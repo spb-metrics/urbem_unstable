@@ -1808,21 +1808,9 @@ sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
         $this->obRCarneMata->setNomBairro         ( $rsGeraCarneCabecalho->getCampo( 'nom_bairro' )             );
         $this->obRCarneMata->setCodDivida         ( $rsGeraCarneCabecalho->getCampo( 'cod_grupo' )              );
 
-/*
-        if ( preg_match( '/LIMPEZA.*/i',$rsGeraCarneCabecalho->getCampo( 'descricao_credito' ) ) ) {
-            $this->obRCarneMata->setTaxaLimpezaAnual  ( $rsGeraCarneCabecalho->getCampo( 'valor' )              );
-        } else {
-            $flImpostoAnualReal = $rsGeraCarneCabecalho->getCampo( 'valor' );
-            $this->obRCarneMata->setImpostoAnualReal  ( $flImpostoAnualReal                                     );
-        }
-        $this->obRCarneMata->setReferencia        ( ""                                                          );
-        $this->obRCarneMata->setNumeroPlanta      ( ""                                                          );
-*/
-
         // capturar creditos
         $this->obRCarneMata->setObservacaoL1 ( $this->obRCarneMata->getObservacaoL1().$rsGeraCarneCabecalho->getCampo( 'descricao_credito').": ".$rsGeraCarneCabecalho->getCampo( 'valor' )."  ");
 
-//            $rsGeraCarneCabecalho->proximo();
 
   //      } //fim do loop de reemitirCarne
         $this->obRCarneMata->setValorAnualReal        ( $flImpostoAnualReal + $this->obRCarneMata->getTaxaLimpezaAnual() );

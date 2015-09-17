@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 28549 $
-* $Name:  $
-* $Author: tonismar $
-* $Date: 2008-03-14 09:16:14 -0300 (Sex, 14 Mar 2008) $
+* $Id: relatorioDemostrativoSaldosContaCorrente.plsql 63554 2015-09-10 16:12:53Z michel $
 *
 * Casos de uso: uc-02.04.24
 */
@@ -55,8 +52,6 @@ DECLARE
     stSql               VARCHAR := '';
 
 BEGIN
-
---SELECT tesouraria.fn_listar_arrecadacao('','') INTO boTabela;
 
 stDataAno := '01/01/' || stExercicio;
 
@@ -369,7 +364,6 @@ stSql := '
                                     BETWEEN TO_DATE(''' || stDtInicial || ''',''dd/mm/yyyy'')
                                        AND  TO_DATE(''' || stDtFinal || '''  ,''dd/mm/yyyy'')
 
-
                         UNION ALL
                         -- ARRECADACAO DEDUTORA ESTORNADA
                             SELECT   ard.cod_arrecadacao
@@ -441,7 +435,6 @@ stSql := '
                                             , digito_verificador_conta_bancaria TEXT                                                        
                                             , desc_conta_bancaria               VARCHAR
                                            )
-                            WHERE tipo_conta = 1
             ) as contas_ctb
                  ON contas_ctb.cod_conta = CPC.cod_conta
                 AND contas_ctb.exercicio = CPC.exercicio

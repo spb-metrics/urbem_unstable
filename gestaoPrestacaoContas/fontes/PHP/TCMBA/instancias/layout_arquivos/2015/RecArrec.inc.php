@@ -53,7 +53,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_receita");
@@ -63,3 +63,8 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_receita");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
+unset($obTTBARecArrec);
+unset($rsRecordSet);
+
+?>

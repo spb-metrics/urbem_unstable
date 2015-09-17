@@ -45,22 +45,25 @@ class TPessoalDeParaTipoCargoTCMBA extends Persistente
     * Método Construtor
     * @access Private
 */
-function TPessoalDeParaTipoCargoTCMBA()
+function __construct()
 {
-    parent::Persistente();
+    parent::__construct();
     $this->setTabela('pessoal.de_para_tipo_cargo_tcmba');
 
     $this->setCampoCod('cod_sub_divisao');
     $this->setComplementoChave('cod_tipo_cargo');
 
-    $this->AddCampo('cod_sub_divisao'   , 'integer', true, '' , true, true);
-    $this->AddCampo('cod_tipo_cargo_tce', 'integer', true, '' , true, true);
+    $this->AddCampo('cod_sub_divisao'    , 'integer', true, '' , true, true);
+    $this->AddCampo('cod_tipo_cargo_tce' , 'integer', true, '' , true, true);
+    $this->AddCampo('cod_tipo_regime_tce', 'integer', true, '' , true, true);
+    
 }
 
  public function montaRecuperaTodos()
     {
         $stSQL  = " SELECT cod_sub_divisao
                          , cod_tipo_cargo_tce
+                         , cod_tipo_regime_tce
                      FROM  pessoal".Sessao::getEntidade().".de_para_tipo_cargo_tcmba  ";
         return $stSQL;
     }

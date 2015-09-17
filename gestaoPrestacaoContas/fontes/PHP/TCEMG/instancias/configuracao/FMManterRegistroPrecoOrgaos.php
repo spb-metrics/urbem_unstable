@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoOrgaos.php 62915 2015-07-08 14:10:35Z michel $
-  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
+  * $Id: FMManterRegistroPrecoOrgaos.php 63427 2015-08-27 17:02:24Z michel $
+  * $Date: 2015-08-27 14:02:24 -0300 (Qui, 27 Ago 2015) $
   * $Author: michel $
-  * $Rev: 62915 $
+  * $Rev: 63427 $
   **/
   
 $obHdnInId = new Hidden;
@@ -45,6 +45,7 @@ $obHdnInId->setValue ( $inId  );
 $obTxtExercicio = new Exercicio();
 $obTxtExercicio->setName('stExercicioOrgao');
 $obTxtExercicio->setId('stExercicioOrgao');
+$obTxtExercicio->obEvento->setOnChange("jQuery('#inHndStExercicioM').val(+this.value);buscaOCMontaOrgaoUnidade('preencheUnidade', '../../../../../../gestaoFinanceira/fontes/PHP/ppa/instancias/montaOrgaoUnidade/OCMontaOrgaoUnidade.php', '', '', '".Sessao::getId()."');");
 
 $obIMontaUnidadeOrcamentaria = new MontaOrgaoUnidade();
 $obIMontaUnidadeOrcamentaria->setRotulo('*Unidade Executora');
@@ -52,6 +53,7 @@ $obIMontaUnidadeOrcamentaria->setValue( $stUnidadeOrcamentaria );
 $obIMontaUnidadeOrcamentaria->setCodOrgao('');
 $obIMontaUnidadeOrcamentaria->setCodUnidade('');
 $obIMontaUnidadeOrcamentaria->setActionPosterior($pgProc);
+$obIMontaUnidadeOrcamentaria->setTarget('oculto');
 $obIMontaUnidadeOrcamentaria->setNull(true);
 
 $obRdoGerenciadorSim = new Radio();
@@ -102,10 +104,17 @@ $obTxtCodigoProcessoAdesao->setName('stCodigoProcessoAdesao');
 $obTxtCodigoProcessoAdesao->setId('stCodigoProcessoAdesao');
 $obTxtCodigoProcessoAdesao->setRotulo('Nro. do Processo de Adesão');
 $obTxtCodigoProcessoAdesao->setTitle('Número do processo de adesão do órgão à Ata de Registro de Preços.');
-$obTxtCodigoProcessoAdesao->setMaxLength(17);
-$obTxtCodigoProcessoAdesao->setMascara('999999999999/9999');
+$obTxtCodigoProcessoAdesao->setMaxLength(12);
 $obTxtCodigoProcessoAdesao->setValue( '' );
-$obTxtCodigoProcessoAdesao->obEvento->setOnChange( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade='+jQuery('#inCodEntidade').val()+'&stCodigoProcessoAdesao='+this.value,'validaNroAdesao');");
+
+$obTxtExercicioProcessoAdesao = new TextBox();
+$obTxtExercicioProcessoAdesao->setName('stExercicioProcessoAdesao');
+$obTxtExercicioProcessoAdesao->setId('stExercicioProcessoAdesao');
+$obTxtExercicioProcessoAdesao->setRotulo('Exercício do Processo de Adesão');
+$obTxtExercicioProcessoAdesao->setMaxLength(4);
+$obTxtExercicioProcessoAdesao->setSize(5);
+$obTxtExercicioProcessoAdesao->setInteiro(true);
+$obTxtExercicioProcessoAdesao->setValue( Sessao::getExercicio() );
 
 $obDtPublicacaoAvisoIntencao = new Data(); 
 $obDtPublicacaoAvisoIntencao->setName('dtPublicacaoAvisoIntencao');

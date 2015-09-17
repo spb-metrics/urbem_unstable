@@ -33,60 +33,66 @@
     * @package URBEM
     * @subpackage
 
-    $Id:$
+    $Id: FTCEMGDespFuncaoSubfuncao.class.php 63314 2015-08-17 13:48:57Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FTCEMGDespFuncaoSubfuncao extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FTCEMGDespFuncaoSubfuncao()
-{
-    parent::Persistente();
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+    
+        $this->setTabela('tcemg.fn_desp_funcao_subfuncao');
+    
+        $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
+        $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
+        $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
+    }
 
-    $this->setTabela('tcemg.fn_desp_funcao_subfuncao');
+    public function montaRecuperaTodos()
+    {
+        $stSql  = "
+              SELECT periodo
+                   , cod_vinculo
+                   , vl_inicial
+                   , vl_atualizada
+                   , vl_empenhado
+                   , vl_liquidado
+                   , vl_anulada
+                   , cod_funcao
+                   , cod_subfuncao
+                   , cod_entidade_relacionada
+                FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
+                                           , '".$this->getDado("cod_entidade")."'
+                                           , '".$this->getDado("data_inicial")."'
+                                           , '".$this->getDado("data_final")."'
+                                           )
+                  AS retorno ( periodo                  INTEGER
+                             , cod_vinculo              VARCHAR
+                             , vl_inicial               NUMERIC
+                             , vl_atualizada            NUMERIC
+                             , vl_empenhado             NUMERIC
+                             , vl_liquidado             NUMERIC
+                             , vl_anulada               NUMERIC
+                             , cod_funcao               VARCHAR
+                             , cod_subfuncao            VARCHAR
+                             , cod_entidade_relacionada INTEGER
+                             );
+        ";
+        return $stSql;
+    }
 
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "
-        SELECT periodo
-             , cod_vinculo
-             , vl_inicial
-             , vl_atualizada
-             , vl_empenhado
-             , vl_liquidado
-             , vl_anulada
-             , cod_funcao
-             , cod_subfuncao
-             , cod_entidade_relacionada
-          FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     , '".$this->getDado("data_inicial")."'
-                                     , '".$this->getDado("data_final")."'
-                                     ) AS retorno (
-                                            periodo                  INTEGER
-                                          , cod_vinculo              VARCHAR
-                                          , vl_inicial               NUMERIC
-                                          , vl_atualizada            NUMERIC
-                                          , vl_empenhado             NUMERIC
-                                          , vl_liquidado             NUMERIC
-                                          , vl_anulada               NUMERIC
-                                          , cod_funcao               VARCHAR
-                                          , cod_subfuncao            VARCHAR
-                                          , cod_entidade_relacionada integer
-                                      ); ";
-
-    return $stSql;
-}
+    /**
+        * Método Destruct
+        * @access Private
+    */
+    public function __destruct() {}
 
 }

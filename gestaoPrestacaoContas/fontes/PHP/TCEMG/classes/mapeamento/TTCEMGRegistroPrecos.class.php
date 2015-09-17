@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGRegistroPrecos.class.php 62832 2015-06-25 16:55:06Z michel $
- * $Revision: 62832 $
+ * $Id: TTCEMGRegistroPrecos.class.php 63501 2015-09-03 17:22:53Z michel $
+ * $Revision: 63501 $
  * $Author: michel $
- * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+ * $Date: 2015-09-03 14:22:53 -0300 (Qui, 03 Set 2015) $
  * 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -49,7 +49,7 @@ class TTCEMGRegistroPrecos extends Persistente
      * Método construtor
      * @access private
      */
-    public function TTCEMGRegistroPrecos()
+    public function __construct()
     {
         parent::Persistente();
 
@@ -89,24 +89,66 @@ class TTCEMGRegistroPrecos extends Persistente
     public function montaRecuperaListaProcesso()
     {
         $stSql = "
-            SELECT cod_entidade
-                 , LPAD(numero_registro_precos::VARCHAR, 12, '0') || '/'|| exercicio AS codigo_registro_precos
-                 , numero_registro_precos
-                 , exercicio
-                 , TO_CHAR(data_abertura_registro_precos,'dd/mm/yyyy') AS data_abertura_registro_precos
-                 , LPAD(numero_processo_licitacao::VARCHAR, 15, '0') || '/' || exercicio_licitacao AS codigo_processo_licitacao 
-                 , CASE WHEN codigo_modalidade_licitacao = 1 THEN 'Concorrência' ELSE 'Pregão' END AS modalidade 
-                 , numero_modalidade
-                 , CASE WHEN interno IS TRUE THEN 'Interno' ELSE 'Externo' END AS tipo_reg_precos
-                 , CASE WHEN interno IS TRUE THEN 'true' ELSE 'false' END AS interno
-                 , ( SELECT nom_cgm FROM sw_cgm WHERE numcgm = numcgm_gerenciador ) AS nomcgm_gerenciador
-                 , numcgm_gerenciador
+            SELECT registro_precos.cod_entidade
+                 , LPAD(registro_precos.numero_registro_precos::VARCHAR, 12, '0') || '/'|| registro_precos.exercicio AS codigo_registro_precos
+                 , registro_precos.numero_registro_precos
+                 , registro_precos.exercicio
+                 , TO_CHAR(registro_precos.data_abertura_registro_precos,'dd/mm/yyyy') AS data_abertura_registro_precos
+                 , LPAD(registro_precos.numero_processo_licitacao::VARCHAR, 15, '0') || '/' || registro_precos.exercicio_licitacao AS codigo_processo_licitacao 
+                 , CASE WHEN registro_precos.codigo_modalidade_licitacao = 1 THEN 'Concorrência' ELSE 'Pregão' END AS modalidade 
+                 , registro_precos.numero_modalidade
+                 , CASE WHEN registro_precos.interno IS TRUE THEN 'Interno' ELSE 'Externo' END AS tipo_reg_precos
+                 , CASE WHEN registro_precos.interno IS TRUE THEN 'true' ELSE 'false' END AS interno
+                 , ( SELECT nom_cgm FROM sw_cgm WHERE numcgm = registro_precos.numcgm_gerenciador ) AS nomcgm_gerenciador
+                 , registro_precos.numcgm_gerenciador
 
               FROM tcemg.registro_precos
 
-             WHERE cod_entidade = ".$this->getDado('cod_entidade');
+         LEFT JOIN tcemg.registro_precos_licitacao
+                ON registro_precos_licitacao.cod_entidade = registro_precos.cod_entidade
+               AND registro_precos_licitacao.numero_registro_precos = registro_precos.numero_registro_precos
+               AND registro_precos_licitacao.exercicio = registro_precos.exercicio
+               AND registro_precos_licitacao.interno = registro_precos.interno
+               AND registro_precos_licitacao.numcgm_gerenciador = registro_precos.numcgm_gerenciador
+
+         LEFT JOIN tcemg.empenho_registro_precos
+                ON empenho_registro_precos.cod_entidade = registro_precos.cod_entidade
+               AND empenho_registro_precos.numero_registro_precos = registro_precos.numero_registro_precos
+               AND empenho_registro_precos.exercicio = registro_precos.exercicio
+               AND empenho_registro_precos.interno = registro_precos.interno
+               AND empenho_registro_precos.numcgm_gerenciador = registro_precos.numcgm_gerenciador
+
+             WHERE registro_precos.cod_entidade = ".$this->getDado('cod_entidade');
         if($this->getDado('exercicio')!=NULL)
-            $stSql .= " AND exercicio='".$this->getDado('exercicio')."'";
+            $stSql .= " AND registro_precos.exercicio='".$this->getDado('exercicio')."'";
+        if($this->getDado('stCodigoProcesso')!=NULL)
+            $stSql .= " AND registro_precos.numero_registro_precos=".$this->getDado('stCodigoProcesso');
+        if($this->getDado('inCodLicitacao')!=NULL)
+            $stSql .= " AND registro_precos_licitacao.cod_licitacao||'/'||registro_precos_licitacao.exercicio_licitacao = '".$this->getDado('inCodLicitacao')."'";
+        if($this->getDado('inCodModalidade')!=NULL)
+            $stSql .= " AND registro_precos_licitacao.cod_modalidade = ".$this->getDado('inCodModalidade');
+        if($this->getDado('stExercicioEmpenho')!=NULL && $this->getDado('inNumEmpenho')!=NULL){
+            $stSql .= " AND empenho_registro_precos.cod_entidade_empenho = ".$this->getDado('cod_entidade');
+            $stSql .= " AND empenho_registro_precos.cod_empenho = ".$this->getDado('inNumEmpenho');
+            $stSql .= " AND empenho_registro_precos.exercicio_empenho = '".$this->getDado('stExercicioEmpenho')."'";
+        }
+
+        $stSql .= "
+          GROUP BY registro_precos.cod_entidade
+                 , codigo_registro_precos
+                 , registro_precos.numero_registro_precos
+                 , registro_precos.exercicio
+                 , data_abertura_registro_precos
+                 , codigo_processo_licitacao 
+                 , modalidade 
+                 , registro_precos.numero_modalidade
+                 , registro_precos.interno
+                 , nomcgm_gerenciador
+                 , registro_precos.numcgm_gerenciador
+
+          ORDER BY registro_precos.exercicio
+                 , registro_precos.cod_entidade
+                 , codigo_registro_precos ";
 
         return $stSql;
     }

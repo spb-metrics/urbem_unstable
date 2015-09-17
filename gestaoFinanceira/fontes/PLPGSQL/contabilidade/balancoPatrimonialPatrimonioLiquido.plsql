@@ -26,7 +26,7 @@
  * URBEM Soluções de Gestão Pública Ltda
  * www.urbem.cnm.org.br
  *
- $Id: balancoPatrimonialPatrimonioLiquido.plsql 62920 2015-07-08 16:48:00Z evandro $
+ $Id: balancoPatrimonialPatrimonioLiquido.plsql 63434 2015-08-27 19:45:12Z lisiane $
  *
  * Casos de uso: uc-02.02.11
  */
@@ -186,14 +186,11 @@ BEGIN
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
              , nivel
              , CAST(nom_conta AS VARCHAR) as nom_conta
-             , CASE WHEN SUM(valores[1] * multiplicador) < 0.00 THEN SUM(valores[1] * multiplicador * -1)
-                    ELSE SUM(valores[1] * multiplicador)
-               END AS vl_saldo_anterior
+             , SUM(valores[1] * multiplicador) AS vl_saldo_anterior
              , SUM(valores[2] * multiplicador * -1) as vl_saldo_debitos
              , SUM(valores[3] * multiplicador * -1) as vl_saldo_creditos
-             , CASE WHEN SUM(valores[4] * multiplicador) < 0.00 THEN SUM(valores[4] * multiplicador * -1)
-                    ELSE SUM(valores[4] * multiplicador)
-               END AS vl_saldo_atual
+             , SUM(valores[4] * multiplicador) AS vl_saldo_atual
+          
           FROM (
             
             --CONTA PATRIMÔNIO LIQUIDO
@@ -565,7 +562,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.1.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -574,7 +571,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.3.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -583,7 +580,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.4.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -592,7 +589,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.5.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -601,7 +598,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -610,7 +607,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -619,7 +616,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.02.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -628,7 +625,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.1.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -637,7 +634,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.3.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -646,7 +643,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.4.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -655,7 +652,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.5.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -664,7 +661,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -673,7 +670,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -682,7 +679,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -691,7 +688,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.5.03.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -700,7 +697,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.1.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -709,7 +706,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.3.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -718,7 +715,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.4.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -727,7 +724,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.5.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -736,7 +733,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -745,7 +742,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -754,7 +751,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -763,7 +760,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.5.04.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -772,7 +769,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.05.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -781,7 +778,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.05.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -790,7 +787,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.05.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -799,7 +796,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.5.05.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -808,7 +805,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.06.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -817,7 +814,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.06.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -826,7 +823,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.06.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -835,7 +832,7 @@ END IF;
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.5.06.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
             
             UNION ALL
 
@@ -1087,7 +1084,7 @@ IF (boUpdateRelatorio = true) THEN
 END IF;
 
 stSql := 'SELECT * FROM tmp_relatorio';
-    
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;

@@ -32,7 +32,7 @@
 
     Caso de uso: uc-03.01.04
 
-    $Id: TPatrimonioGrupo.class.php 61653 2015-02-20 19:35:15Z arthur $
+    $Id: TPatrimonioGrupo.class.php 63222 2015-08-05 14:25:57Z arthur $
 
   */
 
@@ -45,16 +45,16 @@ class TPatrimonioGrupo extends Persistente
      * Método Construtor
      * @access Private
      */
-    public function TPatrimonioGrupo()
+    public function __construct()
     {
-        parent::Persistente();
+        parent::__construct();
         $this->setTabela('patrimonio.grupo');
         $this->setCampoCod('cod_grupo');
         $this->setComplementoChave('cod_natureza');
-        $this->AddCampo('cod_grupo','integer',true,'',true,false);
-        $this->AddCampo('cod_natureza','integer',true,'',true,"TPatrimonioNatureza");
-        $this->AddCampo('nom_grupo','varchar',true,'60',false,false);
-        $this->AddCampo('depreciacao','numeric',true,'4.2',false,false);
+        $this->AddCampo('cod_grupo'    ,'integer' ,true ,''    ,true  ,false);
+        $this->AddCampo('cod_natureza' ,'integer' ,true ,''    ,true  ,"TPatrimonioNatureza");
+        $this->AddCampo('nom_grupo'    ,'varchar' ,true ,'60'  ,false ,false);
+        $this->AddCampo('depreciacao'  ,'numeric' ,true ,'4.2' ,false ,false);
 
     }
 
@@ -269,6 +269,14 @@ class TPatrimonioGrupo extends Persistente
         
         if ($this->getDado('cod_plano_grupo')) {
             $stSql .= " AND grupo_plano_depreciacao.cod_plano = ".$this->getDado('cod_plano_grupo');
+        }
+        
+        if ($this->getDado('cod_grupo')) {
+            $stSql.= " AND grupo.cod_grupo = ".$this->getDado('cod_grupo');
+        }
+
+        if ($this->getDado('cod_natureza')) {
+            $stSql.= " AND grupo.cod_natureza = ".$this->getDado('cod_natureza');
         }
         
         return $stSql;

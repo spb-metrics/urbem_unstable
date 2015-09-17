@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63023 $
+    $Revision: 63482 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -92,22 +92,45 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 function montaRecuperaDadosTribunal()
 {
     $stSql .= "
-       SELECT pc.exercicio AS dt_ano_criacao
+       SELECT pc.exercicio::VARCHAR||LPAD(".$this->getDado('inMes')."::VARCHAR,2,'0') AS competencia
+            , pc.exercicio AS dt_ano_criacao
+            , 1 AS tipo_registro
+            , '".$this->getDado('inCodUnidadeGestora')."' AS unidade_gestora
+            , '' AS reservado_tcm
             , pc.cod_estrutural AS cd_conta_contabil
-            , CASE WHEN pb.cod_banco IS NOT NULL
-                   THEN 1 /*Banco*/
-                   WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '1%'
-                   THEN 5 /*Ativo*/
-                   WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '2%'
-                   THEN 6 /*Passivo*/
-                   ELSE 9 /*Outras Contas*/
-               END AS tp_conta_contabil
+            , CASE WHEN pb.cod_banco IS NULL
+                      THEN
+                          CASE WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '1%'
+                                    THEN
+                                        CASE WHEN pc.cod_estrutural = '1.1.1.1.1.02.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.03.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.04.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.05.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.06.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.19.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.20.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.1.1.1.50.00.00.00.00' THEN 1
+                                             WHEN pc.cod_estrutural = '1.1.4.0.0.00.00.00.00.00' THEN 1
+                                          ELSE
+                                              5
+                                        END
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '5%' THEN 2
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '6%' THEN 3
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '8%' THEN 4
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '2%' THEN 6
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '3%' THEN 7
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '4%' THEN 8
+                               WHEN SUBSTR(REPLACE(pc.cod_estrutural,'.',''),1,14) LIKE '7%' THEN 0
+                          END
+                    ELSE
+                        1
+              END AS tp_conta_contabil
             , row_number() over (order by pc.cod_estrutural ) AS nu_sequencial_tc
             , CASE WHEN pb.cod_banco IS NOT NULL
                    THEN pr.cod_recurso
                    ELSE 0
                END AS tcd_fonte_gestor
-            , pc.nom_conta AS nm_conta_contabil
+            , remove_acentos(pc.nom_conta) AS nm_conta_contabil
             , 'S' AS st_conta_ativa
             , CASE pc.natureza_saldo
                    WHEN 'devedor' THEN 'D'
@@ -151,9 +174,7 @@ function montaRecuperaDadosTribunal()
         WHERE pc.exercicio = '".$this->getDado('exercicio')."'
      ORDER BY pc.exercicio
             , pc.cod_estrutural
-         
     ";
-
     return $stSql;
 }
 

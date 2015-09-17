@@ -31,7 +31,7 @@
  * @package URBEM
  * @subpackage Regra
 
- $Id: PRManterLicenca.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRManterLicenca.php 63390 2015-08-24 19:17:05Z arthur $
 
  * Casos de uso: uc-05.02.12
  */
@@ -50,7 +50,6 @@ include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 $link = Sessao::read( "link" );
 $stLink = "&pg=".$link["pg"]."&pos=".$link["pos"]."&stAcao=".$request->get('stAcao');
 
-//Define o nome dos arquivos PHP
 //Define o nome dos arquivos PHP
 $stPrograma      = "ManterLicenca";
 $pgFilt          = "FL".$stPrograma.".php";
@@ -143,7 +142,6 @@ switch ($request->get('stAcao')) {
                 foreach ($arAtividadeSessao as $arAtividade) {
                     $dtAtividadeInicio = dt2int($arAtividade["dt_inicio"]);
                     if ($arAtividade["principal"] == 't') {
-                        #echo 'TEM PRINCIPAL';
                         $boTemPrincipal = true;
                     }
                     if ($dtDataInicioComp < $dtAtividadeInicio) {
@@ -158,7 +156,6 @@ switch ($request->get('stAcao')) {
                     }
                 }//fim do FOR EACH
                 if (!$boTemPrincipal) {
-                    #echo 'SEM';
                     $obErro->setDescricao ("Para obter licença, é preciso que a atividade principal seja relacionada.");
                 }
             }
@@ -172,22 +169,19 @@ switch ($request->get('stAcao')) {
             $obTModeloDocumento = new TAdministracaoModeloDocumento;
             $obTModeloDocumento->recuperaRelacionamento( $rsDocumentos, $stFiltro );
 
-            //sistemaLegado::mostravar( $rsDocumentos ); exit;
-
             while ( !$rsDocumentos->Eof() ) {
                 $inCodTipoDocAtual 	= $rsDocumentos->getCampo( "cod_tipo_documento" );
                 $inCodDocAtual		= $rsDocumentos->getCampo( "cod_documento" );
-            $stNomeArquivo      	= $rsDocumentos->getCampo( "nome_arquivo_agt" );
-            $stNomeDocumento    	= $rsDocumentos->getCampo( 'nome_documento' );
+                $stNomeArquivo      	= $rsDocumentos->getCampo( "nome_arquivo_agt" );
+                $stNomeDocumento    	= $rsDocumentos->getCampo( 'nome_documento' );
                 $rsDocumentos->proximo();
             }
 
-        $obRCEMLicencaAtividade->setAtividades( Sessao::read( "atividades" ));
-        $obErro 		   = $obRCEMLicencaAtividade->concederLicenca();
+            $obRCEMLicencaAtividade->setAtividades( Sessao::read( "atividades" ));
+            $obErro 		   = $obRCEMLicencaAtividade->concederLicenca();
             $codigoLicencaInclusao = $obRCEMLicencaAtividade->getCodigoLicenca();
 
             if ( !$obErro->ocorreu() ) {
-                #echo '<h2>LICENCA DOCUMENTO</h2>';
                 $obRCEMConfiguracao = new RCEMConfiguracao;
                 $obRCEMConfiguracao->setAnoExercicio( Sessao::getExercicio() );
                 $obErro = $obRCEMConfiguracao->consultarConfiguracao();
@@ -204,6 +198,7 @@ switch ($request->get('stAcao')) {
                     }
 
                     $obErro = $obTCEMLicencaDocumento->buscaUltimoNumeroAlvara( $rsEmissao, $stFiltro );
+                    
                     if ( !$obErro->ocorreu() ) {
                         $inNumEmissao = ( $rsEmissao->getCampo('valor') + 1 );
                         if ( !$exercicio_divida )
@@ -221,9 +216,7 @@ switch ($request->get('stAcao')) {
 
         if ( !$obErro->ocorreu() ) {
 
-            if ($boEmissaoDocumento) { //boEmissaoDocumento
-
-                    #$stCaminho = CAM_GT_CEM_INSTANCIAS."emissao/LSManterEmissao.php";
+            if ($boEmissaoDocumento) {
                     $stCaminho = CAM_GT_CEM_INSTANCIAS."emissao/FMManterEmissao.php";
 
                     $stInscricoes = $stParametros = '';
@@ -239,13 +232,11 @@ switch ($request->get('stAcao')) {
                     $stParametros .= "&stNomeDocumento=".$stNomeDocumento;
                     $stParametros .= "&inInscricaoEconomica=".$request->get("inInscricaoEconomica");
                     $stParametros .= "&stCtrl=Download";
-
                     sistemaLegado::alertaAviso( $stCaminho."?".Sessao::getId().$stParametros."&stAcao=incluir","Concessão de Licença", "incluir","aviso", Sessao::getId(), "../");
                 } else {
                     sistemaLegado::alertaAviso( $pgFormAtividade."?stAcao=incAtiv","Código da Licença: ".$codigoLicencaInclusao,"incluir","aviso", Sessao::getId(), "../" );
                 }
             } else {
-                #echo '<br><b>ERRO</b>';
                 $obErro->setDescricao("Código da Licença já em uso");
                 sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()." : ".$codigoLicencaInclusao),"n_incluir","erro");
         }
@@ -340,9 +331,6 @@ switch ($request->get('stAcao')) {
         }
 
         if ( !$obErro->ocorreu() ) {
-            #echo '<br>NO PR:<br>CODIGO LICENCA ATUAL: </b>'.$codigoLicencaInclusao;
-            #echo ' '.$obRCEMLicencaEspecial->getCodigoLicenca().'x<br>';
-
             $obErro = $obRCEMLicencaEspecial->concederLicenca( );
 
             if ( $request->get("hdnNumeroLicenca") == 1 ) {

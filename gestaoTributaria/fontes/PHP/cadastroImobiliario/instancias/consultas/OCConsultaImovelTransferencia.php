@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCConsultaImovelTransferencia.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConsultaImovelTransferencia.php 63503 2015-09-03 18:25:17Z jean $
 
     * Casos de uso: uc-05.01.18
 */
@@ -232,7 +232,7 @@ switch ($stCtrl) {
 
         $stFiltro = " WHERE timestamp <= '".$rsProrprietarios->getCampo("timestamp")."' AND inscricao_municipal = ".$obRCIMTransferencia->getInscricaoMunicipal()." ORDER BY timestamp DESC LIMIT 1";
         $obTCIMExProprietario = new TCIMExProprietario;
-        $obTCIMExProprietario->recuperaTodos( &$rsListaTimestampEx, $stFiltro );
+        $obTCIMExProprietario->recuperaTodos( $rsListaTimestampEx, $stFiltro );
         unset( $obTCIMExProprietario );
         $obRCIMProprietario->setTimestamp( $rsListaTimestampEx->getCampo("timestamp") );
         $obRCIMProprietario->listarExProprietarios( $rsExProprietarios );

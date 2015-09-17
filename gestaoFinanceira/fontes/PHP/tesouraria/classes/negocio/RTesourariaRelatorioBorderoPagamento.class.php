@@ -1053,7 +1053,7 @@ function geraRecordSetBorderoPagamento2015(&$arRecordSet)
     $obRContabilidadePlanoBanco->setCodPlano($this->arDadosBordero['inCodConta'] );
     $obRContabilidadePlanoBanco->consultar( $boTransacao );
 
-    switch ($this->arDadosBordero['stTipoTransacao']) {
+    switch ($this->arDadosPagamento[0]['stTipoTransacaoCredor']) {
         case "2":
                 $stTipoTransacao = "Transferência Conta Corrente";
             break;
@@ -1072,7 +1072,7 @@ function geraRecordSetBorderoPagamento2015(&$arRecordSet)
     }
 
     $arDadosPagamento['dados_bordero'][0]['numero_bordero'] = str_pad($this->arDadosBordero['inNumBordero'], 3,"0",STR_PAD_LEFT). " / " . $this->arDadosBordero['stExercicio'];
-    $arDadosPagamento['dados_bordero'][0]['data_bordero']   = date("d/m/Y");
+    $arDadosPagamento['dados_bordero'][0]['data_bordero']   = $this->arDadosBordero['stDtBoletim'];
     $arDadosPagamento['dados_bordero'][0]['entidade']       = $rsEntidade->getCampo("nom_cgm");
     $arDadosPagamento['dados_bordero'][0]['tipo_bordero']   = $stTipoTransacao;
     $arDadosPagamento['dados_bordero'][0]['conta_pagadora'] = $this->arDadosBordero['inCodConta'] . " - " . $this->arDadosBordero['stConta'];

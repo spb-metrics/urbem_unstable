@@ -52,16 +52,6 @@ include_once ( CAM_GRH_CON_NEGOCIO   ."RConcursoConcurso.class.php"		           
 include_once ( CAM_GA_ADM_NEGOCIO    ."RCadastroDinamico.class.php"                                    );
 include_once ( CAM_GRH_CON_MAPEAMENTO."TConcursoAtributoCandidatoValor.class.php"                      );
 
-/**
-    * Classe de regra de negócio Candidato
-    * Data de Criação: 30/03/2005
-
-    * @author Analista: Leandro Oliveira
-    * @author Desenvolvedor: Rafael Almeida
-
-    * @package URBEM
-    * @subpackage Regra
-*/
 class RConcursoCandidato extends RCGMPessoaFisica
 {
 /**
@@ -370,8 +360,10 @@ function listarCandidato(&$rsRecordSet, $boTransacao = "")
 */
 function listarCandidatoPorEdital(&$rsRecordSet,$stFiltro = "",$stOrder = "", $boTransacao = "")
 {
-    if( $this->obRConcursoConcurso->getCodEdital() )
+    if( $this->obRConcursoConcurso->getCodEdital() ) {
         $stFiltro .= "  AND ccc.cod_edital = ".$this->obRConcursoConcurso->getCodEdital();
+    }
+    
     $stOrderAux = " ORDER BY cc.reclassificado,t.media DESC ".$stOrder;
     $stOrder = $stOrderAux;
     $obErro = $this->obTConcursoCandidato->recuperaCandidatoConcurso( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
@@ -437,4 +429,5 @@ function recuperaTodosMunicipio(&$rsResultado , $stFiltro = "", $boTransacao = "
 }
 
 }
+
 ?>

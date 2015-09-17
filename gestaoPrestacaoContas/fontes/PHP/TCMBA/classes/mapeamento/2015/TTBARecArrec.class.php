@@ -50,7 +50,7 @@ class TTBARecArrec extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBARecArrec()
+function __construct()
 {
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
@@ -76,7 +76,7 @@ function montaRecuperaDadosTribunal()
                      , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                      , REPLACE(conta_receita.cod_estrutural,'.','') AS item_receita
                      , '".$this->getDado('exercicio')."'||'".$this->getDado('mes')."' AS competencia
-                     , conta_corrente AS conta_contabil
+                     , configuracao_lancamento_receita.cod_conta AS conta_contabil
                      , COALESCE(SUM(arrecadacao_receita.vl_arrecadacao),0.00) AS vl_receita
                      , TO_CHAR(arrecadacao_receita.timestamp_arrecadacao,'dd/mm/yyyy') AS dt_receita
 
@@ -85,6 +85,14 @@ function montaRecuperaDadosTribunal()
           INNER JOIN orcamento.conta_receita
                   ON conta_receita.cod_conta = receita.cod_conta
                  AND conta_receita.exercicio = receita.exercicio
+
+          INNER JOIN contabilidade.lancamento_receita
+                  ON lancamento_receita.cod_receita = receita.cod_receita
+                 AND lancamento_receita.exercicio = receita.exercicio
+
+          INNER JOIN contabilidade.configuracao_lancamento_receita
+                  ON configuracao_lancamento_receita.exercicio = conta_receita.exercicio
+                 AND configuracao_lancamento_receita.cod_conta_receita = conta_receita.cod_conta
 
           INNER JOIN tesouraria.arrecadacao_receita
                   ON arrecadacao_receita.cod_receita = receita.cod_receita
@@ -107,13 +115,13 @@ function montaRecuperaDadosTribunal()
                         BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
                  AND receita.exercicio = '".$this->getDado('exercicio')."'
                  AND receita.cod_entidade IN (".$this->getDado('entidades').")
+                 AND lancamento_receita.estorno <> 't'
 
               GROUP BY tipo_registro, unidade_gestora, item_receita, competencia, conta_contabil, dt_receita
 
               ORDER BY unidade_gestora, item_receita, conta_contabil, dt_receita
 
             ";
-            
     return $stSql;
 }
 

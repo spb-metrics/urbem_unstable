@@ -50,8 +50,8 @@ class TOrcamentoPAOPPAAcao extends Persistente
         parent::Persistente();
 
         $this->setTabela          ('orcamento.pao_ppa_acao');
-        $this->setCampoCod        ('');
-        $this->setComplementoChave('exercicio, num_pao');
+        $this->setCampoCod        ('num_pao');
+        $this->setComplementoChave('exercicio');
 
         $this->AddCampo('exercicio'  ,'varchar', true, '4', true, false);
         $this->AddCampo('num_pao'    ,'integer', true, '' , true, false);

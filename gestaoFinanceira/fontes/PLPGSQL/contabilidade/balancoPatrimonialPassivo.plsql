@@ -46,6 +46,14 @@ DECLARE
     arRetorno           NUMERIC[];
 
 BEGIN
+    CREATE TEMPORARY TABLE tmp_passivo_financeiro (
+         cod_estrutural  varchar
+       , valores         numeric[] 
+    );
+    CREATE TEMPORARY TABLE tmp_passivo_permanente (
+         cod_estrutural  varchar
+       , valores         numeric[] 
+    );
 
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
@@ -179,11 +187,60 @@ BEGIN
         WHERE
              ' || stSqlComplemento || '
     ';
+
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
 
-    stSql := '
+ --ATIVO FINANCEIRO
+    stSql := ' Select *
+                 from contabilidade.plano_conta
+                where exercicio = ' || quote_literal(stExercicio) || '
+                  and cod_estrutural like ''2%''
+                  and escrituracao = ''analitica''
+                  and indicador_superavit = ''financeiro''
+             ';
+    FOR reRegistro IN EXECUTE stSql
+    LOOP
+        INSERT INTO tmp_passivo_financeiro VALUES ( reRegistro.cod_estrutural
+                                                  , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
+                                              );
+    END LOOP;
+    
+    --ATIVO PERMANENTE
+    stSql := ' Select *
+                 from contabilidade.plano_conta
+                where exercicio = ' || quote_literal(stExercicio) || '
+                  and cod_estrutural like ''2%''
+                  and escrituracao = ''analitica''
+                  and indicador_superavit = ''permanente''
+             ';
+    FOR reRegistro IN EXECUTE stSql
+    LOOP
+        INSERT INTO tmp_passivo_permanente VALUES ( reRegistro.cod_estrutural
+                                                  , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
+                                              );
+    END LOOP;
+    
+    stSql := 'CREATE TEMPORARY TABLE tmp_soma_passivo_financeiro AS
+                SELECT SUM(valores[1]) as vl_saldo_anterior
+                     , SUM(valores[2]) as vl_saldo_debitos
+                     , SUM(valores[3]) as vl_saldo_creditos
+                     , SUM(valores[4]) as vl_saldo_atual
+                  FROM tmp_passivo_financeiro
+             ';
+    EXECUTE stSql;
+    
+     stSql := 'CREATE TEMPORARY TABLE tmp_soma_passivo_permanente AS
+                SELECT SUM(valores[1]) as vl_saldo_anterior
+                     , SUM(valores[2]) as vl_saldo_debitos
+                     , SUM(valores[3]) as vl_saldo_creditos
+                     , SUM(valores[4]) as vl_saldo_atual
+                  FROM tmp_passivo_permanente
+             ';
+    EXECUTE stSql;
+    
+    stSql := ' CREATE TEMPORARY TABLE tmp_balanco_patrimonial_passivo AS
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
              , nivel
              , CAST(nom_conta AS VARCHAR) as nom_conta
@@ -509,11 +566,32 @@ BEGIN
              , nivel
              , nom_conta
     ';
+    EXECUTE stSql;
+    
+    INSERT INTO tmp_balanco_patrimonial_passivo  SELECT '2.0.0.0.0.00.00' 
+                                                    , 2 
+                                                    , 'Permanente Financeiro' 
+                                                    , vl_saldo_anterior *-1
+                                                    , vl_saldo_debitos *-1
+                                                    , vl_saldo_creditos *-1
+                                                    , vl_saldo_atual *-1
+                                                 FROM tmp_soma_passivo_financeiro ;
 
+    INSERT INTO tmp_balanco_patrimonial_passivo  SELECT '2.0.0.0.0.00.01' 
+                                                    , 2 
+                                                    , 'Permanente Permanente' 
+                                                    , vl_saldo_anterior *-1
+                                                    , vl_saldo_debitos *-1
+                                                    , vl_saldo_creditos *-1
+                                                    , vl_saldo_atual *-1
+                                                 FROM tmp_soma_passivo_permanente ;
+   
+    stSql := ' SELECT * FROM tmp_balanco_patrimonial_passivo ';
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN NEXT reRegistro;
     END LOOP;
+
 
     DROP INDEX unq_totaliza;
     DROP INDEX unq_totaliza_debito;
@@ -526,6 +604,11 @@ BEGIN
     DROP TABLE tmp_credito;
     DROP TABLE tmp_totaliza_debito;
     DROP TABLE tmp_totaliza_credito;
+    DROP TABLE tmp_passivo_financeiro;
+    DROP TABLE tmp_passivo_permanente;
+    DROP TABLE tmp_soma_passivo_financeiro;
+    DROP TABLE tmp_soma_passivo_permanente;
+    DROP TABLE tmp_balanco_patrimonial_passivo;
 
     RETURN;
 END;

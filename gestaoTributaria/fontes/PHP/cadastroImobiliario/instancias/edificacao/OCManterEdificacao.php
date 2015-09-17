@@ -34,17 +34,9 @@
 
     * @ignore
 
-    * $Id: OCManterEdificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterEdificacao.php 63228 2015-08-05 18:49:28Z arthur $
 
     * Casos de uso: uc-05.01.11
-*/
-
-/*
-$Log$
-Revision 1.14  2006/09/18 10:30:30  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -55,7 +47,7 @@ include_once ( CAM_GT_CIM_NEGOCIO."RCIMUnidadeDependente.class.php" );
 include_once ( CAM_GT_CIM_COMPONENTES."MontaLocalizacao.class.php" );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMCondominio.class.php" );
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 $obMontaLocalizacao = new MontaLocalizacao;
 $obMontaLocalizacao->setCadastroLocalizacao( false );
@@ -97,7 +89,6 @@ switch ($_REQUEST ["stCtrl"]) {
         SistemaLegado::executaFrameOculto( $stJs );
     break;
     case "calculaAreaTotal":
-        //mostravar( $_REQUEST );
         $flAreaUnidade         = str_replace( ".", "" , $_REQUEST['flAreaUnidade']        );
         $flAreaUnidade         = str_replace( ",", ".", $flAreaUnidade                    );
         $flAreaTotalOriginal   = str_replace( ".", "" , $_REQUEST['hdnAreaTotalOriginal'] );
@@ -497,24 +488,17 @@ switch ($_REQUEST ["stCtrl"]) {
 
    case "visualizarProcesso":
         $obRCIMEdificacao     = new RCIMEdificacao;
-
-        $arChaveAtributoEdificacaoProcesso =  array("cod_tipo" => $_REQUEST["cod_tipo"], "cod_construcao" => $_REQUEST["cod_construcao"],"timestamp" => "'$_REQUEST[timestamp]'", "cod_processo" => $_REQUEST["cod_processo"] );
+        $arChaveAtributoEdificacaoProcesso =  array("cod_tipo" => $request->get('cod_tipo'), "cod_construcao" => $request->get('cod_construcao'), "cod_processo" => $request->get('cod_processo') );
+        
         $obRCIMEdificacao->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoEdificacaoProcesso );
         $obRCIMEdificacao->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributosEdificacaoProcesso );
 
         $obLblProcesso = new Label;
         $obLblProcesso->setRotulo    ( "Processo" );
-        $obLblProcesso->setValue     ( str_pad($_REQUEST["cod_processo"],5,"0",STR_PAD_LEFT) . "/" . $_REQUEST["ano_exercicio"]  );
-
-        $obMontaAtributosEdificacaoProcesso = new MontaAtributos;
-        $obMontaAtributosEdificacaoProcesso->setTitulo     ( "Atributos"        );
-        $obMontaAtributosEdificacaoProcesso->setName       ( "Atributo_"  );
-        $obMontaAtributosEdificacaoProcesso->setLabel       ( true  );
-        $obMontaAtributosEdificacaoProcesso->setRecordSet  ( $rsAtributosEdificacaoProcesso );
+        $obLblProcesso->setValue     ( str_pad($request->get('cod_processo'),5,"0",STR_PAD_LEFT) . "/" . $request->get('ano_exercicio')  );
 
         $obFormularioProcesso = new Formulario;
         $obFormularioProcesso->addComponente( $obLblProcesso  );
-        $obMontaAtributosEdificacaoProcesso->geraFormulario ( $obFormularioProcesso );
         $obFormularioProcesso->montaInnerHTML();
         $stHtml = $obFormularioProcesso->getHTML();
 
@@ -524,5 +508,7 @@ switch ($_REQUEST ["stCtrl"]) {
     break;
 
 }
+
 SistemaLegado::LiberaFrames();
+
 ?>

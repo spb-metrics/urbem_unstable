@@ -34,386 +34,291 @@
 * Casos de uso: uc-02.01.31
 */
 
-CREATE OR REPLACE FUNCTION orcamento.fn_verifica_exercicio(VARCHAR) RETURNS INTEGER AS '
+CREATE OR REPLACE FUNCTION orcamento.fn_verifica_exercicio(VARCHAR) RETURNS INTEGER AS $$
 DECLARE
     stExercicio                ALIAS FOR $1;
 
     stProximoExercicio         INTEGER;
     stExercicioExiste          INTEGER := 0;
 BEGIN
+    SELECT to_number(stExercicio,'9999') + 1 INTO stProximoExercicio;
 
-SELECT to_number(stExercicio,''99999'') + 1 INTO stProximoExercicio;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM empenho.historico
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        empenho.historico
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM empenho.permissao_autorizacao
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        empenho.permissao_autorizacao
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.historico_contabil
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.historico_contabil
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.posicao_plano
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.posicao_plano
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.plano_conta
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.plano_conta
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.plano_analitica
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.plano_analitica
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.desdobramento_receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.desdobramento_receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.classificacao_contabil
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.classificacao_contabil
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.plano_recurso
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.plano_recurso
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.sistema_contabil
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.sistema_contabil
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.plano_banco
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.plano_banco
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM contabilidade.tipo_transferencia
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        contabilidade.tipo_transferencia
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.posicao_receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.posicao_receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.classificacao_receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.classificacao_receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.conta_receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.conta_receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.posicao_despesa
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.posicao_despesa
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.classificacao_despesa
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.classificacao_despesa
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.conta_despesa
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.conta_despesa
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.previsao_receita
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.previsao_receita
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.despesa
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.despesa
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.previsao_despesa
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.previsao_despesa
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
+    IF (stExercicioExiste<stProximoExercicio) THEN
+        SELECT exercicio
+          INTO stExercicioExiste
+          FROM orcamento.previsao_orcamentaria
+         WHERE exercicio = stProximoExercicio::varchar
+         LIMIT 1;
+    END IF;
 
-IF (stExercicioExiste<stProximoExercicio) THEN
-    SELECT
-        exercicio
-    INTO
-        stExercicioExiste
-    FROM
-        orcamento.previsao_orcamentaria
-    WHERE
-        exercicio = stProximoExercicio::varchar
-    LIMIT 1;
-END IF;
+    IF(stExercicioExiste IS NULL) THEN
+        stExercicioExiste := 0;
+    END IF;
 
-IF(stExercicioExiste IS NULL) THEN
-    stExercicioExiste := 0;
-END IF;
-
-RETURN stExercicioExiste;
-
+    RETURN stExercicioExiste;
 END;
-'LANGUAGE 'plpgsql';
-
+$$ LANGUAGE 'plpgsql';

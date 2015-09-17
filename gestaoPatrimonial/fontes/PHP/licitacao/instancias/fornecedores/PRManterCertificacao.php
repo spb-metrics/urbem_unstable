@@ -33,16 +33,17 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: PRManterCertificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterCertificacao.php 63432 2015-08-27 19:31:41Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php"   );
-include_once( TLIC."TLicitacaoParticipanteCertificacao.class.php" );
-include_once( TLIC."TLicitacaoCertificacaoDocumentos.class.php"   );
-include_once( TLIC."TLicitacaoDocumentoAtributoValor.class.php"   );
-include_once( TLIC."TLicitacaoDocumentosAtributos.class.php"      );
+include_once  CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" ;
+include_once TLIC."TLicitacaoParticipanteCertificacao.class.php";
+include_once TLIC."TLicitacaoCertificacaoDocumentos.class.php";
+include_once TLIC."TLicitacaoDocumentoAtributoValor.class.php";
+include_once TLIC."TLicitacaoDocumentosAtributos.class.php";
+include_once TLIC."TLicitacaoParticipanteCertificacaoLicitacao.class.php";      
 
 $stPrograma = "ManterCertificacao";
 $pgFilt       = "FL".$stPrograma.".php";
@@ -53,56 +54,70 @@ $pgOcul       = "OC".$stPrograma.".php";
 $pgJS         = "JS".$stPrograma.".js";
 $pgGera       = "OCGeraCertificadoFornecedor.php";
 
+//MANTEM O FILTRO E A PAGINACAO
+$stLink = Sessao::read('stLink');
 $stAcao = $request->get('stAcao');
-
-Sessao::setTrataExcecao( true );
 
 $obRCadastroDinamico = new RCadastroDinamico();
 $obRCadastroDinamico->setPersistenteValores  (  new TLicitacaoDocumentoAtributoValor );
 $obRCadastroDinamico->setCodCadastro( 1 );
 $obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributos );
 
+$obErro = new Erro();
+$boFlagTransacao = false;
+
+$obTransacao = new Transacao();
+$obTransacao->begin();
+$boTransacao = $obTransacao->getTransacao();
+
+$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+
 $obTLicitacaoParticipanteCertificacao = new TLicitacaoParticipanteCertificacao();
 $obTLicitacaoCertificacaoDocumentos   = new TLicitacaoCertificacaoDocumentos();
 $obTLicitacaoDocumentoAtributoValor   = new TLicitacaoDocumentoAtributoValor();
 $obTLicitacaoDocumentosAtributos      = new TLicitacaoDocumentosAtributos();
-
-Sessao::getTransacao()->setMapeamento( $obTLicitacaoParticipanteCertificacao );
-Sessao::getTransacao()->setMapeamento( $obTLicitacaoCertificacaoDocumentos );
-Sessao::getTransacao()->setMapeamento( $obTLicitacaoDocumentoAtributoValor );
-Sessao::getTransacao()->setMapeamento( $obTLicitacaoDocumentosAtributos );
+$obTLicitacaoParticipanteCertificacaoLicitacao = new TLicitacaoParticipanteCertificacaoLicitacao();
 
 switch ($stAcao) {
     case "incluir":
-        //if ( implode(array_reverse(explode('/',$_REQUEST['dtDataVigencia']))) < date('Ymd') ) {
-        //        $stMensagem = 'Data de vigência inferior ao dia de hoje.';
-        //}
-        if ( implode(array_reverse(explode('/',$_REQUEST['dtDataRegistro']))) > implode(array_reverse(explode('/',$_REQUEST['dtDataVigencia']))) ) {
+        if ( implode(array_reverse(explode('/',$request->get('dtDataRegistro')))) > implode(array_reverse(explode('/',$request->get('dtDataVigencia')))) ) {
                 $stMensagem = 'A data de registro deve ser menor que a data de vigência.';
         } elseif ( count( Sessao::read('arDocs') ) == 0 ) {
                 $stMensagem = 'Ao menos um documento deve ser incluído.';
         }
 
-        if (!$stMensagem) {
+        if (!$stMensagem && !$obErro->ocorreu()) {
 
+            $obTLicitacaoParticipanteCertificacao->proximocod($inNumCertificacao);
+            
             $obTLicitacaoParticipanteCertificacao->setDado( 'exercicio', Sessao::getExercicio() );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $_REQUEST['inCodFornecedor'] );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $request->get('inCodFornecedor') );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cod_tipo_documento', 0 );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cod_documento', 0 );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'dt_registro', $_REQUEST['dtDataRegistro'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'final_vigencia', $_REQUEST['dtDataVigencia'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'observacao', $_REQUEST['hdnObservacao'] );
-
-            $obTLicitacaoParticipanteCertificacao->inclusao();
+            $obTLicitacaoParticipanteCertificacao->setDado( 'dt_registro', $request->get('dtDataRegistro') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'final_vigencia', $request->get('dtDataVigencia') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'observacao', $request->get('hdnObservacao') );
+            $obErro = $obTLicitacaoParticipanteCertificacao->inclusao($boTransacao);
+            
+            if (!$obErro->ocorreu()) {
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'num_certificacao'      , $inNumCertificacao );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'exercicio_certificacao', Sessao::getExercicio() );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cgm_fornecedor'        , $request->get('inCodFornecedor') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_licitacao'         , $request->get('inCodLicitacao') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_modalidade'        , $request->get('inCodModalidade') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_entidade'          , $request->get('inCodEntidade') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'exercicio_licitacao'   , $request->get('stExercicioLicitacao') );
+                $obErro = $obTLicitacaoParticipanteCertificacaoLicitacao->inclusao($boTransacao);
+            }
 
             foreach ( Sessao::read('arDocs') as $key => $value ) {
                 $obTLicitacaoCertificacaoDocumentos->obTLicitacaoParticipanteCertificacao = & $obTLicitacaoParticipanteCertificacao;
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'cod_documento', $value['cod_documento'] );
-                $obTLicitacaoCertificacaoDocumentos->setDado( 'cgm_fornecedor', $_REQUEST['inCodFornecedor'] );
+                $obTLicitacaoCertificacaoDocumentos->setDado( 'cgm_fornecedor', $request->get('inCodFornecedor') );
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'num_documento', $value['num_documento'] );
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'dt_emissao', $value['data_emissao'] );
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'dt_validade', $value['data_validade'] );
-                $obTLicitacaoCertificacaoDocumentos->inclusao();
+                $obTLicitacaoCertificacaoDocumentos->inclusao($boTransacao);
 
                 if ( is_array($value['atributos']) ) {
                     foreach ($value['atributos'] as $key => $value2) {
@@ -114,10 +129,16 @@ switch ($stAcao) {
 
                         $obTLicitacaoDocumentoAtributoValor->obTLicitacaoCertificacaoDocumentos = & $obTLicitacaoCertificacaoDocumentos;
                         $obTLicitacaoDocumentoAtributoValor->setDado( 'valor', $value2 );
-                        $obTLicitacaoDocumentoAtributoValor->inclusao();
+                        $obTLicitacaoDocumentoAtributoValor->inclusao($boTransacao);
                     }
                 }
             }
+            
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoParticipanteCertificacao);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoParticipanteCertificacaoLicitacao);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoCertificacaoDocumentos);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoDocumentoAtributoValor);
+            
             SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=$stAcao",'Incluir Cadastro / Certificação concluído com sucesso ('.str_pad($obTLicitacaoCertificacaoDocumentos->getDado("num_certificacao"),6,"0",STR_PAD_LEFT).'/'.$obTLicitacaoCertificacaoDocumentos->getDado("exercicio").')! ', "", "aviso", Sessao::getId(), "../");
             $requestTMP = $_REQUEST;
             $requestTMP['request']['inNumCertificacao'] = str_pad($obTLicitacaoCertificacaoDocumentos->getDado("num_certificacao"),6,"0",STR_PAD_LEFT);
@@ -125,11 +146,11 @@ switch ($stAcao) {
 
             Sessao::write('request' , $requestTMP);
 
-            $stLink = '&inCodFornecedor='.$_REQUEST['inCodFornecedor'];
+            $stLink = '&inCodFornecedor='.$request->get('inCodFornecedor');
             $stLink.= '&stExercicio='.$obTLicitacaoCertificacaoDocumentos->getDado("exercicio"       );
             $stLink.= '&inNumCertificacao='.str_pad($obTLicitacaoCertificacaoDocumentos->getDado("num_certificacao"),6,"0",STR_PAD_LEFT);
-            $stLink.= '&dtDataRegistro='.$_REQUEST['dtDataRegistro'];
-            $stLink.= '&dtDataVigencia='.$_REQUEST['dtDataVigencia'];
+            $stLink.= '&dtDataRegistro='.$request->get('dtDataRegistro');
+            $stLink.= '&dtDataVigencia='.$request->get('dtDataVigencia');
             SistemaLegado::mudaFrameOculto($pgGera.'?'.Sessao::getId().$stLink);
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem),"n_alterar","erro");
@@ -137,22 +158,43 @@ switch ($stAcao) {
     break;
 
     case 'alterar':
-
+            
         if ( count( Sessao::read('arDocs') ) == 0 ) {
             $stMensagem = 'Ao menos um documento deve ser incluído.';
         }
-        if (!$stMensagem) {
-            $obTLicitacaoParticipanteCertificacao->setDado( 'exercicio', $_REQUEST['stHdnExercicio'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $_REQUEST['inHdnCodFornecedor'] );
+        if (!$stMensagem && !$obErro->ocorreu()) {
+            
+            $obTLicitacaoParticipanteCertificacao->setDado( 'exercicio', $request->get('stHdnExercicio') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $request->get('inHdnCodFornecedor') );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cod_tipo_documento', 0 );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cod_documento', 0 );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'dt_registro', $_REQUEST['dtHdnDataRegistro'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'final_vigencia', $_REQUEST['dtHdnDataVigencia'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'observacao', $_REQUEST['hdnObservacao'] );
-            $obTLicitacaoParticipanteCertificacao->setDado( 'num_certificacao', intval($_REQUEST['inNumCertificacao']) );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'dt_registro', $request->get('dtHdnDataRegistro') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'final_vigencia', $request->get('dtHdnDataVigencia') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'observacao', $request->get('hdnObservacao') );
+            $obTLicitacaoParticipanteCertificacao->setDado( 'num_certificacao', intval($request->get('inNumCertificacao')) );
+            $obTLicitacaoParticipanteCertificacao->alteracao($boTransacao);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoParticipanteCertificacao);
+            
+            if (!$obErro->ocorreu()) {
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'num_certificacao'      , $request->get('inNumCertificacao'));
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'exercicio_certificacao', $request->get('stHdnExercicio') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cgm_fornecedor'        , $request->get('inHdnCodFornecedor') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_entidade'          , $request->get('inCodEntidade') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'exercicio_licitacao'   , $request->get('stExercicioLicitacao') );
+                
+                $obTLicitacaoParticipanteCertificacaoLicitacao->recuperaPorChave($rsParticipanteLicitacao);
+                
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_modalidade'        , $request->get('inCodModalidade') );
+                $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'cod_licitacao'         , $request->get('inCodLicitacao') );
+                                
+                if ($rsParticipanteLicitacao->getNumLinhas() <= 0) {
+                    $obErro = $obTLicitacaoParticipanteCertificacaoLicitacao->inclusao($boTransacao);  
+                } else {
+                    $obErro = $obTLicitacaoParticipanteCertificacaoLicitacao->alteracao($boTransacao);
+                }
 
-            $obTLicitacaoParticipanteCertificacao->alteracao();
-
+            }
+            
             // verificação da chave do array de itens
             $obTLicitacaoCertificacaoDocumentos->obTLicitacaoParticipanteCertificacao = & $obTLicitacaoParticipanteCertificacao;
             $obTLicitacaoCertificacaoDocumentos->recuperaPorChave( $rsItens );
@@ -160,10 +202,10 @@ switch ($stAcao) {
             while ( !$rsItens->eof() ) {
                 $obTLicitacaoDocumentoAtributoValor->obTLicitacaoCertificacaoDocumentos = & $obTLicitacaoCertificacaoDocumentos;
                 $obTLicitacaoDocumentoAtributoValor->setDado( 'cod_documento', $rsItens->getCampo('cod_documento') );
-                $obTLicitacaoDocumentoAtributoValor->exclusao();
+                $obTLicitacaoDocumentoAtributoValor->exclusao($boTransacao);
                 $rsItens->proximo();
             }
-            $obTLicitacaoCertificacaoDocumentos->exclusao();
+            $obTLicitacaoCertificacaoDocumentos->exclusao($boTransacao);
 
             $arDocs = Sessao::read('arDocs');
 
@@ -173,7 +215,7 @@ switch ($stAcao) {
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'num_documento', $value['num_documento'] );
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'dt_emissao', $value['data_emissao'] );
                 $obTLicitacaoCertificacaoDocumentos->setDado( 'dt_validade', $value['data_validade'] );
-                $obTLicitacaoCertificacaoDocumentos->inclusao();
+                $obTLicitacaoCertificacaoDocumentos->inclusao($boTransacao);
 
                 if ( is_array($value['atributos']) && ( count($value['atributos']) > 0 )) {
                     foreach ($value['atributos'] as $key => $value2) {
@@ -184,14 +226,21 @@ switch ($stAcao) {
                         $obTLicitacaoDocumentoAtributoValor->setDado( 'cod_atributo', $arKey[1] );
                         $obTLicitacaoDocumentoAtributoValor->obTLicitacaoCertificacaoDocumentos = & $obTLicitacaoCertificacaoDocumentos;
                         $obTLicitacaoDocumentoAtributoValor->setDado( 'valor', $value2 );
-                        $obTLicitacaoDocumentoAtributoValor->inclusao();
+                        $obTLicitacaoDocumentoAtributoValor->inclusao($boTransacao);
                     }
                 }
             }
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao", "Número da certificação: ".$_REQUEST['inNumCertificacao']."/".$_REQUEST['stHdnExercicio'], "alterar", "aviso", Sessao::getId(), "../");
+            
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoParticipanteCertificacaoLicitacao);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoCertificacaoDocumentos);
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTLicitacaoDocumentoAtributoValor);
+            
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId().$stLink, "Número da certificação: ".$request->get('inNumCertificacao')."/".$request->get('stHdnExercicio'), "alterar", "aviso", Sessao::getId(), "../");
+            
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem),"n_alterar","erro");
         }
     break;
 }
-Sessao::encerraExcecao();
+
+?>

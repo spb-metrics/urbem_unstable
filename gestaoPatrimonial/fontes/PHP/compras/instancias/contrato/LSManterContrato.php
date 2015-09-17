@@ -143,7 +143,7 @@ $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
-$obLista->ultimoDado->setCampo( "[num_contrato]/[exercicio_contrato]" );
+$obLista->ultimoDado->setCampo( "[numero_contrato]/[exercicio_contrato]" );
 $obLista->commitDado();
 
 $obLista->addDado();
@@ -176,6 +176,7 @@ if ($stAcao == 'rescindir') {
 
 $obLista->ultimaAcao->addCampo( "&inNumContrato", "num_contrato" );
 $obLista->ultimaAcao->addCampo( "&inCodEntidade", "cod_entidade" );
+$obLista->ultimaAcao->addCampo( "stExercicio", "exercicio_contrato" );
 $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
 $obLista->commitAcao();
 

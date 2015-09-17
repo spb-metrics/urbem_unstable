@@ -41,17 +41,18 @@
     * Casos de uso: uc-06.03.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBASubempenho.class.php" );
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBASubempenho.class.php" );
     
-    $obTTBASubempenho = new TTBASubempenho();
-    $obTTBASubempenho->setDado('mes'       , $inMes );
-    $obTTBASubempenho->setDado('entidades' , $stEntidades );
-    $obTTBASubempenho->setDado('unidade_gestora', $inCodUnidadeGestora );
-    $obTTBASubempenho->setDado('dt_inicial', $stDataInicial );
-    $obTTBASubempenho->setDado('dt_final', $stDataFinal );
-    $obTTBASubempenho->recuperaDadosTribunal($rsArquivo);
+    // Não possui subEmpenho então será gerado em branco
+    $obTTCMBASubempenho = new TTCMBASubempenho();
+    $obTTCMBASubempenho->setDado('mes'       , $inMes );
+    $obTTCMBASubempenho->setDado('entidades' , $stEntidades );
+    $obTTCMBASubempenho->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTCMBASubempenho->setDado('dt_inicial', $stDataInicial );
+    $obTTCMBASubempenho->setDado('dt_final', $stDataFinal );
+    $obTTCMBASubempenho->recuperaDadosTribunal($rsArquivo);
     
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+  /*  $obExportador->roUltimoArquivo->addBloco($rsArquivo);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
@@ -102,7 +103,7 @@
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(27);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(27);*/
   
     unset($obTTBASubEmpenho);
     unset($rsArquivo);

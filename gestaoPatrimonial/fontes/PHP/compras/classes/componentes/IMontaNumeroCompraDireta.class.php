@@ -43,7 +43,13 @@ class IMontaNumeroCompraDireta extends Objeto
     public $obExercicio;
     public $obITextBoxSelectEntidadeGeral;
     public $obITextBoxSelectEntidadeUsuario;
+    public $obTxtOrgao;
+    public $obCmbOrgao;
+    public $obTxtUnidade;
+    public $obCmbUnidade;
+    public $obTxtNumeroContrato;
     public $obISelectModalidade;
+    public $obCmbTipoObjeto;
     public $obCmbCompraDireta;
 
     public $stName;
@@ -71,8 +77,8 @@ class IMontaNumeroCompraDireta extends Objeto
         $rsCompraDireta = new RecordSet();
 
         include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
-        include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php"      );
-
+        include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php" );
+        
         $this->obExercicio = new Exercicio();
         $this->obExercicio->setName( 'stExercicioCompraDireta' );
 
@@ -87,25 +93,25 @@ class IMontaNumeroCompraDireta extends Objeto
         $this->obITextBoxSelectEntidadeUsuario->obTextBox->obEvento->setOnChange("ajaxJavaScript('".$oculto."?".Sessao::getId()."&stExercicioCompraDireta='+frm.stExercicioCompraDireta.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
 
         $this->obISelectModalidade = new Select();
-        $this->obISelectModalidade->setNull      ( false                        );
-        $this->obISelectModalidade->setRotulo            ("Modalidade"                            );
-        $this->obISelectModalidade->setTitle             ("Selecione a modalidade."               );
-        $this->obISelectModalidade->setName              ("inCodModalidade"                       );
-        $this->obISelectModalidade->setCampoID           ("cod_modalidade"                        );
-        $this->obISelectModalidade->addOption            ("","Selecione"                          );
-        $this->obISelectModalidade->addOption            ("8","8 - Dispensa de Licitação"         );
-        $this->obISelectModalidade->addOption            ("9","9 - Inexibilidade"                 );
+        $this->obISelectModalidade->setRotulo    ("Modalidade"                    );
+        $this->obISelectModalidade->setTitle     ("Selecione a modalidade."       );
+        $this->obISelectModalidade->setName      ("inCodModalidade"               );
+        $this->obISelectModalidade->setCampoID   ("cod_modalidade"                );
+        $this->obISelectModalidade->addOption    ("","Selecione"                  );
+        $this->obISelectModalidade->addOption    ("8","8 - Dispensa de Licitação" );
+        $this->obISelectModalidade->addOption    ("9","9 - Inexibilidade"         );
+        $this->obISelectModalidade->setNull      ( false                          );
         $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$oculto."?". Sessao::getId(). "&inCodCompraDireta='+frm.inCodCompraDireta.value+'&stExercicioCompraDireta='+frm.stExercicioCompraDireta.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraCompraDireta=".$boFiltraCompraDireta."&numCompraDireta='+document.getElementById('hdnNumCompraDireta').value, 'carregaCompraDireta');");
 
         $this->obCmbCompraDireta = new Select();
-        $this->obCmbCompraDireta->setName     ( 'inCodCompraDireta'   );
-        $this->obCmbCompraDireta->setRotulo   ( 'Compra Direta'        );
+        $this->obCmbCompraDireta->setName     ( 'inCodCompraDireta'          );
+        $this->obCmbCompraDireta->setRotulo   ( 'Compra Direta'              );
         $this->obCmbCompraDireta->setTitle    ( 'Selecione a Compra Direta.' );
-        $this->obCmbCompraDireta->setId       ( 'inCodCompraDireta'   );
-        $this->obCmbCompraDireta->setCampoID  ( 'cod_compra_direta'    );
-        $this->obCmbCompraDireta->setCampoDesc( 'cod_compra_direta'    );
-        $this->obCmbCompraDireta->addOption   ( '','Selecione'     );
-        $this->obCmbCompraDireta->setNull     ( false );
+        $this->obCmbCompraDireta->setId       ( 'inCodCompraDireta'          );
+        $this->obCmbCompraDireta->setCampoID  ( 'cod_compra_direta'          );
+        $this->obCmbCompraDireta->setCampoDesc( 'cod_compra_direta'          );
+        $this->obCmbCompraDireta->addOption   ( '','Selecione'               );
+        $this->obCmbCompraDireta->setNull     ( false                        );
         $this->obCmbCompraDireta->preencheCombo( $rsCompraDireta      );
         $this->obCmbCompraDireta->obEvento->setOnChange("ajaxJavaScript('".$oculto."?".Sessao::getId()."&stExercicioCompraDireta=' +frm.stExercicioCompraDireta.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+ '&inCodCompraDireta='+this.value, 'carregaDadosCompraDireta');");
 
@@ -130,6 +136,7 @@ class IMontaNumeroCompraDireta extends Objeto
         } else {
             $obFormulario->addComponente( $this->obITextBoxSelectEntidadeUsuario );
         }
+        
         $obFormulario->addComponente( $this->obISelectModalidade );
         $obFormulario->addComponente( $this->obCmbCompraDireta );
         $obFormulario->addHidden    ( $this->obHdnDtCompraDireta );

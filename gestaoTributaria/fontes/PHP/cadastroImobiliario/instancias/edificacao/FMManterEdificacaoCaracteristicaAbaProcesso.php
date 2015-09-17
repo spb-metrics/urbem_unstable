@@ -32,17 +32,9 @@
 
     * @ignore
 
-    * $Id: FMManterEdificacaoCaracteristicaAbaProcesso.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterEdificacaoCaracteristicaAbaProcesso.php 63277 2015-08-12 12:59:36Z arthur $
 
     * Casos de uso: uc-05.01.11
-*/
-
-/*
-$Log$
-Revision 1.4  2006/09/18 10:30:30  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -74,11 +66,6 @@ $obLista->ultimoCabecalho->addConteudo( "Hora" );
 $obLista->ultimoCabecalho->setWidth( 20 );
 $obLista->commitCabecalho();
 
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "&nbsp;" );
-$obLista->ultimoCabecalho->setWidth( 3 );
-$obLista->commitCabecalho();
-
 $obLista->addDado();
 $obLista->ultimoDado->setCampo( "cod_processo_ano" );
 $obLista->ultimoDado->setAlinhamento( 'CENTER' );
@@ -94,16 +81,6 @@ $obLista->ultimoDado->setCampo( "hora" );
 $obLista->ultimoDado->setAlinhamento( 'CENTER' );
 $obLista->commitDado();
 
-$obLista->addAcao();
-$obLista->ultimaAcao->setAcao( "VISUALIZAR" );
-$obLista->ultimaAcao->setFuncao( true );
-$obLista->ultimaAcao->setLink( "JavaScript:visualizarProcesso();" );
-$obLista->ultimaAcao->addCampo("1","cod_processo");
-$obLista->ultimaAcao->addCampo("2","timestamp");
-$obLista->ultimaAcao->addCampo("3","cod_construcao");
-$obLista->ultimaAcao->addCampo("4","ano_exercicio");
-$obLista->commitAcao();
-
 $obLista->montaHTML();
 
 $obSpnProcesso = new Span;
@@ -112,3 +89,5 @@ $obSpnProcesso->setValue ($obLista->getHTML());
 
 $obSpnAtributosProcesso = new Span;
 $obSpnAtributosProcesso->setId ( "spnAtributosProcesso" );
+
+?>

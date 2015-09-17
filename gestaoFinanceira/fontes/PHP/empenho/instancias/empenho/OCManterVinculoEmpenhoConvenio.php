@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.38
 
-    $Id: OCManterVinculoEmpenhoConvenio.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterVinculoEmpenhoConvenio.php 63231 2015-08-05 21:10:01Z carlos.silva $
 
 */
 
@@ -50,7 +50,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 switch ($stCtrl) {
     case "consultaEmpenhoConvenio":
@@ -96,13 +96,14 @@ case "incluirEmpenho":
     $rsEmpenhos  = new RecordSet;
     $arElementos = array();
 
-    $arEmpenho = explode('/', $_REQUEST['inCodEmpenho']);
+    $arEmpenho = explode('/', $request->get('inCodEmpenho'));
     $inCodEmpenho = $arEmpenho[0];
     $stExercicioEmpenho = $arEmpenho[1];
-    $inCodEntidade = Sessao::getCodEntidade();
+    $inCodEntidade = $request->get('inCodEntidade');
     if ($inCodEmpenho != "") {
 
         $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+        $stFiltro .= " AND e.cod_entidade = ".$inCodEntidade;
         $stFiltro .= " AND e.cod_empenho = ".$inCodEmpenho;
         $stFiltro .= " AND e.exercicio = '".$stExercicioEmpenho."'";
         $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
@@ -116,8 +117,10 @@ case "incluirEmpenho":
             $arElementosExcluidos = Sessao::read('elementos_excluidos');
             if (is_array($arElementosExcluidos)) {
                 foreach ($arElementosExcluidos as $arExcluidos) {
-                    if ($arExcluidos['cod_empenho'] ==  $inCodEmpenho && $arExcluidos['exercicio']	==  $_REQUEST['stExercicio']
-                     && $arExcluidos['cod_entidade']==  $inCodEntidade) {
+                    if ($arExcluidos['cod_empenho'] ==  $inCodEmpenho &&
+                        $arExcluidos['exercicio']	==  $request->get('stExercicio') &&
+                        $arExcluidos['cod_entidade']==  $inCodEntidade) {
+                        
                         $boInserir = true;
                         break;
                     }
@@ -126,7 +129,7 @@ case "incluirEmpenho":
             // se o elemento não esta no array de excluidos, então procura ele no banco de dados, se não achar quer dizer que pode inseri-lo na listagem
             if (!$boInserir) {
                 $obEmpenhoEmpenhoConvenio = new TEmpenhoEmpenhoConvenio;
-                $obEmpenhoEmpenhoConvenio->setDado('exercicio', $_REQUEST['stExercicio']);
+                $obEmpenhoEmpenhoConvenio->setDado('exercicio', $request->get('stExercicio'));
                 $obEmpenhoEmpenhoConvenio->setDado('cod_entidade', $inCodEntidade);
                 $obEmpenhoEmpenhoConvenio->setDado('cod_empenho', $inCodEmpenho);
                 $obEmpenhoEmpenhoConvenio->recuperaPorChave($rsEmpenhoConvenio);
@@ -142,13 +145,17 @@ case "incluirEmpenho":
                     $rsEmpenhos->preenche($arElementosSessao);
                     while (!$rsEmpenhos->eof()) {
                         $cod_empenho = $rsRecordSet->getCampo('cod_empenho');
-                        if ( $cod_empenho == $rsEmpenhos->getCampo('cod_empenho') ) {
+                        if ( $rsRecordSet->getCampo('cod_empenho') == $rsEmpenhos->getCampo('cod_empenho') &&
+                             $rsRecordSet->getCampo('exercicio') == $rsEmpenhos->getCampo('exercicio') &&
+                             $rsRecordSet->getCampo('cod_entidade') == $rsEmpenhos->getCampo('cod_entidade')) {
+                            
                             $boExecuta = true;
                             $stJs .= "alertaAviso('Empenho já incluso na lista.','form','erro','".Sessao::getId()."');";
                         }
                         $rsEmpenhos->proximo();
                     }
                 }
+                
                 if (!$boExecuta) {
                     $arElementosTmp = array();
                     while ( !$rsRecordSet->eof() ) {
@@ -186,13 +193,22 @@ case "excluirEmpenho":
     $arElementos = array();
     $arExcluidos = array();
 
-    $id = $_REQUEST['inId'];
     $inCount  = 0;
     $inCount2 = 0;
     $arElementosSessao = Sessao::read('elementos');
 
     foreach ($arElementosSessao as $key => $value) {
-        if ($value["cod_empenho"] != $id) {
+        if ($value["exercicio"] == $request->get('exercicio') &&
+            $value["cod_entidade"] == $request->get('cod_entidade') &&
+            $value["cod_empenho"] == $request->get('cod_empenho')) {
+            
+            $arExcluidos[$inCount2]['inId']         = $value["cod_empenho"];
+            $arExcluidos[$inCount2]['cod_empenho']  = $value["cod_empenho"];
+            $arExcluidos[$inCount2]['exercicio']	= $value["exercicio"];
+            $arExcluidos[$inCount2]['cod_entidade'] = $value["cod_entidade"];
+            $inCount2++;
+
+        } else {
             $arElementos[$inCount]['inId']         = $value["cod_empenho"];
             $arElementos[$inCount]['cod_empenho']  = $value["cod_empenho"];
             $arElementos[$inCount]['exercicio']	   = $value["exercicio"];
@@ -201,12 +217,6 @@ case "excluirEmpenho":
             $arElementos[$inCount]['vl_total']	   = $value["vl_total"];
             $arElementos[$inCount]['nom_credor']   = $value["nom_credor"];
             $inCount++;
-        } else {
-            $arExcluidos[$inCount2]['inId']         = $value["cod_empenho"];
-            $arExcluidos[$inCount2]['cod_empenho']  = $value["cod_empenho"];
-            $arExcluidos[$inCount2]['exercicio']	= $value["exercicio"];
-            $arExcluidos[$inCount2]['cod_entidade'] = $value["cod_entidade"];
-            $inCount2++;
         }
     }
 
@@ -221,8 +231,8 @@ case "detalharConvenio":
 
     include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoParticipanteConvenio.class.php" );
     $obTLicitacaoParticipanteConvenio = new TLicitacaoParticipanteConvenio();
-    $obTLicitacaoParticipanteConvenio->setDado('num_convenio', $_REQUEST['num_convenio']);
-    $obTLicitacaoParticipanteConvenio->setDado('exercicio', "'".$_REQUEST['exercicio']."'");
+    $obTLicitacaoParticipanteConvenio->setDado('num_convenio', $request->get('num_convenio'));
+    $obTLicitacaoParticipanteConvenio->setDado('exercicio', $request->get('exercicio'));
     $stOrder   = " ORDER BY sw_cgm.nom_cgm ";
     $obTLicitacaoParticipanteConvenio->recuperaParticipanteConvenio($rsRecordset, "", $stOrder);
 
@@ -308,7 +318,9 @@ function listarEmpenho()
         $obLista->ultimaAcao->setFuncaoAjax( true );
 
         $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('excluirEmpenho');" );
-        $obLista->ultimaAcao->addCampo("1","inId");
+        $obLista->ultimaAcao->addCampo("1","exercicio");
+        $obLista->ultimaAcao->addCampo("2","cod_entidade");
+        $obLista->ultimaAcao->addCampo("3","cod_empenho");
         $obLista->commitAcao();
 
         $obLista->montaInnerHtml();

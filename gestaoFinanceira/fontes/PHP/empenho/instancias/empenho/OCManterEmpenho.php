@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterEmpenho.php 63531 2015-09-09 14:16:34Z carlos.silva $
 
     $Revision: 31087 $
     $Name$
@@ -767,9 +767,9 @@ switch ($stCtrl) {
             $inCodUnidade = $rsUnidade->getCampo('num_unidade');
             $stNomUnidade = $rsUnidade->getCampo('nom_unidade');
 
-            $js .= "d.getElementById('stOrgaoOrcamento').innerHTML='" . $inCodOrgao . " - " . $stNomOrgao . "';";
+            $js .= "d.getElementById('stOrgaoOrcamento').innerHTML='" . $inCodOrgao . " - " .trim($stNomOrgao)."';";
             $js .= "f.hdnOrgaoOrcamento.value='" . $inCodOrgao . "';";
-            $js .= "d.getElementById('stUnidadeOrcamento').innerHTML='" . $inCodUnidade . " - " . $stNomUnidade . "';";
+            $js .= "d.getElementById('stUnidadeOrcamento').innerHTML='" . $inCodUnidade . " - ".trim($stNomUnidade)."';";
             $js .= "f.hdnUnidadeOrcamento.value='" . $inCodUnidade . "';";
         } else {
             $js .= "d.getElementById('spnSaldoDotacao').innerHTML='';";

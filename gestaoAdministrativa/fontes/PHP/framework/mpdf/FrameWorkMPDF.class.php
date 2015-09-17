@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FrameWorkMPDF.class.php 61319 2015-01-06 18:07:28Z evandro $
-  * $Date: 2015-01-06 16:07:28 -0200 (Ter, 06 Jan 2015) $
-  * $Author: evandro $
-  * $Rev: 61319 $
+  * $Id: FrameWorkMPDF.class.php 63190 2015-08-03 18:55:30Z carlos.silva $
+  * $Date: 2015-08-03 15:55:30 -0300 (Seg, 03 Ago 2015) $
+  * $Author: carlos.silva $
+  * $Rev: 63190 $
   *
 */
 
@@ -342,16 +342,15 @@ class FrameWorkMPDF
         $obTAdministracaoMPDF->setDado('exercicio', Sessao::getExercicio());
         
         // Quando for selecionada duas ou mais entidades para gerar o relatório, será verificado qual entidade está como prefeitura na tabela administracao.configuracao
-        // Caso conttrário será gerado com a entidade selecionada
-        switch(count($this->getCodEntidades())) {
-            case 1:
-                $inCodEntidade = $this->getCodEntidades();
-                $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade[0]);
-                break;
-            default:
-                $inCodEntidade = SistemaLegado::pegaDado('valor','administracao.configuracao',"where cod_modulo = 8 AND parametro ILIKE 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."'");
-                $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade);
-                break;
+        // Caso contrário será gerado com a entidade selecionada
+        
+        if(substr_count($this->getCodEntidades(), ',') > 0) {
+            $inCodEntidade = SistemaLegado::pegaDado('valor','administracao.configuracao',"where cod_modulo = 8 AND parametro ILIKE 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."'");
+            $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade);
+
+        } else {
+            $inCodEntidade = $this->getCodEntidades();
+            $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade[0]);
         }
         
         $obTAdministracaoMPDF->recuperaDadosEntidade($rsEntidade,'','',$boTransacao);

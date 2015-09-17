@@ -33,7 +33,7 @@
     * @package Conectividade
     * @subpackage Persistente
 
-    $Id: Persistente.class.php 63060 2015-07-20 20:35:00Z evandro $
+    $Id: Persistente.class.php 63572 2015-09-11 14:07:05Z evandro $
 
     Casos de uso: uc-01.01.00
 
@@ -1335,9 +1335,9 @@ public function validaExclusao($stFiltro = "" , $boTransacao = "")
             $stSelect = "SELECT 1 \n FROM ".$valor['nome_tabela_mae']." , ".$valor['nome_tabela_fk'];
             for($i=0;$i<count($arChaveTabelaMae);$i++){
                 if($i == 0 ) {                    
-                    $stWhere = "\n WHERE ".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];
+                    $stWhere = "\n WHERE ".$valor['schema_mae'].".".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['schema_fk'].".".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];
                 } else {
-                    $stWhere .= "\n AND ".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];                    
+                    $stWhere .= "\n AND ".$valor['schema_mae'].".".$valor['tabela_mae'].".".$arChaveTabelaMae[$i]." = ".$valor['schema_fk'].".".$valor['tabela_fk'].".".$arChaveTabelaFK[$i];                    
                 }
             }
             //Monta filtro com os campos de chaves

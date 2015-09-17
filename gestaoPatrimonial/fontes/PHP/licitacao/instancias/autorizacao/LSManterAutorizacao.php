@@ -32,7 +32,7 @@
 
     * @ignore
 
-     $Id: LSManterAutorizacao.php 63116 2015-07-27 20:27:08Z franver $
+     $Id: LSManterAutorizacao.php 63584 2015-09-14 13:11:00Z michel $
 
     * Casos de uso: uc-uc-03.05.21
 */
@@ -56,12 +56,12 @@ $stAcao = $request->get('stAcao');
 //filtros
 $arFiltro = Sessao::read('filtro');
 
-$pg  = $_GET['pg'] ? $_GET['pg']  : 0;
-$pos = $_GET['pos']? $_GET['pos'] : 0;
+$pg  = $request->get('pg', 0);
+$pos = $request->get('pos', 0);
 
 //seta o filtro na sessao e vice-versa
 if ( !Sessao::read('paginando') ) {
-    foreach ($_POST as $stCampo => $stValor) {
+    foreach ($_REQUEST as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;
     }
     Sessao::write('pg', $pg);
@@ -78,6 +78,8 @@ if ($arFiltro) {
     }
 }
 
+$request = new Request($_REQUEST);
+
 Sessao::write('paginando',true);
 Sessao::write('filtro',$arFiltro);
 
@@ -85,28 +87,28 @@ Sessao::write('filtro',$arFiltro);
 
 $stFiltros .= " AND licitacao.exercicio = '" . Sessao::getExercicio() . "'";
 
-if ($_REQUEST ['inCodEntidade']) {
-    $stFiltros .= " AND entidade.cod_entidade = ". $_REQUEST ['inCodEntidade'] ;
+if ($request->get('inCodEntidade')) {
+    $stFiltros .= " AND entidade.cod_entidade = ".$request->get('inCodEntidade');
 }
 
-if ($_REQUEST['inCodModalidade']) {
-    $stFiltros .= " AND licitacao.cod_modalidade = " . $_REQUEST['inCodModalidade'];
+if ($request->get('inCodModalidade')) {
+    $stFiltros .= " AND licitacao.cod_modalidade = ".$request->get('inCodModalidade');
 }
 
-if ($_REQUEST['inCodigoLicitacao']) {
-    $stFiltros .= " AND licitacao.cod_licitacao = ".$_REQUEST['inCodigoLicitacao'];
+if ($request->get('inCodigoLicitacao')) {
+    $stFiltros .= " AND licitacao.cod_licitacao = ".$request->get('inCodigoLicitacao');
 }
 
-if ($_REQUEST['stDtInicial']) {
-    $stFiltros .= " AND to_date( licitacao.timestamp::VARCHAR, 'yyyy/mm/dd' ) >= to_date ( '".$_POST['stDtInicial']."' , 'dd/mm/yyyy' )     ";
+if ($request->get('stDtInicial')) {
+    $stFiltros .= " AND to_date( licitacao.timestamp::VARCHAR, 'yyyy/mm/dd' ) >= to_date ( '".$request->get('stDtInicial')."' , 'dd/mm/yyyy' )     ";
 }
 
-if ($_REQUEST['stDtFinal']) {
-    $stFiltros .= " AND to_date( licitacao.timestamp::VARCHAR, 'yyyy/mm/dd' ) <=  to_date ( '".$_POST['stDtFinal']."', 'dd/mm/yyyy' )   ";
+if ($request->get('stDtFinal')) {
+    $stFiltros .= " AND to_date( licitacao.timestamp::VARCHAR, 'yyyy/mm/dd' ) <=  to_date ( '".$request->get('stDtFinal')."', 'dd/mm/yyyy' )   ";
 }
 
-if ($_REQUEST['inCodMapa']) {
-    $stFiltros .= " AND mapa_cotacao.cod_mapa = ".$_REQUEST['inCodMapa'];
+if ($request->get('inCodMapa')) {
+    $stFiltros .= " AND mapa_cotacao.cod_mapa = ".$request->get('inCodMapa');
 }
 
 $stFiltros .= "
@@ -207,7 +209,6 @@ $stFiltros .= "
                                     AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
                                   WHERE mp.cod_mapa = mapa_cotacao.cod_mapa
                                     AND mp.exercicio = mapa_cotacao.exercicio_mapa
-                                    AND solicitacao.registro_precos IS FALSE
                                GROUP BY mp.exercicio
                                       , mp.cod_mapa
                                       , mp.cod_objeto
@@ -287,8 +288,7 @@ $obLista->ultimaAcao->addCampo( "&inCodCotacao"       , "cod_cotacao"    );
 $obLista->ultimaAcao->addCampo( "&inCodEntidade"      , "cod_entidade"   );
 $obLista->ultimaAcao->addCampo( "&inCodLicitacao"     , "cod_licitacao"  );
 $obLista->ultimaAcao->addCampo( "&inCodModalidade"    , "cod_modalidade" );
-$obLista->ultimaAcao->setLink( $pgForm."?stAcao=$stAcao&".Sessao::getId().$stLink );
+$obLista->ultimaAcao->setLink( $pgForm."?stAcao=".$stAcao."&".Sessao::getId().$stLink );
 $obLista->commitAcao();
 
 $obLista->show();
-SistemaLegado::exibeAviso("Autorizações de Empenho de Registros de Preços devem ser feitas na ação: Gestão Financeira :: Empenho :: Autorização :: Incluir Autorização Diversos.","aviso","aviso");

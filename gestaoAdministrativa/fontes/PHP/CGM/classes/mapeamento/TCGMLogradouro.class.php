@@ -55,4 +55,70 @@ class TCGMLogradouro extends Persistente
         $this->AddCampo('cod_uf',           'integer', true, '', true,  true);
         $this->AddCampo('cep',              'varchar', true,  8, false, false);
     }
+
+
+    function recuperaBairroCgm(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRecuperaBairroCgm().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+    function montaRecuperaBairroCgm()
+    {
+        $stSql = "  SELECT 
+                            numcgm ,
+                            cod_logradouro ,
+                            cod_bairro ,
+                            cod_municipio ,
+                            cod_uf ,
+                            cep 
+                    FROM sw_cgm_logradouro
+                    WHERE cod_bairro    = ".$this->getDado('cod_bairro')." 
+                      AND cod_uf        = ".$this->getDado('cod_uf')."
+                      AND cod_municipio = ".$this->getDado('cod_municipio')."
+                ";
+
+        return $stSql;
+    }
+
+    function recuperaLogradouroCgm(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRecuperaLogradouroCgm().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+    function montaRecuperaLogradouroCgm()
+    {
+        $stSql = "  SELECT 
+                            numcgm ,
+                            cod_logradouro ,
+                            cod_bairro ,
+                            cod_municipio ,
+                            cod_uf ,
+                            cep 
+                    FROM sw_cgm_logradouro
+                    WHERE cod_logradouro = ".$this->getDado('cod_logradouro')." 
+                      AND cod_uf         = ".$this->getDado('cod_uf')."
+                      AND cod_municipio  = ".$this->getDado('cod_municipio')."
+                ";
+
+        return $stSql;
+    }
+
 }

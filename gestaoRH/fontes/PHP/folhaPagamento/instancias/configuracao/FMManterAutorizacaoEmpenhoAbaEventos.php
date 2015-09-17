@@ -143,9 +143,18 @@ $arBotoesEventos = array($onBtnIncluirEvento,$onBtnAlterarEvento,$onBtnLimparEve
 $obSpnConfiguracoesEventos = new Span();
 $obSpnConfiguracoesEventos->setId("spnConfiguracoesEventos");
 
+$obHdnNumPAOEvento = new Hidden();
+$obHdnNumPAOEvento->setId('inHdnNumPAOEvento');
+$obHdnNumPAOEvento->setName('inHdnNumPAOEvento');
+$obHdnNumPAOEvento->obEvento->setOnChange("montaParametrosGET('preencherDotacao','stMascClassificacao,inNumPAOEvento');");
+
+$obHdnDotacaoEvento = new Hidden();
+$obHdnDotacaoEvento->setId('stHdnDotacaoEvento');
+$obHdnDotacaoEvento->setName('stHdnDotacaoEvento');
+
 include_once ( CAM_GF_ORC_COMPONENTES.'IPopUpPAO.class.php' );
 $obIPopUpPAO = new IPopUpPAO(array('extensao'=>'Evento'));
-$obIPopUpPAO->obCampoCod->obEvento->setOnBlur("montaParametrosGET('preencherDotacao','stMascClassificacao,inNumPAOEvento');");
+$obIPopUpPAO->obCampoCod->obEvento->setOnBlur(" setTimeout(function(){jQuery('#inHdnNumPAOEvento').change()},500);");
 
 include_once(CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php");
 $obROrcamentoDespesa = new ROrcamentoDespesa();
@@ -165,8 +174,7 @@ $obBscRubricaDespesaSal->obCampoCod->setValue              ( $stRubricaDespesa  
 $obBscRubricaDespesaSal->obCampoCod->setAlign              ( "LEFT"                                                 );
 $obBscRubricaDespesaSal->obCampoCod->setPreencheComZeros   ( "D"                                                    );
 $obBscRubricaDespesaSal->obCampoCod->setMascara            ( $stMascaraRubrica                                      );
-$obBscRubricaDespesaSal->obCampoCod->obEvento->setOnChange ( "montaParametrosGET('preencheMascClassificacao','stMascClassificacao,inNumPAOEvento');" );
-$obBscRubricaDespesaSal->obCampoCod->obEvento->setOnBlur   ( "if (this.value == '') { jQuery('#HdnstMascClassificacao').val(); jQuery('#hdnStRubricaDespesa').val(''); jQuery('#stRubricaDespesa').html('&nbsp;'); jQuery('#inCodDespesa').removeOption(/./); jQuery('#inCodDespesa').addOption('', 'Selecione'); }" );
+$obBscRubricaDespesaSal->obCampoCod->obEvento->setOnBlur   ( " montaParametrosGET('preencheMascClassificacao','stMascClassificacao,inNumPAOEvento'); if (this.value == '') { jQuery('#HdnstMascClassificacao').val(); jQuery('#hdnStRubricaDespesa').val(''); jQuery('#stRubricaDespesa').html('&nbsp;'); jQuery('#inCodDespesa').removeOption(/./); jQuery('#inCodDespesa').addOption('', 'Selecione'); }" );
 $obBscRubricaDespesaSal->obCampoCodHidden->setId           ( "HdnstMascClassificacao"                               );
 $obBscRubricaDespesaSal->obCampoDescrHidden->setId         ( "stRubricaDespesa"                                     );
 $obBscRubricaDespesaSal->setFuncaoBusca                    ( "abrePopUp('".CAM_GF_ORC_POPUPS."classificacaodespesa/FLClassificacaoDespesa.php','frm','stMascClassificacao','stRubricaDespesa','','".Sessao::getId()."&mascClassificacao=".$stMascaraRubrica."','800','550');" );

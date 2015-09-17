@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 62294 2015-04-20 14:58:06Z jean $
+    * $Id: LSPlanoConta.php 63547 2015-09-10 13:42:18Z carlos.silva $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -229,14 +229,18 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
-                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.%' OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%') ) OR ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.1.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural like '1.1.5.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 }
             }
 
@@ -252,14 +256,19 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
-                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%') ) OR ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.1.1.%'
+                                    OR pc.cod_estrutural like '1.1.1.1.2.%'
+                                    OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                    OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                    OR pc.cod_estrutural like '1.1.5.%'
+                                    OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 }
             }
         break;
@@ -274,15 +283,20 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
-                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                    $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.%'
+                                 OR pc.cod_estrutural like '1.1.4.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.3.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%') ) OR ";
-                    $stFiltro .= "\n  ( pc.cod_estrutural like '1.1.5.%' OR pc.cod_estrutural like '1.1.1.1.3.%' )) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.1.3.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural like '1.1.5.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.3.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 }
             }
         break;
@@ -297,15 +311,20 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
-                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                    $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.%'
+                                 OR pc.cod_estrutural like '1.1.4.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' )) OR ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.1.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural like '1.1.5.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%')) AND ";
                 }
             }
         break;
@@ -320,15 +339,18 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
-                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                    $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.%'
+                                OR  pc.cod_estrutural like '1.1.4.%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' ) ) OR ";
-                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                    $stFiltro .= "( pb.cod_banco is not null AND ";
+                    $stFiltro .= "  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "( pc.cod_estrutural like '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural like '1.1.5.%'
+                                 OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 }
             }
         break;
@@ -344,14 +366,18 @@ if ($_REQUEST['tipoBusca']) {
             if ($_REQUEST['inCodEntidade']) {
                 if ( SistemaLegado::is_tcems() ) {
                     $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                    $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                    $stFiltro .= "\n  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "\n( pc.cod_estrutural like '1.1.1.%'
+                                   OR pc.cod_estrutural like '1.1.4.%' )) AND ";
                 } else {
-                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.1.3.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' ) ) OR ";
-                    $stFiltro .= "\n   (pc.cod_estrutural like '1.1.5.%' OR pc.cod_estrutural like '1.1.1.1.3.%' )) AND ";
+                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
+                    $stFiltro .= "\n  pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "\n( pc.cod_estrutural like '1.1.1.1.3.%'
+                                   OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                   OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                   OR pc.cod_estrutural like '1.1.5.%'
+                                   OR pc.cod_estrutural like '1.1.1.1.3.%'
+                                   OR pc.cod_estrutural like '1.2.2.3%' )) AND ";
                 }
             }
         break;

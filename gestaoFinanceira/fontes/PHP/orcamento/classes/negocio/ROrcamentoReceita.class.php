@@ -30,34 +30,9 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoReceita.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: ROrcamentoReceita.class.php 63294 2015-08-13 18:28:40Z evandro $
 
     * Casos de uso: uc-02.01.06, uc-02.02.01, uc-02.04.04
-*/
-
-/*
-$Log: ROrcamentoReceita.class.php,v $
-Revision 1.20  2007/06/12 21:18:06  cako
-Bug #9349#
-
-Revision 1.19  2006/11/25 13:03:40  cleisson
-Bug #7545#
-
-Revision 1.18  2006/10/18 18:17:29  cako
-Bug #7241#
-
-Revision 1.17  2006/10/09 14:47:18  cako
-Bug #7125#
-
-Revision 1.16  2006/09/05 15:35:44  rodrigo
-Caso de uso 02.01.34
-
-Revision 1.15  2006/08/30 08:52:51  rodrigo
-*** empty log message ***
-
-Revision 1.14  2006/07/05 20:42:11  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -67,11 +42,6 @@ include_once( CAM_GF_ORC_NEGOCIO        ."ROrcamentoPrevisaoOrcamentaria.class.p
 include_once( CAM_GF_ORC_NEGOCIO        ."ROrcamentoClassificacaoReceita.class.php"    );
 include_once( CAM_FW_BANCO_DADOS."Transacao.class.php"                );
 
-/**
-    * Classe de Regra de Negócio Itens
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Marcelo Boezzio Paulino
-*/
 class ROrcamentoReceita
 {
 /**
@@ -632,6 +602,7 @@ function verificaValorConta(&$stSumConta , $stFiltro, $boTransacao = "")
     $obFOrcamentoRelacaoReceita->setDado("exercicio", $this->getExercicio());
 
     $obErro = $obFOrcamentoRelacaoReceita->consultaValorConta( $rsLista, $stFiltro, $stOrder, $boTransacao );
+    
     $stSumConta = 0;
     if ( $rsLista->getNumLinhas() > -1 ) {
         $stSumConta = $rsLista->getCampo('sum');
@@ -639,6 +610,25 @@ function verificaValorConta(&$stSumConta , $stFiltro, $boTransacao = "")
         $stSumConta = "0.00";
     }
 
+    return $obErro;
+}
+
+/**
+    * Verifica se pode ser inserido valor na Classificacao indicada
+    * @access Public
+    * @param  Object $rsListaCategoria Retorna o RecordSet preenchido
+    * @param  String $stOrdem Parâmetro de Ordenação
+    * @param  Object $boTransacao Parâmetro Transação
+    * @return Object Objeto Erro
+*/
+function verificaLancamentoAnterior(&$rsLista , $stFiltro, $stGrupo, $boTransacao = "")
+{
+    include_once( CAM_GF_ORC_MAPEAMENTO."FOrcamentoRelacaoReceita.class.php" );
+    $obFOrcamentoRelacaoReceita  = new FOrcamentoRelacaoReceita;
+    $obFOrcamentoRelacaoReceita->setDado("exercicio", $this->getExercicio());
+
+    $obErro = $obFOrcamentoRelacaoReceita->consultaLancamentoAnterior( $rsLista, $stFiltro, $stGrupo, "ORDER BY ordem_estrutural", $boTransacao );
+    
     return $obErro;
 }
 

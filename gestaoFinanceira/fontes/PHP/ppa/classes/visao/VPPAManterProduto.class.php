@@ -180,8 +180,9 @@ class VPPAManterProduto
         } else {
             $pgDestino = 'FMManterProdutos.php?stAcao=' . $_REQUEST['stAcao'];
             SistemaLegado::LiberaFrames(true,false);
-            SistemaLegado::alertaAviso($pgDestino, $_REQUEST['inCodProduto'], 'incluir', 'aviso', Sessao::getId(), '../');
 
+            SistemaLegado::exibeAviso("Produto ".$_REQUEST['stDescricao']." incluido com sucesso", 'incluir', 'aviso');
+            SistemaLegado::mudaFramePrincipal($pgDestino);
         }
     }
 

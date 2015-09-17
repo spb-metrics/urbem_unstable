@@ -28,7 +28,7 @@
  *
  * Casos de uso: uc-06.01.10
  * 
- * $Id: siconfi.relatorio_anexo_dca_if.plsql 62980 2015-07-14 17:06:33Z carlos.silva $
+ * $Id: siconfi.relatorio_anexo_dca_if.plsql 63269 2015-08-11 16:52:11Z evandro $
  */
 
 /**
@@ -42,9 +42,10 @@ DECLARE
   stCodEntidade       ALIAS FOR $2;
   dtFinal             ALIAS FOR $3;
 
-  dtInicial           VARCHAR := '';
-  stExercicioAnterior VARCHAR := ''; 
-  stSql               VARCHAR := '';  
+  arRetorno           NUMERIC[] := array[0];
+  dtInicial           VARCHAR   := '';
+  stExercicioAnterior VARCHAR   := ''; 
+  stSql               VARCHAR   := '';  
   reRegistro          RECORD;
 
 BEGIN
@@ -1461,41 +1462,59 @@ BEGIN
  
   EXECUTE stSql; 
 
+    stSql := 'SELECT  DISTINCT                    
+                    conta_despesa.cod_estrutural
+                  , conta_despesa.descricao                  
+                  , 0.00 AS valor_t1
+                  , 0.00 AS valor_t2
+                  , 0.00 AS valor_t3
+                  , 0.00 AS valor_t4
+                  , 0.00 AS valor_t5
+                  , 0.00 AS valor_t6
+                  , 0.00 AS valor_t7
+                  , 0.00 AS valor_t8
+                  
+              FROM orcamento.conta_despesa
+        LEFT JOIN orcamento.despesa 
+               ON conta_despesa.exercicio = despesa.exercicio
+              AND conta_despesa.cod_conta = despesa.cod_conta
+        LEFT JOIN orcamento.entidade
+            ON entidade.exercicio = despesa.exercicio
+           AND entidade.cod_entidade = despesa.cod_entidade
+    
+        LEFT JOIN sw_cgm
+            ON sw_cgm.numcgm = entidade.numcgm
 
---consulta para retornar todas os orgaos para nao intra-orcamentarias
-  stSql := 'SELECT  t1.nom_entidade
-                  , t1.cod_estrutural
-                  , t1.descricao
-                  
-                  , t1.vl_total AS vl_processados_exercicios_anteriores
-                  , t2.vl_total AS vl_processados_exercicio_anterior
-                  , t3.vl_total AS vl_processados_cancelado
-                  , t4.vl_total AS vl_processados_pago
-                  , t5.vl_total AS vl_nao_processados_exercicios_anteriores
-                  , t6.vl_total AS vl_nao_processados_exercicio_anterior
-                  , t7.vl_total AS vl_nao_processados_cancelado
-                  , t8.vl_total AS vl_nao_processados_pago
-                  
-              FROM tmp_processados_exercicios_anteriores t1
-        LEFT JOIN tmp_processados_exercicio_anterior t2
-                ON t1.cod_estrutural = t2.cod_estrutural
-        LEFT JOIN tmp_processados_cancelado t3
-                ON t1.cod_estrutural = t3.cod_estrutural
-        LEFT JOIN tmp_processados_pago t4
-                ON t1.cod_estrutural = t4.cod_estrutural
-        LEFT JOIN tmp_nao_processados_exercicios_anteriores t5
-                ON t1.cod_estrutural = t5.cod_estrutural
-        LEFT JOIN tmp_nao_processados_exercicio_anterior t6
-                ON t1.cod_estrutural = t6.cod_estrutural
-        LEFT JOIN tmp_nao_processados_cancelado t7
-                ON t1.cod_estrutural = t7.cod_estrutural
-        LEFT JOIN tmp_nao_processados_pago t8
-                ON t1.cod_estrutural = t8.cod_estrutural';
-  
-  FOR reRegistro IN EXECUTE stSql
-  LOOP
-      RETURN next reRegistro;
-  END LOOP;
+        WHERE conta_despesa.exercicio = '''||stExercicio||''' 
+
+        ORDER BY cod_estrutural ';
+
+    FOR reRegistro IN EXECUTE stSql
+    LOOP
+        arRetorno := stn.totaliza_siconfi_anexo_dca_if( REPLACE(publico.fn_mascarareduzida(reRegistro.cod_estrutural),'.','') );
+        reRegistro.valor_t1 := arRetorno[1];
+        reRegistro.valor_t2 := arRetorno[2];
+        reRegistro.valor_t3 := arRetorno[3];
+        reRegistro.valor_t4 := arRetorno[4];
+        reRegistro.valor_t5 := arRetorno[5];
+        reRegistro.valor_t6 := arRetorno[6];
+        reRegistro.valor_t7 := arRetorno[7];
+        reRegistro.valor_t8 := arRetorno[8];
+        
+        IF  ( reRegistro.valor_t1 = 0.00 ) AND
+            ( reRegistro.valor_t2 = 0.00 ) AND
+            ( reRegistro.valor_t3 = 0.00 ) AND
+            ( reRegistro.valor_t4 = 0.00 ) AND
+            ( reRegistro.valor_t5 = 0.00 ) AND
+            ( reRegistro.valor_t6 = 0.00 ) AND
+            ( reRegistro.valor_t7 = 0.00 ) AND
+            ( reRegistro.valor_t8 = 0.00 )
+        THEN
+            
+        ELSE
+            RETURN NEXT reRegistro;
+        END IF;
+    END LOOP;
 
   DROP TABLE tmp_processados_exercicios_anteriores;
   DROP TABLE tmp_processados_exercicio_anterior;
@@ -1505,9 +1524,7 @@ BEGIN
   DROP TABLE tmp_nao_processados_exercicio_anterior;
   DROP TABLE tmp_nao_processados_cancelado;
   DROP TABLE tmp_nao_processados_pago;
---  DROP TABLE tmp_estrutural;
 
---  RETURN;
 END;
 
 $$ language 'plpgsql';

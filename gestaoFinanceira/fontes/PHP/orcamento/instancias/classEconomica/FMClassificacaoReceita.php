@@ -39,22 +39,6 @@
     * Casos de uso: uc-02.01.04
 */
 
-/*
-$Log$
-Revision 1.9  2007/06/25 15:43:13  vitor
-Bug#9466#
-
-Revision 1.8  2007/05/21 18:55:38  melo
-Bug #9229#
-
-Revision 1.7  2006/07/18 20:25:03  leandro.zis
-Bug #6379#
-
-Revision 1.6  2006/07/05 20:42:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once( CAM_GF_INCLUDE."validaGF.inc.php");
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -69,10 +53,9 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-//include_once ($pgJS);
-
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
+
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
@@ -83,9 +66,9 @@ $obROrcamentoClassificacaoReceita = new ROrcamentoClassificacaoReceita;
 $mascClassificacao = $obROrcamentoClassificacaoReceita->recuperaMascara();
 
 if ($stAcao == 'alterar') {
-    $inCodClassificacao = $_GET['stMascClassReceita'];
-    $stDescricao        = $_GET['stDescricao'];
-    $inCodNorma         = $_GET['inCodNorma'];
+    $inCodClassificacao = $request->get('stMascClassReceita');
+    $stDescricao        = $request->get('stDescricao');
+    $inCodNorma         = $request->get('inCodNorma');
 }
 
 //****************************************//
@@ -203,6 +186,7 @@ $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao;
 $arBtn = array();
 $arBtn[] = $obBtnOK;
 $arBtn[] = $obBtnLimpar;
+
 if ($stAcao=='alterar') {
     $obFormulario->Cancelar($stLocation);
 } else {

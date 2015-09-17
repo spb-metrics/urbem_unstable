@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Marcelo Boezzio Paulino
 
-    * $Id: PREfetuarLancamentos.php 60961 2014-11-26 15:57:45Z evandro $
+    * $Id: PREfetuarLancamentos.php 63292 2015-08-13 13:57:29Z arthur $
 
     Caso de uso: uc-05.03.05
 **/
@@ -49,7 +49,7 @@ $stPrograma    = "EfetuarLancamentos";
 $pgFilt        = "FL".$stPrograma.".php";
 $pgList        = "LS".$stPrograma.".php";
 $pgForm        = "FM".$stPrograma.".php";
-$pgFormManual = "FM".$stPrograma."Manual.php";
+$pgFormManual  = "FM".$stPrograma."Manual.php";
 $pgProc        = "PR".$stPrograma.".php";
 $pgOcul        = "OC".$stPrograma.".php";
 $pgJs          = "JS".$stPrograma.".js";
@@ -60,17 +60,16 @@ $obRegra = new RARRParametroCalculo;
 
 if ( $_REQUEST['boLancar'] == 1)
     $stAcao = 'incluir';
-else
-if ( Sessao::read( "grupo_automatico" ) ) {
+else if ( Sessao::read( "grupo_automatico" ) ) {
     $stAcao = 'lancamentoAutomaticoGeral';
 }
 
 switch ($stAcao) {
     case "lancar_calculos":
-        if ($_REQUEST["inCodGrupo"]) {
+        if ($request->get('inCodGrupo')) {
             $obConexao   = new Conexao;
             //---------------------------
-            list( $inCodGrupo , $inExercicio ) = explode( '/' , $_REQUEST[ 'inCodGrupo' ] );
+            list( $inCodGrupo , $inExercicio ) = explode( '/' , $request->get('inCodGrupo') );
             $inInscricaoInicial = 1000000;
             $inInscricaoFinal = 0;
             $nome_arquivo = Sessao::read( 'arquivo_calculos_lancamentos' );
@@ -593,3 +592,5 @@ switch ($stAcao) {
         }
     break;
 }
+
+?>

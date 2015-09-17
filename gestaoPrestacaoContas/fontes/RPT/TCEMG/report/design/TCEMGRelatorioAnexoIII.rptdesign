@@ -207,8 +207,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsRecursos" id="6866">
@@ -263,9 +262,9 @@ this.queryText = this.queryText +"    ,nom_programa                             
 this.queryText = this.queryText +"        ,SUM(empenhado_per) as empenhado_per                  \n";
 this.queryText = this.queryText +"        ,SUM(pago_per) as pago_per                            \n";
 this.queryText = this.queryText +"        ,SUM(liquidado_per) as  liquidado_per                 \n";
-this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_empenhada( publico.fn_mascarareduzida(classificacao), '"+params["exercicio_anterior"]+"', '"+params["entidade"]+"', '"+params["dtInicialAnterior"]+"', '"+params["dtFinalAnterior"]+"', num_orgao::varchar, true ))) AS vl_empenhado_anterior\n";
-this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_liquidada( publico.fn_mascarareduzida(classificacao), '"+params["exercicio_anterior"]+"', '"+params["entidade"]+"', '"+params["dtInicialAnterior"]+"', '"+params["dtFinalAnterior"]+"', num_orgao::varchar, "+params["boRestos"]+" ))) AS vl_liquidado_anterior \n";
-this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_paga(publico.fn_mascarareduzida(classificacao), '"+params["exercicio_anterior"]+"', '"+params["entidade"]+"', '"+params["dtInicialAnterior"]+"', '"+params["dtFinalAnterior"]+"', num_orgao::varchar, "+params["boRestos"]+" ))) AS vl_pago_anterior \n";
+this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_empenhada( publico.fn_mascarareduzida(classificacao), '"+params["exercicio"]+"', '"+params["entidade"]+"', '"+params["dtInicial"]+"', '"+params["dtFinal"]+"', num_orgao::varchar, true, cod_programa ))) AS vl_empenhado_anterior\n";
+this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_liquidada( publico.fn_mascarareduzida(classificacao), '"+params["exercicio"]+"', '"+params["entidade"]+"', '"+params["dtInicial"]+"', '"+params["dtFinal"]+"', num_orgao::varchar, "+params["boRestos"]+", cod_programa ))) AS vl_liquidado_anterior \n";
+this.queryText = this.queryText +"    ,SUM((SELECT * FROM tcemg.relatorio_anexoIII_despesa_paga(publico.fn_mascarareduzida(classificacao), '"+params["exercicio"]+"', '"+params["entidade"]+"', '"+params["dtInicial"]+"', '"+params["dtFinal"]+"', num_orgao::varchar, "+params["boRestos"]+", cod_programa ))) AS vl_pago_anterior \n";
 this.queryText = this.queryText +"    ,CASE WHEN descricao ilike '%60%%' THEN                   \n";
 this.queryText = this.queryText +"        SUM(empenhado_per)                                    \n";
 this.queryText = this.queryText +"    END as fundeb_60_empenhado                                \n";
@@ -415,7 +414,8 @@ this.queryText = this.queryText +"             ,nom_recurso        VARCHAR      
 this.queryText = this.queryText +"             ,cod_agencia        INTEGER                  \n";                                                      
 this.queryText = this.queryText +"         ,cod_conta_corrente VARCHAR                      \n";                                                  
 this.queryText = this.queryText +")                                                         \n";                                                      
-this.queryText = this.queryText +"ORDER BY cod_estrutural ASC                               \n";]]></method>
+this.queryText = this.queryText +"ORDER BY cod_estrutural ASC                               \n";
+]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[SELECT * FROM]]></xml-property>
         </oda-data-set>

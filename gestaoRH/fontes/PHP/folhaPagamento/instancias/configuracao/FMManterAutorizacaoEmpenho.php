@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.29
 
-    $Id: FMManterAutorizacaoEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterAutorizacaoEmpenho.php 63259 2015-08-10 14:30:00Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -150,6 +150,8 @@ $obFormulario->addAba ( "Eventos" );
 $obFormulario->addSpan($obSpnComboOpcoesConfiguracaoEvento);
 $obFormulario->addSpan($obSpnOpcoesConfiguracaoEventos);
 $obFormulario->addHidden($obHdnOpcoesConfiguracaoEventos);
+$obFormulario->addHidden($obHdnNumPAOEvento);
+$obFormulario->addHidden($obHdnDotacaoEvento);
 $obFormulario->addComponente($obCmbConfiguracao);
 $obFormulario->addComponente($obISelectMultiploEvento);
 $obISelectMultiploRegSubCarEsp->geraFormulario($obFormulario);

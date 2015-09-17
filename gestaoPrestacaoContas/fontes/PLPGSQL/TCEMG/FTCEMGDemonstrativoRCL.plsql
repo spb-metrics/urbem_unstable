@@ -27,7 +27,7 @@
     * @author Analista:      Eduardo Paculski Schitz
     * @author Desenvolvedor: Franver Sarmento de Moraes
     
-    $Id: FTCEMGDemonstrativoRCL.plsql 62441 2015-05-11 14:06:55Z jean $
+    $Id: FTCEMGDemonstrativoRCL.plsql 63595 2015-09-15 18:26:39Z franver $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_demostrativo_rcl(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -65,7 +65,7 @@ BEGIN
                                       UNION
                                       SELECT cod_conta FROM orcamento.conta_receita WHERE exercicio IN ((inExercicio)::VARCHAR, (inExercicio-1)::VARCHAR) AND cod_estrutural ILIKE '1.2.1.0.29.19.00.00.00'
                                       UNION
-                                      SELECT cod_conta FROM orcamento.conta_receita WHERE exercicio IN ((inExercicio)::VARCHAR, (inExercicio-1)::VARCHAR) AND cod_estrutural ILIKE '1.9.2.2.10.00.00.00.00'), ',') INTO stCodContas;
+                                      SELECT cod_conta FROM orcamento.conta_receita WHERE exercicio IN ((inExercicio)::VARCHAR, (inExercicio-1)::VARCHAR) AND cod_estrutural ILIKE '1.9.2.2.10.%'), ',') INTO stCodContas;
     END IF;
 
     stSql := '

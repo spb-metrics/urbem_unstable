@@ -35,7 +35,7 @@
 
  * @ignore
 
- $Id: receitaCapital.inc.php 62751 2015-06-16 14:44:45Z michel $
+ $Id: receitaCapital.inc.php 63297 2015-08-13 19:09:38Z franver $
  */
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGReceitaCapital.class.php';
 
@@ -74,26 +74,32 @@ foreach ($arDatasInicialFinal as $stDatas) {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('rec_convenios');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('out_rec_cap');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('rec_ret_op_cred');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('rec_privat');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('rec_ref_divida');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('rec_out_op_cred');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

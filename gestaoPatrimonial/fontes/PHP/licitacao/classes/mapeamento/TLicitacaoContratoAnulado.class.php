@@ -83,6 +83,10 @@ function TLicitacaoContratoAnulado()
     $this->AddCampo('cod_entidade','integer',true,'',true,'TLicitacaoContrato');
     $this->AddCampo('dt_anulacao','date',true,'',true,false);
     $this->AddCampo('motivo','text',true,''  ,true,false);
+    $this->AddCampo('valor_anulacao','numeric',true,'14,2',false,false);
+    $this->AddCampo('justificativa','char',true,'250',true, false);
+    $this->AddCampo('razao','char',true,'250', true, false);
+    $this->AddCampo('fundamentacao_legal','char',true,'250' ,true, false);
   }
 
 }

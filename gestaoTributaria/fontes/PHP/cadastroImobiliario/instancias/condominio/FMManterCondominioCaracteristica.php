@@ -32,20 +32,9 @@
 
     * @ignore
 
-    * $Id: FMManterCondominioCaracteristica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterCondominioCaracteristica.php 63230 2015-08-05 20:49:42Z arthur $
 
     * Casos de uso: uc-05.01.14
-*/
-
-/*
-$Log$
-Revision 1.7  2007/02/06 11:54:00  cercato
-Bug #6980#
-
-Revision 1.6  2006/09/18 10:30:12  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -61,6 +50,7 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
 //Instancia objetos
@@ -78,7 +68,7 @@ $stSeparador = preg_replace( "/[a-zA-Z0-9]/","", $stMascaraProcesso );
 
 $stMascaraLote = $obRCIMConfiguracao->getMascaraLote();
 
-$obRCIMCondominio->setCodigoCondominio( $_REQUEST["inCodigoCondominio"] );
+$obRCIMCondominio->setCodigoCondominio( $request->get('inCodigoCondominio') );
 $obRCIMCondominio->listarProcessos( $rsListaProcesso );
 
 $stAcao = $request->get('stAcao');
@@ -97,11 +87,11 @@ $obHdnCtrl->setValue( "" );
 
 $obHdnCodigoCondominio = new Hidden;
 $obHdnCodigoCondominio->setName( "inCodigoCondominio" );
-$obHdnCodigoCondominio->setValue( $_REQUEST["inCodigoCondominio"] );
+$obHdnCodigoCondominio->setValue( $request->get('inCodigoCondominio') );
 
 $obHdnNomCondominio = new Hidden;
 $obHdnNomCondominio->setName( "stNomCondominio" );
-$obHdnNomCondominio->setValue( $_REQUEST["stNomCondominio"] );
+$obHdnNomCondominio->setValue( $request->get('stNomCondominio') );
 
 //DEFINICAO DO FORMULARIO
 $obForm = new Form;
@@ -126,8 +116,10 @@ $obFormulario->addComponente( $obLblLocalizacao       );
 $obFormulario->addComponente( $obLblLote              );
 $obFormulario->addComponente( $obLblNomCondominio     );
 $obFormulario->addComponente( $obLblTipoCondominio    );
-if( $_REQUEST["inNumCGM"] )
+
+if( $request->get('inNumCGM') )
     $obFormulario->addComponente  ( $obLblCGM          );
+
 $obFormulario->addComponente( $obBscProcesso        );
 $obMontaAtributosCondominio->geraFormulario( $obFormulario      );
 
@@ -138,8 +130,10 @@ $obFormulario->addComponente( $obLblLocalizacao       );
 $obFormulario->addComponente( $obLblLote              );
 $obFormulario->addComponente( $obLblNomCondominio     );
 $obFormulario->addComponente( $obLblTipoCondominio    );
-if( $_REQUEST["inNumCGM"] )
+
+if( $request->get('inNumCGM') )
     $obFormulario->addComponente  ( $obLblCGM          );
+    
 $obFormulario->addSpan      ( $obSpnProcesso        );
 $obFormulario->addSpan      ( $obSpnAtributosProcesso );
 

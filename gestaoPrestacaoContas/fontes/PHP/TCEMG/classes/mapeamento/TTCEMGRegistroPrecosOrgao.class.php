@@ -32,10 +32,10 @@
 
   * @ignore
 
-  $Id: TTCEMGRegistroPrecosOrgao.class.php 62915 2015-07-08 14:10:35Z michel $
-  $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
+  $Id: TTCEMGRegistroPrecosOrgao.class.php 63322 2015-08-18 13:58:14Z michel $
+  $Date: 2015-08-18 10:58:14 -0300 (Ter, 18 Ago 2015) $
   $Author: michel $
-  $Rev: 62915 $
+  $Rev: 63322 $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
@@ -45,7 +45,7 @@ class TTCEMGRegistroPrecosOrgao extends Persistente {
     * Método Construtor
     * @access Public
     */
-    public function TTCEMGRegistroPrecosOrgao()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('tcemg.registro_precos_orgao');
@@ -60,7 +60,7 @@ class TTCEMGRegistroPrecosOrgao extends Persistente {
         $this->AddCampo('num_unidade'                 , 'integer', true,  '',  true,  true);
         $this->AddCampo('num_orgao'                   , 'integer', true,  '',  true,  true);
         $this->AddCampo('participante'                , 'boolean', true,  '', false, false);
-        $this->AddCampo('numero_processo_adesao'      , 'integer',false,  '', false, false);
+        $this->AddCampo('numero_processo_adesao'      , 'varchar',false,'12', false, false);
         $this->AddCampo('exercicio_adesao'            , 'varchar',false, '4', false, false);
         $this->AddCampo('dt_publicacao_aviso_intencao',    'date',false,  '', false, false);
         $this->AddCampo('dt_adesao'                   ,    'date',false,  '', false, false);

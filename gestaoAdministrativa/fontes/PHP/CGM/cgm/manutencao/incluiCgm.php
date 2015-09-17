@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: incluiCgm.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: incluiCgm.php 63238 2015-08-06 19:18:45Z lisiane $
 
 */
 
@@ -480,7 +480,6 @@ switch ($controle) {
             }
     break;
     case 1:
-
         $arDadosAux = Sessao::read('dadosCgm');
 
         $codpaisCorresp = $_REQUEST['codpaisCorresp'];
@@ -688,6 +687,7 @@ switch ($controle) {
             dtNascimento=>$_REQUEST['dtNascimento'],
             chSexo=>$_REQUEST['chSexo'],
             rg=>$_REQUEST['rg'],
+            site=>$_REQUEST['stSite']
             );
         
         if ($_REQUEST['atributo']) {

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterTipoVeiculo.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterTipoVeiculo.php 63195 2015-08-03 20:45:09Z carlos.silva $
 
     * Casos de uso: uc-03.02.02
 */
@@ -48,20 +48,15 @@ $pgJs     = "JS".$stPrograma.".js";
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
 if ($stAcao == 'alterar') {
-
     $obTFrotaTipoVeiculo = new TFrotaTipoVeiculo();
     $obTFrotaTipoVeiculo->setDado( 'cod_tipo', $_REQUEST['inCodTipoVeiculo'] );
     $obTFrotaTipoVeiculo->recuperaPorChave( $rsTipoVeiculo );
-
-    //cria um textbox para o codigo do tipo do veiculo
-    $obCodTipoVeiculo = new TextBox();
-    $obCodTipoVeiculo->setName( 'inCodTipoVeiculo' );
-    $obCodTipoVeiculo->setId( 'inCodTipoVeiculo' );
-    $obCodTipoVeiculo->setValue( $rsTipoVeiculo->getCampo( 'cod_tipo' ) );
-    $obCodTipoVeiculo->setRotulo( 'Código' );
-    $obCodTipoVeiculo->setLabel( true );
-
+    
+    $inCodTipoVeiculo = $_REQUEST['inCodTipoVeiculo'];
 } else {
+    $obTFrotaTipoVeiculo = new TFrotaTipoVeiculo();
+    $obTFrotaTipoVeiculo->ProximoCod( $inCodTipoVeiculo );
+    
     $rsTipoVeiculo = new RecordSet();
 }
 
@@ -79,6 +74,20 @@ $obHdnAcao->setValue($stAcao);
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ("stCtrl" );
 $obHdnCtrl->setValue("");
+
+//cria textbox para o tipo do veiculo
+$obTxtCodigoTipoVeiculo = new Inteiro();
+$obTxtCodigoTipoVeiculo->setName( 'stCodigoTipoVeiculo' );
+$obTxtCodigoTipoVeiculo->setId( 'stCodigoTipoVeiculo' );
+$obTxtCodigoTipoVeiculo->setRotulo( 'Código' );
+$obTxtCodigoTipoVeiculo->setTitle( 'Informe o Código do Tipo de Veículo.' );
+$obTxtCodigoTipoVeiculo->setNull( false );
+$obTxtCodigoTipoVeiculo->setMaxLength( 8 );
+$obTxtCodigoTipoVeiculo->setSize( 8 );
+$obTxtCodigoTipoVeiculo->setValue( $inCodTipoVeiculo );
+if ($stAcao == 'alterar') {
+    $obTxtCodigoTipoVeiculo->setLabel( true );
+}
 
 //cria textbox para o tipo do veiculo
 $obTxtTipoVeiculo = new TextBox();
@@ -108,7 +117,7 @@ if ( $stAcao == 'incluir' OR $rsTipoVeiculo->getCampo('placa') == 't' ) {
 $obRdPlacaNao = new Radio();
 $obRdPlacaNao->setName('boPlaca');
 $obRdPlacaNao->setId( 'boPlacaNao' );
-$obRdPlacaNao->setValue( false );
+$obRdPlacaNao->setValue( 'false' );
 $obRdPlacaNao->setRotulo( 'Exige Placa' );
 $obRdPlacaNao->setTitle( 'Informe a obrigatoriedade da placa.' );
 $obRdPlacaNao->setLabel( 'Nao' );
@@ -135,7 +144,7 @@ if ( $stAcao == 'incluir' OR $rsTipoVeiculo->getCampo('prefixo') == 't' ) {
 $obRdPrefixoNao = new Radio();
 $obRdPrefixoNao->setName('boPrefixo');
 $obRdPrefixoNao->setId( 'boPrefixo' );
-$obRdPrefixoNao->setValue( false );
+$obRdPrefixoNao->setValue( 'false' );
 $obRdPrefixoNao->setRotulo( 'Exige Prefixo' );
 $obRdPrefixoNao->setTitle( 'Informe a obrigatoriedade do prefixo.' );
 $obRdPrefixoNao->setLabel( 'Nao' );
@@ -158,7 +167,7 @@ $obRdHorasSim->setNull( false );
 $obRdHorasNao = new Radio();
 $obRdHorasNao->setName('boHoras');
 $obRdHorasNao->setId( 'boHorasNao' );
-$obRdHorasNao->setValue( false );
+$obRdHorasNao->setValue( 'false' );
 $obRdHorasNao->setRotulo( 'Controlar Horas Trabalhadas' );
 $obRdHorasNao->setTitle( 'Informe se este Tipo de Veículo possuirá controle de horas trabalhadas.' );
 $obRdHorasNao->setLabel( 'Nao' );
@@ -178,10 +187,9 @@ $obFormulario->addHidden    ( $obHdnCtrl );
 
 $obFormulario->addTitulo    ( 'Tipo do Veículo' );
 
-if ($stAcao == 'alterar') {
-    $obFormulario->addComponente( $obCodTipoVeiculo );
-}
+$obFormulario->addComponente( $obTxtCodigoTipoVeiculo );
 $obFormulario->addComponente( $obTxtTipoVeiculo );
+
 $obFormulario->agrupaComponentes( array( $obRdPlacaSim, $obRdPlacaNao ) );
 $obFormulario->agrupaComponentes( array( $obRdPrefixoSim, $obRdPrefixoNao ) );
 $obFormulario->agrupaComponentes( array( $obRdHorasSim, $obRdHorasNao ) );

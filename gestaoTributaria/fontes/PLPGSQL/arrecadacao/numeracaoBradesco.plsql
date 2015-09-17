@@ -26,29 +26,11 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: numeracaoBradesco.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: numeracaoBradesco.plsql 63292 2015-08-13 13:57:29Z arthur $
 *
 * Casos d uso: uc-05.03.11
 */
-
-/*
-$Log$
-Revision 1.7  2006/12/13 16:56:38  dibueno
-Alterações referente ao uso de 17 caracteres
-
-Revision 1.6  2006/11/23 11:23:31  dibueno
-Alterações no procedimento de casas da numeracao
-
-Revision 1.5  2006/11/22 18:17:50  dibueno
-Alteração nas casas da numeracao
-
-Revision 1.4  2006/09/15 10:20:09  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
-CREATE OR REPLACE FUNCTION numeracaoBradesco(VARCHAR,VARCHAR) RETURNS VARCHAR AS '
+CREATE OR REPLACE FUNCTION numeracaoBradesco(VARCHAR,VARCHAR) RETURNS VARCHAR AS $$
 DECLARE
     stCarteira      VARCHAR;
     stConvenio      VARCHAR;
@@ -60,27 +42,27 @@ DECLARE
     stMascara       VARCHAR;
     reRecord        RECORD;
 BEGIN
-    stCarteira      := LPAD( $1, 2 , ''0'' );
-    inCodConvenio   := $2::int;
+    stCarteira      := LPAD( $1, 2 , '0' );
+    inCodConvenio   := $2::INTEGER;
     stConvenio := recuperaNumConvenio(inCodConvenio);
 
     inNumCasas := 17 - ( char_length( stConvenio ));
     inCont := 0;
-    stMascara := '''';
+    stMascara := '';
     while ( inCont < inNumCasas ) loop
-        stMascara := stMascara||''9'';
+        stMascara := stMascara||'9';
         inCont := incont + 1;
     end loop;
     
-    stNumAnterior := ultimaNumeracao(inCodConvenio, char_length( stConvenio )::int)::int;
+    stNumAnterior := ultimaNumeracao(inCodConvenio, char_length( stConvenio )::INTEGER)::INTEGER;
 
     IF stNumAnterior > 0 THEN
-        stNumeracao := stConvenio||lpad((to_number(stNumAnterior::varchar,stMascara::varchar)+1)::varchar, inNumCasas,''0'');
+        stNumeracao := stConvenio || lpad((to_number(stNumAnterior::VARCHAR,stMascara::VARCHAR)+1)::VARCHAR, inNumCasas,'0');
     ELSE
-        stNumeracao := stConvenio||lpad(to_number(''1'',stMascara::varchar), inNumCasas,''0'');
+        stNumeracao := stConvenio || lpad(to_number('1',stMascara::VARCHAR)::VARCHAR, inNumCasas,'0');
     END IF;
 
     return stNumeracao;
 END;
 
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

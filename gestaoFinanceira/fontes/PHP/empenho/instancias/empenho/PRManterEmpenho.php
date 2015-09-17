@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: PRManterEmpenho.php 63332 2015-08-18 19:54:17Z franver $
 
     $Revision: 32828 $
     $Name$
@@ -95,32 +95,33 @@ switch ($stAcao) {
     case "incluir":
 
     $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao);
+
     if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
-    if (!$_REQUEST["inModalidadeLicitacao"] || $_REQUEST["inModalidadeLicitacao"] == '') {
-        SistemaLegado::exibeAviso("Modalidade TCMGO não informada!","n_incluir","erro");
-        SistemaLegado::LiberaFrames(true,False);
-        break;
-    }
-
-    if ($_REQUEST['inModalidadeLicitacao'] == '10' || $_REQUEST['inModalidadeLicitacao'] == '11') {
-
-        if (!$_REQUEST["inFundamentacaoLegal"] || $_REQUEST["inFundamentacaoLegal"] == '') {
-        SistemaLegado::exibeAviso("Fundamentação legal não informada!","n_incluir","erro");
-        SistemaLegado::LiberaFrames(true,False);
-        break;
+        if (!$_REQUEST["inModalidadeLicitacao"] || $_REQUEST["inModalidadeLicitacao"] == '') {
+            SistemaLegado::exibeAviso("Modalidade TCMGO não informada!","n_incluir","erro");
+            SistemaLegado::LiberaFrames(true,False);
+            break;
         }
 
-        if (!$_REQUEST["stJustificativa"] || $_REQUEST["stJustificativa"] == '') {
-        SistemaLegado::exibeAviso("Justificativa não informada!","n_incluir","erro");
-        SistemaLegado::LiberaFrames(true,False);
-        break;
-        }
-
-        if (!$_REQUEST["stRazao"] || $_REQUEST["stRazao"] == '') {
-        SistemaLegado::exibeAviso("Razão da escolha não informada!","n_incluir","erro");
-        SistemaLegado::LiberaFrames(true,False);
-        break;
-        }
+        if ($_REQUEST['inModalidadeLicitacao'] == '10' || $_REQUEST['inModalidadeLicitacao'] == '11') {
+        
+            if (!$_REQUEST["inFundamentacaoLegal"] || $_REQUEST["inFundamentacaoLegal"] == '') {
+                SistemaLegado::exibeAviso("Fundamentação legal não informada!","n_incluir","erro");
+                SistemaLegado::LiberaFrames(true,False);
+                break;
+            }
+        
+            if (!$_REQUEST["stJustificativa"] || $_REQUEST["stJustificativa"] == '') {
+                SistemaLegado::exibeAviso("Justificativa não informada!","n_incluir","erro");
+                SistemaLegado::LiberaFrames(true,False);
+                break;
+            }
+        
+            if (!$_REQUEST["stRazao"] || $_REQUEST["stRazao"] == '') {
+                SistemaLegado::exibeAviso("Razão da escolha não informada!","n_incluir","erro");
+                SistemaLegado::LiberaFrames(true,False);
+                break;
+            }
         }
     }
 

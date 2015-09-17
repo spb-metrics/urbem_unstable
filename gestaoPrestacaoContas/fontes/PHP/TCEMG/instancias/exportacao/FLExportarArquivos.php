@@ -34,8 +34,11 @@
     * @subpackage
 
     * @ignore
+    * $Id: FLExportarArquivos.php 63325 2015-08-18 17:13:32Z franver $
+    * $Rev: 63325 $
+    * $Author: franver $
+    * $Date: 2015-08-18 14:13:32 -0300 (Ter, 18 Ago 2015) $
 
-    $Id:$
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -75,7 +78,6 @@ $obSlTipoPoder->setRotulo  ('Tipo de Poder');
 $obSlTipoPoder->setTitle   ('Selecione o tipo de poder');
 $obSlTipoPoder->setNull    (false);
 $obSlTipoPoder->addOption  ('','Selecione');
-$obSlTipoPoder->addOption  ('ambos','Ambos');
 $obSlTipoPoder->addOption  ('executivo','Executivo');
 $obSlTipoPoder->addOption  ('legislativo','Legislativo');
 $obSlTipoPoder->obEvento->setOnChange("montaParametrosGET('preencheEntidade','stTipoPoder');");

@@ -32,18 +32,11 @@
 
     * @ignore
 
-    * $Id: LSManterCondominio.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCondominio.php 63230 2015-08-05 20:49:42Z arthur $
 
     * Casos de uso: uc-05.01.14
 */
 
-/*
-$Log$
-Revision 1.7  2006/09/18 10:30:12  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMCondominio.class.php" );
@@ -54,12 +47,13 @@ $pgFilt        = "FL".$stPrograma.".php";
 $pgList        = "LS".$stPrograma.".php";
 $pgForm        = "FM".$stPrograma.".php";
 $pgFormVinculo = "FM".$stPrograma."Vinculo.php";
-$pgFormAlterar = "FM".$stPrograma.".php";//"Alteracao.php";
+$pgFormAlterar = "FM".$stPrograma.".php";
 $pgFormReforma = "FM".$stPrograma."Reforma.php";
 $pgFormCaracteristica = "FM".$stPrograma."Caracteristica.php";
 $pgProc        = "PR".$stPrograma.".php";
 $pgOcul        = "OC".$stPrograma.".php";
 $pgJs          = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
 $stCaminho = CAM_GT_CIM_INSTANCIAS."condominio/";
@@ -120,7 +114,7 @@ Sessao::write('stLink', $stLink);
 $obRCIMCondominio->listarCondominios( $rsLista );
 
 $rsLista->addFormatacao( "area_total_comum", "NUMERIC_BR" );
-//SistemaLegado::mostravar($rsLista);exit;
+
 //DEFINICAO DA LISTA
 $obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
@@ -211,4 +205,5 @@ $obLista->show();
 $obFormulario = new Formulario;
 $obFormulario->setAjuda  ( "UC-05.01.14" );
 $obFormulario->show();
+
 ?>

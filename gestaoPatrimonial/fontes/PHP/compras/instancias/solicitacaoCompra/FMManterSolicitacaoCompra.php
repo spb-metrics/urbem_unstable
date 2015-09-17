@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
+ $Id: FMManterSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
 
  */
 
@@ -70,6 +70,27 @@ $stAcao = $request->get('stAcao');
 Sessao::write('arValores'		   , array());
 Sessao::write('arSaldoDotacoes'    , array());
 Sessao::write('arValoresExcluidos' , array());
+
+$boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+$boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+$boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+$boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+
+if(!$boReservaRigida && !$boReservaAutorizacao){
+    $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
+    
+    $obLblMsgTipoReserva = new Label();
+    $obLblMsgTipoReserva->setRotulo ( "Aviso" );
+    $obLblMsgTipoReserva->setValue  ( $stMsg );
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo     ( 'Configuração Tipo de Reserva'   );
+    $obFormulario->addComponente ( $obLblMsgTipoReserva             );
+    $obFormulario->show();
+    
+    exit();
+}
 
 // Pegar informações da solicitação( para data de solicitação)
 $obTComprasSolicitacao = new TComprasSolicitacao();
@@ -126,7 +147,7 @@ if ($stAcao == 'alterar') {
 
 if ($stAcao == 'alterar') {
     $obLblDataSolicitacao = new Label;
-    $obLblDataSolicitacao->setRotulo( "Data Solicitação"        );
+    $obLblDataSolicitacao->setRotulo( "Data Solicitação" );
     $obLblDataSolicitacao->setValue ( $dataFormatada );
 
     # Código da Solicitação.
@@ -247,7 +268,7 @@ $obLblRequisitante->setNumCGM ( Sessao::read('numCgm'));
 $stFiltro = "\n AND tabela_vinculo.ativo = 't'";
 
 $obSolicitante = new IPopUpCGMVinculado( $obForm );
-$obSolicitante->setTabelaVinculo    ( 'compras.solicitante'   );
+$obSolicitante->setTabelaVinculo    ( 'compras.solicitante' );
 $obSolicitante->setCampoVinculo     ( 'solicitante' );
 $obSolicitante->setNomeVinculo      ( 'Solicitante' );
 $obSolicitante->setRotulo           ( 'Solicitante' );
@@ -257,7 +278,7 @@ $obSolicitante->setId               ( 'stNomCGM' );
 $obSolicitante->obCampoCod->setName ( 'inCGM' );
 $obSolicitante->obCampoCod->setId   ( 'inCGM' );
 $obSolicitante->setNull             ( false );
-$obSolicitante->setFiltroVinculado             ( $stFiltro );
+$obSolicitante->setFiltroVinculado ( $stFiltro );
 
 $obAlmoxarifado = new ISelectAlmoxarifado($obForm);
 $obAlmoxarifado->setNull ( false                       );

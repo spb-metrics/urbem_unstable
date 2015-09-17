@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 62879 2015-07-02 18:03:08Z evandro $
+    $Id: OCManterCadastroFerias.php 63555 2015-09-10 17:00:04Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -227,6 +227,7 @@ function gerarSpan2Form($boConsultar=false,$inCodFerias="",$boValidaFolha=true)
         $obCkbPagamento13->setName                      ( "boPagamento13"                                                       );
         $obCkbPagamento13->setId                        ( "boPagamento13"                                                       );
         $obCkbPagamento13->setValue                     ( true                                                                  );
+        $obCkbPagamento13->setChecked                   ( true                                                                  );
         $obCkbPagamento13->setRotulo                    ( "Efetuar Pagamento apenas de 1/3"                                     );
         $obCkbPagamento13->setTitle                     ( "Selecione se deverá ser efetuado o pagamento de apenas 1/3 das férias." );
 

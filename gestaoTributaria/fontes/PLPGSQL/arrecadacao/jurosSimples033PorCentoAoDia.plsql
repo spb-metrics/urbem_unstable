@@ -40,7 +40,7 @@ DECLARE
     nuRetorno           NUMERIC = 0.00;
     nuAux               NUMERIC = 0.00;
     inDias              INTEGER;
-    nuTaxaFracao        NUMERIC = 0.33/100;
+    nuTaxaFracao        NUMERIC = 0.033/100;
     ValorComJuros       NUMERIC = 0.00;
     inCount             INTEGER = 0;
 BEGIN

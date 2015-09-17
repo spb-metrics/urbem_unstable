@@ -58,12 +58,7 @@ class TTCMBAOrgao extends Persistente
     {
         $stSql = " SELECT 1 AS tipo_registro
                         , '".$this->getDado('exercicio')."' AS ano
-                        , ( SELECT valor
-                              FROM administracao.configuracao_entidade
-                             WHERE cod_modulo = 45
-                               AND parametro = 'tceba_codigo_unidade_gestora'
-                               AND cod_entidade = '".$this->getDado('entidade')."'
-                          ) AS unidade_gestora
+                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , orgao.num_orgao
                         , orgao.nom_orgao AS descricao
                         , (SELECT CASE WHEN sw_cgm.nom_cgm ilike '%prefeitura%' THEN 1
@@ -82,27 +77,38 @@ class TTCMBAOrgao extends Persistente
                               AND cod_modulo = 45
                         ) AS tipo_poder
                         , sw_cgm_pessoa_fisica.cpf
-                        , 0 AS tipo_gestao --necessário ver com a análise
+                        , (SELECT CASE WHEN COUNT(tco.num_orgao) > 1 THEN 2 ELSE 1 END
+                             FROM tcmba.configuracao_ordenador AS tco
+                            WHERE tco.num_orgao = orgao.num_orgao
+                              AND tco.exercicio = orgao.exercicio
+                              AND tco.dt_inicio_vigencia = configuracao_ordenador.dt_inicio_vigencia
+                            GROUP BY dt_inicio_vigencia
+                        ) AS tipo_gestao
                         , configuracao_ordenador.dt_inicio_vigencia AS dt_inicio_responsavel
-                        , 0 AS tipo_responsavel --necessário ver com a análise
+                        , tipo_responsavel.cod_tipo_responsavel AS tipo_responsavel
 
                     FROM orcamento.orgao
-
-              INNER JOIN sw_cgm
-                      ON sw_cgm.numcgm = orgao.usuario_responsavel
-
-              INNER JOIN sw_cgm_pessoa_fisica
-                      ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
 
               INNER JOIN tcmba.configuracao_ordenador
                       ON configuracao_ordenador.num_orgao = orgao.num_orgao
                      AND configuracao_ordenador.exercicio = orgao.exercicio
 
-                   WHERE orgao.exercicio = '".$this->getDado('exercicio')."'
+              INNER JOIN sw_cgm
+                      ON sw_cgm.numcgm = configuracao_ordenador.cgm_ordenador
+
+              INNER JOIN sw_cgm_pessoa_fisica
+                      ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+              INNER JOIN tcmba.tipo_responsavel
+                      ON tipo_responsavel.cod_tipo_responsavel = configuracao_ordenador.cod_tipo_responsavel
+
+                   WHERE configuracao_ordenador.exercicio = '".$this->getDado('exercicio')."'
+                     AND configuracao_ordenador.cod_entidade IN (".$this->getDado('entidade').")
+                     AND configuracao_ordenador.dt_inicio_vigencia <= TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                     AND configuracao_ordenador.dt_fim_vigencia >= TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
 
                    ORDER BY num_orgao
         ";
-        
         return $stSql;
     }
 

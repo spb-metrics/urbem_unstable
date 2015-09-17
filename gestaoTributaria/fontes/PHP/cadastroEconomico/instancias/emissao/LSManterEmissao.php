@@ -30,52 +30,33 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Diego Bueno Coelho
 
-    * $Id: LSManterEmissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterEmissao.php 63405 2015-08-25 14:14:49Z arthur $
 
   Caso de uso: uc-05.02.12
 **/
 
-/*
-$Log$
-Revision 1.5  2007/05/11 20:24:49  dibueno
-Alterações para possibilitar a emissao do alvará
-
-Revision 1.4  2006/12/14 12:59:41  dibueno
-Modificações para listagem de licenças
-
-Revision 1.3  2006/12/12 11:25:07  dibueno
-Modificações para listagem de licenças
-
-Revision 1.2  2006/11/24 17:22:40  dibueno
-Alteração de nome da coluna nome_arquivo_swx para nome_arquivo_template
-
-Revision 1.1  2006/10/23 16:12:21  dibueno
-*** empty log message ***
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GT_CEM_MAPEAMENTO."TCEMLicencaDocumento.class.php" );
+include_once CAM_GT_CEM_MAPEAMENTO."TCEMLicencaDocumento.class.php";
 
 //Define o nome dos arquivos PHP
-$stParametros .= "&stAcao=".$_REQUEST["stAcao"];
+$stParametros .= "&stAcao=".$request->get('stAcao');
 $stParametros .= "&stTipoLicenca=2";
-$stParametros .= "&inInscricaoEconomica=".$_REQUEST["inInscricaoEconomica"];
-$stParametros .= "&inCodLicenca=".$_REQUEST['inCodLicenca'];
-$stParametros .= "&inNumeroLicenca=".$_REQUEST['inCodLicenca'];
-$stParametros .= "&inExercicio=".$_REQUEST['inExercicio'];
+$stParametros .= "&inInscricaoEconomica=".$request->get('inInscricaoEconomica');
+$stParametros .= "&inCodLicenca=".$request->get('inCodLicenca');
+$stParametros .= "&inNumeroLicenca=".$request->get('inCodLicenca');
+$stParametros .= "&inExercicio=".$request->get('inExercicio');
 $stParametros .= "&stTipoModalidade=alteracao";
-$stParametros .= "&stCodAcao=".$_REQUEST['stCodAcao'];
-$stParametros .= "&inOcorrenciaLicenca=".$_REQUEST['inOcorrenciaLicenca'];
+$stParametros .= "&stCodAcao=".$request->get('stCodAcao');
+$stParametros .= "&inOcorrenciaLicenca=".$request->get('inOcorrenciaLicenca');
 $stParametros .= "&stOrigemFormulario=conceder_licenca";
-$stParametros .= "&stTipoLicenca=".$_REQUEST['inInscricaoEconomica'];
-$stParametros .= "&inInscricaoEconomica=".$_REQUEST["inInscricaoEconomica"];
-$stParametros .= "&inCodigoTipoDocumento=".$_REQUEST["inCodTipoDocumento2"];
-$stParametros .= "&stCodigoDocumentoTxt=".$_REQUEST["stCodDocumentoTxt2"];
-$stParametros .= "&stNomeDocumento=".$_REQUEST["stNomeDocumento"];
-$stParametros .= "&stNomeArquivo=".$_REQUEST["stNomeArquivo"];
-$stParametros .= "&inCodigoDocumento=".$_REQUEST["stCodDocumento2"]."&";
+$stParametros .= "&stTipoLicenca=".$request->get('inInscricaoEconomica');
+$stParametros .= "&inInscricaoEconomica=".$request->get('inInscricaoEconomica');
+$stParametros .= "&inCodigoTipoDocumento=".$request->get('inCodTipoDocumento2');
+$stParametros .= "&stCodigoDocumentoTxt=".$request->get('stCodDocumentoTxt2');
+$stParametros .= "&stNomeDocumento=".$request->get('stNomeDocumento');
+$stParametros .= "&stNomeArquivo=".$request->get('stNomeArquivo');
+$stParametros .= "&inCodigoDocumento=".$request->get('stCodDocumento2')."&";
 
 $pgFilt = CAM_GT_CEM_INSTANCIAS."licenca/LSManterLicenca.php?".Sessao::getId().$stParametros;
 
@@ -88,8 +69,8 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once( $pgJS );
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if ( empty( $_REQUEST['stAcao'] ) ) {
-    $_REQUEST['stAcao'] = "incluir";
+if ( empty( $request->get('stAcao') ) ) {
+    $request->set('stAcao', 'incluir');
 }
 
 //MANTEM FILTRO E PAGINACAO
@@ -103,55 +84,52 @@ if ($_GET["pg"] and  $_GET["pos"]) {
 
 Sessao::write( 'link'  , $link );
 Sessao::write( 'stLink', $stLink );
+
 //MONTAGEM DO FILTRO
-if ( $_REQUEST['stCodAcao'] )
-    $stFiltro = " amad.cod_acao = ". $_REQUEST['stCodAcao'] ." AND ";
+if ( $request->get('stCodAcao') )
+    $stFiltro = " amad.cod_acao = ". $request->get('stCodAcao') ." AND ";
 else
     $stFiltro = " amad.cod_acao = ". Sessao::read('acao')." AND ";
 
 /* PARAMETROS VINDOS DA EMISSAO DA INSCRICAO DE DIVIDA */
-if ($_REQUEST['inExercicio']) {
-    $stFiltro .= " \n eld.exercicio = ".$_REQUEST['inExercicio']." AND ";
+if ($request->get('inExercicio')) {
+    $stFiltro .= " \n eld.exercicio = ".$request->get('inExercicio')." AND ";
 }
 
-if ($_REQUEST['inNumeroLicenca']) {
-    $stFiltro .= " \n eld.cod_licenca = ".$_REQUEST['inNumeroLicenca']." AND ";
+if ($request->get('inNumeroLicenca')) {
+    $stFiltro .= " \n eld.cod_licenca = ".$request->get('inNumeroLicenca')." AND ";
 }
-if ($_REQUEST['inCodLicenca']) {
-    $stFiltro .= " \n eld.cod_licenca = ".$_REQUEST['inCodLicenca']." AND ";
-}
-
-if ($_REQUEST['inOcorrenciaLicenca']) {
-    $stFiltro .= " \n lca.ocorrencia_licenca = ".$_REQUEST['inOcorrenciaLicenca']." AND ";
+if ($request->get('inCodLicenca')) {
+    $stFiltro .= " \n eld.cod_licenca = ".$request->get('inCodLicenca')." AND ";
 }
 
-if ($_REQUEST['stTipoModalidade'] == "emissao") {
+if ($request->get('inOcorrenciaLicenca')) {
+    $stFiltro .= " \n lca.ocorrencia_licenca = ".$request->get('inOcorrenciaLicenca')." AND ";
+}
+
+if ($request->get('stTipoModalidade') == "emissao") {
     $stFiltro .= " \n ded.timestamp IS NULL AND ";
-} elseif ($_REQUEST['stTipoModalidade'] == "reemissao" || $_REQUEST["stTipoModalidade"] == 'alteracao') {
+} elseif ($request->get('stTipoModalidade') == "reemissao" || $request->get('stTipoModalidade') == 'alteracao') {
     $stFiltro .= " \n ded.timestamp IS NOT NULL AND ";
 }
 
-if ($_REQUEST['stCodDocumento']) {
-    $stFiltro .= " \n ddd.num_documento = ".$_REQUEST['stCodDocumento']." AND ";
+if ($request->get('stCodDocumento')) {
+    $stFiltro .= " \n ddd.num_documento = ".$request->get('stCodDocumento')." AND ";
 }
 
 if ( $stFiltro )
     $stFiltro = " WHERE ".substr( $stFiltro, 0, strlen($stFiltro) - 4 );
 
-#echo 'filtro: '.$stFiltro;
-
 $obTCEMLicencaDocumento = new TCEMLicencaDocumento;
 $stOrdem = " limit 1 ";
 $obTCEMLicencaDocumento->recuperaListaDocumentoLS( $rsDocumentos, $stFiltro, $stOrdem );
-#$obTCEMLicencaDocumento->debug();
-#sistemaLegado::mostravar( $rsDocumentos );
 
 $obForm = new Form;
 $obForm->setAction ( $pgForm );
 $obFormulario = new FormularioAbas;
 $obFormulario->addForm  ( $obForm );
 
-if ($_REQUEST['stOrigemFormulario'] == 'conceder_licenca' || $_REQUEST['stOrigemFormulario'] == 'alterar_licenca') {
+if ($request->get('stOrigemFormulario') == 'conceder_licenca' || $request->get('stOrigemFormulario') == 'alterar_licenca') {
     $obFormulario->addTitulo  ( "Emissão de Alvará" );
 }
 
@@ -259,3 +237,5 @@ $obFormulario->addSpan  ( $obSpanLista );
 $obFormulario->Cancelar();
 
 $obFormulario->show();
+
+?>

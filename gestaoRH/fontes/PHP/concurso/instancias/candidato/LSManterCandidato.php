@@ -56,11 +56,11 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
-$stCaminho   = CAM_GRH."PHP/concurso/instancias/candidato/";
+$stCaminho    = CAM_GRH."PHP/concurso/instancias/candidato/";
 $obRCandidato = new RConcursoCandidato;
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 if ( empty( $stAcao ) ) {
     $stAcao = "alterar";
 }
@@ -81,10 +81,10 @@ if ( is_array($sessao->link) ) {
     }
 }
 
-if ($_REQUEST['inNumCGM']) {
-    $obRCandidato->setNumCGM ( $_REQUEST['inNumCGM'] );
+if ($request->get('inNumCGM')) {
+    $obRCandidato->setNumCGM ( $request->get('inNumCGM') );
     $obRCandidato->consultarCGM($rsCGM);
-    $stLink .= '&inNumCGM='.$_REQUEST['inNumCGM'];
+    $stLink .= '&inNumCGM='.$request->get('inNumCGM');
 }
 
 $obLblNome = new Label;
@@ -97,10 +97,10 @@ $obSpnLista->setId ('spnLista' );
 $obFormulario = new Formulario;
 
 $stLink .= "&stAcao=".$stAcao;
-$obRCandidato->setNumCGM($_REQUEST['inNumCGM']);
+$obRCandidato->setNumCGM($request->get('inNumCGM'));
 
 if ($stAcao=='alterar') {
-    $arVal         = preg_split( "/[^a-zA-Z0-9]/", $_REQUEST['inCodConcurso']);
+    $arVal         = preg_split( "/[^a-zA-Z0-9]/", $request->get('inCodConcurso'));
     $obRCandidato->obRConcursoConcurso->setCodEdital($arVal[0]);
 } else {
     if ($stAcao != 'reclassifi') {
@@ -109,14 +109,14 @@ if ($stAcao=='alterar') {
     }
 }
 
-$obRCandidato->obRConcursoConcurso->setCodEdital( $_REQUEST['inCodEdital'] );
+$obRCandidato->obRConcursoConcurso->setCodEdital( $request->get('inCodEdital') );
 $obRCandidato->obRConcursoConcurso->consultarConcurso( $rsNorma, $rsCargos );
 
 $obTxtCodEdital = new TextBox;
 $obTxtCodEdital->setRotulo("Edital");
 $obTxtCodEdital->setTitle ("Selecione o concurso".Sessao::getEntidade()."");
 $obTxtCodEdital->setName  ("inCodEdital");
-$obTxtCodEdital->setValue ($_REQUEST['inCodEdital']);
+$obTxtCodEdital->setValue ($request->get('inCodEdital'));
 $obTxtCodEdital->setStyle    ("color: #000000");
 $obTxtCodEdital->setMaxLength(5    );
 $obTxtCodEdital->setSize     (10   );
@@ -124,7 +124,7 @@ $obTxtCodEdital->setDisabled (true );
 
 $obLblEdital = new Label;
 $obLblEdital->setRotulo( "Edital");
-$obLblEdital->setValue( $_REQUEST['inCodEdital'] ." - ". $rsNorma->getCampo("nom_norma") );
+$obLblEdital->setValue( $request->get('inCodEdital') ." - ". $rsNorma->getCampo("nom_norma") );
 
 $obCmbEdital = new TextBox;
 $obCmbEdital->setRotulo   ("Edital");
@@ -159,13 +159,6 @@ $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
 $obLista->ultimoCabecalho->setWidth(5);
 $obLista->commitCabecalho();
-
-//if ($stAcao == 'reclassifi') {
-//    $obLista->addCabecalho();
-//    $obLista->ultimoCabecalho->addConteudo	("Reclassificar"			);
-//    $obLista->ultimoCabecalho->setWidth		( 10 				);
-//    $obLista->commitCabecalho();
-//}
 
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Candidato");
@@ -207,19 +200,6 @@ if ($stAcao == 'alterar' || $stAcao == 'reclassifi') {
     $obLista->ultimoCabecalho->setWidth(5);
     $obLista->commitCabecalho();
 }
-
-//***************************************************
-//if ($stAcao == 'reclassifi') {
-//    $obChkReclassificado = new CheckBox;
-//    $obChkReclassificado->setName           ( "reclassificar_[cod_candidato]_"  );
-//    $obChkReclassificado->setValue          ( "reclassificado");
-//    $obChkReclassificado->obEvento->setOnClick( "candidatoReclassificar();" );
-//
-//    $obLista->addDadoComponente( $obChkReclassificado );
-//    $obLista->ultimoDado->setCampo( "boReclassificado" );
-//    $obLista->ultimoDado->setAlinhamento('DIREITA');
-//    $obLista->commitDadoComponente();
-//}
 
 $obLista->addDado();
 $obLista->ultimoDado->setCampo("cod_candidato");
@@ -282,16 +262,6 @@ if ($stAcao == "reclassifi") {
     $obFormulario->addTitulo    ( "Reclassificar candidato"            );
     $obFormulario->addComponente( $obLblEdital );
 }
-
-/*$obLista->montaHTML();
-$stHtml = $obLista->getHTML();
-/*$stHtml = str_replace("\n","",$stHtml);
-$stHtml = str_replace("\"","'",$stHtml);
-$stHtml = str_replace("\\","",$stHtml);
-
-// preenche a lista com innerHTML
-//$stJs .= 'd.getElementById("spnLista").innerHTML = '.$stHtml.';';
-$obFormulario->addSpan( $obSpnLista );*/
 
 if ($stAcao == 'reclassifi') {
     $obForm = new Form;

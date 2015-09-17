@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.38
 
-    $Id: FMManterVinculoEmpenhoConvenio.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterVinculoEmpenhoConvenio.php 63268 2015-08-11 14:44:43Z jean $
 
 */
 
@@ -63,7 +63,7 @@ $stLocation = $pgFilt.'?'.Sessao::getId()."&stAcao=".$stAcao;
 include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoParticipanteConvenio.class.php" );
 $obTLicitacaoParticipanteConvenio = new TLicitacaoParticipanteConvenio();
 $obTLicitacaoParticipanteConvenio->setDado('num_convenio', $_REQUEST['numConvenio']);
-$obTLicitacaoParticipanteConvenio->setDado('exercicio', "'".$_REQUEST['exercicio']."'");
+$obTLicitacaoParticipanteConvenio->setDado('exercicio', $_REQUEST['exercicio']);
 $stOrder   = " ORDER BY sw_cgm.nom_cgm ";
 $obTLicitacaoParticipanteConvenio->recuperaParticipanteConvenio($rsParticipantes, "", $stOrder);
 
@@ -117,7 +117,7 @@ $obBtnIncluir = new Button;
 $obBtnIncluir->setValue             ( "Incluir" 	);
 $obBtnIncluir->setName				( "btnIncluir"  );
 $obBtnIncluir->setId				( "btnIncluir"  );
-$obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET('incluirEmpenho','inCodEmpenho, numConvenio, stExercicio', false);" );
+$obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET('incluirEmpenho','inCodEntidade, inCodEmpenho, numConvenio, stExercicio', false);" );
 
 $obBtnLimpar = new Button;
 $obBtnLimpar->setId                ( "limpar" );
@@ -166,7 +166,7 @@ $obFormulario->addTitulo( "Participantes do Convênio" );
 // Faz o while para montar as labels dos participantes
 while ( !$rsParticipantes->eof() ) {
     $obLblParticipantes = new Label;
-    $obLblParticipantes->setValue  ( $rsParticipantes->getCampo('numcgm').' - '.$rsParticipantes->getCampo('nom_cgm') );
+    $obLblParticipantes->setValue  ( $rsParticipantes->getCampo('cgm_fornecedor').' - '.$rsParticipantes->getCampo('nom_cgm') );
     $obFormulario->addComponente( $obLblParticipantes );
     $rsParticipantes->proximo();
 }

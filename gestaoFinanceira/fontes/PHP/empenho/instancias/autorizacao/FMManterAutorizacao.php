@@ -58,11 +58,10 @@ $pgProc = 'PR'.$stPrograma.'.php';
 $pgOcul = 'OC'.$stPrograma.'.php';
 $pgJS   = 'JS'.$stPrograma.'.js';
 
+include_once ($pgJS);
+
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if (empty($stAcao)) {
-    $stAcao = 'incluir';
-}
+$stAcao = $request->get('stAcao','incluir');
 
 $stFiltro = '';
 if ( Sessao::read('filtro') ) {
@@ -162,6 +161,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $stDescricao           = $obREmpenhoAutorizacaoEmpenho->getDescricao();
         $inCodHistorico        = $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->getCodHistorico();
         $inCodCategoria        = $obREmpenhoAutorizacaoEmpenho->getCodCategoria();
+
+        //$obROrcamentoClassificacaoDespesaAlterar = new ROrcamentoClassificacaoDespesa;
+        //$obROrcamentoClassificacaoDespesaAlterar->setCodDespesa($inCodDespesa);
+        //$obROrcamentoClassificacaoDespesaAlterar->listar($rsClassificacao);
         
         if ($inCodCategoria == 2 || $inCodCategoria == 3) {
             include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoContrapartidaAutorizacao.class.php';
@@ -240,11 +243,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
             $stJs .= "bloqueiaTipoItem('Descricao');";
         }
 
-        $stJs .= "alterar('".$inCodOrgao."');";
-        
-        //SistemaLegado::executaFramePrincipal("BloqueiaFrames(true,false);". $stJs);
-        SistemaLegado::executaFramePrincipal($stJs);
-
+        $jsOnLoad = "montaParametrosGET('alterar','');";
     } else {
         $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionados($rsAtributos);
     }
@@ -290,7 +289,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     //Define o Hidden de Valor de Reserva
     $obHdnVlReserva = new Hidden;
     $obHdnVlReserva->setId   ('hdnVlReserva');
-    $obHdnVlReserva->setName ('nuVlReserva');
+    $obHdnVlReserva->setName ('hdnVlReserva');
     $obHdnVlReserva->setValue(0);
 
     if ($stAcao == 'alterar') {
@@ -310,7 +309,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obHdnCodEntidade->setId   ('inCodEntidade'); // Necessário para o componete IMontaAssinaturas
         $obHdnCodEntidade->setValue($inCodEntidade);
 
-        // Define o objeto Hidden para Codigo da Reserva
+        // Define o objeto Hidden para Codigo da Reserva  $js = "";
         $obHdnCodReserva = new Hidden;
         $obHdnCodReserva->setName ('inCodReserva');
         $obHdnCodReserva->setValue($inCodReserva);
@@ -343,6 +342,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $obHdnVlTotalAutorizacao = new Hidden;
     $obHdnVlTotalAutorizacao->setName ('nuVlTotalAutorizacao');
+    $obHdnVlTotalAutorizacao->setId   ('nuVlTotalAutorizacao');
     $obHdnVlTotalAutorizacao->setValue('');
 
     if ($stAcao != 'alterar') {
@@ -355,7 +355,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
         if ($rsEntidade->getNumLinhas()==1) {
             $obTxtCodEntidade->setValue($rsEntidade->getCampo('cod_entidade'));
-            $jsOnload = "BloqueiaFrames(true,false);executaFuncaoAjax('buscaDtAutorizacao','&inCodEntidade=".$rsEntidade->getCampo("cod_entidade")."');";
+            $jsOnLoad .= "BloqueiaFrames(true,false);montaParametrosGET('buscaDtAutorizacao','inCodEntidade');";
         } else {
             $obTxtCodEntidade->setValue($inCodEntidade);
             $obTxtCodEntidade->obEvento->setOnBlur("montaParametrosGET('buscaDtAutorizacao');");
@@ -370,7 +370,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obCmbNomEntidade->setName ('stNomEntidade');
         $obCmbNomEntidade->setId   ('stNomEntidade');
         $obCmbNomEntidade->setValue($inCodEntidade);
-        $obCmbNomEntidade->obEvento->setOnChange("document.getElementById('inCodEntidade').value = this.value; montaParametrosGET('buscaDtAutorizacao'); getIMontaAssinaturas();");
+        $obCmbNomEntidade->obEvento->setOnChange("jq('#inCodEntidade').val(this.value); montaParametrosGET('buscaDtAutorizacao'); getIMontaAssinaturas();");
 
         if ($rsEntidade->getNumLinhas()>1) {
             $obCmbNomEntidade->addOption('', 'Selecione');
@@ -400,6 +400,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     // Define objeto Data para armazenar a data da autorização
     $obDtAutorizacao = new Data;
     $obDtAutorizacao->setName  ('stDtAutorizacao');
+    $obDtAutorizacao->setId    ('stDtAutorizacao');
     $obDtAutorizacao->setValue ('');
     $obDtAutorizacao->setRotulo('Data da Autorização');
     $obDtAutorizacao->setTitle ('Informe a data da autorização.');
@@ -417,7 +418,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscDespesa->obCampoCod->setMaxLength(5);
     $obBscDespesa->obCampoCod->setValue    ($inCodDespesa);
     $obBscDespesa->obCampoCod->setAlign    ('left');
-    $obBscDespesa->obCampoCod->obEvento->setOnChange("buscaDado('buscaDespesa');");
+    $obBscDespesa->obCampoCod->obEvento->setOnChange("montaParametrosGET('buscaDespesa');");
     $obBscDespesa->setFuncaoBusca("abrePopUp('".CAM_GF_ORC_POPUPS."despesa/LSDespesa.php','frm','inCodDespesa','stNomDespesa','autorizacaoEmpenho&inCodEntidade='+document.frm.inCodEntidade.value+'&inNumOrgao='+document.frm.inCodOrgao.value+'&inNumUnidade='+document.frm.inCodUnidadeOrcamento.value,'".Sessao::getId()."','800','550');");
 
     // Define Objeto Select para Classificacao da Despesa
@@ -455,7 +456,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obCmbOrgaoOrcamento->preencheCombo($rsOrgao);
     }
     $obCmbOrgaoOrcamento->setNull(false);
-    $obCmbOrgaoOrcamento->obEvento->setOnChange("buscaValor('buscaOrgaoUnidade','".$pgOcul."','".$pgProc."','oculto','".Sessao::getId()."');");
+    $obCmbOrgaoOrcamento->obEvento->setOnChange("montaParametrosGET('buscaOrgaoUnidade');");
 
     // Define Objeto Select para Unidade Orcamentaria
     $obCmbUnidadeOrcamento = new Select;
@@ -482,7 +483,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscFornecedor->obCampoCod->setMaxLength(8);
     $obBscFornecedor->obCampoCod->setValue    ($inCodFornecedor);
     $obBscFornecedor->obCampoCod->setAlign    ('left');
-    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("buscaDado('buscaFornecedor'); montaParametrosGET('buscaContrapartida'); montaParametrosGET('verificaFornecedor');");
+    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("montaParametrosGET('buscaFornecedor'); montaParametrosGET('buscaContrapartida'); montaParametrosGET('verificaFornecedor');");
     $obBscFornecedor->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodFornecedor','stNomFornecedor','','".Sessao::getId()."','800','550');");
 
     $rsCategoriaEmpenho = new RecordSet();
@@ -522,7 +523,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
        $obBscMaterial->obCampoCod->setMaxLength(7);
        $obBscMaterial->obCampoCod->setValue    ($inCodMaterial);
        $obBscMaterial->obCampoCod->setAlign    ('left');
-       $obBscMaterial->obCampoCod->obEvento->setOnBlur("buscaDado('buscaMaterial');");
+       $obBscMaterial->obCampoCod->obEvento->setOnBlur("montaParametrosGET('buscaMaterial');");
        $obBscMaterial->setFuncaoBusca("abrePopUp('".CAM_FRAMEWORK."popupsLegado/materialSiam/FLMaterialSiam.php','frm','inCodMaterial','stNomMaterial','','".Sessao::getId()."','800','550');");
     }
 
@@ -631,12 +632,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBtnIncluir->setValue('Incluir Item');
     $obBtnIncluir->setName ('btnIncluir');
     $obBtnIncluir->setId   ('btnIncluir');
-    $obBtnIncluir->obEvento->setOnClick("incluirItem();document.getElementById('stNomItem').focus();");
+    $obBtnIncluir->obEvento->setOnClick("jq('#stNomItem').focus();if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}");
 
     // Define Objeto Button para Limpar
     $obBtnLimpar = new Button;
     $obBtnLimpar->setValue('Limpar');
-    $obBtnLimpar->obEvento->setOnClick("limparItem();document.getElementById('stNomItem').focus();");
+    $obBtnLimpar->obEvento->setOnClick("limparItem();jq('#stNomItem').focus();");
 
     // Define Objeto Span Para lista de itens
     $obSpan = new Span;
@@ -645,6 +646,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     // Define Objeto Label para Valor Total dos Itens
     $obLblVlTotal = new Label;
     $obLblVlTotal->setId    ('nuValorTotal');
+    $obLblVlTotal->setName  ('nuValorTotal');
     $obLblVlTotal->setRotulo('TOTAL: ');
 
     // Objeto Span para valor da reserva e data de validade
@@ -694,7 +696,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
     $obMontaItemUnidade->obIPopUpCatalogoItem->setNull(true);
     $obMontaItemUnidade->obIPopUpCatalogoItem->obCampoCod->setId("inCodItem");
-    $obMontaItemUnidade->obIPopUpCatalogoItem->obCampoCod->obEvento->setOnBlur("javascript: unidadeItem(this.value);");
+    $obMontaItemUnidade->obIPopUpCatalogoItem->obCampoCod->obEvento->setOnBlur("montaParametrosGET('unidadeItem','inCodItem');");
     $obMontaItemUnidade->obIPopUpCatalogoItem->setId( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obIPopUpCatalogoItem->setName( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obSpnInformacoesItem->setStyle('visibility:hidden; display:none');
@@ -823,11 +825,11 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->show();
 
     if ($obMontaAssinaturas->getOpcaoAssinaturas()) {
-        echo $obMontaAssinaturas->disparaLista();
+        $jsOnLoad .= "getIMontaAssinaturas();\n";
     }
 }
 if ($stAcao != 'alterar') {
-    echo ("<script>habilitaCampos('Descricao')</script>");
+    $jsOnLoad .= "habilitaCampos('Descricao');\n";
 }
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

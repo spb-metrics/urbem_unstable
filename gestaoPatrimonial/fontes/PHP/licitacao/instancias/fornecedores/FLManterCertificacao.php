@@ -39,15 +39,11 @@
     * Casos de uso: uc-03.05.13
 */
 
-/*
-
-$Log:
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php" );
+include_once CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php";
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
+include_once CAM_GP_COM_COMPONENTES."ISelectModalidade.class.php";
 
 $stPrograma = "ManterCertificacao";
 $pgFilt       = "FL".$stPrograma.".php";
@@ -56,6 +52,8 @@ $pgForm       = "FM".$stPrograma.".php";
 $pgProc       = "PR".$stPrograma.".php";
 $pgOcul       = "OC".$stPrograma.".php";
 $pgJS         = "JS".$stPrograma.".js";
+
+Sessao::remove('link');
 
 $stAcao = $request->get('stAcao');
 $stCtrl = $request->get('stCtrl');
@@ -75,6 +73,38 @@ $obHdnCtrl->setValue  ( $stCtrl  );
 $obForm = new Form;
 $obForm->setAction ( $pgList  );
 
+$rsLicitacao = new RecordSet();
+
+$obExercicio = new Exercicio();
+$obExercicio->setName ( 'stExercicioLicitacao' );
+$obExercicio->setId   ( 'stExercicioLicitacao' );
+$obExercicio->setValue( '' );
+$obExercicio->setNull ( true );
+
+$obITextBoxSelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
+$obITextBoxSelectEntidadeUsuario->obSelect->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
+$obITextBoxSelectEntidadeUsuario->obTextBox->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
+$obITextBoxSelectEntidadeUsuario->setNull( true );
+
+$obISelectModalidade = new ISelectModalidade();
+$obISelectModalidade->setNull( true );
+$obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=false&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");
+    
+$obCmbLicitacao = new Select();
+$obCmbLicitacao->setName      ( 'inCodLicitacao'   );
+$obCmbLicitacao->setRotulo    ( 'Licitação'        );
+$obCmbLicitacao->setTitle     ( 'Selecione a Licitação.' );
+$obCmbLicitacao->setId        ( 'inCodLicitacao'   );
+$obCmbLicitacao->setCampoID   ( 'cod_licitacao'    );
+$obCmbLicitacao->setCampoDesc ( 'cod_licitacao'    );
+$obCmbLicitacao->addOption    ( '','Selecione'     );
+$obCmbLicitacao->setNull      ( true );
+$obCmbLicitacao->preencheCombo( $rsLicitacao       );
+    
+$obHdnNumLicitacao = new Hidden();
+$obHdnNumLicitacao->setName( 'hdnNumLicitacao' );
+$obHdnNumLicitacao->setId( 'hdnNumLicitacao' );
+
 $obFornecedor = new IPopUpFornecedor($obForm);
 $obFornecedor->setId ( "stNomFornecedor" );
 $obFornecedor->setTitle( "Selecione o Fornecedor que deseja pesquisar." );
@@ -90,9 +120,16 @@ $obFormulario = new Formulario();
 $obFormulario->addForm( $obForm );
 $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addHidden( $obHdnCtrl );
+$obFormulario->addHidden( $obHdnNumLicitacao  );
+$obFormulario->addComponente( $obExercicio    );
+$obFormulario->addComponente( $obITextBoxSelectEntidadeUsuario );
+$obFormulario->addComponente( $obISelectModalidade );
+$obFormulario->addComponente( $obCmbLicitacao );
 $obFormulario->addComponente( $obFornecedor );
 $obFormulario->addComponente( $obTxtNumCertificacao );
 $obFormulario->Ok();
 $obFormulario->Show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

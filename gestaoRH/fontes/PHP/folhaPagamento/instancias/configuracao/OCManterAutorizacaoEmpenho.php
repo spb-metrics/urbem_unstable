@@ -171,7 +171,7 @@ function processarForm()
             $obTOrganogramaOrgao->recuperaDadosUltimoOrgao($rsOrgao);
 
             $stOpcao     = "lotacao";
-            $stRotulo    = "Lotação ".$rsOrgao->getCampo("orgao")."-".$rsOrgao->getCampo("descricao");
+            $stRotulo    = "Lotação : ".$rsOrgao->getCampo("orgao")." - ".$rsOrgao->getCampo("descricao");
             $inCodigo    = $rsLotacao->getCampo("cod_orgao");
             $inNumPAO    = $rsLotacao->getCampo("num_pao");
             $stDescricao = $rsOrgao->getCampo("descricao");
@@ -229,15 +229,21 @@ function processarForm()
         $obTOrcamentoProjetoAtividade = new TOrcamentoProjetoAtividade();
         $obTOrcamentoProjetoAtividade->setDado("num_pao",$inNumPAO);
         $obTOrcamentoProjetoAtividade->setDado("exercicio",$rsConfiguracaoLla->getCampo("exercicio"));
-        $obTOrcamentoProjetoAtividade->recuperaPorChave($rsPAO);
+        $stOrderBy = "
+              ORDER BY acao.num_acao
+                     , dotacao
+        ";
+        $obTOrcamentoProjetoAtividade->recuperaPorNumPAODotacao($rsPAO, "WHERE pao.exercicio = '".$rsConfiguracaoLla->getCampo("exercicio")."' AND pao.num_pao = ".$inNumPAO , $stOrderBy , $boTransacao);
 
         $arConfiguracaoLLA                      = array();
         $arConfiguracaoLLA["inId"]              = count($arConfiguracoesLLA)+1;
         $arConfiguracaoLLA["stOpcao"]           = $stOpcao;
         $arConfiguracaoLLA["rotulo"]            = $stRotulo;
         $arConfiguracaoLLA["codigo"]            = $inCodigo;
-        $arConfiguracaoLLA["inNumPAO"]          = $inNumPAO;
-        $arConfiguracaoLLA["stNomPAO"]          = $rsPAO->getCampo("nom_pao");
+        $arConfiguracaoLLA["stHdnDotacao"]      = $rsPAO->getCampo("dotacao");
+        $arConfiguracaoLLA["inNumPAO"]          = $rsPAO->getCampo("num_acao");
+        $arConfiguracaoLLA["inHdnNumPAO"]       = $inNumPAO;
+        $arConfiguracaoLLA["stNomPAO"]          = $rsPAO->getCampo("titulo");
         $arConfiguracaoLLA["descricao"]         = $stDescricao;
         $arConfiguracaoLLA["extra"]             = $extra;
         $arConfiguracoesLLA[]                   = $arConfiguracaoLLA;
@@ -442,6 +448,14 @@ function processarForm()
             $rsSituacao->proximo();
         }
 
+        include_once(CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php");
+        $obTOrcamentoProjetoAtividade = new TOrcamentoProjetoAtividade();
+        $stOrderBy = "
+              ORDER BY acao.num_acao
+                     , dotacao
+        ";
+        $obTOrcamentoProjetoAtividade->recuperaPorNumPAODotacao($rsPAO, "WHERE pao.exercicio = '".$rsConfiguracoesEventos->getCampo("exercicio_despesa")."' AND pao.num_pao =".$rsConfiguracoesEventos->getCampo("num_pao")." AND acao.num_acao = ".$rsConfiguracoesEventos->getCampo("num_acao") , $stOrderBy , $boTransacao);
+
         $arConfiguracaoEvento["stMascClassificacao"]      = $rsContaDespesa->getCampo("cod_estrutural");
         $arConfiguracaoEvento["stRubricaDespesa"]         = $rsContaDespesa->getCampo("descricao");
         $arConfiguracaoEvento["inCodDespesa"]             = $rsConfiguracoesEventos->getCampo("cod_despesa");
@@ -452,7 +466,9 @@ function processarForm()
         $arConfiguracaoEvento["inCodEventoSelecionados"]  = $arCodEventos;
         $arConfiguracaoEvento["rotulo"]                   = $stRotulo;
         $arConfiguracaoEvento["codigo"]                   = $inCodigo;
-        $arConfiguracaoEvento["inNumPAO"]                 = $rsConfiguracoesEventos->getCampo("num_pao");
+        $arConfiguracaoEvento["inNumPAO"]                 = $rsConfiguracoesEventos->getCampo("num_acao");
+        $arConfiguracaoEvento["inHdnNumPAOEvento"]        = $rsConfiguracoesEventos->getCampo("num_pao");
+        $arConfiguracaoEvento["stHdnDotacaoEvento"]       = $rsPAO->getCampo("dotacao");
         $arConfiguracaoEvento["stNomPAO"]                 = $rsConfiguracoesEventos->getCampo("nom_pao");
         $arConfiguracaoEvento["descricao"]                = $stDescricao;
         $arConfiguracaoEvento["extra"]                    = $extra;
@@ -647,7 +663,17 @@ function gerarSpanLotacao()
     $obIBuscaInnerLotacao = new IBuscaInnerLotacao( array('cod_organograma' => $rsOrganograma->getCampo('cod_organograma')) );
     $obIPopUpPAO          = new IPopUpPAO(array('exercicio'=>Sessao::read('inExercicioVigencia')));
 
+    $obHdnNumPAO = new Hidden();
+    $obHdnNumPAO->setId('inHdnNumPAO');
+    $obHdnNumPAO->setName('inHdnNumPAO');
+    
+    $obHdnDotacao = new Hidden();
+    $obHdnDotacao->setId('stHdnDotacao');
+    $obHdnDotacao->setName('stHdnDotacao');
+    
     $obFormulario = new Formulario;
+    $obFormulario->addHidden($obHdnNumPAO);
+    $obFormulario->addHidden($obHdnDotacao);
     $obFormulario->addTitulo("Lotação");
     $obIBuscaInnerLotacao->geraFormulario($obFormulario);
     $obFormulario->addComponente($obIPopUpPAO);
@@ -663,7 +689,17 @@ function gerarSpanLocal()
     $obIBuscaInnerLocal   = new IBuscaInnerLocal;
     $obIPopUpPAO          = new IPopUpPAO(array('exercicio'=>Sessao::read('inExercicioVigencia')));
 
+    $obHdnNumPAO = new Hidden();
+    $obHdnNumPAO->setId('inHdnNumPAO');
+    $obHdnNumPAO->setName('inHdnNumPAO');
+    
+    $obHdnDotacao = new Hidden();
+    $obHdnDotacao->setId('stHdnDotacao');
+    $obHdnDotacao->setName('stHdnDotacao');
+    
     $obFormulario = new Formulario;
+    $obFormulario->addHidden($obHdnNumPAO);
+    $obFormulario->addHidden($obHdnDotacao);
     $obFormulario->addTitulo("Local");
     $obIBuscaInnerLocal->geraFormulario($obFormulario);
     $obFormulario->addComponente($obIPopUpPAO);
@@ -699,7 +735,17 @@ function gerarSpanAtributo()
 
     $obIPopUpPAO = new IPopUpPAO(array('exercicio'=>Sessao::read('inExercicioVigencia')));
 
-    $obFormulario = new Formulario();
+    $obHdnNumPAO = new Hidden();
+    $obHdnNumPAO->setId('inHdnNumPAO');
+    $obHdnNumPAO->setName('inHdnNumPAO');
+    
+    $obHdnDotacao = new Hidden();
+    $obHdnDotacao->setId('stHdnDotacao');
+    $obHdnDotacao->setName('stHdnDotacao');
+    
+    $obFormulario = new Formulario;
+    $obFormulario->addHidden($obHdnNumPAO);
+    $obFormulario->addHidden($obHdnDotacao);
     $obFormulario->addTitulo("Atributo Dinâmico");
     $obFormulario->addComponente($obCmbAtributo);
     $obFormulario->addSpan($obSpnAtributo);
@@ -830,7 +876,7 @@ function processarInformacoesLLA()
         case "lotacao";
             $arDados["inCodigo"]    = $request->get("HdninCodLotacao");
             $arDados["stDescricao"] = $request->get("stLotacao");
-            $arDados["stRotulo"]    = "Lotação ".$request->get("inCodLotacao")."-".$request->get("stLotacao");
+            $arDados["stRotulo"]    = "Lotação : ".$request->get("inCodLotacao")." - ".$request->get("stLotacao");
             $arDados["extra"]       = $request->get("inCodLotacao");
         break;
 
@@ -867,7 +913,7 @@ function processarInformacoesLLA()
                     Sessao::write($stNomeAtributo."_Selecionados",true);
                 }
             } else {
-                $arDados["stDescricao"] = utf8_decode($request->get($stNomeAtributo));
+                $arDados["stDescricao"] = $request->get($stNomeAtributo);
                 $arDados["extra"]       = $request->get($stNomeAtributo);
             }
 
@@ -888,8 +934,10 @@ function incluirLLA()
         $arConfiguracaoLLA["stOpcao"]           = $_REQUEST["stOpcoes"];
         $arConfiguracaoLLA["rotulo"]            = $arDados["stRotulo"];
         $arConfiguracaoLLA["codigo"]            = $arDados["inCodigo"];
+        $arConfiguracaoLLA["stHdnDotacao"]      = $_REQUEST["stHdnDotacao"];
         $arConfiguracaoLLA["inNumPAO"]          = $_REQUEST["inNumPAO"];
-        $arConfiguracaoLLA["stNomPAO"]          = utf8_decode($_REQUEST["campoInnerPAO"]);
+        $arConfiguracaoLLA["inHdnNumPAO"]       = $_REQUEST["inHdnNumPAO"];
+        $arConfiguracaoLLA["stNomPAO"]          = $_REQUEST["campoInnerPAO"];
         $arConfiguracaoLLA["descricao"]         = $arDados["stDescricao"];
         $arConfiguracaoLLA["extra"]             = $arDados["extra"];
         $arConfiguracoesLLA[] = $arConfiguracaoLLA;
@@ -926,7 +974,9 @@ function alterarLLA()
         $arConfiguracaoLLA["stOpcao"]           = $request->get("stOpcoes");
         $arConfiguracaoLLA["rotulo"]            = html_entity_decode($arDados["stRotulo"]);
         $arConfiguracaoLLA["codigo"]            = $arDados["inCodigo"];
+        $arConfiguracaoLLA["stHdnDotacao"]      = $request->get("stHdnDotacao");
         $arConfiguracaoLLA["inNumPAO"]          = $request->get("inNumPAO");
+        $arConfiguracaoLLA["inHdnNumPAO"]       = $request->get("inHdnNumPAO");
         $arConfiguracaoLLA["stNomPAO"]          = html_entity_decode($request->get("campoInnerPAO"));
         $arConfiguracaoLLA["descricao"]         = html_entity_decode($arDados["stDescricao"]);
         $arConfiguracaoLLA["extra"]             = $arDados["extra"];
@@ -1022,9 +1072,12 @@ function montaAlterarLLA()
             $stJs .= gerarSpanAtributosDinamicos($arCodigo[1],$arConfiguracaoLLA["extra"]);
             break;
     }
+
     $stJs .= "d.getElementById('campoInnerPAO').innerHTML = '".$arConfiguracaoLLA["stNomPAO"]."';\n";
     $stJs .= "f.campoInnerPAO.value = '".$arConfiguracaoLLA["stNomPAO"]."'; \n";
     $stJs .= "f.inNumPAO.value = '".$arConfiguracaoLLA["inNumPAO"]."'; \n";
+    $stJs .= "f.inHdnNumPAO.value = '".$arConfiguracaoLLA["inHdnNumPAO"]."';";
+    $stJs .= "f.stHdnDotacao.value = '".$arConfiguracaoLLA["stHdnDotacao"]."';";
     $stJs .= "f.obBtnIncluir.disabled = true;\n";
     $stJs .= "f.obBtnAlterar.disabled = false;\n";
 
@@ -1042,11 +1095,11 @@ function montaLLA()
     $obLista->setRecordset($rsLista);
     $obLista->setSummary("Lista de Configurações da Aba Lotação/Local/Atributo");
 
-    $obLista->Head->addCabecalho("Descrição",40);
-    $obLista->Head->addCabecalho("PAO",25);
+    $obLista->Head->addCabecalho("Descrição",35);
+    $obLista->Head->addCabecalho("PAO",30);
 
     $obLista->Body->addCampo( 'rotulo', 'E' );
-    $obLista->Body->addCampo( '[inNumPAO]-[stNomPAO]', 'E' );
+    $obLista->Body->addCampo( '[stHdnDotacao] - [stNomPAO]', 'E' );
 
     $obLista->Body->addAcao("alterar","executaFuncaoAjax('%s','&inId=%s')",array('montaAlterarLLA','inId'));
     $obLista->Body->addAcao("excluir","executaFuncaoAjax('%s','&inId=%s')",array('excluirLLA','inId'));
@@ -1310,13 +1363,13 @@ function processarInformacoesEvento()
     switch ($_REQUEST["stOpcoesConfiguracaoEvento"]) {
         case "lotacao";
             $arDados["inCodigo"] = $_REQUEST["HdninCodLotacaoEvento"];
-            $arDados["stDescricao"] = utf8_decode($_REQUEST["stLotacaoEvento"]);
+            $arDados["stDescricao"] = $_REQUEST["stLotacaoEvento"];
             $arDados["stRotulo"] = "Lotação";
             $arDados["extra"] = $_REQUEST["inCodLotacaoEvento"];
             break;
         case "local";
             $arDados["inCodigo"] = $_REQUEST["inCodLocalEvento"];
-            $arDados["stDescricao"] = utf8_decode($_REQUEST["stLocalEvento"]);
+            $arDados["stDescricao"] = $_REQUEST["stLocalEvento"];
             $arDados["stRotulo"] = "Local";
             $arDados["extra"] = $_REQUEST["inCodLocalEvento"];
             break;
@@ -1346,7 +1399,7 @@ function processarInformacoesEvento()
                     Sessao::write($stNomeAtributo."_Selecionados",true);
                 }
             } else {
-                $arDados["stDescricao"] = utf8_decode($_REQUEST[$stNomeAtributo]);
+                $arDados["stDescricao"] = $_REQUEST[$stNomeAtributo];
                 $arDados["extra"] = $_REQUEST[$stNomeAtributo];
             }
             $arDados["stRotulo"] = "Atributo ".$rsAtributos->getCampo("nom_atributo");
@@ -1361,9 +1414,10 @@ function incluirEvento()
     $obErro = validarEvento();
     if (!$obErro->ocorreu()) {
         $arDados = processarInformacoesEvento();
+
         $arConfiguracoesEvento = Sessao::read("arConfiguracoesEvento");
         $arConfiguracaoEvento["inId"]                       = count($arConfiguracoesEvento)+1;
-        $arConfiguracaoEvento["stOpcoesConfiguracaoEvento"] = utf8_decode($_REQUEST["stOpcoesConfiguracaoEvento"]);
+        $arConfiguracaoEvento["stOpcoesConfiguracaoEvento"] = $_REQUEST["stOpcoesConfiguracaoEvento"];
         $arConfiguracaoEvento["inCodEventoSelecionados"]    = $_REQUEST["inCodEventoSelecionados"];
         $arConfiguracaoEvento["stConfiguracao"]             = $_REQUEST["stConfiguracao"];
         $arConfiguracaoEvento["stSituacao1"]                = $_REQUEST["stSituacao1"];
@@ -1384,7 +1438,9 @@ function incluirEvento()
         $arConfiguracaoEvento["rotulo"]                     = $arDados["stRotulo"];
         $arConfiguracaoEvento["codigo"]                     = $arDados["inCodigo"];
         $arConfiguracaoEvento["inNumPAO"]                   = $_REQUEST["inNumPAOEvento"];
-        $arConfiguracaoEvento["stNomPAO"]                   = utf8_decode($_REQUEST["campoInnerPAOEvento"]);
+        $arConfiguracaoEvento["inHdnNumPAOEvento"]          = $_REQUEST["inHdnNumPAOEvento"];
+        $arConfiguracaoEvento["stHdnDotacaoEvento"]         = $_REQUEST["stHdnDotacaoEvento"];
+        $arConfiguracaoEvento["stNomPAO"]                   = $_REQUEST["campoInnerPAOEvento"];
         $arConfiguracaoEvento["descricao"]                  = $arDados["stDescricao"];
         $arConfiguracaoEvento["extra"]                      = $arDados["extra"];
 
@@ -1409,7 +1465,7 @@ function alterarEvento()
         $arDados = processarInformacoesEvento();
         $arConfiguracoesEvento = Sessao::read("arConfiguracoesEvento");
         $arConfiguracaoEvento["inId"]                           = Sessao::read("inId");
-        $arConfiguracaoEvento["stOpcoesConfiguracaoEvento"]     = utf8_decode($_REQUEST["stOpcoesConfiguracaoEvento"]);
+        $arConfiguracaoEvento["stOpcoesConfiguracaoEvento"]     = $_REQUEST["stOpcoesConfiguracaoEvento"];
         $arConfiguracaoEvento["inCodEventoSelecionados"]        = $_REQUEST["inCodEventoSelecionados"];
         $arConfiguracaoEvento["stConfiguracao"]                 = $_REQUEST["stConfiguracao"];
         $arConfiguracaoEvento["stSituacao1"]                    = $_REQUEST["stSituacao1"];
@@ -1421,7 +1477,7 @@ function alterarEvento()
 
         include_once(CAM_GF_ORC_MAPEAMENTO."TOrcamentoContaDespesa.class.php");
         $obTOrcamentoContaDespesa = new TOrcamentoContaDespesa();
-        $stFiltro = " WHERE exercicio = ".Sessao::read('inExercicioVigencia')." AND cod_estrutural = '".$_REQUEST["stMascClassificacao"]."'";
+        $stFiltro = " WHERE exercicio = '".Sessao::read('inExercicioVigencia')."' AND cod_estrutural = '".$_REQUEST["stMascClassificacao"]."'";
         $obTOrcamentoContaDespesa->recuperaTodos($rsContaDespesa, $stFiltro);
 
         $arConfiguracaoEvento["inCodContaDespesa"]              = $rsContaDespesa->getCampo('cod_conta');
@@ -1430,7 +1486,9 @@ function alterarEvento()
         $arConfiguracaoEvento["rotulo"]                         = $arDados["stRotulo"];
         $arConfiguracaoEvento["codigo"]                         = $arDados["inCodigo"];
         $arConfiguracaoEvento["inNumPAO"]                       = $_REQUEST["inNumPAOEvento"];
-        $arConfiguracaoEvento["stNomPAO"]                       = utf8_decode($_REQUEST["campoInnerPAOEvento"]);
+        $arConfiguracaoEvento["inHdnNumPAOEvento"]              = $_REQUEST["inHdnNumPAOEvento"];
+        $arConfiguracaoEvento["stHdnDotacaoEvento"]             = $_REQUEST["stHdnDotacaoEvento"];
+        $arConfiguracaoEvento["stNomPAO"]                       = $_REQUEST["campoInnerPAOEvento"];
         $arConfiguracaoEvento["descricao"]                      = $arDados["stDescricao"];
         $arConfiguracaoEvento["extra"]                          = $arDados["extra"];
 
@@ -1491,6 +1549,8 @@ function limparEvento()
     $stJs .= "d.getElementById('campoInnerPAOEvento').innerHTML = '&nbsp;';         \n";
     $stJs .= "f.campoInnerPAOEvento.value = '';                                     \n";
     $stJs .= "f.inNumPAOEvento.value = '';                                          \n";
+    $stJs .= "f.inHdnNumPAOEvento.value = '';                                       \n";
+    $stJs .= "f.stHdnDotacaoEvento.value = '';                                      \n";
     $stJs .= "d.getElementById('stRubricaDespesa').innerHTML = '&nbsp;';            \n";
     $stJs .= "f.stMascClassificacao.value = '';                                     \n";
     $stJs .= "f.HdnstMascClassificacao.value = '';                                  \n";
@@ -1555,6 +1615,8 @@ function montaAlterarEvento()
     $stJs .= "d.getElementById('campoInnerPAOEvento').innerHTML = '".$arConfiguracaoEvento["stNomPAO"]."';      \n";
     $stJs .= "f.campoInnerPAOEvento.value = '".$arConfiguracaoEvento["stNomPAO"]."';                            \n";
     $stJs .= "f.inNumPAOEvento.value = '".$arConfiguracaoEvento["inNumPAO"]."';                                 \n";
+    $stJs .= "f.inHdnNumPAOEvento.value = '".$arConfiguracaoEvento["inHdnNumPAOEvento"]."';                     \n";
+    $stJs .= "f.stHdnDotacaoEvento.value = '".$arConfiguracaoEvento["stHdnDotacaoEvento"]."';                   \n";
     $stJs .= "jQuery('#stOpcoesConfiguracaoEvento').val('".$arConfiguracaoEvento["stOpcoesConfiguracaoEvento"]."');\n";
 
     switch ($arConfiguracaoEvento["stOpcoesConfiguracaoEvento"]) {
@@ -1588,6 +1650,7 @@ function montaAlterarEvento()
     $stJs .= "f.stRubricaDespesa.value = '".$arConfiguracaoEvento["stRubricaDespesa"]."';                       \n";
     $_REQUEST["stMascClassificacao"] = $arConfiguracaoEvento["stMascClassificacao"];
     $_REQUEST["inNumPAOEvento"] = $arConfiguracaoEvento["inNumPAO"];
+    $_REQUEST["stHdnDotacaoEvento"] = $arConfiguracaoEvento["stHdnDotacaoEvento"];
     $stJs .= preencherDotacao();
     $stJs .= "f.inCodDespesa.value = '".$arConfiguracaoEvento["inCodDespesa"]."';\n";
 
@@ -1610,7 +1673,7 @@ function montaEvento()
     $obLista->Head->addCabecalho("Opção de Configuração",30);
     $obLista->Body->addCampo( '[rotulo]: [extra]-[descricao] - [stConfiguracao]', 'E' );
     $obLista->Head->addCabecalho("PAO",30);
-    $obLista->Body->addCampo( '[inNumPAO] - [stNomPAO]', 'E' );
+    $obLista->Body->addCampo( '[stHdnDotacaoEvento] - [stNomPAO]', 'E' );
     $obLista->Head->addCabecalho("Rubrica de Despesa",30);
     $obLista->Body->addCampo( '[stMascClassificacao] - [stRubricaDespesa]', 'E' );
     $obLista->Body->addAcao("alterar","executaFuncaoAjax('%s','&inId=%s')",array('montaAlterarEvento','inId'));
@@ -1827,7 +1890,7 @@ function preencherEventos()
 function preencherDotacao()
 {
     $stJs  = "limpaSelect(f.inCodDespesa,0);\n";
-    $stJs .= "f.inCodDespesa[0] = new Option('Selecione','','');\n";
+    $stJs .= "f.inCodDespesa[0] = new Option('Selecione','');\n";
     if (trim($_REQUEST["stMascClassificacao"]) != "" and trim($_REQUEST["inNumPAOEvento"]) != "") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."FFolhaPagamentoRecuperaDespesaPorPAORubricaDespesa.class.php");
         $obFFolhaPagamentoRecuperaDespesaPorPAORubricaDespesa = new FFolhaPagamentoRecuperaDespesaPorPAORubricaDespesa();
@@ -1839,7 +1902,7 @@ function preencherDotacao()
 
         while (!$rsDespesa->eof()) {
             $stDescricao = $rsDespesa->getCampo("descricao_conta").' / DEST. REC.: '.$rsDespesa->getCampo("cod_fonte").' - '.$rsDespesa->getCampo("descricao_recurso");
-            $stJs .= "f.inCodDespesa[".$inIndex."] = new Option('".$rsDespesa->getCampo('cod_despesa')." - ".$stDescricao."','".$rsDespesa->getCampo('cod_despesa')."','');\n";
+            $stJs .= "f.inCodDespesa[".$inIndex."] = new Option('".$rsDespesa->getCampo('cod_despesa')." - ".$stDescricao."','".$rsDespesa->getCampo('cod_despesa')."');\n";
             $inIndex++;
             $rsDespesa->proximo();
         }
@@ -1852,7 +1915,6 @@ function preencheMascClassificacao()
 {
     $stJs = '';
     $stMascClassificacao = $_REQUEST["stMascClassificacao"];
-
     if ($stMascClassificacao != "") {
         include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoClassificacaoDespesa.class.php");
         $obROrcamentoClassificacaoDespesa = new ROrcamentoClassificacaoDespesa;

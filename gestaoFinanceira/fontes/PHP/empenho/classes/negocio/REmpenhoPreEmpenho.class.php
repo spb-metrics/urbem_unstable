@@ -718,7 +718,9 @@ function consultarExistenciaDespesa($boTransacao = "")
         $obErro = $obTEmpenhoPreEmpenhoDespesa->exclusao( $boTransacao );
         if ( !$obErro->ocorreu() ) {
             $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_despesa" , $this->obROrcamentoDespesa->getCodDespesa() );
-            if ( !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() ) {
+            if ( $this->obROrcamentoClassificacaoDespesa->getCodConta() || $this->obROrcamentoClassificacaoDespesa->getCodConta() != '' ) {
+                $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_conta" , $this->obROrcamentoClassificacaoDespesa->getCodConta() );
+            } else if ( !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() ) {
                 $obErro = $this->obROrcamentoDespesa->listarRelacionamentoContaDespesa( $rsDespesa, '',$boTransacao );
                 if ( !$obErro->ocorreu() ) {
                     if ( !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() ) {

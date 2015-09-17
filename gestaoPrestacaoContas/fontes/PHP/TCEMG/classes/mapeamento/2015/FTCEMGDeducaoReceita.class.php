@@ -32,8 +32,12 @@
 
     * @package URBEM
     * @subpackage
-
-    $Id:$
+    * 
+    * $Id: FTCEMGDeducaoReceita.class.php 63326 2015-08-18 17:43:41Z franver $
+    * $Date: 2015-08-18 14:43:41 -0300 (Ter, 18 Ago 2015) $
+    * $Rev: 63326 $
+    * $Author: franver $
+    * 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';

@@ -33,52 +33,13 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RMONCredito.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RMONCredito.class.php 63344 2015-08-19 18:51:30Z arthur $
 
 * Casos de uso: uc-05.05.10
                 uc-02.04.03
                 uc-02.04.33
 */
 
-/*
-$Log$
-Revision 1.43  2007/08/14 19:57:31  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.42  2007/08/14 14:43:24  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.41  2007/08/13 19:09:29  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.40  2007/08/06 19:00:46  cercato
-Bug#9792#
-
-Revision 1.39  2007/03/15 18:58:15  domluc
-Caso de Uso 02.04.33
-
-Revision 1.38  2007/02/22 13:17:41  rodrigo
-Bug #8423#
-
-Revision 1.37  2007/02/08 10:36:18  cercato
-alteracoes para o credito trabalhar com conta corrente.
-
-Revision 1.36  2006/11/22 15:43:36  cercato
-Bug #7578#
-
-Revision 1.35  2006/11/01 18:09:17  dibueno
-Bug #7285
-
-Revision 1.34  2006/10/30 13:16:34  dibueno
-#7285#
-
-Revision 1.33  2006/09/15 14:46:22  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
-/*include_once ( "../../../includes/Constante.inc.php"        );*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_GT_MON_MAPEAMENTO."TMONEspecieCredito.class.php");
 include_once ( CAM_GT_MON_MAPEAMENTO."TMONCredito.class.php");

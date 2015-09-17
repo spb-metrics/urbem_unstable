@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62931 $
+    $Revision: 63153 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -42,30 +42,37 @@
 */
 
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAContaReceita.class.php" );
-    $obTMapeamento = new TTBAContaReceita();
-    $obTMapeamento->setDado('inMes'      , $inMes );
-    $obTMapeamento->setDado('stEntidades', $stEntidades );
-    $obTMapeamento->recuperaDadosTribunal($arRecordSet[$stArquivo]);
+    $obTTBAContaReceita = new TTBAContaReceita();
+    $obTTBAContaReceita->setDado('mes'      , $inMes );
+    $obTTBAContaReceita->setDado('entidades', $stEntidades );
+    $obTTBAContaReceita->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTBAContaReceita->recuperaDadosTribunal($rsArquivo);
 
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1"); //Reservado
+    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]".$inCodUnidadeGestora); //unidade_gestora
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("estrutural");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cd_item_receita"); //Ainda nao tem as tabela interna. 
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cd_item_receita");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);

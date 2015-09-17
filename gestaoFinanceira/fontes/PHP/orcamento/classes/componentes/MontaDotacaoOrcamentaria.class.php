@@ -597,7 +597,15 @@ function geraFormulario( &$obFormulario,$stAcao='',$nuCountDespesaExercicio='',$
         if ($arDespesa[0]['num_pao'] == '') {
             $obLblPAO->setValue($arDespesa[0]['num_acao'].' - '.$arDespesa[0]['titulo']);
             $obHdnPAO->setValue($arDespesa[0]['num_acao']);
+        } else {
+            $this->obRDespesa->obROrcamentoProjetoAtividade->setExercicio($arDespesa[0]['exercicio']);
+            $this->obRDespesa->obROrcamentoProjetoAtividade->setNumeroProjeto($arDespesa[0]['num_pao']);
+            $this->obRDespesa->obROrcamentoProjetoAtividade->consultar( $rsPAO, "ORDER BY num_acao" );
+            
+            $obLblPAO->setValue($arDespesa[0]['num_acao'].' - '.$rsPAO->getCampo('nom_pao'));
+            $obHdnPAO->setValue($arDespesa[0]['num_pao']);
         }
+        
         $obFormulario->addComponente( $obLblDotacaoOrcamentaria );
         $obFormulario->addComponente( $obLblOrgao 				);
         $obFormulario->addComponente( $obLblUnidade 			);

@@ -27,7 +27,7 @@
  * Página de Processamento Manter Solicitação de Compra
  * Data de Criação   : 21/09/2006
 
- $Id: PRManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
+ $Id: PRManterSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
 
  * @ignore
 
@@ -102,9 +102,6 @@ function homologaSolicitacao($inCodSolicitacao, $inCodEntidade, $stExercicio, $a
     }
 
     if ($boDotacao) {
-        if ($arItem['inCodEstrutural']!="") {
-
-        }
         $stFiltro= " AND D.cod_despesa     = ".$arItem['inCodDespesa']."\n";
         $stFiltro.= " AND CD.exercicio      ='".$stExercicio."'          \n";
 
@@ -722,14 +719,14 @@ switch ($stAcao) {
 
                     if (!isset($arAgrupadoValores[$arDados['inCodItem'].'-'.$arDados['inCodCentroCusto']])) {
                         $stChave = $arDados['inCodItem'].'-'.$arDados['inCodCentroCusto'];
-                        $arAgrupadoValores[$stChave]['valor'] = str_replace(',','.',str_replace('.','',$arDados['nuVlTotal']));//number_format(str_replace(',', '.',$arDados['nuVlTotal']),4,'.','');
+                        $arAgrupadoValores[$stChave]['valor'] = str_replace(',','.',str_replace('.','',$arDados['nuVlTotal']));
                         $arAgrupadoValores[$stChave]['quantidade'] = str_replace(',','.',str_replace('.','',$arDados['nuQuantidade']));
                         $arAgrupadoValores[$stChave]['complemento'] = $arDados['stComplemento'];
                         foreach ($arValoresAux as $inChaveAux => $arDadosAux) {
                             if (($arDados['id'] != $arDadosAux['id'])
                             && ($arDados['inCodItem'] == $arDadosAux['inCodItem'] && $arDados['inCodCentroCusto'] == $arDadosAux['inCodCentroCusto'])) {
                                 $stChave = $arDados['inCodItem'].'-'.$arDados['inCodCentroCusto'];
-                                $arAgrupadoValores[$stChave]['valor'] += str_replace(',','.',str_replace('.','',$arDadosAux['nuVlTotal']));//number_format(str_replace(',', '.',$arDadosAux['nuVlTotal']),4,'.','');
+                                $arAgrupadoValores[$stChave]['valor'] += str_replace(',','.',str_replace('.','',$arDadosAux['nuVlTotal']));
                                 $arAgrupadoValores[$stChave]['quantidade'] += number_format(str_replace(',', '.',$arDadosAux['nuQuantidade']),4,'.','');
                                 $arAgrupadoValores[$stChave]['complemento'] = $arDadosAux['stComplemento'];
                                 unset($arValoresAux[$inChaveAux]);
@@ -797,8 +794,7 @@ switch ($stAcao) {
 
             # Rotina para controlar as dotações, reservas de saldo.
             foreach ($arValores as $arItens) {
-                # Caso tenha sido informado dotação é obrigatório informar
-                # o desdobramento, não permitindo mais usar o desdobramento padrão.
+                # Caso tenha sido informado dotação é obrigatório informar o desdobramento, não permitindo mais usar o desdobramento padrão.
                 if (is_numeric($arItens['inCodDespesa']) && isset($arItens['inCodDespesa'])) {
                     $obTComprasSolicitacaoItemDotacao->setDado('exercicio'       , $_REQUEST['hdnExercicio']);
                     $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'    , $_REQUEST['HdnCodEntidade']);
@@ -848,7 +844,7 @@ switch ($stAcao) {
                     $obTOrcamentoReservaSaldo->setDado('vl_reserva'         , $nuVlrReserva		   );
                     $obTOrcamentoReservaSaldo->setDado('dt_validade_final'  , '31/12/'.Sessao::getExercicio() );
 
-                    if ($boHomologaAutomatico && $nuVlrReserva > 0 && $boRegistroPreco=='false') {
+                    if ($boHomologaAutomatico && $boReservaRigida && $nuVlrReserva > 0 && $boRegistroPreco=='false') {
                         if ($obTOrcamentoReservaSaldo->incluiReservaSaldo()) {
                             # Inclusão na tabela compras.solicitacao_homologada_reserva
                             $obTSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
@@ -1061,11 +1057,11 @@ switch ($stAcao) {
                         foreach ($arValoresAux as $inChaveAux => $arDadosAux) {
                             if (($arDados['id'] != $arDadosAux['id'])
                                 && ($arDados['inCodItem'] == $arDadosAux['inCodItem']
-                && $arDados['inCodCentroCusto'] == $arDadosAux['inCodCentroCusto'])) {
+                                    && $arDados['inCodCentroCusto'] == $arDadosAux['inCodCentroCusto'])) {
                                 $stChave = $arDados['inCodItem'].'-'.$arDados['inCodCentroCusto'];
                                 $arAgrupadoValores[$stChave]['valor'] += str_replace(',','.',str_replace('.','',$arDadosAux['nuVlTotal']));
                                 $arAgrupadoValores[$stChave]['quantidade'] += str_replace(',','.',str_replace('.','',$arDadosAux['nuQuantidade']));
-                $arAgrupadoValores[$stChave]['complemento'] = $arDadosAux['stComplemento'];
+                                $arAgrupadoValores[$stChave]['complemento'] = $arDadosAux['stComplemento'];
                                 unset($arValoresAux[$inChaveAux]);
                             }
                         }
@@ -1096,7 +1092,7 @@ switch ($stAcao) {
             foreach( $arValores as $key => $arItens ) :
                 //inclui a dotação caso tenha sido selecionado uma
                 if ($arItens['inCodDespesa'] != '') {
-                    $stFiltro= " AND D.cod_despesa     = ".$arItens['inCodDespesa']."\n";
+                    $stFiltro = " AND D.cod_despesa     = ".$arItens['inCodDespesa']."\n";
                     $stFiltro.= " AND CD.exercicio      ='".Sessao::getExercicio()."'          \n";
 
                     $obTOrcamentoContaDespesa->recuperaRelacionamento( $rsContaDespesa , $stFiltro );
@@ -1108,20 +1104,20 @@ switch ($stAcao) {
                     $stSql.=" AND solicitacao_item_dotacao.exercicio ='".Sessao::getExercicio()."'                                           \n";
                     $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItem,$stSql);
 
-                        $obTComprasSolicitacaoItemDotacao->setDado('exercicio'      ,Sessao::getExercicio()		       );
-                        $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'   ,$_REQUEST['HdnCodEntidade']   		       );
-                        $obTComprasSolicitacaoItemDotacao->setDado('cod_solicitacao',$inSolicitacao            );
-                        $obTComprasSolicitacaoItemDotacao->setDado('cod_centro'     ,$arItens['inCodCentroCusto']  );
-                        $obTComprasSolicitacaoItemDotacao->setDado('cod_item'       ,$arItens['inCodItem']         );
-                        $obTComprasSolicitacaoItemDotacao->setDado('vl_reserva'     ,str_replace(',','.',str_replace('.','',$arItens['nuVlTotal'])));
-                        if ($arItens['inCodEstrutural']=="") {
-                            $obTComprasSolicitacaoItemDotacao->setDado('cod_conta',$rsContaDespesa->getCampo('cod_conta')                         );
-                        } else {
-                            $obTComprasSolicitacaoItemDotacao->setDado('cod_conta',$arItens['inCodEstrutural'] );
-                        }
-                        $obTComprasSolicitacaoItemDotacao->setDado('cod_despesa'    ,$arItens['inCodDespesa']      );
-                        $obTComprasSolicitacaoItemDotacao->setDado('quantidade'     ,$arItens['nuQuantidade']      );
-                        $obTComprasSolicitacaoItemDotacao->inclusao();
+                    $obTComprasSolicitacaoItemDotacao->setDado('exercicio'      ,Sessao::getExercicio()		       );
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'   ,$_REQUEST['HdnCodEntidade']   		       );
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_solicitacao',$inSolicitacao            );
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_centro'     ,$arItens['inCodCentroCusto']  );
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_item'       ,$arItens['inCodItem']         );
+                    $obTComprasSolicitacaoItemDotacao->setDado('vl_reserva'     ,str_replace(',','.',str_replace('.','',$arItens['nuVlTotal'])));
+                    if ($arItens['inCodEstrutural']=="") {
+                        $obTComprasSolicitacaoItemDotacao->setDado('cod_conta',$rsContaDespesa->getCampo('cod_conta')                         );
+                    } else {
+                        $obTComprasSolicitacaoItemDotacao->setDado('cod_conta',$arItens['inCodEstrutural'] );
+                    }
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_despesa'    ,$arItens['inCodDespesa']      );
+                    $obTComprasSolicitacaoItemDotacao->setDado('quantidade'     ,$arItens['nuQuantidade']      );
+                    $obTComprasSolicitacaoItemDotacao->inclusao();
 
                     $numcgm = SistemaLegado::pegaDado('numcgm','orcamento.entidade', "where cod_entidade =".$_REQUEST['HdnCodEntidade']." and exercicio = '".Sessao::getExercicio()."'");
                     $nomEntidade = SistemaLegado::pegaDado('nom_cgm','sw_cgm', "where numcgm =".$numcgm);
@@ -1144,7 +1140,7 @@ switch ($stAcao) {
                         $obTOrcamentoReservaSaldo->setDado( 'vl_reserva'         ,  $nuVlReserva	                );
                         $obTOrcamentoReservaSaldo->setDado( 'dt_validade_final'  , '31/12/'.Sessao::getExercicio()  );
 
-                        if ($boHomologaAutomatico) {
+                        if ($boHomologaAutomatico&&$boReservaRigida) {
                             if ( $obTOrcamentoReservaSaldo->incluiReservaSaldo() ) {
                                 $arValores[$key]['inCodReserva'] = $inCodReserva;
                                 $nroItensReservaSaldo++;
@@ -1156,58 +1152,57 @@ switch ($stAcao) {
                         }
                     }
                 }
-                endforeach;
+            endforeach;
 
-                $boIncluiHomologacaoReserva = false;
+            $boIncluiHomologacaoReserva = false;
 
-                if ($boReservaRigida) {
-                    if ($boHomologaAutomatico) {
-                        if ($nroItensReservaSaldo == count($arValores)) {
-                            $obTComprasSolicitacaoHomologacao->setDado( 'exercicio'		 	,Sessao::getExercicio() 		);
-                            $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$_REQUEST['HdnCodEntidade'] );
-                            $obTComprasSolicitacaoHomologacao->setDado( 'cod_solicitacao'	,$inSolicitacao 			);
-                            $obTComprasSolicitacaoHomologacao->setDado( 'numcgm'			,Sessao::read('numCgm') 			);
-                            $obTComprasSolicitacaoHomologacao->inclusao();
-                            $boIncluiHomologacaoReserva = true;
-                        } else {
-                            $mensagemHomologacao = "( Essa solicitação não pode ser homologada, pois não foi possivel criar as reservas de saldo para todos os itens)";
-                            $boIncluiHomologacaoReserva = false;
-                        }
-                    }
-                } else {
-                    if ($boHomologaAutomatico) {
+            if ($boReservaRigida) {
+                if ($boHomologaAutomatico) {
+                    if ($nroItensReservaSaldo == count($arValores)) {
                         $obTComprasSolicitacaoHomologacao->setDado( 'exercicio'		 	,Sessao::getExercicio() 		);
                         $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$_REQUEST['HdnCodEntidade'] );
                         $obTComprasSolicitacaoHomologacao->setDado( 'cod_solicitacao'	,$inSolicitacao 			);
                         $obTComprasSolicitacaoHomologacao->setDado( 'numcgm'			,Sessao::read('numCgm') 			);
                         $obTComprasSolicitacaoHomologacao->inclusao();
                         $boIncluiHomologacaoReserva = true;
+                    } else {
+                        $mensagemHomologacao = "( Essa solicitação não pode ser homologada, pois não foi possivel criar as reservas de saldo para todos os itens)";
+                        $boIncluiHomologacaoReserva = false;
                     }
                 }
+            } else {
+                if ($boHomologaAutomatico) {
+                    $obTComprasSolicitacaoHomologacao->setDado( 'exercicio'		 	,Sessao::getExercicio() 		);
+                    $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$_REQUEST['HdnCodEntidade'] );
+                    $obTComprasSolicitacaoHomologacao->setDado( 'cod_solicitacao'	,$inSolicitacao 			);
+                    $obTComprasSolicitacaoHomologacao->setDado( 'numcgm'			,Sessao::read('numCgm') 			);
+                    $obTComprasSolicitacaoHomologacao->inclusao();
+                    $boIncluiHomologacaoReserva = true;
+                }
+            }
 
-                //Faz a inclusão na tabela compras.solicitacao_homologada_reserva se NÃO for Registro de Preço
-                if ($boIncluiHomologacaoReserva == true && $boRegistroPreco=='false') {
-                    foreach ($arValores as $arItens) {
-                        $nuVlReserva = str_replace(',','.',str_replace('.','',$arItens['nuVlTotal']));
-                        if ($nuVlReserva > 0) {
-                            if ($arCodItemReserva[$arItens['inCodItem'].'-'.$arItens['inCodCentroCusto'].'-'.$arItens['inCodDespesa']]['temReserva'] == true) {
-                                // inclusão na tabela compras.solicitacao_homologada_reserva
-
-                                $obTSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'exercicio'       , Sessao::getExercicio()       );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_entidade'    , $_REQUEST['HdnCodEntidade']  );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_solicitacao' , $inSolicitacao               );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_item'        , $arItens['inCodItem']        );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_centro'      , $arItens['inCodCentroCusto'] );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_reserva'     , $arItens['inCodReserva']     );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_conta'       , $arItens['inCodEstrutural']  );
-                                $obTSolicitacaoHomologadaReserva->setDado ( 'cod_despesa'     , $arItens['inCodDespesa']     );
-                                $obTSolicitacaoHomologadaReserva->obTOrcamentoReservaSaldos = $obTOrcamentoReservaSaldo;
-                                $obTSolicitacaoHomologadaReserva->inclusao();
-                            }
+            //Faz a inclusão na tabela compras.solicitacao_homologada_reserva se NÃO for Registro de Preço
+            if ($boIncluiHomologacaoReserva == true && $boRegistroPreco=='false' && $boReservaRigida) {
+                foreach ($arValores as $arItens) {
+                    $nuVlReserva = str_replace(',','.',str_replace('.','',$arItens['nuVlTotal']));
+                    if ($nuVlReserva > 0) {
+                        if ($arCodItemReserva[$arItens['inCodItem'].'-'.$arItens['inCodCentroCusto'].'-'.$arItens['inCodDespesa']]['temReserva'] == true) {
+                            // inclusão na tabela compras.solicitacao_homologada_reserva
+                            $obTSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'exercicio'       , Sessao::getExercicio()       );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_entidade'    , $_REQUEST['HdnCodEntidade']  );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_solicitacao' , $inSolicitacao               );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_item'        , $arItens['inCodItem']        );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_centro'      , $arItens['inCodCentroCusto'] );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_reserva'     , $arItens['inCodReserva']     );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_conta'       , $arItens['inCodEstrutural']  );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_despesa'     , $arItens['inCodDespesa']     );
+                            $obTSolicitacaoHomologadaReserva->obTOrcamentoReservaSaldos = $obTOrcamentoReservaSaldo;
+                            $obTSolicitacaoHomologadaReserva->inclusao();
                         }
                     }
                 }
+            }
 
             $pgAux = ($_REQUEST['boRelatorio']) ? $pgRel : $pgForm;
             SistemaLegado::alertaAviso($pgAux."&dtSolicitacao=".$_REQUEST['stDtSolicitacao']."&stHoraSolicitacao=".$stHoraSolicitacao."&inSolicitacao=".$inSolicitacao."&inEntidade=".$obTComprasSolicitacao->getDado('cod_entidade')."&dtSolicitacao=".$_REQUEST['stDtSolicitacao'],"Número da solicitação: ".$inSolicitacao." ".$mensagemHomologacao,"incluir", "aviso", Sessao::getId(),"");

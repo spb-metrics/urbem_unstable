@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterPagamento.php 60768 2014-11-13 19:56:35Z lisiane $
+    * $Id: FMManterPagamento.php 63464 2015-08-31 17:30:39Z michel $
 
     * Casos de uso: uc-02.04.05,uc-02.03.28
 
@@ -41,12 +41,12 @@
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once CLA_IAPPLETTERMINAL;
-require_once CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php";
-require_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
-include_once CAM_GF_TES_COMPONENTES . 'ISaldoCaixa.class.php';
-include CAM_GF_TES_NEGOCIO . 'RTesourariaCheque.class.php';
-include CAM_FW_COMPONENTES . 'Table/Table.class.php';
-include_once( CAM_GPC_TCEAL_MAPEAMENTO."TTCEALPagamentoTipoDocumento.class.php");
+require_once CAM_GF_TES_NEGOCIO.'RTesourariaBoletim.class.php';
+require_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracao.class.php';
+include_once CAM_GF_TES_COMPONENTES.'ISaldoCaixa.class.php';
+include CAM_GF_TES_NEGOCIO.'RTesourariaCheque.class.php';
+include CAM_FW_COMPONENTES.'Table/Table.class.php';
+include_once CAM_GPC_TCEAL_MAPEAMENTO.'TTCEALPagamentoTipoDocumento.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterPagamento";
@@ -200,7 +200,7 @@ foreach ($arREmpenhoNotaLiquidacao as $obREmpenhoNotaLiquidacao) {
     $inCodCategoria = $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->getCodCategoria();
 
     if ($inCodCategoria == 2 || $inCodCategoria == 3) {
-        include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPrestacaoContas.class.php");
+        include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPrestacaoContas.class.php';
         $obTEmpenhoItemPrestacaoContas = new TEmpenhoItemPrestacaoContas();
         $obTEmpenhoItemPrestacaoContas->setDado('cod_empenho',$obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho());
         $obTEmpenhoItemPrestacaoContas->setDado('cod_entidade',$obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade());
@@ -208,7 +208,7 @@ foreach ($arREmpenhoNotaLiquidacao as $obREmpenhoNotaLiquidacao) {
         $obTEmpenhoItemPrestacaoContas->recuperaValorPrestado($rsValorPrestado);
         $nuValorPrestado = $rsValorPrestado->getCampo('vl_prestado');
 
-        include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaEmpenho.class.php");
+        include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoContrapartidaEmpenho.class.php';
         $obTEmpenhoContrapartidaEmpenho = new TEmpenhoContrapartidaEmpenho();
         $stFiltro  = " WHERE cod_empenho  = ".$obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho()."";
         $stFiltro .= "   AND cod_entidade = ".$obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()."";
@@ -281,7 +281,6 @@ $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_a
 SistemaLegado::executaFramePrincipal( "buscaDado( 'montaItem' );" );
 
 //Define a função do arquivo7, ex: incluir, excluir, alterar, consultar, etc
-//$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
 if ( empty( $stAcao ) ) {
     $stAcao = "alterar";
 }
@@ -294,7 +293,7 @@ if ( !count( $arFiltroAux ) > 0 ) {
 }
 Sessao::write('filtroAux', $arFiltroAux);
 
-include_once( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoRecurso.class.php"             );
+include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoRecurso.class.php';
 $obTOrcamentoRecurso = new TOrcamentoRecurso;
 
 $inCodRecurso = $obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso();
@@ -313,14 +312,13 @@ if ( !$obErro->ocorreu() ) {
     $stNomRecurso = $rsLista->getCampo( 'nom_recurso' );
 }
 
-$stRecurso = $inCodRecurso . ' - ' . $stNomRecurso;
+$stRecurso = $inCodRecurso.' - '.$stNomRecurso;
 
 $obForm = new Form;
 $obForm->setAction ( $pgProc );
 $obForm->setTarget ( "oculto" );
 
 $obIAppletTerminal = new IAppletTerminal( $obForm );
-//$obIAppletTerminal->setNameTimestampTerminal( "IAppletTimestampTerminal" );
 
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName( "stAcao" );
@@ -416,7 +414,7 @@ if ($stAcao == 'alterar') {
     $obHdnTimestamp->setValue( $_REQUEST['stTimestamp']  );
 }
 
-require_once( CAM_GF_TES_COMPONENTES . 'ISelectBoletim.class.php' );
+require_once CAM_GF_TES_COMPONENTES.'ISelectBoletim.class.php';
 $obISelectBoletim = new ISelectBoletim;
 $obISelectBoletim->obBoletim->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade']  );
 $obISelectBoletim->obBoletim->setExercicio( Sessao::getExercicio() );
@@ -477,8 +475,6 @@ $obLblEntidade = new Label;
 $obLblEntidade->setRotulo( "Entidade"     );
 $obLblEntidade->setId    ( "stEntidade"   );
 $obLblEntidade->setValue ( $stNomEntidade );
-
-
 
 // Define Objeto Label para Ordem de pagamento
 $obLblOrdemPagamento = new Label;
@@ -651,11 +647,13 @@ if ($stAcao == 'incluir') {
     $obLblConta->setValue( $inCodConta.' - '.$stNomConta );
 }
 
-//Busca cod_uf para verificar se é o estado de Tocantins 27
-$inCodUf = SistemaLegado::pegaConfiguracao("cod_uf", 2, Sessao::getExercicio(), $boTransacao);    
+//Busca cod_uf para verificar de qual estado o município pertence
+$inCodUf = SistemaLegado::pegaConfiguracao("cod_uf", 2, Sessao::getExercicio(), $boTransacao);
+$stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."");
+
 //Disponibilizar na tela de Pagamento Extra na Tesouraria o campo Tipo Pagamento para atender exigências do Tribunal de Tocantins.
 if ( $inCodUf == 27 ) {
-    include_once CAM_GPC_TCETO_MAPEAMENTO."TTCETOTipoPagamento.class.php";
+    include_once CAM_GPC_TCETO_MAPEAMENTO.'TTCETOTipoPagamento.class.php';
     $obTTCETOTipoPagamento = new TTCETOTipoPagamento();
     $obTTCETOTipoPagamento->recuperaTodos($rsTipoPagamento,"","",$boTransacao);
 
@@ -673,8 +671,7 @@ if ( $inCodUf == 27 ) {
 
 //TCEPB, quando o municipio for de PB, cria-se o campo Origem do Recurso
 if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()))==15){
-
-    include_once CAM_GPC_TPB_NEGOCIO."RTCEPBTipoOrigemRecurso.class.php";
+    include_once CAM_GPC_TPB_NEGOCIO.'RTCEPBTipoOrigemRecurso.class.php';
     $obRTPBTipoOrigemRecurso = new RTCEPBTipoOrigemRecurso;
     $obRTPBTipoOrigemRecurso->recuperaOrigemRecurso($rsOrigemRecurso);
     $obCboOrigemRecurso = new Select;
@@ -689,12 +686,42 @@ if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()))==15){
     $obCboOrigemRecurso->setNull(false);
 }
 
+//Disponibilizar campo Tipo Pagamento para atender exigências do Tribunal da Bahia.
+if ( $inCodUf == 5 ) {
+    include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBATipoPagamento.class.php';
+    $obTTCMBATipoPagamento = new TTCMBATipoPagamento();
+    $obTTCMBATipoPagamento->recuperaTodos($rsTipoPagamento,"","",$boTransacao);
+
+    // Define o objeto para o tipo de pagamento
+    $obTipoPagamento = new Select;
+    $obTipoPagamento->setRotulo    ( "Tipo de Pagamento" );
+    $obTipoPagamento->setName      ( "inCodTipoPagamento" );
+    $obTipoPagamento->setId        ( "inCodTipoPagamento" );
+    $obTipoPagamento->setCampoId   ( 'cod_tipo'      );
+    $obTipoPagamento->setCampoDesc ( '[cod_tipo] - [descricao]' );
+    $obTipoPagamento->addOption    ( "", "Selecione" );
+    $obTipoPagamento->setNull      ( false );
+    $obTipoPagamento->setStyle     ( "width: 220px" );        
+    $obTipoPagamento->preencheCombo($rsTipoPagamento);
+    $obTipoPagamento->obEvento->setOnChange("buscaDado('montaDocumentoTCMBA');");
+    
+    $obTxtValorDoc = new TextBox;
+    $obTxtValorDoc->setName     ( "numDocPagamento" );
+    $obTxtValorDoc->setId       ( "numDocPagamento" );
+    $obTxtValorDoc->setValue    ( $numDocPagamento );
+    $obTxtValorDoc->setRotulo   ( "Detalhe do Tipo Pagamento" );
+    $obTxtValorDoc->setTitle    ( "Informar o numero de identificação do lançamento, como número do cheque, número do TED, etc." );
+    $obTxtValorDoc->setinteiro  ( true );
+    $obTxtValorDoc->setNull     ( false );
+    $obTxtValorDoc->setMaxLength( 8 );
+}
+
 $obAdministracaoConfiguracao = new TAdministracaoConfiguracao;
 $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE configuracao.parametro = 'seta_tipo_documento_tcmgo'");
 $boMostrarComboTipoDocTcmgo  = $rsAdministracaoConfiguracao->getCampo('valor');
 
 if ($boMostrarComboTipoDocTcmgo  == 'true') {
-    require_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoTipoDocumentoTcepbInterna.class.php";
+    require_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoTipoDocumentoTcepbInterna.class.php';
     $obTEmpenhoTipoDocumentoTcepbInterna = new TEmpenhoTipoDocumentoTcepbInterna;
     $obTEmpenhoTipoDocumentoTcepbInterna->recuperaTodos($rsOrigemRecurso);
 
@@ -714,7 +741,7 @@ $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHER
 $boMostrarComboTipoDocTcemg  = $rsAdministracaoConfiguracao->getCampo('valor');
 
 if ($boMostrarComboTipoDocTcemg  == 'true') {
-    require_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoTipoDocumentoTcemgInterna.class.php";
+    require_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoTipoDocumentoTcemgInterna.class.php';
     $obTEmpenhoTipoDocumentoTcemgInterna = new TEmpenhoTipoDocumentoTcemgInterna;
     $obTEmpenhoTipoDocumentoTcemgInterna->recuperaTodos($rsOrigemRecurso);
 
@@ -729,10 +756,6 @@ if ($boMostrarComboTipoDocTcemg  == 'true') {
     $obCboDocTipo->setNull(false);
     $obCboDocTipo->obEvento->setOnChange("buscaDado('montaDocumentoTcemg')");
 }
-$obAdministracaoConfiguracao = new TAdministracaoConfiguracao;
-$obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'");
-$inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
-$stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."");
 
 if ($stSiglaUf == "AL") {
     //veriica se ja contem cheques vinculados a essa OP
@@ -884,14 +907,12 @@ if ($stAcao == 'incluir') {
     $obTxtObs->setRows   ( 2    );
     $obTxtObs->setCols   ( 100  );
     $obTxtObs->setMaxCaracteres( 170 );
-
 } else {
     // Define Objeto Data para data do estorno
     $obLblDtEstorno = new Label();
     $obLblDtEstorno->setRotulo ( 'Data'       );
     $obLblDtEstorno->setId   ( 'stDtEstorno' );
 if (!$boMultiploBoletim) $obLblDtEstorno->setValue( $stDtBoletim  );
-
     // Define Objeto TextArea para motivo da anulação
     $stMotivo = isset($stMotivo) ? $stMotivo : null;
     $obTxtMotivo = new TextArea;
@@ -953,9 +974,11 @@ if ($stAcao == 'incluir') {
     if ($rsCheque->getNumLinhas() <= 0) {
         $obFormulario->addComponente ( $obBscConta      );
     }
-    //TCETO
-    if ($inCodUf == 27) {
-        $obFormulario->addComponente ( $obTipoPagamento     );
+    //TCETO ou TCMBA
+    if ($inCodUf == 27 || $inCodUf == 5) {
+        $obFormulario->addComponente ( $obTipoPagamento );
+        if($inCodUf == 5)
+            $obFormulario->addComponente ( $obTxtValorDoc );
     }
     //TCEPB
     if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()))==15){
@@ -968,7 +991,6 @@ if ($stAcao == 'incluir') {
             $obFormulario->addSpan( $obSpnDocumento );
         }
     }else{
-        
         if( !Sessao::read('arCheque') ) {
             $obFormulario->addComponente( $obCboDocTipoAL );
             $obFormulario->addComponente( $obTxtValorDoc );
@@ -983,7 +1005,6 @@ if ($stAcao == 'incluir') {
 } elseif ($stAcao == 'alterar') {
     $obFormulario->addHidden     ( $obHdnConta      );
     $obFormulario->addHidden     ( $obHdnTimestamp  );
-//    $obFormulario->addComponente ( $obLblConta      );
     $obFormulario->addComponente ( $obLblDtEstorno  );
     $obFormulario->addComponente ( $obTxtMotivo     );
 }
@@ -1019,7 +1040,6 @@ if ($stAcao == 'alterar') {
 
 $stLocation = $pgList.'?'.Sessao::getId();
 
-//echo $stLocation;
 $obCancelar = new Button();
 $obCancelar->setValue ("Cancelar");
 $obCancelar->obEvento->setOnclick("Cancelar('".$stLocation."');");

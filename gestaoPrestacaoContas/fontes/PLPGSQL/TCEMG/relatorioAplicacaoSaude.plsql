@@ -170,7 +170,7 @@ BEGIN
     -- ------------------------------------- 
 
     -- -------------------------------------------------------------
-    -- Impostos 
+    -- Impostos  
     -- -------------------------------------------------------------
 
     INSERT INTO tmp_tcemg_saude_receita 
@@ -189,20 +189,27 @@ BEGIN
 
     INSERT INTO tmp_tcemg_saude_receita 
          SELECT 1, 3
-              , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.2.08.00.00.00.00')
+              , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.2.04.34.00.00.00')
                                                         , '' || stDataInicio || ''
                                                         , '' || stDataFim || ''
               ) as valor;
 
     INSERT INTO tmp_tcemg_saude_receita 
          SELECT 1, 4
-              , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.3.05.00.00.00.00')
+              , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.2.08.00.00.00.00')
                                                         , '' || stDataInicio || ''
                                                         , '' || stDataFim || ''
               ) as valor;
 
     INSERT INTO tmp_tcemg_saude_receita 
          SELECT 1, 5
+              , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.3.05.00.00.00.00')
+                                                        , '' || stDataInicio || ''
+                                                        , '' || stDataFim || ''
+              ) as valor;
+
+    INSERT INTO tmp_tcemg_saude_receita 
+         SELECT 1, 6
               , orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida('1.1.1.3.05.03.00.00.00')
                                                         , '' || stDataInicio || ''
                                                         , '' || stDataFim || ''
@@ -402,12 +409,25 @@ BEGIN
               SELECT grupo
                    , item
                    , 'A' AS tipo_receita
+                   , '1.1.1.2.04.34.00.00.00' AS cod_estrutural
+                   , CAST('Retido Nas Fontes - Outros Rendimentos' AS VARCHAR) AS descricao
+                   , CAST(SUM(valor) AS NUMERIC) AS valor
+                FROM tmp_tcemg_saude_receita 
+               WHERE grupo = 1
+                 AND item = 3
+            GROUP BY grupo
+                   , item;
+
+    INSERT INTO tmp_retorno
+              SELECT grupo
+                   , item
+                   , 'A' AS tipo_receita
                    , '1.1.1.2.08.00.00.00.00' AS cod_estrutural
                    , CAST('Imposto sobre Transmissão "Inter-Vivos" de Bens Imóveis e de Direitos Reais sobre Imóveis' AS VARCHAR) AS descricao
                    , CAST(SUM(valor) AS NUMERIC) AS valor
                 FROM tmp_tcemg_saude_receita 
                WHERE grupo = 1
-                 AND item = 3
+                 AND item = 4
             GROUP BY grupo
                    , item;
 
@@ -420,7 +440,7 @@ BEGIN
                    , CAST(SUM(valor) AS NUMERIC) AS valor
                 FROM tmp_tcemg_saude_receita 
                WHERE grupo = 1
-                 AND item = 4
+                 AND item = 5
             GROUP BY grupo
                    , item;
 
@@ -433,7 +453,7 @@ BEGIN
                    , CAST(SUM(valor) AS NUMERIC) AS valor
                 FROM tmp_tcemg_saude_receita 
                WHERE grupo = 1
-                 AND item = 5
+                 AND item = 6
             GROUP BY grupo
                    , item;
 

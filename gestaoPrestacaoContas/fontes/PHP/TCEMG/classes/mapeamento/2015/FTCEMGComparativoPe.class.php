@@ -26,78 +26,85 @@
 /**
     * Arquivo de mapeamento para a função que busca os dados dos serviços de terceiros
     * Data de Criação   : 16/01/2008
-
+    * 
     * @author Analista      Tonismar Regis Bernardo
     * @author Desenvolvedor André Machado
-
+    * 
     * @package URBEM
     * @subpackage
-
-    $Id:$
+    * 
+    * $Id: FTCEMGComparativoPe.class.php 63321 2015-08-18 13:15:45Z franver $
+    * $Rev: 63321 $
+    * $Author: franver $
+    * $Date: 2015-08-18 10:15:45 -0300 (Ter, 18 Ago 2015) $
 */
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FTCEMGComparativoPe extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FTCEMGComparativoPe()
-{
-    parent::Persistente();
-
-    $this->setTabela('tcemg.fn_comparativoPe');
-
-    $this->AddCampo('exercicio'     ,'varchar' ,false ,'' ,false ,false);
-    $this->AddCampo('dtInicial'     ,'varchar' ,false ,'' ,false ,false);
-    $this->AddCampo('dtFinal'       ,'varchar' ,false ,'' ,false ,false);
-    $this->AddCampo('cod_entidade'  ,'varchar' ,false ,'' ,false ,false);
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "
-        SELECT descricao
-             , ABS(COALESCE(valor,0.00)) AS valor
-          FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("dtInicial")."'
-                                     , '".$this->getDado("dtFinal")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     ) AS retorno(
-                                                  descricao VARCHAR,
-                                                  valor     NUMERIC
-                                                 )";
-    return $stSql;
-}
-
-public function recuperaContasARO(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    if(trim($stOrdem))
-        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-    $stSql = $this->montaRecuperaContasARO().$stCondicao.$stOrdem;
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-   
-public function montaRecuperaContasARO()
-{
-
-    $stSql = "  SELECT cod_plano         
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+    
+        $this->setTabela('tcemg.fn_comparativoPe');
+    
+        $this->AddCampo('exercicio'     ,'varchar' ,false ,'' ,false ,false);
+        $this->AddCampo('dtInicial'     ,'varchar' ,false ,'' ,false ,false);
+        $this->AddCampo('dtFinal'       ,'varchar' ,false ,'' ,false ,false);
+        $this->AddCampo('cod_entidade'  ,'varchar' ,false ,'' ,false ,false);
+    }
+    
+    public function montaRecuperaTodos()
+    {
+        $stSql  = "
+              SELECT descricao
+                   , ABS(COALESCE(valor,0.00)) AS valor
+                FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
+                                           , '".$this->getDado("dtInicial")."'
+                                           , '".$this->getDado("dtFinal")."'
+                                           , '".$this->getDado("cod_entidade")."'
+                                           )
+                  AS retorno( descricao VARCHAR
+                            , valor     NUMERIC
+                            )
+        ";
+        return $stSql;
+    }
+    
+    public function recuperaContasARO(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRecuperaContasARO().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+       
+    public function montaRecuperaContasARO()
+    {
+        $stSql = "
+              SELECT cod_plano         
                 FROM stn.vinculo_contas_rgf_2 
-                WHERE cod_conta = 17 
-                AND exercicio = '".$this->getDado("exercicio")."'
-            ";
-    return $stSql;
-}  
-
-
+               WHERE cod_conta = 17 
+                 AND exercicio = '".$this->getDado("exercicio")."'
+        ";
+        return $stSql;
+    }  
+    
+    /**
+        * Método Destruct
+        * @access Private
+    */
+    public function __destruct() {}
 }

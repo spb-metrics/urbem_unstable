@@ -32,12 +32,13 @@
 
  * @ignore
 
- * $Id: FLConsultaImovel.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: FLConsultaImovel.php 63503 2015-09-03 18:25:17Z jean $
 
  * Casos de uso: uc-05.01.18
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CAM_GT_CIM_NEGOCIO."RCIMConfiguracao.class.php";
 include_once CAM_GT_CIM_COMPONENTES."MontaLocalizacao.class.php";
@@ -201,7 +202,10 @@ $obBscInscricaoMunicipal->setFuncaoBusca( "abrePopUp( '".CAM_GT_CIM_POPUPS."imov
 $obBscLote = new BuscaInner;
 $obBscLote->setRotulo               ( "Lote"     );
 $obBscLote->setNull                 ( true       );
-$obBscLote->obCampoCod->setName     ("inCodLote" );
+$obBscLote->setId                   ( "innerLote" );
+$obBscLote->setName                 ( "innerLote" );
+$obBscLote->obCampoCod->setName     ( "inCodLote" );
+$obBscLote->obCampoCod->setId       ( "inCodLote" );
 $obBscLote->obCampoCod->setValue    ( $request->get('inNumLoteamento') );
 $obBscLote->obCampoCod->setMaxLength( strlen( $stMascaraLote )   );
 $obBscLote->obCampoCod->setSize     ( strlen( $stMascaraLote )+1 );
@@ -323,5 +327,9 @@ $obMontaAtributos->geraFormulario  ( $obFormulario );
 
 $obFormulario->ok();
 $obFormulario->show();
+
+$jsOnload = " jq('#innerLote').hide(); \n";
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

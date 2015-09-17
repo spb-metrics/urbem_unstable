@@ -61,7 +61,7 @@ class TConcursoCandidato extends Persistente
     * Método Construtor
     * @access Private
 */
-function TConcursoCandidato()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela('concurso.candidato');
@@ -78,46 +78,74 @@ function TConcursoCandidato()
 
 }
 
-function montaRecuperaCandidatoConcurso()
+public function montaRecuperaCandidatoConcurso()
 {
-$stSql  = " Select                                                                                      \n";
-$stSql .= "     ccc.cod_edital, c.tipo_prova, cc.cod_candidato, c.tipo_prova, cgm.nom_cgm, cc.numcgm,   \n";
-$stSql .= "     c.avalia_titulacao,c.nota_minima, coalesce((cc.classificacao),0) as classificacao,      \n";
-$stSql .= "     cc.nota_prova,cc.nota_titulacao, t.media,                                               \n";
-$stSql .= "     cgm.logradouro,cgm.numero,cgm.complemento,cgm.bairro,cgm.cep,municipio.nom_municipio,   \n";
-$stSql .= "     uf.sigla_uf,cgm.fone_residencial,fone_celular,                                          \n";
-$stSql .= "     CASE cc.reclassificado                                                                  \n";
-$stSql .= "             WHEN 't' THEN 'true'                                                            \n";
-$stSql .= "             WHEN 'f' THEN 'false' END as reclassificado,                                    \n";
-$stSql .= "     CASE cc.reclassificado                                                                  \n";
-$stSql .= "             WHEN 't' THEN '/Reclassificado'                                                 \n";
-$stSql .= "             WHEN 'f' THEN  null END as reclassificacao,                                     \n";
-$stSql .= "     CASE WHEN t.media >= c.nota_minima THEN 'Aprovado'                                      \n";
-$stSql .= "          WHEN t.media < c.nota_minima AND  t.media is not null THEN 'Reprovado'             \n";
-$stSql .= "          WHEN t.media is null  THEN 'Sem nota' END as situacao                              \n";
-$stSql .= " From                                                                                        \n";
-$stSql .= "     concurso.concurso_candidato ccc, concurso.candidato cc,                                 \n";
-$stSql .= "     concurso.edital c,                                                                      \n";
-$stSql .= "     sw_municipio municipio,                                                                 \n";
-$stSql .= "     sw_uf uf,                                                                               \n";
-$stSql .= "     sw_cgm cgm,                                                                             \n";
-$stSql .= "     (SELECT cca.cod_candidato as cod_candidato,                                             \n";
-$stSql .= "         CASE c.avalia_titulacao                                                             \n";
-$stSql .= "             WHEN 't' THEN round((cca.nota_titulacao + cca.nota_prova)/2,2)                  \n";
-$stSql .= "             WHEN 'f' THEN cca.nota_prova                                                    \n";
-$stSql .= "         END as media FROM concurso.edital c, concurso.concurso_candidato cc,                \n";
-$stSql .= "         concurso.candidato cca                                                              \n";
-$stSql .= "         WHERE c.cod_edital = cc.cod_edital and cc.cod_candidato = cca.cod_candidato) as t   \n";
-$stSql .= "                                                                                             \n";
-$stSql .= " Where                                                                                       \n";
-$stSql .= "     ccc.cod_candidato = cc.cod_candidato                                                    \n";
-$stSql .= "     AND c.cod_edital = ccc.cod_edital                                                       \n";
-$stSql .= "     AND cc.numcgm = cgm.numcgm                                                              \n";
-$stSql .= "     AND cgm.cod_municipio = municipio.cod_municipio                                         \n";
-$stSql .= "     AND cgm.cod_uf =  municipio.cod_uf                                                      \n";
-$stSql .= "     AND cgm.cod_uf = uf.cod_uf                                                              \n";
-$stSql .= "     AND t.cod_candidato = cc.cod_candidato                                                  \n";
-
+    
+    $stSql  = " 
+     SELECT ccc.cod_edital
+          , c.tipo_prova
+          , cc.cod_candidato
+          , c.tipo_prova
+          , cgm.nom_cgm
+          , cc.numcgm
+          , c.avalia_titulacao
+          , c.nota_minima
+          , coalesce((cc.classificacao),0) AS classificacao
+          , cc.nota_prova,cc.nota_titulacao
+          , t.media
+          , cgm.logradouro,cgm.numero
+          , cgm.complemento
+          , cgm.bairro
+          , cgm.cep
+          , municipio.nom_municipio
+          , uf.sigla_uf
+          , cgm.fone_residencial
+          , fone_celular
+          , CASE cc.reclassificado                                                                  
+              WHEN 't' THEN 'true'                                                            
+              WHEN 'f' THEN 'false'
+            END as reclassificado,                                    
+            CASE cc.reclassificado                                                                  
+                 WHEN 't' THEN '/Reclassificado'                                                 
+                 WHEN 'f' THEN  null END as reclassificacao
+          , CASE WHEN t.media >= c.nota_minima THEN 'Aprovado'                                      
+              WHEN t.media < c.nota_minima AND t.media IS NOT NULL THEN 'Reprovado'             
+              WHEN t.media is null  THEN 'Sem nota' END as situacao                              
+       
+       FROM concurso.concurso_candidato ccc
+    
+       INNER JOIN concurso.candidato cc
+               ON ccc.cod_candidato = cc.cod_candidato
+       
+       INNER JOIN concurso.edital c
+               ON c.cod_edital = ccc.cod_edital                                                       
+         
+       INNER JOIN sw_cgm cgm
+               ON cc.numcgm = cgm.numcgm
+           
+        INNER JOIN sw_municipio municipio
+                ON cgm.cod_municipio = municipio.cod_municipio                                         
+               AND cgm.cod_uf =  municipio.cod_uf                                                      
+             
+        INNER JOIN sw_uf uf
+                ON cgm.cod_uf = uf.cod_uf                                                              
+         
+         INNER JOIN (
+               SELECT cca.cod_candidato as cod_candidato
+                    , CASE c.avalia_titulacao                                                             
+                         WHEN 't' THEN round((cca.nota_titulacao + cca.nota_prova)/2,2)                  
+                         WHEN 'f' THEN cca.nota_prova                                                    
+                      END AS media
+                FROM concurso.edital c
+                   , concurso.concurso_candidato cc
+                   , concurso.candidato cca                                                              
+               WHERE c.cod_edital = cc.cod_edital
+                 AND cc.cod_candidato = cca.cod_candidato
+             ) AS t   
+            ON t.cod_candidato = cc.cod_candidato
+         
+         WHERE 1 = 1 ";
+         
 return $stSql;
 
 }
@@ -130,7 +158,7 @@ return $stSql;
     * @param  Boolean $boTransacao
     * @return Object  Objeto Erro
 */
-function recuperaCandidatoConcurso(&$rsRecordSet, $stFiltro = "", $stOrdem = "" , $boTransacao = "")
+public function recuperaCandidatoConcurso(&$rsRecordSet, $stFiltro = "", $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -145,3 +173,5 @@ function recuperaCandidatoConcurso(&$rsRecordSet, $stFiltro = "", $stOrdem = "" 
 }
 
 }
+
+?>

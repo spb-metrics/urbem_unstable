@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterLiquidacao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: PRManterLiquidacao.php 63351 2015-08-20 13:42:42Z evandro $
 
     $Revision: 32142 $
     $Name$
@@ -736,6 +736,44 @@ switch ($stAcao) {
                     $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao($boTransacao);
                 }
             }
+        }
+        
+        //se for prefeitura de Bahia, inclui as informações de documento fiscal
+        if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 5 ) { 
+            include_once(CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBANotaFiscalLiquidacao.class.php");
+            $obTTCMBANotaFiscalLiquidacao = new TTCMBANotaFiscalLiquidacao();
+            
+            $obTTCMBANotaFiscalLiquidacao->setDado('cod_nota_liquidacao'  , $obREmpenhoNotaLiquidacao->getCodNota() );
+            $obTTCMBANotaFiscalLiquidacao->setDado('exercicio_liquidacao' , $obREmpenhoNotaLiquidacao->getExercicio() );
+            $obTTCMBANotaFiscalLiquidacao->setDado('cod_entidade'         , $request->get('inCodEntidade') );
+
+            if ( $request->get('stAnoNotaFiscal') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('ano' , $request->get('stAnoNotaFiscal') );                
+            }
+            if ( $request->get('stNumeroNF') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('nro_nota' , $request->get('stNumeroNF') );                
+            }
+            if ( $request->get('stSerieNF') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('nro_serie', $request->get('stSerieNF') );                
+            }
+            if ( $request->get('stSubSerieNF') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('nro_subserie', $request->get('stSubSerieNF') );                
+            }
+            if ( $request->get('stDtEmissaoNF') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('data_emissao', $request->get('stDtEmissaoNF') );                
+            }
+            if ( $request->get('nuValorNotaFiscal') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('vl_nota', $request->get('nuValorNotaFiscal') );                
+            }
+            if ( $request->get('stObjetoNF') ) {
+                $obTTCMBANotaFiscalLiquidacao->setDado('descricao', $request->get('stObjetoNF') );                
+            }
+            if ( $request->get('stUFUnidadeFederacao') ) {
+                $inCodUF = SistemaLegado::pegaDado("cod_uf","sw_uf"," WHERE sigla_uf = '".$request->get('stUFUnidadeFederacao')."'");
+                $obTTCMBANotaFiscalLiquidacao->setDado('cod_uf', $inCodUF );                
+            }
+
+            $obErro = $obTTCMBANotaFiscalLiquidacao->inclusao($boTransacao);
         }
 
         if ( !$obErro->ocorreu() ) {

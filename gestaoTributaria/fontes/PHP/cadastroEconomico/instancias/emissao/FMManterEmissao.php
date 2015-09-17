@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FMManterEmissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterEmissao.php 63390 2015-08-24 19:17:05Z arthur $
 
     *Casos de uso: uc-05.02.12
 */
@@ -124,3 +124,5 @@ for ($inX=0; $inX<$inTotal; $inX++) {
     $obFormulario->defineBarra ( array( $obLabelDownLoad, $obBtnDownLoad ), 'left', '' );
 }
 $obFormulario->show();
+
+?>

@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterRegistroPreco.php 62915 2015-07-08 14:10:35Z michel $
-  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
+  * $Id: OCManterRegistroPreco.php 63501 2015-09-03 17:22:53Z michel $
+  * $Date: 2015-09-03 14:22:53 -0300 (Qui, 03 Set 2015) $
   * $Author: michel $
-  * $Rev: 62915 $
+  * $Rev: 63501 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -49,28 +49,6 @@ $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
-
-function validaNroAdesao($stCodAdesao, $inCodEntidade)
-{
-    $stCodProcessoAdesao = explode('/', $stCodAdesao);
-    
-    if ( array_key_exists( 1, $stCodProcessoAdesao) ) {
-        $stExercicioAdesao = (int)$stCodProcessoAdesao[1];
-    } else {
-        $stExercicioAdesao = Sessao::getExercicio();
-    }
-    
-    if ( (int)$stCodProcessoAdesao[0] <> 0 ) {
-        $stCodProcessoAdesaoTMP = str_pad($stCodProcessoAdesao[0], 12, "0", STR_PAD_LEFT) .'/'.$stExercicioAdesao;
-        $stJs .= "jQuery('#stCodigoProcessoAdesao').val('".$stCodProcessoAdesaoTMP."'); \n";
-    } else {
-        $stJs .= "jQuery('#stCodigoProcessoAdesao').val('');                            \n";
-        $stJs .= "jQuery('#stCodigoProcessoAdesao').focus();                            \n";
-        $stJs .= "alertaAviso('Número de Processo de Adesão não pode ser igual a 0 (zero).','form','erro','".Sessao::getId()."'); \n";
-    }
-    
-    return $stJs;
-}
 
 function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEntidade)
 {
@@ -294,7 +272,11 @@ function alterarListaItens()
                 if ($arItem['inCodItem']==$_REQUEST['inCodItem'] && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
                     $obErro->setDescricao("Este Item já está na lista, para esse CGM de Fornecedor!");
                     break;
-                }                    
+                }
+                if (str_replace(",",".",str_replace(".","",$_REQUEST['nuQtdeLicitada']))<str_replace(",",".",str_replace(".","",$_REQUEST['nuQtdeAderida']))){
+                    $obErro->setDescricao("Quantidade Licitada não pode ser menor que a Quantidade Aderida!");
+                    break;
+                }
             }
         }
     }
@@ -320,9 +302,12 @@ function alterarListaItens()
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     } else {
         $_REQUEST['stCodigoLote'] = (isset($_REQUEST['stCodigoLote'])) ? $_REQUEST['stCodigoLote'] : 0;
+        $inNumItemLote = -1;
 
         foreach ($arItens as $key => $arItem) {
             if ($arItem['inId'] == $_REQUEST['inIdItem']) {
+                $inNumItemLote = $arItem['inNumItemLote'];
+
                 $arItens[$key]['nuVlReferencia']            = $_REQUEST['nuVlReferencia'];
                 $arItens[$key]['inNumItemLote']             = $_REQUEST['inNumItemLote'];
                 $arItens[$key]['inOrdemClassifFornecedor']  = $_REQUEST['inOrdemClassifFornecedor'];
@@ -345,11 +330,27 @@ function alterarListaItens()
             }
         }
 
+        if($inNumItemLote>-1){
+            $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+
+            foreach ($arOrgaoItemQuantitativos as $key => $value) {
+                if ($value['inNumItemQ'] == $inNumItemLote) {
+                    $arOrgaoItemQuantitativos[$key]['inNumItemQ']       = $_REQUEST['inNumItemLote'];
+                    $arOrgaoItemQuantitativos[$key]['inCodFornecedorQ'] = $_REQUEST['inNumCGMVencedor'];
+                    $arOrgaoItemQuantitativos[$key]['stNomFornecedorQ'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
+                }
+            }
+
+            Sessao::write('arOrgaoItemQuantitativos', $arOrgaoItemQuantitativos);
+        }
+
         $stJs .= limparFormItem();
+        $stJs .= atualizaQtdAderidaItem();
         $stJs .= montaListaItens();
 
         $boLote = ($_REQUEST['stCodigoLote']>0) ? true : false;
         $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
+        $stJs .= montaListaOrgaoItemQuantitativos();
     }
 
     return $stJs;
@@ -561,6 +562,8 @@ function alterarItem()
 
     foreach ($arItens as $arItem) {
         if ($arItem['inId'] == $_REQUEST['inId']) {
+            $stChaveItem = $arItem['stCodigoLote'].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'];
+
             if ($obErro->ocorreu()) {
                 $stJs  = limparFormItem();
                 $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
@@ -589,6 +592,27 @@ function alterarItem()
                 
                 $stJs .= alteraItemLabel($arItem);
 
+                if(isset($stChaveItem)){
+                    $nuQtdeAderida = 0;
+                    $nuQtdeSaldo = 0;
+
+                    foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {
+                        if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem ) {
+                            $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+                        }
+                    }
+
+                    foreach( $arItens as $arItemTemp) {
+                        if ( $arItemTemp["stCodigoLote"].$arItemTemp['inNumItemLote'].$arItemTemp['inCodItem'].$arItemTemp['inNumCGMVencedor'] == $stChaveItem ) {
+                            $nuQtdeSaldo = str_replace(",",".",str_replace(".","",$arItemTemp['nuQtdeLicitada'])) - $nuQtdeAderida;
+                        }
+                    }
+
+                    $stJs .= "jQuery('#nuQtdeAderida').val('".number_format($nuQtdeAderida, 4, ',', '.')."');           \n";
+                    $stJs .= "jQuery('#nuQtdeAderida_label').html('".number_format($nuQtdeAderida, 4, ',', '.')."');    \n";
+                    $stJs .= "jQuery('#nuSaldoItem').html('".number_format($nuQtdeSaldo, 4, ',', '.')."');              \n";
+                }
+
                 $stJs .= "jQuery('#imgBuscar').parent('a').css('visibility', 'hidden');                         \n";
                 $stJs .= "jQuery('#stUnidadeMedida').html('".$arItem['stNomUnidade']."');                       \n";
                 $stJs .= "jQuery('#nuVlReferencia').val('".$arItem['nuVlReferencia']."');                       \n";
@@ -596,7 +620,6 @@ function alterarItem()
                 $stJs .= "jQuery('#nuVlTotal').val('".$arItem['nuVlTotal']."');                                 \n";
                 $stJs .= "jQuery('#nuVlUnitario').val('".$arItem['nuVlUnitario']."');                           \n";
                 $stJs .= "jQuery('#nuQtdeLicitada').val('".$arItem['nuQtdeLicitada']."');                       \n";
-                $stJs .= "jQuery('#nuQtdeAderida').val('".$arItem['nuQtdeAderida']."');                         \n";
                 $stJs .= "jQuery('#nuPercentualItem').val('".$arItem['nuPercentualItem']."');                   \n";
                 $stJs .= "jQuery('#inNumCGMVencedor').val('".$arItem['inNumCGMVencedor']."');                   \n";
                 $stJs .= "jQuery('#inNomCGMVencedor').html('".$arItem['stNomCGMVencedor']."');                  \n";
@@ -611,6 +634,34 @@ function alterarItem()
     SistemaLegado::executaFrameOculto($stJs);
 }
 
+function preencheQuantidadeAderidaAbaItem()
+{
+    $arItens = Sessao::read('arItens');
+    $arQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+    $inCodLoteQ = (isset($_REQUEST['stCodigoLote']) && $_REQUEST['stCodigoLote'] != '') ? $_REQUEST['stCodigoLote'] : 0;
+    $nuQtdeAderida = 0;
+    $nuQtdeSaldo = 0;
+
+    foreach( $arItens as $arItem) {
+        if ( $arItem["inNumItemLote"]==$_REQUEST['inNumItemLote'] && $arItem["inNumCGMVencedor"]==$_REQUEST['inNumCGMVencedor'] && $arItem["stCodigoLote"] == $inCodLoteQ) {
+            $stChaveItem = $arItem['stCodigoLote'].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'];
+
+            foreach ($arQuantitativos as $arQuantitativo) {
+                if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem
+                    && $arQuantitativo['inId']!=$_REQUEST['inId']) {
+                    $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+                }
+            }
+
+            $nuQtdeSaldo = str_replace(",",".",str_replace(".","",$_REQUEST['nuQtdeLicitada'])) - $nuQtdeAderida;
+            break;
+        }
+    }
+
+    $stJs .= "jQuery('#nuSaldoItem').html('".number_format($nuQtdeSaldo, 4, ',', '.')."');         \n"; 
+
+    return $stJs;
+}
 
 function alteraItemLabel($arItem)
 {
@@ -674,6 +725,7 @@ function excluirItem()
     Sessao::write('arItens', $arItens);
 
     $stJs .= limparFormItem();
+    $stJs .= atualizaQtdAderidaItem();
     $stJs .= montaListaItens();
 
     SistemaLegado::executaFrameOculto($stJs);
@@ -702,6 +754,8 @@ function limparFormItem()
     $stJs .= "jQuery('#nuVlUnitario').val('0,0000');                        \n";
     $stJs .= "jQuery('#nuQtdeLicitada').val('0,0000');                      \n";
     $stJs .= "jQuery('#nuQtdeAderida').val('0,0000');                       \n";
+    $stJs .= "jQuery('#nuQtdeAderida_label').html('0,0000');                \n";
+    $stJs .= "jQuery('#nuSaldoItem').html('0,0000');                        \n";
     $stJs .= "jQuery('#nuPercentualItem').val('0');                         \n";
     $stJs .= "jQuery('#inNumCGMVencedor').val('');                          \n";
     $stJs .= "jQuery('#inNomCGMVencedor').html('');                         \n";
@@ -829,80 +883,84 @@ function buscaCGMVencedor()
 
 function incluirEmpenho()
 {
-    include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
-    
-    $stExercicio = $_REQUEST['stExercicioEmpenho'];
-    list($numEmpenho) = explode( '/', $_REQUEST['numEmpenho']);
-    $obErro = new Erro();
-    $obREmpenhoEmpenho = new REmpenhoEmpenho();
-    $obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade']);
-    $obREmpenhoEmpenho->setCodEmpenho($numEmpenho);
-    $obREmpenhoEmpenho->setExercicio($stExercicio);
-    
-    $arEmpenhos = Sessao::read("arEmpenhos");
-    $arEmpenhosRemovidos = Sessao::read('arEmpenhosRemovidos');
-    
-    $inIdMax = 0;
-    if (is_array($arEmpenhos) && count($arEmpenhos) > 0) {
-        foreach($arEmpenhos as $arEmpenho) {            
-            $inIdMax = ($arEmpenho['inId']>$inIdMax||$arEmpenho['inId']==$inIdMax) ? $arEmpenho['inId']+1 : $inIdMax;
-        }
-    }
-    if (is_array($arEmpenhosRemovidos) && count($arEmpenhosRemovidos) > 0) {
-        foreach($arEmpenhosRemovidos as $arRemovido) {            
-            $inIdMax = ($arRemovido['inId']>$inIdMax||$arRemovido['inId']==$inIdMax) ? $arRemovido['inId']+1 : $inIdMax;
-        }
-    }
-    
-    $arEmpenhoNovo = array();
-    if ( $stExercicio == Sessao::getExercicio() ) {
-        $obREmpenhoEmpenho->listarConsultaEmpenho( $rsLista );
-    } else {
-        $obREmpenhoEmpenho->listarRestosConsultaEmpenho( $rsLista );
-    }
+    if ($_REQUEST['stExercicioEmpenho'] != "" && $_REQUEST['numEmpenho']  != "" && $_REQUEST['inCodEntidade'] != "" ){        
+        include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
 
-    # Validação necessária para não permitir incluir o mesmo empenho em Registro de Preços diferentes.
-    $boValidaInclusao = SistemaLegado::pegaDado("cod_empenho", "tcemg.empenho_registro_precos", " WHERE cod_entidade = ".$_REQUEST['inCodEntidade']." AND cod_empenho = ".$numEmpenho." AND exercicio_empenho = '".$stExercicio."'");
-  
-    if (!empty($boValidaInclusao)) {
-        $obErro->setDescricao("Este empenho já foi vinculado em outro Registro de Preços");
-    } else {
-        if ( $rsLista->getNumLinhas() == 1 ) {
-            $rsLista->addFormatacao("vl_empenhado","NUMERIC_BR");
-            $arEmpenhoNovoTmp = $rsLista->getElementos();
+        $stExercicio = $_REQUEST['stExercicioEmpenho'];
+        list($numEmpenho) = explode( '/', $_REQUEST['numEmpenho']);
+        $obErro = new Erro();
+        $obREmpenhoEmpenho = new REmpenhoEmpenho();
+        $obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade']);
+        $obREmpenhoEmpenho->setCodEmpenho($numEmpenho);
+        $obREmpenhoEmpenho->setExercicio($stExercicio);
 
-            $arEmpenhoNovo['cod_entidade']   = $arEmpenhoNovoTmp[0]["cod_entidade"];
-            $arEmpenhoNovo['exercicio']      = $arEmpenhoNovoTmp[0]["exercicio"];
-            $arEmpenhoNovo['cod_empenho']    = $arEmpenhoNovoTmp[0]["cod_empenho"];
-            $arEmpenhoNovo['nom_fornecedor'] = $arEmpenhoNovoTmp[0]["nom_fornecedor"];
-            $arEmpenhoNovo['vl_empenhado']   = $arEmpenhoNovoTmp[0]["vl_empenhado"];
-            $arEmpenhoNovo['dt_empenho']     = $arEmpenhoNovoTmp[0]["dt_empenho"];
-            $arEmpenhoNovo['inId']           = $inIdMax;
-        }else{
-            $obErro->setDescricao("Não existe registro desse empenho na entidade selecionada!");
-            $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');   \n";
+        $arEmpenhos = Sessao::read("arEmpenhos");
+        $arEmpenhosRemovidos = Sessao::read('arEmpenhosRemovidos');
+
+        $inIdMax = 0;
+        if (is_array($arEmpenhos) && count($arEmpenhos) > 0) {
+            foreach($arEmpenhos as $arEmpenho) {            
+                $inIdMax = ($arEmpenho['inId']>$inIdMax||$arEmpenho['inId']==$inIdMax) ? $arEmpenho['inId']+1 : $inIdMax;
+            }
         }
+        if (is_array($arEmpenhosRemovidos) && count($arEmpenhosRemovidos) > 0) {
+            foreach($arEmpenhosRemovidos as $arRemovido) {            
+                $inIdMax = ($arRemovido['inId']>$inIdMax||$arRemovido['inId']==$inIdMax) ? $arRemovido['inId']+1 : $inIdMax;
+            }
+        }
+
+        $arEmpenhoNovo = array();
+        if ( $stExercicio == Sessao::getExercicio() )
+            $obREmpenhoEmpenho->listarConsultaEmpenho( $rsLista );
+        else
+            $obREmpenhoEmpenho->listarRestosConsultaEmpenho( $rsLista );
+
+        # Validação necessária para não permitir incluir o mesmo empenho em Registro de Preços diferentes.
+        $boValidaInclusao = SistemaLegado::pegaDado("cod_empenho", "tcemg.empenho_registro_precos", " WHERE cod_entidade = ".$_REQUEST['inCodEntidade']." AND cod_empenho = ".$numEmpenho." AND exercicio_empenho = '".$stExercicio."'");
+
+        if (!empty($boValidaInclusao)) {
+            $obErro->setDescricao("Este empenho já foi vinculado em outro Registro de Preços");
+        } else {
+            if ( $rsLista->getNumLinhas() == 1 ) {
+                $rsLista->addFormatacao("vl_empenhado","NUMERIC_BR");
+                $arEmpenhoNovoTmp = $rsLista->getElementos();
     
-        if ($arEmpenhos != "") {
-            foreach($arEmpenhos AS $arEmpenho){
-                if ( $arEmpenhoNovo['cod_entidade'] == $arEmpenho['cod_entidade']   AND
-                     $arEmpenhoNovo['exercicio']    == $arEmpenho['exercicio']      AND
-                     $arEmpenhoNovo['cod_empenho']  == $arEmpenho['cod_empenho']
-                ){
-                    $obErro->setDescricao("Este empenho já foi adicionado na lista de Empenhos!");
+                $arEmpenhoNovo['cod_entidade']   = $arEmpenhoNovoTmp[0]["cod_entidade"];
+                $arEmpenhoNovo['exercicio']      = $arEmpenhoNovoTmp[0]["exercicio"];
+                $arEmpenhoNovo['cod_empenho']    = $arEmpenhoNovoTmp[0]["cod_empenho"];
+                $arEmpenhoNovo['nom_fornecedor'] = $arEmpenhoNovoTmp[0]["nom_fornecedor"];
+                $arEmpenhoNovo['vl_empenhado']   = $arEmpenhoNovoTmp[0]["vl_empenhado"];
+                $arEmpenhoNovo['dt_empenho']     = $arEmpenhoNovoTmp[0]["dt_empenho"];
+                $arEmpenhoNovo['inId']           = $inIdMax;
+            }else{
+                $obErro->setDescricao("Não existe registro desse empenho na entidade selecionada!");
+                $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');   \n";
+            }
+
+            if ($arEmpenhos != "") {
+                foreach($arEmpenhos AS $arEmpenho){
+                    if ( $arEmpenhoNovo['cod_entidade'] == $arEmpenho['cod_entidade']   AND
+                         $arEmpenhoNovo['exercicio']    == $arEmpenho['exercicio']      AND
+                         $arEmpenhoNovo['cod_empenho']  == $arEmpenho['cod_empenho']
+                    ){
+                        $obErro->setDescricao("Este empenho já foi adicionado na lista de Empenhos!");
+                    }
                 }
             }
         }
-    }
+
+        if ($obErro->ocorreu()) {
+            $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
+            return $stJs;
+        } else {
+            $arEmpenhos[] = $arEmpenhoNovo;
+            Sessao::write('arEmpenhos',$arEmpenhos);
+            $stJs .= limparFormEmpenho();
+            $stJs .= montaListaEmpenho();
+        }
     
-    if ($obErro->ocorreu()) {
-        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
-        return $stJs;
     } else {
-        $arEmpenhos[] = $arEmpenhoNovo;
-        Sessao::write('arEmpenhos',$arEmpenhos);
-        $stJs .= limparFormEmpenho();
-        $stJs .= montaListaEmpenho();
+       $stJs .= "alertaAviso('Informe Todos os campos!','form','erro','".Sessao::getId()."');               \n";
     }
     
     return $stJs;
@@ -1032,11 +1090,13 @@ function incluirListaOrgaos()
     $arOrgaos = Sessao::read('arOrgaos');
     $arOrgaosRemovido = Sessao::read('arOrgaosRemovido');
     
+    $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
+    
     $inIdMax=0;
 
     if (is_array($arOrgaos) && count($arOrgaos) > 0) {
         foreach($arOrgaos as $arOrgao) {
-            if ( $arOrgao['stExercicioOrgao']==$_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM']==$_REQUEST['inMontaCodOrgaoM'] && $arOrgao['inMontaCodUnidadeM']==$_REQUEST['inMontaCodUnidadeM']) {
+            if ( $arOrgao['stExercicioOrgao']==$_REQUEST['stExercicioOrgao'] && $arOrgao['inMontaCodOrgaoM']==$arUnidadeOrcamentaria[0] && $arOrgao['inMontaCodUnidadeM']==$arUnidadeOrcamentaria[1]) {
                 $obErro->setDescricao('Não é permitido adicionar Orgão e Unidade iguais para o mesmo exercicio.');
             }
             if ( $_REQUEST['inOrgaoGerenciador'] == 1 ) {
@@ -1064,35 +1124,46 @@ function incluirListaOrgaos()
             $_REQUEST['inOrgaoGerenciador']     != "" &&
             $_REQUEST['inResponsavel']          != ""
         ){
-            $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
-            
-            $arOrgaoRegPreg = array();
-            $arOrgaoRegPreg['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
-            $arOrgaoRegPreg['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
-            $arOrgaoRegPreg['stMontaCodOrgaoM']          = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]);
-            $arOrgaoRegPreg['stMontaCodUnidadeM']        = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]." AND num_unidade = ".(int)$arUnidadeOrcamentaria[1]);
-            $arOrgaoRegPreg['inMontaCodOrgaoM']          = $_REQUEST['inMontaCodOrgaoM'];
-            $arOrgaoRegPreg['inMontaCodUnidadeM']        = $_REQUEST['inMontaCodUnidadeM'];
-            $arOrgaoRegPreg['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
-            $arOrgaoRegPreg['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
-            $arOrgaoRegPreg['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
-            $arOrgaoRegPreg['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
-            $arOrgaoRegPreg['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
-            $arOrgaoRegPreg['dtAdesao']                  = $_REQUEST['dtAdesao'];
-            $arOrgaoRegPreg['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
-            $arOrgaoRegPreg['inResponsavel']             = $_REQUEST['inResponsavel'];
-            $arOrgaoRegPreg['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
-            $arOrgaoRegPreg['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
-            $arOrgaoRegPreg['inId']                      = $inIdMax;
+            if($_REQUEST['stCodigoProcessoAdesao']!='' && $_REQUEST['stExercicioProcessoAdesao'] ==''){
+                $obErro->setDescricao("Informe o Exercício do Processo de Adesão!");
+            }else{                
+                $arOrgaoRegPreg = array();
+                $arOrgaoRegPreg['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
+                $arOrgaoRegPreg['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
+                $arOrgaoRegPreg['stMontaCodOrgaoM']          = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]);
+                $arOrgaoRegPreg['stMontaCodUnidadeM']        = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]." AND num_unidade = ".(int)$arUnidadeOrcamentaria[1]);
+                $arOrgaoRegPreg['inMontaCodOrgaoM']          = $_REQUEST['inMontaCodOrgaoM'];
+                $arOrgaoRegPreg['inMontaCodUnidadeM']        = $_REQUEST['inMontaCodUnidadeM'];
+                $arOrgaoRegPreg['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
+                $arOrgaoRegPreg['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
+                $arOrgaoRegPreg['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
+                $arOrgaoRegPreg['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
+                $arOrgaoRegPreg['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
+                $arOrgaoRegPreg['stExercicioProcessoAdesao'] = $_REQUEST['stExercicioProcessoAdesao'];
+                $arOrgaoRegPreg['dtAdesao']                  = $_REQUEST['dtAdesao'];
+                $arOrgaoRegPreg['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
+                $arOrgaoRegPreg['inResponsavel']             = $_REQUEST['inResponsavel'];
+                $arOrgaoRegPreg['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
+                $arOrgaoRegPreg['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
+                $arOrgaoRegPreg['inId']                      = $inIdMax;
+            }
         } else {
            $obErro->setDescricao("Informe Todos os campos com *!");
         }
     }
     if ($obErro->ocorreu()) {
-        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
     } else {
         $arOrgaos[] = $arOrgaoRegPreg;
         Sessao::write('arOrgaos', $arOrgaos);
+
+        $boResponsavelOrgao = 'true';
+        foreach ($arOrgaos as $key => $arOrgao) {
+            if( $arOrgao['inResponsavel'] == '' )
+                $boResponsavelOrgao = 'false';
+        }
+
+        $stJs .= "document.getElementById('boResponsavelOrgao').value='".$boResponsavelOrgao."';        \n";
         $stJs .= limparFormOrgaos();
         $stJs .= preencheComboOrgaoAbaQuantitativo();
     }
@@ -1108,7 +1179,14 @@ function montaListaOrgaos()
     $rsRecordSet = new RecordSet();
     
     if (Sessao::read('arOrgaos') != "") {
-        $rsRecordSet->preenche(Sessao::read('arOrgaos'));
+        $arOrgaos = Sessao::read('arOrgaos');
+        $arOrgaosTemp = array();
+        foreach($arOrgaos as $arOrgao){
+            if($arOrgao['stCodigoProcessoAdesao']!='')
+                $arOrgao['stCodigoProcessoAdesao'] = $arOrgao['stCodigoProcessoAdesao'].'/'.$arOrgao['stExercicioProcessoAdesao'];
+            $arOrgaosTemp[]=$arOrgao; 
+        }
+        $rsRecordSet->preenche($arOrgaosTemp);
     }
 
     $obLista = new Lista;
@@ -1246,13 +1324,15 @@ function montaListaOrgaos()
 
 function limparFormOrgaos()
 {
+    global $pgProc;
+    $pgOculMontaOrgao = '../../../../../../gestaoFinanceira/fontes/PHP/ppa/instancias/montaOrgaoUnidade/OCMontaOrgaoUnidade.php';
+
     $stJs .= "jQuery('input[name=stExercicioOrgao]').val('".Sessao::getExercicio()."');                     \n";
+    $stJs .= "jQuery('#inHndStExercicioM').val('".Sessao::getExercicio()."');                               \n";
     $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').val('');                                          \n";
-    $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').removeAttr('readonly');                           \n";
     $stJs .= "jQuery('#inMontaCodOrgaoM').val('');                                                          \n";
-    $stJs .= "jQuery('#inMontaCodOrgaoM').removeAttr('disabled');                                           \n";
     $stJs .= "jQuery('#inMontaCodUnidadeM').val('');                                                        \n";
-    $stJs .= "jQuery('#inMontaCodUnidadeM').removeAttr('disabled');                                         \n";
+    $stJs .= "buscaOCMontaOrgaoUnidade('preencheUnidade', '".$pgOculMontaOrgao."', '".$pgProc."', 'oculto', '".Sessao::getId()."'); \n";
     $stJs .= "f.inMontaCodUnidadeM.options.length = 0;                                                      \n";
     $stJs .= "f.inMontaCodUnidadeM.options[0] = new Option('Selecione','');                                 \n";
     $stJs .= "jQuery('input:radio[name=\"inOrgaoGerenciador\"][value=\"1\"]').attr(\"checked\",false);      \n";
@@ -1265,6 +1345,7 @@ function limparFormOrgaos()
     $stJs .= "jQuery('input[name=stNomResponsavel]').val('');                                               \n";
     $stJs .= "jQuery('#stNomResponsavel').html('&nbsp;');                                                   \n";
     $stJs .= "jQuery('#stCodigoProcessoAdesao').val('');                                                    \n";
+    $stJs .= "jQuery('#stExercicioProcessoAdesao').val('".Sessao::getExercicio()."');                       \n";
     $stJs .= "jQuery('#dtAdesao').val('');                                                                  \n";
     $stJs .= "jQuery('#dtPublicacaoAvisoIntencao').val('');                                                 \n";
     $stJs .= "jQuery('#dtPublicacaoAvisoIntencao').focus();                                                 \n";
@@ -1322,56 +1403,37 @@ function excluirOrgao()
 function alterarOrgao()
 {
     $arOrgaos = Sessao::read('arOrgaos');
-    $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
-    $boOrgaoQuantitativo = false;
-    
+
     foreach ($arOrgaos as $arOrgao) {
-        if ($arOrgao['inId'] == $_REQUEST['inId']) {
-            foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {
-                $stUnidOrcaQuantitativo = str_pad($arQuantitativo['inCodOrgaoQ'], 2, "0", STR_PAD_LEFT).'.'.str_pad($arQuantitativo['inCodUnidadeQ'], 2, "0", STR_PAD_LEFT);
-                
-                if ($stUnidOrcaQuantitativo == $arOrgao['stUnidadeOrcamentaria']) {
-                    $boOrgaoQuantitativo = true;
-                }
-            }
-            
+        if ($arOrgao['inId'] == $_REQUEST['inId']) {            
             $inNaturezaSelecionada = ($arOrgao['inNaturezaProcedimento'] == 't' OR $arOrgao['inNaturezaProcedimento'] == 1) ? 1 : 2;
             $inGerenciadorSelecionado = ($arOrgao['inOrgaoGerenciador'] == 't' OR $arOrgao['inOrgaoGerenciador'] == 1) ? 1 : 2;
-            
+
             $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                                \n";
             $stJs .= "jQuery('#btnSalvarOrgao').val('Alterar Orgão');                                           \n";
             $stJs .= "jQuery('#btnSalvarOrgao').attr('onclick', 'montaParametrosGET(\'alterarListaOrgaos\');'); \n";
             # Preenche informações do Lote
-            $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').removeAttr('readonly');                       \n";
-            $stJs .= "jQuery('#inMontaCodOrgaoM').removeAttr('disabled');                                       \n";
-            $stJs .= "jQuery('#inMontaCodUnidadeM').removeAttr('disabled');                                     \n";
             $stJs .= "jQuery('#stExercicioOrgao').val('".$arOrgao['stExercicioOrgao']."');                      \n";
-            $stJs .= "jQuery('#stExercicioOrgao').removeAttr('readonly');                                       \n";
+            $stJs .= "jQuery('#inHndStExercicioM').val('".$arOrgao['stExercicioOrgao']."');                     \n";
             $stJs .= "jQuery('#inHndIdOrgao').val('".$arOrgao['inId']."');                                      \n";
             $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').focus();                                      \n";
             $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').val('".$arOrgao['stUnidadeOrcamentaria']."'); \n";
-            if($boOrgaoQuantitativo){
-                $stJs .= "jQuery('input[name=stUnidadeOrcamentaria]').attr('readonly', 'readonly');             \n";
-                $stJs .= "jQuery('#inMontaCodOrgaoM').attr('disabled', 'disabled');                             \n";
-                $stJs .= "jQuery('#inMontaCodUnidadeM').attr('disabled', 'disabled');                           \n";
-                $stJs .= "jQuery('#stExercicioOrgao').attr('readonly', 'readonly');                             \n";
-            }
             $stJs .= "jQuery('#dtPublicacaoAvisoIntencao').focus();                                             \n";
             $stJs .= "jQuery('#inOrgaoGerenciador".$inGerenciadorSelecionado."').attr(\"checked\",true);        \n";
-            
-            if ( $inGerenciadorSelecionado == 1 ) {
+
+            if ( $inGerenciadorSelecionado == 1 )
                 $stJs .= "jQuery('#inNaturezaProcedimento2').attr('disabled', 'disabled');                      \n";
-            }
-            
+
             $stJs .= "jQuery('#inResponsavel').val('".$arOrgao['inResponsavel']."');                            \n";
             $stJs .= "jQuery('input[name=stNomResponsavel]').val('".$arOrgao['stNomResponsavel']."');           \n";
             $stNomResponsavel = ($arOrgao['stNomResponsavel']!='') ? $arOrgao['stNomResponsavel'] : '&nbsp;';
             $stJs .= "jQuery('#stNomResponsavel').html('".$stNomResponsavel."');                                \n";
             $stJs .= "jQuery('input:radio[name=\"inNaturezaProcedimento\"][value=\"".$inNaturezaSelecionada."\"]').attr(\"checked\",true); \n";
             $stJs .= "jQuery('#stCodigoProcessoAdesao').val('".$arOrgao['stCodigoProcessoAdesao']."');          \n";
+            $stJs .= "jQuery('#stExercicioProcessoAdesao').val('".$arOrgao['stExercicioProcessoAdesao']."');    \n";
             $stJs .= "jQuery('#dtAdesao').val('".$arOrgao['dtAdesao']."');                                      \n";
             $stJs .= "jQuery('#dtPublicacaoAvisoIntencao').val('".$arOrgao['dtPublicacaoAvisoIntencao']."');    \n";
-            
+
             break;
         }
     }
@@ -1383,6 +1445,9 @@ function alterarListaOrgaos()
 {
     $obErro  = new Erro();
     $arOrgaos = Sessao::read('arOrgaos');
+    $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+    $boResponsavelOrgao = 'true';
+
     if (is_array($arOrgaos) && count($arOrgaos) > 0) {
         foreach($arOrgaos as $arOrgao) {
             if ($arOrgao['inId'] != $_REQUEST['inHndIdOrgao']) {
@@ -1395,10 +1460,14 @@ function alterarListaOrgaos()
                         $obErro->setDescricao('Não é permitido adicionar mais do que um gerenciador para o Registro de Preço.');
                     }
                 }
+            }else{
+                $inMontaCodOrgaoM = $arOrgao['inMontaCodOrgaoM'];
+                $inMontaCodUnidadeM = $arOrgao['inMontaCodUnidadeM'];
+                $stExercicioOrgao = $arOrgao['stExercicioOrgao'];
             }
         }
     }
-    
+
     if(!$obErro->ocorreu()) {
         if ($_REQUEST['stExercicioOrgao']       != "" &&
             $_REQUEST['stUnidadeOrcamentaria']  != "" &&
@@ -1408,27 +1477,48 @@ function alterarListaOrgaos()
             $_REQUEST['inOrgaoGerenciador']     != "" &&
             $_REQUEST['inResponsavel']          != ""
         ){
-            foreach ($arOrgaos as $key => $arOrgao) {
-                if ($arOrgao['inId'] == $_REQUEST['inHndIdOrgao']) {
-                    $arUnidadeOrcamentaria = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
-                    $arOrgaos[$key]['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
-                    $arOrgaos[$key]['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
-                    $arOrgaos[$key]['stMontaCodOrgaoM']          = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]);
-                    $arOrgaos[$key]['stMontaCodUnidadeM']        = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".(int)$arUnidadeOrcamentaria[0]." AND num_unidade = ".(int)$arUnidadeOrcamentaria[1]);
-                    $arOrgaos[$key]['inMontaCodOrgaoM']          = (int) $arUnidadeOrcamentaria[0];
-                    $arOrgaos[$key]['inMontaCodUnidadeM']        = (int) $arUnidadeOrcamentaria[1];
-                    $arOrgaos[$key]['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
-                    $arOrgaos[$key]['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
-                    $arOrgaos[$key]['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
-                    $arOrgaos[$key]['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
-                    $arOrgaos[$key]['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
-                    $arOrgaos[$key]['dtAdesao']                  = $_REQUEST['dtAdesao'];
-                    $arOrgaos[$key]['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
-                    $arOrgaos[$key]['inResponsavel']             = $_REQUEST['inResponsavel'];
-                    $arOrgaos[$key]['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
-                    $arOrgaos[$key]['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
+            if($_REQUEST['stCodigoProcessoAdesao']!='' && $_REQUEST['stExercicioProcessoAdesao'] ==''){
+                $obErro->setDescricao("Informe o Exercício do Processo de Adesão!");
+            }else{
+                foreach ($arOrgaos as $key => $arOrgao) {
+                    if ($arOrgao['inId'] == $_REQUEST['inHndIdOrgao']) {
+                        list($inCodOrgao, $inCodUnidade) = explode('.',$_REQUEST['stUnidadeOrcamentaria']);
+                        $stNomeOrgao = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".$inCodOrgao);
+                        $stNomeUnidade = SistemaLegado::pegaDado("nom_unidade", "orcamento.unidade", "WHERE exercicio ='".$_REQUEST['stExercicioOrgao']."' AND num_orgao = ".$inCodOrgao." AND num_unidade = ".$inCodUnidade);
+
+                        $arOrgaos[$key]['stExercicioOrgao']          = $_REQUEST['stExercicioOrgao'];
+                        $arOrgaos[$key]['stUnidadeOrcamentaria']     = $_REQUEST['stUnidadeOrcamentaria'];
+                        $arOrgaos[$key]['stMontaCodOrgaoM']          = $stNomeOrgao;
+                        $arOrgaos[$key]['stMontaCodUnidadeM']        = $stNomeUnidade;
+                        $arOrgaos[$key]['inMontaCodOrgaoM']          = $inCodOrgao;
+                        $arOrgaos[$key]['inMontaCodUnidadeM']        = $inCodUnidade;
+                        $arOrgaos[$key]['inNaturezaProcedimento']    = $_REQUEST['inNaturezaProcedimento'];
+                        $arOrgaos[$key]['inOrgaoGerenciador']        = $_REQUEST['inOrgaoGerenciador'];
+                        $arOrgaos[$key]['stOrgaoGerenciador']        = ($_REQUEST['inOrgaoGerenciador'] == 1) ? "Sim":"Não";
+                        $arOrgaos[$key]['stNaturezaProcedimento']    = ($_REQUEST['inNaturezaProcedimento'] == 1) ? "Órgão Participante":"Órgão Não Participante";
+                        $arOrgaos[$key]['stCodigoProcessoAdesao']    = $_REQUEST['stCodigoProcessoAdesao'];
+                        $arOrgaos[$key]['stExercicioProcessoAdesao'] = $_REQUEST['stExercicioProcessoAdesao'];
+                        $arOrgaos[$key]['dtAdesao']                  = $_REQUEST['dtAdesao'];
+                        $arOrgaos[$key]['dtPublicacaoAvisoIntencao'] = $_REQUEST['dtPublicacaoAvisoIntencao'];
+                        $arOrgaos[$key]['inResponsavel']             = $_REQUEST['inResponsavel'];
+                        $arOrgaos[$key]['stNomResponsavel']          = $_REQUEST['stNomResponsavel'];
+                        $arOrgaos[$key]['inStNomResponsavel']        = $_REQUEST['inResponsavel'].' - '.$_REQUEST['stNomResponsavel'];
+                    }
     
-                    break;
+                    if( $arOrgao['inResponsavel'] == '' && $arOrgao['inId'] != $_REQUEST['inHndIdOrgao'] )
+                        $boResponsavelOrgao = 'false';
+                }
+
+                foreach ($arOrgaoItemQuantitativos as $key => $arQuantitativo) {
+                    $stUnidOrcaQuantitativo = str_pad($arQuantitativo['inCodOrgaoQ'], 2, "0", STR_PAD_LEFT).'.'.str_pad($arQuantitativo['inCodUnidadeQ'], 2, "0", STR_PAD_LEFT);
+
+                    if ($arQuantitativo['inCodOrgaoQ'] == $inMontaCodOrgaoM && $arQuantitativo['inCodUnidadeQ'] == $inMontaCodUnidadeM && $arQuantitativo['stExercicioOrgao'] == $stExercicioOrgao) {
+                        $arOrgaoItemQuantitativos[$key]['stExercicioOrgao']     = $_REQUEST['stExercicioOrgao'];
+                        $arOrgaoItemQuantitativos[$key]['inCodOrgaoQ']          = $inCodOrgao;
+                        $arOrgaoItemQuantitativos[$key]['inCodUnidadeQ']        = $inCodUnidade;
+                        $arOrgaoItemQuantitativos[$key]['stNomOrgaoQ']          = $stNomeOrgao;
+                        $arOrgaoItemQuantitativos[$key]['stNomUnidadeQ']        = $stNomeUnidade;
+                    }
                 }
             }
         } else {
@@ -1436,12 +1526,16 @@ function alterarListaOrgaos()
         }
     }
 
+    $stJs .= "document.getElementById('boResponsavelOrgao').value='".$boResponsavelOrgao."';        \n";
+
     if ($obErro->ocorreu()) {
-        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');   \n";
     } else {
         Sessao::write('arOrgaos', $arOrgaos);
+        Sessao::write('arOrgaoItemQuantitativos', $arOrgaoItemQuantitativos);
         $stJs .= limparFormOrgaos();
         $stJs .= preencheComboOrgaoAbaQuantitativo();
+        $stJs .= montaListaOrgaoItemQuantitativos();
     }
 
     return $stJs;
@@ -1616,6 +1710,8 @@ function preencheComboFornecedorAbaQuantitativo()
 
     $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                        \n";
     $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');                                    \n";
+    $stJs .= "jQuery('#nuQtdeAderidaQ').html('0,0000');                                     \n";
+    $stJs .= "jQuery('#nuSaldoItemQ').html('0,0000');                                       \n"; 
 
     return $stJs;
 }
@@ -1625,16 +1721,80 @@ function preencheSpanQuantidadeFornecidaAbaQuantitativo()
     $arItens = Sessao::read('arItens');
     $arItensTMP = array();
     $inContador = 0;
+    $inCodLoteQ = (isset($_REQUEST['inCodLoteQ']) && $_REQUEST['inCodLoteQ'] != '') ? $_REQUEST['inCodLoteQ'] : 0;
 
     $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                        \n";
     $stJs .= "jQuery('#nuQtdeFornecida').html('0,0000');                                    \n";
+    $stJs .= "jQuery('#nuQtdeAderidaQ').html('0,0000');                                     \n";
+    $stJs .= "jQuery('#nuSaldoItemQ').html('0,0000');                                       \n"; 
 
     foreach( $arItens as $arItem) {
-        if ( $arItem["inNumItemLote"]==$_REQUEST['inNumItemQ'] && $arItem["inNumCGMVencedor"]==$_REQUEST['inCodFornecedorQ']) {
-            $stJs .= "f.nuHdnQtdeFornecida.value = ".$arItem['nuQuantidade'].";             \n";
-            $stJs .= "jQuery('#nuQtdeFornecida').html('".$arItem['nuQuantidade']."');       \n"; 
+        if ( $arItem["inNumItemLote"]==$_REQUEST['inNumItemQ'] && $arItem["inNumCGMVencedor"]==$_REQUEST['inCodFornecedorQ'] && $arItem["stCodigoLote"] == $inCodLoteQ) {
+            $stJs .= "f.nuHdnQtdeFornecida.value = ".str_replace(",",".",str_replace(".","",$arItem['nuQtdeLicitada'])).";             \n";
+            $stJs .= "jQuery('#nuQtdeFornecida').html('".$arItem['nuQtdeLicitada']."');       \n";
+
+            $stChaveItem = $arItem['stCodigoLote'].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'];
         }
     }
+    
+    if(isset($stChaveItem)){
+        $arQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+
+        $nuQtdeAderida = 0;
+        $nuQtdeSaldo = 0;
+
+        foreach ($arQuantitativos as $arQuantitativo) {
+            if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem
+                && $arQuantitativo['inId']!=$_REQUEST['inHndIdItemQ']) {
+                $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+            }
+        }
+
+        $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$_REQUEST['nuQtdeOrgao']));
+
+        foreach( $arItens as $arItem) {
+            if ( $arItem["stCodigoLote"].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'] == $stChaveItem ) {
+                $nuQtdeSaldo = str_replace(",",".",str_replace(".","",$arItem['nuQtdeLicitada'])) - $nuQtdeAderida;
+            }
+        }
+
+        $stJs .= "jQuery('#nuQtdeAderidaQ').html('".number_format($nuQtdeAderida, 4, ',', '.')."');     \n";
+        $stJs .= "jQuery('#nuSaldoItemQ').html('".number_format($nuQtdeSaldo, 4, ',', '.')."');         \n"; 
+    }
+
+    return $stJs;
+}
+
+function preencheSpanQuantidadeAderidaAbaQuantitativo()
+{
+    $arItens = Sessao::read('arItens');
+    $arQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+    $inCodLoteQ = (isset($_REQUEST['inCodLoteQ']) && $_REQUEST['inCodLoteQ'] != '') ? $_REQUEST['inCodLoteQ'] : 0;
+    $nuQtdeAderida = 0;
+    $nuQtdeSaldo = 0;
+
+    foreach( $arItens as $arItem) {
+        if ( $arItem["inNumItemLote"]==$_REQUEST['inNumItemQ'] && $arItem["inNumCGMVencedor"]==$_REQUEST['inCodFornecedorQ'] && $arItem["stCodigoLote"] == $inCodLoteQ) {            
+            $stChaveItem = $arItem['stCodigoLote'].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'];
+
+            foreach ($arQuantitativos as $arQuantitativo) {
+                if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem
+                    && $arQuantitativo['inId']!=$_REQUEST['inHndIdItemQ']
+                    ) {
+                    $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+                }
+            }
+
+            $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$_REQUEST['nuQtdeOrgao']));
+            $nuQtdeSaldo = str_replace(",",".",str_replace(".","",$arItem['nuQtdeLicitada'])) - $nuQtdeAderida;
+
+            break;
+        }
+    }
+
+    $stJs .= "jQuery('#nuQtdeAderidaQ').html('".number_format($nuQtdeAderida, 4, ',', '.')."');     \n";
+    $stJs .= "jQuery('#nuSaldoItemQ').html('".number_format($nuQtdeSaldo, 4, ',', '.')."');         \n"; 
+
     return $stJs;
 }
 
@@ -1696,12 +1856,22 @@ function incluirListaQuantitativo()
                 }
             }
         }
+        $stChaveItem = $arOrgaoItemQuantitativo['inCodLoteQ'].$arOrgaoItemQuantitativo['inNumItemQ'].$arOrgaoItemQuantitativo['inCodItemQ'].$arOrgaoItemQuantitativo['inCodFornecedorQ'];
     } else {
        $obErro->setDescricao("Informe Todos os campos!");
     }
 
-    if ( (float)number_format($_REQUEST['nuHdnQtdeFornecida'], 4, ',', '.') < (float)number_format($_REQUEST['nuQtdeOrgao'], 4, ',', '.') ) {
-        $obErro->setDescricao("A quantidade informada não pode ser maior do que a quantidade fornecida!");
+    $nuQtdeAderida = 0;
+    foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {
+        if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem ) {
+            $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+        }
+    }
+
+    $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arOrgaoItemQuantitativo['nuQtdeOrgao']));
+
+    if ( $_REQUEST['nuHdnQtdeFornecida'] < $nuQtdeAderida ) {
+        $obErro->setDescricao("A Quantidade Total Aderida não pode ser maior do que a Quantidade Fornecida!");
     }
 
     if ($obErro->ocorreu()) {
@@ -1715,6 +1885,8 @@ function incluirListaQuantitativo()
         $stJs .= preencheComboOrgaoAbaQuantitativo();
         $boLote = ($_REQUEST['inCodLoteQ']>0) ? true : false;
         $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
+        $stJs .= atualizaQtdAderidaItem();
+        $stJs .= montaListaItens();
     }
     
     return $stJs;
@@ -1723,11 +1895,9 @@ function incluirListaQuantitativo()
 function montaListaOrgaoItemQuantitativos()
 {
     $rsRecordSet = new RecordSet();
-    
     if (Sessao::read('arOrgaoItemQuantitativos') != "") {
-        $rsRecordSet->preenche(Sessao::read('arOrgaoItemQuantitativos'));
+        $rsRecordSet->preenche(SistemaLegado::ordenaArray(Sessao::read('arOrgaoItemQuantitativos'),array( "inCodLoteQ" => SORT_ASC ,"inId" => SORT_ASC)));
     }
-    $rsRecordSet->ordena('inCodLoteQ');
 
     $obLista = new Lista;
     $obLista->setMostraPaginacao( false );
@@ -1870,6 +2040,8 @@ function limparFormOrgaoItemQuantitativos()
     $stJs .= "f.nuQtdeOrgao.value = '0,0000';                                   \n";
     $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                            \n";
     $stJs .= "f.inHndIdItemQ.value = '';                                        \n";
+    $stJs .= "jQuery('#nuQtdeAderidaQ').html('0,0000');                         \n";
+    $stJs .= "jQuery('#nuSaldoItemQ').html('0,0000');                           \n";
     $stJs .= "jQuery('#btnSalvarQuantitativo').val('Incluir Quantitativo');     \n";
     $stJs .= "jQuery('#btnSalvarQuantitativo').attr('onclick', 'montaParametrosGET(\'incluirListaQuantitativo\')'); \n";
     
@@ -1877,9 +2049,43 @@ function limparFormOrgaoItemQuantitativos()
     return $stJs;
 }
 
+function carregaLicitacaoFiltro()
+{
+    $inCodEntidade              = ( isset($_REQUEST['inCodEntidade'])               ) ? $_REQUEST['inCodEntidade']              : NULL;
+    $stExercicioLicitacao       = ( isset($_REQUEST['stExercicioLicitacao'])        ) ? $_REQUEST['stExercicioLicitacao']       : NULL;
+    $inCodModalidade            = ( isset($_REQUEST['inCodModalidade'])             ) ? $_REQUEST['inCodModalidade']            : NULL;
+
+    //Filtro para Modalidades de Licitação e Licitação
+    include_once CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php";
+    include_once TLIC."TLicitacaoLicitacao.class.php";
+
+    $obComprasModalidade = new TComprasModalidade();
+    $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
+
+    $inCount = 0;
+    $stJs .= "f.inCodLicitacao.options.length = ".$inCount.";                                   \n";
+    $stJs .= "f.inCodLicitacao.options[".$inCount."] = new Option('Selecione','');              \n";
+
+    if($stExercicioLicitacao!=NULL&&$inCodEntidade!=NULL&&$inCodModalidade!=NULL){
+        $obTLicitacaoLicitacao->setDado( 'exercicio'        , $stExercicioLicitacao );
+        $obTLicitacaoLicitacao->setDado( 'cod_entidade'     , $inCodEntidade        );
+        $obTLicitacaoLicitacao->setDado( 'cod_modalidade'   , $inCodModalidade      );
+
+        $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao );
+
+        while (!($rsLicitacao->eof())) {
+            $inCount++;
+            $stJs .= "f.inCodLicitacao.options[".$inCount."] = new Option('".$rsLicitacao->getCampo('cod_licitacao')."','".$rsLicitacao->getCampo('cod_licitacao')."/".$rsLicitacao->getCampo('exercicio')."'); \n";
+
+            $rsLicitacao->proximo();
+        }
+    }
+
+    return $stJs;
+}
+
 function carregaLicitacao()
 {
-    //$inCodModalidadeLicitacao = Modalidade da Licitação:Concorrência(1)/Pregão(2)
     $inCodModalidadeLicitacao   = ( isset($_REQUEST['inCodModalidadeLicitacao'])    ) ? $_REQUEST['inCodModalidadeLicitacao']   : NULL;
     $inCodEntidade              = ( isset($_REQUEST['inCodEntidade'])               ) ? $_REQUEST['inCodEntidade']              : NULL;
     $stExercicioLicitacao       = ( isset($_REQUEST['stExercicioLicitacao'])        ) ? $_REQUEST['stExercicioLicitacao']       : NULL;
@@ -1989,13 +2195,16 @@ function excluirQuantitativo($inId = '')
     Sessao::write('arOrgaoItemQuantitativos', $arOrgaoItemQuantitativos);
 
     $stJs .= montaListaOrgaoItemQuantitativos();
-    
+    $stJs .= atualizaQtdAderidaItem();
+    $stJs .= montaListaItens();
+
     SistemaLegado::executaFrameOculto($stJs);
 }
 
 function alterarQuantitativo()
 {
     $arQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+
     foreach ($arQuantitativos as $arQuantitativo) {
         if ($arQuantitativo['inId'] == $_REQUEST['inId']) {
             $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                                            \n";
@@ -2028,9 +2237,9 @@ function alterarQuantitativo()
 
             $stJs .= preencheComboFornecedorAbaQuantitativo();
             $stJs .= "jQuery('#inCodFornecedorQ').val('".$arQuantitativo['inCodFornecedorQ']."');                           \n";
+            $stJs .= "jQuery('#nuQtdeOrgao').val('".$arQuantitativo['nuQtdeOrgao']."');         \n";
             $stJs .= "jQuery('#inCodFornecedorQ').change();                                                                 \n";
             $stJs .= "jQuery('#nuQtdeOrgao').focus();                                                                       \n";
-            $stJs .= "jQuery('#nuQtdeOrgao').val('".str_replace('.', ',',$arQuantitativo['nuQtdeOrgao'])."');               \n";
 
             break;
         }
@@ -2060,14 +2269,13 @@ function alterarListaQuantitativo()
                     break;
                 }
             }
-            if($value['inCodItemQ'] == $_REQUEST['inHdnCodItemQ'] && $value['inId'] != $_REQUEST['inHndIdItemQ']){
-                $qtdSomaItem = $qtdSomaItem + $value['nuQtdeOrgao'];
-            }
         }
 
         if ( !$obErro->ocorreu() ) {
             foreach ($arOrgaoItemQuantitativos as $key => $value) {
                 if ($value['inId'] == $_REQUEST['inHndIdItemQ']) {
+                    $stChaveItem = $value['inCodLoteQ'].$value['inNumItemQ'].$value['inCodItemQ'].$value['inCodFornecedorQ'];
+
                     $arOrgaoItemQuantitativos[$key]['stExercicioOrgao'] = $_REQUEST['stExercicioOrgaoQ'];
                     $arOrgaoItemQuantitativos[$key]['inCodOrgaoQ']      = $_REQUEST['inCodOrgaoQ'];
                     $arOrgaoItemQuantitativos[$key]['stNomOrgaoQ']      = SistemaLegado::pegaDado("nom_orgao", "orcamento.orgao", "WHERE exercicio ='".$_REQUEST['stExercicioOrgaoQ']."' AND num_orgao = ".$_REQUEST['inCodOrgaoQ']);
@@ -2076,19 +2284,14 @@ function alterarListaQuantitativo()
                     $arOrgaoItemQuantitativos[$key]['inCodLoteQ']       = (!empty($_REQUEST['inCodLoteQ']) ? $_REQUEST['inCodLoteQ'] : 0);
                     $arOrgaoItemQuantitativos[$key]['inNumItemQ']       = $_REQUEST['inNumItemQ'];
                     $arOrgaoItemQuantitativos[$key]['inCodItemQ']       = $_REQUEST['inHdnCodItemQ'];
-                    
-                    $qtdSomaItem = $qtdSomaItem + $_REQUEST['nuQtdeOrgao'];
+
                     foreach( $arItens as $arItem) {
                         if ( $arItem["inCodItem"] == $_REQUEST['inHdnCodItemQ'] ){
-                            $_REQUEST['stNomItem'] = $arItem["stNomItem"];
-                            if ( (float)number_format($arItem['nuQuantidade'], 4, ',', '.') < (float)number_format($qtdSomaItem, 4, ',', '.') ) {
-                                $obErro->setDescricao("A quantidade informada não pode ser maior do que a quantidade fornecida!");
-                                break;
-                            }
+                            $stNomItem = $arItem["stNomItem"];
                         }
                     }
-            
-                    $arOrgaoItemQuantitativos[$key]['stNomItemQ']       = $_REQUEST['stNomItem'];
+
+                    $arOrgaoItemQuantitativos[$key]['stNomItemQ']       = $stNomItem;
                     $arOrgaoItemQuantitativos[$key]['inCodFornecedorQ'] = $_REQUEST['inCodFornecedorQ'];
                     $arOrgaoItemQuantitativos[$key]['stNomFornecedorQ'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inCodFornecedorQ']);
                     $arOrgaoItemQuantitativos[$key]['nuQtdeOrgao']      = $_REQUEST['nuQtdeOrgao'];
@@ -2100,9 +2303,17 @@ function alterarListaQuantitativo()
     } else {
        $obErro->setDescricao("Informe Todos os campos!");
     }
+
+    $nuQtdeAderida = 0;
     
-    if ( (float)number_format($_REQUEST['nuHdnQtdeFornecida'], 4, ',', '.') < (float)number_format($_REQUEST['nuQtdeOrgao'], 4, ',', '.') ) {
-        $obErro->setDescricao("A quantidade informada não pode ser maior do que a quantidade fornecida!");
+    foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {
+        if ( $arQuantitativo['inCodLoteQ'].$arQuantitativo['inNumItemQ'].$arQuantitativo['inCodItemQ'].$arQuantitativo['inCodFornecedorQ'] == $stChaveItem ) {
+            $nuQtdeAderida = $nuQtdeAderida + str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+        }
+    }
+
+    if ( $_REQUEST['nuHdnQtdeFornecida'] < $nuQtdeAderida ) {
+        $obErro->setDescricao("A Quantidade Total Aderida não pode ser maior do que a Quantidade Fornecida!");
     }
     
     if ($obErro->ocorreu()) {
@@ -2114,6 +2325,8 @@ function alterarListaQuantitativo()
         $stJs .= preencheComboOrgaoAbaQuantitativo();
         $boLote = ($_REQUEST['inCodLoteQ']>0) ? true : false;
         $stJs .= preencheLoteOuNumItemAbaQuantitativo($boLote);
+        $stJs .= atualizaQtdAderidaItem();
+        $stJs .= montaListaItens();
     }
     
     return $stJs;
@@ -2144,6 +2357,28 @@ function verificaExercicioLicitacao()
     return $stJs;
 }
 
+function atualizaQtdAderidaItem(){
+    $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
+    $arItens = Sessao::read('arItens');
+    $arQuantitativosItemTemp = array();
+
+    foreach ($arOrgaoItemQuantitativos as $arQuantitativo) {        
+        if(isset($arQuantitativosItemTemp[$arQuantitativo['inNumItemQ'].'_'.$arQuantitativo['inCodLoteQ']]))
+            $arQuantitativosItemTemp[$arQuantitativo['inNumItemQ'].'_'.$arQuantitativo['inCodLoteQ']]=$arQuantitativosItemTemp[$arQuantitativo['inNumItemQ'].'_'.$arQuantitativo['inCodLoteQ']]+str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+        else
+            $arQuantitativosItemTemp[$arQuantitativo['inNumItemQ'].'_'.$arQuantitativo['inCodLoteQ']]=str_replace(",",".",str_replace(".","",$arQuantitativo['nuQtdeOrgao']));
+    }
+
+    foreach($arItens as $key => $value) {
+        if(isset($arQuantitativosItemTemp[$value['inNumItemLote'].'_'.$value['stCodigoLote']]))
+            $arItens[$key]['nuQtdeAderida'] = number_format($arQuantitativosItemTemp[$value['inNumItemLote'].'_'.$value['stCodigoLote']], 4, ',', '.');
+        else
+            $arItens[$key]['nuQtdeAderida'] = '0,0000';
+    }
+
+    Sessao::write('arItens', $arItens);
+}
+
 function LimparForm()
 {
     Sessao::write('arOrgaos'                        , array());
@@ -2171,9 +2406,6 @@ switch ($stCtrl)
 {
     case 'validaNroProcesso':
         $stJs .= validaNroProcesso($request->get('stNumProcesso'), $request->get('stExercicioRegistroPreco'), $request->get('inCodEntidade'));
-    break;
-    case 'validaNroAdesao':
-        $stJs .= validaNroAdesao($request->get('stCodigoProcessoAdesao'), $request->get('inCodEntidade'));
     break;
     case 'validaNroItemNoLote':
         $stJs .= validaNroItemNoLote($request->get('inCodLote'), $request->get('stNumItemLote'));
@@ -2308,6 +2540,9 @@ switch ($stCtrl)
     case "preencheSpanQuantidadeFornecidaAbaQuantitativo":
         $stJs .= preencheSpanQuantidadeFornecidaAbaQuantitativo();
         break;
+    case "preencheSpanQuantidadeAderidaAbaQuantitativo":
+        $stJs .= preencheSpanQuantidadeAderidaAbaQuantitativo();
+        break;
     case "incluirListaQuantitativo":
         $stJs .= incluirListaQuantitativo();
         break;
@@ -2322,6 +2557,9 @@ switch ($stCtrl)
     case "carregaLicitacao":
         $stJs .= carregaLicitacao();
         break;
+    case "carregaLicitacaoFiltro":
+        $stJs .= carregaLicitacaoFiltro();
+        break;
     case 'alterarListaQuantitativo':
         $stJs .= alterarListaQuantitativo();
         break;
@@ -2333,6 +2571,52 @@ switch ($stCtrl)
         break;
     case 'LimparForm':
         $stJs .= LimparForm();
+        break;
+    case 'preencheQuantidadeAderidaAbaItem':
+        $stJs .= preencheQuantidadeAderidaAbaItem();
+        break;
+    case "buscaEmpenho":
+        $numEmpenho         = $request->get('numEmpenho');
+        $inCodEntidade      = $request->get('inCodEntidade');
+        $stExercicioEmpenho = $request->get('stExercicioEmpenho');
+
+        if ($inCodEntidade!=NULL and $stExercicioEmpenho!=NULL and $numEmpenho!=NULL) {
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+            $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+            $obTEmpenhoEmpenho->setDado('cod_empenho'  , $numEmpenho );
+            $obTEmpenhoEmpenho->setDado('exercicio'    , $stExercicioEmpenho);
+            $obTEmpenhoEmpenho->setDado('cod_entidade' , $inCodEntidade);
+
+            # Busca somente os Empenhos da modalidade Registro De Preços
+            $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
+
+            if ($rsRecordSet->getNumLinhas() > 0) {
+                $stJs  = "d.getElementById('stEmpenho').innerHTML = '".$rsRecordSet->getCampo('credor')."';                                         \n";
+            } else {
+                $stJs  = "alertaAviso('Empenho não cadastrado ou não pertence a Modalidade Registro de Preços','form','erro','".Sessao::getId()."');\n";
+                $stJs .= "d.getElementById('stEmpenho').innerHTML = '&nbsp;';                                                                       \n";
+                $stJs .= "f.numEmpenho.value = '';                                                                                                  \n";
+            }
+        } else {
+            if ($inCodEntidade==NULL) {
+                $stJs  = "alertaAviso('Informe a entidade.','form','erro','".Sessao::getId()."');                                                   \n";
+                $stJs .= "f.inCodEntidade.focus();                                                                                                  \n";
+            }
+            if ($stExercicioEmpenho==NULL) {
+                $stJs  = "alertaAviso('Informe o exercício do empenho.','form','erro','".Sessao::getId()."');                                       \n";
+                $stJs .= "f.stExercicioEmpenho.focus();                                                                                             \n";
+            }
+            if ($numEmpenho==NULL) {
+                $stJs  = "d.getElementById('stEmpenho').innerHTML = '&nbsp;';                                                                       \n";
+                $stJs .= "f.numEmpenho.value = '';                                                                                                  \n";
+            }
+            $stJs .= "f.numEmpenho.value = '';                                                                                                      \n";
+        }
+
+        break;
+    case "limpaEmpenho":
+        $stJs  = "d.getElementById('stEmpenho').innerHTML = '&nbsp;';   \n";
+        $stJs .= "f.numEmpenho.value = '';                              \n";
         break;
 }
 

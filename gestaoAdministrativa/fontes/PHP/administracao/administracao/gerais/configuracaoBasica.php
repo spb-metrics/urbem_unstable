@@ -30,7 +30,7 @@
       * @author Analista: Cassiano
       * @author Desenvolvedor: Cassiano
 
-      $Id: configuracaoBasica.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+      $Id: configuracaoBasica.php 63460 2015-08-31 14:20:23Z evandro $
 
       Casos de uso: uc-01.03.97
     */
@@ -96,6 +96,7 @@ switch ($ctrl) {
             $mascaraSetor         = pegaConfiguracao("mascara_setor");
             $mascaraLocal         = pegaConfiguracao("mascara_local");
             $inInatividadeUsuario = pegaConfiguracao("tempo_inatividade_usuario");
+            $codMunicipioIBGE     = pegaConfiguracao("cod_municipio_ibge");
 
             $samlinkHost 	= pegaConfiguracao("samlink_host");
             $samlinkPort 	= pegaConfiguracao("samlink_port");
@@ -244,6 +245,12 @@ switch ($ctrl) {
                     erro = true;
                 }
 
+                campo = document.frm.inCodIGBE.value;
+                if ( campo == '' ) {
+                    mensagem += "@Campo Código do Município do IBGE inválido!";
+                    erro = true;
+                }
+
                 campo = document.frm.email.value.length;
                 if (campo>0) {
                     if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.frm.email.value))) {
@@ -368,6 +375,27 @@ switch ($ctrl) {
         echo $comboMunicipio;
     ?>
 
+    </td>
+    </tr>
+
+    <td class=label>*Código do Município do IBGE</td>
+    <td class=field>
+    <?php
+        if ( strstr($codMunicipioIBGE,'cod_municipio_ibge') == true ) {
+            $codMunicipioIBGE = '';
+        }
+        require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+        $obTextMunicipioIBGE = new TextBox();
+        $obTextMunicipioIBGE->setId        ( 'inCodIGBE' );
+        $obTextMunicipioIBGE->setName      ( 'inCodIGBE' );
+        $obTextMunicipioIBGE->setSize      ( 5 );
+        $obTextMunicipioIBGE->setMaxLength ( 7 );
+        $obTextMunicipioIBGE->setInteiro   ( true  );
+        $obTextMunicipioIBGE->setNull      ( false );
+        $obTextMunicipioIBGE->setValue     ( $codMunicipioIBGE );
+        $obTextMunicipioIBGE->montaHTML();
+        echo $obTextMunicipioIBGE->getHTML();
+    ?>
     </td>
     </tr>
 
@@ -641,6 +669,7 @@ switch ($ctrl) {
     $samlink_port         = $request->get('samlink_port');
     $samlink_dbname       = $request->get('samlink_dbname');
     $samlink_user         = $request->get('samlink_user');
+    $codMunicipioIBGE     = $request->get('inCodIGBE');
 
     include_once( CAM_GA_ADM_NEGOCIO."RAdministracaoConfiguracao.class.php" );
 
@@ -650,7 +679,7 @@ switch ($ctrl) {
     $fax = $dddCom.$foneCom;
     $cep = $cep1.$cep2;
     $cnpj = preg_replace('/[^a-zA-Z0-9]/','', $cnpj );
-
+    
     $obRAdministracaoConfiguracao->setCodModulo( 2 );
     $obRAdministracaoConfiguracao->setExercicio( Sessao::getExercicio() );
     $obRAdministracaoConfiguracao->addConfiguracao( 'nom_prefeitura'            , $nom_prefeitura       );
@@ -679,6 +708,7 @@ switch ($ctrl) {
     $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_setor'             , $mascaraSetor         );
     $obRAdministracaoConfiguracao->addConfiguracao( 'mascara_local'             , $mascaraLocal         );
     $obRAdministracaoConfiguracao->addConfiguracao( 'tempo_inatividade_usuario' , $inInatividadeUsuario );
+    $obRAdministracaoConfiguracao->addConfiguracao( 'cod_municipio_ibge'        , $codMunicipioIBGE );
     if ($samlinkExiste) {
         $obRAdministracaoConfiguracao->addConfiguracao( 'samlink_host',$samlink_host     );
         $obRAdministracaoConfiguracao->addConfiguracao( 'samlink_port',$samlink_port     );

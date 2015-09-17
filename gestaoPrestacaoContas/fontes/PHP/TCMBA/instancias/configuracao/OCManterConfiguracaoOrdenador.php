@@ -32,7 +32,7 @@
 
  * @ignore
 
- * $Id: OCManterConfiguracaoOrdenador.php 60205 2014-10-06 21:06:16Z lisiane $
+ * $Id: OCManterConfiguracaoOrdenador.php 63385 2015-08-24 13:09:55Z michel $
  * $Name: $
  * $Revision: 59612 $
  * $Author: gelson $
@@ -41,8 +41,8 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GA_CGM_NEGOCIO."RCGM.class.php" );
-include_once(CAM_GPC_TCMBA_MAPEAMENTO."TTCMBAConfiguracaoOrdenador.class.php" );
+include_once CAM_GA_CGM_NEGOCIO.'RCGM.class.php';
+include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBAConfiguracaoOrdenador.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracaoOrdenador";
@@ -53,7 +53,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-include_once ($pgJS);
+include_once $pgJS;
 
 $stCtrl = $request->get('stCtrl');
 
@@ -160,13 +160,13 @@ function montaListaOrdenador()
 }
 
 function incluirOrdenador()
-{    
-     $responsavel = explode('-', $_REQUEST['tipo_responsavel']);
+{
+    $responsavel = explode('-', $_REQUEST['tipo_responsavel']);
+    for($i=1;$i<count($responsavel);$i++){
+        $stResponsavel = ($stResponsavel) ? $stResponsavel.'-'.$responsavel[$i] : $responsavel[$i];
+    }
    
-    if ( !($_REQUEST["stHdnAcao"] == "alterar")) {
-        
-  //      $obTTCMBAConfiguracaoOrdenador = new TTCMBAConfiguracaoOrdenador();
-        
+    if ( !($_REQUEST["stHdnAcao"] == "alterar")) {        
         $obErro = new Erro();
         if ( $_REQUEST["inCgmOrdenador"] == "" ) {
             return "alertaAviso('Preencher o campo Ordenador.','form','erro','".Sessao::getId()."');\n";
@@ -181,16 +181,16 @@ function incluirOrdenador()
         $arOrdenadores = Sessao::read('arOrdenadores');
 
         $arNovoOrdenador = array();
-        $arNovoOrdenador["cod_entidade"] = $_REQUEST["hdnCodEntidade"];
-        $arNovoOrdenador["cgm_ordenador"] = $_REQUEST["inCgmOrdenador"];
-        $arNovoOrdenador["nom_cgm"] = $_REQUEST["stNomCgmOrdenador"];
-        $arNovoOrdenador["dt_inicio_vigencia"] = $_REQUEST["dtDataInicio"];
-        $arNovoOrdenador["dt_fim_vigencia"] = $_REQUEST["dtDataFim"];
-        $arNovoOrdenador["num_orgao"] = $_REQUEST["inMontaCodOrgaoM"];
-        $arNovoOrdenador["num_unidade"] = $_REQUEST["inMontaCodUnidadeM"];
-        $arNovoOrdenador["cod_tipo_responsavel_ordenador"] = $responsavel[0];
-        $arNovoOrdenador["tipo_responsavel_desc"] = $responsavel[1];
-        $arNovoOrdenador["inId"] = count($arOrdenadores);
+        $arNovoOrdenador["cod_entidade"]            = $_REQUEST["hdnCodEntidade"];
+        $arNovoOrdenador["cgm_ordenador"]           = $_REQUEST["inCgmOrdenador"];
+        $arNovoOrdenador["nom_cgm"]                 = $_REQUEST["stNomCgmOrdenador"];
+        $arNovoOrdenador["dt_inicio_vigencia"]      = $_REQUEST["dtDataInicio"];
+        $arNovoOrdenador["dt_fim_vigencia"]         = $_REQUEST["dtDataFim"];
+        $arNovoOrdenador["num_orgao"]               = $_REQUEST["inMontaCodOrgaoM"];
+        $arNovoOrdenador["num_unidade"]             = $_REQUEST["inMontaCodUnidadeM"];
+        $arNovoOrdenador["cod_tipo_responsavel"]    = $responsavel[0];
+        $arNovoOrdenador["tipo_responsavel_desc"]   = $stResponsavel;
+        $arNovoOrdenador["inId"]                    = count($arOrdenadores);
         
         if ( $arOrdenadores != "" ) {
             foreach ($arOrdenadores as $arrOrdenadores) {   
@@ -217,18 +217,15 @@ function incluirOrdenador()
             Sessao::write('arOrdenadores',$arOrdenadores);
         }    
     } else {
-       
         $obErro  = new Erro();
     
         $arOrdenadores = Sessao::read('arOrdenadores');
 
         foreach ($arOrdenadores as $arrOrdenadores) {
             if ( $arrOrdenadores['inId'] <> $_REQUEST['hdnInId'] ) {
-
                 if ( $arrOrdenadores['dt_inicio_vigencia'] == $_REQUEST['dtDataInicio'] AND $arrOrdenadores['dt_fim_vigencia'] == $_REQUEST['dtDataFim'] ){
                     $obErro->setDescricao("Já possui Ordenador cadastrado, para essa Unidade Orçamentária, no período informado!");
                 }
-                
                 elseif ( SistemaLegado::comparaDatas($arrOrdenadores['dt_fim_vigencia'], $_REQUEST['dtDataInicio'], true)
                         AND SistemaLegado::comparaDatas($_REQUEST['dtDataFim'],$arrOrdenadores['dt_inicio_vigencia'] , true)) {
                     $obErro->setDescricao("Já possui Ordenador cadastrado, para essa Unidade Orçamentária, no período informado!");
@@ -250,8 +247,8 @@ function incluirOrdenador()
                     $arOrdenadores[$key]['dt_fim_vigencia']         = $_REQUEST['dtDataFim'];
                     $arOrdenadores[$key]["num_orgao"]               = $_REQUEST["inMontaCodOrgaoM"];
                     $arOrdenadores[$key]["num_unidade"]             = $_REQUEST["inMontaCodUnidadeM"];
-                    $arOrdenadores[$key]["cod_tipo_responsavel_ordenador"]        = $responsavel[0];
-                    $arOrdenadores[$key]["tipo_responsavel_desc"]   = $responsavel[1];
+                    $arOrdenadores[$key]["cod_tipo_responsavel"]    = $responsavel[0];
+                    $arOrdenadores[$key]["tipo_responsavel_desc"]   = $stResponsavel;
                     Sessao::write('arOrdenadores',$arOrdenadores);     
                     break;
                 }
@@ -260,19 +257,17 @@ function incluirOrdenador()
     } 
     
     if ( $obErro->ocorreu() ) {
-        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');   \n";
     } else {
         $stJs .= montaListaOrdenador();
-    
-        $stJs .= "f.inCgmOrdenador.value = ''; \n";
-        $stJs .= "d.getElementById('stNomCgmOrdenador').innerHTML = '&nbsp;';\n";
-        
-        $stJs .= "f.dtDataInicio.value = '';\n";
-        $stJs .= "f.dtDataFim.value = '';\n";
-        $stJs .= "f.tipo_responsavel.value = '';\n";
-        $stJs .= "f.btIncluirOrdenador.value = 'Incluir';\n";
-        $stJs .= "f.hdnInId.value = '';\n";
-        $stJs .= "f.stHdnAcao.value = '';\n";
+        $stJs .= "f.inCgmOrdenador.value = '';                                                      \n";
+        $stJs .= "d.getElementById('stNomCgmOrdenador').innerHTML = '&nbsp;';                       \n";
+        $stJs .= "f.dtDataInicio.value = '';                                                        \n";
+        $stJs .= "f.dtDataFim.value = '';                                                           \n";
+        $stJs .= "f.tipo_responsavel.value = '';                                                    \n";
+        $stJs .= "f.btIncluirOrdenador.value = 'Incluir';                                           \n";
+        $stJs .= "f.hdnInId.value = '';                                                             \n";
+        $stJs .= "f.stHdnAcao.value = '';                                                           \n";
     }
     
     return $stJs;
@@ -311,16 +306,15 @@ function alterarOrdenador()
     
     foreach($arOrdenadores as $arOrdenador){
         if ( $arOrdenador["inId"] == $_GET["inId"] ) {
-        
-            $stJs .= "f.inCgmOrdenador.value = '".$arOrdenador['cgm_ordenador']."';\n";
-            $stJs .= "d.getElementById('stNomCgmOrdenador').innerHTML = '".$arOrdenador['nom_cgm']."';\n";
-            $stJs .= "f.dtDataInicio.value = '".$arOrdenador['dt_inicio_vigencia']."';\n";
-            $stJs .= "f.dtDataFim.value = '".$arOrdenador['dt_fim_vigencia']."';\n";
-            $stJs .= "f.hdnInId.value = '".$arOrdenador["inId"]."';\n";
-            $stJs .= "f.tipo_responsavel.options[".$arOrdenador['cod_tipo_responsavel_ordenador']."].selected = true ;\n";
-            $stJs .= "f.stNomCgmOrdenador.value = '".$arOrdenador['nom_cgm']."';\n";
-            $stJs .= "f.btIncluirOrdenador.value = 'Alterar';\n";
-            $stJs .= "f.stHdnAcao.value = 'alterar';\n";
+            $stJs .= "f.inCgmOrdenador.value = '".$arOrdenador['cgm_ordenador']."';                                                     \n";
+            $stJs .= "d.getElementById('stNomCgmOrdenador').innerHTML = '".$arOrdenador['nom_cgm']."';                                  \n";
+            $stJs .= "f.dtDataInicio.value = '".$arOrdenador['dt_inicio_vigencia']."';                                                  \n";
+            $stJs .= "f.dtDataFim.value = '".$arOrdenador['dt_fim_vigencia']."';                                                        \n";
+            $stJs .= "f.hdnInId.value = '".$arOrdenador["inId"]."';                                                                     \n";
+            $stJs .= "f.tipo_responsavel.value = '".$arOrdenador['cod_tipo_responsavel']."-".$arOrdenador['tipo_responsavel_desc']."';  \n";
+            $stJs .= "f.stNomCgmOrdenador.value = '".$arOrdenador['nom_cgm']."';                                                        \n";
+            $stJs .= "f.btIncluirOrdenador.value = 'Alterar';                                                                           \n";
+            $stJs .= "f.stHdnAcao.value = 'alterar';                                                                                    \n";
         }
     }
     return $stJs;
@@ -328,7 +322,6 @@ function alterarOrdenador()
 
 // Acoes por pagina
 switch ($stCtrl) {
-    
     case "incluirOrdenador":
         $stJs .= incluirOrdenador();
     break;

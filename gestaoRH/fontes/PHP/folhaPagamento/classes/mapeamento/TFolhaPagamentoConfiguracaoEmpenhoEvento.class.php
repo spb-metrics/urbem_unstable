@@ -33,31 +33,37 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TFolhaPagamentoConfiguracaoEmpenhoEvento.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TFolhaPagamentoConfiguracaoEmpenhoEvento.class.php 63259 2015-08-10 14:30:00Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TFolhaPagamentoConfiguracaoEmpenhoEvento extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function TFolhaPagamentoConfiguracaoEmpenhoEvento()
-{
-    parent::Persistente();
-    $this->setTabela("folhapagamento.configuracao_empenho_evento");
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+        $this->setTabela("folhapagamento.configuracao_empenho_evento");
+    
+        $this->setCampoCod('');
+        $this->setComplementoChave('exercicio,cod_configuracao,sequencia,cod_evento,timestamp');
+    
+        $this->AddCampo('exercicio'       ,'char'     ,true  ,'4'  ,true,'TFolhaPagamentoConfiguracaoEmpenho');
+        $this->AddCampo('cod_configuracao','integer'  ,true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
+        $this->AddCampo('sequencia'       ,'integer'  ,true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
+        $this->AddCampo('timestamp'       ,'timestamp',true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
+        $this->AddCampo('cod_evento'      ,'integer'  ,true  ,''   ,true,'TFolhaPagamentoEvento');
+    }
 
-    $this->setCampoCod('');
-    $this->setComplementoChave('exercicio,cod_configuracao,sequencia,cod_evento,timestamp');
-
-    $this->AddCampo('exercicio'       ,'char'     ,true  ,'4'  ,true,'TFolhaPagamentoConfiguracaoEmpenho');
-    $this->AddCampo('cod_configuracao','integer'  ,true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
-    $this->AddCampo('sequencia'       ,'integer'  ,true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
-    $this->AddCampo('timestamp'       ,'timestamp',true  ,''   ,true,'TFolhaPagamentoConfiguracaoEmpenho');
-    $this->AddCampo('cod_evento'      ,'integer'  ,true  ,''   ,true,'TFolhaPagamentoEvento');
-}
+    /**
+        * Método Destruct
+        * @access Private
+    */
+    public function __destruct() {}
 }
 ?>

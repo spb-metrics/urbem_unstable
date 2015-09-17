@@ -45,21 +45,21 @@ class TTCMBAConfiguracaoOrdenador extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTCMBAConfiguracaoOrdenador()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('tcmba.configuracao_ordenador');
         $this->setCampoCod('');
         $this->setComplementoChave('exercicio,cod_entidade,cgm_ordenador,num_orgao, num_unidade ');
         
-        $this->AddCampo('exercicio'                        , 'varchar',   true,   '4',   true, false);
-        $this->AddCampo('cod_entidade'                     , 'integer',   true,    '',   true, false);
-        $this->AddCampo('cgm_ordenador'                    , 'integer',   true,    '',   true, true );
-        $this->AddCampo('num_orgao'                        , 'integer',   true,    '',   true, true );
-        $this->AddCampo('num_unidade'                      , 'integer',   true,    '',   true, true );
-        $this->AddCampo('dt_inicio_vigencia'               , 'date'   ,   true,    '',  false, false);
-        $this->AddCampo('dt_fim_vigencia'                  , 'date'   ,   true,    '',  false, false);
-        $this->AddCampo('cod_tipo_responsavel_ordenador'   , 'integer',   true,    '',  false, true );
+        $this->AddCampo('exercicio'            , 'varchar',   true,   '4',   true, false);
+        $this->AddCampo('cod_entidade'         , 'integer',   true,    '',   true, false);
+        $this->AddCampo('cgm_ordenador'        , 'integer',   true,    '',   true, true );
+        $this->AddCampo('num_orgao'            , 'integer',   true,    '',   true, true );
+        $this->AddCampo('num_unidade'          , 'integer',   true,    '',   true, true );
+        $this->AddCampo('dt_inicio_vigencia'   , 'date'   ,   true,    '',  false, false);
+        $this->AddCampo('dt_fim_vigencia'      , 'date'   ,   true,    '',  false, false);
+        $this->AddCampo('cod_tipo_responsavel' , 'integer',   true,    '',  false, true );
     }    
 }
 ?>

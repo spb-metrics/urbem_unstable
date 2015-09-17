@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoRelatorioNotaLiquidacaoEmpenho.class.php 60708 2014-11-11 13:02:53Z franver $
+    $Id: REmpenhoRelatorioNotaLiquidacaoEmpenho.class.php 63465 2015-08-31 18:06:10Z jean $
 
     $Revision: 30668 $
     $Name$
@@ -42,19 +42,6 @@
 
     * Casos de uso uc-02.03.21
                    uc-02.03.04
-*/
-
-/*
-$Log$
-Revision 1.12  2007/04/04 21:07:26  luciano
-#8736#
-
-Revision 1.11  2007/03/22 19:04:32  luciano
-#8736#
-
-Revision 1.10  2006/07/05 20:47:06  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -663,6 +650,42 @@ function geraRecordSet(&$arRecordSet , $stOrder = "")
             }
         }
     }
+
+    //TCMBA
+    if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 5) {
+        include_once(CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBANotaFiscalLiquidacao.class.php");
+        $obTTCMBANotaFiscalLiquidacao = new TTCMBANotaFiscalLiquidacao();
+        
+        $stFiltroBANotaFiscal.= " WHERE cod_entidade         = " .$this->inCodEntidade;
+        $stFiltroBANotaFiscal.= "   AND exercicio_liquidacao = '".$this->stExercicio."'";
+        $stFiltroBANotaFiscal.= "   AND cod_nota_liquidacao  = " .$this->inCodNota;
+
+        $obTTCMBANotaFiscalLiquidacao->recuperaTodos($rsNotaBA, $stFiltroBANotaFiscal,"",$boTransacao);
+
+        $arLinha20[0]['cod_nota_liquidacao']  = $rsNotaBA->getCampo('cod_nota_liquidacao');
+        $arLinha20[0]['exercicio_liquidacao'] = $rsNotaBA->getCampo('exercicio_liquidacao');
+        $arLinha20[0]['cod_entidade']         = $rsNotaBA->getCampo('cod_entidade');
+        $arLinha20[0]['ano']                  = $rsNotaBA->getCampo('ano');
+        $arLinha20[0]['nro_nota']             = $rsNotaBA->getCampo('nro_nota');
+        $arLinha20[0]['nro_serie']            = $rsNotaBA->getCampo('nro_serie');        
+        $arLinha20[0]['nro_subserie']         = $rsNotaBA->getCampo('nro_subserie');
+        $arLinha20[0]['data_emissao']         = $rsNotaBA->getCampo('data_emissao');
+        $arLinha20[0]['vl_nota']              = number_format($rsNotaBA->getCampo('vl_nota'), 2, ",",".");
+        $arLinha20[0]['descricao']            = $rsNotaBA->getCampo('descricao');
+        $arLinha20[0]['cod_uf']               = $rsNotaBA->getCampo('cod_uf');
+
+        $varCodUf = $rsNotaBA->getCampo('cod_uf');
+        
+        $stSiglaUF = !empty($varCodUf) ? SistemaLegado::pegaDado("sigla_uf","sw_uf"," WHERE cod_uf = ".$varCodUf." ") : "";
+        $arLinha20[0]['sigla_uf'] = $stSiglaUF;
+       
+        $rsNewRecord20 = new RecordSet;
+        $rsNewRecord20->preenche($arLinha20);
+        $arRecordSet[20] = $rsNewRecord20;
+    }
+
 }
 
 }
+
+?>

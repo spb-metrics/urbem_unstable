@@ -64,6 +64,7 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
     $stSql = $this->montaRecuperaDadosTribunal().$stCondicao.$stOrdem;
     $this->setDebug( $stSql );
+
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
@@ -74,7 +75,7 @@ function montaRecuperaDadosTribunal()
     
     $stSql = " 
         SELECT 1 AS tipo_registro
-             ,  licitacao.exercicio_processo || licitacao.cod_entidade || licitacao.cod_modalidade || licitacao.cod_processo AS num_processo
+             , licitacao.exercicio || LPAD(licitacao.cod_entidade::VARCHAR,2,'0') || LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')|| LPAD(licitacao.cod_licitacao::VARCHAR ,4,'0') AS num_processo
              , ".$this->getDado('inCodGestora')." AS unidade_gestora            
              , CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL
                      THEN 1    
@@ -88,7 +89,7 @@ function montaRecuperaDadosTribunal()
                END AS documento
              , sw_cgm.nom_cgm AS convidado
              , participante.dt_inclusao AS dt_recebimento_convite
-             , cotacao_licitacao.exercicio_licitacao || '".$this->getDado('inMes')."' AS competencia
+            , TO_CHAR(participante.dt_inclusao, 'yyyymm') AS competencia
      
           FROM licitacao.cotacao_licitacao
           
@@ -115,25 +116,24 @@ function montaRecuperaDadosTribunal()
             ON sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm
      
          WHERE cotacao_licitacao.exercicio_licitacao = '".$this->getDado('stExercicio')."'
-           AND TO_CHAR(participante.dt_inclusao, 'mm') = '".$this->getDado('inMes')."'  \n ";
-            
-    if (trim($this->getDado('stEntidades'))) { 
-        $stSql .= " AND cotacao_licitacao.cod_entidade IN (".$this->getDado('stEntidades').") \n";
-    }  
-
-    $stSql .= " 
-         GROUP BY cotacao_licitacao.exercicio_licitacao    
-                , cotacao_licitacao.cod_licitacao    
-                , sw_cgm_pessoa_fisica.cpf    
-                , sw_cgm_pessoa_juridica.cnpj    
-                , sw_cgm_pessoa_fisica.numcgm    
-                , sw_cgm.nom_cgm
-                , dt_recebimento_convite
-                , licitacao.exercicio_processo 
-                , licitacao.cod_entidade 
-                , licitacao.cod_modalidade 
-                , licitacao.cod_processo ";
-
+           AND participante.dt_inclusao BETWEEN TO_DATE('".$this->getDado('stDataInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('stDataFinal')."', 'dd/mm/yyyy')
+           AND cotacao_licitacao.cod_entidade IN (".$this->getDado('stEntidades').")
+           AND licitacao.cod_modalidade NOT IN (8, 9)
+           
+      GROUP BY num_processo
+             , cotacao_licitacao.exercicio_licitacao    
+             , cotacao_licitacao.cod_licitacao    
+             , sw_cgm_pessoa_fisica.cpf    
+             , sw_cgm_pessoa_juridica.cnpj    
+             , sw_cgm_pessoa_fisica.numcgm    
+             , sw_cgm.nom_cgm
+             , dt_recebimento_convite
+             , licitacao.exercicio_processo 
+             , licitacao.cod_entidade 
+             , licitacao.cod_modalidade 
+             , licitacao.cod_processo
+             , licitacao.cod_tipo_objeto
+             , licitacao.registro_precos ";
     return $stSql;
 }
 

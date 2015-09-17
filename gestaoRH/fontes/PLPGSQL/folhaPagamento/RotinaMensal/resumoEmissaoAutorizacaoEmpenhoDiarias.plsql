@@ -35,10 +35,7 @@
     $Author: souzadl $
     $Date: 2007-10-17 10:37:19 -0200 (Qua, 17 Out 2007) $
     
-    * Casos de uso: uc-04.05.62   
 */
-
-
 CREATE OR REPLACE FUNCTION resumoEmissaoAutorizacaoEmpenhoDiarias(varchar,varchar,varchar,varchar) RETURNS SETOF colunasResumoDiarias AS $$
 DECLARE
     stTipoFiltro                        ALIAS FOR $1;
@@ -92,53 +89,54 @@ BEGIN
     --Busca Configuração para a autorizacao de empenho                                              
     ----------------------------------------------------                       
 
-    stSql := '    SELECT ultima_vigencia_competencia.vigencia as dt_vigencia
-                       , to_char(ultima_vigencia_competencia.vigencia,''dd/mm/yyyy'') as vigencia
-                       , to_char(ultima_vigencia_competencia.vigencia,''yyyy'') as exercicio
-                       , ultima_vigencia_competencia.cod_periodo_movimentacao
-                       , (   SELECT max(timestamp)                                               
-                               FROM (                                                            
-                                        SELECT max(timestamp) as timestamp
-                                          FROM folhapagamento'|| stEntidade ||'.configuracao_empenho
-                                         WHERE vigencia = ultima_vigencia_competencia.vigencia   
-                                         UNION
-                                        SELECT max(timestamp) as timestamp
-                                          FROM folhapagamento'|| stEntidade ||'.configuracao_autorizacao_empenho
-                                         WHERE vigencia = ultima_vigencia_competencia.vigencia
-                                         UNION
-                                        SELECT max(timestamp) as timestamp
-                                          FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla
-                                         WHERE vigencia = ultima_vigencia_competencia.vigencia
-                                    ) as max_timestamp_vigencia
-                         ) as timestamp                                                          
-                    FROM (   SELECT DISTINCT max(vigencia) as vigencia
-                                  , ( SELECT cod_periodo_movimentacao
-                                        FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao
-                                       WHERE vigencia BETWEEN dt_inicial AND dt_final
-                                    ) as cod_periodo_movimentacao
-                               FROM ( SELECT vigencia
-                                        FROM folhapagamento'|| stEntidade ||'.configuracao_empenho
-                                       UNION
-                                      SELECT vigencia
-                                        FROM folhapagamento'|| stEntidade ||'.configuracao_autorizacao_empenho
-                                       UNION
-                                      SELECT vigencia
-                                        FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla
-                                    ) as configuracoes_empenho
-                           GROUP BY cod_periodo_movimentacao
-                         ) as ultima_vigencia_competencia
-                   WHERE ultima_vigencia_competencia.vigencia <= (SELECT dt_final 
-                                                                    FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao 
-                                                                   WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||')
-                     AND to_char(ultima_vigencia_competencia.vigencia,''yyyy'') = '|| quote_literal(stExercicio) ||'
-                ORDER BY dt_vigencia DESC LIMIT 1';
-                
+    stSql := '
+          SELECT ultima_vigencia_competencia.vigencia as dt_vigencia
+               , to_char(ultima_vigencia_competencia.vigencia,''dd/mm/yyyy'') as vigencia
+               , to_char(ultima_vigencia_competencia.vigencia,''yyyy'') as exercicio
+               , ultima_vigencia_competencia.cod_periodo_movimentacao
+               , (SELECT max(timestamp)
+                    FROM (SELECT max(timestamp) as timestamp
+                            FROM folhapagamento'|| stEntidade ||'.configuracao_empenho
+                           WHERE vigencia = ultima_vigencia_competencia.vigencia
+                           UNION
+                          SELECT max(timestamp) as timestamp
+                            FROM folhapagamento'|| stEntidade ||'.configuracao_autorizacao_empenho
+                           WHERE vigencia = ultima_vigencia_competencia.vigencia
+                           UNION
+                          SELECT max(timestamp) as timestamp
+                            FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla
+                           WHERE vigencia = ultima_vigencia_competencia.vigencia
+                         ) as max_timestamp_vigencia
+                 ) as timestamp
+            FROM (SELECT DISTINCT max(vigencia) as vigencia
+                       , ( SELECT cod_periodo_movimentacao
+                             FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                            WHERE vigencia BETWEEN dt_inicial AND dt_final
+                         ) as cod_periodo_movimentacao
+                    FROM ( SELECT vigencia
+                             FROM folhapagamento'|| stEntidade ||'.configuracao_empenho
+                            UNION
+                           SELECT vigencia
+                             FROM folhapagamento'|| stEntidade ||'.configuracao_autorizacao_empenho
+                            UNION
+                           SELECT vigencia
+                             FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla
+                         ) as configuracoes_empenho
+                GROUP BY cod_periodo_movimentacao
+                 ) as ultima_vigencia_competencia
+           WHERE ultima_vigencia_competencia.vigencia <= (SELECT dt_final
+                                                            FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao
+                                                           WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||')
+             AND to_char(ultima_vigencia_competencia.vigencia,''yyyy'') = '|| quote_literal(stExercicio) ||'
+        ORDER BY dt_vigencia DESC LIMIT 1
+    ';
+
     OPEN crCursor FOR EXECUTE stSql;
         FETCH crCursor INTO reConfiguracao;
     CLOSE crCursor;    
     
-    stMascaraDespesa := selectIntoVarchar('SELECT valor 
-                                             FROM administracao.configuracao 
+    stMascaraDespesa := selectIntoVarchar('SELECT valor
+                                             FROM administracao.configuracao
                                             WHERE parametro = ''masc_class_despesa'' AND exercicio = '|| quote_literal(reConfiguracao.exercicio) ||' ');
     
     inCountLotacao  := selectIntoInteger('SELECT count(*) 
@@ -156,48 +154,87 @@ BEGIN
                                            WHERE exercicio = '|| quote_literal(reConfiguracao.exercicio) ||'
                                              AND timestamp = '|| quote_literal(reConfiguracao.timestamp) ||' ');
 
-    stSql := '  SELECT diaria.cod_diaria
-                     , diaria.timestamp
-                     , diaria.motivo
-                     , contrato.*
-                     , sw_cgm.nom_cgm
-                     , sw_cgm.numcgm
-                     , diaria.dt_inicio
-                     , diaria.dt_termino
-                     , diaria.vl_total as valor
-                     , diaria.quantidade
-                     , tipo_diaria_despesa.cod_conta
-                     , tipo_diaria_despesa.exercicio
-                     , norma.num_norma
-                     , norma.exercicio as exercicio_norma
-                     , (SELECT descricao FROM pessoal'|| stEntidade ||'.cargo WHERE cod_cargo = contrato_servidor.cod_cargo) as cargo
-                     ';
+    stSql := '
+              SELECT diaria.cod_diaria
+                   , diaria.timestamp
+                   , diaria.motivo
+                   , contrato.*
+                   , sw_cgm.nom_cgm
+                   , sw_cgm.numcgm
+                   , diaria.dt_inicio
+                   , diaria.dt_termino
+                   , diaria.vl_total as valor
+                   , diaria.quantidade
+                   , tipo_diaria_despesa.cod_conta
+                   , tipo_diaria_despesa.exercicio
+                   , norma.num_norma
+                   , norma.exercicio as exercicio_norma
+                   , (SELECT descricao FROM pessoal'|| stEntidade ||'.cargo WHERE cod_cargo = contrato_servidor.cod_cargo) as cargo
+    ';
                      
     IF inCountLotacao >= 1 THEN
-        stSql := stSql || ' , contrato_servidor_orgao.cod_orgao
-                            , (SELECT orgao||''-''|| recuperaDescricaoOrgao(contrato_servidor_orgao.cod_orgao,('|| quote_literal(stExercicio ||'-01-01') ||')::date) FROM organograma.vw_orgao_nivel WHERE cod_orgao = contrato_servidor_orgao.cod_orgao) as lla';
+        stSql := stSql || '
+                   , contrato_servidor_orgao.cod_orgao
+                   , (SELECT orgao||''-''||recuperaDescricaoOrgao(contrato_servidor_orgao.cod_orgao,('|| quote_literal(stExercicio ||'-01-01') ||')::date) FROM organograma.vw_orgao_nivel WHERE cod_orgao = contrato_servidor_orgao.cod_orgao) as lla
+        ';
     END IF;       
     IF inCountLocal >= 1 THEN
         stSql := stSql || ' , contrato_servidor_local.cod_local
-                            , (SELECT descricao FROM organograma.local WHERE cod_local = contrato_servidor_local.cod_local) as lla';
+                            , (SELECT descricao FROM organograma.local WHERE cod_local = contrato_servidor_local.cod_local) as lla ';
     END IF;
     IF inCountAtributo >= 1 THEN
         stSql := stSql || ' , atributo.valor,atributo.cod_atributo
-                            , atributo.valor as lla';
+                            , atributo.valor as lla ';
     END IF;        
-            
-    stSql := stSql || '   FROM diarias'|| stEntidade ||'.diaria
-                              , (  SELECT cod_diaria
-                                        , cod_contrato
-                                        , max(timestamp) as timestamp
-                                     FROM diarias'|| stEntidade ||'.diaria
-                                 GROUP BY cod_diaria, cod_contrato) as max_diaria
-                              , diarias'|| stEntidade ||'.tipo_diaria
-                              , diarias'|| stEntidade ||'.tipo_diaria_despesa
-                             , pessoal'|| stEntidade ||'.servidor_contrato_servidor
-                             , pessoal'|| stEntidade ||'.contrato_servidor
-                             , pessoal'|| stEntidade ||'.servidor
-                             , pessoal'|| stEntidade ||'.contrato ';
+
+    stSql := stSql || '
+                FROM diarias'|| stEntidade ||'.diaria
+          INNER JOIN (SELECT cod_diaria
+                           , cod_contrato
+                           , max(timestamp) as timestamp
+                        FROM diarias'|| stEntidade ||'.diaria
+                    GROUP BY cod_diaria
+                           , cod_contrato
+                     ) as max_diaria
+                  ON diaria.cod_contrato = max_diaria.cod_contrato
+                 AND diaria.cod_diaria   = max_diaria.cod_diaria
+                 AND diaria.timestamp    = max_diaria.timestamp
+           LEFT JOIN diarias'|| stEntidade ||'.diaria_empenho 
+                  ON diaria_empenho.cod_diaria   = diaria.cod_diaria
+                 AND diaria_empenho.cod_contrato = diaria.cod_contrato
+                 AND diaria_empenho.timestamp    = diaria.timestamp
+          INNER JOIN diarias'|| stEntidade ||'.tipo_diaria
+                  ON diaria.cod_tipo       = tipo_diaria.cod_tipo  
+                 AND diaria.timestamp_tipo = tipo_diaria.timestamp
+           LEFT JOIN diarias'|| stEntidade ||'.tipo_diaria_despesa
+                  ON tipo_diaria.cod_tipo  = tipo_diaria_despesa.cod_tipo
+                 AND tipo_diaria.timestamp = tipo_diaria_despesa.timestamp
+          INNER JOIN pessoal'|| stEntidade ||'.contrato
+                  ON diaria.cod_contrato = contrato.cod_contrato
+          INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor
+                  ON contrato.cod_contrato = contrato_servidor.cod_contrato
+          INNER JOIN pessoal'|| stEntidade ||'.servidor_contrato_servidor
+                  ON contrato_servidor.cod_contrato = servidor_contrato_servidor.cod_contrato
+          INNER JOIN pessoal'|| stEntidade ||'.servidor
+                  ON servidor_contrato_servidor.cod_servidor = servidor.cod_servidor
+           LEFT JOIN (SELECT contrato_servidor_orgao.cod_orgao
+                           , contrato_servidor_orgao.cod_contrato
+                        FROM pessoal'|| stEntidade ||'.contrato_servidor_orgao
+                  INNER JOIN (SELECT cso.cod_contrato
+                                   , max(cso.timestamp) as timestamp
+                                FROM pessoal'|| stEntidade ||'.contrato_servidor_orgao AS cso
+                               WHERE cso.timestamp <= '|| quote_literal(stTimestampFechamentoPeriodo) ||'
+                            GROUP BY cso.cod_contrato
+                             ) as max_contrato_servidor_orgao
+                          ON max_contrato_servidor_orgao.cod_contrato = contrato_servidor_orgao.cod_contrato
+                         AND max_contrato_servidor_orgao.timestamp    = contrato_servidor_orgao.timestamp
+                     ) AS contrato_servidor_orgao
+                  ON contrato_servidor_orgao.cod_contrato = contrato_servidor.cod_contrato
+          INNER JOIN sw_cgm
+                  ON servidor.numcgm = sw_cgm.numcgm
+          INNER JOIN normas.norma
+                  ON diaria.cod_norma = norma.cod_norma
+    ';
          
     IF inCountLocal >= 1 THEN
         stSql := stSql || 'INNER JOIN ( SELECT contrato_servidor_local.cod_contrato
@@ -256,35 +293,9 @@ BEGIN
                                         ON (contrato.cod_contrato = atributo.cod_contrato)';
     END IF;
          
-    stSql := stSql || '        
-         , pessoal'|| stEntidade ||'.contrato_servidor_orgao
-         , (  SELECT cod_contrato
-                   , max(timestamp) as timestamp
-                FROM pessoal'|| stEntidade ||'.contrato_servidor_orgao
-               WHERE timestamp <= '|| quote_literal(stTimestampFechamentoPeriodo) ||'
-            GROUP BY cod_contrato) as max_contrato_servidor_orgao
-         , sw_cgm
-         , normas.norma
-     WHERE diaria.cod_contrato                     = servidor_contrato_servidor.cod_contrato
-       AND servidor_contrato_servidor.cod_servidor = servidor.cod_servidor
-       AND servidor_contrato_servidor.cod_contrato = contrato.cod_contrato
-       AND contrato.cod_contrato                   = contrato_servidor_orgao.cod_contrato
-       AND contrato.cod_contrato                   = contrato_servidor.cod_contrato
-       AND contrato_servidor_orgao.cod_contrato    = max_contrato_servidor_orgao.cod_contrato
-       AND contrato_servidor_orgao.timestamp       = max_contrato_servidor_orgao.timestamp
-       AND servidor.numcgm      = sw_cgm.numcgm   
-       AND diaria.cod_norma     = norma.cod_norma
-       AND diaria.cod_contrato  = max_diaria.cod_contrato
-       AND diaria.cod_diaria    = max_diaria.cod_diaria
-       AND diaria.timestamp     = max_diaria.timestamp
-       AND diaria.cod_tipo      = tipo_diaria.cod_tipo  
-       AND tipo_diaria.cod_tipo = tipo_diaria_despesa.cod_tipo
-       AND not exists (SELECT 1
-                         FROM diarias'|| stEntidade ||'.diaria_empenho
-                        WHERE diaria_empenho.cod_diaria   = diaria.cod_diaria
-                          AND diaria_empenho.cod_contrato = diaria.cod_contrato
-                          AND diaria_empenho.timestamp    = diaria.timestamp)
-       ';       
+    stSql := stSql || '
+               WHERE diaria_empenho.cod_diaria IS NULL
+    ';       
 
     IF stTipoFiltro = 'contrato' or stTipoFiltro = 'cgm_contrato' THEN
         stSql := stSql || ' AND contrato.cod_contrato IN ('|| stCodigos ||')';
@@ -298,8 +309,40 @@ BEGIN
         stSql := stSql || ' AND (diaria.dt_inicio  between '|| quote_literal(to_date(arCodigos[1],'dd/mm/yyyy')) ||' AND '|| quote_literal(to_date(arCodigos[2],'dd/mm/yyyy')) ||' ';
         stSql := stSql || '  OR  diaria.dt_termino between '|| quote_literal(to_date(arCodigos[1],'dd/mm/yyyy')) ||' AND '|| quote_literal(to_date(arCodigos[2],'dd/mm/yyyy')) ||' )';
     END IF;               
-  
-    stSql := stSql || ' ORDER BY dt_inicio,dt_termino';
+
+
+    stSql := stSql || '
+            GROUP BY diaria.cod_diaria
+                   , diaria.timestamp
+                   , diaria.motivo
+                   , contrato.cod_contrato
+                   , sw_cgm.nom_cgm
+                   , sw_cgm.numcgm
+                   , diaria.dt_inicio
+                   , diaria.dt_termino
+                   , diaria.vl_total
+                   , diaria.quantidade
+                   , tipo_diaria_despesa.cod_conta
+                   , tipo_diaria_despesa.exercicio
+                   , norma.num_norma
+                   , norma.exercicio
+                   , cargo';
+    
+    IF inCountLotacao >= 1 THEN
+        stSql := stSql || ' , contrato_servidor_orgao.cod_orgao ';
+    END IF;       
+    IF inCountLocal >= 1 THEN
+        stSql := stSql || ' , contrato_servidor_local.cod_local ';
+    END IF;
+    IF inCountAtributo >= 1 THEN
+        stSql := stSql || ' , atributo.valor,atributo.cod_atributo ';
+    END IF;        
+    
+    stSql := stSql || '
+                   , lla
+            ORDER BY dt_inicio
+                   , dt_termino
+    ';
     
     FOR reRegistro IN EXECUTE stSql LOOP
         stOrgao                 := '';
@@ -315,6 +358,7 @@ BEGIN
 
         inCodConta         := reRegistro.cod_conta;
         stExercicioDespesa := reRegistro.exercicio;
+        
         IF inCountLotacao >= 1 THEN
             inNumPAO := selectIntoInteger('SELECT num_pao
                                              FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla_lotacao
@@ -335,8 +379,8 @@ BEGIN
                 inNumPAO := selectIntoInteger('SELECT num_pao
                                                  FROM folhapagamento'|| stEntidade ||'.configuracao_empenho_lla_atributo_valor                           
                                                 WHERE cod_atributo = '|| reRegistro.cod_atributo ||'
-                                                 AND valor     = '|| quote_literal(reRegistro.valor)         ||''
-                                                 AND exercicio = '|| quote_literal(reConfiguracao.exercicio) ||''
+                                                 AND valor     = '|| quote_literal(reRegistro.valor)         ||'
+                                                 AND exercicio = '|| quote_literal(reConfiguracao.exercicio) ||'
                                                  AND timestamp = '|| quote_literal(reConfiguracao.timestamp) ||' ');
             END IF;
         END IF;                             
@@ -362,7 +406,7 @@ BEGIN
             
             IF inCodDespesa IS NULL THEN
                 WHILE inCodDespesa IS NULL AND stCodEstrutural != stCodEstruturalUltimo LOOP               
-                    stCodEstruturalUltimo := stCodEstrutural;                    
+                    stCodEstruturalUltimo := stCodEstrutural;
                     stCodEstrutural := fn_conta_mae(stCodEstrutural);
                     stCodEstrutural := publico.fn_mascara_completa(stMascaraDespesa,stCodEstrutural);
                     stSql := 'SELECT cod_despesa 
@@ -446,7 +490,8 @@ BEGIN
         rwColunasResumo.cod_diaria         := reRegistro.cod_diaria;                 
         rwColunasResumo.cod_contrato       := reRegistro.cod_contrato;                 
         rwColunasResumo.timestamp          := reRegistro.timestamp;                 
-        rwColunasResumo.motivo_viagem      := reRegistro.motivo;                 
+        rwColunasResumo.motivo_viagem      := reRegistro.motivo;
+        rwColunasResumo.cod_conta          := inCodConta;
         boInserir     := FALSE;
         RETURN NEXT rwColunasResumo;                    
     END LOOP;

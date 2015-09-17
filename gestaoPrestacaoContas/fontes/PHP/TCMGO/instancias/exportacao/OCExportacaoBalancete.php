@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoBalancete.php 61662 2015-02-23 18:48:44Z carlos.silva $
+    $Id: OCExportacaoBalancete.php 63215 2015-08-04 19:42:18Z franver $
 
     * Casos de uso: uc-06.04.00
 */
@@ -55,6 +55,9 @@ $inMes = $arFiltroRelatorio['inMes'];
 
 $arFiltroRelatorio['stDataInicial'] = '01/'.$inMes.'/'.Sessao::getExercicio();
 $arFiltroRelatorio['stDataFinal']   = SistemaLegado::retornaUltimoDiaMes($inMes, Sessao::getExercicio());
+
+$stDataInicial = $arFiltroRelatorio['stDataInicial'];
+$stDataFinal   = $arFiltroRelatorio['stDataFinal'];
 
 Sessao::write('filtroRelatorio', $arFiltroRelatorio);
 

@@ -48,7 +48,7 @@
 function buscaFornecedor(){
     var stTarget = document.frm.target;
     var stAction = document.frm.action;
-    document.frm.target = "oculto";
+    document.frm.target = "telaPrincipal";
     document.frm.action = 'OCManterAutorizacao.php?<?=Sessao::getId();?>&stCtrl=buscaFornecedor';
     document.frm.submit();
     document.frm.action = stAction;
@@ -115,14 +115,9 @@ function incluirItem() {
 
     if( mensagem ) {
         alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>');
+        return false;
     } else {
-        document.getElementById('stTipoItemRadio1').setAttribute('disabled',true);
-        document.getElementById('stTipoItemRadio2').setAttribute('disabled',true);
-        document.frm.Ok.disabled = true;
-        document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
-        document.frm.stCtrl.value = 'incluiItemPreEmpenho';
-        document.frm.submit();
-        document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
+        return true;
         limparItem();
     }
 }
@@ -305,7 +300,7 @@ function buscaDtAutorizacao( valor ) {
 function unidadeItem(ent){
     var stTarget = document.frm.target;
     var stAction = document.frm.action; 
-    document.frm.target = 'oculto';
+    document.frm.target = 'telaPrincipal';
     document.frm.stCtrl.value = "unidadeItem";
     document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&codItem='+ent;
     document.frm.submit();

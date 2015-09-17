@@ -31,29 +31,18 @@
 
     * @ignore
 
-    * $Id: FMConsultarCadastroEconomico.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultarCadastroEconomico.php 63376 2015-08-21 18:55:42Z arthur $
 
     * Casos de uso: uc-05.02.21
 */
 
-/*
-$Log$
-Revision 1.18  2007/03/16 14:47:32  cercato
-Bug #8761#
-
-Revision 1.17  2006/09/15 14:32:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php" );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeFato.class.php"      );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeDireito.class.php"   );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMAutonomo.class.php"           );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMConfiguracao.class.php"       );
+include_once CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeFato.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeDireito.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMAutonomo.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMConfiguracao.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ConsultarCadastroEconomico";
@@ -83,7 +72,6 @@ $stMascaraInscricao = $obRCEMConfiguracao->getMascaraInscricao();
 $obRCEMInscricaoEconomica = new RCEMInscricaoEconomica;
 $obRCEMInscricaoEconomica->setInscricaoEconomica      ( $_REQUEST['inCodInscricao'] );
 $obRCEMInscricaoEconomica->consultarInscricaoEconomica( $rsInscricaoEconomica       );
-//sistemaLegado::mostravar ($rsInscricaoEconomica);exit;
 
 $obRCEMInscricaoEconomica->ConsultaBaixaProcesso();
 

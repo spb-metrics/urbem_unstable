@@ -34,44 +34,38 @@
 
     * @ignore
 
-    * $Id: FMManterConstrucaoCaracteristica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterConstrucaoCaracteristica.php 63279 2015-08-12 13:11:09Z arthur $
 
     * Casos de uso: uc-05.01.12
 */
 
-/*
-$Log$
-Revision 1.6  2006/09/18 10:30:16  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMConstrucaoOutros.class.php" );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMImovel.class.php"           );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMLote.class.php"             );
 
-$stLink = Sessao::read('stLink');
-
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConstrucao";
 $pgFilt = "FL".$stPrograma.".php";
-$pgList = "LS".$stPrograma.".php".$stLink;
+$pgList = "LS".$stPrograma.".php";
 $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
+$stLink = Sessao::read('stLink');
 $stAcao = $request->get('stAcao');
+
 if ( empty( $stAcao ) ) {
     $stAcao = "alterar";
 }
 
 $obRCIMConstrucao = new RCIMConstrucaoOutros;
-
 $obRCIMImovel = new RCIMImovel( new RCIMLote );
+
 $obRCIMImovel->obRCIMConfiguracao->consultarConfiguracao();
 $obRCIMImovel->obRCIMConfiguracao->setCodigoModulo( 12 );
 $obRCIMImovel->obRCIMConfiguracao->setAnoExercicio( Sessao::getExercicio() );
@@ -147,7 +141,8 @@ $obFormulario->addComponente      ( $obLblDescricaoConstrucao );
 $obFormulario->addSpan      ( $obSpnProcesso        );
 $obFormulario->addSpan      ( $obSpnAtributosProcesso );
 
-$obFormulario->Cancelar( $pgList );
+$obFormulario->Cancelar( $pgList."?".$stLink );
 $obFormulario->setFormFocus( $obBscProcesso->obCampoCod->getId() );
 $obFormulario->show();
+
 ?>

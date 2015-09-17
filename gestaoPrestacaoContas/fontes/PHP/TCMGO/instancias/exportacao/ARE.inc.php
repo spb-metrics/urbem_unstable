@@ -33,35 +33,30 @@
 */
 
 $inCount = 0;
-/*
+
 if (Sessao::getExercicio() > 2011) {
-
-    $inCount = 0;
-
     include_once( CAM_GPC_TGO_MAPEAMENTO."TTCMGOAnulacaoRecita.class.php" );
 
     $arFiltroRelatorio = Sessao::read('filtroRelatorio');
-    $obTMapeamento = new TTCMGOAnulacaoReceita;
+    $obTTCMGOAnulacaoReceita = new TTCMGOAnulacaoReceita;
 
-    if ($arFiltroRelatorio['inPeriodicidade']) {
-        $stDtInicial = $arFiltroRelatorio['stDataInicial'];
-        $stDtFinal   = $arFiltroRelatorio['stDataFinal'];
-    } else {
-        $stDtInicial = '01/01/'.Sessao::getExercicio();
-        $stDtFinal   = '31/12/'.Sessao::getExercicio();
-    }
+    $rsDetalhamento = new RecordSet();
+    $rsDetalhamentoConta = new RecordSet();
+    $rsDetalhamentoFonteRecurso = new RecordSet();
+    
+    $stDtInicial = $arFiltroRelatorio['stDataInicial'];
+    $stDtFinal   = $arFiltroRelatorio['stDataFinal'];
 
-    $obTMapeamento->setDado('exercicio'  , Sessao::getExercicio() );
-    $obTMapeamento->setDado('stEntidades', $stEntidades );
-    $obTMapeamento->setDado('dtInicio'   , $stDtInicial );
-    $obTMapeamento->setDado('dtFim'      , $stDtFinal   );
-
-    $obTMapeamento->recuperaRelacionamento( $rsDetalhamento );
-    $obTMapeamento->recuperaDetalhamentoConta( $rsDetalhamentoConta );
-    $obTMapeamento->recuperaDetalhamentoFonteRecurso( $rsDetalhamentoFonteRecurso );
+    $obTTCMGOAnulacaoReceita->setDado('exercicio'  , Sessao::getExercicio() );
+    $obTTCMGOAnulacaoReceita->setDado('stEntidades', $stEntidades );
+    $obTTCMGOAnulacaoReceita->setDado('dtInicio'   , $stDtInicial );
+    $obTTCMGOAnulacaoReceita->setDado('dtFim'      , $stDtFinal   );
+    $obTTCMGOAnulacaoReceita->recuperaRelacionamento( $rsDetalhamento );
+    $obTTCMGOAnulacaoReceita->recuperaDetalhamentoConta( $rsDetalhamentoConta );
+    $obTTCMGOAnulacaoReceita->recuperaDetalhamentoFonteRecurso( $rsDetalhamentoFonteRecurso );
 
     //tipo10
-    foreach ($rsDetalhamento->arElementos as $arDetalhamento) {
+    foreach ($rsDetalhamento->getElementos() as $arDetalhamento) {
 
         $arDetalhamento['numero_registro'] = ++$inCount;
         $stChave = $arDetalhamento['cod_orgao'].$arDetalhamento['rubrica'];
@@ -101,8 +96,8 @@ if (Sessao::getExercicio() > 2011) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-        /* TIPO REGISTRO 11 -- MOVIMENTAÇÃO FINANCEIRA*//*
-        foreach ($rsDetalhamentoConta->arElementos as $arDetalhamentoConta) {
+        /* TIPO REGISTRO 11 -- MOVIMENTAÇÃO FINANCEIRA*/
+        foreach ($rsDetalhamentoConta->getElementos() as $arDetalhamentoConta) {
             $stChaveElemento = $arDetalhamentoConta['cod_orgao'].$arDetalhamentoConta['rubrica'];
 
             $stChaveElemento2 = $arDetalhamentoConta['cod_orgao'].$arDetalhamentoConta['rubrica'].$arDetalhamentoConta['banco'].$arDetalhamentoConta['agencia'].$arDetalhamentoConta['conta_corrente'].$arDetalhamentoConta['digito'].$arDetalhamentoConta['tipo_conta'];
@@ -169,8 +164,8 @@ if (Sessao::getExercicio() > 2011) {
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-                /* TIPO REGISTRO 12 -- DETALHAMENTO FONTE RECURSO*//*
-                foreach ($rsDetalhamentoFonteRecurso->arElementos as $arDetalhamentoFonteRecurso) {
+                /* TIPO REGISTRO 12 -- DETALHAMENTO FONTE RECURSO*/
+                foreach ($rsDetalhamentoFonteRecurso->getElementos() as $arDetalhamentoFonteRecurso) {
                     $stChaveElemento3 = $arDetalhamentoFonteRecurso['cod_orgao'].$arDetalhamentoFonteRecurso['rubrica'].$arDetalhamentoFonteRecurso['banco'].$arDetalhamentoFonteRecurso['agencia'].$arDetalhamentoFonteRecurso['conta_corrente'].$arDetalhamentoFonteRecurso['digito'].$arDetalhamentoFonteRecurso['tipo_conta'];
 
                     if ($boChave == true AND $stChaveElemento2 === $stChaveElemento3) {
@@ -240,7 +235,7 @@ if (Sessao::getExercicio() > 2011) {
         }
     }
 }
-/*/
+
 $arrayDado = array (
         'tipo_registro'  => '99',
         'brancos'        => '',

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 63362 $
     $Name$
     $Autor: $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -49,12 +49,11 @@ Arquivos novos
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GPC_TCMBA_MAPEAMENTO ."TTBATipoNorma.class.php" );
-include_once ( CAM_GA_NORMAS_MAPEAMENTO ."TTipoNorma.class.php" );
+include_once ( CAM_GPC_TCMBA_MAPEAMENTO ."TTCMBATipoNorma.class.php" );
+include_once ( CAM_GPC_TCMBA_MAPEAMENTO ."TTCMBAVinculoTipoNorma.class.php" );
+include_once CAM_FW_COMPONENTES.'/Table/Table.class.php';
 
-SistemaLegado::BloqueiaFrames();
 
-//Define o nome dos arquivos PHP
 $stPrograma = "ManterTipoNorma";
 $pgFilt = "FL".$stPrograma.".php";
 $pgList = "LS".$stPrograma.".php";
@@ -63,100 +62,63 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-//include_once ($pgJS);
+$stAcao = $request->get('stAcao', 'incluir');
 
-//Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
-
-//SistemaLegado::executaFramePrincipal( "buscaDado('MontaListaUniOrcam');" );
-
-//*****************************************************//
-// Define COMPONENTES DO FORMULARIO
-//*****************************************************//
-//Instancia o formulário
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
 
-//Define o objeto da ação stAcao
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName ( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
 
-//Define o objeto de controle
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
-$obPersistente = new TTBATipoNorma();
-$obPersistente->recuperaRelacionamento($rsRecordSetLista);
+# Recupera Tipo Normas do TCMBA
+$obTTCMBATipoNorma = new TTCMBATipoNorma();
+$obTTCMBATipoNorma->recuperaRelacionamento($rsTipoNorma);
 
-$obTTipoNorma = new TTipoNorma();
-$obTTipoNorma->recuperaTodos($rsRecordSetCombo,' ORDER BY cod_tipo_norma');
+# Recupera Vinculo de Tipo Normas do Urbem e TCMBA
+$obTTCMBAVinculoTipoNorma = new TTCMBAVinculoTipoNorma();
+$obTTCMBAVinculoTipoNorma->recuperaVinculo($rsTipoNormaUrbem,' ORDER BY cod_tipo_norma');
 
-// SistemaLegado::mostravar($rsRecordSetLista);
-// SistemaLegado::mostravar($rsRecordSetCombo);
+# Select com os tipos de norma do tribunal
+$obCmbTipoNorma = new Select  ();
+$obCmbTipoNorma->setId        ('inTipo_[cod_tipo_norma]');
+$obCmbTipoNorma->setName      ('inTipo_[cod_tipo_norma]');
+$obCmbTipoNorma->setCampoId   ('[cod_tipo]');
+$obCmbTipoNorma->setCampoDesc ('[cod_tipo] - [descricao]');
+$obCmbTipoNorma->addOption    ('','Selecione');
+$obCmbTipoNorma->preencheCombo($rsTipoNorma);
+$obCmbTipoNorma->setValue     ('[cod_tipo_norma_tcmba]');
 
-$obLista = new Lista;
-$obLista->setTitulo ( "Relacionamento com Tipos de Norma-TCMBA");
-$obLista->setRecordSet ($rsRecordSetLista );
-$obLista->setMostraPaginacao( false );
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "&nbsp;" );
-$obLista->ultimoCabecalho->setWidth( 3 );
-$obLista->commitCabecalho();
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "Tipo Norma - TCM" );
-$obLista->ultimoCabecalho->setWidth( 67 );
-$obLista->commitCabecalho();
-$obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "Tipo Norma - Sistema" );
-$obLista->ultimoCabecalho->setWidth( 30 );
-$obLista->commitCabecalho();
-$obLista->addDado();
-$obLista->ultimoDado->setCampo( "[cod_tipo_tcm] - [descricao]" );
-$obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
-$obLista->commitDado();
+$obTable = new Table;
+$obTable->setRecordset($rsTipoNormaUrbem);
 
-$obCmbCombo = new Select();
-$obCmbCombo->setName          ("inTipo_[cod_tipo_tcm]_"     );
-$obCmbCombo->setTitle         ("Selecione"                  );
-$obCmbCombo->setRotulo        (""                           );
-$obCmbCombo->addOption        ("","Selecione"               );
-$obCmbCombo->setCampoId       ("cod_tipo_norma"             );
-$obCmbCombo->setCampoDesc     ("[cod_tipo_norma] - [nom_tipo_norma]"    );
-$obCmbCombo->preencheCombo    ($rsRecordSetCombo            );
-$obCmbCombo->setNull          ( false                       );
-$obCmbCombo->setValue         ("cod_tipo");
+$obTable->Head->addCabecalho('Tipo Norma - Urbem', 30);
+$obTable->Head->addCabecalho('Tipo Norma - TCMBA', 10);
 
-$obLista->addDadoComponente( $obCmbCombo );
-$obLista->ultimoDado->setCampo( "cod_tipo" );
-$obLista->commitDadoComponente();
-$obLista->montaInnerHTML();
+$obTable->Body->addCampo('[cod_tipo_norma] - [nom_tipo_norma]', 'E');
+$obTable->Body->addCampo($obCmbTipoNorma, 'C');
 
-$stLista = $obLista->getHTML();
+$obTable->montaHTML(true);
+$stHTML = $obTable->getHtml();
 
-//Define Span para DataGrid
-$obSpnLista = new Span;
-$obSpnLista->setId ( "spnLista" );
-$obSpnLista->setValue ( $stLista );
+$obSpnLista = new Span();
+$obSpnLista->setId('spnLista');
+$obSpnLista->setValue($stHTML);
 
-//****************************************//
-// Monta FORMULARIO
-//****************************************//
 $obFormulario = new Formulario;
 $obFormulario->addForm( $obForm );
 $obFormulario->addTitulo( "Dados" );
 
 $obFormulario->addHidden( $obHdnCtrl );
 $obFormulario->addHidden( $obHdnAcao );
-
 $obFormulario->addSpan( $obSpnLista );
 
-$obFormulario->defineBarra( array( new Ok(true) ) );
+$obFormulario->defineBarra(array(new Ok()));
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

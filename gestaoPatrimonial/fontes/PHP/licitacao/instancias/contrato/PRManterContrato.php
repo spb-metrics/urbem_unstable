@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Rodrigo
 
-    * $Id: PRManterContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterContrato.php 63574 2015-09-11 15:53:11Z carlos.silva $
 
     * Casos de uso : uc-03.05.23
 */
@@ -38,7 +38,7 @@
 //include padrão do framework
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 //include padrão do framework
-//include_once( "../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php");
+include_once( "../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php");
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php"          );
 include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoContrato.class.php"           );
@@ -72,6 +72,35 @@ $obTContratoAnulado = new TLicitacaoContratoAnulado;
 $obTPublicacaoContrato = new TLicitacaoPublicacaoContrato;
 $obTLicitacaoContratoArquivo = new TLicitacaoContratoArquivo;
 
+
+if ($request->get('inNumeroContrato') != '') {
+    $obTLicitacaoContrato = new TLicitacaoContrato();
+    
+    if ($stAcao == 'incluir') {
+        $obTLicitacaoContrato->recuperaTodos( $rsLicitacaoContrato, " WHERE numero_contrato = '".$request->get('inNumeroContrato')."' AND exercicio = '".$request->get('stExercicioContrato')."' AND cod_entidade = ".$request->get('inCodEntidade'));
+        
+        if($rsLicitacaoContrato->getNumLinhas() > 0) {
+            SistemaLegado::exibeAviso(urlencode('O Número de Contrato '.$request->get('inNumeroContrato').' já está vinculado a outro contrato!'),'n_incluir','erro');
+            die;
+        }
+    } else {
+        if($request->get('inNumeroContrato') != $request->get('inHdnNumeroContrato')) {
+            $obTLicitacaoContrato->recuperaTodos( $rsLicitacaoContrato, " WHERE numero_contrato = '".$request->get('inNumeroContrato')."' AND exercicio = '".$request->get('stExercicioContrato')."' AND cod_entidade = ".$request->get('inCodEntidade'));
+            
+            if($rsLicitacaoContrato->getNumLinhas() > 0) {
+                SistemaLegado::exibeAviso(urlencode('O Número de Contrato '.$request->get('inNumeroContrato').' já está vinculado a outro contrato!'),'n_incluir','erro');
+                die;
+            }
+        }
+    }
+}
+
+
+if($request->get('stExercicioContrato') < $request->get('stExercicioLicitacao')) {
+    SistemaLegado::exibeAviso(urlencode('Exercício do Contrato deve ser maior ou igual ao Exercício da Licitação!'),'n_incluir','erro');
+    die;
+}
+
 Sessao::setTrataExcecao( true );
 Sessao::getTransacao()->setMapeamento( $obTContrato );
 Sessao::getTransacao()->setMapeamento( $obTContratoDocumento );
@@ -86,12 +115,12 @@ $arValores = Sessao::read('arValores');
 switch ($stAcao) {
     case "incluir":
 
-        if (strlen($_REQUEST['nmValorGarantiaExecucao']) < 19) {
+        if (strlen($request->get('nmValorGarantiaExecucao')) < 19) {
 
             $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
-            $obTLicitacaoLicitacao->setDado( 'cod_licitacao'	,$_REQUEST['inCodLicitacao'	] 	);
-            $obTLicitacaoLicitacao->setDado( 'cod_modalidade'	,$_REQUEST['inCodModalidade'] 	);
-            $obTLicitacaoLicitacao->setDado( 'cod_entidade'		,$_REQUEST['inCodEntidade'] 	);
+            $obTLicitacaoLicitacao->setDado( 'cod_licitacao'	,$request->get('inCodLicitacao'	) 	);
+            $obTLicitacaoLicitacao->setDado( 'cod_modalidade'	,$request->get('inCodModalidade') 	);
+            $obTLicitacaoLicitacao->setDado( 'cod_entidade'		,$request->get('inCodEntidade') 	);
             $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao );
 
             unset($stMensagem);
@@ -112,15 +141,15 @@ switch ($stAcao) {
                 $stMensagem = 'É necessário informar ao menos um documento do participante!';
             }
 
-            if ( implode(array_reverse(explode('/',$_REQUEST['dtVencimento']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
-                $stMensagem = 'A data de vencimento deve ser igual ou superior a data de assinatura! ('.$_REQUEST['dtAssinatura'].')';
-            } elseif ( implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) <= implode(array_reverse(explode('/',$rsLicitacao->getCampo('dt_licitacao')))) ) {
+            if ( implode(array_reverse(explode('/',$request->get('dtVencimento')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
+                $stMensagem = 'A data de vencimento deve ser igual ou superior a data de assinatura! ('.$request->get('dtAssinatura').')';
+            } elseif ( implode(array_reverse(explode('/',$request->get('dtAssinatura')))) <= implode(array_reverse(explode('/',$rsLicitacao->getCampo('dt_licitacao')))) ) {
                 $stMensagem = 'A data de assinatura deve ser superior a data de inclusão da licitação! ('.$rsLicitacao->getCampo('dt_licitacao').')';
-            } elseif ( implode(array_reverse(explode('/',$_REQUEST['dtInicioExecucao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
-                $stMensagem = 'A data de Início da execução deve ser igual ou maior a data de assinatura do contrato! ('.$_REQUEST['dtAssinatura'].')';
-            } elseif ( implode(array_reverse(explode('/',$_REQUEST['dtFimExecucao']))) < implode(array_reverse(explode('/',$_REQUEST['dtInicioExecucao']))) ) {
-                $stMensagem = 'A data de Fim de execução deve ser igual ou maior a data de Início da execução! ('.$_REQUEST['dtInicioExecucao'].')';
-            } elseif ( !strstr($_REQUEST['nmValorGarantiaExecucao'],',')) {
+            } elseif ( implode(array_reverse(explode('/',$request->get('dtInicioExecucao')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
+                $stMensagem = 'A data de Início da execução deve ser igual ou maior a data de assinatura do contrato! ('.$request->get('dtAssinatura').')';
+            } elseif ( implode(array_reverse(explode('/',$request->get('dtFimExecucao')))) < implode(array_reverse(explode('/',$request->get('dtInicioExecucao')))) ) {
+                $stMensagem = 'A data de Fim de execução deve ser igual ou maior a data de Início da execução! ('.$request->get('dtInicioExecucao').')';
+            } elseif ( !strstr($request->get('nmValorGarantiaExecucao'),',')) {
                 $stMensagem = 'Valor da Garantia de Execução inválido!';
             }
 
@@ -128,7 +157,7 @@ switch ($stAcao) {
                 $stMensagem = 'É necessário pelo menos um veículo de publicação!';
             } else {
                 foreach ($arValores as $arTemp) {
-                    if ( implode('',array_reverse(explode('/',$arTemp['dtDataPublicacao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
+                    if ( implode('',array_reverse(explode('/',$arTemp['dtDataPublicacao']))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
                         $stMensagem = 'A data de publicação do veículo '.$arTemp['inVeiculo'].' deve ser maior ou igual a data de assinatura do contrato!';
                         break;
                     }
@@ -137,23 +166,34 @@ switch ($stAcao) {
             }
             if ($stMensagem == '') {
 
-                $obTContrato->setDado('cod_entidade',$_REQUEST['inCodEntidade']);
-                $obTContrato->setDado('exercicio',Sessao::getExercicio());
-                $obTContrato->setDado('cgm_responsavel_juridico',$_REQUEST['inCGM']);
-                $obTContrato->setDado('cgm_contratado',$_REQUEST['inCGMContratado']);
-
+                $obTContrato->setDado('cod_entidade',$request->get('inCodEntidade'));
+                $obTContrato->setDado('exercicio', $request->get('stExercicioContrato'));
+                $obTContrato->setDado('cgm_responsavel_juridico',$request->get('inCGM'));
+                $obTContrato->setDado('cgm_contratado',$request->get('inCGMContratado'));
                 $obTContrato->setDado('cod_documento', 0 );
                 $obTContrato->setDado('cod_tipo_documento', 0 );
-
-                $obTContrato->setDado('dt_assinatura', $_REQUEST['dtAssinatura']);
-                $obTContrato->setDado('vencimento', $_REQUEST['dtVencimento']);
-                $obTContrato->setDado('valor_garantia', str_replace(',','.',str_replace('.','',$_REQUEST['nmValorGarantiaExecucao'])) );
-                $obTContrato->setDado('valor_contratado', $_REQUEST['hdnValorContrato'] );
-
-                $obTContrato->setDado('inicio_execucao' , $_REQUEST['dtInicioExecucao'] );
-                $obTContrato->setDado('fim_execucao'    , $_REQUEST['dtFimExecucao'] );
-                $obTContrato->setDado('cod_tipo_contrato'    , $_REQUEST['inTipoContrato'] );
-
+                $obTContrato->setDado('dt_assinatura', $request->get('dtAssinatura'));
+                $obTContrato->setDado('vencimento', $request->get('dtVencimento'));
+                $obTContrato->setDado('valor_garantia', str_replace(',','.',str_replace('.','',$request->get('nmValorGarantiaExecucao'))) );
+                $obTContrato->setDado('valor_contratado', $request->get('vlContrato') );
+                $obTContrato->setDado('inicio_execucao', $request->get('dtInicioExecucao') );
+                $obTContrato->setDado('fim_execucao', $request->get('dtFimExecucao') );
+                $obTContrato->setDado('cod_tipo_contrato', $request->get('inTipoContrato') );
+                
+                $obTContrato->setDado('num_orgao', $request->get('inNumOrgao') );
+                $obTContrato->setDado('num_unidade', $request->get('inNumUnidade') );
+                $obTContrato->setDado('numero_contrato', $request->get('inNumeroContrato') );
+                $obTContrato->setDado('tipo_objeto', $request->get('inCodTipoObjeto') );
+                $obTContrato->setDado('objeto', $request->get('stObjeto') );
+                $obTContrato->setDado('forma_fornecimento', $request->get('stFormaFornecimento') );
+                $obTContrato->setDado('forma_pagamento', $request->get('stFormaPagamento') );
+                $obTContrato->setDado('cgm_signatario', $request->get('inCGMSignatario') );
+                $obTContrato->setDado('prazo_execucao', $request->get('stPrazoExecucao') );
+                $obTContrato->setDado('multa_rescisoria', $request->get('stMultaRescisoria') );
+                $obTContrato->setDado('justificativa', $request->get('stJustificativa') );
+                $obTContrato->setDado('razao', $request->get('stRazao') );
+                $obTContrato->setDado('fundamentacao_legal', $request->get('stFundamentacaoLegal') );
+                
                 $obTContrato->inclusao();
 
                 $inCountDocumentos = count($arDocumentos);
@@ -171,20 +211,20 @@ switch ($stAcao) {
                     $obTPublicacaoContrato->setDado( 'numcgm', $arTemp['inVeiculo'] );
                     $obTPublicacaoContrato->setDado( 'dt_publicacao', $arTemp['dtDataPublicacao'] );
                     $obTPublicacaoContrato->setDado( 'num_publicacao',$arTemp['inNumPublicacao'] );
-                    $obTPublicacaoContrato->setDado( 'exercicio', Sessao::getExercicio() );
-                    $obTPublicacaoContrato->setDado( 'cod_entidade', $_REQUEST['inCodEntidade'] );
-                    $obTPublicacaoContrato->setDado( 'cod_modalidade', $_REQUEST['inCodModalidade'] );
-                    $obTPublicacaoContrato->setDado( 'cod_licitacao', $_REQUEST['inCodLicitacao'] );
+                    $obTPublicacaoContrato->setDado( 'exercicio', $request->get('stExercicioContrato') );
+                    $obTPublicacaoContrato->setDado( 'cod_entidade', $request->get('inCodEntidade') );
+                    $obTPublicacaoContrato->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
+                    $obTPublicacaoContrato->setDado( 'cod_licitacao', $request->get('inCodLicitacao') );
                     $obTPublicacaoContrato->setDado( 'observacao', $arTemp['stObservacao'] );
                     $obTPublicacaoContrato->inclusao();
                 }
 
                 $obTLicitacaoContratoLicitacao->setDado('num_contrato', $obTContrato->getDado('num_contrato'));
                 $obTLicitacaoContratoLicitacao->setDado('cod_entidade', $obTContrato->getDado('cod_entidade'));
-                $obTLicitacaoContratoLicitacao->setDado('exercicio', Sessao::getExercicio());
-                $obTLicitacaoContratoLicitacao->setDado('exercicio_licitacao', $_REQUEST['stExercicioLicitacao']);
-                $obTLicitacaoContratoLicitacao->setDado('cod_licitacao',$_REQUEST['inCodLicitacao']);
-                $obTLicitacaoContratoLicitacao->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
+                $obTLicitacaoContratoLicitacao->setDado('exercicio', $request->get('stExercicioContrato') );
+                $obTLicitacaoContratoLicitacao->setDado('exercicio_licitacao', $request->get('stExercicioLicitacao'));
+                $obTLicitacaoContratoLicitacao->setDado('cod_licitacao',$request->get('inCodLicitacao'));
+                $obTLicitacaoContratoLicitacao->setDado('cod_modalidade',$request->get('inCodModalidade'));
 
                 $obTLicitacaoContratoLicitacao->inclusao();
 
@@ -228,13 +268,13 @@ switch ($stAcao) {
                 }
                 /***************************************************************************************************************/
 
-                SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContrato->getDado('num_contrato')."/".$obTContrato->getDado('exercicio')." da entidade ".$obTContrato->getDado('cod_entidade')." - ".$rsEntidade->getCampo('nom_cgm'),"incluir", "aviso", Sessao::getId(),"");
+                SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContrato->getDado('numero_contrato')."/".$obTContrato->getDado('exercicio')." da entidade ".$obTContrato->getDado('cod_entidade')." - ".$rsEntidade->getCampo('nom_cgm'),"incluir", "aviso", Sessao::getId(),"");
 
-                if ($_REQUEST['boImprimirContrato']) {
+                if ($request->get('boImprimirContrato')) {
                 $arRelatorio = array();
                 include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                 );
                 $obTEntidade = new TOrcamentoEntidade;
-                $obTEntidade->setDado('cod_entidade', $_REQUEST['inCodEntidade'] );
+                $obTEntidade->setDado('cod_entidade', $request->get('inCodEntidade'));
                 $obTEntidade->setDado('exercicio', Sessao::getExercicio());
                 $obTEntidade->recuperaRelacionamentoNomes($rsRelatorio);
                 $arRelatorio['nomEntidade'] = $rsRelatorio->getCampo('entidade');
@@ -243,25 +283,25 @@ switch ($stAcao) {
                 $stFiltro = " and CGM.numcgm = ".$rsRelatorio->getCampo('numcgm');;
                 $obTEntidade->recuperaRelacionamentoSintetico($rsRelatorio, $stFiltro);
                 $arRelatorio['cgcEntidade'] = $rsRelatorio->getCampo('documento');
-                include_once( CAM_GA_CGM_MAPEAMENTO."TCGM.class.php"                                 );
+                include_once( CAM_GA_CGM_MAPEAMENTO."TCGM.class.php" );
                 $obTFornecedor = new TCGM;
-                $obTFornecedor->setDado('numcgm',$_REQUEST['inCGMContratado'] );
+                $obTFornecedor->setDado('numcgm',$request->get('inCGMContratado') );
                 $obTFornecedor->recuperaRelacionamentoFornecedor($rsFornecedor);
 
                 $arRelatorio['cgcFornecedor'] = $rsFornecedor->getCampo('documento');
                 $arRelatorio['cgmFornecedor'] = $rsFornecedor->getCampo('numcgm');
                 $arRelatorio['nomFornecedor'] = $rsFornecedor->getCampo('nom_cgm');
                 $arRelatorio['nom_logradouro'] = $rsFornecedor->getCampo('tipo_logradouro').' '.$rsFornecedor->getCampo('logradouro').' '.$rsFornecedor->getCampo('numero').' '.$rsFornecedor->getCampo('complemento').', '.$rsFornecedor->getCampo('bairro').', '.$rsFornecedor->getCampo('cidade').'/'.$rsFornecedor->getCampo('uf');
-                $arRelatorio['nomRepresentante'] = $_REQUEST['stNomCGM'];
-                $arRelatorio['cgmRepresentante'] = $_REQUEST['inCGM'];
-                $arRelatorio['dataInicio'] = $_REQUEST['dtAssinatura'];
-                $arRelatorio['dataVigencia'] = $_REQUEST['dtVencimento'];
+                $arRelatorio['nomRepresentante'] = $request->get('stNomCGM');
+                $arRelatorio['cgmRepresentante'] = $request->get('inCGM');
+                $arRelatorio['dataInicio'] = $request->get('dtAssinatura');
+                $arRelatorio['dataVigencia'] = $request->get('dtVencimento');
 
                 $arRelatorio['numContrato'] = $obTContrato->getDado('num_contrato');
-                $arRelatorio['codModalidade'] = $_REQUEST['inCodModalidade'];
-                $arRelatorio['codLicitacao'] = $_REQUEST['inCodLicitacao'];
-                $arRelatorio['codEntidade'] = $_REQUEST['inCodEntidade'];
-                $arRelatorio['descObjeto'] = $_REQUEST['hdnDescObjeto'];
+                $arRelatorio['codModalidade'] = $request->get('inCodModalidade');
+                $arRelatorio['codLicitacao'] = $request->get('inCodLicitacao');
+                $arRelatorio['codEntidade'] = $request->get('inCodEntidade');
+                $arRelatorio['descObjeto'] = $request->get('hdnDescObjeto');
 
                 //CONSULTANDO ARQUIVO TEMPLATE
                 include_once( TADM.'TAdministracaoModeloArquivosDocumento.class.php');
@@ -269,7 +309,7 @@ switch ($stAcao) {
                 $obTAdministracaoArquivosDocumento->setDado( 'cod_acao', Sessao::read('acao') );
                 $obTAdministracaoArquivosDocumento->setDado( 'cod_documento', 0);
                 $obTAdministracaoArquivosDocumento->recuperaDocumentos( $rsTemplate );
-                $arRelatorio['nomDocumentoSxw'] =$rsTemplate->getCampo('nome_arquivo_template');
+                $arRelatorio['nomDocumentoSxw'] = $rsTemplate->getCampo('nome_arquivo_template');
                 Sessao::write('arRelatorio', $arRelatorio);
                 SistemaLegado::mudaFrameOculto($pgGera.'?'.Sessao::getId());
                  }
@@ -282,25 +322,25 @@ switch ($stAcao) {
     break;
 
     case "alterar":
-            if (strlen($_REQUEST['nmValorGarantiaExecucao']) < 19) {
+            if (strlen($request->get('nmValorGarantiaExecucao')) < 19) {
         $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
-        $obTLicitacaoLicitacao->setDado( 'cod_licitacao'	,$_REQUEST['inCodLicitacao'	] 	);
-        $obTLicitacaoLicitacao->setDado( 'cod_modalidade'	,$_REQUEST['inCodModalidade'] 	);
-        $obTLicitacaoLicitacao->setDado( 'cod_entidade'		,$_REQUEST['inCodModalidade'] 	);
-        $obTLicitacaoLicitacao->setDado( 'cod_exercicio'    ,Sessao::getExercicio()	);
+        $obTLicitacaoLicitacao->setDado( 'cod_licitacao', $request->get('inCodLicitacao'));
+        $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $request->get('inCodModalidade'));
+        $obTLicitacaoLicitacao->setDado( 'cod_entidade', $request->get('inCodModalidade'));
+        $obTLicitacaoLicitacao->setDado( 'cod_exercicio', Sessao::getExercicio()	);
         $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao );
 
         unset($stMensagem);
 
-        if ( implode(array_reverse(explode('/',$_REQUEST['dtVencimento']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
-            $stMensagem = 'A data de vencimento deve ser igual ou superior a data de assinatura! ('.$_REQUEST['dtAssinatura'].')';
-        } elseif ( SistemaLegado::comparaDatas($rsLicitacao->getCampo('dt_licitacao'),$_REQUEST['dtAssinatura'])) {
+        if ( implode(array_reverse(explode('/',$request->get('dtVencimento')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
+            $stMensagem = 'A data de vencimento deve ser igual ou superior a data de assinatura! ('.$request->get('dtAssinatura').')';
+        } elseif ( SistemaLegado::comparaDatas($rsLicitacao->getCampo('dt_licitacao'),$request->get('dtAssinatura'))) {
             $stMensagem = 'A data de assinatura deve ser superior a data de inclusão da licitação! ('.$rsLicitacao->getCampo('dt_licitacao').')';
-        } elseif ( implode(array_reverse(explode('/',$_REQUEST['dtInicioExecucao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
-            $stMensagem = 'A data de Início da execução deve ser igual ou maior a data de assinatura do contrato! ('.$_REQUEST['dtAssinatura'].')';
-        } elseif ( implode(array_reverse(explode('/',$_REQUEST['dtFimExecucao']))) < implode(array_reverse(explode('/',$_REQUEST['dtInicioExecucao']))) ) {
-            $stMensagem = 'A data de Fim de execução deve ser igual ou maior a data de Início da execução! ('.$_REQUEST['dtInicioExecucao'].')';
-        } elseif ( !strstr($_REQUEST['nmValorGarantiaExecucao'],',')) {
+        } elseif ( implode(array_reverse(explode('/',$request->get('dtInicioExecucao')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
+            $stMensagem = 'A data de Início da execução deve ser igual ou maior a data de assinatura do contrato! ('.$request->get('dtAssinatura').')';
+        } elseif ( implode(array_reverse(explode('/',$request->get('dtFimExecucao')))) < implode(array_reverse(explode('/',$request->get('dtInicioExecucao')))) ) {
+            $stMensagem = 'A data de Fim de execução deve ser igual ou maior a data de Início da execução! ('.$request->get('dtInicioExecucao').')';
+        } elseif ( !strstr($request->get('nmValorGarantiaExecucao'),',')) {
             $stMensagem = 'Valor da Garantia de Execução inválido!';
         }
         if ( count( $arValores ) <= 0 ) {
@@ -310,7 +350,7 @@ switch ($stAcao) {
             $stMensagem = 'É necessário informar ao menos um documento do participante!';
         } else {
             foreach ($arValores as $arTemp) {
-            if ( implode('',array_reverse(explode('/',$arTemp['dtDataPublicacao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
+            if ( implode('',array_reverse(explode('/',$arTemp['dtDataPublicacao']))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
                 $stMensagem = 'A data de publicação do veículo '.$arTemp['inVeiculo'].' deve ser maior ou igual a data de assinatura do contrato!';
                 break;
             }
@@ -318,25 +358,36 @@ switch ($stAcao) {
         }
 
         if ($stMensagem == '') {
-            $obTContrato->setDado('cod_licitacao',$_REQUEST['inCodLicitacao']);
-            $obTContrato->setDado('cod_entidade',$_REQUEST['inCodEntidade']);
-            $obTContrato->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
-            $obTContrato->setDado('exercicio',Sessao::getExercicio());
-            $obTContrato->setDado('num_contrato',$_REQUEST['inNumContrato']);
-            $obTContrato->setDado('cgm_responsavel_juridico',$_REQUEST['inCGM']);
-            $obTContrato->setDado('cgm_contratado',$_REQUEST['inCGMContratado']);
-
-            $obTContrato->setDado('inicio_execucao' , $_REQUEST['dtInicioExecucao'] );
-            $obTContrato->setDado('fim_execucao'    , $_REQUEST['dtFimExecucao'] );
-
+            $obTContrato->setDado('cod_licitacao',$request->get('inCodLicitacao'));
+            $obTContrato->setDado('cod_entidade',$request->get('inCodEntidade'));
+            $obTContrato->setDado('cod_modalidade',$request->get('inCodModalidade'));
+            $obTContrato->setDado('exercicio', $request->get('stExercicioContrato'));
+            $obTContrato->setDado('num_contrato',$request->get('inNumContrato'));
+            $obTContrato->setDado('cgm_responsavel_juridico',$request->get('inCGM'));
+            $obTContrato->setDado('cgm_contratado',$request->get('inCGMContratado'));
+            $obTContrato->setDado('inicio_execucao' , $request->get('dtInicioExecucao') );
+            $obTContrato->setDado('fim_execucao'    , $request->get('dtFimExecucao') );
             $obTContrato->setDado('cod_documento', 0 );
             $obTContrato->setDado('cod_tipo_documento', 0);
-
-            $obTContrato->setDado('dt_assinatura', $_REQUEST['dtAssinatura']);
-            $obTContrato->setDado('vencimento', $_REQUEST['dtVencimento']);
-            $obTContrato->setDado('valor_garantia', str_replace(',','.',str_replace('.','',$_REQUEST['nmValorGarantiaExecucao'])) );
-            $obTContrato->setDado('valor_contratado', $_REQUEST['hdnValorContrato']);
-
+            $obTContrato->setDado('dt_assinatura', $request->get('dtAssinatura'));
+            $obTContrato->setDado('vencimento', $request->get('dtVencimento'));
+            $obTContrato->setDado('valor_garantia', str_replace(',','.',str_replace('.','',$request->get('nmValorGarantiaExecucao'))) );
+            $obTContrato->setDado('valor_contratado', $request->get('vlContrato'));
+            $obTContrato->setDado('cod_tipo_contrato', $request->get('inTipoContrato') );
+            
+            $obTContrato->setDado('num_orgao', $request->get('inNumOrgao') );
+            $obTContrato->setDado('num_unidade', $request->get('inNumUnidade') );
+            $obTContrato->setDado('numero_contrato', $request->get('inNumeroContrato') );
+            $obTContrato->setDado('tipo_objeto', $request->get('inCodTipoObjeto') );
+            $obTContrato->setDado('objeto', $request->get('stObjeto') );
+            $obTContrato->setDado('forma_fornecimento', $request->get('stFormaFornecimento') );
+            $obTContrato->setDado('forma_pagamento', $request->get('stFormaPagamento') );
+            $obTContrato->setDado('cgm_signatario', $request->get('inCGMSignatario') );
+            $obTContrato->setDado('prazo_execucao', $request->get('stPrazoExecucao') );
+            $obTContrato->setDado('multa_rescisoria', $request->get('stMultaRescisoria') );
+            $obTContrato->setDado('justificativa', $request->get('stJustificativa') );
+            $obTContrato->setDado('razao', $request->get('stRazao') );
+            $obTContrato->setDado('fundamentacao_legal', $request->get('stFundamentacaoLegal') );
             $obTContrato->alteracao();
 
             $inCountDocumentos = count($arDocumentos);
@@ -344,10 +395,10 @@ switch ($stAcao) {
             $obTContratoDocumento->exclusao();
 
             for ($inPosTransf = 0; $inPosTransf < $inCountDocumentos; $inPosTransf++) {
-                $obTContratoDocumento->setDado('cod_documento',       $arDocumentos[$inPosTransf]["inCodDocumento"]);
-                $obTContratoDocumento->setDado('num_documento',$arDocumentos[$inPosTransf]["stNumDocumento"]);
-                $obTContratoDocumento->setDado('dt_validade', $arDocumentos[$inPosTransf]["dtValidade"]);
-                $obTContratoDocumento->setDado('dt_emissao',  $arDocumentos[$inPosTransf]["dtEmissao"]);
+                $obTContratoDocumento->setDado('cod_documento', $arDocumentos[$inPosTransf]["inCodDocumento"]);
+                $obTContratoDocumento->setDado('num_documento', $arDocumentos[$inPosTransf]["stNumDocumento"]);
+                $obTContratoDocumento->setDado('dt_validade',   $arDocumentos[$inPosTransf]["dtValidade"]);
+                $obTContratoDocumento->setDado('dt_emissao',    $arDocumentos[$inPosTransf]["dtEmissao"]);
                 $obTContratoDocumento->inclusao();
             }
 
@@ -372,25 +423,25 @@ switch ($stAcao) {
             }
 
             //exclui os veiculos de publicidade existentes
-            $obTPublicacaoContrato->setDado( 'num_contrato', $_REQUEST['inNumContrato'] );
-            $obTPublicacaoContrato->setDado( 'exercicio', Sessao::getExercicio() );
-            $obTPublicacaoContrato->setDado( 'cod_entidade', $_REQUEST['inCodEntidade'] );
+            $obTPublicacaoContrato->setDado( 'num_contrato', $request->get('inNumContrato') );
+            $obTPublicacaoContrato->setDado( 'exercicio', $request->get('stExercicioContrato') );
+            $obTPublicacaoContrato->setDado( 'cod_entidade', $request->get('inCodEntidade') );
             $obTPublicacaoContrato->exclusao();
 
             //inclui os veiculos que estao na sessao
             foreach ($arValores as $arTemp) {
-            $obTPublicacaoContrato->setDado( 'numcgm', $arTemp['inVeiculo'] );
-            $obTPublicacaoContrato->setDado( 'dt_publicacao', $arTemp['dtDataPublicacao'] );
-            $obTPublicacaoContrato->setDado( 'num_publicacao', $arTemp['inNumPublicacao'] );
-            $obTPublicacaoContrato->setDado( 'num_licitacao', $_REQUEST['inNumPublicacao'] );
-            $obTPublicacaoContrato->setDado( 'cod_modalidade', $_REQUEST['inCodModalidade'] );
-            $obTPublicacaoContrato->setDado( 'cod_licitacao', $_REQUEST['inCodLicitacao'] );
-            $obTPublicacaoContrato->setDado( 'observacao', $arTemp['stObservacao'] );
+            $obTPublicacaoContrato->setDado( 'numcgm', $arTemp['inVeiculo']);
+            $obTPublicacaoContrato->setDado( 'dt_publicacao', $arTemp['dtDataPublicacao']);
+            $obTPublicacaoContrato->setDado( 'num_publicacao', $arTemp['inNumPublicacao']);
+            $obTPublicacaoContrato->setDado( 'num_licitacao', $request->get('inNumPublicacao'));
+            $obTPublicacaoContrato->setDado( 'cod_modalidade', $request->get('inCodModalidade'));
+            $obTPublicacaoContrato->setDado( 'cod_licitacao', $request->get('inCodLicitacao'));
+            $obTPublicacaoContrato->setDado( 'observacao', $arTemp['stObservacao']);
             $obTPublicacaoContrato->inclusao();
             }
-            include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                 );
+            include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php");
             $obTEntidade = new TOrcamentoEntidade;
-            $obTEntidade->setDado('cod_entidade', $_REQUEST['inCodEntidade'] );
+            $obTEntidade->setDado('cod_entidade', $request->get('inCodEntidade'));
             $obTEntidade->setDado('exercicio', Sessao::getExercicio());
             $obTEntidade->recuperaRelacionamentoNomes($rsRelatorio);
 
@@ -448,9 +499,9 @@ switch ($stAcao) {
             }
             /***************************************************************************************************************/
 
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContrato->getDado('num_contrato')."/".$obTContrato->getDado('exercicio')." da entidade ".$obTContrato->getDado('cod_entidade')." - ". $rsRelatorio->getCampo('entidade'),"alterar", "aviso", Sessao::getId(),"");
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContrato->getDado('numero_contrato')."/".$obTContrato->getDado('exercicio')." da entidade ".$obTContrato->getDado('cod_entidade')." - ". $rsRelatorio->getCampo('entidade'),"alterar", "aviso", Sessao::getId(),"");
 
-            if ($_REQUEST['boImprimirContrato']) {
+            if ($request->get('boImprimirContrato')) {
             $arRelatorio = array();
             $arRelatorio['nomEntidade'] = $rsRelatorio->getCampo('entidade');
             $arRelatorio['nomPrefeito'] = $rsRelatorio->getCampo('responsavel');
@@ -460,27 +511,27 @@ switch ($stAcao) {
             $arRelatorio['cgcEntidade'] = $rsRelatorio->getCampo('documento');
             include_once( CAM_GA_CGM_MAPEAMENTO."TCGM.class.php"                                 );
             $obTFornecedor = new TCGM;
-            $obTFornecedor->setDado('numcgm',$_REQUEST['inCGMContratado'] );
+            $obTFornecedor->setDado('numcgm',$request->get('inCGMContratado') );
             $obTFornecedor->recuperaRelacionamentoFornecedor($rsFornecedor, $stFiltro);
             $arRelatorio['cgcFornecedor'] = $rsFornecedor->getCampo('documento');
-            $arRelatorio['nomFornecedor'] = $_REQUEST['stNomContratado'];
+            $arRelatorio['nomFornecedor'] = $request->get('stNomContratado');
             $arRelatorio['nom_logradouro'] = $rsFornecedor->getCampo('tipo_logradouro').' '.$rsFornecedor->getCampo('logradouro').' '.$rsFornecedor->getCampo('numero').' '.$rsFornecedor->getCampo('complemento').', '.$rsFornecedor->getCampo('bairro').', '.$rsFornecedor->getCampo('cidade').'/'.$rsFornecedor->getCampo('uf');
             $arRelatorio['nomOrgao'] = '';
             $arRelatorio['nomUnidade'] = '';
             $arRelatorio['numContrato'] = $obTContrato->getDado('num_contrato');
-            $arRelatorio['codModalidade'] = $_REQUEST['inCodModalidade'];
-            $arRelatorio['codLicitacao'] = $_REQUEST['inCodLicitacao'];
-            $arRelatorio['codEntidade'] = $_REQUEST['inCodEntidade'];
-            $arRelatorio['descObjeto'] = $_REQUEST['hdnDescObjeto'];
-            $arRelatorio['dataInicio'] = $_REQUEST['dtAssinatura'];
-            $arRelatorio['dataVigencia'] = $_REQUEST['dtVencimento'];
+            $arRelatorio['codModalidade'] = $request->get('inCodModalidade');
+            $arRelatorio['codLicitacao'] = $request->get('inCodLicitacao');
+            $arRelatorio['codEntidade'] = $request->get('inCodEntidade');
+            $arRelatorio['descObjeto'] = $request->get('hdnDescObjeto');
+            $arRelatorio['dataInicio'] = $request->get('dtAssinatura');
+            $arRelatorio['dataVigencia'] = $request->get('dtVencimento');
             $arRelatorio['cgmFornecedor'] = $rsFornecedor->getCampo( 'numcgm' );
 
             $obTRepresentante = new TCGM();
-            $obTRepresentante->setDado('numcgm',$_REQUEST['inCGM']);
+            $obTRepresentante->setDado('numcgm',$request->get('inCGM'));
             $obTRepresentante->recuperaRelacionamentoSintetico( $rsRepresentante );
             $arRelatorio['nomRepresentante'] = $rsRepresentante->getCampo('nom_cgm');
-            $arRelatorio['cgmRepresentante'] = $_REQUEST['inCGM'];
+            $arRelatorio['cgmRepresentante'] = $request->get('inCGM');
 
             //CONSULTANDO ARQUIVO TEMPLATE
             include_once( TADM.'TAdministracaoModeloArquivosDocumento.class.php');
@@ -501,14 +552,30 @@ switch ($stAcao) {
     break;
 
     case "anular";
-            if ( ( sistemaLegado::comparaDatas( $_REQUEST['stDataAnulacao'], $_REQUEST['dtAssinatura'] ) ) || ( $_REQUEST['stDataAnulacao'] == $_REQUEST['dtAssinatura'] ) ) {
-                $obTContratoAnulado->setDado('num_contrato',$_REQUEST['inNumContrato']);
-                $obTContratoAnulado->setDado('cod_entidade',$_REQUEST['inCodEntidade']);
+            if ( ( sistemaLegado::comparaDatas( $request->get('stDataAnulacao'), $request->get('dtAssinatura') ) ) || ( $request->get('stDataAnulacao') == $request->get('dtAssinatura') ) ) {
+                $obTContratoAnulado->setDado('num_contrato',$request->get('inNumContrato'));
+                $obTContratoAnulado->setDado('cod_entidade',$request->get('inCodEntidade'));
                 $obTContratoAnulado->setDado('exercicio',Sessao::getExercicio());
-                $obTContratoAnulado->setDado('dt_anulacao', $_REQUEST['stDataAnulacao']);
-                $obTContratoAnulado->setDado('motivo', $_REQUEST['stMotivo']);
+                $obTContratoAnulado->setDado('dt_anulacao', $request->get('stDataAnulacao'));
+                $obTContratoAnulado->setDado('motivo', $request->get('stMotivo'));
+                
+                $vlAnulacao = number_format(str_replace(".", "", $request->get('vlAnulacao')), 2, ".", "");
+                $obTContratoAnulado->setDado('valor_anulacao', $vlAnulacao);
+                
+                $obTContrato = new TLicitacaoContrato;
+                $obTContrato->setDado('num_contrato',$request->get('inNumContrato'));
+                $obTContrato->setDado('cod_entidade',$request->get('inCodEntidade'));
+                $obTContrato->setDado('exercicio',Sessao::getExercicio());
+                $obTContrato->recuperaPorChave($rsContrato);
+                
+                if($vlAnulacao > $rsContrato->getCampo('valor_contratado')) {
+                    SistemaLegado::exibeAviso('O valor da anulação não pode ser maior que o valor do contrato.', "n_incluir", "erro" );
+                    break;
+                }
+                
                 $obTContratoAnulado->inclusao();
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContratoAnulado->getDado('exercicio')." - ".$obTContratoAnulado->getDado('cod_entidade')." - ".$obTContratoAnulado->getDado('num_contrato'),"incluir", "aviso", Sessao::getId(),"");
+                
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContratoAnulado->getDado('exercicio')." - ".$obTContratoAnulado->getDado('cod_entidade')." - ".$obTContratoAnulado->getDado('numero_contrato'),"incluir", "aviso", Sessao::getId(),"");
             } else {
                 sistemaLegado::exibeAviso(urlencode('<i><b>Data de Anulação</b></i> deve ser maior ou igual a <b><i>Data da Assinatura</i></b>.'),'n_anular','erro');
             }

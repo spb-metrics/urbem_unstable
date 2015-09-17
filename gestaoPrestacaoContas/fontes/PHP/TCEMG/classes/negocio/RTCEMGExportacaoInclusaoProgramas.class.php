@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     Tesouraria
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 62293 2015-04-20 14:51:26Z franver $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
+ * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 63540 2015-09-09 20:30:56Z franver $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
  */
 
 /* Includes */
@@ -179,6 +179,7 @@ class RTCEMGExportacaoInclusaoProgramas
         
         if (in_array("INCPRO.csv",$this->getArquivos())) {
             $rsInclusaoProgramas = new Recordset();
+            $this->obTTCEMGRegistrosArquivoPrograma->setDado('dt_final',SistemaLegado::retornaUltimoDiaMes($this->getMes(),Sessao::getExercicio()));
             $this->obTTCEMGRegistrosArquivoPrograma->setDado('exercicio', Sessao::getExercicio());
             $this->obTTCEMGRegistrosArquivoPrograma->recuperaRecursosIncluisaoPrograma($rsInclusaoProgramas);
             

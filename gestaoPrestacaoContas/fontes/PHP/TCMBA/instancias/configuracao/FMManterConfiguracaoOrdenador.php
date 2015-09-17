@@ -20,7 +20,10 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-
+*/
+?>
+<?php
+/**
     * Pacote de configuração do TCMBA
     * Data de Criação   : 13/07/2015
 
@@ -28,14 +31,13 @@
     * @author Desenvolvedor: Lisiane Morais
     * 
     * $id: $
-    
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php"                                );
-include_once(CAM_GPC_TCMBA_MAPEAMENTO."TTCMBAConfiguracaoOrdenador.class.php" );
-include_once(CAM_GPC_TCMBA_MAPEAMENTO."TTCMBATipoResponsavelOrdenador.class.php" );
+include_once CAM_GA_CGM_COMPONENTES.'IPopUpCGMVinculado.class.php';
+include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBAConfiguracaoOrdenador.class.php';
+include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBATipoResponsavel.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracaoOrdenador";
@@ -47,12 +49,10 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
 include_once $pgJS;
-include_once ($pgOcul);
+include_once $pgOcul ;
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if (empty($stAcao)) {
-    $stAcao = "manter";
-}
+$stAcao = $request->get('stAcao', 'manter');
 $arEntidade = explode('-',$_REQUEST['inCodEntidade']);
 $stUnidadeOrcamentaria = $request->get('stUnidadeOrcamentaria');
 
@@ -86,7 +86,7 @@ $inCount = 0;
 
 foreach ( $arOrdenadores as $ordenador ) {
     $ordenador["nom_cgm"] = SistemaLegado::pegaDado('nom_cgm','sw_cgm','WHERE numcgm ='.$ordenador['cgm_ordenador']);
-    $ordenador["tipo_responsavel_desc"] = SistemaLegado::pegaDado('descricao','tcmba.tipo_responsavel_ordenador','WHERE cod_tipo_responsavel_ordenador ='.$ordenador['cod_tipo_responsavel_ordenador']);
+    $ordenador["tipo_responsavel_desc"] = SistemaLegado::pegaDado('descricao','tcmba.tipo_responsavel','WHERE cod_tipo_responsavel ='.$ordenador['cod_tipo_responsavel']);
     $ordenador["inId"] = $inCount;
     $arrOrdenadores[$inCount] = $ordenador;
     $inCount++;
@@ -132,14 +132,14 @@ $obHdnInId->setName("hdnInId");
 $obHdnInId->setId  ("hdnInId");
 
 $obLblOrgao = new Label;
-$obLblOrgao->setName   ( "stCodOrgao"               );
-$obLblOrgao->setValue  ( $num_orgao.' - '.$nom_orgao );
-$obLblOrgao->setRotulo ( 'Órgão'                 );
+$obLblOrgao->setName   ( "stCodOrgao"                   );
+$obLblOrgao->setValue  ( $num_orgao.' - '.$nom_orgao    );
+$obLblOrgao->setRotulo ( 'Órgão'                        );
 
 $obLblUnidade = new Label;
-$obLblUnidade->setName   ( "stCodUnidade"               );
-$obLblUnidade->setValue  ( $num_unidade.' - '.$nom_unidade );
-$obLblUnidade->setRotulo ( 'Unidade'                 );
+$obLblUnidade->setName   ( "stCodUnidade"                   );
+$obLblUnidade->setValue  ( $num_unidade.' - '.$nom_unidade  );
+$obLblUnidade->setRotulo ( 'Unidade'                        );
 
 $obCgmOrdenador =  new IPopUpCGMVinculado($obForm);
 $obCgmOrdenador->setTabelaVinculo 	     ( "sw_cgm_pessoa_fisica"          );
@@ -157,17 +157,17 @@ $obCgmOrdenador->setTipo                 ( 'fisica'                        );
 
 // Campo de Data Inicial
 $obDataInicial = new Data();
-$obDataInicial->setId	                ('dtDataInicio'      );
-$obDataInicial->setName	                ('dtDataInicio'      );
-$obDataInicial->setRotulo               ('*Início da Vigência');
-$obDataInicial->setNullBarra            (false               );
+$obDataInicial->setId	                ('dtDataInicio'         );
+$obDataInicial->setName	                ('dtDataInicio'         );
+$obDataInicial->setRotulo               ('*Início da Vigência'  );
+$obDataInicial->setNullBarra            (false                  );
 
 // Campo de Data Final
 $obDataFinal = new Data();
-$obDataFinal->setId	                    ('dtDataFim'      );
-$obDataFinal->setName	                ('dtDataFim'      );
-$obDataFinal->setRotulo	                ('*Fim da Vigência');
-$obDataFinal->setNullBarra              (false            );
+$obDataFinal->setId	                    ('dtDataFim'        );
+$obDataFinal->setName	                ('dtDataFim'        );
+$obDataFinal->setRotulo	                ('*Fim da Vigência' );
+$obDataFinal->setNullBarra              (false              );
 
 $obBtnIncluirOrdenador = new Button;
 $obBtnIncluirOrdenador->setName             ( "btIncluirOrdenador"                                         );
@@ -176,29 +176,28 @@ $obBtnIncluirOrdenador->setValue            ( "Incluir"                         
 $obBtnIncluirOrdenador->obEvento->setOnClick( "buscaValor('incluirOrdenador');"                            );
 $obBtnIncluirOrdenador->setTitle            ( "Clique para incluir um ordenador na lista de Ordenadores"   );
 
-$obTTCMBATipoResponsavelOrdenador = new TTCMBATipoResponsavelOrdenador();
-$obTTCMBATipoResponsavelOrdenador->recuperaTodos($rsTipoResponsavel);
+$obTTCMBATipoResponsavel = new TTCMBATipoResponsavel();
+$obTTCMBATipoResponsavel->recuperaTodos($rsTipoResponsavel);
 
 
 if ($rsTipoResponsavel->getNumLinhas() < 1) {
     $obErro = new Erro();
-    //$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
     $obErro->setDescricao("Não existe dados para o tipo de responsável!");
     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
 }
 
 /* Combo para Selecionar os Tipos de responsavel Ordenador */
 $obCmbTipoResponsavel = new Select;
-$obCmbTipoResponsavel->setName       ( 'tipo_responsavel'        );
-$obCmbTipoResponsavel->setId         ( 'tipo_responsavel'        );
-$obCmbTipoResponsavel->setRotulo     ( '*Tipo de Responsável'     );
-$obCmbTipoResponsavel->setStyle      ( "width: 400px"            );
-$obCmbTipoResponsavel->setNull       ( true                      );
-$obCmbTipoResponsavel->setCampoId    ('[cod_tipo_responsavel_ordenador]-[descricao]');
-$obCmbTipoResponsavel->setCampoDesc  ('[descricao]');
-$obCmbTipoResponsavel->addOption     ( "", "Selecione"           );
-$obCmbTipoResponsavel->setValue      ( "[cod_tipo_responsavel_ordenador]");
-$obCmbTipoResponsavel->preencheCombo ( $rsTipoResponsavel  );
+$obCmbTipoResponsavel->setName       ( 'tipo_responsavel'                   );
+$obCmbTipoResponsavel->setId         ( 'tipo_responsavel'                   );
+$obCmbTipoResponsavel->setRotulo     ( '*Tipo de Responsável'               );
+$obCmbTipoResponsavel->setStyle      ( "width: 400px"                       );
+$obCmbTipoResponsavel->setNull       ( true                                 );
+$obCmbTipoResponsavel->setCampoId    ( '[cod_tipo_responsavel]-[descricao]' );
+$obCmbTipoResponsavel->setCampoDesc  ( '[descricao]'                        );
+$obCmbTipoResponsavel->addOption     ( "", "Selecione"                      );
+$obCmbTipoResponsavel->setValue      ( "[cod_tipo_responsavel]"             );
+$obCmbTipoResponsavel->preencheCombo ( $rsTipoResponsavel                   );
 
 $obSpnCGMsOrdenador = new Span();
 $obSpnCGMsOrdenador->setId("spnCGMsOrdenadores");

@@ -149,12 +149,12 @@ switch ($stAcao) {
                 switch ($arConfiguracaoLLA["stOpcao"]) {
                     case "lotacao":
                         $obTFolhaPagamentoConfiguracaoEmpenhoLlaLotacao->setDado("cod_orgao",$arConfiguracaoLLA["codigo"]);
-                        $obTFolhaPagamentoConfiguracaoEmpenhoLlaLotacao->setDado("num_pao",$arConfiguracaoLLA["inNumPAO"]);
+                        $obTFolhaPagamentoConfiguracaoEmpenhoLlaLotacao->setDado("num_pao",$arConfiguracaoLLA["inHdnNumPAO"]);
                         $obTFolhaPagamentoConfiguracaoEmpenhoLlaLotacao->inclusao();
                         break;
                     case "local":
                         $obTFolhaPagamentoConfiguracaoEmpenhoLlaLocal->setDado("cod_local",$arConfiguracaoLLA["codigo"]);
-                        $obTFolhaPagamentoConfiguracaoEmpenhoLlaLocal->setDado("num_pao",$arConfiguracaoLLA["inNumPAO"]);
+                        $obTFolhaPagamentoConfiguracaoEmpenhoLlaLocal->setDado("num_pao",$arConfiguracaoLLA["inHdnNumPAO"]);
                         $obTFolhaPagamentoConfiguracaoEmpenhoLlaLocal->inclusao();
                         break;
                     case "atributo":
@@ -166,12 +166,12 @@ switch ($stAcao) {
                         if (is_array($arConfiguracaoLLA["extra"])) {
                             foreach ($arConfiguracaoLLA["extra"] as $inValor) {
                                 $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("valor",$inValor);
-                                $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("num_pao",$arConfiguracaoLLA["inNumPAO"]);
+                                $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("num_pao",$arConfiguracaoLLA["inHdnNumPAO"]);
                                 $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->inclusao();
                             }
                         } else {
                             $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("valor",$arConfiguracaoLLA["extra"]);
-                            $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("num_pao",$arConfiguracaoLLA["inNumPAO"]);
+                            $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->setDado("num_pao",$arConfiguracaoLLA["inHdnNumPAO"]);
                             $obTFolhaPagamentoConfiguracaoEmpenhoLlaAtributoValor->inclusao();
                         }
                         break;
@@ -221,7 +221,7 @@ switch ($stAcao) {
                     $obTFolhaPagamentoConfiguracaoEmpenho->setDado("cod_configuracao",$inCodConfiguracao);
                     $obTFolhaPagamentoConfiguracaoEmpenho->setDado("exercicio_despesa",$inExercicioVigencia);
                     $obTFolhaPagamentoConfiguracaoEmpenho->setDado("cod_despesa",$arConfiguracaoEvento["inCodDespesa"]);
-                    $obTFolhaPagamentoConfiguracaoEmpenho->setDado("num_pao",$arConfiguracaoEvento["inNumPAO"]);
+                    $obTFolhaPagamentoConfiguracaoEmpenho->setDado("num_pao",$arConfiguracaoEvento["inHdnNumPAOEvento"]);
                     $obTFolhaPagamentoConfiguracaoEmpenho->setDado("exercicio_pao",$inExercicioVigencia);
                     $obTFolhaPagamentoConfiguracaoEmpenho->inclusao();
 

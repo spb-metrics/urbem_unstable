@@ -71,19 +71,55 @@ stSql := '
             ,CPC.cod_estrutural
             ,CPA.cod_plano
             ,CPC.nom_conta
-            ,ABS((SELECT fn_busca_saldo_anterior_anexoIII[0]
-                    FROM tcemg.fn_busca_saldo_anterior_anexoIII(  '|| quote_literal(stExercicio) ||'
-                                                                , '|| quote_literal(inCodEntidade) ||' 
-                                                                , '|| quote_literal(stDtInicial)||'
-                                                                , '|| quote_literal(stDtFinal)||'
-                                                                , CPA.cod_plano)) 
+            ,ABS((SELECT saldo_anterior                                                                                 
+		            FROM tesouraria.fn_relatorio_demostrativo_saldos('|| quote_literal(stExercicio)   ||'
+                                                                    ,'|| quote_literal(inCodEntidade) ||'
+                                                                    ,'|| quote_literal(stDtInicial)   ||'
+                                                                    ,'|| quote_literal(stDtFinal)     ||'
+                                                                    ,''''
+                                                                    ,''''
+                                                                    ,CPA.cod_plano::VARCHAR,CPA.cod_plano::VARCHAR
+                                                                    ,''''
+                                                                    ,''S''
+                                                                    ,''''
+                                                                    ,''''
+                                                                    ,''true''  
+								                    ) as retorno( exercicio          VARCHAR                                                        
+									                	 ,cod_estrutural     VARCHAR                                                        
+									                	 ,cod_plano          INTEGER                                                        
+									                	 ,nom_conta          VARCHAR                                                        
+									                	 ,saldo_anterior     NUMERIC                                                        
+									                	 ,vl_credito         NUMERIC                                                        
+									                	 ,vl_debito          NUMERIC                                                        
+									                	 ,cod_recurso        INTEGER                                                        
+									                	 ,nom_recurso        VARCHAR                                                        
+									                	)                                                                                               
+		         ORDER BY cod_estrutural ASC  )
             ) as saldo_anterior
-            ,ABS((SELECT fn_busca_saldo_anterior_anexoIII[1]
-                    FROM tcemg.fn_busca_saldo_anterior_anexoIII(  '|| quote_literal(stExercicio)   ||'
-                                                                , '|| quote_literal(inCodEntidade) ||' 
-                                                                , '|| quote_literal(stDtInicial)   ||'
-                                                                , '|| quote_literal(stDtFinal)     ||'
-                                                                , CPA.cod_plano)) 
+            ,ABS((SELECT (vl_debito + saldo_anterior)- vl_credito  AS saldo_atual                                                                    
+		            FROM tesouraria.fn_relatorio_demostrativo_saldos('|| quote_literal(stExercicio)   ||'
+                                                                    ,'|| quote_literal(inCodEntidade) ||'
+                                                                    ,'|| quote_literal(stDtInicial)   ||'
+                                                                    ,'|| quote_literal(stDtFinal)     ||'
+                                                                    ,''''
+                                                                    ,''''
+                                                                    ,CPA.cod_plano::VARCHAR,CPA.cod_plano::VARCHAR
+                                                                    ,''''
+                                                                    ,''S''
+                                                                    ,''''
+                                                                    ,''''
+                                                                    ,''true''  
+								                    ) as retorno( exercicio          VARCHAR                                                        
+									                	 ,cod_estrutural     VARCHAR                                                        
+									                	 ,cod_plano          INTEGER                                                        
+									                	 ,nom_conta          VARCHAR                                                        
+									                	 ,saldo_anterior     NUMERIC                                                        
+									                	 ,vl_credito         NUMERIC                                                        
+									                	 ,vl_debito          NUMERIC                                                        
+									                	 ,cod_recurso        INTEGER                                                        
+									                	 ,nom_recurso        VARCHAR                                                        
+									                	)                                                                                               
+		         ORDER BY cod_estrutural ASC  )
             ) as saldo_atual
             ,coalesce(arrecadacoes.vl_credito,0.00) + coalesce(pagamentos.vl_credito,0.0) + coalesce(transferencias.vl_credito,0.00) AS vl_credito
             ,coalesce(arrecadacoes.vl_debito,0.00)  + coalesce(pagamentos.vl_debito,0.00) + coalesce(transferencias.vl_debito,0.00) AS vl_debito

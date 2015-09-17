@@ -31,25 +31,14 @@
 
     * @ignore
 
-    * $Id: LSConsultarCadastroEconomico.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSConsultarCadastroEconomico.php 63376 2015-08-21 18:55:42Z arthur $
 
     * Casos de uso: uc-05.02.21
 */
 
-/*
-$Log$
-Revision 1.10  2007/02/13 16:00:43  rodrigo
-#6255#
-
-Revision 1.9  2006/09/15 14:32:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php" );
+include_once CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php";
 
 //Define o nome dos arquivos PHP
 $stCadastroEcon = "FMConsultarCadastroEconomico.php";
@@ -126,7 +115,6 @@ if ($_REQUEST['inNumCGM']) {
 
 if ($_REQUEST['stLicenca']) {
     $temp = explode( "/", $_REQUEST['stLicenca'] );
-//SistemaLegado::mostraVar($temp);die();
     $obRCEMInscricaoEconomica->setCodLicenca( $temp[0] );
     $obRCEMInscricaoEconomica->setLicencaExercicio( $temp[1] );
 }

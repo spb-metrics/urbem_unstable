@@ -99,7 +99,8 @@ switch ($stAcao) {
         
         $obErro = $obRCIMBairro->excluirBairro( $boTransacao );
 
-        $pgList .= "&stAcao=".$stAcao."&inCodMunicipio=".$request->get( "inCodMunicipio")."&inCodUF=".$request->get( "inCodUF");        
+        $pgList .= "&stAcao=".$stAcao."&inCodMunicipio=".$request->get( "inCodMunicipio");
+        $pgList .= "&inCodUF=".$request->get("inCodUF")."&stNomBairro=".$request->get("stNomBairro")."&inCodBairro=".$request->get("inCodBairro");
         if ( !$obErro->ocorreu() ) {
             sistemaLegado::alertaAviso($pgList,"Nome Bairro: ".$request->get("stDescQuestao"),"excluir","aviso", Sessao::getId(), "../");
         } else {

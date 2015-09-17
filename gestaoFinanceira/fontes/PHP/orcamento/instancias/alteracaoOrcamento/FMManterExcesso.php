@@ -40,26 +40,10 @@
     * Casos de uso: uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.11  2007/05/21 18:54:50  melo
-Bug #9229#
-
-Revision 1.10  2006/07/28 17:19:18  leandro.zis
-Bug #6679#
-
-Revision 1.9  2006/07/24 20:19:42  andre.almeida
-Bug #6408#
-
-Revision 1.8  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once( CAM_GF_INCLUDE."validaGF.inc.php");
+include_once CAM_GF_INCLUDE."validaGF.inc.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GF_ORC_NEGOCIO. "ROrcamentoSuplementacao.class.php");
+include_once CAM_GF_ORC_NEGOCIO. "ROrcamentoSuplementacao.class.php";
 
 $stPrograma = "ManterExcesso";
 $pgFilt = "FL".$stPrograma.".php";
@@ -262,5 +246,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     if ($jsSL) SistemaLegado::executaFrameOculto($jsSL);
 }
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

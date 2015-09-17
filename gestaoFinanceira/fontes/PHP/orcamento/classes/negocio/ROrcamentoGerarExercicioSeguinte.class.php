@@ -41,112 +41,104 @@
 
     * Casos de uso: uc-02.01.31
 */
-
-/*
-$Log$
-Revision 1.6  2006/07/05 20:42:11  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_FW_BANCO_DADOS."Transacao.class.php"             );
+include_once CAM_FW_BANCO_DADOS."Transacao.class.php";
 
 class ROrcamentoGerarExercicioSeguinte
 {
-/**
-    * @var Object
-    * @access Private
-*/
-var $obTransacao;
-/**
-    * @var String
-    * @access Private
-*/
-var $stExercicio;
-/**
-    * @var String
-    * @access Private
-*/
-var $stOpcoesSelecionadas;
-
-/**
-     * @access Public
-     * @param String $valor
-*/
-function setExercicio($valor) { $this->stExercicio  = $valor;                          }
-/**
-     * @access Public
-     * @param String $valor
-*/
-function setOpcoesSelecionadas($valor) { $this->stOpcoesSelecionadas = $valor;                  }
-
-/**
-     * @access Public
-     * @param String $valor
-*/
-function getExercicio() { return $this->stExercicio;                           }
-/**
-     * @access Public
-     * @param String $valor
-*/
-function getOpcoesSelecionadas() { return $this->stOpcoesSelecionadas;                  }
-
-/**
-    * Método Construtor
-    * @access Private
-*/
-function ROrcamentoGerarExercicioSeguinte()
-{
-    $this->obTransacao                = new Transacao;
-}
-
-/**
-    * Inclui dados no banco
-    * @access Public
-    * @param  Object $boTransacao Parâmetro Transação
-    * @return Object Objeto Erro
-*/
-
-function verificaPPA(&$rsRecordSet)
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    $stSql = $this->montaVerificaPPA();
-    //$this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-function montaVerificaPPA()
-{
-    $stSql = "SELECT ppa.cod_ppa
-                FROM ppa.ppa
-                WHERE ppa.ano_inicio <= BTRIM(TO_CHAR(TO_NUMBER('".$this->stExercicio."','99999') + 1, '9999'))
-                  AND ppa.ano_final >= BTRIM(TO_CHAR(TO_NUMBER('".$this->stExercicio."','99999') + 1, '9999'))";
-
-    return $stSql;
-}
-
-function incluir(&$rsRecordSet, $stFiltro = "", $boTransacao = "")
-{
-    include_once CAM_GF_ORC_MAPEAMENTO.'FOrcamentoGerarOrcamento.class.php';
-    $obFOrcamentoGerarOrcamento = new FOrcamentoGerarOrcamento;
-
-    $boFlagTransacao = false;
-    $obErro = $this->obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
-    if (!$obErro->ocorreu()) {
-        $obFOrcamentoGerarOrcamento->setDado('stExercicio'  , $this->stExercicio);
-        $obFOrcamentoGerarOrcamento->setDado('stParametros' , $this->stOpcoesSelecionadas);        
-        $obFOrcamentoGerarOrcamento->setDado('stFiltro' , $stFiltro);
-        $obErro = $obFOrcamentoGerarOrcamento->recuperaTodos($rsRecordSet, '', '', $boTransacao);
+    /**
+        * @var Object
+        * @access Private
+    */
+    var $obTransacao;
+    /**
+        * @var String
+        * @access Private
+    */
+    var $stExercicio;
+    /**
+        * @var String
+        * @access Private
+    */
+    var $stOpcoesSelecionadas;
+    
+    /**
+         * @access Public
+         * @param String $valor
+    */
+    public function setExercicio($valor) { $this->stExercicio  = $valor;                          }
+    /**
+         * @access Public
+         * @param String $valor
+    */
+    public function setOpcoesSelecionadas($valor) { $this->stOpcoesSelecionadas = $valor;                  }
+    
+    /**
+         * @access Public
+         * @param String $valor
+    */
+    public function getExercicio() { return $this->stExercicio;                           }
+    /**
+         * @access Public
+         * @param String $valor
+    */
+    public function getOpcoesSelecionadas() { return $this->stOpcoesSelecionadas;                  }
+    
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function ROrcamentoGerarExercicioSeguinte()
+    {
+        $this->obTransacao                = new Transacao;
     }
-    $this->obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $this->obTOrcamentoReserva);
-
-    return $obErro;
-}
-
+    
+    /**
+        * Inclui dados no banco
+        * @access Public
+        * @param  Object $boTransacao Parâmetro Transação
+        * @return Object Objeto Erro
+    */
+    
+    public function verificaPPA(&$rsRecordSet)
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        $stSql = $this->montaVerificaPPA();
+        //$this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+    
+    public function montaVerificaPPA()
+    {
+        $stSql = "
+          SELECT ppa.cod_ppa
+            FROM ppa.ppa
+           WHERE ppa.ano_inicio <= BTRIM(TO_CHAR(TO_NUMBER('".$this->stExercicio."','9999') + 1, '9999'))
+             AND ppa.ano_final  >= BTRIM(TO_CHAR(TO_NUMBER('".$this->stExercicio."','9999') + 1, '9999'))
+        ";
+        return $stSql;
+    }
+    
+    public function incluir(&$rsRecordSet, $stFiltro = "", $boTransacao = "")
+    {
+        include_once CAM_GF_ORC_MAPEAMENTO.'FOrcamentoGerarOrcamento.class.php';
+        $obFOrcamentoGerarOrcamento = new FOrcamentoGerarOrcamento;
+    
+        $boFlagTransacao = false;
+        $obErro = $this->obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+        if (!$obErro->ocorreu()) {
+            $obFOrcamentoGerarOrcamento->setDado('stExercicio' , $this->stExercicio);
+            $obFOrcamentoGerarOrcamento->setDado('stParametros', $this->stOpcoesSelecionadas);        
+            $obFOrcamentoGerarOrcamento->setDado('stFiltro'    , $stFiltro);
+            $obErro = $obFOrcamentoGerarOrcamento->recuperaTodos($rsRecordSet, '', '', $boTransacao);
+        }
+        $this->obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $this->obTOrcamentoReserva);
+    
+        return $obErro;
+    }
 }

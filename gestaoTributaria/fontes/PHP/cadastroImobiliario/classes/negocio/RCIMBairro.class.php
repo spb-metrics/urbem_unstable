@@ -20,33 +20,17 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-*/
-?>
-<?php
 /**
      * Classe de regra de negócio para bairro
      * Data de Criação: 27/09/2004
-
      * @author Analista: Ricardo Lopes de Alencar
      * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
      * @author Desenvolvedor: Fabio Bertoldi Rodrigues
-
      * @package URBEM
      * @subpackage Regra
-
-    * $Id: RCIMBairro.class.php 63129 2015-07-28 20:08:28Z evandro $
-
+     * $Id: RCIMBairro.class.php 63252 2015-08-07 19:04:21Z evandro $
      * Casos de uso: uc-05.01.05
 */
-
-/*
-$Log$
-Revision 1.4  2006/09/18 09:12:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoBairro.class.php"      );
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoBairroMunicipio.class.php" );
@@ -54,6 +38,7 @@ include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoMunicipio.class.php"   );
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoUF.class.php"          );
 include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMBairroAliquota.class.php");
 include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMBairroValorM2.class.php");
+include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMLogradouro.class.php" );
 
 class RCIMBairro
 {
@@ -66,6 +51,11 @@ var $inMDCodNorma;
 var $inMDTerritorial;
 var $inMDPredial;
 
+/**
+    * @access Private
+    * @var Object
+*/
+var $obTCGMLogradouro;
 /**
     * @access Private
     * @var Integer
@@ -231,6 +221,7 @@ function __construct()
     $this->obTBairroMunicipio = new TBairroMunicipio;
     $this->obTMunicipio       = new TMunicipio;
     $this->obTUF              = new TUF;
+    $this->obTCGMLogradouro   = new TCGMLogradouro();
     $this->obTransacao        = new Transacao;
 }
 
@@ -357,6 +348,18 @@ function excluirBairro($boTransacao = "")
         }
     }
 
+    if (!$obErro->ocorreu()) {
+        $this->obTCGMLogradouro->setDado( "cod_bairro"      , $this->getCodigoBairro()    );
+        $this->obTCGMLogradouro->setDado( "cod_uf"          , $this->getCodigoUF()        );
+        $this->obTCGMLogradouro->setDado( "cod_municipio"   , $this->getCodigoMunicipio() );
+        $this->obTCGMLogradouro->recuperaBairroCgm($rsBairro,"","",$boTransacao);
+
+        if ( $rsBairro->getNumLinhas() < 0 ) {
+            $obErro = $this->obTCGMLogradouro->exclusao( $boTransacao );
+        }else{
+            $obErro->setDescricao("Bairro está vinculado a um CGM.");
+        }
+    }
 
     if ( !$obErro->ocorreu() ) {
         $obTCIMBairroAliquota = new TCIMBairroAliquota;

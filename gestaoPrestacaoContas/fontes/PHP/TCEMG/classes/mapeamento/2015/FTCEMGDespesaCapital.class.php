@@ -33,11 +33,11 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGDespesaCapital.class.php 62780 2015-06-17 14:35:08Z michel $
+    $Id: FTCEMGDespesaCapital.class.php 63307 2015-08-14 18:35:11Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FTCEMGDespesaCapital extends Persistente
 {
@@ -45,7 +45,7 @@ class FTCEMGDespesaCapital extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function FTCEMGDespesaCapital()
+    public function __construct()
     {
         parent::Persistente();
 
@@ -55,39 +55,40 @@ class FTCEMGDespesaCapital extends Persistente
     public function montaRecuperaTodos()
     {
         $stSql  = "
-            SELECT mes AS periodo
-                 , ROUND(desp_invest       ,2) AS desp_invest
-                 , ROUND(desp_inv_finan    ,2) AS desp_inv_finan
-                 , ROUND(desp_amort_div_int,2) AS desp_amort_div_int
-                 , ROUND(desp_amort_div_ext,2) AS desp_amort_div_ext
-                 , ROUND(desp_amort_div_mob,2) AS desp_amort_div_mob
-                 , ROUND(desp_out_desp_cap ,2) AS desp_out_desp_cap
-                 , ROUND(conc_emprestimos  ,2) AS conc_emprestimos
-                 , ROUND(aquisicao_titulos ,2) AS aquisicao_titulos
-                 , ROUND(incent_contrib    ,2) AS incent_contrib
-                 , ROUND(incent_inst_finan ,2) AS incent_inst_finan
-                 , LPAD(cod_tipo::varchar,2,'0') AS cod_tipo 
-              FROM ".$this->getTabela()."('".$this->getDado('exercicio')."'
-                                         ,'".$this->getDado('cod_entidade')."'
-                                         , '".$this->getDado("dt_inicial")."'
-                                         , '".$this->getDado("dt_final")."'
-                                         ) AS retorno
-                                          (  mes                 INTEGER,
-                                             desp_invest         NUMERIC,
-                                             desp_inv_finan      NUMERIC,
-                                             desp_amort_div_int  NUMERIC,
-                                             desp_amort_div_ext  NUMERIC,
-                                             desp_amort_div_mob  NUMERIC,
-                                             desp_out_desp_cap   NUMERIC,
-                                             conc_emprestimos    NUMERIC,
-                                             aquisicao_titulos   NUMERIC,
-                                             incent_contrib      NUMERIC,
-                                             incent_inst_finan   NUMERIC,
-                                             cod_tipo            INTEGER
-                                          )
-          ORDER BY cod_tipo";
-
+          SELECT mes AS periodo
+               , desp_invest
+               , desp_inv_finan
+               , desp_amort_div_int
+               , desp_amort_div_ext
+               , desp_amort_div_mob
+               , desp_out_desp_cap
+               , conc_emprestimos
+               , aquisicao_titulos
+               , incent_contrib
+               , incent_inst_finan
+               , LPAD(cod_tipo::varchar,2,'0') AS cod_tipo 
+            FROM ".$this->getTabela()."( '".$this->getDado('exercicio')."'
+                                       , '".$this->getDado('cod_entidade')."'
+                                       , '".$this->getDado("dt_inicial")."'
+                                       , '".$this->getDado("dt_final")."' )
+              AS retorno ( mes                 INTEGER
+                         , desp_invest         NUMERIC
+                         , desp_inv_finan      NUMERIC
+                         , desp_amort_div_int  NUMERIC
+                         , desp_amort_div_ext  NUMERIC
+                         , desp_amort_div_mob  NUMERIC
+                         , desp_out_desp_cap   NUMERIC
+                         , conc_emprestimos    NUMERIC
+                         , aquisicao_titulos   NUMERIC
+                         , incent_contrib      NUMERIC
+                         , incent_inst_finan   NUMERIC
+                         , cod_tipo            INTEGER
+                         )
+        ORDER BY cod_tipo
+        ";
         return $stSql;
     }
+    
+    public function __destruct() {}
 
 }

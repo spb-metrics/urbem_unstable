@@ -33,7 +33,7 @@
     * @package framework
     * @subpackage componentes
 
-    $Id: Periodicidade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: Periodicidade.class.php 63510 2015-09-04 15:12:29Z evandro $
 
     Casos de uso: uc-01.01.00
 
@@ -325,6 +325,7 @@ function Periodicidade()
 
     $this->setPeriodicidade             ( new Select        );
     $this->obPeriodicidade->setName     ("inPeriodicidade".$this->getIdComponente() );
+    $this->obPeriodicidade->setId       ("inPeriodicidade".$this->getIdComponente() );
     $this->obPeriodicidade->setRotulo   ( "Periodicidade"   );
     $this->obPeriodicidade->setStyle    ( "width: 100px"    );
 
@@ -403,6 +404,7 @@ function montaHtml()
 {
     //adicionado para poder existir mais de uma instância deste componente
     $this->obPeriodicidade->setName     ("inPeriodicidade".$this->getIdComponente() );
+    $this->obPeriodicidade->setId       ("inPeriodicidade".$this->getIdComponente() );
     $this->obPeriodoInicial->setName    ("stPeriodoInicial".$this->getIdComponente() );
     $this->obPeriodoInicial->obEvento->setOnChange ("preenchePeriodoInicial".$this->getIdComponente()."(this.value)");
     $this->obPeriodoFinal->setName      ("stPeriodoInicial".$this->getIdComponente() );

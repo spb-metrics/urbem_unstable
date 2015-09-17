@@ -104,13 +104,13 @@ if ($stMensagemErro == '') {
     $obTComprasJustificativaRazao->setDado( 'exercicio_entidade'     , $_REQUEST['stExercicioCompraDireta'] );
     $obTComprasJustificativaRazao->recuperaPorChave($rsJustificativaRazao);
     
+    $obTComprasJustificativaRazao->setDado( 'justificativa'          , $_REQUEST['stJustificativa']         );
+    $obTComprasJustificativaRazao->setDado( 'razao'                  , $_REQUEST['stRazao']                 );
+    $obTComprasJustificativaRazao->setDado( 'fundamentacao_legal'    , $_REQUEST['stFundamentacao']         );
+    
     if($rsJustificativaRazao->getNumLinhas() > 0){
-        $obTComprasJustificativaRazao->setDado( 'justificativa'          , $_REQUEST['stJustificativa']         );
-        $obTComprasJustificativaRazao->setDado( 'razao'                  , $_REQUEST['stRazao']                 );
         $obTComprasJustificativaRazao->alteracao();
     }else{
-        $obTComprasJustificativaRazao->setDado( 'justificativa'          , $_REQUEST['stJustificativa']         );
-        $obTComprasJustificativaRazao->setDado( 'razao'                  , $_REQUEST['stRazao']                 );
         $obTComprasJustificativaRazao->inclusao();
     }
 
@@ -121,7 +121,6 @@ if ($stMensagemErro == '') {
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_compra_direta'       , $item['codCompraDireta']         );
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_modalidade'          , $item['codModalidade']           );
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_entidade'            , $item['codEntidade']             );
-        //$obTComprasCompraDiretaHomologacao->setDado( 'num_adjudicacao'       , $item['numAdjudicacao']          );
         $obTComprasCompraDiretaHomologacao->setDado( 'exercicio_compra_direta' , $item['CompraDiretaExercicio']   );
         $obTComprasCompraDiretaHomologacao->setDado( 'lote'                    , $item['lote']                    );
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_cotacao'             , $item['codCotacao']              );
@@ -130,7 +129,6 @@ if ($stMensagemErro == '') {
         $obTComprasCompraDiretaHomologacao->setDado( 'exercicio_cotacao'       , $item['cotacaoExercicio']        );
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_documento'           , 0 );
         $obTComprasCompraDiretaHomologacao->setDado( 'cod_tipo_documento'      , 0 );
-        //$obTComprasCompraDiretaHomologacao->setDado( 'autorizado_empenho'    , $_REQUEST['boGerarAutorizacao'] );
         $data      = explode('/',$_REQUEST["stDtHomologacao"]);
         $timestamp = date("Y-m-d H:i:s", strtotime($data[2]."-".$data[1]."-".$data[0]." ".$_REQUEST["stHoraHomologacao"]));
         $obTComprasCompraDiretaHomologacao->setDado( 'timestamp', "'".$timestamp."'" );

@@ -29,16 +29,18 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
- * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+ * $Id: FLManterRegistroPreco.php 63501 2015-09-03 17:22:53Z michel $
+ * $Date: 2015-09-03 14:22:53 -0300 (Qui, 03 Set 2015) $
  * $Author: michel $
- * $Rev: 62832 $
+ * $Rev: 63501 $
  *
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once CAM_GF_ORC_COMPONENTES . 'ITextBoxSelectEntidadeGeral.class.php';
+include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeGeral.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasModalidade.class.php';
+
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterRegistroPreco";
 $pgFilt     = "FL".$stPrograma.".php";
@@ -58,19 +60,83 @@ $obForm = new Form;
 $obForm->setAction($pgList);
 
 $obTxtExercicioRegistroPreco = new TextBox();
-$obTxtExercicioRegistroPreco->setName('stExercicioRegistroPreco');
-$obTxtExercicioRegistroPreco->setId('stExercicioRegistroPreco');
-$obTxtExercicioRegistroPreco->setRotulo('Exercício');
-$obTxtExercicioRegistroPreco->setMaxLength(4);
-$obTxtExercicioRegistroPreco->setSize(5);
-$obTxtExercicioRegistroPreco->setNull(true);
-$obTxtExercicioRegistroPreco->setInteiro(true);
-$obTxtExercicioRegistroPreco->setValue( Sessao::getExercicio() );
+$obTxtExercicioRegistroPreco->setName       ( 'stExercicioRegistroPreco' );
+$obTxtExercicioRegistroPreco->setId         ( 'stExercicioRegistroPreco' );
+$obTxtExercicioRegistroPreco->setRotulo     ( 'Exercício' );
+$obTxtExercicioRegistroPreco->setMaxLength  ( 4 );
+$obTxtExercicioRegistroPreco->setSize       ( 5 );
+$obTxtExercicioRegistroPreco->setNull       ( true );
+$obTxtExercicioRegistroPreco->setInteiro    ( true );
+$obTxtExercicioRegistroPreco->setValue      ( Sessao::getExercicio() );
+$obTxtExercicioRegistroPreco->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioRegistroPreco.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value, 'carregaLicitacaoFiltro');");
 
 $obITextBoxSelectEntidade = new ITextBoxSelectEntidadeGeral();
-$obITextBoxSelectEntidade->setId('stEntidade');
-$obITextBoxSelectEntidade->setName('stEntidade');
-$obITextBoxSelectEntidade->setObrigatorio(true);
+$obITextBoxSelectEntidade->setId            ( 'stEntidade' );
+$obITextBoxSelectEntidade->setName          ( 'stEntidade' );
+$obITextBoxSelectEntidade->setObrigatorio   ( true );
+$obITextBoxSelectEntidade->obTextBox->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioRegistroPreco.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value, 'carregaLicitacaoFiltro');");
+$obITextBoxSelectEntidade->obSelect->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioRegistroPreco.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value, 'carregaLicitacaoFiltro');");
+
+$obTxtCodigoProcesso = new TextBox();
+$obTxtCodigoProcesso->setName('stCodigoProcesso');
+$obTxtCodigoProcesso->setId('stCodigoProcesso');
+$obTxtCodigoProcesso->setRotulo('Nro. do Processo de Registro de Preços');
+$obTxtCodigoProcesso->setTitle('Número do processo de Registro de Preços.');
+$obTxtCodigoProcesso->setMaxLength(12);
+$obTxtCodigoProcesso->setNull(true);
+$obTxtCodigoProcesso->setInteiro(true);
+
+//Consulta para Buscar Modalidades Licitação
+$obComprasModalidade = new TComprasModalidade();
+$stFiltro = " WHERE cod_modalidade IN (3,6,7) ";
+$stOrdem  = " ORDER BY cod_modalidade, descricao ";
+$obComprasModalidade->recuperaTodos($rsModalidadeLicit, $stFiltro, $stOrdem);
+
+//Montando Licitação Urbem
+$obISelectModalidade = new Select();
+$obISelectModalidade->setName       ( 'inCodModalidade' );
+$obISelectModalidade->setId         ( 'inCodModalidade' );
+$obISelectModalidade->setRotulo     ( 'Modalidade' );
+$obISelectModalidade->setTitle      ( 'Selecione a Modalidade.' );
+$obISelectModalidade->setCampoID    ( 'cod_modalidade' );
+$obISelectModalidade->setValue      ( $inCodModalidade );
+$obISelectModalidade->setCampoDesc  ( '[cod_modalidade] - [descricao]' );
+$obISelectModalidade->addOption     ( '','Selecione' );
+$obISelectModalidade->setNull       ( true );
+$obISelectModalidade->preencheCombo ( $rsModalidadeLicit );
+$obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioRegistroPreco.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value, 'carregaLicitacaoFiltro');");
+
+$obISelectLicitacao = new Select();
+$obISelectLicitacao->setName    ( 'inCodLicitacao' );
+$obISelectLicitacao->setId      ( 'inCodLicitacao' );
+$obISelectLicitacao->setRotulo  ( 'Licitação' );
+$obISelectLicitacao->setTitle   ( 'Selecione a Licitação.' );
+$obISelectLicitacao->addOption  ( '','Selecione' );
+$obISelectLicitacao->setNull    ( true );
+$obISelectLicitacao->setValue   ( $inCodLicitacao );
+
+$obTxtExercicioEmpenho = new TextBox;
+$obTxtExercicioEmpenho->setName     ( "stExercicioEmpenho"              );
+$obTxtExercicioEmpenho->setValue    ( Sessao::getExercicio()            );
+$obTxtExercicioEmpenho->setRotulo   ( "Exercício do Empenho"            );
+$obTxtExercicioEmpenho->setTitle    ( "Informe o exercício do empenho." );
+$obTxtExercicioEmpenho->setInteiro  ( false                             );
+$obTxtExercicioEmpenho->setNull     ( true                              );
+$obTxtExercicioEmpenho->setMaxLength( 4                                 );
+$obTxtExercicioEmpenho->setSize     ( 5                                 );
+$obTxtExercicioEmpenho->obEvento->setOnChange("montaParametrosGET('limpaEmpenho');");
+
+$obBscEmpenho = new BuscaInner;
+$obBscEmpenho->setTitle            ( "Informe o número do empenho." );
+$obBscEmpenho->setRotulo           ( "Número do Empenho"            );
+$obBscEmpenho->setId               ( "stEmpenho"                    );
+$obBscEmpenho->setValue            ( $_REQUEST['stEmpenho']         );
+$obBscEmpenho->setNull             ( true                           );
+$obBscEmpenho->obCampoCod->setName ( "numEmpenho"                   );
+$obBscEmpenho->obCampoCod->setId   ( "numEmpenho"                   );
+$obBscEmpenho->obCampoCod->setValue(  $numEmpenho                   );
+$obBscEmpenho->obCampoCod->obEvento->setOnBlur( "montaParametrosGET('buscaEmpenho','numEmpenho, inCodEntidade, stExercicioEmpenho');" );
+$obBscEmpenho->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/FLEmpenho.php','frm','numEmpenho','stEmpenho','empenhoNotaFiscal&inCodEntidade='+document.frm.inCodEntidade.value + '&stCampoExercicio=stExercicioEmpenho&stExercicioEmpenho='+document.frm.stExercicioEmpenho.value,'".Sessao::getId()."','800','550');");
 
 $obFormulario = new Formulario;
 $obFormulario->addForm  ( $obForm    );
@@ -78,6 +144,13 @@ $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addTitulo("Dados para filtro");
 $obFormulario->addComponente($obTxtExercicioRegistroPreco);
 $obFormulario->addComponente($obITextBoxSelectEntidade);
+$obFormulario->addComponente($obTxtCodigoProcesso);
+$obFormulario->addTitulo("Licitação");
+$obFormulario->addComponente($obISelectModalidade);
+$obFormulario->addComponente($obISelectLicitacao);
+$obFormulario->addTitulo("Empenho");
+$obFormulario->addComponente($obTxtExercicioEmpenho);
+$obFormulario->addComponente($obBscEmpenho);
 $obFormulario->OK();
 $obFormulario->show();
 

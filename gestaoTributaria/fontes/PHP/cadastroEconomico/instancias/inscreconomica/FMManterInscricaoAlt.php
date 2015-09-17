@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMManterInscricaoAlt.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterInscricaoAlt.php 63376 2015-08-21 18:55:42Z arthur $
 
     * Casos de uso: uc-05.02.10
 
@@ -39,12 +39,12 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php" );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeFato.class.php"      );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeDireito.class.php"   );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMAutonomo.class.php"           );
-include_once ( CAM_GT_CEM_NEGOCIO."RCEMCategoria.class.php"          );
-include_once ( CAM_GA_CGM_NEGOCIO."RCGM.class.php"                   );
+include_once CAM_GT_CEM_NEGOCIO."RCEMInscricaoEconomica.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeFato.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMEmpresaDeDireito.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMAutonomo.class.php";
+include_once CAM_GT_CEM_NEGOCIO."RCEMCategoria.class.php";
+include_once CAM_GA_CGM_NEGOCIO."RCGM.class.php";
 
 $stAcao = $request->get('stAcao');
 $link = Sessao::read( "link" );
@@ -139,8 +139,7 @@ switch ($_REQUEST[ "inCodigoEnquadramento" ]) {
     $obDtAbertura->setRotulo    ( "Data de Abertura" );
     $obDtAbertura->setTitle     ( "Data de Abertura da Inscrição Econômica" );
     $obDtAbertura->setNull      ( false );
-
-    //echo 'DO BANCO: '.$rsInscricao->getCampo( "cod_natureza"        );
+    
     $inCodigoDomicilio = $rsInscricao->getCampo( "inscricao_municipal" );
     $inRegistroJunta   = $rsInscricao->getCampo( "num_registro_junta"  );
     $inCodigoNatureza  = $rsInscricao->getCampo( "cod_natureza"        );
@@ -284,10 +283,8 @@ $obBscCGMContabil->setRotulo( "Responsável Contábil" );
 $obBscCGMContabil->setId( "stNomCGMResponsavel" );
 $obBscCGMContabil->obCampoCod->setName("inNumCGMResponsavel");
 $obBscCGMContabil->obCampoCod->setValue( $inNumCGM );
-//$obBscCGMContabil->setValue( $stNomCGM );
 $obBscCGMContabil->setValue( $stNomResponsavel );
 $obBscCGMContabil->obCampoCod->obEvento->setOnChange("buscaValor('buscaRespContabil');");
-//$obBscCGMContabil->obCampoCod->obEvento->setOnBlur  ("buscaValor('buscaRespContabil');");
 $obBscCGMContabil->setFuncaoBusca( "abrePopUp('".CAM_GT_CEM_POPUPS."RespTecnico/LSProcurarRespTecnico.php','frm','inNumCGMResponsavel','stNomCGMResponsavel','todos','".Sessao::getId()."','800','550');" );
 if ($_REQUEST[ "inCodigoEnquadramento" ] == 2)
     $obBscCGMContabil->setNull ( false );
@@ -322,19 +319,8 @@ $obBscNatureza->obCampoCod->setMascara( $stMascaraNatureza);
 $obBscNatureza->obCampoCod->setMaxLength( strlen($stMascaraNatureza));
 $obBscNatureza->obCampoCod->setMinLength( strlen($stMascaraNatureza));
 $obBscNatureza->setValue( $stNomNatureza );
-//$obBscCGM->obCampoCod->obEvento->setOnFocus("if (this.value!=0) {buscaValor('buscaCGM');}");
 $obBscNatureza->obCampoCod->obEvento->setOnChange("buscaValor('buscaNatureza');");
 $obBscNatureza->setFuncaoBusca( "abrePopUp( '" . CAM_GT_CEM_POPUPS ."naturezajuridica/FLProcurarNaturezaJuridica.php','frm','inCodigoNatureza','stNomeNatureza','todos','".Sessao::getId()."','800','550');" );
-
-//$obTxtCategoria = new TextBox;
-//$obTxtCategoria->setName      ( "inCodigoCategoria" );
-//$obTxtCategoria->setValue     ( $inCodigoCategoria  );
-//$obTxtCategoria->setInteiro   ( true );
-//$obTxtCategoria->setRotulo    ( "Categoria" );
-//$obTxtCategoria->setNull      ( false );
-//$obTxtCategoria->setSize      ( 10 );
-//$obTxtCategoria->setMaxLength ( 10 );
-//$obTxtCategoria->obEvento->setOnChange ( "preencheCategoria();" );
 
 $obRCEMCategoria = new RCEMCategoria;
 $rsCategoria = new RecordSet;
@@ -425,3 +411,5 @@ $stJs .= "busca('BuscaIndexacao');";
 $stJs .= "f.inNumCGMResponsavel.focus();";
 $stJs .= "d.getElementById('stNomCGM').innerHTML = f.stDescCGM.value;";
 sistemaLegado::executaFrameOculto( $stJs );
+
+?>

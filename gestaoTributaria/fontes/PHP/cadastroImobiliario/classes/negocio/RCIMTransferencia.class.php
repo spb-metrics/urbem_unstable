@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMTransferencia.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMTransferencia.class.php 63503 2015-09-03 18:25:17Z jean $
 
      * Casos de uso: uc-05.01.17
 */
@@ -558,16 +558,12 @@ function efetivarTransferencia($boTransacao = "", $boAbstracao = true)
                                     $stFiltro =  " WHERE numcgm = ".$inCodCGMAdquirenteAtual;
                                     $stFiltro .= " AND cod_calculo = ".$rsCalculos->getCampo('cod_calculo');
                                     $obTARRCalculoCgm->recuperaTodos ( $rsCalculoExiste, $stFiltro, $stOrdem, $boTransacao);
-                                    #$obTARRCalculoCgm->debug();
-                                    #sistemaLegado::mostravar ( $rsCalculoExiste );
 
                                     if ( $rsCalculoExiste->getNumLinhas() < 1 ) {
                                         $obErro = $obTARRCalculoCgm->inclusao( $boTransacao );
                                     } else {
                                         $arBoCalculosExcluir[$rsCalculos->getCampo('cod_calculo').'-'.$inCodCGMAdquirenteAtual] = FALSE;
-                                        #$obErro->setDescricao("Cálculo já cadastrado para este CGM");
                                     }
-                                    #$obTARRCalculoCgm->debug();
                                     $contAdquirentes++;
                                 }
                                 $rsCalculos->proximo();
@@ -580,7 +576,6 @@ function efetivarTransferencia($boTransacao = "", $boAbstracao = true)
                                     $obTARRCalculoCgm->setDado( 'numcgm', $rsCalculos->getCampo('numcgm') );
                                     $obTARRCalculoCgm->exclusao( $boTransacao );
                                 }
-                                #$obTARRCalculoCgm->debug();
                                 $rsCalculos->proximo();
                             }
 
@@ -672,8 +667,7 @@ function consultarTransferencia($boTransacao = "")
         $this->setEfetivacao  ('t');
     }
     $obErro = $this->listarTransferencia( $rsTransferencia, $boTransacao ) ;
-
-    if ( $this->getEfetivacao() == 'f' || $rsTransferencia->getNumLinhas() < 1 ) {
+    if ( $rsTransferencia->getNumLinhas() < 1 ) {
         $obErro->setDescricao( "Nenhuma transferência foi encontrada!");
     }
 
@@ -719,7 +713,6 @@ function consultarDocumentos($boTransacao = "")
              $this->obTCIMTransferenciaDocumento->setDado( "cod_transferencia", $this->inCodigoTransferencia            );
              $this->obTCIMTransferenciaDocumento->setDado( "cod_documento"    , $this->arDocumentos[$inCount]['codigo'] );
              $obErro = $this->obTCIMTransferenciaDocumento->recuperaPorChave( $rsDocumentos, $boTransacao );
-             //$this->obTCIMTransferenciaDocumento->debug();
              if ( !$obErro->ocorreu() ) {
                  if ( $rsDocumentos->getNumLinhas() > 0 ) {
                      $this->arDocumentos[$inCount]['entregue'] = 't';
@@ -863,7 +856,6 @@ function salvarProprietario($boTransacao = "")
     $obTCIMProprietario = new TCIMProprietario;
     $obTCIMProprietario->setDado( "inscricao_municipal", $this->inInscricaoMunicipal );
     $obErro = $obTCIMProprietario->exclusao( $boTransacao );
-//$this->obTCIMProprietario->debug(); exit;
     if ( !$obErro->ocorreu() ) {
         $inTotalArray = count( $this->arAdquirentes ) - 1;
         for ($inCount = 0; $inCount <= $inTotalArray; $inCount ++) {
@@ -889,7 +881,6 @@ function verificaPagamentoImovelITBI(&$rsPagamento, $boTransacao = "")
     }
     $stOrdem =" order by cod_calculo DESC limit 1";
     $obErro = $this->obTCIMTransferenciaImovel->recuperaPagamentoImovelITBI( $rsPagamento,$stFiltro, $stOrdem, $boTransacao );
-    //$this->obTCIMTransferenciaImovel->debug();
     return $obErro;
 }
 }

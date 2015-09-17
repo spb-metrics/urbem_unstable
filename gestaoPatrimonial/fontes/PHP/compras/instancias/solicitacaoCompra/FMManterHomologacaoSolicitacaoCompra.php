@@ -30,7 +30,7 @@
 * @author Analista     : Cleisson
 * @author Desenvolvedor: Bruce Cruz de Sena
 
-  $Id: FMManterHomologacaoSolicitacaoCompra.php 62986 2015-07-14 18:08:54Z michel $
+  $Id: FMManterHomologacaoSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
 
 * Casos de uso: uc-03.04.02
 */
@@ -42,6 +42,7 @@ include_once CAM_GP_ALM_COMPONENTES.'ILabelAlmoxarifado.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/CGM/classes/componentes/ILabelCGM.class.php';
 include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacao.class.php';
 include_once CAM_GP_COM_COMPONENTES.'ILabelEditObjeto.class.php';
+include_once TCOM.'TComprasConfiguracao.class.php';
 
 SistemaLegado::LiberaFrames(true,true);
 
@@ -72,6 +73,22 @@ $obHdnCodSolicitacao->setValue( $_REQUEST['cod_solicitacao'] );
 
 $obTComprasSolicitacao->consultar();
 
+$obTConfiguracao = new TComprasConfiguracao();
+$obTConfiguracao->setDado("parametro","reserva_rigida");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+
+$boReservaRigida = $rsConfiguracao->getCampo('valor') == 'true' ? true : false;
+
+$obTConfiguracao->setDado("parametro","reserva_autorizacao");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$boReservaAutorizacao = $rsConfiguracao->getCampo('valor') == 'true' ? true : false;
+
+if(!$boReservaRigida && !$boReservaAutorizacao){
+    $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
+    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$_REQUEST["stAcao"],$stMsg,"unica","aviso", Sessao::getId(), "../");
+}else
+    $stReserva = ($boReservaRigida) ? 'reserva_rigida' : 'reserva_autorizacao';
+
 include_once ( $pgOcul );
 
 $stAcao = $_REQUEST["stAcao"];
@@ -97,28 +114,28 @@ $obLblRegistroPreco->setId     ( 'stRegistroPreco' );
 $obLblRegistroPreco->setrotulo ( 'Registro de Preço' );
 $obLblRegistroPreco->setValue  ( ($obTComprasSolicitacao->getDado('registro_precos') == 't') ? 'Sim' : 'Não' );
 
-////Exercicio
+//Exercicio
 $obLblExercicio = new Label;
 $obLblExercicio->setId     ( 'stExercicio' );
 $obLblExercicio->setrotulo ( 'Exercício'   );
 $obLblExercicio->setValue  ( $obTComprasSolicitacao->getDado('exercicio') );
 
-///Entidade
+//Entidade
 $obILabelEntidade = new ILabelEntidade( $obForm );
 $obILabelEntidade->setMostraCodigo( true           );
 $obILabelEntidade->setCodEntidade ( $obTComprasSolicitacao->getDado( 'cod_entidade' ) );
 
-/// Solicitação
+// Solicitação
 $obLblSolicitacao = new Label;
 $obLblSolicitacao->setId     ( 'stSolicitacao' );
 $obLblSolicitacao->setrotulo ( 'Solicitação'   );
 $obLblSolicitacao->setValue  ( $_REQUEST['cod_solicitacao'] );
 
-/// almoxarifado
+// almoxarifado
 $obLblAlmoxarifado = new ILabelAlmoxarifado($obForm);
 $obLblAlmoxarifado->setCodAlmoxarifado( $obTComprasSolicitacao->getDado( 'cod_almoxarifado' ) );
 
-/// Data da solicitação
+// Data da solicitação
 $arDataSolicitacao = substr( $obTComprasSolicitacao->getDado( 'timestamp' ),0,10);
 $arDataSolicitacao = explode ("-", $arDataSolicitacao);
 $arDataSolicitacao = $arDataSolicitacao[2]."/".$arDataSolicitacao[1].'/'.$arDataSolicitacao[0];
@@ -128,17 +145,17 @@ $obLblDataSolicitacao->setId     ( 'stDataSolicitacao' );
 $obLblDataSolicitacao->setrotulo ( 'Data Solicitação'  );
 $obLblDataSolicitacao->setValue  ( $arDataSolicitacao  );
 
-/// Objeto
+// Objeto
 $obILabelEditObjeto = new ILabelEditObjeto;
 $obILabelEditObjeto->setRotulo   ( 'Objeto' );
 $obILabelEditObjeto->setCodObjeto( stripslashes($obTComprasSolicitacao->getDado ( 'cod_objeto' )) );
 
-///Requisitante CGM
+//Requisitante CGM
 $obLblRequisitante = new ILabelCGM();
 $obLblRequisitante->setRotulo ( "Requisitante" );
 $obLblRequisitante->setNumCGM ( $obTComprasSolicitacao->getDado('cgm_requisitante') );
 
-/// Solicitante CGM
+// Solicitante CGM
 $obLblSolicitante = new ILabelCGM();
 $obLblSolicitante->setRotulo ( "Solicitante" );
 $obLblSolicitante->setNumCGM ( $obTComprasSolicitacao->getDado( 'cgm_solicitante' ) );
@@ -184,7 +201,8 @@ $obFormulario->show();
 sistemaLegado::executaFrameOculto(  montaSpanItens ($obTComprasSolicitacao->getDado('exercicio'),
                                                     $obTComprasSolicitacao->getDado( 'cod_entidade' ),
                                                     $_REQUEST['cod_solicitacao'],
-                                                    $obTComprasSolicitacao->getDado('registro_precos'))
+                                                    $obTComprasSolicitacao->getDado('registro_precos'),
+                                                    $stReserva)
                                  );
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

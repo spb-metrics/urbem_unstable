@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Fernando Zank Correa Evangelista
 
-    $Id: FMManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
+    $Id: FMManterProcessoLicitatorio.php 63367 2015-08-20 21:27:34Z michel $
 
     * Casos de uso : uc-03.04.15
 */
@@ -38,7 +38,6 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-
 include_once CAM_GA_CGM_COMPONENTES."IPopUpCGM.class.php";
 include_once CAM_GA_CGM_COMPONENTES."IPopUpCGM.class.php";
 include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
@@ -67,57 +66,77 @@ $pgJs   = "JS".$stPrograma.".js";
 
 include_once $pgJs;
 
-Sessao::write('arDocumentos', array());
-Sessao::write('arMembros', array());
-Sessao::write('arMembro', array());
-Sessao::write('arDocumentosExcluidos', array());
-Sessao::write('arMembrosExcluidos', array());
-Sessao::write('arMembrosIncluidos', array());
+Sessao::write('arDocumentos'            , array());
+Sessao::write('arMembros'               , array());
+Sessao::write('arMembro'                , array());
+Sessao::write('arDocumentosExcluidos'   , array());
+Sessao::write('arMembrosExcluidos'      , array());
+Sessao::write('arMembrosIncluidos'      , array());
 Sessao::remove('arMembroAdicionalExcluido');
 Sessao::remove('arMembroAdicionalIncluido');
 
 $stAcao = $request->get('stAcao');
 
-$stLocation = $pgList . "?". Sessao::getId() . "&stAcao=" . $stAcao;
+$stLocation = $pgList."?".Sessao::getId()."&stAcao=".$stAcao;
 $jsOnload = '';
 
-if (isset($_REQUEST['inCodLicitacao'])){
-    include_once(TLIC."TLicitacaoEdital.class.php");
-    $obLicitacaoEdital = new TLicitacaoEdital;
-    $obLicitacaoEdital->recuperaTodos($rsLicitacaoEdital, " WHERE cod_licitacao = ".$_REQUEST['inCodLicitacao']." AND
-                                                                cod_modalidade = ".substr($_REQUEST['stModalidade'],0,1)." AND
-                                                                cod_entidade IN (".substr($_REQUEST['stEntidade'],0,1).") AND
-                                                                exercicio = '".Sessao::getExercicio()."'"
-                                    );
+$boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+$boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+$boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+$boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+
+if(!$boReservaRigida && !$boReservaAutorizacao){
+    $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
     
+    $obLblMsgTipoReserva = new Label();
+    $obLblMsgTipoReserva->setRotulo ( "Aviso" );
+    $obLblMsgTipoReserva->setValue  ( $stMsg );
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo     ( 'Configuração Tipo de Reserva'   );
+    $obFormulario->addComponente ( $obLblMsgTipoReserva             );
+    $obFormulario->show();
+    
+    exit();
+}
+
+if (isset($_REQUEST['inCodLicitacao'])){
+    include_once TLIC."TLicitacaoEdital.class.php";
+    $obLicitacaoEdital = new TLicitacaoEdital;
+    $obLicitacaoEdital->recuperaTodos($rsLicitacaoEdital, " WHERE cod_licitacao = ".$_REQUEST['inCodLicitacao']."               AND
+                                                                  cod_modalidade = ".substr($_REQUEST['stModalidade'],0,1)."    AND
+                                                                  cod_entidade IN (".substr($_REQUEST['stEntidade'],0,1).")     AND
+                                                                  exercicio = '".Sessao::getExercicio()."'");
+
     $boEdital = Sessao::write('boEdital', $rsLicitacaoEdital->getNumLinhas() > 0 ? true : false);
 }
 
 //Verifica se ja houve julgamento
 $compraJulgamento = false;
 if ($stAcao == 'alterar') {
-    include_once( CAM_GP_COM_MAPEAMENTO."TComprasMapaCotacao.class.php" );
+    include_once CAM_GP_COM_MAPEAMENTO."TComprasMapaCotacao.class.php";
     $arMapaCompra = explode('/', $_REQUEST['stMapaCompra']);
 
     $obTComprasMapaCotacao = new TComprasMapaCotacao;
-    $obTComprasMapaCotacao->setDado('cod_mapa'      , $arMapaCompra[0]      );
-    $obTComprasMapaCotacao->setDado('exercicio_mapa', $arMapaCompra[1]       );
+    $obTComprasMapaCotacao->setDado('cod_mapa'      , $arMapaCompra[0] );
+    $obTComprasMapaCotacao->setDado('exercicio_mapa', $arMapaCompra[1] );
     $obTComprasMapaCotacao->recuperaPorChave($rsRecordSet);
 
     if ($rsRecordSet->getNumLinhas() > 0) {
-        include_once( CAM_GP_COM_MAPEAMENTO."TComprasJulgamento.class.php" );
+        include_once CAM_GP_COM_MAPEAMENTO."TComprasJulgamento.class.php";
         $obTComprasJulgamento = new TComprasJulgamento;
         $obTComprasJulgamento->setDado('exercicio'  , $rsRecordSet->getCampo('exercicio_cotacao'));
         $obTComprasJulgamento->setDado('cod_cotacao', $rsRecordSet->getCampo('cod_cotacao')      );
         $obTComprasJulgamento->recuperaPorChave($rsRecordSet);
         if ($rsRecordSet->getNumLinhas() > 0) {
-            include_once( CAM_GP_COM_MAPEAMENTO."TComprasJulgamentoItem.class.php" );
+            include_once CAM_GP_COM_MAPEAMENTO."TComprasJulgamentoItem.class.php";
             $obTComprasJulgamentoItem = new TComprasJulgamentoItem;
             $obTComprasJulgamentoItem->setDado('exercicio'  , $rsRecordSet->getCampo('exercicio')   );
             $obTComprasJulgamentoItem->setDado('cod_cotacao', $rsRecordSet->getCampo('cod_cotacao') );
             $obTComprasJulgamentoItem->recuperaPorChave($rsRecordSet);
             if ($rsRecordSet->getNumLinhas() > 0) {
-                include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoJulgamento.class.php" );
+                include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoJulgamento.class.php";
                 $obTEmpenhoItemPreEmpenhoJulgamento = new TEmpenhoItemPreEmpenhoJulgamento;
                 $stFiltro  = " WHERE exercicio_julgamento = '".$rsRecordSet->getCampo('exercicio')."'";
                 $stFiltro .= "   AND cod_cotacao          =  ".$rsRecordSet->getCampo('cod_cotacao');
@@ -125,9 +144,8 @@ if ($stAcao == 'alterar') {
                 $stFiltro .= "   AND lote                 =  ".$rsRecordSet->getCampo('lote');
                 $stFiltro .= "   AND cgm_fornecedor       =  ".$rsRecordSet->getCampo('cgm_fornecedor');
                 $obTEmpenhoItemPreEmpenhoJulgamento->recuperaTodos($rsRecordSet, $stFiltro);
-                if ($rsRecordSet->getNumLinhas() > 0) {
+                if ($rsRecordSet->getNumLinhas() > 0)
                     $compraJulgamento = true;
-                }
             }
         }
     }
@@ -237,9 +255,9 @@ $obLblValorReferencia = new Label();
 $obLblValorReferencia->setName('flValorReferencia');
 $obLblValorReferencia->setId( 'stValorReferencia' );
 $obLblValorReferencia->setRotulo('Valor Total de Referência');
-if (!isset($stValorReferencia)) {
+if (!isset($stValorReferencia))
     $stValorReferencia = '';
-}
+
 $obLblValorReferencia->setValue( $stValorReferencia == '' ? "0,00" : number_format( $stValorReferencia , 2 , ',' , '.' ) );
 
 //// define o Label para tipo de Cotação
@@ -403,7 +421,6 @@ $obHdnstExercicioLicitacao->setName('hdnExercicioLicitacao');
 $obHdnstExercicioLicitacao->setValue($request->get('stExercicioLicitacao'));
 
 if ($stAcao != "incluir") {
-
     $obLblEntidade = new Label();
     $obLblEntidade->setRotulo('Entidade');
     $obLblEntidade->setValue($_REQUEST['stEntidade']);
@@ -443,7 +460,7 @@ if ($stAcao != "incluir") {
         $obLblMapaCompra->setRotulo('Mapa de Compras');
         $obLblMapaCompra->setValue($_REQUEST['stMapaCompra']);
         
-        include_once(TLIC."TLicitacaoLicitacao.class.php");
+        include_once TLIC."TLicitacaoLicitacao.class.php";
         $obLicitacaoLicitacao = new TLicitacaoLicitacao;
         $obLicitacaoLicitacao->setDado('cod_licitacao' , $_REQUEST['inCodLicitacao']   );
         $obLicitacaoLicitacao->setDado('cod_modalidade', $_REQUEST['inCodModalidade']  );
@@ -466,7 +483,7 @@ if ($stAcao != "incluir") {
         $obHdnMapaCompra->setName('hdnMapaCompra');
         $obHdnMapaCompra->setValue($_REQUEST['stMapaCompra']);
         
-        include_once(CAM_GP_COM_MAPEAMENTO . "../../../licitacao/classes/mapeamento/TLicitacaoCriterioJulgamento.class.php");
+        include_once CAM_GP_COM_MAPEAMENTO . "../../../licitacao/classes/mapeamento/TLicitacaoCriterioJulgamento.class.php";
         $obMapeamento   = new TLicitacaoCriterioJulgamento();
         $obMapeamento->setDado('cod_criterio', $_REQUEST['inCodCriterio']);
         $obMapeamento->recuperaPorChave( $rsRecordSet );
@@ -558,16 +575,15 @@ $obFormulario->addHidden        ( $obHdnTipoRegistroPrecos         );
 
 if ($stAcao != 'incluir') {
     $obFormulario->addComponente ($obLblEntidade);
-    $obFormulario->addHidden ($obHdnEntidade);
+    $obFormulario->addHidden     ($obHdnEntidade);
     $obFormulario->addComponente ($obLblLicitacao);
     $obFormulario->addHidden     ($obHdnModalidade);
 }
 if ($stAcao != 'anular' ) {
-    $obFormulario->addTitulo        ( "Dados da Licitação"             );
+    $obFormulario->addTitulo            ( "Dados da Licitação"          );
     if ($stAcao == 'incluir') {
-        if ($boIdLicitacaoAutomatica != 't') {
-            $obFormulario->addComponente ( $obCodLicitacao                 );
-        }
+        if ($boIdLicitacaoAutomatica != 't')
+            $obFormulario->addComponente ( $obCodLicitacao              );
     }
     if($compraJulgamento){
         $obFormulario->addComponente    ( $obLblProcessoAdm             );
@@ -578,76 +594,76 @@ if ($stAcao != 'anular' ) {
         $obFormulario->addHidden        ( $obHdnCriterioJulg            );
         $obFormulario->addHidden        ( $obHdnDtLicitacao             );
     }else{
-        $obFormulario->addComponente    ( $obPopUpProcesso                 );
-        $obFormulario->addComponente    ( $obPopUpMapa                     );
+        $obFormulario->addComponente    ( $obPopUpProcesso              );
+        $obFormulario->addComponente    ( $obPopUpMapa                  );
     }
     
     if ($stAcao == 'incluir')
-        $obFormulario->addComponente( $obISelectEntidadeUsuario    	   );
+        $obFormulario->addComponente    ( $obISelectEntidadeUsuario    	);
         
     if ( $compraJulgamento) {
-        $obFormulario->addComponente    ( $obLblDtLicitacao                   );
+        $obFormulario->addComponente    ( $obLblDtLicitacao             );
     }else{
-        $obFormulario->addComponente    ( $obDtLicitacao                   );
+        $obFormulario->addComponente    ( $obDtLicitacao                );
     }
-    $obFormulario->addComponente( $obLblValorReferencia            );
-    $obFormulario->addComponente( $obLblTipoCotacao                );
-    $obFormulario->addComponente( $obLblTipoRegistroPrecos         );
+    $obFormulario->addComponente        ( $obLblValorReferencia         );
+    $obFormulario->addComponente        ( $obLblTipoCotacao             );
+    $obFormulario->addComponente        ( $obLblTipoRegistroPrecos      );
 
     if ($stAcao == 'incluir') {
-        $obFormulario->addComponente( $obISelectModalidadeLicitacao    );
+        $obFormulario->addComponente    ( $obISelectModalidadeLicitacao );
     } else {
-        $obFormulario->addComponente( $obLblModalidade		           );
+        $obFormulario->addComponente    ( $obLblModalidade              );
     }
 
-    $obFormulario->addSpan          ( $obSpnRegistroModalidade             );
+    $obFormulario->addSpan              ( $obSpnRegistroModalidade      );
 
-     if($compraJulgamento){
-        $obFormulario->addComponente    ( $obLblCriterioJulg             );
+    if($compraJulgamento){
+        $obFormulario->addComponente    ( $obLblCriterioJulg            );
     }else{
-        $obFormulario->addComponente    ( $obISelectCriterioJulgamento     );
+        $obFormulario->addComponente    ( $obISelectCriterioJulgamento  );
     }
     
-    $obFormulario->addComponente    ( $obISelectTipoObjeto             );
-    $obFormulario->addSpan          ( $obSpnRegime                     );
+    $obFormulario->addComponente        ( $obISelectTipoObjeto          );
+    $obFormulario->addSpan              ( $obSpnRegime                  );
     
     if(!$boEdital) {
-        $obFormulario->addComponente    ( $obPopUpObjeto );
+        $obFormulario->addComponente    ( $obPopUpObjeto                );
     } else {
-        $obFormulario->addComponente    ( $obLblObjeto );
-        $obFormulario->addHidden        ( $obHdnObjeto );
+        $obFormulario->addComponente    ( $obLblObjeto                  );
+        $obFormulario->addHidden        ( $obHdnObjeto                  );
     }
    
     $obIMontaUnidadeOrcamentaria->geraFormulario( $obFormulario );
-    $obFormulario->addSpan   ( $obSpnItens );
-    $obFormulario->addSpan          ( $obSpnMaxMin                     );
-    $obFormulario->addTitulo        ( "Dados da Comissão de Licitação" );
-    $obFormulario->addcomponente    ( $obISelectComissao               );
-    $obFormulario->addcomponente    ( $obISelectComissaoEquipeApoio    );
-    $obFormulario->addSpan          ( $obSpnMembros                    );
-    $obFormulario->addTitulo        ( "Membro Adicional"               );
-    $obFormulario->addComponente    ( $obMembroAdicional               );
-    $obFormulario->addComponente    ( $obTxtCargoMembro                );
-    $obFormulario->addComponente    ( $obSlNaturezaCargo               );
-    $obFormulario->Incluir          ('MembroAdicional', array ( $obMembroAdicional,$obTxtCargoMembro,$obSlNaturezaCargo ),true);
-    $obFormulario->addSpan          ( $obSpnMembroAdicional            );
+    $obFormulario->addSpan          ( $obSpnItens                       );
+    $obFormulario->addSpan          ( $obSpnMaxMin                      );
+    $obFormulario->addTitulo        ( "Dados da Comissão de Licitação"  );
+    $obFormulario->addcomponente    ( $obISelectComissao                );
+    $obFormulario->addcomponente    ( $obISelectComissaoEquipeApoio     );
+    $obFormulario->addSpan          ( $obSpnMembros                     );
+    $obFormulario->addTitulo        ( "Membro Adicional"                );
+    $obFormulario->addComponente    ( $obMembroAdicional                );
+    $obFormulario->addComponente    ( $obTxtCargoMembro                 );
+    $obFormulario->addComponente    ( $obSlNaturezaCargo                );
+    $obFormulario->Incluir          ( 'MembroAdicional', array ( $obMembroAdicional,$obTxtCargoMembro,$obSlNaturezaCargo ),true );
+    $obFormulario->addSpan          ( $obSpnMembroAdicional             );
     
     if(!$boEdital) {
-        $obFormulario->addTitulo        ( "Documentos Exigidos"            );
-        $obFormulario->addcomponente    ( $obISelectDocumento              );
+        $obFormulario->addTitulo    ( "Documentos Exigidos"             );
+        $obFormulario->addcomponente( $obISelectDocumento               );
         $obFormulario->Incluir ('Documento', array ($obISelectDocumento),true);
     }
     
-    $obFormulario->addSpan          ( $obSpnDocumento          );    
+    $obFormulario->addSpan          ( $obSpnDocumento                   );    
 } else {
-    $obFormulario->addComponente ($obLblProcesso);
-    $obFormulario->addHidden     ($obHdnProcesso);
-    $obFormulario->addComponente ($obLblMapaCompra);
-    $obFormulario->addHidden     ($obHdnMapaCompra);
-    $obFormulario->addComponente ($obLblModalidade);
-    $obFormulario->agrupaComponentes(array($obRadioDeserta,$obRadioFracassada,$obRadioOutros));
-    $obFormulario->addComponente ($obTextAreaJustificativa);
-    $obFormulario->addSpan   ( $obSpnItens );
+    $obFormulario->addComponente    ( $obLblProcesso                    );
+    $obFormulario->addHidden        ( $obHdnProcesso                    );
+    $obFormulario->addComponente    ( $obLblMapaCompra                  );
+    $obFormulario->addHidden        ( $obHdnMapaCompra                  );
+    $obFormulario->addComponente    ( $obLblModalidade                  );
+    $obFormulario->agrupaComponentes( array($obRadioDeserta,$obRadioFracassada,$obRadioOutros) );
+    $obFormulario->addComponente    ( $obTextAreaJustificativa          );
+    $obFormulario->addSpan          ( $obSpnItens                       );
 }
 
 if ($stAcao == "alterar" || $stAcao == "anular") {

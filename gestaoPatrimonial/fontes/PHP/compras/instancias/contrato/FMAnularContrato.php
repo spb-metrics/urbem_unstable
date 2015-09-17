@@ -133,6 +133,12 @@ $obTxtDataAnulacao->setTitle('Informe a data da anulação.');
 $obTxtDataAnulacao->setName('stDataAnulacao');
 $obTxtDataAnulacao->setNull(false);
 
+$obTxtValorAnulacao = new Moeda;
+$obTxtValorAnulacao->setRotulo('Valor da Anulação');
+$obTxtValorAnulacao->setTitle('Informe o valor da anulação.');
+$obTxtValorAnulacao->setName('vlAnulacao');
+$obTxtValorAnulacao->setNull(false);
+
 $obTxtMotivo = new TextArea;
 $obTxtMotivo->setRotulo('Motivo');
 $obTxtMotivo->setTitle('Informe o motivo da anulação.');
@@ -156,6 +162,7 @@ $obFormulario->addComponente    ( $obLblNumeroLicitacao );
 $obFormulario->addComponente    ( $obLblFornecedor );
 $obFormulario->addComponente    ( $obLblDataAssinatura );
 $obFormulario->addComponente    ( $obLblValor );
+$obFormulario->addComponente    ( $obTxtValorAnulacao );
 $obFormulario->addComponente    ( $obTxtDataAnulacao );
 $obFormulario->addComponente    ( $obTxtMotivo );
 

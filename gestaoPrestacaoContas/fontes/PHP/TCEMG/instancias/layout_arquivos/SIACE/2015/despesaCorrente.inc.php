@@ -23,60 +23,58 @@
 */
 ?>
 <?php
-   /*
-    * Arquivo de geracao do arquivo sertTerceiros TCM/MG
-    * Data de Criação   : 29/01/2009
+/*
+ * Arquivo de geracao do arquivo sertTerceiros TCM/MG
+ * Data de Criação   : 29/01/2009
+ 
+ * @author Analista      Tonismar Régis Bernardo
+ * @author Desenvolvedor Lucas Andrades Mendes
+ 
+ * @package URBEM
+ * @subpackage
+ 
+ * @ignore
+ 
+ * $Id: despesaCorrente.inc.php 63311 2015-08-14 20:49:24Z franver $
+**/
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDespesaCorrente.class.php';
 
-    * @author Analista      Tonismar Régis Bernardo
-    * @author Desenvolvedor Lucas Andrades Mendes
+$arFiltros = Sessao::read('filtroRelatorio');
 
-    * @package URBEM
-    * @subpackage
+foreach ($arDatasInicialFinal as $stDatas) {
+    $obFTCEMGDespesaCorrente = new FTCEMGDespesaCorrente();
+    $obFTCEMGDespesaCorrente->setDado('exercicio'   , Sessao::read('exercicio'));
+    $obFTCEMGDespesaCorrente->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
+    $obFTCEMGDespesaCorrente->setDado('data_inicial', $stDatas['stDtInicial']);
+    $obFTCEMGDespesaCorrente->setDado('data_final'  , $stDatas['stDtFinal']);
 
-    * @ignore
+    $obFTCEMGDespesaCorrente->recuperaTodos($rsDespesaCorrente);
 
-    $Id: despesaCorrente.inc.php 62763 2015-06-16 18:34:47Z jean $
-    */
+    //DOTAÇÃO ANUAL INICIAL
+    $obExportador->roUltimoArquivo->addBloco($rsDespesaCorrente);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('periodo');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desppesencsoc');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivint');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivext');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despoutdespcor');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+}
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDespesaCorrente.class.php');
-
-    $arFiltros = Sessao::read('filtroRelatorio');
-
-    foreach ($arDatasInicialFinal as $stDatas) {
-        $obFTCEMGDespesaCorrente = new FTCEMGDespesaCorrente();
-        $obFTCEMGDespesaCorrente->setDado('exercicio'   , Sessao::read('exercicio'));
-        $obFTCEMGDespesaCorrente->setDado('cod_entidade', implode(',',$arFiltros['inCodEntidadeSelecionado']));
-        $obFTCEMGDespesaCorrente->setDado('data_inicial', $stDatas['stDtInicial']);
-        $obFTCEMGDespesaCorrente->setDado('data_final'  , $stDatas['stDtFinal']);
-    
-        $obFTCEMGDespesaCorrente->recuperaTodos($rsDespesaCorrente);
-        
-        //DOTAÇÃO ANUAL INICIAL
-
-        $obExportador->roUltimoArquivo->addBloco($rsDespesaCorrente);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('periodo');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('cod_tipo');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('desppesencsoc');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivint');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despjurdivext');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despoutdespcor');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    }
-    
 ?>

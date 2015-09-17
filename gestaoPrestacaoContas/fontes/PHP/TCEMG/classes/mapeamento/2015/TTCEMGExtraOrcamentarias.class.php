@@ -76,127 +76,129 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function recuperaExportacao10(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
-        return $this->executaRecupera("montaRecuperaExportacao10",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+      return $this->executaRecupera("montaRecuperaExportacao10",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
     }
 
     public function montaRecuperaExportacao10()
     {
-        $stSql = "  SELECT  tipo_registro
-                            , cod_plano AS cod_ext 
-                            , cod_orgao
-                            , cod_unidade
-                            , tipo_lancamento
-                            , sub_tipo
-                            , desdobra_sub_tipo                            
-                            , desc_extra_orc
-                            , '".$this->getDado('mes')."' as mes
-                            , '".$this->getDado('exercicio')."' as ano
-                    FROM (
-                        SELECT
-                                10 AS tipo_registro
-                                , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
-                                , LPAD((LPAD(''||configuracao_entidade.valor,2, '0')||LPAD(''||configuracao_entidade.cod_entidade,2, '0')), 5, '0') AS cod_unidade 
-                                , LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0') as tipo_lancamento
-                                , LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0') AS sub_tipo
-                                , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
-                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 3
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 4
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          ELSE ''
-                                     END
-                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
-                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          ELSE ''
-                                     END
-                                ELSE ''
-                                END AS desdobra_sub_tipo                                                            
-                              , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
-                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 3
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 4
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          ELSE plano_analitica.cod_plano::VARCHAR
-                                     END
-                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
-                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
-                                          ELSE plano_analitica.cod_plano::VARCHAR
-                                     END
-                                ELSE plano_analitica.cod_plano::VARCHAR
-                                END AS cod_plano
-                               , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
-                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN 'INSS'
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN 'RPPS'
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 3
-                                          THEN 'IRRF'
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 4
-                                          THEN 'ISSQN'
-                                          ELSE remove_acentos(plano_conta.nom_conta)
-                                     END
-                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
-                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
-                                          THEN 'Repasse à Câmara'
-                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
-                                          THEN 'Devolução de numerário para a prefeitura'
-                                          ELSE remove_acentos(plano_conta.nom_conta)
-                                     END
-                                ELSE remove_acentos(plano_conta.nom_conta)
-                                END AS desc_extra_orc
+      $stSql = "  SELECT  tipo_registro
+                        , cod_plano AS cod_ext 
+                        , cod_orgao
+                        , cod_unidade
+                        , tipo_lancamento
+                        , sub_tipo
+                        , desdobra_sub_tipo                            
+                        , desc_extra_orc
+                        , '".$this->getDado('mes')."' as mes
+                        , '".$this->getDado('exercicio')."' as ano
 
-                              
+                    FROM (
+                          SELECT 10 AS tipo_registro
+                               , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
+                               , LPAD((LPAD(''||configuracao_entidade.valor,2, '0')||LPAD(''||configuracao_entidade.cod_entidade,2, '0')), 5, '0') AS cod_unidade 
+                               , LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0') as tipo_lancamento
+                               , LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0') AS sub_tipo
+                               , CASE WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    ELSE ''
+                                              END
+                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                      THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                    ELSE ''
+                                              END
+                                      ELSE ''
+                               END AS desdobra_sub_tipo                                                            
+                              , CASE WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  ELSE plano_analitica.cod_plano::VARCHAR
+                                              END
+                                     WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                    THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                                  ELSE plano_analitica.cod_plano::VARCHAR
+                                          END
+                                     ELSE plano_analitica.cod_plano::VARCHAR
+                               END AS cod_plano
+                               , CASE WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                    THEN 'INSS'
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                    THEN 'RPPS'
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                                    THEN 'IRRF'
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                                    THEN 'ISSQN'
+                                                  ELSE remove_acentos(plano_conta.nom_conta)
+                                            END
+                                      WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                                    THEN 'Repasse à Câmara'
+                                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                                    THEN 'Devolução de numerário para a prefeitura'
+                                                  ELSE remove_acentos(plano_conta.nom_conta)
+                                            END
+                                      ELSE remove_acentos(plano_conta.nom_conta)
+                               END AS desc_extra_orc
+
                             FROM contabilidade.plano_analitica 
-                          
-                            LEFT JOIN tcemg.balancete_extmmaa
+
+                       LEFT JOIN tcemg.balancete_extmmaa
                               ON plano_analitica.cod_plano = balancete_extmmaa.cod_plano
                              AND plano_analitica.exercicio = balancete_extmmaa.exercicio
 
-                            JOIN contabilidade.plano_conta
-                                ON plano_analitica.exercicio = plano_conta.exercicio
-                                AND plano_analitica.cod_conta = plano_conta.cod_conta
-                            
-                            JOIN administracao.configuracao_entidade
+                      INNER JOIN contabilidade.plano_conta
+                              ON plano_analitica.exercicio = plano_conta.exercicio
+                             AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                      INNER JOIN administracao.configuracao_entidade
                               ON configuracao_entidade.cod_entidade IN (".$this->getDado('entidades').")
                              AND configuracao_entidade.exercicio = '".$this->getDado('exercicio')."'
                              AND configuracao_entidade.cod_modulo = 55
                              AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
                 
-                            JOIN tcemg.arquivo_ext
-                                ON plano_analitica.cod_plano = arquivo_ext.cod_plano
-                                AND plano_analitica.exercicio = arquivo_ext.exercicio
-                              
-                            WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
-                            AND arquivo_ext.mes = '".$this->getDado('mes')."'
+                      INNER JOIN tcemg.arquivo_ext
+                              ON plano_analitica.cod_plano = arquivo_ext.cod_plano
+                             AND plano_analitica.exercicio = arquivo_ext.exercicio
 
-                    ) AS resultado
-                    GROUP BY tipo_registro
-                            , cod_orgao
-                            , cod_unidade
-                            , tipo_lancamento
-                            , sub_tipo
-                            , desdobra_sub_tipo
-                            , cod_plano
-                            , desc_extra_orc
-                    ORDER BY  cod_plano
+                           WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+                             AND arquivo_ext.mes = '".$this->getDado('mes')."'
+
+                        ) AS resultado
+                GROUP BY tipo_registro
+                       , cod_orgao
+                       , cod_unidade
+                       , tipo_lancamento
+                       , sub_tipo
+                       , desdobra_sub_tipo
+                       , cod_plano
+                       , desc_extra_orc
+
+                ORDER BY  cod_plano
         ";
-        
+
         return $stSql;
+
     }
+
 
     public function recuperaExportacao20(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
@@ -212,7 +214,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         , sub_tipo
                         , cod_ext
                         , cod_font_recurso
-                        , SUM(vl_saldo_ant) as vl_saldo_ant
+                        , SUM(vl_saldo_anterior) as vl_saldo_ant
                         , SUM(vl_saldo_atual)AS vl_saldo_atual
                         , nat_saldo_anterior_fonte
                         , nat_saldo_atual_fonte
@@ -224,14 +226,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                     , tipo_lancamento
                                     , sub_tipo
                                     , cod_recurso AS cod_font_recurso
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
-                                           THEN(vl_saldo_anterior * -1)
-                                           ELSE vl_saldo_anterior
-                                      END AS vl_saldo_ant
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
-                                           THEN (vl_saldo_atual * -1)
-			                    ELSE vl_saldo_atual
-		                      END AS vl_saldo_atual
+                                    , vl_saldo_anterior
+                                    , vl_saldo_atual
                                     , nat_saldo_anterior_fonte
                                     , nat_saldo_atual_fonte
                             
@@ -706,18 +702,15 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
         $stSql = "  SELECT
                             23 AS tipo_registro
                             , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar AS cod_reduzido_op
-                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN
-                                                '99'
-                                        ELSE
-                                                pagamento_tipo_documento.cod_tipo_documento
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN '99'
+                                   ELSE pagamento_tipo_documento.cod_tipo_documento
                               END AS tipo_documento_op                            
                             , pagamento_tipo_documento.num_documento AS num_documento
                             , cod_ctb_transferencia.cod_ctb_anterior as cod_ctb
                             , COALESCE(plano_recurso.cod_recurso,'100') AS cod_fonte_ctb
-                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 OR pagamento_tipo_documento.cod_tipo_documento IS NULL THEN
-                                                tipo_documento.descricao
-                                        ELSE
-                                                ''
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 THEN 'Outros'
+                                   WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN 'Outros'
+                                   ELSE tipo_documento.descricao
                               END AS desctipodocumentoop
                             , TO_CHAR(transferencia.dt_autenticacao, 'ddmmyyyy') AS dt_emissao
                             , COALESCE(lote.vl_lancamento, 0.00) AS vl_documento

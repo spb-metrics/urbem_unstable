@@ -30,27 +30,16 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: OCGeraEmissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: OCGeraEmissao.php 63415 2015-08-25 21:17:03Z arthur $
 
   Caso de uso: uc-05.03.11
 **/
 
-/*
-$Log$
-Revision 1.4  2006/09/15 11:50:45  fabio
-corrigidas tags de caso de uso
-
-Revision 1.3  2006/09/15 11:08:04  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-$passo = $_REQUEST["passo"];
+$passo = $request->get('passo');
+
 if ($passo == 1) {
-    ;
     $stHTML .= " <html> \n";
     $stHTML .= " <head> \n";
     $stHTML .= " <script type=\"text/javascript\"> \n";
@@ -86,3 +75,5 @@ if ($passo == 1) {
 
     echo $buffer;
 }
+
+?>

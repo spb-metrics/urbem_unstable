@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62931 $
+    $Revision: 63153 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -88,14 +88,24 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   c.*      \n";
-    $stSql .= "         ,replace(c.cod_estrutural,'.','') as estrutural      \n";
-    $stSql .= "         ,''                               as cd_item_receita \n";
-    $stSql .= "         ,case when orcamento.fn_tipo_conta_receita(exercicio,cod_estrutural) = 'A' then '1' else '2' end as tipo_conta \n";
-    $stSql .= " FROM     orcamento.conta_receita as c \n";
-    $stSql .= " WHERE   c.exercicio='".$this->getDado('exercicio')."' \n";
-    $stSql .= " ORDER BY c.exercicio, c.cod_estrutural  \n";
+    $stSql .= " SELECT conta_receita.*      
+                      ,REPLACE(conta_receita.cod_estrutural,'.','') AS estrutural      
+                      ,REPLACE(conta_receita.cod_estrutural,'.','') AS cd_item_receita 
+                      ,CASE WHEN orcamento.fn_tipo_conta_receita(conta_receita.exercicio,conta_receita.cod_estrutural) = 'A' then '1' else '2' end AS tipo_conta
+                      ,1 AS tipo_registro
+                      ,".$this->getDado('unidade_gestora')." AS unidade_gestora
 
+                  FROM orcamento.conta_receita
+
+            INNER JOIN orcamento.receita
+                    ON receita.exercicio = conta_receita.exercicio
+                   AND receita.cod_conta = conta_receita.cod_conta
+
+                 WHERE conta_receita.exercicio = '".$this->getDado('exercicio')."'
+                   AND receita.cod_entidade IN (".$this->getDado('entidades').")
+
+              ORDER BY conta_receita.exercicio, conta_receita.cod_estrutural
+            ";
     return $stSql;
 }
 

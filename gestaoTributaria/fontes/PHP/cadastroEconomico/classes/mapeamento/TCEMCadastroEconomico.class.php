@@ -33,7 +33,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-    * $Id: TCEMCadastroEconomico.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TCEMCadastroEconomico.class.php 63376 2015-08-21 18:55:42Z arthur $
 
 * Casos de uso: uc-05.02.10
 */
@@ -194,134 +194,112 @@ function recuperaListaConsulta(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $bo
 
 function montaRecuperaListaConsulta()
 {
-    $stSQL  ="SELECT                                                               \n";
-    $stSQL .="    DISTINCT ON(CE.inscricao_economica )                             \n";
-    $stSQL .="    CE.inscricao_economica,                                          \n";
-    $stSQL .="    ACE.cod_atividade,                                               \n";
-    $stSQL .="    A.nom_atividade,                                                 \n";
-    $stSQL .="    COALESCE (                                                       \n";
-    $stSQL .="        A.cod_estrutural,                                            \n";
-    $stSQL .="        '&nbsp;'                                                     \n";
-    $stSQL .="    ) as cod_estrutural,                                             \n";
-    $stSQL .="    COALESCE (                                                       \n";
-    $stSQL .="        CEED.numcgm,                                                 \n";
-    $stSQL .="        CEEF.numcgm,                                                 \n";
-    $stSQL .="        CEA.numcgm                                                   \n";
-    $stSQL .="    ) as numcgm,                                                     \n";
-    $stSQL .="    CGM.nom_cgm,                                                     \n";
-    $stSQL .="    DF.inscricao_municipal,                                          \n";
-    $stSQL .="    EDNJ.cod_natureza,                                               \n";
-    $stSQL .="    CERC.numcgm as resp_contabil_cgm,                                \n";
-    $stSQL .="    CERC.sequencia as resp_contabil_sequencia,                       \n";
-    $stSQL .="    SOC.numcgm as cgm_socio,                                         \n";
-    $stSQL .="    to_char(BA.dt_inicio, 'dd/mm/yyyy') AS data_baixa,               \n";
-    $stSQL .="    to_char(BA.dt_termino, 'dd/mm/yyyy') AS data_reativacao,         \n";
-    $stSQL .="    el.cod_licenca,                                                  \n";
-    $stSQL .="    el.exercicio as licenca_exercicio,                               \n";
-    $stSQL .="     CASE                                                            \n";
-    $stSQL .="        WHEN (BA.dt_inicio IS NULL) OR (BA.dt_inicio IS NOT NULL AND BA.dt_termino IS NOT NULL) THEN 'Ativo'\n";
-    $stSQL .="        ELSE TBI.nom_tipo                                            \n";
-    $stSQL .="    END AS situacao                                                  \n";
-    $stSQL .="FROM                                                                 \n";
-    $stSQL .="    economico.cadastro_economico CE                                  \n";
-    $stSQL .="    LEFT JOIN(                                                       \n";
-    $stSQL .="        SELECT                                                       \n";
-    $stSQL .="            MAX(ocorrencia_atividade) AS ocorrencia_atividade        \n";
-    $stSQL .="            ,inscricao_economica                                     \n";
-    $stSQL .="        FROM                                                         \n";
-    $stSQL .="            economico.atividade_cadastro_economico                   \n";
-    $stSQL .="        WHERE                                                        \n";
-    $stSQL .="            principal = TRUE                                         \n";
-    $stSQL .="        GROUP BY                                                     \n";
-    $stSQL .="            inscricao_economica                                      \n";
-    $stSQL .="        ) ACE_MAX                                                    \n";
-    $stSQL .="    ON                                                               \n";
-    $stSQL .="        CE.inscricao_economica = ACE_MAX.inscricao_economica         \n";
-    $stSQL .="    LEFT JOIN                                                        \n";
-    $stSQL .="        economico.atividade_cadastro_economico AS ACE                \n";
-    $stSQL .="    ON                                                               \n";
-    $stSQL .="        ACE.ocorrencia_atividade = ACE_MAX.ocorrencia_atividade AND  \n";
-    $stSQL .="        ACE.inscricao_economica = ACE_MAX.inscricao_economica AND    \n";
-    $stSQL .="        ACE.inscricao_economica = CE.inscricao_economica             \n";
-    $stSQL .="                                                                     \n";
-    $stSQL .="    LEFT JOIN economico.licenca_atividade ela  ON                    \n";
-    $stSQL .="       ACE.ocorrencia_atividade = ela.ocorrencia_atividade AND       \n";
-    $stSQL .="       ACE.inscricao_economica =  ela.inscricao_economica AND        \n";
-    $stSQL .="       ACE.cod_atividade = ela.cod_atividade                         \n";
-    $stSQL .="                                                                     \n";
-    $stSQL .="    LEFT JOIN economico.licenca_especial ele  ON                     \n";
-    $stSQL .="       ACE.ocorrencia_atividade = ele.ocorrencia_atividade AND       \n";
-    $stSQL .="       ACE.inscricao_economica =  ele.inscricao_economica AND        \n";
-    $stSQL .="       ACE.cod_atividade =        ele.cod_atividade                  \n";
-    $stSQL .="    LEFT JOIN economico.licenca el  ON                               \n";
-    $stSQL .="        ela.cod_licenca = el.cod_licenca OR                          \n";
-    $stSQL .="        ele.cod_licenca = el.cod_licenca                             \n";
-    $stSQL .="    LEFT JOIN economico.atividade A ON                               \n";
-    $stSQL .="        A.cod_atividade = ACE.cod_atividade                          \n";
-    $stSQL .="    LEFT JOIN economico.cadastro_economico_empresa_direito CEED ON   \n";
-    $stSQL .="        CEED.inscricao_economica = CE.inscricao_economica            \n";
-    $stSQL .="    LEFT JOIN economico.cadastro_economico_empresa_fato CEEF ON      \n";
-    $stSQL .="        CEEF.inscricao_economica = CE.inscricao_economica            \n";
-    $stSQL .="    LEFT JOIN economico.cadastro_economico_autonomo CEA ON           \n";
-    $stSQL .="        CEA.inscricao_economica = CE.inscricao_economica             \n";
-    $stSQL .="    LEFT JOIN                                                        \n";
-    $stSQL .="        (SELECT                                                      \n";
-    $stSQL .="            MAX(timestamp) AS timestamp                              \n";
-    $stSQL .="            ,inscricao_economica                                     \n";
-    $stSQL .="         FROM                                                        \n";
-    $stSQL .="             economico.domicilio_fiscal                              \n";
-    $stSQL .="         GROUP BY                                                    \n";
-    $stSQL .="            inscricao_economica                                      \n";
-    $stSQL .="        ) AS DF_MAX                                                  \n";
-    $stSQL .="    ON                                                               \n";
-    $stSQL .="        DF_MAX.inscricao_economica = CE.inscricao_economica          \n";
-    $stSQL .="    LEFT JOIN                                                        \n";
-    $stSQL .="        economico.domicilio_fiscal AS DF                             \n";
-    $stSQL .="    ON                                                               \n";
-    $stSQL .="        DF.timestamp = DF_MAX.timestamp AND                          \n";
-    $stSQL .="        DF.inscricao_economica = DF_MAX.inscricao_economica AND      \n";
-    $stSQL .="        DF.inscricao_economica = CE.inscricao_economica              \n";
-    $stSQL .="                                                                     \n";
-    $stSQL .="    LEFT JOIN economico.empresa_direito_natureza_juridica EDNJ ON    \n";
-    $stSQL .="        EDNJ.inscricao_economica = CEED.inscricao_economica          \n";
-    $stSQL .="    LEFT JOIN economico.sociedade SOC ON                             \n";
-    $stSQL .="        SOC.inscricao_economica = CEED.inscricao_economica           \n";
-    $stSQL .="    LEFT JOIN                                                        \n";
-    $stSQL .="        (                                                            \n";
-    $stSQL .="        SELECT                                                       \n";
-    $stSQL .="            tmp.*                                                    \n";
-    $stSQL .="        FROM                                                         \n";
-    $stSQL .="            economico.cadastro_econ_resp_contabil AS tmp             \n";
-    $stSQL .="        INNER JOIN                                                   \n";
-    $stSQL .="            (                                                        \n";
-    $stSQL .="                SELECT                                               \n";
-    $stSQL .="                    max( timestamp) AS timestamp,                    \n";
-    $stSQL .="                    inscricao_economica                              \n";
-    $stSQL .="                FROM                                                 \n";
-    $stSQL .="                    economico.cadastro_econ_resp_contabil            \n";
-    $stSQL .="                GROUP BY                                             \n";
-    $stSQL .="                    inscricao_economica                              \n";
-    $stSQL .="            )AS tmp2                                                 \n";
-    $stSQL .="        ON                                                           \n";
-    $stSQL .="            tmp2.timestamp = tmp.timestamp                           \n";
-    $stSQL .="            AND tmp2.inscricao_economica = tmp.inscricao_economica   \n";
-    $stSQL .="        ) AS CERC ON                                                 \n";
-    $stSQL .="        CERC.inscricao_economica = CE.inscricao_economica            \n";
-    $stSQL .="    LEFT JOIN economico.baixa_cadastro_economico BA ON               \n";
-    $stSQL .="        BA.inscricao_economica = CE.inscricao_economica              \n";
-    $stSQL .="    LEFT JOIN economico.tipo_baixa_inscricao TBI ON                  \n";
-    $stSQL .="            TBI.cod_tipo = BA.cod_tipo                               \n";
-    $stSQL .="    ,sw_cgm AS CGM                                                   \n";
-    $stSQL .="    LEFT JOIN sw_cgm_pessoa_juridica AS CGMPJ ON                     \n";
-    $stSQL .="        CGMPJ.numcgm = CGM.numcgm                                    \n";
-    $stSQL .="    LEFT JOIN sw_cgm_pessoa_fisica AS CGMPF ON                       \n";
-    $stSQL .="        CGMPF.numcgm = CGM.numcgm                                    \n";
-    $stSQL .="WHERE                                                                \n";
-    $stSQL .="    COALESCE (                                                       \n";
-    $stSQL .="        CEED.numcgm,                                                 \n";
-    $stSQL .="        CEEF.numcgm,                                                 \n";
-    $stSQL .="        CEA.numcgm                                                   \n";
-    $stSQL .="    ) = cgm.numcgm                                                   \n";
+    $stSQL  ="SELECT DISTINCT ON(CE.inscricao_economica )                            
+                     CE.inscricao_economica                                         
+                   , ACE.cod_atividade                                              
+                   , A.nom_atividade        
+                   , COALESCE ( A.cod_estrutural, '&nbsp;') AS cod_estrutural
+                   , COALESCE ( CEED.numcgm, CEEF.numcgm, CEA.numcgm ) AS numcgm
+                   , CGM.nom_cgm
+                   , DF.inscricao_municipal
+                   , EDNJ.cod_natureza
+                   , CERC.numcgm as resp_contabil_cgm
+                   , CERC.sequencia as resp_contabil_sequencia
+                   , SOC.numcgm as cgm_socio
+                   , to_char(BA.dt_inicio, 'dd/mm/yyyy') AS data_baixa
+                   , to_char(BA.dt_termino, 'dd/mm/yyyy') AS data_reativacao
+                   , el.cod_licenca         
+                   , el.exercicio AS licenca_exercicio
+                   , CASE WHEN (BA.dt_inicio IS NULL) OR (BA.dt_inicio IS NOT NULL AND BA.dt_termino IS NOT NULL)
+                           THEN 'Ativo'
+                           ELSE TBI.nom_tipo                                            
+                     END AS situacao                                                  
+                
+                FROM economico.cadastro_economico CE                                  
+           
+           LEFT JOIN ( SELECT MAX(ocorrencia_atividade) AS ocorrencia_atividade        
+                            , inscricao_economica                                     
+                        FROM economico.atividade_cadastro_economico                   
+                       WHERE principal = TRUE                                         
+                    GROUP BY inscricao_economica                                      
+                    ) ACE_MAX                                                    
+                  ON CE.inscricao_economica = ACE_MAX.inscricao_economica
+                  
+           LEFT JOIN economico.atividade_cadastro_economico AS ACE                
+                  ON ACE.ocorrencia_atividade = ACE_MAX.ocorrencia_atividade
+                 AND ACE.inscricao_economica = ACE_MAX.inscricao_economica
+                 AND ACE.inscricao_economica = CE.inscricao_economica             
+                                                                                    
+           LEFT JOIN economico.licenca_atividade ela
+                  ON ACE.ocorrencia_atividade = ela.ocorrencia_atividade
+                 AND ACE.inscricao_economica =  ela.inscricao_economica
+                 AND ACE.cod_atividade = ela.cod_atividade                         
+                                                                                   
+           LEFT JOIN economico.licenca_especial ele
+                  ON ACE.ocorrencia_atividade = ele.ocorrencia_atividade
+                 AND ACE.inscricao_economica  = ele.inscricao_economica
+                 AND ACE.cod_atividade        = ele.cod_atividade                  
+           
+           LEFT JOIN economico.licenca el
+                  ON ela.cod_licenca = el.cod_licenca
+                  OR ele.cod_licenca = el.cod_licenca                             
+           
+           LEFT JOIN economico.atividade A
+                  ON A.cod_atividade = ACE.cod_atividade                          
+           
+           LEFT JOIN economico.cadastro_economico_empresa_direito CEED
+                  ON CEED.inscricao_economica = CE.inscricao_economica            
+           
+           LEFT JOIN economico.cadastro_economico_empresa_fato CEEF
+                  ON CEEF.inscricao_economica = CE.inscricao_economica            
+           
+           LEFT JOIN economico.cadastro_economico_autonomo CEA
+                  ON CEA.inscricao_economica = CE.inscricao_economica             
+           
+           LEFT JOIN ( SELECT MAX(timestamp) AS timestamp                              
+                            , inscricao_economica                                     
+                        FROM economico.domicilio_fiscal                              
+                    GROUP BY inscricao_economica                                      
+                    ) AS DF_MAX                                                  
+                  ON DF_MAX.inscricao_economica = CE.inscricao_economica          
+           
+           LEFT JOIN economico.domicilio_fiscal AS DF                             
+                  ON DF.timestamp           = DF_MAX.timestamp
+                 AND DF.inscricao_economica = DF_MAX.inscricao_economica
+                 AND DF.inscricao_economica = CE.inscricao_economica              
+
+           LEFT JOIN economico.empresa_direito_natureza_juridica EDNJ
+                  ON EDNJ.inscricao_economica = CEED.inscricao_economica         
+           
+           LEFT JOIN economico.sociedade SOC
+                  ON SOC.inscricao_economica = CEED.inscricao_economica          
+           
+           LEFT JOIN (  SELECT tmp.*                                                   
+                          FROM economico.cadastro_econ_resp_contabil AS tmp            
+                    INNER JOIN ( SELECT max( timestamp) AS timestamp
+                                      , inscricao_economica                             
+                                   FROM economico.cadastro_econ_resp_contabil           
+                               GROUP BY inscricao_economica                             
+                            )AS tmp2                                                
+                           ON tmp2.timestamp           = tmp.timestamp                          
+                          AND tmp2.inscricao_economica = tmp.inscricao_economica  
+                    ) AS CERC
+                   ON CERC.inscricao_economica = CE.inscricao_economica           
+            
+            LEFT JOIN economico.baixa_cadastro_economico BA
+                   ON BA.inscricao_economica = CE.inscricao_economica             
+            
+            LEFT JOIN economico.tipo_baixa_inscricao TBI
+                   ON TBI.cod_tipo = BA.cod_tipo                              
+                    , sw_cgm AS CGM                                                  
+            
+            LEFT JOIN sw_cgm_pessoa_juridica AS CGMPJ
+                   ON CGMPJ.numcgm = CGM.numcgm                                   
+            
+            LEFT JOIN sw_cgm_pessoa_fisica AS CGMPF
+                   ON CGMPF.numcgm = CGM.numcgm                                   
+                
+                WHERE COALESCE ( CEED.numcgm, CEEF.numcgm, CEA.numcgm ) = cgm.numcgm  \n";
 
     return $stSQL;
 }
@@ -397,54 +375,85 @@ function montaRecuperaConsulta()
              , DI.caixa_postal
              , DF.inscricao_municipal
           FROM economico.cadastro_economico CE
+          
      LEFT JOIN economico.atividade_cadastro_economico ACE
             ON CE.inscricao_economica = ACE.inscricao_economica
            AND ACE.principal = TRUE
+           
      LEFT JOIN economico.atividade A
             ON A.cod_atividade = ACE.cod_atividade
+            
      LEFT JOIN economico.cadastro_economico_empresa_direito CEED
             ON CEED.inscricao_economica = CE.inscricao_economica
+            
      LEFT JOIN economico.cadastro_economico_empresa_fato CEEF
             ON CEEF.inscricao_economica = CE.inscricao_economica
+            
      LEFT JOIN economico.cadastro_economico_autonomo CEA
             ON CEA.inscricao_economica = CE.inscricao_economica
+            
      LEFT JOIN economico.categoria CA
             ON CA.cod_categoria = CEED.cod_categoria
+            
      LEFT JOIN economico.empresa_direito_natureza_juridica EDNJ
             ON EDNJ.inscricao_economica = CEED.inscricao_economica
+            
      LEFT JOIN economico.natureza_juridica NJ
             ON NJ.cod_natureza = EDNJ.cod_natureza
+     
      LEFT JOIN economico.domicilio_informado DI
             ON DI.inscricao_economica = CE.inscricao_economica
-     LEFT JOIN economico.domicilio_fiscal DF
-            ON DF.inscricao_economica = CE.inscricao_economica
+     
+     LEFT JOIN ( SELECT MAX(timestamp) AS timestamp                              
+                      , inscricao_economica                                     
+                   FROM economico.domicilio_fiscal                              
+               GROUP BY inscricao_economica                                      
+              ) AS DF_MAX
+           ON DF_MAX.inscricao_economica = CE.inscricao_economica          
+    
+    LEFT JOIN economico.domicilio_fiscal AS DF                             
+           ON DF.timestamp           = DF_MAX.timestamp
+          AND DF.inscricao_economica = DF_MAX.inscricao_economica
+          AND DF.inscricao_economica = CE.inscricao_economica 
+     
      LEFT JOIN economico.sociedade S
             ON S.inscricao_economica = CE.inscricao_economica
+     
      LEFT JOIN imobiliario.imovel I
             ON I.inscricao_municipal = DF.inscricao_municipal
+     
      LEFT JOIN imobiliario.imovel_confrontacao IC
             ON IC.inscricao_municipal = I.inscricao_municipal
+     
      LEFT JOIN imobiliario.confrontacao_trecho CT
             ON CT.cod_confrontacao = IC.cod_confrontacao
-           AND CT.cod_lote = IC.cod_lote
-           AND CT.principal = true
+           AND CT.cod_lote         = IC.cod_lote
+           AND CT.principal        = true
+     
      LEFT JOIN sw_uf UF
             ON UF.cod_uf = DI.cod_uf
+     
      LEFT JOIN sw_municipio MU
             ON MU.cod_municipio = DI.cod_municipio
-           AND MU.cod_uf = DI.cod_uf
+           AND MU.cod_uf        = DI.cod_uf
+     
      LEFT JOIN sw_bairro BAI
-            ON BAI.cod_bairro = DI.cod_bairro
-           AND BAI.cod_uf = DI.cod_uf
+            ON BAI.cod_bairro    = DI.cod_bairro
+           AND BAI.cod_uf        = DI.cod_uf
            AND BAI.cod_municipio = DI.cod_municipio
+     
      LEFT JOIN sw_nome_logradouro NL
             ON NL.cod_logradouro = CT.cod_logradouro
+     
      LEFT JOIN sw_tipo_logradouro TL
             ON TL.cod_tipo = NL.cod_tipo
+     
      LEFT JOIN sw_nome_logradouro NL2
             ON NL2.cod_logradouro = DI.cod_logradouro
+     
      LEFT JOIN sw_tipo_logradouro TL2
             ON TL2.cod_tipo = NL2.cod_tipo
+     
      LEFT JOIN ( SELECT tmp.*
                    FROM economico.baixa_cadastro_economico AS tmp
              INNER JOIN ( SELECT MAX(timestamp) as timestamp
@@ -457,10 +466,13 @@ function montaRecuperaConsulta()
                ) AS BA
             ON BA.inscricao_economica = CE.inscricao_economica
              , sw_cgm AS CGM
+     
      LEFT JOIN sw_cgm_pessoa_fisica AS CGMPF
             ON CGMPF.numcgm = CGM.numcgm
+     
      LEFT JOIN sw_cgm_pessoa_juridica AS CGMPJ
             ON CGMPJ.numcgm = CGM.numcgm
+            
          WHERE COALESCE ( CEED.numcgm, CEEF.numcgm, CEA.numcgm ) = cgm.numcgm ";
 
     return $stSql;

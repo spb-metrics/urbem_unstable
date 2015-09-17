@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63087 $
+    $Revision: 63250 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,42 +41,22 @@
     * Casos de uso: uc-06.05.00
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/02 18:17:17  hboaventura
-inclusão do caso de uso uc-06.05.00
-
-Revision 1.1  2007/07/22 20:21:25  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
 
-/**
-  *
-  * Data de Criação: 22/07/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAMovimentoContabil extends TContabilidadePlanoConta
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TTBAMovimentoContabil()
+public function __construct()
 {
-    parent::TContabilidadePlanoConta();
-
-    $this->setDado('exercicio', Sessao::getExercicio() );
+    parent::__construct();
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -89,91 +69,124 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+public function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   exercicio                                         
-             , cod_estrutural                                              
-             , tipo_mov                                                    
-             , mes                                                         
-             , abs(sum(valor_credito)) as vl_credito                       
-             , abs(sum(valor_debito))  as vl_debito                        
-             , row_number() over (order by cod_estrutural ) AS nu_sequencial_tc 
-
-     FROM (                                                           
-         SELECT   pc.exercicio                                        
-                , pc.cod_estrutural                                   
-                , case when vl.tipo='I' then 1 else 3 end as tipo_mov 
-                , to_char(lo.dt_lote,'mm') as mes                     
-                , sum(vl.vl_lancamento) as valor_credito              
-                , 0.00 as valor_debito                                
-         FROM     contabilidade.plano_conta      as pc                
-                , contabilidade.plano_analitica  as pa                
-                , contabilidade.conta_credito    as co                
-                , contabilidade.valor_lancamento as vl                
-                , contabilidade.lote             as lo                
-          WHERE pc.exercicio    = pa.exercicio                       
-            AND pc.cod_conta    = pa.cod_conta                       
-            AND pa.exercicio    = co.exercicio                       
-            AND pa.cod_plano    = co.cod_plano                       
-            AND co.exercicio    = vl.exercicio                       
-            AND co.cod_entidade = vl.cod_entidade                    
-            AND co.cod_lote     = vl.cod_lote                        
-            AND co.tipo         = vl.tipo                            
-            AND co.tipo_valor   = vl.tipo_valor                      
-            AND co.sequencia    = vl.sequencia                       
-            AND vl.exercicio    = lo.exercicio                       
-            AND vl.cod_entidade = lo.cod_entidade                    
-            AND vl.tipo         = lo.tipo                            
-            AND vl.cod_lote     = lo.cod_lote                        
-            AND pc.exercicio='".$this->getDado('exercicio')."' \n";
-         
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     vl.cod_entidade IN (".$this->getDado('stEntidades').") \n";
-    }
-    
-    
-    $stSql .= " GROUP BY pc.exercicio, pc.cod_estrutural, vl.tipo, to_char(lo.dt_lote,'mm')
-                                                                                        
-                UNION                                                                      
-                                                                                        
-                SELECT   pc.exercicio                                                      
-                        ,pc.cod_estrutural                                                 
-                        ,case when vl.tipo='I' then 1 else 3 end as tipo_mov               
-                        ,to_char(lo.dt_lote,'mm') as mes                                   
-                        ,0.00 as valor_credito                                             
-                        ,sum(vl.vl_lancamento) as valor_debito                             
-                FROM     contabilidade.plano_conta      as pc                              
-                        ,contabilidade.plano_analitica  as pa                              
-                        ,contabilidade.conta_debito     as co                              
-                        ,contabilidade.valor_lancamento as vl                              
-                        ,contabilidade.lote             as lo                              
-                WHERE   pc.exercicio    = pa.exercicio                                     
-                AND     pc.cod_conta    = pa.cod_conta                                     
-                AND     pa.exercicio    = co.exercicio                                     
-                AND     pa.cod_plano    = co.cod_plano                                     
-                AND     co.exercicio    = vl.exercicio                                     
-                AND     co.cod_entidade = vl.cod_entidade                                  
-                AND     co.cod_lote     = vl.cod_lote                                      
-                AND     co.tipo         = vl.tipo                                          
-                AND     co.tipo_valor   = vl.tipo_valor                                    
-                AND     co.sequencia    = vl.sequencia                                     
-                AND     vl.exercicio    = lo.exercicio                                     
-                AND     vl.cod_entidade = lo.cod_entidade                                  
-                AND     vl.tipo         = lo.tipo                                          
-                AND     vl.cod_lote     = lo.cod_lote                                      
-                AND     pc.exercicio='".$this->getDado('exercicio')."' \n";
-                
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     vl.cod_entidade IN (".$this->getDado('stEntidades').") \n";
-    }
-    
-    $stSql .= "     GROUP BY pc.exercicio, pc.cod_estrutural, vl.tipo, to_char(lo.dt_lote,'mm')
-                 ) as tabela                                                                    
+    $stSql = " SELECT 1 AS tipo_registro
+                    , ".$this->getDado('inCodGestora')." AS unidade_gestora
+                    , exercicio                                         
+                    , cod_estrutural                                              
+                    , tipo_mov                                                    
+                    , competencia                                                         
+                    , ABS(SUM(valor_credito)) AS vl_credito                       
+                    , ABS(SUM(valor_debito))  AS vl_debito                        
+                    , ROW_NUMBER() OVER (ORDER BY cod_estrutural) AS nu_sequencial_tc 
+                 FROM (
                  
-                 GROUP BY exercicio, cod_estrutural, tipo_mov, mes                              
-                 ORDER BY exercicio, cod_estrutural, tipo_mov, mes \n";
+                       SELECT plano_conta.exercicio                                        
+                            , plano_conta.cod_estrutural                                   
+                            , CASE WHEN valor_lancamento.tipo = 'I'
+                                   THEN 1
+                                   ELSE 3
+                              END AS tipo_mov 
+                            , TO_CHAR(lote.dt_lote,'YYYYMM') AS competencia
+                            , SUM(valor_lancamento.vl_lancamento) AS valor_credito              
+                            , 0.00 AS valor_debito                                
+                     
+                        FROM contabilidade.plano_conta
+                      
+                  INNER JOIN contabilidade.plano_analitica
+                          ON plano_conta.exercicio = plano_analitica.exercicio                       
+                         AND plano_conta.cod_conta = plano_analitica.cod_conta                       
+                        
+                 INNER JOIN contabilidade.conta_credito
+                         ON plano_analitica.exercicio = conta_credito.exercicio                       
+                        AND plano_analitica.cod_plano = conta_credito.cod_plano                       
+                        
+                 INNER JOIN contabilidade.valor_lancamento
+                         ON conta_credito.exercicio    = valor_lancamento.exercicio                       
+                        AND conta_credito.cod_entidade = valor_lancamento.cod_entidade                    
+                        AND conta_credito.cod_lote     = valor_lancamento.cod_lote                        
+                        AND conta_credito.tipo         = valor_lancamento.tipo                            
+                        AND conta_credito.tipo_valor   = valor_lancamento.tipo_valor                      
+                        AND conta_credito.sequencia    = valor_lancamento.sequencia                       
+                        
+                 INNER JOIN contabilidade.lote
+                         ON valor_lancamento.exercicio    = lote.exercicio                       
+                        AND valor_lancamento.cod_entidade = lote.cod_entidade                    
+                        AND valor_lancamento.tipo         = lote.tipo                            
+                        AND valor_lancamento.cod_lote     = lote.cod_lote                        
+                        
+                      WHERE plano_conta.exercicio = '".$this->getDado('stExercicio')."'  
+                        AND valor_lancamento.cod_entidade IN (".$this->getDado('stEntidades').")
+                        AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('DtInicio')."', 'DD/MM/YYYY') 
+                                             AND TO_DATE('".$this->getDado('DtFim')."', 'DD/MM/YYYY')
+                   
+                   GROUP BY plano_conta.exercicio
+                          , plano_conta.cod_estrutural
+                          , valor_lancamento.tipo
+                          , TO_CHAR(lote.dt_lote , 'YYYYMM')
+            
+                UNION                                                                      
+            
+                    SELECT plano_conta.exercicio                                                      
+                         , plano_conta.cod_estrutural                                                 
+                         , CASE WHEN valor_lancamento.tipo = 'I'
+                                THEN 1
+                                ELSE 3
+                           END AS tipo_mov               
+                         , TO_CHAR(lote.dt_lote,'YYYYMM') AS competencia
+                         , 0.00 AS valor_credito                                             
+                         , SUM(valor_lancamento.vl_lancamento) AS valor_debito                             
+                     
+                     FROM  contabilidade.plano_conta
+            
+                     
+                INNER JOIN contabilidade.plano_analitica
+                        ON plano_conta.exercicio    = plano_analitica.exercicio                                     
+                       AND plano_conta.cod_conta    = plano_analitica.cod_conta                                     
+                       
+                INNER JOIN contabilidade.conta_debito
+                        ON plano_analitica.exercicio    = conta_debito.exercicio                                     
+                       AND plano_analitica.cod_plano    = conta_debito.cod_plano                                     
+                       
+                INNER JOIN contabilidade.valor_lancamento
+                        ON conta_debito.exercicio    = valor_lancamento.exercicio                                     
+                       AND conta_debito.cod_entidade = valor_lancamento.cod_entidade                                  
+                       AND conta_debito.cod_lote     = valor_lancamento.cod_lote                                      
+                       AND conta_debito.tipo         = valor_lancamento.tipo                                          
+                       AND conta_debito.tipo_valor   = valor_lancamento.tipo_valor                                    
+                       AND conta_debito.sequencia    = valor_lancamento.sequencia                                     
+                       
+                INNER JOIN contabilidade.lote
+                        ON valor_lancamento.exercicio    = lote.exercicio                                     
+                       AND valor_lancamento.cod_entidade = lote.cod_entidade                                  
+                       AND valor_lancamento.tipo         = lote.tipo                                          
+                       AND valor_lancamento.cod_lote     = lote.cod_lote                                      
+                       
+                     WHERE plano_conta.exercicio = '".$this->getDado('stExercicio')."' 
+                       AND valor_lancamento.cod_entidade IN (".$this->getDado('stEntidades').") 
+                       AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('DtInicio')."', 'DD/MM/YYYY') 
+                                            AND TO_DATE('".$this->getDado('DtFim')."', 'DD/MM/YYYY')
+                  
+                  GROUP BY plano_conta.exercicio
+                         , plano_conta.cod_estrutural
+                         , valor_lancamento.tipo
+                         , TO_CHAR(lote.dt_lote,'YYYYMM')
+                         
+                ) AS tabela                                                                    
+                             
+            GROUP BY exercicio
+                   , cod_estrutural
+                   , tipo_mov
+                   , competencia                              
+            ORDER BY exercicio
+                   , cod_estrutural
+                   , tipo_mov
+                   , competencia ";
 
     return $stSql;
 }
 
 }
+
+?>

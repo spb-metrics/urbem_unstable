@@ -43,19 +43,6 @@
     * Casos de uso: uc-02.01.19
 */
 
-/*
-$Log$
-Revision 1.11  2006/10/06 18:16:38  cako
-Bug #7027#
-
-Revision 1.10  2006/07/12 12:11:14  anasilvia
-Bug #5139#
-
-Revision 1.9  2006/07/05 20:42:02  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
@@ -137,4 +124,46 @@ function montaConsultaValorConta()
     return $stSql;
 }
 
+
+function consultaLancamentoAnterior(&$rsRecordSet, $stFiltro = "", $stGroup = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaConsultaLancamentoAnterior().$stFiltro.$stGroup.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
+
+function montaConsultaLancamentoAnterior()
+{
+
+    $stSql = "  SELECT coalesce(SUM(tabela.vl_arrecadado),0.00) AS vl_arrecadado
+                     , tabela.cod_receita
+                     , tabela.cod_estrutural
+                     , REPLACE(publico.fn_mascarareduzida(tabela.cod_estrutural),'.','') as ordem_estrutural
+                  FROM (SELECT conta_receita.cod_estrutural
+                             , receita.cod_receita                                                                                       
+                             , (orcamento.fn_receita_realizada_periodo( orcamento.conta_receita.exercicio                                 
+                                                                      , cast(orcamento.receita.cod_entidade as varchar)                    
+                                                                      , orcamento.receita.cod_receita                                      
+                                                                      , '01/01/'||orcamento.conta_receita.exercicio                        
+                                                                      , TO_CHAR( now(), 'dd/mm/' )||orcamento.conta_receita.exercicio) *-1 
+                                                                     ) AS vl_arrecadado                                                  
+                          FROM orcamento.conta_receita                                                                                   
+                             
+                    INNER JOIN orcamento.receita                                                                                         
+                            ON conta_receita.cod_conta = receita.cod_conta                                                               
+                           AND conta_receita.exercicio = receita.exercicio                                                               
+                         
+                         WHERE receita.exercicio = '".$this->getDado("exercicio")."'
+                       ) AS tabela ";
+    
+    return $stSql;
+}
+
+}
+
+?>

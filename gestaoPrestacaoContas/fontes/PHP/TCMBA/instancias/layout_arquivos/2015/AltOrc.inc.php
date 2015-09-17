@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63123 $
+    $Revision: 63264 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -42,13 +42,13 @@
 */
 
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAAltOrc.class.php" );
-    $obTMapeamento = new TTBAAltOrc();
-    $obTMapeamento->setDado('mes'      , $inMes );
-    $obTMapeamento->setDado('entidades', $stEntidades );
-    $obTMapeamento->setDado('unidade_gestora', $inCodUnidadeGestora );
-    $obTMapeamento->setDado('dt_inicial', $stDataInicial );
-    $obTMapeamento->setDado('dt_final', $stDataFinal );
-    $obTMapeamento->recuperaDadosTribunal($rsRecordSet);
+    $obTTBAAltOrc = new TTBAAltOrc();
+    $obTTBAAltOrc->setDado('mes'      , $inMes );
+    $obTTBAAltOrc->setDado('entidades', $stEntidades );
+    $obTTBAAltOrc->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTBAAltOrc->setDado('dt_inicial', $stDataInicial );
+    $obTTBAAltOrc->setDado('dt_final', $stDataFinal );
+    $obTTBAAltOrc->recuperaDadosTribunal($rsRecordSet);
 
     $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");

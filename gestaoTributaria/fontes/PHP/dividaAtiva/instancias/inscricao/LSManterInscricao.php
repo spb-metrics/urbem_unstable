@@ -30,13 +30,13 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Diego Bueno Coelho
 
-    * $Id: LSManterInscricao.php 61352 2015-01-09 18:14:18Z evandro $
+    * $Id: LSManterInscricao.php 63376 2015-08-21 18:55:42Z arthur $
 
   Caso de uso: uc-05.04.02
 **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';# include_once ( "../../../../../../config.php" );
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
 
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATModalidade.class.php" );
 include_once ( CAM_GT_DAT_MAPEAMENTO."TDATModalidadeAcrescimo.class.php" );
@@ -157,9 +157,6 @@ $timestamp_modalidade	= $rsModalidade->getCampo ('timestamp');
 $dtVigenciaInicial		= $rsModalidade->getCampo ('vigencia_inicial');
 $inCodDocumento			= $rsModalidade->getCampo ('cod_documento');
 $inCodTipoDocumento		= $rsModalidade->getCampo ('cod_tipo_documento');
-
-//echo '<h2>MODALIDADE</h2>';
-//sistemaLegado::mostravar ( $rsModalidade );
 
 /* DADOS PARA INSCRICAO */
 if (!$_REQUEST['inCodAutoridade']) {
@@ -366,8 +363,6 @@ if ($countListagemDivida  > 0) {
     $stHTML = str_replace( "'","\\'",$stHTML );
     $obSpnTotalizador->setValue ($stHTML);
 }
-
-//echo "<br>Uso de Memoria oculto: <b>".round((memory_get_usage()/1024)/1024)." MB</b>";
 
 $obHdnCGM = new Hidden;
 $obHdnCGM->setName 	("inNumCGM");

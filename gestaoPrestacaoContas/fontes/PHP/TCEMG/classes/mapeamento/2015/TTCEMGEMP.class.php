@@ -119,13 +119,12 @@ class TTCEMGEMP extends Persistente
                     AS codprograma
                     , (LPAD(''||acao.num_acao,4, '0')) AS idacao
                     , ''::TEXT AS idsubacao
-                    , (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) AS naturezadespesa
-                    --, SUBSTR(REPLACE(OCD.cod_estrutural, '.', ''),7,2) AS subelemento
-                    
+                    , (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) AS naturezadespesa                    
                     , CASE WHEN (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '339031' OR
                                 (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '329091' OR
                                 (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '339049' OR
-                                (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '339041'
+                                (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '339041' OR
+                                (LPAD(''||REPLACE(OCD.cod_estrutural, '.', ''),6, '')) = '336041'
                            THEN '00'
                            ELSE
                                SUBSTR(REPLACE(OCD.cod_estrutural, '.', ''),7,2)	
@@ -209,123 +208,119 @@ class TTCEMGEMP extends Persistente
                         END
                     AS dataassinaturaconvenio
                     
-                    
                     ,   CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                 1
-                        ELSE
-                            CASE WHEN C_CD.cod_compra_direta IS NOT NULL THEN
-                                    1
-                                 WHEN L_LIC.cod_licitacao IS NOT NULL THEN
-                                    CASE WHEN L_LIC.cod_modalidade = 8 OR L_LIC.cod_modalidade = 9 THEN
-                                            3
-                                         WHEN L_LIC.cod_modalidade = 11 THEN
-                                            4
-                                    ELSE
-                                            2
-                                    END
-                                    
-                                 WHEN E_AEVALOR.valor IS NOT NULL THEN
-                                    CASE WHEN E_AEVALOR.valor::INTEGER = 5 OR E_AEVALOR.valor::INTEGER = 7 OR E_AEVALOR.valor::INTEGER = 15 THEN
-                                            1
-                                         WHEN E_AEVALOR.valor::INTEGER = 6 OR E_AEVALOR.valor::INTEGER = 13 THEN
-                                            3
-                                         WHEN E_AEVALOR.valor::INTEGER = 14 THEN
-                                            4
-                                         WHEN E_AEVALOR.valor::INTEGER = 3 THEN
-                                            2
-                                    ELSE
-                                            2
-                                    END
-                            END
-                        END
-                    AS despdeclicitacao
-                    
-                    
-                    , '' AS codorgaoresplicit
-                  , CASE WHEN E_AEVALOR.valor::INTEGER = 5
-                           THEN ' '
-                           ELSE CASE WHEN C_CD.cod_compra_direta IS NULL
-                                THEN ' '
-                                ELSE CASE WHEN L_LIC.cod_licitacao IS NOT NULL
-                                          THEN LPAD((LPAD(''||L_LIC.num_orgao,2, '0')||LPAD(''||L_LIC.num_unidade,2, '0')), 5, '0')
-                                          WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 
-                                          THEN LPAD((LPAD(''||RegPrecoOrgao.num_orgao,2, '0')||LPAD(''||RegPrecoOrgao.num_unidade,2, '0')), 5, '0')
-                                     END
+                             ELSE
+                                CASE WHEN C_CD.cod_compra_direta IS NOT NULL THEN
+                                        1
+                                     WHEN L_LIC.cod_licitacao IS NOT NULL THEN
+                                        CASE WHEN L_LIC.cod_modalidade = 8 OR L_LIC.cod_modalidade = 9 THEN
+                                                3
+                                             WHEN L_LIC.cod_modalidade = 11 THEN
+                                                4
+                                             ELSE
+                                                2
+                                        END
+                                     WHEN E_AEVALOR.valor IS NOT NULL THEN
+                                        CASE WHEN E_AEVALOR.valor::INTEGER = 5 OR E_AEVALOR.valor::INTEGER = 7 OR E_AEVALOR.valor::INTEGER = 15 THEN
+                                                1
+                                             WHEN E_AEVALOR.valor::INTEGER = 6 OR E_AEVALOR.valor::INTEGER = 13 THEN
+                                                3
+                                             WHEN E_AEVALOR.valor::INTEGER = 14 THEN
+                                                4
+                                             WHEN E_AEVALOR.valor::INTEGER = 3 THEN
+                                                2
+                                             ELSE
+                                                2
+                                        END
                                 END
-                       END AS codUnidadeSubRespLicit
-                       
-                       
-                   , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
+                        END AS despdeclicitacao
+                    ,   '' AS codorgaoresplicit
+                    ,   CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                     ' '
-                            ELSE
-                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL THEN
-                                                config_licitacao.num_licitacao
+                                 ELSE
+                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL AND L_LIC.cod_modalidade NOT IN (11) THEN
+                                            LPAD((LPAD(''||L_LIC.num_orgao,2, '0')||LPAD(''||L_LIC.num_unidade,2, '0')), 5, '0')
+                                         WHEN E_AEVALOR.valor IS NOT NULL AND E_AEVALOR.valor::INTEGER NOT IN(5,7,15) THEN
+                                            LPAD((LPAD(''||L_LIC_RegPreco.num_orgao,2, '0')||LPAD(''||L_LIC_RegPreco.num_unidade,2, '0')), 5, '0')
+                                         ELSE
+                                            ' '
+                                    END
+                            END
+                        END AS codUnidadeSubRespLicit
+                    ,   CASE WHEN C_CD.cod_compra_direta IS NULL THEN
+                            CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
+                                    ' '
+                                 ELSE
+                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL AND L_LIC.cod_modalidade NOT IN (11) THEN
+                                            config_licitacao.num_licitacao
                                          WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 THEN
-                                                CASE WHEN RegPreco.exercicio_licitacao IS NOT NULL THEN
-                                                    RegPreco.exercicio_licitacao::varchar||LPAD(''||RegPreco.cod_entidade::varchar,2, '0')||LPAD(''||RegPreco.codigo_modalidade_licitacao::varchar,2, '0')||LPAD(''||RegPreco.numero_processo_licitacao ::varchar,4, '0')
-                                                ELSE
+                                            CASE WHEN RegPrecoLicitacao.exercicio IS NOT NULL THEN
+                                                    RegPrecoLicitacao.num_licitacao
+                                                 ELSE
                                                     arquivo_emp.exercicio_licitacao::varchar||LPAD(''||arquivo_emp.cod_entidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_modalidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_licitacao ::varchar,4, '0')
-                                                END
-                                        ELSE
-                                                arquivo_emp.exercicio_licitacao::varchar||LPAD(''||arquivo_emp.cod_entidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_modalidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_licitacao ::varchar,4, '0')
+                                            END
+                                         WHEN E_AEVALOR.valor IS NOT NULL AND E_AEVALOR.valor::INTEGER NOT IN(5,7,15) THEN
+                                            arquivo_emp.exercicio_licitacao::varchar||LPAD(''||arquivo_emp.cod_entidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_modalidade::varchar,2, '0')||LPAD(''||arquivo_emp.cod_licitacao ::varchar,4, '0')
                                     END
-                                END
                             END
-                        AS nroProcessoLicitatorio    
-
-               
-                    , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
+                        END AS nroProcessoLicitatorio
+                    ,   CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
                                     ' '
-                            ELSE
-                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL THEN
+                                 ELSE
+                                    CASE WHEN L_LIC.cod_licitacao IS NOT NULL AND L_LIC.cod_modalidade NOT IN (11) THEN
                                             config_licitacao.exercicio_licitacao
                                          WHEN E_AEVALOR.valor::INTEGER = 14 OR E_AEVALOR.valor::INTEGER = 4 THEN
-                                            CASE WHEN RegPreco.exercicio_licitacao IS NOT NULL THEN
-                                                RegPreco.exercicio_licitacao
-                                            ELSE
-                                                arquivo_emp.exercicio_licitacao
+                                            CASE WHEN RegPrecoLicitacao.exercicio IS NOT NULL THEN
+                                                    RegPrecoLicitacao.exercicio
+                                                 ELSE
+                                                    arquivo_emp.exercicio_licitacao
                                             END
-                                     END
-                                END
+                                         WHEN E_AEVALOR.valor IS NOT NULL AND E_AEVALOR.valor::INTEGER NOT IN(5,7,15) THEN
+                                            arquivo_emp.exercicio_licitacao
+                                    END
                             END
-                        AS exercicioProcessoLicitatorio
-                    
-                    , 	CASE WHEN C_CD.cod_compra_direta IS NULL THEN
+                        END AS exercicioProcessoLicitatorio
+                    ,   CASE WHEN C_CD.cod_compra_direta IS NULL THEN
                             CASE WHEN E_AEVALOR.valor::INTEGER = 5 THEN
-                                    ' '
-                            ELSE
-                                CASE WHEN L_LIC.cod_modalidade = 8 OR E_AEVALOR.valor::INTEGER = 15 THEN
-                                        '1'
-                                     WHEN L_LIC.cod_modalidade = 9 OR E_AEVALOR.valor::INTEGER = 6 THEN
-					'2'
-				ELSE
-					''
-                                END
+                                    ''
+                                 ELSE
+                                    CASE WHEN L_LIC.cod_modalidade = 8 OR RegPrecoLicitacao.cod_modalidade = 8 THEN
+                                            '1'
+                                         WHEN L_LIC.cod_modalidade = 9 OR E_AEVALOR.valor::INTEGER = 6 OR E_AEVALOR.valor::INTEGER = 13 OR RegPrecoLicitacao.cod_modalidade = 9 THEN
+                                            '2'
+                                         ELSE
+                                            ''
+                                    END
                             END
-			ELSE
-			    ''
-			END
-                    AS tipoProcesso
+                        ELSE
+                            ''
+                        END AS tipoProcesso
                     ,   CASE WHEN uniorcam.cgm_ordenador IS NOT NULL THEN
                             (SELECT cpf FROM sw_cgm_pessoa_fisica WHERE numcgm=uniorcam.cgm_ordenador)
                         ELSE
                             ''
-                        END
-                    AS cpfOrdenador
+                        END AS cpfOrdenador
                     ,   CASE WHEN C_CD.cod_compra_direta IS NULL THEN
-			      CASE  WHEN tipo_objeto.cod_tipo_objeto = 1 THEN
-                                        CASE  WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 15000) THEN 2
-                                              ELSE 99
-				         END
-                                    WHEN tipo_objeto.cod_tipo_objeto = 2 THEN
-                                        CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 8000) THEN 1
-					     ELSE 99
-					END
-                                    WHEN tipo_objeto.cod_tipo_objeto = 3 THEN 3
-                                    WHEN tipo_objeto.cod_tipo_objeto = 4 THEN 3
-                              END
+                            CASE WHEN tipo_objeto.cod_tipo_objeto = 1 THEN
+                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 15000) THEN
+                                            2
+                                         ELSE
+                                            99
+                                    END
+                                 WHEN tipo_objeto.cod_tipo_objeto = 2 THEN
+                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 8000) THEN
+                                            1
+                                         ELSE
+                                            99
+                                    END
+                                 WHEN tipo_objeto.cod_tipo_objeto = 3 THEN
+                                    3
+                                 WHEN tipo_objeto.cod_tipo_objeto = 4 THEN
+                                    3
+                            END
                         END AS natureza_objeto
                     
                     FROM empenho.empenho AS EE
@@ -442,12 +437,12 @@ class TTCEMGEMP extends Persistente
                       
                     LEFT JOIN (
                             SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidade')."')
-                                                                       VALUES (cod_licitacao		INTEGER
-                                                                              ,cod_modalidade		INTEGER
-                                                                              ,cod_entidade		INTEGER
-                                                                              ,exercicio			CHAR(4)
-                                                                              ,exercicio_licitacao	VARCHAR
-                                                                              ,num_licitacao		TEXT ) 
+                                                                       VALUES (cod_licitacao        INTEGER
+                                                                              ,cod_modalidade       INTEGER
+                                                                              ,cod_entidade         INTEGER
+                                                                              ,exercicio            CHAR(4)
+                                                                              ,exercicio_licitacao  VARCHAR
+                                                                              ,num_licitacao        TEXT ) 
                     ) AS config_licitacao
                     ON config_licitacao.cod_entidade = L_LIC.cod_entidade
                     AND config_licitacao.cod_licitacao = L_LIC.cod_licitacao
@@ -482,21 +477,54 @@ class TTCEMGEMP extends Persistente
 
                     LEFT JOIN tcemg.registro_precos_orgao AS RegPrecoOrgao
                      ON RegPreco.numero_registro_precos = RegPrecoOrgao.numero_registro_precos
-                    AND RegPreco.exercicio      = RegPrecoOrgao.exercicio_registro_precos
+                    AND RegPreco.exercicio              = RegPrecoOrgao.exercicio_registro_precos
                     AND RegPreco.cod_entidade           = RegPrecoOrgao.cod_entidade
                     AND RegPreco.interno                = RegPrecoOrgao.interno
                     AND RegPreco.numcgm_gerenciador     = RegPrecoOrgao.numcgm_gerenciador
+
+                    LEFT JOIN tcemg.registro_precos_licitacao
+                     ON RegPreco.cod_entidade           = registro_precos_licitacao.cod_entidade
+                    AND RegPreco.numero_registro_precos = registro_precos_licitacao.numero_registro_precos
+                    AND RegPreco.exercicio              = registro_precos_licitacao.exercicio
+                    AND RegPreco.interno                = registro_precos_licitacao.interno
+                    AND RegPreco.numcgm_gerenciador     = registro_precos_licitacao.numcgm_gerenciador
+
+                    LEFT JOIN (
+                            SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidade')."')
+                                                                       VALUES (cod_licitacao        INTEGER
+                                                                              ,cod_modalidade       INTEGER
+                                                                              ,cod_entidade         INTEGER
+                                                                              ,exercicio            CHAR(4)
+                                                                              ,exercicio_licitacao  VARCHAR
+                                                                              ,num_licitacao        TEXT )
+                    )  AS RegPrecoLicitacao
+                    ON RegPrecoLicitacao.cod_entidade    = registro_precos_licitacao.cod_entidade_licitacao
+                    AND RegPrecoLicitacao.cod_licitacao  = registro_precos_licitacao.cod_licitacao
+                    AND RegPrecoLicitacao.cod_modalidade = registro_precos_licitacao.cod_modalidade
+                    AND RegPrecoLicitacao.exercicio      = registro_precos_licitacao.exercicio_licitacao
                     
                     LEFT JOIN tcemg.arquivo_emp
                     ON  arquivo_emp.exercicio    = EE.exercicio
                     AND arquivo_emp.cod_empenho  = EE.cod_empenho
                     AND arquivo_emp.cod_entidade = EE.cod_entidade
+                    
+                    LEFT JOIN licitacao.licitacao AS L_LIC_RegPreco
+                    ON (    L_LIC_RegPreco.cod_entidade   = RegPrecoLicitacao.cod_entidade
+                        AND L_LIC_RegPreco.cod_licitacao  = RegPrecoLicitacao.cod_licitacao
+                        AND L_LIC_RegPreco.cod_modalidade = RegPrecoLicitacao.cod_modalidade
+                        AND L_LIC_RegPreco.exercicio      = RegPrecoLicitacao.exercicio
+                       )
+                    OR (    L_LIC_RegPreco.cod_entidade   = arquivo_emp.cod_entidade
+                        AND L_LIC_RegPreco.cod_licitacao  = arquivo_emp.cod_licitacao
+                        AND L_LIC_RegPreco.cod_modalidade = arquivo_emp.cod_modalidade
+                        AND L_LIC_RegPreco.exercicio      = arquivo_emp.exercicio_licitacao
+                       )
                 
                     WHERE EE.exercicio='".$this->getDado('exercicio')."' -- ENTRADA EXERCICIO
                     AND EE.dt_empenho BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') --ENTRADA MES
                     AND EE.cod_entidade IN (".$this->getDado('entidade').") -- ENTRADA ENTIDADE
                     GROUP BY codOrgao,codunidadesub,codfuncao,codsubfuncao,codprograma,idacao,naturezadespesa,subelemento,nroempenho,dtempenho,modalidadeempenho,tpempenho,vlbruto,especificacaoempenho,despdeccontrato,
-                    codorgaorespcontrato,codunidadesubrespcontrato,nrocontrato,dataassinaturacontrato,nrosequencialtermoaditivo,despdecconvenio,nroconvenio,dataassinaturaconvenio,despdeclicitacao,nroProcessoLicitatorio,
+                    codorgaorespcontrato,codunidadesubrespcontrato,nrocontrato,dataassinaturacontrato,nrosequencialtermoaditivo,despdecconvenio,nroconvenio,dataassinaturaconvenio,despdeclicitacao,nroProcessoLicitatorio, codorgaoresplicit,
                     tipoProcesso,cpfOrdenador,C_CD.cod_compra_direta,tipo_objeto.cod_tipo_objeto,L_LIC.exercicio, exercicioProcessoLicitatorio, codUnidadeSubRespLicit, config_licitacao.exercicio_licitacao, config_licitacao.num_licitacao ";
         
         return $stSql;

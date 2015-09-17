@@ -39,9 +39,9 @@ class TContabilidadeLancamentoDepreciacao extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TContabilidadeLancamentoDepreciacao()
+    public function __construct()
     {
-        parent::Persistente();
+        parent::__construct();
         $this->setTabela('contabilidade.lancamento_depreciacao');
 
         $this->setCampoCod('id');
@@ -183,3 +183,5 @@ class TContabilidadeLancamentoDepreciacao extends Persistente
     }
     
 }
+
+?>

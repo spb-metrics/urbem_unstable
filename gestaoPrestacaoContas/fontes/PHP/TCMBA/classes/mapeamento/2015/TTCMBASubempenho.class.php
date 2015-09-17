@@ -44,13 +44,13 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-class TTBASubempenho
+class TTCMBASubempenho extends Persistente
 {
     /**
         * Método Construtor
         * @access Private
     */
-    function TTBASubempenho()
+    function __construct()
     {
         parent::Persistente();
         $this->setDado('exercicio', Sessao::getExercicio() );
@@ -71,8 +71,7 @@ class TTBASubempenho
     
     function montaRecuperaDadosTribunal()
     {
-        $stSql = "
-        ";
+        $stSql = "SELECT ''";
         return $stSql;
     }
 

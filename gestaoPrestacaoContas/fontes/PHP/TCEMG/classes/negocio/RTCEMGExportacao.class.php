@@ -30,7 +30,10 @@
  * @package     Tesouraria
  * @author      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id:$
+ * $Id: RTCEMGExportacao.class.php 63325 2015-08-18 17:13:32Z franver $
+ * $Rev: 63325 $
+ * $Author: franver $
+ * $Date: 2015-08-18 14:13:32 -0300 (Ter, 18 Ago 2015) $
  */
 
 include_once CAM_GF_ORC_NEGOCIO . 'ROrcamentoDespesa.class.php';
@@ -65,11 +68,8 @@ class RTCEMGExportacao
     {
         if ($this->stPoder == 'legislativo') {
             $stFiltro = " AND (nom_cgm ILIKE '%camara%' OR nom_cgm ILIKE '%câmara%') ";
-        } elseif ($this->stPoder == 'executivo') {
-            $stFiltro = " AND nom_cgm NOT ILIKE '%camara%'
-                          AND nom_cgm NOT ILIKE '%câmara%' ";
         }
-
+        
         $obROrcamentoEntidade = new ROrcamentoEntidade();
         $obROrcamentoEntidade->obRCGM->setNumCGM     (Sessao::read('numCgm'));
         $obROrcamentoEntidade->listarUsuariosEntidade($rsEntidades, $stFiltro . ' ORDER BY cod_entidade');

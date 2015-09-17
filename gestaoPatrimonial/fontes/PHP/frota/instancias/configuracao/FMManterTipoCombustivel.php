@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterTipoCombustivel.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterTipoCombustivel.php 63209 2015-08-04 18:18:08Z jean $
 
     * Casos de uso: uc-03.02.05
 */
@@ -45,22 +45,17 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 if ($stAcao == 'alterar') {
     $obTFrotaCombustivel = new TFrotaCombustivel();
-    $obTFrotaCombustivel->setDado( 'cod_combustivel', $_REQUEST['inCodCombustivel'] );
+    $obTFrotaCombustivel->setDado( 'cod_combustivel', $request->get('inCodCombustivel') );
     $obTFrotaCombustivel->recuperaPorChave( $rsCombustivel );
-
-    //cria um textbox para o codigo do combustivel
-    $obCodCombustivel = new TextBox();
-    $obCodCombustivel->setName( 'inCodCombustivel' );
-    $obCodCombustivel->setId( 'inCodCombustivel' );
-    $obCodCombustivel->setValue( $rsCombustivel->getCampo( 'cod_combustivel' ) );
-    $obCodCombustivel->setRotulo( 'Código' );
-    $obCodCombustivel->setLabel( true );
-
+    $inCodCombustivel = $rsCombustivel->getCampo( 'cod_combustivel' );
+    $stNomCombustivel = $rsCombustivel->getCampo( 'nom_combustivel' );
 } else {
+    $obTFrotaCombustivel = new TFrotaCombustivel();
+    $obTFrotaCombustivel->ProximoCod( $inCodCombustivel,$boTransacao );
     $rsCombustivel = new RecordSet();
 }
 
@@ -88,7 +83,20 @@ $obTxtCombustivel->setTitle( 'Informe a descrição do combustível.' );
 $obTxtCombustivel->setNull( false );
 $obTxtCombustivel->setMaxLength( 15 );
 $obTxtCombustivel->setSize( 15 );
-$obTxtCombustivel->setValue( $rsCombustivel->getCampo( 'nom_combustivel' ) );
+$obTxtCombustivel->setValue( $stNomCombustivel );
+
+$obCodCombustivel = new TextBox();
+$obCodCombustivel->setName( 'inCodCombustivel' );
+$obCodCombustivel->setId( 'inCodCombustivel' );
+$obCodCombustivel->setValue( $inCodCombustivel );
+$obCodCombustivel->setRotulo( '*Código' );
+$obCodCombustivel->setMaxLength( 8 );
+$obCodCombustivel->setSize( 8 );
+if ($stAcao == 'alterar') {
+    $obCodCombustivel->setLabel(true);
+} else {
+    $obCodCombustivel->setTitle( 'Informe o código do combustível.' );
+}
 
 //monta o formulário
 $obFormulario = new Formulario;
@@ -99,9 +107,7 @@ $obFormulario->addHidden    ( $obHdnCtrl );
 
 $obFormulario->addTitulo    ( 'Combustível do Veículo' );
 
-if ($stAcao == 'alterar') {
-    $obFormulario->addComponente( $obCodCombustivel );
-}
+$obFormulario->addComponente( $obCodCombustivel );
 $obFormulario->addComponente( $obTxtCombustivel );
 
 if ($stAcao == 'alterar') {

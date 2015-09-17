@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGORecita.class.php 62735 2015-06-12 20:51:43Z arthur $
+    $Id: TTCMGORecita.class.php 63598 2015-09-15 19:15:26Z franver $
 
     * Casos de uso: uc-06.04.00
 */
@@ -47,7 +47,7 @@ class TTCMGOReceita extends TOrcamentoContaReceita
         * Método Construtor
         * @access Private
     */
-    public function TTCMReceita()
+    public function _construct()
     {
         parent::TOrcamentoContaReceita();
         $this->setDado('exercicio', Sessao::getExercicio() );
@@ -292,9 +292,9 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                          , receita.exercicio
                          , conta_receita.descricao
                          , CASE WHEN receita.vl_original < 0.00 THEN (receita.vl_original * -1) ELSE receita.vl_original END AS vl_original
-                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0.00))) AS vl_arrecadacao_mes
                          , ABS((
-                                SELECT COALESCE(sum ( arrecadacao_receita.vl_arrecadacao),0) - COALESCE(sum(arrecadacao_estornada_receita.vl_estornado),0)
+                                SELECT COALESCE(sum ( arrecadacao_receita.vl_arrecadacao),0.00) - COALESCE(sum(arrecadacao_estornada_receita.vl_estornado),0.00)
                                   FROM tesouraria.arrecadacao_receita
                               
                              LEFT JOIN tesouraria.arrecadacao_estornada_receita
@@ -415,7 +415,7 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
-                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0.00))) AS vl_arrecadacao_mes
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , CASE
@@ -746,7 +746,7 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
-                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0)) - SUM(COALESCE(arrecadacao_estornada_receita.vl_estornado,0))) AS vl_arrecadacao_mes
+                         , ABS(SUM(COALESCE(arrecadacao_receita.vl_arrecadacao,0.00))) AS vl_arrecadacao_mes
                          , banco.num_banco AS banco
                          , ltrim(replace(num_agencia,'-',''),'0') AS agencia
                          , CASE

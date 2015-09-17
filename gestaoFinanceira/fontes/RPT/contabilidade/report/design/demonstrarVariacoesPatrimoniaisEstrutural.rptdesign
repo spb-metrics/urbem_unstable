@@ -242,6 +242,28 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="dt_inicial_anterior" id="6907">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="dt_final_anterior" id="6908">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
@@ -285,66 +307,22 @@ WHERE assinatura.exercicio = ?]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="variacaoQuantitativa" id="3954">
             <list-property name="columnHints"/>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">exercicio</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">entidade</property>
-                    <property name="paramName">cod_entidades</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">2</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">data_inicial</property>
-                    <property name="paramName">dt_inicial</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">3</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">dt_final</property>
-                    <property name="paramName">dt_final</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">4</property>
-                    <property name="isOptional">false</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
+            <method name="beforeOpen"><![CDATA[this.queryText = " SELECT SUBSTR(cod_estrutural, 0,16) as cod_estrutural \n";
+this.queryText +="      , nivel \n";
+this.queryText +="      , CASE WHEN nivel = 1  \n";
+this.queryText +="           THEN UPPER(nom_conta) \n";
+this.queryText +="           ELSE INITCAP(nom_conta) \n";
+this.queryText +="         END AS descricao \n";
+this.queryText +="      , ABS(vl_saldo_atual) AS saldo_atual       \n";
+this.queryText +="      , ABS(vl_saldo_anterior) AS saldo_anterior \n";
+this.queryText +="   FROM contabilidade.fn_variacao_patrimonial_estrutural('"+params['exercicio']+"','"+params['entidade']+"','"+params['dt_inicial']+"','"+params['dt_final']+"') \n";
+    
+params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <list-property name="resultSet"/>
-            <xml-property name="queryText"><![CDATA[ SELECT SUBSTR(cod_estrutural, 0,16) as cod_estrutural
-       , nivel
-       , CASE WHEN nivel = 1 
-           THEN UPPER(nom_conta)
-           ELSE INITCAP(nom_conta)
-         END AS descricao
-       , ABS(vl_saldo_atual) AS saldo_atual
-       , vl_saldo_anterior AS saldo_anterior
-    FROM contabilidade.fn_variacao_patrimonial_estrutural(?,?,?,?)
-ORDER BY cod_estrutural;
-]]></xml-property>
+            <xml-property name="queryText"><![CDATA[]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="variacaoQualitativa" id="4080">
             <list-property name="parameters">
@@ -824,6 +802,7 @@ if( this.getRowData().getColumnValue('cod_estrutural') == '4.0.0.0.0.00.00'  ){
                                             <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
                                         </structure>
                                         <property name="textAlign">right</property>
+                                        <structure name="toc"/>
                                         <property name="resultSetColumn">saldo_anterior</property>
                                     </data>
                                 </cell>

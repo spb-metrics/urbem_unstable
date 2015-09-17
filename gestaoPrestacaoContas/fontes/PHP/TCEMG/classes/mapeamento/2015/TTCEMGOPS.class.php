@@ -43,7 +43,7 @@ class TTCEMGOPS extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTCEMGOPS()
+    public function __construct()
     {
         parent::Persistente();
     }
@@ -265,7 +265,12 @@ class TTCEMGOPS extends Persistente
                                        THEN '4'
                                        ELSE resultado_pagamento.pagamento
                                    END
-                                  ELSE resultado_pagamento.pagamento
+                                  ELSE CASE WHEN TO_CHAR(nl.dt_liquidacao, 'yyyy')::INTEGER < ".$this->getDado('exercicio')." AND TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'yyyy')::INTEGER = ".$this->getDado('exercicio')."
+                                       THEN '3'
+                                       WHEN TO_CHAR(empenho.dt_empenho, 'yyyy')::INTEGER < ".$this->getDado('exercicio')." AND TO_CHAR(nl.dt_liquidacao, 'yyyy')::INTEGER = ".$this->getDado('exercicio')." AND TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'yyyy')::INTEGER = ".$this->getDado('exercicio')."
+                                       THEN '4'
+                                       ELSE resultado_pagamento.pagamento
+                                       END
                               END AS tipopagamento
                            , TCEMG.numero_nota_liquidacao('".$this->getDado('exercicio')."'
                                                            ,empenho.cod_entidade

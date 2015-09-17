@@ -36,22 +36,22 @@
 CREATE OR REPLACE FUNCTION stn.fn_rgf_anexo1_despesas_novo ( varchar,varchar,varchar,varchar,varchar ) RETURNS SETOF RECORD AS $$
 DECLARE
 
-    stExercicio    	ALIAS FOR $1;
-    dtInicial     	ALIAS FOR $2;
-    dtFinal      	ALIAS FOR $3;
+    stExercicio    	    ALIAS FOR $1;
+    dtInicial     	    ALIAS FOR $2;
+    dtFinal      	    ALIAS FOR $3;
     stExercicioRestos 	ALIAS FOR $4;
-    stCodEntidades 	ALIAS FOR $5;
+    stCodEntidades 	    ALIAS FOR $5;
     
     reRegistro 		record ;
     reReg   		record ;
-    stSql 		varchar := '';
+    stSql 		    varchar := '';
     stSqlAux    	varchar := '';
     stValor        	varchar := '';
-    boRestos            boolean;   
-    intI                integer;
-    intMes              integer;
-    dtInicioMes         varchar[];
-    dtFimMes            varchar[];
+    boRestos        boolean;   
+    intI            integer;
+    intMes          integer;
+    dtInicioMes     varchar[];
+    dtFimMes        varchar[];
     
 BEGIN
 
@@ -175,7 +175,7 @@ BEGIN
         
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            IF (SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade IN (stCodEntidades::INTEGER) ) >= 1 THEN
+            IF (SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR) ) >= 1 THEN
             stSql := stSql||' (SELECT COALESCE(SUM(valor), 0.00)
                                  FROM stn.despesa_pessoal
                                 WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'

@@ -27,7 +27,7 @@
     * @author Analista:      
     * @author Desenvolvedor: Arthur Cruz
     
-    $Id: FTCEMGDespesaTotalPessoal.plsql 62451 2015-05-12 16:03:08Z michel $
+    $Id: FTCEMGDespesaTotalPessoal.plsql 63419 2015-08-26 19:33:43Z jean $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_despesa_total_pessoal(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -128,7 +128,6 @@ BEGIN
                         And nl.cod_entidade IN ('||stEntidades||')
                  );';
         EXECUTE stSql;
-        
     END IF;
     
     IF ( stTipoSituacao = 'pago' ) THEN 
@@ -175,7 +174,6 @@ BEGIN
                         And ENL.cod_entidade IN ('||stEntidades||')
                 );';
         EXECUTE stSql;
-        
     END IF;
     
   	-- -------------------------------------	
@@ -207,7 +205,6 @@ BEGIN
     ); ';
 	
     EXECUTE stSQL ;
-    
     --Tabela temporaria para fazer o calculo dos primeiros
     stSQL := '
     CREATE TEMPORARY TABLE tmp_vencimentos_vantagens_1 (
@@ -231,7 +228,6 @@ BEGIN
     ); ';
 	
     EXECUTE stSQL;
-    
     --Tabela temporaria para fazer o calculo dos primeiros
     stSQL := '
     CREATE TEMPORARY TABLE tmp_vencimentos_vantagens_2 (
@@ -255,7 +251,6 @@ BEGIN
     ); ';
 	
     EXECUTE stSQL;
-    
     
     IF inTipoDados = 1 THEN
         
@@ -573,7 +568,6 @@ BEGIN
                    AND tmp_vencimentos_vantagens_2.cod_conta      = tmp_vencimentos_vantagens_1.cod_conta; ';
         
         EXECUTE stSql;
-            
         -- Calculando os valores referente a conta 3.1.90.01.00.00  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -808,45 +802,129 @@ BEGIN
                                           , total          NUMERIC );';
         EXECUTE stSql;
        
-        -- Calculando os valores referente a conta 3.1.90.13.03  Nível 7 
+        -- Calculando os valores referente a conta 3.1.90.13.03 + 3.3.1.9.0.13.03  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
-                 SELECT 7 AS ordem
-                      , cod_conta
+                  SELECT 7 AS ordem
+                      , ''9999'' AS cod_conta
                       , ''Obrigações Patronais'' AS nom_conta
-                      , cod_estrutural
-                      , mes_1
-                      , mes_2
-                      , mes_3
-                      , mes_4
-                      , mes_5
-                      , mes_6
-                      , mes_7
-                      , mes_8
-                      , mes_9
-                      , mes_10
-                      , mes_11
-                      , mes_12
-                      , total
-                   FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.13.03'', 7, '||quote_literal(stTipoSituacao)||')
-                               AS retorno ( cod_conta      VARCHAR
-                                          , nom_conta      VARCHAR
-                                          , cod_estrutural VARCHAR
-                                          , mes_1          NUMERIC
-                                          , mes_2          NUMERIC
-                                          , mes_3          NUMERIC
-                                          , mes_4          NUMERIC
-                                          , mes_5          NUMERIC
-                                          , mes_6          NUMERIC
-                                          , mes_7          NUMERIC
-                                          , mes_8          NUMERIC
-                                          , mes_9          NUMERIC
-                                          , mes_10         NUMERIC
-                                          , mes_11         NUMERIC
-                                          , mes_12         NUMERIC
-                                          , total          NUMERIC );';
+                      , ''9.9.9.9.99.99.99.99.99'' cod_estrutural
+                      , SUM( mes_1 ) AS mes_1
+                      , SUM( mes_2 ) AS mes_2
+                      , SUM( mes_3 ) AS mes_3
+                      , SUM( mes_4 ) AS mes_4
+                      , SUM( mes_5 ) AS mes_5
+                      , SUM( mes_6 ) AS mes_6
+                      , SUM( mes_7 ) AS mes_7
+                      , SUM( mes_8 ) AS mes_8
+                      , SUM( mes_9 ) AS mes_9
+                      , SUM( mes_10 ) AS mes_10
+                      , SUM( mes_11 ) AS mes_11
+                      , SUM( mes_12 ) AS mes_12
+                      , SUM( total ) AS total
+                   FROM (
+                 
+                        -- Calculando os valores referente a conta 3.3.1.9.0.13.03  Nível 7 
+                        SELECT mes_1
+                             , mes_2
+                             , mes_3
+                             , mes_4
+                             , mes_5
+                             , mes_6
+                             , mes_7
+                             , mes_8
+                             , mes_9
+                             , mes_10
+                             , mes_11
+                             , mes_12
+                             , total
+                          FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.13.03'', 7, '||quote_literal(stTipoSituacao)||')
+                                      AS retorno ( cod_conta      VARCHAR
+                                                 , nom_conta      VARCHAR
+                                                 , cod_estrutural VARCHAR
+                                                 , mes_1          NUMERIC
+                                                 , mes_2          NUMERIC
+                                                 , mes_3          NUMERIC
+                                                 , mes_4          NUMERIC
+                                                 , mes_5          NUMERIC
+                                                 , mes_6          NUMERIC
+                                                 , mes_7          NUMERIC
+                                                 , mes_8          NUMERIC
+                                                 , mes_9          NUMERIC
+                                                 , mes_10         NUMERIC
+                                                 , mes_11         NUMERIC
+                                                 , mes_12         NUMERIC
+                                                 , total          NUMERIC )
+                        UNION
+
+                         -- Calculando os valores referente a conta 3.3.1.9.1.13.99  Nível 7 
+                        SELECT mes_1
+                             , mes_2
+                             , mes_3
+                             , mes_4
+                             , mes_5
+                             , mes_6
+                             , mes_7
+                             , mes_8
+                             , mes_9
+                             , mes_10
+                             , mes_11
+                             , mes_12
+                             , total
+                          FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.1.13.99'', 7, '||quote_literal(stTipoSituacao)||')
+                                      AS retorno ( cod_conta      VARCHAR
+                                                 , nom_conta      VARCHAR
+                                                 , cod_estrutural VARCHAR
+                                                 , mes_1          NUMERIC
+                                                 , mes_2          NUMERIC
+                                                 , mes_3          NUMERIC
+                                                 , mes_4          NUMERIC
+                                                 , mes_5          NUMERIC
+                                                 , mes_6          NUMERIC
+                                                 , mes_7          NUMERIC
+                                                 , mes_8          NUMERIC
+                                                 , mes_9          NUMERIC
+                                                 , mes_10         NUMERIC
+                                                 , mes_11         NUMERIC
+                                                 , mes_12         NUMERIC
+                                                 , total          NUMERIC )
+
+                      UNION
+
+                         -- Calculando os valores referente a conta 3.1.9.0.13.99  Nível 7
+                        SELECT mes_1
+                             , mes_2
+                             , mes_3
+                             , mes_4
+                             , mes_5
+                             , mes_6
+                             , mes_7
+                             , mes_8
+                             , mes_9
+                             , mes_10
+                             , mes_11
+                             , mes_12
+                             , total
+                          FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.9.0.13.99'', 7, '||quote_literal(stTipoSituacao)||')
+                                      AS retorno ( cod_conta      VARCHAR
+                                                 , nom_conta      VARCHAR
+                                                 , cod_estrutural VARCHAR
+                                                 , mes_1          NUMERIC
+                                                 , mes_2          NUMERIC
+                                                 , mes_3          NUMERIC
+                                                 , mes_4          NUMERIC
+                                                 , mes_5          NUMERIC
+                                                 , mes_6          NUMERIC
+                                                 , mes_7          NUMERIC
+                                                 , mes_8          NUMERIC
+                                                 , mes_9          NUMERIC
+                                                 , mes_10         NUMERIC
+                                                 , mes_11         NUMERIC
+                                                 , mes_12         NUMERIC
+                                                 , total          NUMERIC ) 
+                    ) AS obrigacoes_patronais ';
         EXECUTE stSql;
-    
+
         -- Calculando os valores referente as contas 3.1.90.13.02 + 3.1.91.13.02  Nível 7 
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
@@ -977,29 +1055,45 @@ BEGIN
                                           , total          NUMERIC );';
         EXECUTE stSql;
         
-        -- Valores a serem conferidos
+        -- Calculando os valores referente a conta 3.3.1.7.1.70  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal
-                VALUES ( 10 
-                        , 0 
-                        , ''Outras Despesas de Pessoal''
-                        , ''0.0.0.0.00.00.00.00.00''
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                        , 0.00
-                       )';
+                    SELECT 10 AS ordem
+                          , cod_conta
+                          , ''Outras Despesas de Pessoal'' AS nom_conta
+                          , cod_estrutural
+                          , mes_1
+                          , mes_2
+                          , mes_3
+                          , mes_4
+                          , mes_5
+                          , mes_6
+                          , mes_7
+                          , mes_8
+                          , mes_9
+                          , mes_10
+                          , mes_11
+                          , mes_12
+                          , total
+                       FROM tcemg.sub_consulta_despesa_total_pessoal('||quote_literal(stDtIni)||', '||quote_literal(stDtFim)||','||quote_literal(stExercicio)||','||quote_literal(stEntidades)||',''3.3.1.7.1.70'', 6, '||quote_literal(stTipoSituacao)||')
+                                   AS retorno ( cod_conta      VARCHAR
+                                              , nom_conta      VARCHAR
+                                              , cod_estrutural VARCHAR
+                                              , mes_1          NUMERIC
+                                              , mes_2          NUMERIC
+                                              , mes_3          NUMERIC
+                                              , mes_4          NUMERIC
+                                              , mes_5          NUMERIC
+                                              , mes_6          NUMERIC
+                                              , mes_7          NUMERIC
+                                              , mes_8          NUMERIC
+                                              , mes_9          NUMERIC
+                                              , mes_10         NUMERIC
+                                              , mes_11         NUMERIC
+                                              , mes_12         NUMERIC
+                                              , total          NUMERIC ); ';
         EXECUTE stSql;
-  
+        
         -- Calculando os valores referente a conta 3.1.90.92.00.00  Nível 6
         stSql := '
                 INSERT INTO tmp_tcemg_despesa_total_pessoal

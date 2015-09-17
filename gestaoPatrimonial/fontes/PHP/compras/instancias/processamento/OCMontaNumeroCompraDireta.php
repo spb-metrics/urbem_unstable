@@ -74,6 +74,35 @@ function limpaSelect()
 }
 
 switch ($_REQUEST['stCtrl']) {
+    case "MontaUnidade":
+        include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+        if ($_REQUEST["inNumOrgao"]) {
+            $stCombo  = "inNumUnidade";
+            $stComboTxt  = "inNumUnidadeTxt";
+            $stJs .= "limpaSelect(f.$stCombo,0); \n";
+            $stJs .= "f.$stComboTxt.value=''; \n";
+            $stJs .= "f.$stCombo.options[0] = new Option('Selecione','', 'selected');\n";
+            
+            $obREmpenhoPreEmpenho = new REmpenhoPreEmpenho;
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($_REQUEST["inNumOrgao"]);
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->consultar( $rsCombo, $stFiltro,"", $boTransacao );
+            
+            $inCount = 0;
+            while (!$rsCombo->eof()) {
+                $inCount++;
+                $inId   = $rsCombo->getCampo("num_unidade");
+                $stDesc = $rsCombo->getCampo("nom_unidade");
+                if( $stSelecionado == $inId )
+                    $stSelected = 'selected';
+                else
+                    $stSelected = '';
+                $stJs .= "f.$stCombo.options[$inCount] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
+                $rsCombo->proximo();
+            }
+        }
+        echo $stJs;
+    break;
+    
     case 'carregaModalidade':
         if ($_REQUEST['stExercicioCompraDireta'] && $_REQUEST['inCodEntidade']) {
         } else {

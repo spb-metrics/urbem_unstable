@@ -50,17 +50,21 @@ $obTOrcamentoEntidade->setDado( 'exercicio'   , Sessao::getExercicio() );
 $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$request->get('inCodEntidade')).")" );
 
 if ($request->get("stEstrutural") == "false") {
+    //demonstrarVariacoesPatrimoniais.rptdesign
     $preview = new PreviewBirt(2,9,14);
     $preview->addParametro( 'dt_inicial', $stDataIncial );
     $preview->addParametro( 'dt_final'  , $stDataFinal  );
     $preview->addParametro( 'data_inicial_nota', sistemaLegado::dataToSql($stDataIncial) );
     $preview->addParametro( 'data_final_nota'  , sistemaLegado::dataToSql($stDataFinal));
 } else {
+    //demonstrarVariacoesPatrimoniaisEstrutural.rptdesign
     $preview = new PreviewBirt(2,9,19);
-    $preview->addParametro( 'dt_inicial', '01/01/'.Sessao::getExercicio() );
-    $preview->addParametro( 'dt_final'  , '31/12/'.Sessao::getExercicio() );
-    $preview->addParametro( 'data_inicial_nota', Sessao::getExercicio().'-01-01');
-    $preview->addParametro( 'data_final_nota'  , Sessao::getExercicio().'-12-31');
+    $preview->addParametro( 'dt_inicial'         , '01/01/'.Sessao::getExercicio() );
+    $preview->addParametro( 'dt_inicial_anterior', '01/01/'.(Sessao::getExercicio()-1) );
+    $preview->addParametro( 'dt_final'           , $stDataFinal );
+    $preview->addParametro( 'dt_final_anterior'  , Sistemalegado::somaOuSubtraiData($stDataFinal, false ,1, 'year') );
+    $preview->addParametro( 'data_inicial_nota'  , Sessao::getExercicio().'-01-01' );
+    $preview->addParametro( 'data_final_nota'    , sistemaLegado::dataToSql($stDataFinal) );
 }
 
 $preview->setTitulo('Demonstração das Variações do Patrimoniais');

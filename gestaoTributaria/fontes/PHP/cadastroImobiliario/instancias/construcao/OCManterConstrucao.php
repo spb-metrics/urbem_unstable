@@ -34,7 +34,7 @@
 
  * @ignore
 
- * $Id: OCManterConstrucao.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: OCManterConstrucao.php 63161 2015-07-30 19:45:43Z arthur $
 
  * Casos de uso: uc-05.01.12
  */
@@ -112,13 +112,13 @@ switch ($request->get("stCtrl")) {
     case "visualizarProcesso":
         $obRCIMConstrucao = new RCIMConstrucaoOutros;
 
-        $arChaveAtributoConstrucao =  array( "cod_construcao" => $_REQUEST["cod_construcao"],"timestamp" => "'$_REQUEST[timestamp]'", "cod_processo" => $_REQUEST["cod_processo"] );
+        $arChaveAtributoConstrucao =  array( "cod_construcao" => $request->get('cod_construcao'),"timestamp" => $request->get('timestamp'), "cod_processo" => $request->get('cod_processo') );
         $obRCIMConstrucao->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoConstrucao );
         $obRCIMConstrucao->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributosConstrucao );
 
         $obLblProcesso = new Label;
         $obLblProcesso->setRotulo    ( "Processo" );
-        $obLblProcesso->setValue     ( str_pad($_REQUEST["cod_processo"],5,"0",STR_PAD_LEFT) . "/" . $_REQUEST["ano_exercicio"]  );
+        $obLblProcesso->setValue     ( str_pad($request->get('cod_processo'),5,"0",STR_PAD_LEFT) . "/" . $request->get('ano_exercicio')  );
 
         $obMontaAtributosConstrucao = new MontaAtributos;
         $obMontaAtributosConstrucao->setTitulo     ( "Atributos"        );

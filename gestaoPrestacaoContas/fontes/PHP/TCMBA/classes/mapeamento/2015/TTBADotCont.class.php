@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63346 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -95,65 +95,75 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   soid.exercicio          \n";
-    $stSql .= "         ,contr.num_contrato        \n";
-    $stSql .= "         ,soid.cod_despesa        \n";
-    $stSql .= "         \n";
-    $stSql .= "         ,desp.exercicio        \n";
-    $stSql .= "         ,desp.num_orgao        \n";
-    $stSql .= "         ,desp.num_unidade        \n";
-    $stSql .= "         ,desp.cod_funcao        \n";
-    $stSql .= "         ,desp.cod_subfuncao          \n";
-    $stSql .= "         ,desp.cod_programa          \n";
-    $stSql .= "         ,desp.num_pao          \n";
-    $stSql .= "         ,replace(cont.cod_estrutural,'.','') as estrutural          \n";
-    $stSql .= "         ,orcamento.fn_consulta_tipo_pao(desp.exercicio,desp.num_pao) as tipo_pao          \n";
-    $stSql .= "         ,desp.cod_recurso          \n";
-    $stSql .= "         \n";
-    $stSql .= " FROM     licitacao.licitacao                as lici          \n";
-    $stSql .= "         ,compras.mapa                       as mapa          \n";
-    $stSql .= "         ,compras.mapa_solicitacao           as maso          \n";
-    $stSql .= "         ,compras.mapa_item                  as mait          \n";
-    $stSql .= "         ,compras.solicitacao_item           as soit          \n";
-    $stSql .= "         ,compras.solicitacao_item_dotacao   as soid          \n";
-    $stSql .= "         \n";
-    $stSql .= "         ,licitacao.contrato                 as contr          \n";
-    $stSql .= "         \n";
-    $stSql .= "         ,orcamento.despesa          as desp          \n";
-    $stSql .= "         ,orcamento.conta_despesa    as cont          \n";
-    $stSql .= " WHERE   lici.exercicio              = mapa.exercicio          \n";
-    $stSql .= " AND     lici.cod_mapa               = mapa.cod_mapa          \n";
-    $stSql .= " AND     mapa.exercicio              = maso.exercicio          \n";
-    $stSql .= " AND     mapa.cod_mapa               = maso.cod_mapa          \n";
-    $stSql .= " AND     maso.exercicio              = mait.exercicio          \n";
-    $stSql .= " AND     maso.cod_entidade           = mait.cod_entidade          \n";
-    $stSql .= " AND     maso.cod_solicitacao        = mait.cod_solicitacao          \n";
-    $stSql .= " AND     maso.cod_mapa               = mait.cod_mapa          \n";
-    $stSql .= " AND     maso.exercicio_solicitacao  = mait.exercicio_solicitacao          \n";
-    $stSql .= " AND     mait.exercicio              = soit.exercicio          \n";
-    $stSql .= " AND     mait.cod_entidade           = soit.cod_entidade          \n";
-    $stSql .= " AND     mait.cod_solicitacao        = soit.cod_solicitacao          \n";
-    $stSql .= " AND     mait.cod_centro             = soit.cod_centro          \n";
-    $stSql .= " AND     mait.cod_item               = soit.cod_item          \n";
-    $stSql .= " AND     soit.exercicio              = soid.exercicio          \n";
-    $stSql .= " AND     soit.cod_entidade           = soid.cod_entidade          \n";
-    $stSql .= " AND     soit.cod_solicitacao        = soid.cod_solicitacao          \n";
-    $stSql .= " AND     soit.cod_centro             = soid.cod_centro          \n";
-    $stSql .= " AND     soit.cod_item               = soid.cod_item          \n";
-    $stSql .= "           \n";
-    $stSql .= " AND     lici.exercicio              = contr.exercicio        \n";
-    $stSql .= " AND     lici.cod_entidade           = contr.cod_entidade        \n";
-    $stSql .= " AND     lici.cod_modalidade         = contr.cod_modalidade        \n";
-    $stSql .= " AND     lici.cod_licitacao          = contr.cod_licitacao        \n";
-    $stSql .= "           \n";
-    $stSql .= " AND     soid.exercicio              = desp.exercicio          \n";
-    $stSql .= " AND     soid.cod_despesa            = desp.cod_despesa          \n";
-    $stSql .= " AND     soid.exercicio              = cont.exercicio          \n";
-    $stSql .= " AND     soid.cod_conta              = cont.cod_conta          \n";
-    //$stSql .= " AND     lici.exercicio='".$this->getDado('exercicio')."'                    \n";
-    //if ( $this->getDado('stEntidades') ) {
-    //    $stSql .= "           AND   lici.cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    //}
+    $stSql .= " SELECT solicitacao_item_dotacao.exercicio          
+                      ,contrato.num_contrato        
+                      ,solicitacao_item_dotacao.cod_despesa          
+                      ,despesa.exercicio        
+                      ,despesa.num_orgao        
+                      ,despesa.num_unidade        
+                      ,despesa.cod_funcao        
+                      ,despesa.cod_subfuncao          
+                      ,despesa.cod_programa          
+                      ,despesa.num_pao          
+                      ,REPLACE(conta_despesa.cod_estrutural,'.','') AS estrutural          
+                      ,orcamento.fn_consulta_tipo_pao(despesa.exercicio,despesa.num_pao) AS tipo_pao          
+                      ,despesa.cod_recurso
+                      ,TO_CHAR(contrato.dt_assinatura,'yyyymm') AS competencia
+
+                 FROM licitacao.licitacao
+
+           INNER JOIN licitacao.contrato_licitacao
+                   ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
+                  AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
+                  AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
+                  AND contrato_licitacao.exercicio_licitacao = licitacao.exercicio
+
+           INNER JOIN licitacao.contrato
+                   ON contrato.num_contrato = contrato_licitacao.num_contrato
+                  AND contrato.cod_entidade = contrato_licitacao.cod_entidade
+                  AND contrato.exercicio = contrato_licitacao.exercicio
+
+           INNER JOIN compras.mapa
+                   ON mapa.exercicio = licitacao.exercicio_mapa
+                  AND mapa.cod_mapa = licitacao.cod_mapa
+
+           INNER JOIN compras.mapa_solicitacao
+                   ON mapa_solicitacao.exercicio = mapa.exercicio
+                  AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
+
+           INNER JOIN compras.mapa_item
+                   ON mapa_item.exercicio = mapa_solicitacao.exercicio
+                  AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
+                  AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                  AND mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
+                  AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
+
+           INNER JOIN compras.solicitacao_item
+                   ON solicitacao_item.exercicio = mapa_item.exercicio_solicitacao
+                  AND solicitacao_item.cod_entidade = mapa_item.cod_entidade
+                  AND solicitacao_item.cod_solicitacao = mapa_item.cod_solicitacao
+                  AND solicitacao_item.cod_centro = mapa_item.cod_centro
+                  AND solicitacao_item.cod_item = mapa_item.cod_item
+
+           INNER JOIN compras.solicitacao_item_dotacao
+                   ON solicitacao_item_dotacao.exercicio = solicitacao_item.exercicio
+                  AND solicitacao_item_dotacao.cod_entidade = solicitacao_item.cod_entidade
+                  AND solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+                  AND solicitacao_item_dotacao.cod_centro = solicitacao_item.cod_centro
+                  AND solicitacao_item_dotacao.cod_item = solicitacao_item.cod_item
+
+           INNER JOIN orcamento.despesa
+                   ON despesa.exercicio = solicitacao_item_dotacao.exercicio
+                  AND despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
+
+           INNER JOIN orcamento.conta_despesa
+                   ON conta_despesa.exercicio = solicitacao_item_dotacao.exercicio
+                  AND conta_despesa.cod_conta = solicitacao_item_dotacao.cod_conta
+
+                WHERE contrato.exercicio = '".$this->getDado('exercicio')."'
+                  AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                  AND contrato.cod_entidade IN (".$this->getDado('entidades').")
+    ";
     return $stSql;
 }
 

@@ -39,14 +39,9 @@
 
   Caso de uso: uc-05.03.11
 */
-
-/*
-$Log$
-*/
-
-include_once ( CAM_GT_ARR_CLASSES."boletos/RCodigoBarraFebraban.class.php" );
-include_once ( CAM_GT_ARR_NEGOCIO."RARRCarne.class.php" );
-include_once ( CAM_GT_ARR_NEGOCIO."RARRConfiguracao.class.php" );
+include_once CAM_GT_ARR_CLASSES.'boletos/RCodigoBarraFebraban.class.php';
+include_once CAM_GT_ARR_NEGOCIO.'RARRCarne.class.php';
+include_once CAM_GT_ARR_NEGOCIO.'RARRConfiguracao.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
 define       ('FPDF_FONTPATH','font/');
 
@@ -200,7 +195,6 @@ class RProtocolo extends FPDF2File
 
     public function defineCodigoBarras($xpos, $ypos, $code, $basewidth = 0.7, $height = 10)
     {
-        //global $pdf;
         $wide = $basewidth;
         $narrow = $basewidth / 2 ;
 
@@ -282,9 +276,7 @@ class RProtocolo extends FPDF2File
     {
         if ( Sessao::read( 'itbi_observacao' ) == 'sim') {
             $this->lblVlTribReal   = 'VALOR TRIBUTÁVEL';
-            //$this->lblImpAnualReal = 'IMPOSTO ANUAL';
             $this->lblImpAnualReal = 'IMPOSTO - REAL';
-            //$this->lblTotalAnualRl = 'TOTAL ANUAL';
             $this->lblTotalAnualRl = 'TOTAL - REAL';
 
         }
@@ -293,8 +285,6 @@ class RProtocolo extends FPDF2File
         $this->setCodUsuario ( Sessao::read('numCgm') );
 
         $this->setFont('Arial','',10);
-
-        //thisfineCodigoBarras(10,50,'816100000016143532732003601232006101100000000016');
 
         /* retangula mais externo */
         $this->Rect( 7, 8+$this->inTamY, 196, 82);
@@ -381,7 +371,7 @@ class RProtocolo extends FPDF2File
         }
 
         if ( Sessao::read( 'itbi_observacao' ) == 'sim') {
-            //$this->Text   ( 115.5, 82+$this->inTamY  , 'MULTA DE MORA'    );
+
         } else {
             $this->Text   ( 115.5, 82  , $this->lblReferencia    );
         }
@@ -438,7 +428,6 @@ class RProtocolo extends FPDF2File
         $this->Text   ( 165   , 68.5+$this->inTamY , strtoupper(substr($this->stTributo2,0,28)) );
         $this->setFont('Arial', 'b', 7 );
         $this->Text   ( 90    , 68+$this->inTamY   , strtoupper($this->stExercicio)   );
-//        $this->Text   ( 8     , 76.5 , strtoupper($this->stObservacao));
 
         // Observacao
         // 3 linhas de observacao
@@ -450,11 +439,8 @@ class RProtocolo extends FPDF2File
             $rsItbi->addFormatacao ('base_calculo','NUMERIC_BR');
             $rsItbi->addFormatacao ('valor_financiado','NUMERIC_BR');
             $rsItbi->addFormatacao ('valor_pactuado','NUMERIC_BR');
-            //$stObsL1 =    "Adquirinte       : ".$rsItbi->getCampo('adquirinte');
-            //$stObsL2 =    "Transmitente     : ".$rsItbi->getCampo('transmitente');
             $stObsL3 =    "Base de Calculo  : ".$rsItbi->getCampo('base_calculo')."      ITIV: ".$this->flImpostoAnualReal;
             $stObsL4 =    "Valor Financiado : ".$rsItbi->getCampo('valor_financiado');
-            //$stObsL5 =    "Valor Pactuado   : ".$rsItbi->getCampo('valor_pactuado');
             $stObsL5 =    "Natureza de Transferência: ".$rsItbi->getCampo('cod_natureza')." - ".$rsItbi->getCampo('descricao');
             if ( $rsItbi->getCampo('cod_processo') )
                 $stObsL7 =    "Processo       : ".$rsItbi->getCampo('cod_processo')."/".$rsItbi->getCampo('exercicio');
@@ -464,8 +450,6 @@ class RProtocolo extends FPDF2File
             $this->Text   ( 8     , 80.5+$this->inTamY , $stObsL5 );
             $this->Text   ( 8     , 83+$this->inTamY   , $stObsL6 );
             $this->Text   ( 8     , 85.5 +$this->inTamY, $stObsL7 );
-//            $this->Text   ( 8     , 88   , $stObsL6 );
-//            $this->Text   ( 70    , 73   , $stObsL7 );
             // coloca atributo TRANSMITENTE no cabeçaho
             $this->Text   ( 8     , 34+$this->inTamY   , strtoupper($rsItbi->getCampo('transmitente') ));
 
@@ -511,7 +495,6 @@ class RProtocolo extends FPDF2File
     /* gera o PDF */
     public function show()
     {
-        //$this->output('Carne.pdf','D');
         $this->Output2File();
     }
 
@@ -552,7 +535,6 @@ class RProtocolo extends FPDF2File
         $this->Text   ( ($x+32)  , ($y+34.5)  , strtoupper('ATENDIMENTO(24h)') );
         $this->setFont('Arial','',6);
         $this->Text   ( ($x+2)  , ($y+38)   , 'Dependendo dos serviços disponibilizados pelo Banco escolhido para efetuar o pagamento' ) ;
-//      $this->Text   ( ($x+35)  , ($y+41.5), 'efetuar o pagamento') ;
 
         // direita
         $this->setFont('Arial','BU',8);
@@ -1118,7 +1100,6 @@ $stComposicao = "";
     /* mostra o pdf */
     public function show($stNome = "Carne.pdf", $stOpcao="D")
     {
-        //$this->output($stNome,$stOpcao);
         $this->Output2File();
     }
 }
@@ -1482,8 +1463,6 @@ class RCarneMata extends RProtocolo
         $this->setFont('Arial', '', 8 );
         $this->Text   ( ($x+95-20), ($y+(78*$inTamY)), $this->stLinhaCode );
 
-        //$this->setFont('Arial', '', 5 );
-
         $this->defineCodigoBarras( ($x+95-20), ($y+(80*$inTamY)), $this->stBarCode );
     }
 
@@ -1637,6 +1616,7 @@ function imprimirCarne($diffBaixa = FALSE)
     $obTARRCarne = new TARRCarne;
     $inTotalDeCarnes = count( $this->arEmissao );
     $inCarneAtual = 1;
+
     foreach ($this->arEmissao as $valor => $chave) {
         $flTotalImpresso = round( ( $inCarneAtual * 100 ) / $inTotalDeCarnes, 2 );
         $this->percentageBar( $flTotalImpresso, "Processando..." );
@@ -1668,23 +1648,27 @@ function imprimirCarne($diffBaixa = FALSE)
 
         $this->obRCarneMata->stNomeZoneamento = $stNivel;
         unset( $rsListaCarne );
-        $obTARRCarne->recuperaDadosValorVenalIPTUGenericoUrbem( $rsListaCarne, $chave[0]['inscricao'], $chave[0]['exercicio'], $chave[0]['cod_parcela'] );
+        
+        if ($chave[0]['inscricao'] != '') {
+            $obTARRCarne->recuperaDadosValorVenalIPTUGenericoUrbem( $rsListaCarne, $chave[0]['inscricao'], $chave[0]['exercicio'], $chave[0]['cod_parcela'] );
 
-        $rsListaCarne->addFormatacao ( 'venal_territorial_calculado', 'NUMERIC_BR' );
-        $rsListaCarne->addFormatacao ( 'venal_predial_calculado', 'NUMERIC_BR' );
-        $rsListaCarne->addFormatacao ( 'venal_total_calculado', 'NUMERIC_BR' );
-        $rsListaCarne->addFormatacao ( 'area_lote', 'NUMERIC_BR' );
-        $rsListaCarne->addFormatacao ( 'area_edificacao', 'NUMERIC_BR' );
+            $rsListaCarne->addFormatacao ( 'venal_territorial_calculado', 'NUMERIC_BR' );
+            $rsListaCarne->addFormatacao ( 'venal_predial_calculado', 'NUMERIC_BR' );
+            $rsListaCarne->addFormatacao ( 'venal_total_calculado', 'NUMERIC_BR' );
+            $rsListaCarne->addFormatacao ( 'area_lote', 'NUMERIC_BR' );
+            $rsListaCarne->addFormatacao ( 'area_edificacao', 'NUMERIC_BR' );
 
-        $this->obRCarneMata->stLotePadrao = $rsListaCarne->getCampo( "lote_valor" );
+            $this->obRCarneMata->stLotePadrao = $rsListaCarne->getCampo( "lote_valor" );
 
-        $this->obRCarneMata->stVVenalTerreno = $rsListaCarne->getCampo("venal_territorial_calculado");
-        $this->obRCarneMata->stVVenalConstrucao = $rsListaCarne->getCampo("venal_predial_calculado");
-        $this->obRCarneMata->stVVenalImovel = $rsListaCarne->getCampo("venal_total_calculado");
-        $this->obRCarneMata->stVAliquota = $rsListaCarne->getCampo("aliquota");
-        $this->obRCarneMata->stAreaLote = $rsListaCarne->getCampo("area_lote");
-        $this->obRCarneMata->stAreaEdificacao = $rsListaCarne->getCampo("area_edificacao");
+            $this->obRCarneMata->stVVenalTerreno = $rsListaCarne->getCampo("venal_territorial_calculado");
+            $this->obRCarneMata->stVVenalConstrucao = $rsListaCarne->getCampo("venal_predial_calculado");
+            $this->obRCarneMata->stVVenalImovel = $rsListaCarne->getCampo("venal_total_calculado");
+            $this->obRCarneMata->stVAliquota = $rsListaCarne->getCampo("aliquota");
+            $this->obRCarneMata->stAreaLote = $rsListaCarne->getCampo("area_lote");
+            $this->obRCarneMata->stAreaEdificacao = $rsListaCarne->getCampo("area_edificacao");
 
+        }
+        
         $this->obRCarneMata->setImagem(CAM_FW_TEMAS."imagens/".$stNomeImagem );
         $this->obRARRCarne->obRARRParcela->roRARRLancamento->setCodLancamento( $valor );
         $this->obRARRCarne->inCodContribuinteInicial = $chave[0]["numcgm"];
@@ -1822,8 +1806,7 @@ function imprimirCarne($diffBaixa = FALSE)
         $rsListaDetalheCreditos->setPrimeiroElemento();
         $flValorTotalGeral += $flValorTotalCorrecao + $flValorTotalMulta + $flValorTotalJuros + ($flValorTotal-$flValorTotalDesc);
 
-    //    while ( !$rsGeraCarneCabecalho->eof() ) {
-            /* montagem cabecalho (protocolo) */
+        /* montagem cabecalho (protocolo) */
         $this->obRCarneMata->stEnderecoEntrega = "Endereco: ".$rsGeraCarneCabecalho->getCampo( 'endereco_entrega' )." Bairro: ".$rsGeraCarneCabecalho->getCampo( 'bairro_entrega' )." CEP: ".$rsGeraCarneCabecalho->getCampo( 'cep_entrega' )." Município: ".$rsGeraCarneCabecalho->getCampo( 'municipio_entrega' );
         $this->obRCarneMata->stLoteamento = $rsGeraCarneCabecalho->getCampo( 'loteamento' );
         $this->obRCarneMata->stZoneamento = $rsGeraCarneCabecalho->getCampo( 'zoneamento' );
@@ -1848,69 +1831,23 @@ function imprimirCarne($diffBaixa = FALSE)
         $this->obRCarneMata->setAreaTerreno       ( $rsGeraCarneCabecalho->getCampo( 'area_real' )              );
         $this->obRCarneMata->setAreaEdificada     ( $rsGeraCarneCabecalho->getCampo( 'area_edificada' )         );
         $this->obRCarneMata->setUtilizacaoImovel  ( $rsGeraCarneCabecalho->getCampo( 'utilizacao' )             );
-/*
 
-        if ( !$this->getConsolidacao() ) {
-            $this->obRCarneMata->arDados[0]["tributo"] = $rsGeraCarneCabecalho->getCampo( 'cod_grupo')." - ".$rsGeraCarneCabecalho->getCampo( 'descricao' );
-            $this->obRCarneMata->setTributo           ( $rsGeraCarneCabecalho->getCampo( 'cod_grupo')." - ".$rsGeraCarneCabecalho->getCampo( 'descricao' )              );
-        } else {
-            include_once ( CAM_GT_ARR_NEGOCIO."RARRGrupo.class.php" );
-            $obRARRGrupo = new RARRGrupo;
-            $arGruposConsolidados = $sessao->transf4['grupos_consolidados'];
-            $contGrupos = 0;
-            $stGrupoTotal = null;
-            while ( $contGrupos < 3 && $contGrupos < count ( $arGruposConsolidados ) ) {
-
-                $stGrupo = $arGruposConsolidados[$contGrupos];
-                $stGrupo = substr ( $stGrupo, 0, 20 );
-                if ($contGrupos == 0) {
-                    $this->obRCarneMata->setTributoAbrev ( $stGrupo );
-                } elseif ($contGrupos == 1) {
-                    $this->obRCarneMata->setTributoAbrev2 ( $stGrupo );
-                } elseif ($contGrupos == 2) {
-                    $this->obRCarneMata->setTributoAbrev3 ( $stGrupo );
-                }
-
-                $stGrupoTotal .= $stGrupo. " - ";
-                $contGrupos ++;
-            }
-            $stGrupoTotal = substr ( $stGrupoTotal, 0, (strlen ($stGrupoTotal)-3 ) );
-            $this->obRCarneMata->setTributo ( $stGrupoTotal );
-            $this->obRCarneMata->arDados[0]["tributo"] = $stGrupoTotal;
-        }
-*/
-
-        $this->obRCarneMata->setValorTributoReal  ( $rsGeraCarneCabecalho->getCampo( 'valor_venal_total' )      );
+        $vlTributoReal = $rsGeraCarneCabecalho->getCampo( 'valor_venal_total' );
+        $this->obRCarneMata->setValorTributoReal  ( !empty($vlTributoReal) ? $vlTributoReal : "0.00");
         $this->obRCarneMata->setObservacao        ( wordwrap($rsGeraCarneCabecalho->getCampo('observacao' ),40,chr(13)) );
         $this->obRCarneMata->setNomBairro         ( $rsGeraCarneCabecalho->getCampo( 'nom_bairro' )             );
         $this->obRCarneMata->setCodDivida         ( $rsGeraCarneCabecalho->getCampo( 'cod_grupo' )              );
 
-/*
-        if ( preg_match( '/LIMPEZA.*/i',$rsGeraCarneCabecalho->getCampo( 'descricao_credito' ) ) ) {
-            $this->obRCarneMata->setTaxaLimpezaAnual  ( $rsGeraCarneCabecalho->getCampo( 'valor' )              );
-        } else {
-            $flImpostoAnualReal = $rsGeraCarneCabecalho->getCampo( 'valor' );
-            $this->obRCarneMata->setImpostoAnualReal  ( $flImpostoAnualReal                                     );
-        }
-        $this->obRCarneMata->setReferencia        ( ""                                                          );
-        $this->obRCarneMata->setNumeroPlanta      ( ""                                                          );
-*/
-
         // capturar creditos
         $this->obRCarneMata->setObservacaoL1 ( $this->obRCarneMata->getObservacaoL1().$rsGeraCarneCabecalho->getCampo( 'descricao_credito').": ".$rsGeraCarneCabecalho->getCampo( 'valor' )."  ");
 
-//            $rsGeraCarneCabecalho->proximo();
-
-  //      } //fim do loop de reemitirCarne
         $this->obRCarneMata->setValorAnualReal        ( $flImpostoAnualReal + $this->obRCarneMata->getTaxaLimpezaAnual() );
         // formatar
         $this->obRCarneMata->setValorAnualReal    ( number_format($this->obRCarneMata->getValorAnualReal(),2,',','.') );
         $this->obRCarneMata->setTaxaLimpezaAnual  ( number_format($this->obRCarneMata->getTaxaLimpezaAnual(),2,',','.') );
         $this->obRCarneMata->setImpostoAnualReal  ( number_format($this->obRCarneMata->getImpostoAnualReal(),2,',','.') );
         $this->obRCarneMata->setValorTributoReal  ( number_format($this->obRCarneMata->getValorTributoReal(),2,',','.') );
-/*        $this->obRCarneMata->drawProtocolo();
-        $this->obRCarneMata->posicionaVariaveisProtocolo();
-*/
+
         $inParcela = 0;
         if ( count( $chave ) > 1 ) {
             $inCount = 2;
@@ -1962,6 +1899,7 @@ function imprimirCarne($diffBaixa = FALSE)
         foreach ($chave as $parcela) { // impressao das parcelas selecionadas para cada codigo de lancamento
             unset( $rsListaDetalheCreditos );
             $obTARRCarne->ListaDadosPorGrupoParaCarneIPTU( $rsListaDetalheCreditos, " WHERE al.cod_lancamento = ".$valor." AND ap.cod_parcela = ".$parcela['cod_parcela']." AND carne.numeracao = '".$parcela['numeracao']."'" );
+            
             $flValorTotal = 0.00;
             $flValorTotalJuros = 0.00;
             $flValorTotalMulta = 0.00;
@@ -2021,17 +1959,8 @@ function imprimirCarne($diffBaixa = FALSE)
                     /**
                     * Recuperar Desconto
                     */
-    //                include_once(CAM_GT_ARR_MAPEAMENTO."FARRParcentualDescontoParcela.class.php");
-
-    //              $obPercentual = new FARRParcentualDescontoParcela;
-        //            $obPercentual->executaFuncao($rsPercentual,"".$parcela["cod_parcela"].",'".$dtVencimento."'");
-        //          $this->obRCarneMata->setObservacaoL1 ( 'Cota Única com '.$rsPercentual->getCampo('valor').'% de desconto.' );                      ;
-            //        $this->obRCarneMata->setObservacaoL2 ( 'Desconto não incide sobre a Taxa de Coleta de Lixo' );
-            //      $this->obRCarneMata->setObservacaoL3 ( 'Não receber após o vencimento.' );
-    //                $this->obRCarneMata->setParcela ( 'ÚNICA' );
                 } else {
                     $this->arBarra['tipo_moeda'] = 7;
-    //                $this->obRCarneMata->setParcela( $rsParcela->getCampo( 'info' ));
                     $this->obRCarneMata->setParcelaUnica( false );
                     $this->obRCarneMata->setVencimento  ( $rsListaDetalheCreditos->getCampo( 'vencimento' ) );
 
@@ -2137,3 +2066,5 @@ function geraParcelas($data, $iteracao)
 }
 
 }
+
+?>

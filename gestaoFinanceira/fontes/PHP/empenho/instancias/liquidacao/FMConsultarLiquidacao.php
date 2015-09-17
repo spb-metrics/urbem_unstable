@@ -32,7 +32,7 @@
 
     * @ignore
     
-    $Id: FMConsultarLiquidacao.php 60651 2014-11-06 12:38:46Z jean $
+    $Id: FMConsultarLiquidacao.php 63470 2015-08-31 18:29:24Z jean $
 
     $Revision: 31087 $
     $Name$
@@ -40,19 +40,6 @@
     $Date: 2007-08-24 17:21:27 -0300 (Sex, 24 Ago 2007) $
 
     * Casos de uso: uc-02.03.04
-*/
-
-/*
-$Log$
-Revision 1.9  2007/08/24 20:17:44  vitor
-Bug#6005#
-
-Revision 1.8  2007/01/12 18:01:22  bruce
-Bug #7361#
-
-Revision 1.7  2006/07/05 20:48:41  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -83,15 +70,15 @@ $pgList = "LSAnularLiquidacao.php";
 include_once ($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
 
-$inCodEmpenho = $_REQUEST['inCodEmpenho'];
-$inCodPreEmpenho = $_REQUEST['inCodPreEmpenho'];
-$inCodNota = $_REQUEST['inCodNota'];
-$inCodEntidade = $_REQUEST['inCodEntidade'];
+$inCodEmpenho    = $request->get('inCodEmpenho');
+$inCodPreEmpenho = $request->get('inCodPreEmpenho');
+$inCodNota       = $request->get('inCodNota');
+$inCodEntidade   = $request->get('inCodEntidade');
 
 $obREmpenhoEmpenhoAutorizacao  = new REmpenhoEmpenhoAutorizacao;
 $obREmpenhoPagamentoLiquidacao = new REmpenhoPagamentoLiquidacao;
@@ -231,9 +218,38 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
             $stModelo=$rsDocumento->getCampo           ( "modelo"        );
         }
     break;
+
+    //TCM BA
+    case 5:
+        include_once(CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBANotaFiscalLiquidacao.class.php");
+        $obTTCMBANotaFiscalLiquidacao = new TTCMBANotaFiscalLiquidacao();
+        
+        $obTTCMBANotaFiscalLiquidacao->setDado('cod_nota_liquidacao' , $request->get('inCodNota')       );
+        $obTTCMBANotaFiscalLiquidacao->setDado('exercicio_liquidacao', $request->get('stExercicioNota') );
+        $obTTCMBANotaFiscalLiquidacao->setDado('cod_entidade'        , $request->get('inCodEntidade')   );
+        $obTTCMBANotaFiscalLiquidacao->recuperaPorChave($rsNotasFiscais,"","",$boTransacao);
+
+        $stNumeroNF       = $rsNotasFiscais->getCampo('nro_nota');
+        $stExercicioNota  = $rsNotasFiscais->getCampo('exercicio_liquidacao');
+        $stSerieNF        = $rsNotasFiscais->getCampo('nro_serie');
+        $stSubSerie       = $rsNotasFiscais->getCampo('nro_subserie');
+        $stDataEmissaoNF  = $rsNotasFiscais->getCampo('data_emissao');
+        $stVlNotas = $rsNotasFiscais->getCampo('vl_nota');
+
+        if (!empty($stVlNotas)) {
+            $stValorNF = number_format($stVlNotas,2,",",".");
+        }
+
+        $stDescricaoNF    = $rsNotasFiscais->getCampo('descricao');
+        $stCodUf = $rsNotasFiscais->getCampo('cod_uf');
+
+        if (!empty($stCodUf)) {
+            $stUF = SistemaLegado::pegaDado("sigla_uf","sw_uf"," WHERE cod_uf = '".$stCodUf."'");
+        }
+        
+    break;
 }
 
-//$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( Sessao::getExercicio() );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_REQUEST['dtExercicioEmpenho'] );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setExercicio( $_REQUEST['dtExercicioEmpenho']  );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm') );
@@ -563,6 +579,57 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         $obLblModeloNF->setId     ( "stModelo" );
         $obLblModeloNF->setValue  ( $stModelo  );
     break;
+
+    //TCM BA
+    case '5':
+        $obLblNumeroNF = new Label;
+        $obLblNumeroNF->setName     ( 'stNumeroNF' );
+        $obLblNumeroNF->setId       ( 'stNumeroNF' );
+        $obLblNumeroNF->setRotulo   ( 'Número da Nota Fiscal' );
+        $obLblNumeroNF->setValue    ( $stNumeroNF );
+
+        $obLblExercicioNota = new Label();
+        $obLblExercicioNota->setRotulo        ( "Ano" );
+        $obLblExercicioNota->setName          ( "stAnoNotaFiscal" );
+        $obLblExercicioNota->setId            ( "stAnoNotaFiscal" );
+        $obLblExercicioNota->setValue         ( $stExercicioNota );
+
+        $obLblSerieNF = new Label;
+        $obLblSerieNF->setName      ( 'stSerieNF' );
+        $obLblSerieNF->setId        ( 'stSerieNF' );
+        $obLblSerieNF->setRotulo    ( 'Série da Nota Fiscal' );
+        $obLblSerieNF->setValue     ( $stSerieNF );
+        
+        $obLblSubSerieNF = new Label;
+        $obLblSubSerieNF->setName       ( 'stSubSerieNF' );
+        $obLblSubSerieNF->setId         ( 'stSubSerieNF' );
+        $obLblSubSerieNF->setRotulo     ( 'SubSérie da Nota Fiscal' );
+        $obLblSubSerieNF->setValue      ( $stSubSerie );
+        
+        $obLblEmissaoNF = new Label;
+        $obLblEmissaoNF->setName     ( 'stDtEmissaoNF' );
+        $obLblEmissaoNF->setId       ( 'stDtEmissaoNF' );
+        $obLblEmissaoNF->setRotulo   ( 'Data da Emissão da Nota Fiscal' );
+        $obLblEmissaoNF->setValue    ( $stDataEmissaoNF );
+        
+        $obLblValorNota = new Label();
+        $obLblValorNota->setName     ( 'nuValorNotaFiscal' );
+        $obLblValorNota->setId       ( 'nuValorNotaFiscal' );
+        $obLblValorNota->setRotulo   ( 'Valor da Nota Fiscal' );
+        $obLblValorNota->setValue    ( $stValorNF );
+        
+        $obLblObjetoNF = new Label;
+        $obLblObjetoNF->setName      ( 'stObjetoNF' );
+        $obLblObjetoNF->setId        ( 'stObjetoNF' );
+        $obLblObjetoNF->setRotulo    ( 'Descrição do objeto da Nota Fiscal' );
+        $obLblObjetoNF->setValue     ( $stDescricaoNF );
+
+        $obLblUFDocumento = new Label;
+        $obLblUFDocumento->setName      ( 'stUFUnidadeFederacao' );
+        $obLblUFDocumento->setId        ( 'stUFUnidadeFederacao' );
+        $obLblUFDocumento->setRotulo    ( 'Unidade de Federação do documento' );
+        $obLblUFDocumento->setValue     ( $stUF );        
+    break;
 }
 
 // Define objeto Label para Entidade
@@ -808,6 +875,18 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
             $obFormulario->addComponente( $obLblAutorizacao );
             $obFormulario->addComponente( $obLblModeloNF    ); 
         }
+    break;
+	//TCM BA
+    case 5:
+        $obFormulario->addTitulo( "Nota Fiscal" );
+        $obFormulario->addComponente( $obLblNumeroNF );
+        $obFormulario->addComponente( $obLblExercicioNota );
+        $obFormulario->addComponente( $obLblSerieNF );
+        $obFormulario->addComponente( $obLblSubSerieNF );
+        $obFormulario->addComponente( $obLblEmissaoNF );
+        $obFormulario->addComponente( $obLblValorNota );
+        $obFormulario->addComponente( $obLblObjetoNF );
+        $obFormulario->addComponente( $obLblUFDocumento );
     break;
 }
 
@@ -1085,18 +1164,15 @@ if (strtolower(SistemaLegado::pegaConfiguracao( 'seta_tipo_documento_liq_tceam',
     $obFormulario->addComponente( $obLblValorTotal );
 
 }
-//
 
-//$obFormulario->addComponente( $obLblValorPago     );
 $obMontaAtributos->geraFormulario ( $obFormulario );
 
-//$obFormulario->addTitulo( "Itens do empenho" );
 $obFormulario->addSpan( $obSpan );
 $obMontaAtributosLiquidacao->geraFormulario ( $obFormulario );
 
-//$obFormulario->Voltar( $stLocation );
 $obFormulario->defineBarra( array( $obButtonVoltar ), "left", "" );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

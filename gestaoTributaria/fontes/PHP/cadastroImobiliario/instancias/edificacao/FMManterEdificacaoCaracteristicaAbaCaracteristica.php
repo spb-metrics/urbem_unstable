@@ -32,17 +32,9 @@
 
     * @ignore
 
-    * $Id: FMManterEdificacaoCaracteristicaAbaCaracteristica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterEdificacaoCaracteristicaAbaCaracteristica.php 63281 2015-08-12 13:32:43Z arthur $
 
     * Casos de uso: uc-05.01.11
-*/
-
-/*
-$Log$
-Revision 1.5  2006/09/18 10:30:30  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -82,19 +74,14 @@ $obLblTipoUnidade->setRotulo           ( "Tipo de unidade"                   );
 $obLblTipoUnidade->setName             ( "stTipoUnidade"                     );
 $obLblTipoUnidade->setValue            ( $_REQUEST["stTipoUnidade"]          );
 
-//$obTxtJustificativa = new TextArea;
-//$obTxtJustificativa->setRotulo         ( "Motivo"                            );
-//$obTxtJustificativa->setTitle          ( "Motivo da baixa"                   );
-//$obTxtJustificativa->setName           ( "stJustificativa"                   );
-
 $obBscProcesso = new BuscaInner;
 $obBscProcesso->setRotulo ( "Processo" );
 $obBscProcesso->setTitle  ( "Número do processo no protocolo que formaliza este imóvel" );
 $obBscProcesso->obCampoCod->setName ("inProcesso");
 $obBscProcesso->obCampoCod->setId   ("inProcesso");
-if ($_REQUEST['inCodigoProcesso']) {
-    $obBscProcesso->obCampoCod->setValue( $_REQUEST['inCodigoProcesso'].'/'.$_REQUEST['hdnAnoExercicioProcesso'] );
-}
+
 $obBscProcesso->obCampoCod->obEvento->setOnChange( "buscaValor('buscaProcesso');" );
 $obBscProcesso->obCampoCod->obEvento->setOnKeyUp( "mascaraDinamico('".$stMascaraProcesso."', this, event);" );
 $obBscProcesso->setFuncaoBusca( "abrePopUp('".CAM_GA_PROT_POPUPS."processo/FLBuscaProcessos.php','frm','inProcesso','campoInner2','','".Sessao::getId()."','800','550')" );
+
+?>

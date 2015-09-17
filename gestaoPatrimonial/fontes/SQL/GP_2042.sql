@@ -108,7 +108,7 @@ INSERT INTO licitacao.tipo_garantia (cod_garantia, descricao) VALUES (5, 'Sem ga
 ALTER TABLE licitacao.contrato ADD   COLUMN numero_contrato NUMERIC(14);
 UPDATE      licitacao.contrato SET          numero_contrato = num_contrato;
 ALTER TABLE licitacao.contrato ALTER COLUMN numero_contrato SET NOT NULL;
-ALTER TABLE licitacao.contrato ADD CONSTRAINT uk_contrato_1 UNIQUE (numero_contrato);
+ALTER TABLE licitacao.contrato ADD CONSTRAINT uk_contrato_1 UNIQUE (numero_contrato, exercicio, cod_entidade);
 
 ALTER TABLE licitacao.contrato ADD COLUMN exercicio_orgao CHAR(4);
 ALTER TABLE licitacao.contrato ADD COLUMN num_orgao       INTEGER;
@@ -135,9 +135,11 @@ ALTER TABLE licitacao.contrato ADD CONSTRAINT fk_contrato_9 FOREIGN KEY (cgm_sig
 
 ALTER TABLE licitacao.contrato_anulado ADD COLUMN valor_anulacao NUMERIC(14,2) NOT NULL DEFAULT 0;
 
-ALTER TABLE licitacao.contrato_anulado ADD COLUMN justificativa       VARCHAR(250)  NOT NULL DEFAULT '';
-ALTER TABLE licitacao.contrato_anulado ADD COLUMN razao               VARCHAR(250)  NOT NULL DEFAULT '';
-ALTER TABLE licitacao.contrato_anulado ADD COLUMN fundamentacao_legal VARCHAR(250)  NOT NULL DEFAULT '';
+ALTER TABLE licitacao.contrato ADD COLUMN justificativa       VARCHAR(250)  NOT NULL DEFAULT '';
+ALTER TABLE licitacao.contrato ADD COLUMN razao               VARCHAR(250)  NOT NULL DEFAULT '';
+ALTER TABLE licitacao.contrato ADD COLUMN fundamentacao_legal VARCHAR(250)  NOT NULL DEFAULT '';
+ALTER TABLE licitacao.contrato ADD COLUMN multa_rescisoria    VARCHAR(100)  NOT NULL DEFAULT '';
+ALTER TABLE licitacao.contrato ADD COLUMN prazo_execucao      VARCHAR(100)  NOT NULL DEFAULT '';
 
 
 ----------------
@@ -178,4 +180,88 @@ UPDATE administracao.acao SET ordem = 15 WHERE cod_acao = 2818;
 UPDATE administracao.acao SET ordem = 18 WHERE cod_acao = 1716;
 UPDATE administracao.acao SET ordem = 19 WHERE cod_acao = 2325;
 UPDATE administracao.acao SET ordem = 21 WHERE cod_acao = 1730;
+
+CREATE TABLE compras.publicacao_compra_direta(
+    cod_compra_direta   INTEGER     NOT NULL,
+    cod_entidade        INTEGER     NOT NULL,
+    exercicio_entidade  CHAR(4)     NOT NULL,
+    cod_modalidade      INTEGER     NOT NULL,
+    cgm_veiculo         INTEGER     NOT NULL,
+    data_publicacao     DATE        NOT NULL,
+    observacao          VARCHAR(80)         ,
+    num_publicacao      INTEGER             ,
+    CONSTRAINT pk_publicacao_compra_direta      PRIMARY KEY (cod_compra_direta, cod_entidade, exercicio_entidade, cod_modalidade, cgm_veiculo),
+    CONSTRAINT fk_publicacao_compra_direta_1    FOREIGN KEY (cod_compra_direta, cod_entidade, exercicio_entidade, cod_modalidade)
+                            REFERENCES compras.compra_direta(cod_compra_direta, cod_entidade, exercicio_entidade, cod_modalidade),
+    CONSTRAINT fk_publicacao_compra_direta_2    FOREIGN KEY (cgm_veiculo)
+                            REFERENCES licitacao.veiculos_publicidade(numcgm)
+);
+GRANT ALL ON compras.publicacao_compra_direta TO urbem;
+
+UPDATE administracao.acao SET ordem = 21 WHERE cod_acao = 2821;
+UPDATE administracao.acao SET ordem = 22 WHERE cod_acao = 1730;
+
+
+----------------
+-- Ticket #22850
+----------------
+
+CREATE TABLE licitacao.participante_certificacao_licitacao(
+    num_certificacao        INTEGER     NOT NULL,
+    exercicio_certificacao  CHAR(4)     NOT NULL,
+    cgm_fornecedor          INTEGER     NOT NULL,
+    cod_licitacao           INTEGER     NOT NULL,
+    cod_modalidade          INTEGER     NOT NULL,
+    cod_entidade            INTEGER     NOT NULL,
+    exercicio_licitacao     CHAR(4)     NOT NULL,
+    CONSTRAINT pk_participante_certificacao_licitacao   PRIMARY KEY                                   (num_certificacao, exercicio_certificacao, cgm_fornecedor, cod_licitacao, cod_modalidade, cod_entidade, exercicio_licitacao),
+    CONSTRAINT fk_participante_certificacao_licitacao_1 FOREIGN KEY                                   (num_certificacao, exercicio_certificacao, cgm_fornecedor)
+                                                        REFERENCES licitacao.participante_certificacao(num_certificacao, exercicio, cgm_fornecedor),
+    CONSTRAINT fk_participante_certificacao_licitacao_2 FOREIGN KEY                   (cod_licitacao, cod_modalidade, cod_entidade, exercicio_licitacao)
+                                                        REFERENCES licitacao.licitacao(cod_licitacao, cod_modalidade, cod_entidade, exercicio)
+);
+GRANT ALL ON licitacao.participante_certificacao_licitacao TO urbem;
+
+
+----------------
+-- Ticket #22695
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+VALUES
+     ( 3075
+     , 287
+     , 'FLRelatorioNotasFiscais.php'
+     , 'emitir'
+     , 20
+     , 'Relatório de Notas Fiscais'
+     , 'Relatório de Notas Fiscais'
+     , TRUE
+     );
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+VALUES
+     ( 3
+     , 29
+     , 15
+     , 'Relatório de Notas Fiscais'
+     , 'relatorioNotasFiscais.rptdesign'
+     );
+ 
 

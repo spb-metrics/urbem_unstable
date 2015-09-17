@@ -41,16 +41,8 @@
     * Casos de uso: uc-02.03.02, uc-02.03.03, uc-02.08.02
 
 */
-
-/*
-$Log$
-Revision 1.16  2006/07/05 20:46:56  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 /**
   * Efetua conexão com a tabela  EMPENHO.PRE_EMPENHO
@@ -64,298 +56,291 @@ include_once ( CLA_PERSISTENTE );
 */
 class TEmpenhoPreEmpenho extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function TEmpenhoPreEmpenho()
-{
-    parent::Persistente();
-    $this->setTabela('empenho.pre_empenho');
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+        $this->setTabela('empenho.pre_empenho');
+    
+        $this->setCampoCod('cod_pre_empenho');
+        $this->setComplementoChave('exercicio');
+    
+        $this->AddCampo('exercicio','char',true,'04',true,true);
+        $this->AddCampo('cod_pre_empenho','	integer',true,'',true,false);
+        $this->AddCampo('cgm_beneficiario','integer',true,'',false,false);
+        $this->AddCampo('descricao','varchar',true,'160',false,false);
+        $this->AddCampo('cod_tipo','integer',true,'',false,true);
+        $this->AddCampo('cod_historico','integer',true,'',false,true);
+        $this->AddCampo('cgm_usuario','integer',true,'',false,false);
+        $this->AddCampo('implantado' ,'boolean',false,'',false,false);
+    
+    }
 
-    $this->setCampoCod('cod_pre_empenho');
-    $this->setComplementoChave('exercicio');
+    /**
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stCondicao  String de condição do SQL (WHERE)
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function recuperaRelatorioAutorizacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRelatorioAutorizacao();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-    $this->AddCampo('exercicio','char',true,'04',true,true);
-    $this->AddCampo('cod_pre_empenho','	integer',true,'',true,false);
-    $this->AddCampo('cgm_beneficiario','integer',true,'',false,false);
-    $this->AddCampo('descricao','varchar',true,'160',false,false);
-    $this->AddCampo('cod_tipo','integer',true,'',false,true);
-    $this->AddCampo('cod_historico','integer',true,'',false,true);
-    $this->AddCampo('cgm_usuario','integer',true,'',false,false);
-    $this->AddCampo('implantado' ,'boolean',false,'',false,false);
+    /**
+        * Seta dados para fazer o recuperaRelacionamento
+        * @access Public
+        * @return String $stSql
+    */
+    public function montaRelatorioAutorizacao()
+    {
+        $stSql  = "
+                  SELECT tabela.*
+                       , publico.fn_mascara_dinamica( ( SELECT valor FROM administracao.configuracao WHERE parametro = 'masc_despesa' AND exercicio ='".$this->getDado( "exercicio" )."' )
+                                                    , tabela.num_orgao
+                                                      ||'.'||tabela.num_unidade
+                                                      ||'.'||tabela.cod_funcao
+                                                      ||'.'||tabela.cod_subfuncao
+                                                      ||'.'||tabela.num_programa
+                                                      ||'.'||tabela.num_acao
+                                                      ||'.'||replace(cd.cod_estrutural,'.','')
+                                                    ) AS dotacao
+                       , cd.descricao AS nom_conta
+                       , tabela.nom_pao
+                       , tabela.cod_recurso
+                       , tabela.nom_recurso
+                    FROM (SELECT tabela.*
+                               , CGM.nom_cgm as nom_entidade
+                               , de.cod_funcao
+                               , de.cod_subfuncao
+                               , de.cod_programa
+                               , de.num_pao
+                               , pao.nom_pao
+                               , rec.cod_recurso
+                               , rec.nom_recurso
+                               , de.cod_despesa as dotacao_reduzida
+                               , CAST(ppa.programa.num_programa AS varchar) as num_programa
+                               , CAST(ppa.acao.num_acao AS VARCHAR) as num_acao
+                            FROM (SELECT pe.cod_pre_empenho
+                                       , pe.descricao
+                                       , aa.motivo
+                                       , TO_CHAR(aa.dt_anulacao,'dd/mm/yyyy') as dt_anulacao
+                                       , ae.cod_entidade
+                                       , ae.cod_autorizacao
+                                       , to_char(ae.dt_autorizacao, 'dd/mm/yyyy')  as dt_autorizacao
+                                       , to_char(ae.dt_autorizacao, 'dd/mm/yyyy')  as dt_autorizacao
+                                       , it.vl_total                 as valor_total
+                                       , (it.vl_total/it.quantidade) as valor_unitario
+                                       , it.num_item
+                                       , it.quantidade               as quantidade
+                                       , it.nom_unidade
+                                       , it.sigla_unidade as simbolo
+                                       , it.nom_item
+                                       , it.complemento
+                                       , cg.numcgm as num_fornecedor
+                                       , cg.nom_cgm
+                                       , oe.numcgm
+                                       , CASE WHEN pf.numcgm IS NOT NULL
+                                              THEN pf.cpf
+                                              ELSE pj.cnpj
+                                          END as cpf_cnpj
+                                       , cg.tipo_logradouro||' '||cg.logradouro||' '||cg.numero||' '||cg.complemento as endereco
+                                       , mu.nom_municipio
+                                       , CASE WHEN cg.fone_residencial IS NOT NULL
+                                              THEN cg.fone_residencial
+                                              ELSE cg.fone_comercial
+                                          END as telefone
+                                       , uf.sigla_uf
+                                       , pd.cod_despesa
+                                       , pd.cod_conta
+                                       , ae.exercicio
+                                       , ae.num_orgao
+                                       , oo.nom_orgao as num_nom_orgao
+                                       , TO_CHAR(ore.dt_validade_final ,'dd/mm/yyyy') as dt_validade_final
+                                       , ou.num_unidade
+                                       , ou.nom_unidade  as num_nom_unidade
+                                    FROM empenho.pre_empenho          as pe
+                               LEFT JOIN empenho.autorizacao_empenho as ae
+                                      ON ae.cod_pre_empenho = pe.cod_pre_empenho
+                                     AND ae.exercicio       = pe.exercicio
+                               LEFT JOIN empenho.autorizacao_reserva as ar
+                                      ON ar.cod_autorizacao = ae.cod_autorizacao
+                                     AND ar.exercicio       = ae.exercicio
+                                     AND ar.cod_entidade    = ae.cod_entidade
+                               LEFT JOIN orcamento.reserva as ore
+                                      ON ore.cod_reserva = ar.cod_reserva
+                                     AND ore.exercicio   = ar.exercicio
+                               LEFT JOIN empenho.autorizacao_anulada as aa
+                                      ON ae.cod_entidade     = aa.cod_entidade
+                                     AND ae.exercicio        = aa.exercicio
+                                     AND ae.cod_autorizacao  = aa.cod_autorizacao
+                               LEFT JOIN empenho.pre_empenho_despesa as pd
+                                      ON pe.cod_pre_empenho   = pd.cod_pre_empenho
+                                     AND pe.exercicio        = pd.exercicio
+                                       , empenho.item_pre_empenho     as it
+                                       , orcamento.unidade            as ou
+                                       , orcamento.orgao              as oo
+                                       , orcamento.entidade           as oe
+                                       , administracao.unidade_medida as um
+                                       , sw_cgm                       as cg
+                               LEFT JOIN sw_cgm_pessoa_fisica         as pf
+                                      ON cg.numcgm = pf.numcgm
+                               LEFT JOIN sw_cgm_pessoa_juridica       as pj
+                                      ON cg.numcgm = pj.numcgm
+                                       , sw_municipio                 as mu
+                                       , sw_uf                        as uf
+                                   WHERE pe.cod_pre_empenho  = it.cod_pre_empenho
+                                     AND pe.exercicio        = it.exercicio
+                                     AND pe.cod_pre_empenho  = ae.cod_pre_empenho
+                                     AND pe.exercicio        = ae.exercicio
+                                     --Orgão
+                                     AND ae.num_orgao        = ou.num_orgao
+                                     AND ae.num_unidade      = ou.num_unidade
+                                     AND ae.exercicio        = ou.exercicio
+                                     AND ou.num_orgao        = oo.num_orgao
+                                     AND ou.exercicio        = oo.exercicio
+                                     --Unidade
+                                     AND ae.num_orgao        = ou.num_orgao
+                                     AND ae.num_unidade      = ou.num_unidade
+                                     AND ae.exercicio        = ou.exercicio
+                                     -- Entidade
+                                     AND ae.cod_entidade = OE.cod_entidade
+                                     AND ae.exercicio    = OE.exercicio
+                                     --CGM
+                                     AND pe.cgm_beneficiario = cg.numcgm
+                                     --Municipio
+                                     AND cg.cod_municipio    = mu.cod_municipio
+                                     AND cg.cod_uf           = mu.cod_uf
+                                     --Uf
+                                     AND mu.cod_uf           = uf.cod_uf
+                                     --Unidade Medida
+                                     AND it.cod_unidade      = um.cod_unidade
+                                     AND it.nom_unidade      = um.nom_unidade
+                                     " . $this->getDado( "filtro" ) . "
+                                     ORDER BY ae.cod_pre_empenho, it.num_item
+                                 ) as tabela
+                       LEFT JOIN orcamento.despesa as de
+                              ON de.cod_despesa = tabela.cod_despesa
+                             AND de.exercicio   = tabela.exercicio
+                       LEFT JOIN orcamento.pao as pao
+                              ON de.num_pao   = pao.num_pao
+                             AND de.exercicio = pao.exercicio
+                       LEFT JOIN orcamento.recurso as rec
+                              ON de.cod_recurso = rec.cod_recurso
+                             AND de.exercicio   = rec.exercicio
+                       LEFT JOIN orcamento.programa_ppa_programa
+                              ON programa_ppa_programa.cod_programa = de.cod_programa
+                             AND programa_ppa_programa.exercicio    = de.exercicio
+                       LEFT JOIN ppa.programa
+                              ON ppa.programa.cod_programa = programa_ppa_programa.cod_programa_ppa
+                       LEFT JOIN orcamento.pao_ppa_acao
+                              ON pao_ppa_acao.num_pao = de.num_pao
+                             AND pao_ppa_acao.exercicio = de.exercicio
+                       LEFT JOIN ppa.acao
+                              ON ppa.acao.cod_acao = pao_ppa_acao.cod_acao
+                               , sw_cgm as cgm
+                           WHERE CGM.numcgm = tabela.numcgm
+                         ) as tabela
+               LEFT JOIN orcamento.conta_despesa as cd
+                      ON cd.cod_conta  = tabela.cod_conta
+                     AND cd.exercicio  = tabela.exercicio
+        ";
+        return $stSql;
+    }
 
-}
+    /**
+        * Seta os dados pra fazer o recuperaSaldoAnterior
+        * @access Private
+        * @return $stSql
+    */
+    public function montaRecuperaSaldoAnterior()
+    {
+        $stSql  = "SELECT                                                              \n";
+        $stSql .= "  empenho.fn_saldo_dotacao (                                    \n";
+        $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
+        $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
+        $stSql .= "                               ) AS saldo_anterior                  \n";
+    
+        return $stSql;
+    }
 
-/**
-    * @access Public
-    * @param  Object  $rsRecordSet Objeto RecordSet
-    * @param  String  $stCondicao  String de condição do SQL (WHERE)
-    * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
-    * @param  Boolean $boTransacao
-    * @return Object  Objeto Erro
-*/
-function recuperaRelatorioAutorizacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
+    /**
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function recuperaSaldoAnterior(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
+        $stSql = $this->montaRecuperaSaldoAnterior();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-    if(trim($stOrdem))
-        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-    $stSql = $this->montaRelatorioAutorizacao();
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    /**
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function recuperaSaldoAnteriorDataAtual(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
+        $stSql = $this->montaRecuperaSaldoAnteriorDataAtual();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-    return $obErro;
-}
-
-/**
-    * Seta dados para fazer o recuperaRelacionamento
-    * @access Public
-    * @return String $stSql
-*/
-function montaRelatorioAutorizacao()
-{
-    $stSql  = "SELECT                                                                                                    \n";
-    $stSql .= "      tabela.*                                                                                            \n";
-    $stSql .= "     ,publico.fn_mascara_dinamica( ( SELECT valor FROM administracao.configuracao                                    \n";
-    $stSql .= "                                WHERE parametro = 'masc_despesa' AND exercicio ='".$this->getDado( "exercicio" )."' ) \n";
-    $stSql .= "     ,tabela.num_orgao                                                                                    \n";
-    $stSql .= "      ||'.'||tabela.num_unidade                                                                           \n";
-    $stSql .= "      ||'.'||tabela.cod_funcao                                                                            \n";
-    $stSql .= "      ||'.'||tabela.cod_subfuncao                                                                         \n";
-    $stSql .= "      ||'.'||tabela.cod_programa                                                                          \n";
-    $stSql .= "      ||'.'||tabela.num_pao                                                                               \n";
-    $stSql .= "      ||'.'||replace(cd.cod_estrutural,'.','')                                                            \n";
-    $stSql .= "      ) AS dotacao                                                                                          \n";
-    $stSql .= "     ,cd.descricao AS nom_conta                                                                          \n";
-    $stSql .= "     ,tabela.nom_pao                                                                                     \n";
-    $stSql .= "     ,tabela.cod_recurso                                                                                 \n";
-    $stSql .= "     ,tabela.nom_recurso                                                                                 \n";
-    $stSql .= "FROM (                                                                                                    \n";
-    $stSql .= "     SELECT                                                                                               \n";
-    $stSql .= "          tabela.*                                                                                        \n";
-    $stSql .= "         ,CGM.nom_cgm as nom_entidade                                                                     \n";
-    $stSql .= "         ,de.cod_funcao                                                                                   \n";
-    $stSql .= "         ,de.cod_subfuncao                                                                                \n";
-    $stSql .= "         ,de.cod_programa                                                                                 \n";
-    $stSql .= "         ,de.num_pao                                                                                      \n";
-    $stSql .= "         ,pao.nom_pao                                                                                     \n";
-    $stSql .= "         ,rec.cod_recurso                                                                                 \n";
-    $stSql .= "         ,rec.nom_recurso                                                                                 \n";
-    $stSql .= "         ,de.cod_despesa as dotacao_reduzida                                                              \n";
-    $stSql .= "     FROM                                                                                                 \n";
-    $stSql .= "     (                                                                                                    \n";
-    $stSql .= "         SELECT                                                                                           \n";
-    $stSql .= "              pe.cod_pre_empenho                                                                          \n";
-    $stSql .= "             ,pe.descricao                                                                                \n";
-    $stSql .= "             ,aa.motivo                                                                                   \n";
-    $stSql .= "             ,TO_CHAR(aa.dt_anulacao,'dd/mm/yyyy') as dt_anulacao                                         \n";
-    $stSql .= "             ,ae.cod_entidade                                                                             \n";
-    $stSql .= "             ,ae.cod_autorizacao                                                                          \n";
-    $stSql .= "             ,to_char(ae.dt_autorizacao, 'dd/mm/yyyy')  as dt_autorizacao                                 \n";
-    $stSql .= "             ,to_char(ae.dt_autorizacao, 'dd/mm/yyyy')  as dt_autorizacao                                 \n";
-    $stSql .= "             ,it.vl_total                 as valor_total                                                  \n";
-    $stSql .= "             ,(it.vl_total/it.quantidade) as valor_unitario                                               \n";
-    $stSql .= "             ,it.num_item                                                                                 \n";
-    $stSql .= "             ,it.quantidade               as quantidade                                                   \n";
-    $stSql .= "             ,it.nom_unidade                                                                              \n";
-    $stSql .= "             ,it.sigla_unidade as simbolo                                                                 \n";
-    $stSql .= "             ,it.nom_item                                                                                 \n";
-    $stSql .= "             ,it.complemento                                                                              \n";
-    $stSql .= "             ,cg.numcgm as num_fornecedor                                                                 \n";
-    $stSql .= "             ,cg.nom_cgm                                                                                  \n";
-    $stSql .= "             ,oe.numcgm                                                                                   \n";
-    $stSql .= "             ,CASE WHEN pf.numcgm IS NOT NULL THEN pf.cpf                                                 \n";
-    $stSql .= "                   ELSE pj.cnpj                                                                           \n";
-    $stSql .= "              END as cpf_cnpj                                                                             \n";
-    $stSql .= "             ,cg.tipo_logradouro||' '||cg.logradouro||' '||cg.numero||' '||cg.complemento as endereco     \n";
-    $stSql .= "             ,mu.nom_municipio                                                                            \n";
-    $stSql .= "             ,CASE WHEN cg.fone_residencial IS NOT NULL THEN cg.fone_residencial                          \n";
-    $stSql .= "                   ELSE cg.fone_comercial                                                                 \n";
-    $stSql .= "              END as telefone                                                                             \n";
-    $stSql .= "             ,uf.sigla_uf                                                                                 \n";
-    $stSql .= "             ,pd.cod_despesa                                                                              \n";
-    $stSql .= "             ,pd.cod_conta                                                                                \n";
-    $stSql .= "             ,ae.exercicio                                                                                \n";
-    $stSql .= "             ,ae.num_orgao                                                                                \n";
-    $stSql .= "             ,oo.nom_orgao as num_nom_orgao                                                    \n";
-    $stSql .= "             ,TO_CHAR(ore.dt_validade_final ,'dd/mm/yyyy') as dt_validade_final                           \n";
-    $stSql .= "             ,ou.num_unidade                                                                              \n";
-    $stSql .= "             ,ou.nom_unidade  as num_nom_unidade                                                         \n";
-    $stSql .= "         FROM                                                                                             \n";
-    $stSql .= "              empenho.pre_empenho          as pe                                                          \n";
-    $stSql .= "             LEFT JOIN                                                                                    \n";
-    $stSql .= "                    empenho.autorizacao_empenho as ae                                                     \n";
-    $stSql .= "              ON (     ae.cod_pre_empenho  = pe.cod_pre_empenho                                           \n";
-    $stSql .= "                    AND ae.exercicio        = pe.exercicio   )                                            \n";
-    $stSql .= "             LEFT JOIN                                                                                    \n";
-    $stSql .= "                    empenho.autorizacao_reserva as ar                                                     \n";
-    $stSql .= "              ON ( ar.cod_autorizacao = ae.cod_autorizacao AND                                            \n";
-    $stSql .= "                   ar.exercicio       = ae.exercicio       AND                                            \n";
-    $stSql .= "                   ar.cod_entidade    = ae.cod_entidade    )                                              \n";
-    $stSql .= "             LEFT JOIN                                                                                    \n";
-    $stSql .= "                    orcamento.reserva as ore                                                              \n";
-    $stSql .= "              ON ( ore.cod_reserva  =  ar.cod_reserva   AND                                               \n";
-    $stSql .= "                   ore.exercicio    =  ar.exercicio     )                                                 \n";
-    $stSql .= "              LEFT JOIN                                                                                   \n";
-    $stSql .= "                      empenho.autorizacao_anulada as aa                                                   \n";
-    $stSql .= "                   ON (     ae.cod_entidade     = aa.cod_entidade                                         \n";
-    $stSql .= "                        AND ae.exercicio        = aa.exercicio                                            \n";
-    $stSql .= "                        AND ae.cod_autorizacao  = aa.cod_autorizacao )                                    \n";
-    $stSql .= "              LEFT JOIN                                                                                   \n";
-    $stSql .= "                      empenho.pre_empenho_despesa as pd                                                   \n";
-    $stSql .= "                   ON (     pe.cod_pre_empenho   = pd.cod_pre_empenho                                     \n";
-    $stSql .= "                        AND pe.exercicio        = pd.exercicio      )                                     \n";
-    $stSql .= "             ,empenho.item_pre_empenho     as it                                                          \n";
-    $stSql .= "             ,orcamento.unidade            as ou                                                          \n";
-    $stSql .= "             ,orcamento.orgao              as oo                                                          \n";
-    $stSql .= "             ,orcamento.entidade           as oe                                                          \n";
-    $stSql .= "             ,administracao.unidade_medida            as um                                                          \n";
-    $stSql .= "             ,sw_cgm                       as cg                                                          \n";
-    $stSql .= "             LEFT JOIN                                                                                    \n";
-    $stSql .= "              sw_cgm_pessoa_fisica         as pf                                                          \n";
-    $stSql .= "             ON (cg.numcgm = pf.numcgm)                                                                   \n";
-    $stSql .= "             LEFT JOIN                                                                                    \n";
-    $stSql .= "              sw_cgm_pessoa_juridica       as pj                                                          \n";
-    $stSql .= "             ON (cg.numcgm = pj.numcgm)                                                                   \n";
-    $stSql .= "            ,sw_municipio                  as mu                                                          \n";
-    $stSql .= "            ,sw_uf                         as uf                                                          \n";
-    $stSql .= "         WHERE   pe.cod_pre_empenho  = it.cod_pre_empenho                                                 \n";
-    $stSql .= "         AND     pe.exercicio        = it.exercicio                                                       \n";
-    $stSql .= "         AND     pe.cod_pre_empenho  = ae.cod_pre_empenho                                                 \n";
-    $stSql .= "         AND     pe.exercicio        = ae.exercicio                                                       \n";
-    $stSql .= "         --Órgão                                                                                          \n";
-    $stSql .= "         AND     ae.num_orgao        = ou.num_orgao                                                       \n";
-    $stSql .= "         AND     ae.num_unidade      = ou.num_unidade                                                     \n";
-    $stSql .= "         AND     ae.exercicio        = ou.exercicio                                                       \n";
-    $stSql .= "         AND     ou.num_orgao        = oo.num_orgao                                                       \n";
-    $stSql .= "         AND     ou.exercicio        = oo.exercicio                                                       \n";
-    $stSql .= "         --Unidade                                                                                        \n";
-    $stSql .= "         AND     ae.num_orgao        = ou.num_orgao                                                       \n";
-    $stSql .= "         AND     ae.num_unidade      = ou.num_unidade                                                     \n";
-    $stSql .= "         AND     ae.exercicio        = ou.exercicio                                                       \n";
-    $stSql .= "         -- Entidade                                                                                      \n";
-    $stSql .= "         AND     ae.cod_entidade = OE.cod_entidade                                                        \n";
-    $stSql .= "         AND     ae.exercicio    = OE.exercicio                                                           \n";
-    $stSql .= "         --CGM                                                                                            \n";
-    $stSql .= "         AND     pe.cgm_beneficiario = cg.numcgm                                                          \n";
-    $stSql .= "         --Municipio                                                                                      \n";
-    $stSql .= "         AND     cg.cod_municipio    = mu.cod_municipio                                                   \n";
-    $stSql .= "         AND     cg.cod_uf           = mu.cod_uf                                                          \n";
-    $stSql .= "         --Uf                                                                                             \n";
-    $stSql .= "         AND     mu.cod_uf           = uf.cod_uf                                                          \n";
-    $stSql .= "         --Unidade Medida                                                                                 \n";
-    $stSql .= "         AND     it.cod_unidade      = um.cod_unidade                                                     \n";
-    $stSql .= "         AND     it.nom_unidade      = um.nom_unidade                                                     \n";
-    $stSql .= "        " . $this->getDado( "filtro" ) ."                                                                 \n";
-    $stSql .= "         ORDER BY ae.cod_pre_empenho, it.num_item                                                         \n";
-    $stSql .= "     ) as tabela                                                                                          \n";
-    $stSql .= "           LEFT JOIN                                                                                      \n";
-    $stSql .= "                orcamento.despesa as de                                                                   \n";
-    $stSql .= "           ON (    de.cod_despesa = tabela.cod_despesa                                                    \n";
-    $stSql .= "               AND de.exercicio   = tabela.exercicio   )                                                  \n";
-    $stSql .= "           LEFT JOIN                                                                                      \n";
-    $stSql .= "                orcamento.pao as pao                                                                      \n";
-    $stSql .= "           ON (    de.num_pao = pao.num_pao                                                               \n";
-    $stSql .= "               AND de.exercicio   = pao.exercicio   )                                                     \n";
-    $stSql .= "           LEFT JOIN                                                                                      \n";
-    $stSql .= "                orcamento.recurso as rec                                                                  \n";
-    $stSql .= "           ON (    de.cod_recurso = rec.cod_recurso                                                       \n";
-    $stSql .= "               AND de.exercicio   = rec.exercicio   )                                                     \n";
-    $stSql .= "          ,sw_cgm  as cgm                                                                                 \n";
-    $stSql .= "     WHERE                                                                                                \n";
-    $stSql .= "          CGM.numcgm          = tabela.numcgm                                                             \n";
-    $stSql .= ") as tabela                                                                                               \n";
-    $stSql .= "     LEFT JOIN                                                                                            \n";
-    $stSql .= "          orcamento.conta_despesa as cd                                                                   \n";
-    $stSql .= "     ON (    cd.cod_conta  = tabela.cod_conta                                                             \n";
-    $stSql .= "         AND cd.exercicio  = tabela.exercicio   )                                                         \n";
-
-    return $stSql;
-
-}
-
-/**
-    * Seta os dados pra fazer o recuperaSaldoAnterior
-    * @access Private
-    * @return $stSql
-*/
-function montaRecuperaSaldoAnterior()
-{
-    $stSql  = "SELECT                                                              \n";
-    $stSql .= "  empenho.fn_saldo_dotacao (                                    \n";
-    $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
-    $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
-    $stSql .= "                               ) AS saldo_anterior                  \n";
-
-    return $stSql;
-}
-
-/**
-    * @access Public
-    * @param  Object  $rsRecordSet Objeto RecordSet
-    * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
-    * @param  Boolean $boTransacao
-    * @return Object  Objeto Erro
-*/
-function recuperaSaldoAnterior(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    if(trim($stOrdem))
-        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-
-    $stSql = $this->montaRecuperaSaldoAnterior();
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-/**
-    * @access Public
-    * @param  Object  $rsRecordSet Objeto RecordSet
-    * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
-    * @param  Boolean $boTransacao
-    * @return Object  Objeto Erro
-*/
-function recuperaSaldoAnteriorDataAtual(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    if(trim($stOrdem))
-        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-
-    $stSql = $this->montaRecuperaSaldoAnteriorDataAtual();
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-/**
-    * Seta os dados pra fazer o recuperaSaldoAnteriorDataAtual
-    * @access Private
-    * @return $stSql
-*/
-
-function montaRecuperaSaldoAnteriorDataAtual()
-{
-    $stSql  = "SELECT                                                              \n";
-    $stSql .= "  empenho.fn_saldo_dotacao_data_atual (                                    \n";
-    $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
-    $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
-    $stSql .= "                               ,'".Sessao::read('data_reserva_saldo_GF')."' \n";
-    $stSql .= "                               ) AS saldo_anterior                  \n";
-
-    return $stSql;
-}
+    /**
+        * Seta os dados pra fazer o recuperaSaldoAnteriorDataAtual
+        * @access Private
+        * @return $stSql
+    */
+    public function montaRecuperaSaldoAnteriorDataAtual()
+    {
+        $stSql  = "SELECT                                                              \n";
+        $stSql .= "  empenho.fn_saldo_dotacao_data_atual (                                    \n";
+        $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
+        $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
+        $stSql .= "                               ,'".Sessao::read('data_reserva_saldo_GF')."' \n";
+        $stSql .= "                               ) AS saldo_anterior                  \n";
+    
+        return $stSql;
+    }
 
     /**
         * Executa um Select no banco de dados a partir do comando SQL montado no método montaRecuperaDadosExportacao.
@@ -366,42 +351,41 @@ function montaRecuperaSaldoAnteriorDataAtual()
         * @param  Boolean $boTransacao
         * @return Object  Objeto Erro
     */
+    public function recuperaDadosTransferencia(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+        $stSql = $this->montaRecuperaDadosTransferencia();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-function recuperaDadosTransferencia(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    if(trim($stOrdem))
-        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-    $stSql = $this->montaRecuperaDadosTransferencia();
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-function montaRecuperaDadosTransferencia()
-{
-    $stSql = " SELECT pre_empenho.cgm_beneficiario AS cod_credor,
-                      sw_cgm.nom_cgm AS credor,
-                      CASE WHEN sw_cgm_pessoa_fisica.cpf <> ''
-                           THEN sw_cgm_pessoa_fisica.cpf
-                           ELSE sw_cgm_pessoa_juridica.cnpj
-                      END AS cpf_cnpj_credor
-               FROM empenho.pre_empenho
-               JOIN sw_cgm
-                 ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
-          LEFT JOIN sw_cgm_pessoa_fisica
-                 ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
-          LEFT JOIN sw_cgm_pessoa_juridica
-                 ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-          WHERE empenho.pre_empenho.exercicio = '".$this->getDado('exercicio')."'
-          GROUP BY cod_credor, credor, cpf_cnpj_credor";
-
-    return $stSql;
-}
+    public function montaRecuperaDadosTransferencia()
+    {
+        $stSql = " SELECT pre_empenho.cgm_beneficiario AS cod_credor,
+                          sw_cgm.nom_cgm AS credor,
+                          CASE WHEN sw_cgm_pessoa_fisica.cpf <> ''
+                               THEN sw_cgm_pessoa_fisica.cpf
+                               ELSE sw_cgm_pessoa_juridica.cnpj
+                          END AS cpf_cnpj_credor
+                   FROM empenho.pre_empenho
+                   JOIN sw_cgm
+                     ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
+              LEFT JOIN sw_cgm_pessoa_fisica
+                     ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+              LEFT JOIN sw_cgm_pessoa_juridica
+                     ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+              WHERE empenho.pre_empenho.exercicio = '".$this->getDado('exercicio')."'
+              GROUP BY cod_credor, credor, cpf_cnpj_credor";
+    
+        return $stSql;
+    }
 
     public function recuperaDadosExportacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
     {
@@ -411,17 +395,17 @@ function montaRecuperaDadosTransferencia()
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
         $stOrdem .= " ) as tbl
-LEFT JOIN ( SELECT baixa_cadastro_economico.*
-          FROM economico.baixa_cadastro_economico
-         INNER JOIN (SELECT inscricao_economica, max(timestamp) as timestamp
-                   FROM economico.baixa_cadastro_economico
-                          GROUP BY inscricao_economica) as max_baixa
-        ON max_baixa.inscricao_economica  = baixa_cadastro_economico.inscricao_economica
-           AND max_baixa.timestamp        = baixa_cadastro_economico.timestamp) as baixa_cadastro_economico
-  ON baixa_cadastro_economico.inscricao_economica = tbl.inscricao_economica
-
-WHERE baixa_cadastro_economico.timestamp IS NULL
-";
+    LEFT JOIN ( SELECT baixa_cadastro_economico.*
+              FROM economico.baixa_cadastro_economico
+             INNER JOIN (SELECT inscricao_economica, max(timestamp) as timestamp
+                       FROM economico.baixa_cadastro_economico
+                              GROUP BY inscricao_economica) as max_baixa
+            ON max_baixa.inscricao_economica  = baixa_cadastro_economico.inscricao_economica
+               AND max_baixa.timestamp        = baixa_cadastro_economico.timestamp) as baixa_cadastro_economico
+      ON baixa_cadastro_economico.inscricao_economica = tbl.inscricao_economica
+    
+    WHERE baixa_cadastro_economico.timestamp IS NULL
+    ";
         $stSql = $this->montaRecuperaDadosExportacao().$stCondicao.$stOrdem;
         $this->setDebug( $stSql );
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -659,7 +643,7 @@ WHERE baixa_cadastro_economico.timestamp IS NULL
         return $stSql;
     }
     
-    function recuperaSaldoDotacaoCompra(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    public function recuperaSaldoDotacaoCompra(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
     {
         $obErro      = new Erro;
         $obConexao   = new Conexao;
@@ -676,7 +660,7 @@ WHERE baixa_cadastro_economico.timestamp IS NULL
     }
 
 
-    function montaRecuperaSaldoDotacaoCompra()
+    public function montaRecuperaSaldoDotacaoCompra()
     {
         $stSql  = "SELECT                                                              \n";
         $stSql .= "  empenho.fn_saldo_dotacao_compras(                                    \n";

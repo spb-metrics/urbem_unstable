@@ -34,7 +34,7 @@
 
  * Casos de uso : uc-03.04.32
 
- $Id: FMManterAutorizacao.php 61445 2015-01-16 17:57:12Z franver $
+ $Id: FMManterAutorizacao.php 63367 2015-08-20 21:27:34Z michel $
 
  */
 
@@ -49,19 +49,31 @@ $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgList     = "LS".$stPrograma.".php";
+$pgFilt     = "FL".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js" ;
 
 include_once($pgJS);
 
-Sessao::write('arAutorizacao', array());
-Sessao::write('assinaturas', array());
+Sessao::write( 'arAutorizacao'  , array() );
+Sessao::write( 'assinaturas'    , array() );
+
+$boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+$boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+$boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+$boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+
+if(!$boReservaRigida && !$boReservaAutorizacao){
+    $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
+    SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$_REQUEST["stAcao"], $stMsg, "unica", "aviso", Sessao::getId(), "../");
+}
 
 $obTCompraDireta = new TComprasCompraDireta();
-$obTCompraDireta->setDado( 'exercicio'          , Sessao::getExercicio() );
-$obTCompraDireta->setDado( 'cod_compra_direta'  , $_REQUEST['inCodCompraDireta']   );
-$obTCompraDireta->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']       );
-$obTCompraDireta->setDado( 'cod_modalidade'     , $_REQUEST['inCodModalidade']     );
-$obTCompraDireta->setDado( 'exercicio_entidade' , $_REQUEST['stExercicioEntidade'] );
+$obTCompraDireta->setDado( 'exercicio'          , Sessao::getExercicio()            );
+$obTCompraDireta->setDado( 'cod_compra_direta'  , $_REQUEST['inCodCompraDireta']    );
+$obTCompraDireta->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade']        );
+$obTCompraDireta->setDado( 'cod_modalidade'     , $_REQUEST['inCodModalidade']      );
+$obTCompraDireta->setDado( 'exercicio_entidade' , $_REQUEST['stExercicioEntidade']  );
 $obTCompraDireta->recuperaCompraDiretaAutorizacaoEmpenho( $rsCompraDireta );
 
 $obForm = new Form;
@@ -214,7 +226,7 @@ $stParams .= "&stExercicioEntidade=".$rsCompraDireta->getCampo('exercicio_entida
 $stParams .= "&boAlteraAnula=true";
 
 # Carrega as informações básicas da Compra Direta.
-$stJs .= "<script type='text/javascript'> \n";
+$stJs  = "<script type='text/javascript'> \n";
 $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId().$stParams."','buscaInfoCompraDireta'); \n";
 $stJs .= "</script> \n";
 

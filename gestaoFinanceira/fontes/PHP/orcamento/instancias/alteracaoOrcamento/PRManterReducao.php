@@ -40,13 +40,6 @@
     * Casos de uso: uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.4  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include( CAM_GF_ORC_NEGOCIO."ROrcamentoSuplementacao.class.php" );
@@ -59,9 +52,9 @@ $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 
-$obRegra = new ROrcamentoSuplementacao;
+$obROrcamentoSuplementacao = new ROrcamentoSuplementacao;
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //valida a utilização da rotina de encerramento do mês contábil
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
@@ -71,7 +64,7 @@ $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
-$arDtAutorizacao = explode('/', $_POST['stData']);
+$arDtAutorizacao = explode('/', $request->get('stData'));
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
     SistemaLegado::exibeAviso(urlencode("Mês do Crédito encerrado!"),"n_incluir","erro");
     exit;
@@ -83,26 +76,26 @@ switch ($stAcao) {
     case "Especial":
         $obErro = new Erro;
 
-        $nuVlTotal = str_replace( '.' , '' , $_POST['nuVlTotal'] );
+        $nuVlTotal = str_replace( '.' , '' , $request->get('nuVlTotal') );
         $nuVlTotal = str_replace( ',' ,'.' , $nuVlTotal          );
 
-        $obRegra->setExercicio         ( Sessao::getExercicio()      );
-        $obRegra->setCodTipo           ( $_POST['inCodTipo']     );
-        $obRegra->obRNorma->setCodNorma( $_POST['inCodNorma']    );
-        $obRegra->setVlTotal           ( $nuVlTotal              );
-        $obRegra->setDecreto           ( $stDecreto              );
-        $obRegra->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-        $obRegra->setCredSuplementar   ( 'Reducao'               );
-        $obRegra->setMotivo            ( $_POST['stMotivo']      );
-        $obRegra->setDtLancamento      ( $_POST['stData']        );
+        $obROrcamentoSuplementacao->setExercicio         ( Sessao::getExercicio()  );
+        $obROrcamentoSuplementacao->setCodTipo           ( $request->get('inCodTipo')  );
+        $obROrcamentoSuplementacao->obRNorma->setCodNorma( $request->get('inCodNorma') );
+        $obROrcamentoSuplementacao->setVlTotal           ( $nuVlTotal              );
+        $obROrcamentoSuplementacao->setDecreto           ( $stDecreto              );
+        $obROrcamentoSuplementacao->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+        $obROrcamentoSuplementacao->setCredSuplementar   ( 'Reducao'               );
+        $obROrcamentoSuplementacao->setMotivo            ( $request->get('stMotivo') );
+        $obROrcamentoSuplementacao->setDtLancamento      ( $request->get('stData')   );
 
         $arSuplementada = Sessao::read('arSuplementada');
         $inCount = count( $arSuplementada );
         if ($inCount) {
             foreach ($arSuplementada as $arDespesaSuplementar) {
-                $obRegra->addDespesaSuplementada();
-                $obRegra->roUltimoDespesaSuplementada->setCodDespesa   ( $arDespesaSuplementar['cod_reduzido']);
-                $obRegra->roUltimoDespesaSuplementada->setValorOriginal( $arDespesaSuplementar['vl_valor']    );
+                $obROrcamentoSuplementacao->addDespesaSuplementada();
+                $obROrcamentoSuplementacao->roUltimoDespesaSuplementada->setCodDespesa   ( $arDespesaSuplementar['cod_reduzido']);
+                $obROrcamentoSuplementacao->roUltimoDespesaSuplementada->setValorOriginal( $arDespesaSuplementar['vl_valor']    );
             }
         }
 
@@ -110,23 +103,24 @@ switch ($stAcao) {
         $inCount = count( $arRedutoras );
         if ($inCount) {
             foreach ($arRedutoras as $arDespesaReducao) {
-                $obRegra->addDespesaReducao();
-                $obRegra->roUltimoDespesaReducao->setCodDespesa   ( $arDespesaReducao['cod_reduzido']);
-                $obRegra->roUltimoDespesaReducao->setValorOriginal( $arDespesaReducao['vl_valor']    );
+                $obROrcamentoSuplementacao->addDespesaReducao();
+                $obROrcamentoSuplementacao->roUltimoDespesaReducao->setCodDespesa   ( $arDespesaReducao['cod_reduzido']);
+                $obROrcamentoSuplementacao->roUltimoDespesaReducao->setValorOriginal( $arDespesaReducao['vl_valor']    );
             }
         } else {
             $obErro->setDescricao( "É necessário cadastrar pelo menos uma Redução" );
         }
 
         if ( !$obErro->ocorreu() ) {
-            $obErro = $obRegra->incluir();
+            $obErro = $obROrcamentoSuplementacao->incluir();
 
             if ( !$obErro->ocorreu() ) {
-                SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=".$stAcao, $obRegra->getDecreto() , "incluir", "aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=".$stAcao, $obROrcamentoSuplementacao->getDecreto() , "incluir", "aviso", Sessao::getId(), "../");
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
         }
     break;
 }
+
 ?>

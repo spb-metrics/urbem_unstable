@@ -50,9 +50,9 @@ class TTCMBADotacao extends TOrcamentoDespesa
     * Método Construtor
     * @access Private
 */
-function TTCMBADotacao()
+function __construct()
 {
-    parent::TOrcamentoDespesa();
+    parent::__construct();
 }
 
 function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -84,7 +84,7 @@ function montaRecuperaDadosTribunal()
              , programa.num_programa
              , REPLACE(despesa.vl_original::VARCHAR, '.', '') AS vl_dotacao
              , despesa.num_orgao
-                          
+
            FROM orcamento.despesa
              
      INNER JOIN orcamento.conta_despesa
@@ -105,7 +105,8 @@ function montaRecuperaDadosTribunal()
      INNER JOIN ppa.programa
              ON programa.cod_programa = acao.cod_programa
         
-          WHERE despesa.exercicio = '".$this->getDado('stExercicio')."'                    
+          WHERE despesa.exercicio    = '".$this->getDado('stExercicio')."'
+            AND despesa.cod_entidade = ".$this->getDado('stEntidades')."
      
       ORDER BY despesa.exercicio                                                    
              , despesa.num_orgao                                                     

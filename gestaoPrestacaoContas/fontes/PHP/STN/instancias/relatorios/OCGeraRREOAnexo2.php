@@ -33,7 +33,7 @@
 
     * Casos de uso : uc-06.01.02
 
-    $Id: OCGeraRREOAnexo2.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+    $Id: OCGeraRREOAnexo2.php 63275 2015-08-11 20:29:31Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -100,7 +100,7 @@ while ( !$rsEntidade->eof() ) {
 if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($_REQUEST['inCodEntidade']) > 1 ) ) {
     $preview->addParametro( 'poder' , 'Executivo' );
 } else {
-    if (preg_match("/c[âa]mara/i", $rsEntidade->getCampo( 'nom_cgm' )) and count($_REQUEST['inCodEntidade']) == 1) {
+    if (preg_match("/c(â|a)mara/i", $rsEntidade->getCampo( 'nom_cgm' )) and count($_REQUEST['inCodEntidade']) == 1) {
        $preview->addParametro( 'poder' , 'Legislativo' );
     } else {
        $preview->addParametro( 'poder' , 'Executivo' );

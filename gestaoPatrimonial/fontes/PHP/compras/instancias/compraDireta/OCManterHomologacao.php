@@ -86,14 +86,17 @@ function buscaJustificativaRazao()
     $obTComprasJustificativaRazao->recuperaPorChave($rsJustificativaRazao);
     
     $stJustificativa = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('justificativa')));
-    $stRazao = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('razao')));
+    $stRazao         = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('razao')));
+    $stFundamentacao = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('fundamentacao_legal')));
 
     if ( $rsJustificativaRazao->getNumLinhas() > 0 ) {
         $stJs .= "jQuery('#stJustificativa').val('$stJustificativa');\n";
         $stJs .= "jQuery('#stRazao').val('$stRazao');\n";
+        $stJs .= "jQuery('#stFundamentacao').val('$stFundamentacao');\n";
     } else {
         $stJs .= "jQuery('#stJustificativa').val('');\n";
         $stJs .= "jQuery('#stRazao').val('');\n";
+        $stJs .= "jQuery('#stFundamentacao').val('');\n";
     }
     echo $stJs;
 }

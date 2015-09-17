@@ -40,51 +40,17 @@
 
     * Casos de uso: uc-03.05.14
 */
-/*
-$Log$
-Revision 1.7  2006/11/30 19:36:58  hboaventura
-correção dos campos cod_documento e cod_tipo_documento
-
-Revision 1.6  2006/11/08 10:51:42  larocca
-Inclusão dos Casos de Uso
-
-Revision 1.5  2006/10/12 11:51:26  tonismar
-ManterCertificacao
-
-Revision 1.4  2006/10/09 12:17:51  domluc
-Caso de Uso : uc-03.05.14
-
-Revision 1.3  2006/10/04 17:54:00  tonismar
-ManterCertificação
-
-Revision 1.2  2006/10/03 15:15:54  tonismar
-ManterCertificação
-
-Revision 1.1  2006/09/15 12:05:59  cleisson
-inclusão
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.participante_certificacao
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Nome do Programador
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TLicitacaoParticipanteCertificacao extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TLicitacaoParticipanteCertificacao()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela("licitacao.participante_certificacao");
@@ -92,22 +58,24 @@ function TLicitacaoParticipanteCertificacao()
     $this->setCampoCod('num_certificacao');
     $this->setComplementoChave('exercicio');
 
-    $this->AddCampo('num_certificacao','sequence',true ,''   ,true,false);
-    $this->AddCampo('exercicio'       ,'char'    ,false ,'4'  ,true,false);
-    $this->AddCampo('cgm_fornecedor'  ,'integer' ,false ,''   ,false,'TComprasFornecedor');
-    $this->AddCampo('cod_tipo_documento','integer',true  ,''   ,false,'TAdministracaoModeloDocumento');
-    $this->AddCampo('cod_documento'     ,'integer',true  ,''   ,false,'TAdministracaoModeloDocumento');
-    $this->AddCampo('dt_registro'     ,'date'    ,true  ,''   ,false,false);
-    $this->AddCampo('final_vigencia'  ,'date'    ,false ,''   ,false,false);
-    $this->AddCampo('observacao'      ,'text'    ,false ,''   ,false,false);
+    $this->AddCampo('num_certificacao'  ,'sequence',true  ,''   ,true,false);
+    $this->AddCampo('exercicio'         ,'char'    ,false ,'4'  ,true,false);
+    $this->AddCampo('cgm_fornecedor'    ,'integer' ,false ,''   ,false,'TComprasFornecedor');
+    $this->AddCampo('cod_tipo_documento','integer' ,true  ,''   ,false,'TAdministracaoModeloDocumento');
+    $this->AddCampo('cod_documento'     ,'integer' ,true  ,''   ,false,'TAdministracaoModeloDocumento');
+    $this->AddCampo('dt_registro'       ,'date'    ,true  ,''   ,false,false);
+    $this->AddCampo('final_vigencia'    ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('observacao'        ,'text'    ,false ,''   ,false,false);
 
-}function montaRecuperaRelacionamento() {
+}
+
+public function montaRecuperaRelacionamento() {
     $stSql = " select * from licitacao.participante_certificacao ";
 
     return $stSql;
 }
 
-function recuperaListaCertificacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function recuperaListaCertificacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -119,31 +87,75 @@ function recuperaListaCertificacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "",
     return $obErro;
 }
 
-function montaRecuperaListaCertificacao()
+public function montaRecuperaListaCertificacao()
 {
-    $stSql  = "  select											\n";
-    $stSql .= "  	 lpc.num_certificacao                         \n";
-    $stSql .= "  	,lpc.exercicio                                \n";
-    $stSql .= "  	,lpc.cgm_fornecedor                           \n";
-    $stSql .= "  	,to_char(lpc.dt_registro, 'dd/mm/yyyy') as dt_registro    \n";
-    $stSql .= "  	,to_char(lpc.final_vigencia, 'dd/mm/yyyy') as final_vigencia \n";
-    $stSql .= "  	,lpc.observacao                               \n";
-    $stSql .= "  	,cgm.nom_cgm                                  \n";
-    $stSql .= "  from                                              \n";
-    $stSql .= "  	 licitacao.participante_certificacao as lpc   \n";
-    $stSql .= "  	,sw_cgm as cgm                                \n";
-    $stSql .= "  where                                             \n";
-    $stSql .= "  	lpc.cgm_fornecedor = cgm.numcgm               \n";
+    $stSql = "
+            SELECT participante_certificacao.num_certificacao                         
+                 , participante_certificacao.exercicio                                
+                 , participante_certificacao.cgm_fornecedor                           
+                 , TO_CHAR(participante_certificacao.dt_registro, 'dd/mm/yyyy') AS dt_registro    
+                 , TO_CHAR(participante_certificacao.final_vigencia, 'dd/mm/yyyy') AS final_vigencia 
+                 , participante_certificacao.observacao                               
+                 , cgm.nom_cgm
+                 , participante_certificacao_licitacao.cod_licitacao                           
+                 , participante_certificacao_licitacao.cod_modalidade
+                 , participante_certificacao_licitacao.cod_entidade
+                 , participante_certificacao_licitacao.cod_entidade || ' - ' || nom_entidade.nom_cgm AS nome_entidade
+                 , participante_certificacao_licitacao.exercicio_licitacao
+                 
+             FROM licitacao.participante_certificacao
+                   
+       INNER JOIN sw_cgm as cgm
+               ON participante_certificacao.cgm_fornecedor = cgm.numcgm
+    
+        LEFT JOIN licitacao.participante_certificacao_licitacao
+               ON participante_certificacao_licitacao.num_certificacao       = participante_certificacao.num_certificacao
+              AND participante_certificacao_licitacao.exercicio_certificacao = participante_certificacao.exercicio
+              AND participante_certificacao_licitacao.cgm_fornecedor         = participante_certificacao.cgm_fornecedor
+        
+        LEFT JOIN (
+                    SELECT entidade.cod_entidade
+                         , entidade.exercicio
+			 , nome_cgm.nom_cgm                            
+
+		      FROM orcamento.entidade
+
+		INNER JOIN sw_cgm AS nome_cgm
+		        ON entidade.numcgm = nome_cgm.numcgm
+                        
+                ) AS nom_entidade
+               ON nom_entidade.cod_entidade = participante_certificacao_licitacao.cod_entidade
+              AND nom_entidade.exercicio    = participante_certificacao_licitacao.exercicio_licitacao
+              
+            WHERE 1 = 1 ";
+
+    if ( $this->getDado( 'exercicio_licitacao' ) ) {
+        $stSql .= " AND participante_certificacao_licitacao.exercicio_licitacao = '".$this->getDado( 'exercicio_licitacao' )."' \n";
+    }
+    
+    if ( $this->getDado( 'cod_entidade' ) ) {
+        $stSql .= " AND participante_certificacao_licitacao.cod_entidade = ".$this->getDado( 'cod_entidade' )." \n";
+    }
+    
+    if ( $this->getDado( 'cod_modalidade' ) ) {
+        $stSql .= " AND participante_certificacao_licitacao.cod_modalidade = ".$this->getDado( 'cod_modalidade' )." \n";
+    }
+    
+    if ( $this->getDado( 'cod_licitacao' ) ) {
+        $stSql .= " AND participante_certificacao_licitacao.cod_licitacao = ".$this->getDado( 'cod_licitacao' )." \n";
+    }
 
     if ( $this->getDado( 'num_certificacao' ) ) {
-        $stSql .= " and lpc.num_certificacao = ".$this->getDado( 'num_certificacao' )." \n";
+        $stSql .= " AND participante_certificacao.num_certificacao = ".$this->getDado( 'num_certificacao' )." \n";
     }
 
     if ( $this->getDado( 'cgm_fornecedor' ) ) {
-        $stSql .= " and lpc.cgm_fornecedor = ".$this->getDado( 'cgm_fornecedor' )." \n";
+        $stSql .= " AND participante_certificacao.cgm_fornecedor = ".$this->getDado( 'cgm_fornecedor' )." \n";
     }
 
     return $stSql;
 }
 
 }
+
+?>

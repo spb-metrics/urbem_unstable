@@ -35,7 +35,7 @@ $Name:  $
 $Author: lbbarreiro $
 $Date: 2007-10-31 15:55:22 -0200 (Qua, 31 Out 2007) $
 
- $Id: OCContaAnalitica.php 62521 2015-05-18 14:05:16Z arthur $
+ $Id: OCContaAnalitica.php 63583 2015-09-11 20:18:59Z arthur $
 
 Casos de uso: uc-02.02.02,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -79,14 +79,19 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems() ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) AND ";
+                $stFiltro .= " ( pb.cod_banco IS NOT NULL
+                             AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                             AND ( pc.cod_estrutural LIKE '1.1.1.%'
+                                OR pc.cod_estrutural LIKE '1.2.2.3%' )) AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.4.%' ) ) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= " (( pb.cod_banco IS NOT NULL
+                              AND pb.cod_entidade IN (".$stCodEntidades.")
+                              AND ( pc.cod_estrutural LIKE '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.1.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural LIKE '1.2.2.3%'
+                              ))
+                            OR pc.cod_estrutural LIKE '1.1.5.%' ) AND ";
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
@@ -110,14 +115,19 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems() ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) AND ";
+                $stFiltro .= " ( pb.cod_banco IS NOT NULL
+                             AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                             AND ( pc.cod_estrutural LIKE '1.1.1.%'
+                                OR pc.cod_estrutural LIKE '1.2.2.3%' )) AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.4.%') ) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= " (( pb.cod_banco IS NOT NULL
+                              AND pb.cod_entidade IN (".$stCodEntidades.")
+                              AND ( pc.cod_estrutural LIKE '1.1.1.1.1.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural LIKE '1.2.2.3%'
+                               ))
+                             OR pc.cod_estrutural LIKE '1.1.5.%' ) AND ";
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
@@ -142,15 +152,21 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems() ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                $stFiltro .= "( pb.cod_banco IS NOT NULL
+                            AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                            AND ( pc.cod_estrutural LIKE '1.1.1.%'
+                               OR pc.cod_estrutural LIKE '1.1.4.%'
+                               OR pc.cod_estrutural LIKE '1.2.2.3%'
+                             )) AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.1.3.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' ) ) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= "((   pb.cod_banco IS NOT NULL
+                               AND pb.cod_entidade IN (".$stCodEntidades.")
+                               AND ( pc.cod_estrutural LIKE '1.1.1.1.3.%'
+                                  OR pc.cod_estrutural LIKE '1.1.1.1.4.%'
+                                  OR pc.cod_estrutural LIKE '1.1.1.1.5.%'
+                                  OR pc.cod_estrutural LIKE '1.2.2.3%'
+                              ))
+                             OR pc.cod_estrutural like '1.1.5.%' ) AND ";  
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
@@ -175,15 +191,20 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems() ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                $stFiltro .= " ( pb.cod_banco IS NOT NULL
+                             AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                             AND ( pc.cod_estrutural LIKE '1.1.1.%'
+                                OR pc.cod_estrutural LIKE '1.1.4.%'
+                                OR pc.cod_estrutural LIKE '1.2.2.3%')) AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.1.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' ) ) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= " (( pb.cod_banco IS NOT NULL
+                              AND pb.cod_entidade IN (".$stCodEntidades.")
+                              AND ( pc.cod_estrutural LIKE '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.1.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.5.%'
+                              ))
+                             OR pc.cod_estrutural like '1.1.5.%' ) AND ";
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
@@ -208,15 +229,21 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems($boTransacao) ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                $stFiltro .= "  ( pb.cod_banco IS NOT NULL
+                              AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                              AND ( pc.cod_estrutural LIKE '1.1.1.%'
+                                 OR pc.cod_estrutural LIKE '1.1.4.%'
+                                 OR pc.cod_estrutural LIKE '1.2.2.3%' ))
+                              AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.2.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' )) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= " (( pb.cod_banco IS NOT NULL
+                              AND pb.cod_entidade IN (".$stCodEntidades.")
+                              AND ( pc.cod_estrutural LIKE '1.1.1.1.2.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural LIKE '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural LIKE '1.2.2.3%' 
+                               ))
+                              OR pc.cod_estrutural like '1.1.5.%' ) AND ";
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
@@ -241,15 +268,20 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
             if ( SistemaLegado::is_tcems($boTransacao) ) {
-                $stFiltro .= "\n( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
-                $stFiltro .= "\n     pc.cod_estrutural like '1.1.4.%') ) AND ";
+                $stFiltro .= " ( pb.cod_banco IS NOT NULL
+                             AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
+                             AND ( pc.cod_estrutural like '1.1.1.%'
+                                OR pc.cod_estrutural like '1.1.4.%'
+                                OR pc.cod_estrutural LIKE '1.2.2.3%' )) AND ";
             } else {
-                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
-                $stFiltro .= "\n   (pc.cod_estrutural like '1.1.1.1.3.%' OR pc.cod_estrutural like '1.1.1.1.4.%' OR pc.cod_estrutural like '1.1.1.1.5.%' )) OR ";
-                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                $stFiltro .= " (( pb.cod_banco is not null
+                              AND pb.cod_entidade in (".$stCodEntidades.")
+                              AND ( pc.cod_estrutural like '1.1.1.1.3.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.4.%'
+                                 OR pc.cod_estrutural like '1.1.1.1.5.%'
+                                 OR pc.cod_estrutural LIKE '1.2.2.3%'
+                               ))
+                              OR pc.cod_estrutural like '1.1.5.%' ) AND ";
             }
 
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";

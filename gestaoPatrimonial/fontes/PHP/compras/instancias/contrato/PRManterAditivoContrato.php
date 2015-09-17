@@ -55,9 +55,11 @@ $arValores = Sessao::read('arValores');
 // método para setar os dados do objeto passado por parâmetro.
 function setaDados(&$obTLicitacaoContratoAditivo, $stAcao)
 {
-    $obTLicitacaoContratoAditivo->setDado('exercicio_contrato', $_REQUEST['stExercicioContrato']);
-    $obTLicitacaoContratoAditivo->setDado('num_contrato', $_REQUEST['inNumContrato']);
-    $obTLicitacaoContratoAditivo->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+    global $request;
+    
+    $obTLicitacaoContratoAditivo->setDado('exercicio_contrato', $request->get('stExercicioContrato'));
+    $obTLicitacaoContratoAditivo->setDado('num_contrato', $request->get('inNumContrato'));
+    $obTLicitacaoContratoAditivo->setDado('cod_entidade', $request->get('inCodEntidade'));
 
     if ($stAcao == "incluirCD") {
         $obTLicitacaoContratoAditivo->setDado('exercicio', Sessao::getExercicio());
@@ -65,18 +67,22 @@ function setaDados(&$obTLicitacaoContratoAditivo, $stAcao)
         $obTLicitacaoContratoAditivo->setDado('num_aditivo', $inCodNumAditivo);
 
     } else {
-        $obTLicitacaoContratoAditivo->setDado('exercicio', $_REQUEST['stExercicioAditivo']);
-        $obTLicitacaoContratoAditivo->setDado('num_aditivo', $_REQUEST['inNumeroAditivo']);
+        $obTLicitacaoContratoAditivo->setDado('exercicio', $request->get('stExercicioAditivo'));
+        $obTLicitacaoContratoAditivo->setDado('num_aditivo', $request->get('inNumeroAditivo'));
     }
 
-    $obTLicitacaoContratoAditivo->setDado('responsavel_juridico', $_REQUEST['inCodResponsavelJuridico']);
-    $obTLicitacaoContratoAditivo->setDado('dt_vencimento', $_REQUEST['dtFinalVigencia']);
-    $obTLicitacaoContratoAditivo->setDado('dt_assinatura', $_REQUEST['dtAssinatura']);
-    $obTLicitacaoContratoAditivo->setDado('inicio_execucao', $_REQUEST['dtInicioExcucao']);
-    $vlValorContratado = number_format(str_replace(".", "", $_REQUEST['vlValorContratado']), 2, ".", "");
+    $obTLicitacaoContratoAditivo->setDado('responsavel_juridico', $request->get('inCodResponsavelJuridico'));
+    $obTLicitacaoContratoAditivo->setDado('tipo_termo_aditivo', $request->get('inCodTipoTermoAditivo'));
+    $obTLicitacaoContratoAditivo->setDado('tipo_valor', $request->get('inCodTipoAlteracaoValor'));
+    $obTLicitacaoContratoAditivo->setDado('dt_vencimento', $request->get('dtFinalVigencia'));
+    $obTLicitacaoContratoAditivo->setDado('dt_assinatura', $request->get('dtAssinatura'));
+    $obTLicitacaoContratoAditivo->setDado('inicio_execucao', $request->get('dtInicioExcucao'));
+    $obTLicitacaoContratoAditivo->setDado('fim_execucao', $request->get('dtFimExecucao'));
+    $vlValorContratado = number_format(str_replace(".", "", $request->get('vlValorContratado')), 2, ".", "");
     $obTLicitacaoContratoAditivo->setDado('valor_contratado', $vlValorContratado);
-    $obTLicitacaoContratoAditivo->setDado('objeto', $_REQUEST['stObjeto']);
-    $obTLicitacaoContratoAditivo->setDado('fundamentacao', $_REQUEST['stFundamentacaoLegal']);
+    $obTLicitacaoContratoAditivo->setDado('objeto', $request->get('stObjeto'));
+    $obTLicitacaoContratoAditivo->setDado('justificativa', $request->get('stJustificativa'));
+    $obTLicitacaoContratoAditivo->setDado('fundamentacao', $request->get('stFundamentacaoLegal'));
 }
 
 Sessao::setTrataExcecao( true );
@@ -86,20 +92,20 @@ $stMensagem = "";
 if ($stAcao != "anularCD") {
 
     $obTLicitacaoContrato = new TLicitacaoContrato();
-    $obTLicitacaoContrato->setDado('exercicio_contrato', $_REQUEST['stExercicio']);
-    $obTLicitacaoContrato->setDado('num_contrato', $_REQUEST['inNumContrato']);
-    $obTLicitacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+    $obTLicitacaoContrato->setDado('exercicio_contrato', $request->get('stExercicio'));
+    $obTLicitacaoContrato->setDado('num_contrato', $request->get('inNumContrato'));
+    $obTLicitacaoContrato->setDado('cod_entidade', $request->get('inCodEntidade'));
     $obTLicitacaoContrato->recuperaPorChave( $rsLicitacaoContrato );
 
-    if ( implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) < implode(array_reverse(explode('/',$rsLicitacaoContrato->getCampo("dt_assinatura"))))) {
+    if ( implode(array_reverse(explode('/',$request->get('dtAssinatura')))) < implode(array_reverse(explode('/',$rsLicitacaoContrato->getCampo("dt_assinatura"))))) {
         $stMensagem = "A data de assinatura do aditivo não pode ser anterior que a data de assinatura do contrato.";
     }
 
-    if ( implode(array_reverse(explode('/',$_REQUEST['dtInicioExcucao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura'])))) {
+    if ( implode(array_reverse(explode('/',$request->get('dtInicioExcucao')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura'))))) {
         $stMensagem = "A data de início de execução não pode ser anterior que a data de assinatura do aditivo.";
     }
 
-    if ( implode(array_reverse(explode('/',$_REQUEST['dtFinalVigencia']))) < implode(array_reverse(explode('/',$_REQUEST['dtInicioExcucao'])))) {
+    if ( implode(array_reverse(explode('/',$request->get('dtFinalVigencia')))) < implode(array_reverse(explode('/',$request->get('dtInicioExcucao'))))) {
         $stMensagem = "A data de final de vigência não pode ser anterior que a data de início de execução.";
     }
 }
@@ -119,19 +125,19 @@ if ($stMensagem != "") {
 
             //inclui os dados da publicacao do contrato
             foreach ($arValores as $arTemp) {
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_contrato'       , $obTLicitacaoContratoAditivo->getDado('num_contrato') );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_aditivo'        , $obTLicitacaoContratoAditivo->getDado('num_aditivo') );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'numcgm'             , $arTemp['inVeiculo'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'dt_publicacao'      , $arTemp['dtDataPublicacao'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_publicacao'     , $arTemp['inNumPublicacao'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio'          , Sessao::getExercicio() );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio_contrato' , $obTLicitacaoContratoAditivo->getDado('exercicio_contrato') );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'observacao'         , $arTemp['stObservacao'] );
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_contrato'       , $obTLicitacaoContratoAditivo->getDado('num_contrato'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_aditivo'        , $obTLicitacaoContratoAditivo->getDado('num_aditivo'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'numcgm'             , $arTemp['inVeiculo']);
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'dt_publicacao'      , $arTemp['dtDataPublicacao']);
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_publicacao'     , $arTemp['inNumPublicacao']);
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio'          , Sessao::getExercicio());
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio_contrato' , $obTLicitacaoContratoAditivo->getDado('exercicio_contrato'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade'       , $request->get('inCodEntidade'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'observacao'         , $arTemp['stObservacao']);
                 $obTLicitacaoPublicacaoContratoAditivos->inclusao();
             }
 
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$_REQUEST['inNumContrato']."/".$_REQUEST['stExercicioContrato'],"incluir", "aviso", Sessao::getId(),"");
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$request->get('inNumContrato')."/".$request->get('stExercicioContrato'),"incluir", "aviso", Sessao::getId(),"");
             break;
 
         case "alterarCD":
@@ -140,40 +146,57 @@ if ($stMensagem != "") {
             $obTLicitacaoContratoAditivo->alteracao();
 
             //exclui os veiculos de publicidade existentes
-            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_contrato' , $_REQUEST['inNumContrato']);
-            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_aditivo'  , $_REQUEST['inNumAditivo']);
+            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_contrato' , $request->get('inNumContrato'));
+            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_aditivo'  , $request->get('inNumAditivo'));
             $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio'    , Sessao::getExercicio());
-            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade' , $_REQUEST['inCodEntidade']);
+            $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade' , $request->get('inCodEntidade'));
             $obTLicitacaoPublicacaoContratoAditivos->exclusao();
 
             //inclui os veiculos que estao na sessao
             foreach ($arValores as $arTemp) {
                 $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_contrato'       , $obTLicitacaoContratoAditivo->getDado('num_contrato') );
                 $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_aditivo'        , $obTLicitacaoContratoAditivo->getDado('num_aditivo') );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'numcgm'             , $arTemp['inVeiculo'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'dt_publicacao'      , $arTemp['dtDataPublicacao'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_publicacao'     , $arTemp['inNumPublicacao'] );
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'numcgm'             , $arTemp['inVeiculo']);
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'dt_publicacao'      , $arTemp['dtDataPublicacao']);
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'num_publicacao'     , $arTemp['inNumPublicacao']);
                 $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio'          , Sessao::getExercicio() );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio_contrato' , $obTLicitacaoContratoAditivo->getDado('exercicio_contrato') );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade'       , $_REQUEST['inCodEntidade'] );
-                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'observacao'         , $arTemp['stObservacao'] );
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'exercicio_contrato' , $obTLicitacaoContratoAditivo->getDado('exercicio_contrato'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'cod_entidade'       , $request->get('inCodEntidade'));
+                $obTLicitacaoPublicacaoContratoAditivos->setDado( 'observacao'         , $arTemp['stObservacao']);
                 $obTLicitacaoPublicacaoContratoAditivos->inclusao();
             }
 
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$_REQUEST['inNumContrato']."/".$_REQUEST['stExercicioContrato'],"alterar", "aviso", Sessao::getId(),"");
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$request->get('inNumContrato')."/".$request->get('stExercicioContrato'),"alterar", "aviso", Sessao::getId(),"");
             break;
 
         case "anularCD":
-            $obTLicitacaoContratoAditivo = new TLicitacaoContratoAditivosAnulacao();
-            $obTLicitacaoContratoAditivo->setDado("exercicio_contrato", $_REQUEST["stExercicioContrato"]);
-            $obTLicitacaoContratoAditivo->setDado("cod_entidade", $_REQUEST["inCodEntidade"]);
-            $obTLicitacaoContratoAditivo->setDado("num_contrato", $_REQUEST["inNumContrato"]);
-            $obTLicitacaoContratoAditivo->setDado("exercicio", $_REQUEST["stExercicioAditivo"]);
-            $obTLicitacaoContratoAditivo->setDado("num_aditivo", $_REQUEST["inNumeroAditivo"]);
-            $obTLicitacaoContratoAditivo->setDado("dt_anulacao", $_REQUEST["dtAnulacao"]);
-            $obTLicitacaoContratoAditivo->setDado("motivo", $_REQUEST["stMotivoAnulacao"]);
-            $obTLicitacaoContratoAditivo->inclusao();
-            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$_REQUEST['inNumContrato']."/".$_REQUEST['stExercicioContrato'],"anular", "aviso", Sessao::getId(),"");
+            $obTLicitacaoContratoAditivoAnulacao = new TLicitacaoContratoAditivosAnulacao();
+            $obTLicitacaoContratoAditivoAnulacao->setDado("exercicio_contrato", $request->get("stExercicioContrato"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("cod_entidade", $request->get("inCodEntidade"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("num_contrato", $request->get("inNumContrato"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("exercicio", $request->get("stExercicioAditivo"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("num_aditivo", $request->get("inNumeroAditivo"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("dt_anulacao", $request->get("dtAnulacao"));
+            $obTLicitacaoContratoAditivoAnulacao->setDado("motivo", $request->get("stMotivoAnulacao"));
+            $vlValorAnulacao = number_format(str_replace(".", "", $request->get('vlValorAnulacao')), 2, ".", "");
+            $obTLicitacaoContratoAditivoAnulacao->setDado('valor_anulacao', $vlValorAnulacao);
+            
+            $obTLicitacaoContratoAditivo = new TLicitacaoContratoAditivos;
+            $obTLicitacaoContratoAditivo->setDado("exercicio_contrato", $request->get("stExercicioContrato"));
+            $obTLicitacaoContratoAditivo->setDado("cod_entidade", $request->get("inCodEntidade"));
+            $obTLicitacaoContratoAditivo->setDado("num_contrato", $request->get("inNumContrato"));
+            $obTLicitacaoContratoAditivo->setDado("exercicio", $request->get("stExercicioAditivo"));
+            $obTLicitacaoContratoAditivo->setDado("num_aditivo", $request->get("inNumeroAditivo"));
+            $obTLicitacaoContratoAditivo->recuperaPorChave($rsContratoAditivos);
+            
+            if($vlValorAnulacao > $rsContratoAditivos->getCampo('valor_contratado')) {
+                SistemaLegado::exibeAviso('O valor da anulação não pode ser maior que o valor do aditivo.', "n_incluir", "erro" );
+                break;
+            }
+            
+            $obTLicitacaoContratoAditivoAnulacao->inclusao();
+            
+            SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=".$stAcao.$stFiltro,"Contrato: ".$request->get('inNumContrato')."/".$request->get('stExercicioContrato'),"anular", "aviso", Sessao::getId(),"");
             break;
     }
 }

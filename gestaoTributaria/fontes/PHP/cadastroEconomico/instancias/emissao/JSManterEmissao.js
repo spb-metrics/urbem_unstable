@@ -32,24 +32,10 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-	* $Id: JSManterEmissao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+	* $Id: JSManterEmissao.js 63390 2015-08-24 19:17:05Z arthur $
 
     * Casos de uso: uc-05.02.12
 */
-
-/*
-$Log$
-Revision 1.2  2007/04/23 18:31:09  dibueno
-*** empty log message ***
-
-Revision 1.1  2006/10/23 16:12:21  dibueno
-*** empty log message ***
-
-Revision 1.1  2006/10/03 09:57:51  cercato
-*** empty log message ***
-
-*/
-
 ?>
 
 <script type="text/javascript">

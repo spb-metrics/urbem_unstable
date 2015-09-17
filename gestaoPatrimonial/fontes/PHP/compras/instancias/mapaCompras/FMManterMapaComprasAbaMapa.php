@@ -34,24 +34,23 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaComprasAbaMapa.php 63032 2015-07-17 18:04:12Z michel $
+ $Id: FMManterMapaComprasAbaMapa.php 63445 2015-08-28 13:44:54Z michel $
 
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapa.class.php';
 
 Sessao::write('itens_excluidos' , array());
 
-$inCodMapa   = $_POST['cod_mapa']  ? $_POST['cod_mapa']  : $_GET['cod_mapa'];
-$stExercicio = $_POST['exercicio'] ? $_POST['exercicio'] : $_GET['exercicio'];
+$inCodMapa   = $request->get('cod_mapa');
+$stExercicio = $request->get('exercicio');
 
 if ($inCodMapa) {
-    //// está variavél só tera valor se a ação for alteração anulação etc. menos inclusão
-
-    include_once ( CAM_GP_COM_MAPEAMENTO . 'TComprasMapa.class.php' );
+    //está variavél só tera valor se a ação for alteração anulação etc. menos inclusão
     $obTComprasMapa = new TComprasMapa;
-    $stFiltro = " where mapa.cod_mapa = $inCodMapa and mapa.exercicio = '$stExercicio'";
+    $stFiltro = " where mapa.cod_mapa = ".$inCodMapa." and mapa.exercicio = '".$stExercicio."'";
     $obTComprasMapa->recuperaRelacionamento ( $rsMapa, $stFiltro );
 
     $obTComprasMapa->setDado( 'cod_mapa', $inCodMapa );
@@ -139,6 +138,11 @@ $obSolicitacao->obRdRegistroPrecoNao->setObrigatorioBarra       ( true );
 $obSolicitacao->setObrigatorioBarra                             ( true );
 $obSolicitacao->setNull                                         ( true );
 $obSolicitacao->setRegistroPreco                                ( true );
+
+$obHdnBoRegistroPreco = new Hidden;
+$obHdnBoRegistroPreco->setName  ( 'boRegistroPreco' );
+$obHdnBoRegistroPreco->setId    ( 'boRegistroPreco' );
+$obHdnBoRegistroPreco->setValue ( 'false'  );
 
 $arIncluirSolicitacao =  array( &$obSolicitacao->obPopUpSolicitacao, &$obSolicitacao->obITextBoxSelectEntidade );
 

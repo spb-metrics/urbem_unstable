@@ -24,7 +24,7 @@
     * Script de função PLPGSQL - Relatório Anexo III TCEMG - Despesas Liquidadas.
     * Data de Criação: 12/08/2014
     * @author Evandro Melos
-    $Id: TCEMGRelatorioAnexoIIIDespesaLiquidada.plsql 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TCEMGRelatorioAnexoIIIDespesaLiquidada.plsql 63336 2015-08-19 17:17:13Z lisiane $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_liquidada(stMascRed VARCHAR
@@ -34,6 +34,7 @@ CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_liquidada(stMascRed 
 																	 , stDtFim VARCHAR
 																	 , stCodOrgao VARCHAR
 																	 , boRestos BOOLEAN
+                                                                     , codPrograma INTEGER
 																	 ) RETURNS NUMERIC(14,2) AS $$
 DECLARE 
 	stSQL 		VARCHAR;
@@ -57,7 +58,8 @@ IF boRestos = true THEN
 		SELECT 
 			ped.exercicio, 
 			ped.cod_pre_empenho, 
-			cd.cod_estrutural 
+			cd.cod_estrutural,
+            d.cod_programa
 		FROM
 			orcamento.conta_despesa cd 
 	 	JOIN empenho.pre_empenho_despesa ped 
@@ -92,7 +94,8 @@ IF boRestos = true THEN
 		e.cod_entidade IN (' || stEntidades || ') AND 
 		nl.dt_liquidacao BETWEEN to_date(''' || stDtIni || ''', ''dd/mm/yyyy'') AND 
 							 to_date(''' || stDtFim || ''', ''dd/mm/yyyy'') AND 
-		pedcd.cod_estrutural like ''' || stMascRed || '%'' 
+		pedcd.cod_estrutural like ''' || stMascRed || '%''
+        AND pedcd.cod_programa = ' || codPrograma || '
         AND SUBSTRING(pedcd.cod_estrutural, 5, 3) <> ''9.1''  ';
 
 ELSE

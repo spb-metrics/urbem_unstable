@@ -176,10 +176,8 @@ stQuery := '   SELECT  bem.cod_bem
                 WHERE  bem.depreciavel = true
                   AND  NOT EXISTS ( SELECT 1
                                       FROM patrimonio.bem_baixado
-                                     WHERE bem_baixado.cod_bem = bem.cod_bem )
-                  AND grupo_plano_depreciacao.exercicio = '|| quote_literal(stExercicio) ||'
-                   OR bem_plano_depreciacao.exercicio   = '|| quote_literal(stExercicio);
-    
+                                     WHERE bem_baixado.cod_bem = bem.cod_bem ) ';
+                                     
     IF inCodNatureza IS NOT NULL THEN
         stQuery := stQuery||' AND bem.cod_natureza = '||inCodNatureza;
     END IF;

@@ -42,7 +42,7 @@ Adicionada tag Log aos arquivos
 */
 
 CREATE OR REPLACE  FUNCTION empenho.fn_despesa_empenhado_mes_ano(character varying, character varying, character varying, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) RETURNS numeric[]
-    AS '
+AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stDtInicial         ALIAS FOR $2;
@@ -58,46 +58,42 @@ DECLARE
     inCodRecurso        ALIAS FOR $12;
     inCodReduzido       ALIAS FOR $13;
 
-
-
-
-    stSql               VARCHAR   := '''';
+    stSql               VARCHAR   := '';
     nuSoma              NUMERIC   := 0;
     reRegistro          RECORD;
     dtInicioAno         VARCHAR;
     dtFim               VARCHAR;
     nuRetorno           NUMERIC[] := array[0.00];
-
 BEGIN
 
-    dtInicioAno := ''01/01/'' || stExercicio;
+    dtInicioAno := '01/01/' || stExercicio;
 
-    IF stExercicio >= TO_CHAR(now(), ''yyyy'') THEN
-        dtFim := TO_CHAR(NOW(), ''dd/mm/yyyy'');
+    IF stExercicio >= TO_CHAR(now(), 'yyyy') THEN
+        dtFim := TO_CHAR(NOW(), 'dd/mm/yyyy');
     ELSE
-        dtFim := ''31/12/'' || stExercicio;
+        dtFim := '31/12/' || stExercicio;
     END IF;
 
-    stSql := ''SELECT
-               Sum( Case When TE.dt_empenho >= to_date(''''''|| dtInicioAno ||'''''',''''dd/mm/yyyy'''') And 
-                              TE.dt_empenho <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''') 
+    stSql := 'SELECT
+               Sum( Case When TE.dt_empenho >= to_date('|| quote_literal(dtInicioAno) ||',''dd/mm/yyyy'') And 
+                              TE.dt_empenho <= to_date('|| quote_literal(stDtFinal) ||',''dd/mm/yyyy'') 
                          Then TE.vl_total
                          Else 0.00 End ) as empenhado_ano,
-               Sum( Case When TE.dt_empenho >= to_date(''''''|| stDtInicial ||'''''',''''dd/mm/yyyy'''') And 
-                              TE.dt_empenho <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''')  
+               Sum( Case When TE.dt_empenho >= to_date('|| quote_literal(stDtInicial) ||',''dd/mm/yyyy'') And 
+                              TE.dt_empenho <= to_date('|| quote_literal(stDtFinal) ||',''dd/mm/yyyy'')  
                          Then TE.vl_total
                          Else 0.00 End )   as empenhado_per
                FROM  tmp_empenhado as TE
                WHERE
-                     TE.cod_conta                =''|| inCodConta    ||''
-                 And TE.num_unidade              =''|| inCodUnidade  ||''
-                 And TE.num_orgao                =''|| inCodOrgao    ||''
-                 And TE.num_pao                  =''|| inCodNumPAO   ||''
-                 And TE.cod_funcao               =''|| inCodFuncao   ||''
-                 And TE.cod_subfuncao            =''|| inCodSubFuncao  ||''
-                 And TE.cod_programa             =''|| inCodPrograma   ||''
-                 And TE.cod_recurso              =''|| inCodRecurso    ||''
-                 And TE.cod_despesa              =''|| inCodReduzido;
+                     TE.cod_conta                ='|| inCodConta    ||'
+                 And TE.num_unidade              ='|| inCodUnidade  ||'
+                 And TE.num_orgao                ='|| inCodOrgao    ||'
+                 And TE.num_pao                  ='|| inCodNumPAO   ||'
+                 And TE.cod_funcao               ='|| inCodFuncao   ||'
+                 And TE.cod_subfuncao            ='|| inCodSubFuncao  ||'
+                 And TE.cod_programa             ='|| inCodPrograma   ||'
+                 And TE.cod_recurso              ='|| inCodRecurso    ||'
+                 And TE.cod_despesa              ='|| inCodReduzido;
 
     FOR reRegistro IN EXECUTE stSql
       LOOP
@@ -107,6 +103,5 @@ BEGIN
 
     RETURN nuRetorno;
 END;
-'
-    LANGUAGE plpgsql;
-
+$$
+LANGUAGE plpgsql;

@@ -32,33 +32,14 @@
     * @author Desenvolvedor: Fernando Piccini Cercato 
     * @ignore
 
-    * $Id: JSManterEmissao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: JSManterEmissao.js 63390 2015-08-24 19:17:05Z arthur $
 
     * Casos de uso: uc-05.04.03
 */
-
-/*
-$Log$
-Revision 1.2  2007/03/01 14:45:22  cercato
-Bug #8553#
-
-Revision 1.1  2006/10/03 09:57:51  cercato
-*** empty log message ***
-
-*/
-
 ?>
 
 <script type="text/javascript">
-/*
-function Cancelar () {
-    <?php
-        $stLink = Sessao::read('stLink');
-    ?>
 
-    mudaTelaPrincipal("<?=$pgFilt.'?'.Sessao::getId().$stLink;?>");
-}
-*/
 function selecionarTodos(){
     var cont = 0;
     var campoT = document.frm.boTodos.checked;

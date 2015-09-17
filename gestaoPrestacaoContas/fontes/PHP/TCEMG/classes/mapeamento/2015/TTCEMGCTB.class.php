@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCTB.class.php 62547 2015-05-19 17:15:30Z michel $
+    * $Id: TTCEMGCTB.class.php 63533 2015-09-09 17:13:20Z lisiane $
 
 */
 
@@ -145,7 +145,7 @@ class TTCEMGCTB extends Persistente
                         , c.cod_recurso as cod_fonte_recursos
                         , SUM(c.vl_saldo_inicial_fonte) as vl_saldo_inicial_fonte 
                         , SUM(c.vl_saldo_final_fonte) as vl_saldo_final_fonte
-                        , c.movimentacao
+                      --  , c.movimentacao
                      FROM (SELECT '20'::VARCHAR AS tipo_registro
                                 , cod_ctb
                                 , tipo_conta||regexp_replace((conta), '[-|,|.|x]', '', 'gi') AS cod_ctb_view 
@@ -157,7 +157,6 @@ class TTCEMGCTB extends Persistente
                                 , plano_analitica.exercicio
                                 , saldo_inicial.saldo_anterior AS vl_saldo_inicial_fonte
                                 , ((saldo_inicial.vl_debito - saldo_inicial.vl_credito) + saldo_inicial.saldo_anterior) AS vl_saldo_final_fonte
-                                , CASE WHEN (conta_debito_credito.vl_lancamento IS NOT NULL) THEN 1 END AS movimentacao  
                                 , conta
                              FROM tesouraria.fn_relatorio_demostrativo_saldos( '".$this->getDado('exercicio')."'
 																			 , '".$this->getDado('entidades')."'
@@ -299,14 +298,12 @@ class TTCEMGCTB extends Persistente
                                 , plano_recurso.cod_recurso
                                 , plano_analitica.cod_plano
                                 , plano_analitica.exercicio
-                                , movimentacao
                                 , saldo_inicial.saldo_anterior
                                 , saldo_inicial.vl_debito
                                 , saldo_inicial.vl_credito
                                 , conta
                          ORDER BY cod_ctb
                         ) AS c
-                --    WHERE movimentacao = 1   
                  GROUP BY c.tipo_registro
                         , c.cod_ctb
                         , c.cod_ctb_view
@@ -315,7 +312,6 @@ class TTCEMGCTB extends Persistente
                         , c.cod_orgao
                         , c.cod_recurso
                         , c.conta
-                        , c.movimentacao    
                  ORDER BY c.cod_ctb  
                  ";
         return $stSql;

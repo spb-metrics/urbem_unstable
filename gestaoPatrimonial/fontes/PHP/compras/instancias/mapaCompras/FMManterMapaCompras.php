@@ -34,15 +34,16 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaCompras.php 61787 2015-03-04 13:26:46Z evandro $
+ $Id: FMManterMapaCompras.php 63445 2015-08-28 13:44:54Z michel $
 
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once CAM_GP_COM_COMPONENTES."IMontaSolicitacao.class.php";
-include_once CAM_GP_COM_COMPONENTES."IPopUpObjeto.class.php";
-include_once CAM_GP_LIC_COMPONENTES."ISelectTipoLicitacao.class.php";
+include_once CAM_GP_COM_COMPONENTES.'IMontaSolicitacao.class.php';
+include_once CAM_GP_COM_COMPONENTES.'IPopUpObjeto.class.php';
+include_once CAM_GP_LIC_COMPONENTES.'ISelectTipoLicitacao.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasObjeto.class.php';
 
 $link = Sessao::read('link');
 
@@ -57,11 +58,7 @@ $pgJs       = "JS".$stPrograma.".js";
 include_once $pgJs;
 include_once $pgOcul;
 
-$stAcao = $request->get('stAcao');
-
-if (!$stAcao) {
-    $stAcao = 'incluir';
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 # Em breve irei tirar as gambiarras desse fonte.
 Sessao::write('solicitacoes'           , array());
@@ -72,6 +69,27 @@ Sessao::write('solicitacoes_anuladas'  , array());
 
 # a variavel abaixo será usada pra gerar o codigo das solicitações que forem adcionadas na lista
 Sessao::write('ultimoCodigo' , 0);
+
+$boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+$boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+$boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+$boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+
+if(!$boReservaRigida && !$boReservaAutorizacao){
+    $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
+    
+    $obLblMsgTipoReserva = new Label();
+    $obLblMsgTipoReserva->setRotulo ( "Aviso" );
+    $obLblMsgTipoReserva->setValue  ( $stMsg );
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo     ( 'Configuração Tipo de Reserva'   );
+    $obFormulario->addComponente ( $obLblMsgTipoReserva             );
+    $obFormulario->show();
+    
+    exit();
+}
 
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName( "stAcao" );
@@ -161,6 +179,8 @@ $obFormulario->addTitulo             ( "Dados das Solicitações do Mapa" );
 if ($stAcao != 'anular') {
     $obSolicitacao->geraFormulario       ( $obFormulario );
     $obFormulario->defineBarraAba(array($obBtnIncluirForm, $obBtnLimparSolicitacaoForm));
+}else{
+    $obFormulario->addHidden     ( $obHdnBoRegistroPreco );
 }
 
 $obFormulario->addSpan               ( $obSpnSolicitacoes );
@@ -198,7 +218,6 @@ if ($stAcao != 'incluir') {
    Sessao::write('exercicio_mapa' , $stExercicio);
    montaMapa($inCodMapa, $stExercicio );
    if ($stAcao != 'anular') {
-        include_once( CAM_GP_COM_MAPEAMENTO. 'TComprasObjeto.class.php' );
         $obTComprasObjeto = new TComprasObjeto;
         $obTComprasObjeto->setDado( 'cod_objeto' , $inCodObjeto );
         $obTComprasObjeto->consultar();

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63124 $
+    $Revision: 63235 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -99,15 +99,15 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
     

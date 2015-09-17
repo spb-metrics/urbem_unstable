@@ -30,39 +30,10 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-* $Id: PREmitirCarneLancManual.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+* $Id: PREmitirCarneLancManual.php 63344 2015-08-19 18:51:30Z arthur $
 
     Caso de uso: uc-05.03.05
 **/
-
-/*
-$Log$
-Revision 1.21  2007/05/17 20:31:32  cercato
-colocando exit para terminar lancamento manual.
-
-Revision 1.20  2007/05/17 13:20:51  cercato
-colocando exit para terminar lancamento manual.
-
-Revision 1.19  2007/04/16 18:05:52  cercato
-Bug #9132#
-
-Revision 1.18  2007/02/23 20:26:21  cercato
-alteracao para o grupo 6 exibir capa do iss estimativa
-
-Revision 1.17  2007/02/15 16:58:55  dibueno
-Alteração na ordem dos eventos.
-Primeiro, chama a tela de download do PDF.
-Depois, chama os procedimentos de finalização.
-
-Revision 1.16  2007/01/26 17:00:19  fabio
-atualizado para versao de MATA DE SÃO JOÃO
-
-Revision 1.14  2006/09/15 10:57:57  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-//sistemaLegado::mostravar( $_REQUEST );exit;
 
 if (!$obRARRLancamento->obRARRCarne->obRARRParcela->roRARRLancamento->inCodLancamento) {
     $obCarne = $obRARRCarne;
@@ -71,8 +42,7 @@ if (!$obRARRLancamento->obRARRCarne->obRARRParcela->roRARRLancamento->inCodLanca
 }
 
 $obCarne->listarEmissaoCarne( $rsEmissaoCarne );
-//echo '<hr>'.$obRARRLancamento->obRARRCarne->obRARRParcela->roRARRLancamento->inCodLancamento;
-//sistemaLegado::mostravar( $rsEmissaoCarne ); //exit;
+
 if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
     $boExec = TRUE;
     $arEmissao = array();
@@ -88,7 +58,7 @@ if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
     $rsEmissaoCarne->setPrimeiroElemento();
     $stIdVinculo = $rsEmissaoCarne->getCampo('id_vinculo');
     $inCodGrupo = $rsEmissaoCarne->getCampo('cod_grupo');
-    #echo 'COD GRUPOI: '.$inCodGrupo; exit;
+    
     while ( !$rsEmissaoCarne->eof() ) {
         $arEmissao[$rsEmissaoCarne->getCampo('cod_lancamento')][] = array(
             "cod_parcela" => $rsEmissaoCarne->getCampo('cod_parcela'),
@@ -137,8 +107,6 @@ if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
         echo "</script>\r\n";
     }
 
-    //include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php");
-
     include_once (CAM_GT_ARR_MAPEAMENTO."TARRCarne.class.php");
     $rsEmissaoCarne->setPrimeiroElemento();
     while ( !$rsEmissaoCarne->eof() ) {
@@ -175,7 +143,7 @@ if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
             SistemaLegado::alertaAviso($pgForm."?stAcao=emitir",urlencode($obErro->getDescricao()),"n_incluir","erro",Sessao::getId(),"../");
         }
     }
-//exit;
+
 } else {
     if ($obCarne->obRARRParcela->roRARRLancamento->inCodLancamento) {
         $pgFormRelatorioExecucaoLancamento = "FMRelatorioExecucaoLancamento.php";
@@ -198,3 +166,5 @@ if ( $rsEmissaoCarne->getNumLinhas() > 0 ) {
         SistemaLegado::alertaAviso($stPag,"Codigo do Grupo:".$_REQUEST["inCodGrupo"],"incluir","aviso", $sessao->id, "../");
     }
 }
+
+?>

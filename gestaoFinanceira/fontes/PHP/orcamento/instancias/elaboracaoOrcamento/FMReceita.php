@@ -23,16 +23,6 @@
 */
 ?>
 <?php
-/**
-    * Página de Formulario de Inclusao/Alteracao de Fornecedores
-    * Data de Criação   : 02/08/2004
-
-    * @author Desenvolvedor: Marcelo Boezzio Paulino
-
-    $Id: FMReceita.php 60846 2014-11-18 18:16:19Z franver $
-
-    * Casos de uso: uc-02.01.06
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once( CAM_GF_INCLUDE."validaGF.inc.php");
@@ -52,7 +42,8 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once ($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
+
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
@@ -489,9 +480,11 @@ if ($stAcao == 'alterar') {
     $jsOnload .= "montaParametrosGET('preencheMetas','','sincrono');";
     $jsOnload .= "montaParametrosGET('mudaPorcentagem','','sincrono');";
 }
+
 if ($boCreditoTributario == "S") {
     $jsOnload .= "montaParametrosGET('montaContaCreditoTributario','','sincrono');";
 }
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

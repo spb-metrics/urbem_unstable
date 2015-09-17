@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Lisiane Morais
 
-    $Id: TTCEMGRespLic.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: TTCEMGRespLic.class.php 63520 2015-09-08 19:13:32Z carlos.silva $
 
    
 */
@@ -296,6 +296,8 @@ class TTCEMGRespLic extends Persistente
                                AND licitacao_anulada.exercicio = licitacao.exercicio
                          )
                          
+         AND ( CASE WHEN licitacao.cod_tipo_objeto != 4 THEN dadosResponsaveis.tipo_responsabilidade != 9 ELSE TRUE END ) 
+                         
         GROUP BY 1,2,3,4,5,6,7
         ORDER BY num_processo_licitatorio";
         return $stSql;
@@ -465,6 +467,8 @@ class TTCEMGRespLic extends Persistente
                                      WHERE membro_excluido.numcgm = tipo_membro.numcgm
                                  )
                   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+                  
+                  ORDER BY num_processo_licitatorio
                   ";
         return $stSql;
     }

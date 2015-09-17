@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.04.33
 
-    $Id: LSManterCompraDireta.php 60384 2014-10-16 19:00:04Z carolina $
+    $Id: LSManterCompraDireta.php 63408 2015-08-25 17:10:37Z lisiane $
 
     */
 
@@ -48,6 +48,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 $pgFormConsultar = "FMConsultaCompraDireta.php";
+$pgFormPublicar = "FMManterPublicacaoCompraDireta.php";
 
 $arFiltro = Sessao::read('filtro');
 //filtros
@@ -104,9 +105,19 @@ if ($stAcao == 'alterar') {
                                    AND  compra_direta.exercicio_entidade = compra_direta_anulacao.exercicio_entidade
                                    AND  compra_direta.cod_modalidade = compra_direta_anulacao.cod_modalidade
                             )   AND ";
+} elseif ($stAcao == 'publicar') {
+       $stFiltro .= ' NOT EXISTS( SELECT 1
+                                    FROM compras.compra_direta_anulacao
+                                   WHERE compra_direta.cod_compra_direta = compra_direta_anulacao.cod_compra_direta
+                                     AND compra_direta.cod_entidade = compra_direta_anulacao.cod_entidade
+                                     AND compra_direta.exercicio_entidade = compra_direta_anulacao.exercicio_entidade
+                                     AND compra_direta.cod_modalidade = compra_direta_anulacao.cod_modalidade) AND ';
 }
-
-if ($_REQUEST['inCodEntidade']) {
+if($stAcao == 'publicar') {
+    if ( count($_REQUEST['inCodEntidade']) > 0 ) {
+        $stFiltro .= " compra_direta.cod_entidade in (".implode(',', $_REQUEST['inCodEntidade']).") AND ";
+    }
+}elseif ($_REQUEST['inCodEntidade']) {
     $stFiltro .= " compra_direta.cod_entidade = ".$_REQUEST['inCodEntidade']." AND ";
 }
 
@@ -147,7 +158,10 @@ if ($_REQUEST['inCodHomologada'] == 2) {
                                                   AND homologacao.cod_modalidade = compra_direta.cod_modalidade) 
                             ) AND ";
 }
-
+if($stAcao == 'publicar' and $_REQUEST['stChaveProcesso']) {
+    $arProcesso = explode('/', $_REQUEST['stChaveProcesso']);
+    $stFiltro .= " compra_direta_processo.cod_processo = ".$arProcesso[0]." AND compra_direta_processo.exercicio_processo = '".$arProcesso[1]."' AND ";
+}
 if ($stFiltro != '') {
     $stFiltro = ' WHERE '.substr($stFiltro,0,strlen($stFiltro)-4);
 }
@@ -238,11 +252,18 @@ $obLista->ultimaAcao->addCampo("&stDtEmissao", "data"  );
 $obLista->ultimaAcao->addCampo("&inCodMapa", "cod_mapa"  );
 $obLista->ultimaAcao->addCampo("&stExercicioMapa", "exercicio_mapa"  );
 $obLista->ultimaAcao->addCampo("&bolHomologado", "homologado"  );
+if($stAcao == 'publicar'){
+    $obLista->ultimaAcao->addCampo("&stModalidadeDescricao" , "modalidade"   );
+    $obLista->ultimaAcao->addCampo("&stNomeEntidade", "entidade"  );
+    $obLista->ultimaAcao->addCampo("&entidade_exercicio", "entidade_exercicio"  );
+}
 
 if($stAcao == 'reemitir')
     $obLista->ultimaAcao->setLink( $pgProc."?stAcao=$stAcao&".Sessao::getId().$stLink );
 elseif($stAcao == 'consultar')
     $obLista->ultimaAcao->setLink( $pgFormConsultar."?stAcao=$stAcao&".Sessao::getId().$stLink );
+elseif($stAcao == 'publicar')
+    $obLista->ultimaAcao->setLink( $pgFormPublicar."?stAcao=$stAcao&".Sessao::getId().$stLink );
 else
     $obLista->ultimaAcao->setLink( $pgForm."?stAcao=$stAcao&".Sessao::getId().$stLink );
 

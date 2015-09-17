@@ -34,18 +34,11 @@
 
     * @ignore
 
-    * $Id: FMManterEdificacaoCaracteristica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterEdificacaoCaracteristica.php 63277 2015-08-12 12:59:36Z arthur $
 
     * Casos de uso: uc-05.01.11
 */
 
-/*
-$Log$
-Revision 1.6  2006/09/18 10:30:30  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMEdificacao.class.php"     );
@@ -61,6 +54,7 @@ $pgFormVinculo = "FM".$stPrograma."Vinculo.php";
 $pgProc        = "PR".$stPrograma.".php";
 $pgOcul        = "OC".$stPrograma.".php";
 $pgJs          = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
 $stAcao = $request->get('stAcao');
@@ -187,4 +181,5 @@ $obFormulario->addSpan      ( $obSpnAtributosProcesso );
 $obFormulario->Cancelar ();
 $obFormulario->setFormFocus( $obBscProcesso->obCampoCod->getid() );
 $obFormulario->show ();
+
 ?>

@@ -36,62 +36,73 @@ DECLARE
     dtInicial               ALIAS FOR $2;
     dtFinal                 ALIAS FOR $3;
     stCodEntidades          ALIAS FOR $4;
-    stSql                   VARCHAR   := '';
+    inPeriodo               INTEGER;
+    stSql                   VARCHAR := '';
     reRegistro              RECORD;
 BEGIN
 
-    stSql :='CREATE TEMPORARY TABLE tmp_deducoes AS
-                SELECT *
-                FROM orcamento.fn_balancete_receita(
-                                                '|| quote_literal(stExercicio) ||'
-                                                ,''''
-                                                ,'|| quote_literal(dtInicial) || '
-                                                ,'|| quote_literal(dtFinal) || '
-                                                ,'|| quote_literal(stCodEntidades) ||'
-                                                ,'''','''','''','''','''','''','''') 
-                    as retorno(                      
-                        cod_estrutural      varchar,     
-                        receita             integer,     
-                        recurso             varchar,     
-                        descricao           varchar,     
-                        valor_previsto      numeric,     
-                        arrecadado_periodo  numeric,     
-                        arrecadado_ano      numeric,     
-                        diferenca           numeric     
-                    )
-                WHERE cod_estrutural like ''9.1.7.0%''
-                ';
+    inPeriodo := EXTRACT( month FROM TO_DATE(dtInicial,'dd/mm/yyyy') );
+    
+    stSql :='
+          CREATE TEMPORARY TABLE tmp_deducoes AS
+          SELECT *
+            FROM orcamento.fn_balancete_receita( '||quote_literal(stExercicio)||'
+                                               , ''''
+                                               , '|| quote_literal(dtInicial) || '
+                                               , '|| quote_literal(dtFinal) || '
+                                               , '|| quote_literal(stCodEntidades) ||'
+                                               , ''''
+                                               , ''''
+                                               , ''''
+                                               , ''''
+                                               , ''''
+                                               , ''''
+                                               ,'''') 
+              AS retorno( cod_estrutural      VARCHAR
+                        , receita             INTEGER
+                        , recurso             VARCHAR
+                        , descricao           VARCHAR
+                        , valor_previsto      NUMERIC
+                        , arrecadado_periodo  NUMERIC
+                        , arrecadado_ano      NUMERIC
+                        , diferenca           NUMERIC
+                        )
+                  WHERE cod_estrutural like ''9.1.7.0%''
+    ';
+    
     EXECUTE stSql;
     
-    
     stSql := '
-            SELECT *
-                FROM(
-                    SELECT 
-                        12::varchar as mes
-                        , ''01''::varchar as cod_tipo
-                        , ABS(sum(valor_previsto))::varchar as valor_01
-                        FROM tmp_deducoes
-                    UNION 
-                    SELECT 
-                        12::varchar as mes
-                        , ''02''::varchar as cod_tipo
-                        , ABS(sum(valor_previsto))::varchar as valor_02
-                        FROM tmp_deducoes
-                    UNION 
-                    SELECT 
-                        12::varchar as mes
-                        , ''03''::varchar as cod_tipo
-                        , ABS(sum(valor_previsto))::varchar as valor_03
-                        FROM tmp_deducoes
-                    UNION 
-                    SELECT 
-                        12::varchar as mes
-                        , ''04''::varchar as cod_tipo
-                        , ABS(sum(arrecadado_periodo))::varchar as valor_04
-                        FROM tmp_deducoes
-                    ) resultado
-            ORDER BY mes, cod_tipo
+          SELECT *
+            FROM (
+    ';
+    IF inPeriodo = 1 THEN
+        stSql := stSql || '
+                  SELECT '||inPeriodo||'::VARCHAR as mes
+                       , ''01''::VARCHAR as cod_tipo
+                       , ABS(sum(valor_previsto))::VARCHAR as valor_01
+                    FROM tmp_deducoes
+                   UNION 
+        ';
+    END IF;
+    stSql := stSql || '
+                  SELECT '||inPeriodo||'::VARCHAR as mes
+                       , ''02''::VARCHAR as cod_tipo
+                       , ABS(sum(valor_previsto))::VARCHAR as valor_02
+                    FROM tmp_deducoes
+                   UNION 
+                  SELECT '||inPeriodo||'::VARCHAR as mes
+                       , ''03''::VARCHAR as cod_tipo
+                       , ABS(sum(valor_previsto))::VARCHAR as valor_03
+                    FROM tmp_deducoes
+                   UNION 
+                  SELECT '||inPeriodo||'::VARCHAR as mes
+                       , ''04''::VARCHAR as cod_tipo
+                       , ABS(sum(arrecadado_periodo))::VARCHAR as valor_04
+                    FROM tmp_deducoes
+                 ) resultado
+        ORDER BY mes
+               , cod_tipo
     ';
     
     FOR reRegistro IN EXECUTE stSql
@@ -103,5 +114,3 @@ BEGIN
 
 END;
 $$ language 'plpgsql';
-
-

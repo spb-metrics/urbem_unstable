@@ -22,103 +22,139 @@
 */
 CREATE OR REPLACE FUNCTION orcamentosuplementacoescreditosuplementar (character varying, numeric, character varying, integer, character varying, integer, character varying ) RETURNS INTEGER AS $$
 DECLARE
-    EXERCICIO       ALIAS FOR $1;
-    VALOR           ALIAS FOR $2;
-    COMPLEMENTO     ALIAS FOR $3;
-    CODLOTE         ALIAS FOR $4;
-    TIPOLOTE        ALIAS FOR $5;
-    CODENTIDADE     ALIAS FOR $6;
-    CREDSUPLEMENTAR ALIAS FOR $7;
+    stExercicio           ALIAS FOR $1;
+    nuValor               ALIAS FOR $2;
+    stComplemento         ALIAS FOR $3;
+    inCodLote             ALIAS FOR $4;
+    stTipoLote            ALIAS FOR $5;
+    inCodEntidade         ALIAS FOR $6;
+    stCredSuplementar     ALIAS FOR $7;
 
-    SEQUENCIA INTEGER;
-    TIPOCREDSUPLEMENTAR VARCHAR := '';
+    inUF                  INTEGER;
+    inSequencia           INTEGER;
+    stTipoCredSuplementar VARCHAR := '';
 BEGIN
-    TIPOCREDSUPLEMENTAR := '' || CREDSUPLEMENTAR || '';
-    IF EXERCICIO::integer > 2013 THEN
-        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '522130300' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+
+    SELECT INTO
+          inUF
+          configuracao.valor
+     FROM administracao.configuracao
+    WHERE configuracao.cod_modulo = 2
+      AND configuracao.parametro = 'cod_uf'
+      AND configuracao.exercicio = quote_literal(stExercicio);
+
+    stTipoCredSuplementar := '' || stCredSuplementar || '';
+    
+    IF stExercicio::integer > 2013 THEN
+        IF stTipoCredSuplementar = 'Reducao' THEN
+            inSequencia := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            
+            IF inUF <> 2 THEN
+                inSequencia := FAZERLANCAMENTO(  '522130300' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            ELSE
+                inSequencia := FAZERLANCAMENTO(  '522130104' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            END IF;
+                
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '522130400' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Operacao de Credito' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            
+            IF inUF <> 2 THEN
+                inSequencia := FAZERLANCAMENTO(  '522130400' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            ELSE
+                inSequencia := FAZERLANCAMENTO(  '522130103' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            END IF;
+            
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Auxilios' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213020000' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Excesso' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            
+            IF inUF <> 2 THEN
+                inSequencia := FAZERLANCAMENTO(  '52213020000' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            ELSE
+                inSequencia := FAZERLANCAMENTO(  '52213010201' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            END IF;
+            
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010000' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Superavit' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            
+            IF inUF <> 2 THEN
+                inSequencia := FAZERLANCAMENTO(  '52213010000' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            ELSE
+                inSequencia := FAZERLANCAMENTO(  '52213010100' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            END IF;
+            
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaReduzida' THEN
+            inSequencia := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522130300' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaSuplementada' THEN
+            inSequencia := FAZERLANCAMENTO(  '522130300' , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-    ELSIF EXERCICIO::integer = 2013 THEN
-        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '522130104' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+    ELSIF stExercicio::integer = 2013 THEN
+        IF stTipoCredSuplementar = 'Reducao' THEN
+            inSequencia := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '522120100' , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '522130104' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010300' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Operacao de Credito' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '52213010300' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Auxilios' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '52213010203' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010201' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Excesso' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '52213010201' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '52213010100' , '522139900' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Superavit' THEN
+            inSequencia := FAZERLANCAMENTO(  '522120100'   , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '52213010100' , '522139900' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaReduzida' THEN
+            inSequencia := FAZERLANCAMENTO(  '622110000' , '522190109' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '522130104' , '622110000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaSuplementada' THEN
+            inSequencia := FAZERLANCAMENTO(  '522130104' , '622110000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
     ELSE
-        IF TIPOCREDSUPLEMENTAR = 'Reducao' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Reducao' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Excesso' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120100020000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
-            SEQUENCIA := FAZERLANCAMENTO(  '191110000000000' , '291120000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Excesso' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120100020000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
+            inSequencia := FAZERLANCAMENTO(  '191110000000000' , '291120000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Operacao de Credito' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120100030000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Operacao de Credito' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120100030000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Superavit' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120200010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Superavit' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120200010000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Doacoes' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120200020000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Doacoes' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120200020000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'Auxilios' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120200030000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'Auxilios' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120200030000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaReduzida' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaReduzida' THEN
+            inSequencia := FAZERLANCAMENTO(  '292110000000000' , '192190209000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
-        IF TIPOCREDSUPLEMENTAR = 'AnulacaoExternaSuplementada' THEN
-            SEQUENCIA := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , EXERCICIO , VALOR , COMPLEMENTO , CODLOTE , TIPOLOTE , CODENTIDADE  );
+        IF stTipoCredSuplementar = 'AnulacaoExternaSuplementada' THEN
+            inSequencia := FAZERLANCAMENTO(  '192120100010000' , '292110000000000' , 908 , stExercicio , nuValor , stComplemento , inCodLote , stTipoLote , inCodEntidade  );
         END IF;
     END IF;
 
-    RETURN SEQUENCIA;
+    RETURN inSequencia;
+    
 END;
 $$ LANGUAGE 'plpgsql';

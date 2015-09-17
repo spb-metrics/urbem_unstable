@@ -35,7 +35,7 @@
 
 * Casos de uso: uc-01.02.92, uc-01.02.93
 
-  $Id: interfaceCgm.class.php 62988 2015-07-14 18:32:16Z evandro $
+  $Id: interfaceCgm.class.php 63580 2015-09-11 18:47:24Z franver $
 
 */
 
@@ -246,6 +246,7 @@ Monta o formulário de busca por CGM
 </script>
     <form name="frm" action="<?=$action;?>?<?=Sessao::getId();?>" method="POST">
 <?php
+
 if ($formAcao == "CGA") {
     echo "            <input type='hidden' name='controle' value='".$ctrl."'>\n";
 } else {
@@ -747,8 +748,7 @@ $stHTML = <<<HEREDOC
         <tr>
             <td class="label" title="Informe a descrição do objeto social">Objeto Social</td>
             <td class="field">$stHtmlObjSocial</td>
-        </tr>
-        
+        </tr>        
 HEREDOC;
 return $stHTML;
 }
@@ -767,6 +767,7 @@ function formCGMPessoaFisica($dadosCgm, $boInterno = false)
          }
          }
     }
+
     $chObrigatorio = "*";
     if ($boInterno) {
         $chObrigatorio = "";
@@ -866,6 +867,7 @@ function formCGMPessoaFisica($dadosCgm, $boInterno = false)
     $chObrigatorio = isset($chObrigatorio) ? $chObrigatorio : "";
     $cpf = isset($cpf) ? $cpf : "";
     $rg  = isset($rg) ? $rg : "";
+    $site  = isset($site) ? $site : "";
 
 if ( !empty($numCgm) ) {
 $stHTML = <<<HEREDOC
@@ -1018,6 +1020,7 @@ $stHTML .= <<<HEREDOC
                 <input type='radio' value='f' name='chSexo' $stFeminino> Feminino&nbsp;
              </td>
         </tr>
+
 HEREDOC;
 
 return $stHTML;
@@ -1474,6 +1477,58 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
                     }
                 }
 
+            <?php if ($pessoa == 'fisica' or ( $pessoa == 'outros' and $tipo == 'fisica' )) { ?>
+                if (document.frm.dddRes.value != '' && document.frm.foneRes.value == '') {
+                    mensagem += "@@Campo DDD do Telefone residencial foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone residencial !";
+                    erro = true;
+                }
+                
+                if (document.frm.dddRes.value == '' && document.frm.foneRes.value != '') {
+                    mensagem += "@Campo Número do Telefone residencial foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone residencial !";
+                    erro = true;
+                }
+
+                if (document.frm.dddCom.value != '' && document.frm.foneCom.value == '') {
+                    mensagem += "@@Campo DDD do Telefone comercial foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone comercial!";
+                    erro = true;
+                }
+                
+                if (document.frm.dddCom.value == '' && document.frm.foneCom.value != '') {
+                    mensagem += "@Campo Número do Telefone comercial foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone comercial!";
+                    erro = true;
+                }
+            <?php } else { ?>
+                if (document.frm.dddRes.value != '' && document.frm.foneRes.value == '') {
+                    mensagem += "@@Campo DDD do Telefone foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone!";
+                    erro = true;
+                }
+                
+                if (document.frm.dddRes.value == '' && document.frm.foneRes.value != '') {
+                    mensagem += "@Campo Número do Telefone foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone!";
+                    erro = true;
+                }
+
+                if (document.frm.dddCom.value != '' && document.frm.foneCom.value == '') {
+                    mensagem += "@@Campo DDD do FAX foi preenchido, por favor preenchar o campo Correspondente ao Número do FAX!";
+                    erro = true;
+                }
+                
+                if (document.frm.dddCom.value == '' && document.frm.foneCom.value != '') {
+                    mensagem += "@Campo Número do FAX foi preenchido, por favor preenchar o campo Correspondente ao DDD do FAX!";
+                    erro = true;
+                }
+            <?php } ?>
+
+                if (document.frm.dddCel.value != '' && document.frm.foneCel.value == '') {
+                    mensagem += "@@Campo DDD do Telefone celular foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone celular!";
+                    erro = true;
+                }
+                
+                if (document.frm.dddCel.value == '' && document.frm.foneCel.value != '') {
+                    mensagem += "@Campo Número do Telefone celular foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone celular!";
+                    erro = true;
+                }
+                
                 campo = document.frm.email.value.length;
                 if (campo>0) {
                     if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.frm.email.value))) {
@@ -2575,15 +2630,16 @@ if ( $pessoa == 'fisica' or ( $pessoa == 'outros' and $tipo == 'fisica' )) {
         <tr>
             <td class="label"><?=$stRotuloResidencial;?></td>
             <td class="field">
-        <input type="text" name="dddRes" maxlength="2" size="2" value="<?=$dddRes;?>"
+        <input type="text" placeholder="DD" name="dddRes" maxlength="2" size="2" value="<?=$dddRes;?>"
          onKeyUp="return autoTab(this, 2, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;
-                <input type="text" name="foneRes" maxlength="8" size="8" value="<?=$foneRes;?>"
+                <input type="text" placeholder="N° Telefone" name="foneRes" maxlength="8" size="8" value="<?=$foneRes;?>"
                 onKeyUp="return autoTab(this, 8, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;
 <?php
     $ramalCom = isset($ramalCom) ? $ramalCom : "";
     $email = isset($email) ? $email : "";
     $emailAdic = isset($emailAdic) ? $emailAdic : "";
     $ramalRes = isset($ramalRes) ? $ramalRes : "" ;
+    $site = isset($site) ? $site : "" ;
 if ($pessoa == 'juridica') {
 ?>
                 <b> Ramal</b>&nbsp;
@@ -2596,9 +2652,9 @@ if ($pessoa == 'juridica') {
         <tr>
             <td class="label"><?=$stRotuloComercial;?></td>
             <td class="field">
-            <input type="text" name="dddCom" maxlength="2" size="2" value="<?=$dddCom;?>"
+            <input type="text" placeholder="DD" name="dddCom" maxlength="2" size="2" value="<?=$dddCom;?>"
         onKeyUp="return autoTab(this, 2, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;
-                <input type="text" name="foneCom" maxlength="8" size="8" value="<?=$foneCom;?>"
+                <input type="text" placeholder="N° Telefone" name="foneCom" maxlength="8" size="8" value="<?=$foneCom;?>"
                 onKeyUp="return autoTab(this, 8, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;<b> Ramal</b>&nbsp;
                 <input type="text" name="ramalCom" size="4" maxlength="4" value="<?=$ramalCom?>" onKeyUp="return autoTab(this, 4, event);" onKeyPress="return(isValido(this,event,'0123456789'));">
             </td>
@@ -2606,9 +2662,9 @@ if ($pessoa == 'juridica') {
         <tr>
             <td class="label">Telefone celular</td>
             <td class="field">
-            <input type="text" name="dddCel" maxlength="2" size="2" value="<?=$dddCel;?>"
+            <input type="text" placeholder="DD" name="dddCel" maxlength="2" size="2" value="<?=$dddCel;?>"
         onKeyUp="return autoTab(this, 2, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;
-                <input type="text" name="foneCel" maxlength="8" size="8" value="<?=$foneCel;?>"
+                <input type="text" placeholder="N° Telefone" name="foneCel" maxlength="8" size="8" value="<?=$foneCel;?>"
                 onKeyUp="return autoTab(this, 8, event);" onKeyPress="return(isValido(this,event,'0123456789'));">
             </td>
         </tr>
@@ -2623,6 +2679,12 @@ if ($pessoa == 'juridica') {
             <td class="field">
                 <input type="text" name="emailAdic" maxlength="100" size="30" value="<?=$emailAdic;?>"
                 onKeyUp="return autoTab(this, 100, event);"></td>
+        </tr>
+        <tr>
+            <td class="label" width="30%" title="Site">Site</td>
+            <td class="field" width="70%">
+                <input type="text" name="stSite" maxlength="200" size="50" value="<?=$site;?>" onKeyUp="return autoTab(this, 200, event);">
+            </td>
         </tr>
 <?php
     $this->geraCamposAtributo( $numCgm );
@@ -2781,7 +2843,7 @@ Monta o formulário com os dados para cadastro de CGM
 Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
 /**************************************************************************/
     public function listaDadosCgm($dadosCgm="",$action="",$controle=0)
-    {
+    { 
         if (is_array($dadosCgm)) {
             //Grava como variável o nome da chave do vetor com o seu respectivo valor
             foreach ($dadosCgm as $campo=>$valor) {
@@ -3122,6 +3184,12 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
             <td class="label">e-mail adicional</td>
             <td class="field">
                 <?=$emailAdic;?>&nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Site</td>
+            <td class="field">
+                <?=$site;?>&nbsp;
             </td>
         </tr>
 <?php

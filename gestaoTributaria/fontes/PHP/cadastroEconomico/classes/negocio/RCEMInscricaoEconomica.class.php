@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCEMInscricaoEconomica.class.php 60966 2014-11-26 16:22:14Z michel $
+    * $Id: RCEMInscricaoEconomica.class.php 63376 2015-08-21 18:55:42Z arthur $
 
     * Casos de uso: uc-05.02.10
 */
@@ -73,18 +73,6 @@ include_once ( CAM_GT_CEM_MAPEAMENTO."TCEMProcessoSociedade.class.php"          
 include_once ( CAM_GT_CEM_MAPEAMENTO."TCEMProcessoDomicilioFiscal.class.php"     );
 include_once ( CAM_GT_CEM_MAPEAMENTO."TCEMProcessoDomicilioInformado.class.php"  );
 //INCLUDE DAS CLASSES PARA  O TRATAMNTO DOS ATRIBUTOS
-
-/**
-* Classe de regra de negócio para Inscricao Economica
-* Data de Criação: 01/12/2004
-
-* @author Analista: Ricardo Lopes de Alencar
-* @author Desenvolvedor: Fábio Bertoldi Rodrigues
-* @author Desenvolvedor: Tonismar Régis Bernardo
-
-* @package URBEM
-* @subpackage Regra
-*/
 
 class RCEMInscricaoEconomica
 {

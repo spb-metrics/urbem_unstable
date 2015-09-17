@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: FMManterHomologacao.php 61615 2015-02-13 19:33:09Z jean $
+    $Id: FMManterHomologacao.php 63293 2015-08-13 14:32:21Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -149,6 +149,16 @@ $obTxtRazao->setRows   ( 2                 );
 $obTxtRazao->setCols   ( 100               );
 $obTxtRazao->setMaxCaracteres( 250         );
 
+$obTxtFundamentacao = new TextArea;
+$obTxtFundamentacao->setName   ( 'stFundamentacao' );
+$obTxtFundamentacao->setId     ( 'stFundamentacao' );
+$obTxtFundamentacao->setRotulo ( "Fundamentação Legal"   );
+$obTxtFundamentacao->setTitle  ( "Informe a Fundamentação Legal." );
+$obTxtFundamentacao->setNull   ( false              );
+$obTxtFundamentacao->setRows   ( 2                 );
+$obTxtFundamentacao->setCols   ( 100               );
+$obTxtFundamentacao->setMaxCaracteres( 250         );
+
 $obFormulario = new Formulario;
 $obFormulario->addForm( $obForm );
 $obFormulario->addTitulo( "Dados da Homologação" );
@@ -158,6 +168,7 @@ $obFormulario->addComponente( $obDtHomologacao );
 $obFormulario->addComponente( $obHoraHomologacao );
 $obFormulario->addComponente( $obTxtJustificativa );
 $obFormulario->addComponente( $obTxtRazao );
+$obFormulario->addComponente( $obTxtFundamentacao );
 $obFormulario->addSpan( $obSpnItensHomologacao );
 $obFormulario->addSpan( $obSpnHomologacao );
 $obFormulario->addSpan( $obSpnAutorizacao );

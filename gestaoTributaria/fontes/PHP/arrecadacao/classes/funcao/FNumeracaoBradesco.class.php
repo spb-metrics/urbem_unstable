@@ -33,24 +33,12 @@
   * @package URBEM
   * @subpackage Funcao
 
-    * $Id: FNumeracaoBradesco.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FNumeracaoBradesco.class.php 63292 2015-08-13 13:57:29Z arthur $
 
   Caso de uso: uc-05.03.11
 **/
-
-/*
-$Log$
-Revision 1.5  2006/09/15 11:49:45  fabio
-corrigidas tags de caso de uso
-
-Revision 1.4  2006/09/15 10:28:15  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkDB.inc.php';
-include_once( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FNumeracaoBradesco extends Persistente
 {
@@ -58,13 +46,13 @@ class FNumeracaoBradesco extends Persistente
     * Método Construtor
     * @access Private
 */
-function FNumeracaoBradesco()
+public function __construct()
 {
     parent::Persistente();
     $this->AddCampo('valor','varchar'  ,false       ,''     ,false   ,false );
 }
 
-function executaFuncao(&$rsRecordset, $stParametros, $boTransacao = "")
+public function executaFuncao(&$rsRecordset, $stParametros, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -73,10 +61,10 @@ function executaFuncao(&$rsRecordset, $stParametros, $boTransacao = "")
     $this->setDebug($stSql);
     $obErro = $obConexao->executaSQL( $rsRecordset, $stSql, $boTransacao );
 
-return $obErro;
+    return $obErro;
 }
 
-function montaExecutaFuncao($stParametros)
+public function montaExecutaFuncao($stParametros)
 {
     $stSql  = " SELECT  numeracaobradesco(".$stParametros.") as valor \r\n";
 
@@ -84,3 +72,5 @@ function montaExecutaFuncao($stParametros)
 }
 
 }
+
+?>

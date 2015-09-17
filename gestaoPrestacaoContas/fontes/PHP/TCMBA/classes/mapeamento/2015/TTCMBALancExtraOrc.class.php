@@ -70,7 +70,7 @@ class TTCMBALancExtraOrc extends Persistente
                         , transferencia.cod_lote as num_lancamento
                         , TO_CHAR(lote.dt_lote ,'yyyymm') AS competencia
                         , TO_CHAR(lote.dt_lote ,'ddmmyyyy') AS data_lancamento 
-                        , conta_banco.cod_plano_banco AS conta_contabil
+                        , REPLACE(plano_conta.cod_estrutural::VARCHAR,'.','') AS conta_contabil
                         , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL 
                                 THEN sw_cgm_pessoa_fisica.cpf       
                                  WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL 

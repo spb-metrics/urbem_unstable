@@ -99,7 +99,7 @@ class TTransparenciaRemuneracao extends Persistente
                  salario_familia           VARCHAR,
                  jetons        	           VARCHAR,
                  verbas        	           VARCHAR,
-                 remuneracao_apos_deducoes FLOAT
+                 remuneracao_apos_deducoes NUMERIC
              )  WHERE remuneracao_bruta     != '' OR
                   redutor_teto          != '' OR
                   remuneracao_natalina  != '' OR

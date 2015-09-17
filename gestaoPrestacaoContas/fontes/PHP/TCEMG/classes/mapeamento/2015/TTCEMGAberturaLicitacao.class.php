@@ -111,8 +111,8 @@ class TTCEMGAberturaLicitacao extends Persistente
                   END AS num_convidado
                , LPAD('',250,'') AS clausula_prorrogacao
                , 1 AS undade_medida_prazo_execucao
-               , DATE(contrato.fim_execucao)-DATE(contrato.inicio_execucao) AS prazo_execucao
-               , edital.condicoes_pagamento AS forma_pagamento
+               , (DATE(contrato.fim_execucao)-DATE(contrato.inicio_execucao)) AS prazo_execucao
+               , regexp_replace(sem_acentos(edital.condicoes_pagamento),'[º|°|%|§]', '', 'gi') AS forma_pagamento
                , LPAD('',80,'') AS citerio_aceitabilidade
                , 2 AS desconto_tabela
                , CASE WHEN mapa.cod_tipo_licitacao = 2
@@ -344,7 +344,7 @@ class TTCEMGAberturaLicitacao extends Persistente
                , num_convidado
                , clausula_prorrogacao
                , undade_medida_prazo_execucao
-               , prazo_execucao
+               , (DATE(contrato.fim_execucao)-DATE(contrato.inicio_execucao))
                , forma_pagamento
                , citerio_aceitabilidade
                , desconto_tabela

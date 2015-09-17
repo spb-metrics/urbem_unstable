@@ -28,6 +28,9 @@
 
     $obTMapeamento = new TTCMBAOrgao();
     $obTMapeamento->setDado('entidade',$stEntidades);
+    $obTMapeamento->setDado('unidade_gestora',$inCodUnidadeGestora);
+    $obTMapeamento->setDado('dt_inicial',$stDataInicial);
+    $obTMapeamento->setDado('dt_final',$stDataFinal);
     $obTMapeamento->recuperaDados($rsRecord);
 
     $obExportador->roUltimoArquivo->addBloco($rsRecord);
@@ -63,7 +66,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_inicio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_inicio_responsavel");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 

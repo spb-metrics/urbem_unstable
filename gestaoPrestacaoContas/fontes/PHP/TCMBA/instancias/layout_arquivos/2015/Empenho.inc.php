@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63081 $
+    $Revision: 63396 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -46,6 +46,8 @@
     $obTTBAEmpenho->setDado('mes'      , $inMes );
     $obTTBAEmpenho->setDado('entidades', $stEntidades );
     $obTTBAEmpenho->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTBAEmpenho->setDado('dt_inicial', $stDataInicial );
+    $obTTBAEmpenho->setDado('dt_final', $stDataFinal );
     $obTTBAEmpenho->recuperaDadosTribunal($rsRecordSet);
     
     $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
@@ -66,7 +68,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("processo_licitatorio");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(36);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
@@ -98,7 +100,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("historico");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(255);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_empenho");
@@ -110,11 +112,11 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("contrato");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_cgm");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia"); 
@@ -122,7 +124,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_cnpj");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("pf_pj");
@@ -134,7 +136,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dispensa");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
@@ -154,9 +156,9 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("contrato_aplicavel");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("licitacao_sujeito");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);

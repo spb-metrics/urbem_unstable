@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterTipoCombustivel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterTipoCombustivel.php 63209 2015-08-04 18:18:08Z jean $
 
     * Casos de uso: uc-03.02.05
 */
@@ -50,63 +50,108 @@ $stAcao = $request->get('stAcao');
 
 $obTFrotaCombustivel = new TFrotaCombustivel();
 
-Sessao::setTrataExcecao( true );
-Sessao::getTransacao()->setMapeamento( $obTFrotaCombustivel );
+    switch ($stAcao) {
+        case 'incluir':
 
-switch ($stAcao) {
-    case 'incluir':
-        //verifica se nao existe ja no cadastro o nome da marca
-        $obTFrotaCombustivel->recuperaTodos( $rsCombustivel, " WHERE nom_combustivel ILIKE '".$_REQUEST['stCombustivel']."' " );
+            $obErro = new Erro;
+            $boFlagTransacao = false;
+            $obTransacao = new Transacao;
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
-        if ( $rsCombustivel->getNumLinhas() > 0 ) {
-            $stMensagem = 'Já existe um combustível com esta descrição';
-        }
+            if (!$obErro->ocorreu()) {
+                //verifica se nao existe ja no cadastro o nome da marca
+                $obTFrotaCombustivel->recuperaTodos( $rsCombustivel, " WHERE nom_combustivel ILIKE '".$request->get('stCombustivel')."' ","",$boTransacao );
 
-        if (!$stMensagem) {
-            //recupera o cod_combustivel
-            $obTFrotaCombustivel->ProximoCod( $inCodCombustivel );
+                if ( $rsCombustivel->getNumLinhas() > 0 ) {
+                    $obErro->setDescricao('Já existe um combustível com esta descrição');
+                }
+    
+                if (!$obErro->ocorreu()) {
 
-            //seta os dados e cadastra no sistema
-            $obTFrotaCombustivel->setDado( 'cod_combustivel', $inCodCombustivel );
-            $obTFrotaCombustivel->setDado( 'nom_combustivel', $_REQUEST['stCombustivel'] );
-            $obTFrotaCombustivel->inclusao();
+                    if ($request->get('inCodCombustivel') != '') {
+                        $inCodCombustivel = $request->get('inCodCombustivel');
+                        //verifica se já foi informado o codigo do veiculo
+                        $obTFrotaCombustivel->recuperaTodos( $rsCombustivel, " WHERE cod_combustivel = ".$inCodCombustivel." ","",$boTransacao );
 
-            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$inCodCombustivel.' - '.$_REQUEST['stCombustivel'],"incluir","aviso", Sessao::getId(), "../");
-        } else {
-            SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
-        }
+                        if ($rsCombustivel->getNumLinhas() > 0) {
+                            $obErro->setDescricao('Já existe um combustível com este código');
+                        }
+                    } else {
+                        //recupera o cod_combustivel
+                        $obTFrotaCombustivel->ProximoCod( $inCodCombustivel,$boTransacao );
+                    }
+
+                    if (!$obErro->ocorreu()) {
+                        //seta os dados e cadastra no sistema
+                        $obTFrotaCombustivel->setDado( 'cod_combustivel', $inCodCombustivel );
+                        $obTFrotaCombustivel->setDado( 'nom_combustivel', $request->get('stCombustivel') );
+                        $obErro = $obTFrotaCombustivel->inclusao($boTransacao);
+                    }
+                }
+
+                if (!$obErro->ocorreu()) {
+                    SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$inCodCombustivel.' - '.$request->get('stCombustivel'),"incluir","aviso", Sessao::getId(), "../");
+                } else {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()).'!',"n_incluir","erro");
+                }
+
+                $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTFrotaCombustivel);
+            }
+    
+        break;
+    
+        case 'alterar':
+            $obErro = new Erro;
+            $boFlagTransacao = false;
+            $obTransacao = new Transacao;
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
+            if (!$obErro->ocorreu()) {
+                //verifica se nao existe ja no cadastro o nome da marca
+                $obTFrotaCombustivel->recuperaTodos( $rsCombustivel, " WHERE nom_combustivel ILIKE '".$request->get('stCombustivel')."' AND cod_combustivel <> ".$request->get('inCodCombustivel')." " );
+    
+                if ( $rsCombustivel->getNumLinhas() > 0 ) {
+                    $obErro->setDescricao('Já existe um combustível com esta descrição');
+                }
+
+                if (!$obErro->ocorreu()) {
+                    //seta os dados e cadastra no sistema
+                    $obTFrotaCombustivel->setDado( 'cod_combustivel', $request->get('inCodCombustivel') );
+                    $obTFrotaCombustivel->setDado( 'nom_combustivel', $request->get('stCombustivel') );
+                    $obErro = $obTFrotaCombustivel->alteracao();
+                }
+
+                if (!$obErro->ocorreu()) {
+                    SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$request->get('inCodCombustivel').' - '.$request->get('stCombustivel'),"alterar","aviso", Sessao::getId(), "../");
+                } else {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()).'!',"n_incluir","erro");
+                }
+            }
+
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTFrotaCombustivel);
+    
+            break;
+    
+        case 'excluir':
+            $obErro = new Erro;
+            $boFlagTransacao = false;
+            $obTransacao = new Transacao;
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
+            if (!$obErro->ocorreu()) {
+                //seta os dados e exclui da base
+                $obTFrotaCombustivel->setDado( 'cod_combustivel', $request->get('inCodCombustivel') );
+                $obErro = $obTFrotaCombustivel->exclusao();
+
+                if (!$obErro->ocorreu()) {
+                    SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$request->get('inCodCombustivel').' - '.$request->get('stNomCombustivel'),"excluir","aviso", Sessao::getId(), "../");
+                } else {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()).'!',"n_incluir","erro");
+                }
+            }
+
+            $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obTFrotaCombustivel);
 
         break;
-
-    case 'alterar':
-        //verifica se nao existe ja no cadastro o nome da marca
-        $obTFrotaCombustivel->recuperaTodos( $rsCombustivel, " WHERE nom_combustivel ILIKE '".$_REQUEST['stCombustivel']."' AND cod_combustivel <> ".$_REQUEST['inCodCombustivel']." " );
-
-        if ( $rsCombustivel->getNumLinhas() > 0 ) {
-            $stMensagem = 'Já existe um combustível com esta descrição';
-        }
-
-        if (!$stMensagem) {
-            //seta os dados e cadastra no sistema
-            $obTFrotaCombustivel->setDado( 'cod_combustivel', $_REQUEST['inCodCombustivel'] );
-            $obTFrotaCombustivel->setDado( 'nom_combustivel', $_REQUEST['stCombustivel'] );
-            $obTFrotaCombustivel->alteracao();
-
-            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$_REQUEST['inCodCombustivel'].' - '.$_REQUEST['stCombustivel'],"alterar","aviso", Sessao::getId(), "../");
-        } else {
-            SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
-        }
-
-        break;
-
-    CASE 'excluir':
-        //seta os dados e exclui da base
-        $obTFrotaCombustivel->setDado( 'cod_combustivel', $_REQUEST['inCodCombustivel'] );
-        $obTFrotaCombustivel->exclusao();
-        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Combustível - '.$_REQUEST['inCodCombustivel'].' - '.$_REQUEST['stNomCombustivel'],"excluir","aviso", Sessao::getId(), "../");
-
-        break;
-
-}
-
-Sessao::encerraExcecao();
+    }
+?>

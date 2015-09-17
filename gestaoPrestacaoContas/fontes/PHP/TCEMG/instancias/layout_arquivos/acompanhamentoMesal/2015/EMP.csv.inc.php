@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: EMP.csv.inc.php 63118 2015-07-28 12:03:49Z evandro $
-  * $Date: 2015-07-28 09:03:49 -0300 (Ter, 28 Jul 2015) $
-  * $Author: evandro $
-  * $Rev: 63118 $
+  * $Id: EMP.csv.inc.php 63530 2015-09-09 12:51:36Z franver $
+  * $Date: 2015-09-09 09:51:36 -0300 (Qua, 09 Set 2015) $
+  * $Author: franver $
+  * $Rev: 63530 $
   *
 */
 /**
@@ -84,12 +84,12 @@ if (count($rsRecordSetEMP10->getElementos()) > 0) {
             $arEMP10['exercicioprocessolicitatorio'] = '';
             $arEMP10['tipoprocesso'] = '';
             $arEMP10['despdeclicitacao'] = 1;
-            $arEMP10['codUnidadeSubRespLicit'] = '';
+            $arEMP10['codunidadesubresplicit'] = '';
         }
         if( $arEMP10['despdeclicitacao'] == 1 ) { 
            $arEMP10['tipoprocesso'] = '';
         }
-         
+
         $rsBloco = 'rsBloco_'.$inCount;
         unset($$rsBloco);
         $$rsBloco = new RecordSet();

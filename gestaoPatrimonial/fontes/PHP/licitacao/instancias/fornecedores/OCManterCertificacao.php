@@ -33,16 +33,17 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: OCManterCertificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterCertificacao.php 63516 2015-09-08 13:48:28Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_FW_HTML."MontaAtributos.class.php" );
-include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" );
-include_once ( TLIC."TLicitacaoDocumentoAtributoValor.class.php" );
-include_once ( TLIC."TLicitacaoDocumentosAtributos.class.php" );
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
+include_once TLIC."TLicitacaoDocumentoAtributoValor.class.php";
+include_once TLIC."TLicitacaoDocumentosAtributos.class.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
+include_once TLIC.'TLicitacaoLicitacao.class.php';
 
 $obRCadastroDinamico = new RCadastroDinamico();
 $obRCadastroDinamico->setCodCadastro( 1 );
@@ -73,23 +74,22 @@ function montaListaDocumento($arRecordSet, $stAcao = '')
     }
     $obTable->setRecordSet( $rsItens );
 
-    $obTable->Head->addCabecalho( 'Documento', 20 );
-    $obTable->Head->addCabecalho( 'Data de Emissão', 15 );
+    $obTable->Head->addCabecalho( 'Documento'       , 20 );
+    $obTable->Head->addCabecalho( 'Data de Emissão' , 15 );
     $obTable->Head->addCabecalho( 'Data de Validade', 20 );
 
-    $obTable->Body->addCampo( 'nom_documento', 'E' );
-    $obTable->Body->addCampo( 'data_emissao', 'C' );
-    $obTable->Body->addCampo( 'data_validade', 'C' );
+    $obTable->Body->addCampo( 'nom_documento'   , 'E' );
+    $obTable->Body->addCampo( 'data_emissao'    , 'C' );
+    $obTable->Body->addCampo( 'data_validade'   , 'C' );
 
     if ($stAcao != 'consultar') {
-        $obTable->Body->addAcao( 'alterar' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'alterarItem', 'id' ) );
-        $obTable->Body->addAcao( 'excluir' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'excluirItem', 'id' ) );
+        $obTable->Body->addAcao( 'alterar' , 'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )', array( 'alterarItem', 'id' ) );
+        $obTable->Body->addAcao( 'excluir' , 'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )', array( 'excluirItem', 'id' ) );
     }
 
     $obTable->montaHTML();
 
-    $stHTML = $obTable->getHTML();
-    $stHTML = str_replace( "\n" ,"" ,$stHTML );
+    $stHTML = str_replace( "\n" ,"" ,$obTable->getHTML() );
     $stHTML = str_replace( "  " ,"" ,$stHTML );
     $stHTML = str_replace( "'","\\'",$stHTML );
 
@@ -101,12 +101,12 @@ function montaListaDocumento($arRecordSet, $stAcao = '')
 function abilitaCampos($acao)
 {
     if ($acao != 'alterar') {
-        $stJs  = "f.inCodFornecedor.readonly = false;\n";
-        $stJs .= "d.getElementById('imgFornecedor').style.display = 'inline';\n";
-        $stJs .= "f.dtDataRegistro.readonly  = false;\n";
-        $stJs .= "f.dtDataVigencia.readonly  = false;\n";
+        $stJs  = "f.inCodFornecedor.readonly = false;                           \n";
+        $stJs .= "d.getElementById('imgFornecedor').style.display = 'inline';   \n";
+        $stJs .= "f.dtDataRegistro.readonly  = false;                           \n";
+        $stJs .= "f.dtDataVigencia.readonly  = false;                           \n";
     }
-    $stJs .= "f.stObservacao.disabled    = false;\n";
+    $stJs .= "f.stObservacao.disabled    = false;                               \n";
 
     return $stJs;
 }
@@ -114,15 +114,15 @@ function abilitaCampos($acao)
 function desabilitaCampos($acao)
 {
     if ($acao != 'alterar') {
-        $stJs  = "f.inCodFornecedor.readonly = true;\n";
-        $stJs .= "d.getElementById('imgFornecedor').style.display = 'none';\n";
-        $stJs .= "f.dtDataRegistro.readonly  = true;\n";
-        $stJs .= "f.dtDataVigencia.readonly  = true;\n";
+        $stJs  = "f.inCodFornecedor.readonly = true;                            \n";
+        $stJs .= "d.getElementById('imgFornecedor').style.display = 'none';     \n";
+        $stJs .= "f.dtDataRegistro.readonly  = true;                            \n";
+        $stJs .= "f.dtDataVigencia.readonly  = true;                            \n";
     }
-    $stJs .= "f.stDataValidade.disabled = 'disabled';";
-    $stJs .= "f.inNumDiasValido.disabled = 'disabled';";
-    $stJs .= "f.hdnObservacao.value = f.stObservacao.value;\n";
-    $stJs .= "f.stObservacao.disabled    = true;\n";
+    $stJs .= "f.stDataValidade.disabled = 'disabled';                           \n";
+    $stJs .= "f.inNumDiasValido.disabled = 'disabled';                          \n";
+    $stJs .= "f.hdnObservacao.value = f.stObservacao.value;                     \n";
+    $stJs .= "f.stObservacao.disabled    = true;                                \n";
 
     return $stJs;
 }
@@ -148,9 +148,9 @@ function montaAtributos($documento)
         $obFormulario->montaInnerHtml();
         $stHTML = $obFormulario->getHTML();
 
-        $stJs  = "d.getElementById('spnAtributos').innerHTML = '".$stHTML."';\n";
+        $stJs  = "d.getElementById('spnAtributos').innerHTML = '".$stHTML."';   \n";
     } else {
-        $stJs  = "d.getElementById('spnAtributos').innerHTML = '';\n";
+        $stJs  = "d.getElementById('spnAtributos').innerHTML = '';              \n";
     }
 
     return $stJs;
@@ -158,7 +158,7 @@ function montaAtributos($documento)
 
 function montaLabelAtributos($documento)
 {
-    include_once( TLIC."TLicitacaoDocumentosAtributos.class.php" );
+    include_once TLIC."TLicitacaoDocumentosAtributos.class.php";
     $obTLicitacaoDocumentosAtributos = new TLicitacaoDocumentosAtributos();
     $obTLicitacaoDocumentosAtributos->setDado( 'cod_documento', $documento );
     $obTLicitacaoDocumentosAtributos->recuperaAtributo( $rsAtributos );
@@ -186,7 +186,6 @@ function montaLabelAtributos($documento)
 function sincronizarDataValidaDocumento($inDiasValidos, $inDataEmissao)
 {
     if ($inDataEmissao != "") {
-
         if ($inDiasValidos != "") {
             $diasValidos = $inDiasValidos;
         } else {
@@ -203,8 +202,8 @@ function sincronizarDataValidaDocumento($inDiasValidos, $inDataEmissao)
 
         $dataValidade = strftime("%d/%m/%Y" , strtotime("+".$diasValidos." days",$dataEmissao));
 
-        $stJs .= "jQuery('#stDataValidade').val('".$dataValidade."');\n";
-        $stJs .= "jQuery('#inNumDiasValido').val('".$diasValidos."');\n";
+        $stJs .= "jQuery('#stDataValidade').val('".$dataValidade."');   \n";
+        $stJs .= "jQuery('#inNumDiasValido').val('".$diasValidos."');   \n";
         echo $stJs;
     }
 }
@@ -250,91 +249,101 @@ function sincronizaDiasValidosDocumento($inDataValidade, $inDataEmissao)
         //tiro os decimais aos dias de diferenca
         $diasValido = floor($diasValido);
 
-        $stJs .= "jQuery('#stDataValidade').val('');\n";
-        $stJs .= "jQuery('#stDataValidade').val('".$dataValidade."');\n";
-        $stJs .= "jQuery('#inNumDiasValido').val('".$diasValido."');\n";
+        $stJs .= "jQuery('#stDataValidade').val('');                    \n";
+        $stJs .= "jQuery('#stDataValidade').val('".$dataValidade."');   \n";
+        $stJs .= "jQuery('#inNumDiasValido').val('".$diasValido."');    \n";
     } else {
-        $stJs .= "jQuery('#stDataValidade').val('');\n";
-        $stJs .= "jQuery('#inNumDiasValido').val('');\n";
+        $stJs .= "jQuery('#stDataValidade').val('');                    \n";
+        $stJs .= "jQuery('#inNumDiasValido').val('');                   \n";
     }
 
     echo $stJs;
 }
 
-switch ($_REQUEST['stCtrl']) {
+function preencheLicitacao($rsRecordSet, $stComponente, $inCodLicitacao)
+{
+    $stJs = "limpaSelect(f.".$stComponente.",1);                                                    \n";
+    
+    while ( !$rsRecordSet->eof() ) {
+        $stJs .= "f.".$stComponente."[".$rsRecordSet->getCorrente()."] = new Option('".$rsRecordSet->getCampo('cod_licitacao')."','".$rsRecordSet->getCampo('cod_licitacao')."'); \n";
+        
+        if ( $rsRecordSet->getCampo('cod_licitacao') == $inCodLicitacao ){
+            $stJs .= "f.".$stComponente."[".$rsRecordSet->getCorrente()."].selected = 'selected';   \n";
+        }
+        
+        $rsRecordSet->proximo();
+    }
 
+    return $stJs;
+}
+
+switch ($request->get('stCtrl')) {
     case "incluirDocumento":
-
         $arDocs = Sessao::read('arDocs');
 
         if ( is_array($arDocs) ) {
-
             $stCampoFoco = "inDocumento";
 
-            include_once( TLIC."TLicitacaoDocumento.class.php" );
+            include_once TLIC."TLicitacaoDocumento.class.php";
             $obTLicitaoDocumento = new TLicitacaoDocumento();
-            $obTLicitaoDocumento->setDado('cod_documento', $_REQUEST['inDocumento']);
+            $obTLicitaoDocumento->setDado('cod_documento', $request->get('inDocumento'));
             $obTLicitaoDocumento->recuperaPorChave( $rsDocumento );
 
-            include_once( TCOM."TComprasFornecedor.class.php" );
+            include_once TCOM."TComprasFornecedor.class.php";
             $obTComprasFornecedor = new TComprasFornecedor();
-            $obTComprasFornecedor->setDado('cod_fornecedor', $_REQUEST['inCodFornecedor']);
+            $obTComprasFornecedor->setDado('cod_fornecedor', $request->get('inCodFornecedor'));
             $obTComprasFornecedor->recuperaPorChave( $rsFornecedor );
 
             foreach ($arDocs as $key => $value) {
-                if (( $value['cod_documento'] == $_REQUEST['inDocumento'] ) && ( $value['cgm_fornecedor'] == $rsFornecedor->getCampo('cgm_fornecedor') ) && ( $_REQUEST['stAcaoSessao'] != 'alterar' ) ) {
+                if (( $value['cod_documento'] == $request->get('inDocumento') ) && ( $value['cgm_fornecedor'] == $rsFornecedor->getCampo('cgm_fornecedor') ) && ( $request->get('stAcaoSessao') != 'alterar' ) ) {
                     $stMensagem = "Já existe o mesmo documento para este fornecedor.";
                     break;
                 }
             }
 
-            if ($_REQUEST['stAcaoSessao'] == 'alterar') {
-                $inCount = $_REQUEST['id']-1;
+            if ($request->get('stAcaoSessao') == 'alterar') {
+                $inCount = $request->get('id')-1;
             } else {
                 $inCount = count($arDocs);
             }
 
-            if ( ( sistemaLegado::comparaDatas($_REQUEST['stDataEmissao'], $_REQUEST['stDataValidade'] ) ) ) {
+            if ( ( sistemaLegado::comparaDatas($request->get('stDataEmissao'), $request->get('stDataValidade') ) ) ) {
                 $stCampoFoco = 'stDataValidade';
                 $stMensagem = 'A data de validade do documento deve ser maior ou igual que a data de emissão.';
-//            }
-//            elseif ( sistemaLegado::comparaDatas( date('d/m/Y'),$_REQUEST['stDataValidade'] ) ) {
-//                $stCampoFoco = 'stDataValidade';
-//                $stMensagem = 'Este documento já está vencido.';
-            } elseif ( sistemaLegado::comparaDatas( $_REQUEST['stDataEmissao'],date('d/m/Y')) ) {
+            } elseif ( sistemaLegado::comparaDatas( $request->get('stDataEmissao'),date('d/m/Y')) ) {
                 $stCampoFoco = 'stDataEmissao       ';
                 $stMensagem = 'A data de emissão deve ser menor ou igual a data de hoje.';
-            } elseif (sistemaLegado::comparaDatas( $_REQUEST['dtHdnDataRegistro'],$_REQUEST['stDataValidade'] )) {
+            } elseif (sistemaLegado::comparaDatas( $request->get('dtHdnDataRegistro'),$request->get('stDataValidade') )) {
                 $stCampoFoco = 'stDataValidade';
                 $stMensagem = 'A data de validade deve ser maior ou igual a data de registro.';
             }
 
-            if (($_REQUEST['stDataValidade'] == '') && ($_REQUEST['inNumDiasValido'] == '')) {
+            if (($request->get('stDataValidade') == '') && ($request->get('inNumDiasValido') == '')) {
                 $stMensagem = 'A data de validade ou o número de dias para o vencimento do documento devem ser informados';
             }
 
-            $dataValidade = $_REQUEST['stDataValidade'];
+            $dataValidade = $request->get('stDataValidade');
 
             if (!$stMensagem) {
-                $arDocs[$inCount]['id'] 			= $inCount+1;
-                $arDocs[$inCount]['cod_documento']  = $_REQUEST['inDocumento'];
+                $arDocs[$inCount]['id']             = $inCount+1;
+                $arDocs[$inCount]['cod_documento']  = $request->get('inDocumento');
                 $arDocs[$inCount]['nom_documento']  = $rsDocumento->getCampo('nom_documento');
-                $arDocs[$inCount]['num_documento']  = $_REQUEST['inNumDocumento'];
-                $arDocs[$inCount]['data_emissao']   = $_REQUEST['stDataEmissao'];
+                $arDocs[$inCount]['num_documento']  = $request->get('inNumDocumento');
+                $arDocs[$inCount]['data_emissao']   = $request->get('stDataEmissao');
                 $arDocs[$inCount]['data_validade']  = $dataValidade;
-                $arDocs[$inCount]['cod_fornecedor'] = $_REQUEST['inCodFornecedor'];
+                $arDocs[$inCount]['cod_fornecedor'] = $request->get('inCodFornecedor');
                 $arDocs[$inCount]['cgm_fornecedor'] = $rsFornecedor->getCampo('cgm_fornecedor');
 
-                $obRCadastroDinamico->setPersistenteAtributos  (  new TLicitacaoDocumentosAtributos() );
+                $obRCadastroDinamico->setPersistenteAtributos ( new TLicitacaoDocumentosAtributos() );
 
-                $obRCadastroDinamico->setChavePersistenteValores( array("cod_documento" => $_REQUEST['inDocumento'] ) );
+                $obRCadastroDinamico->setChavePersistenteValores( array("cod_documento" => $request->get('inDocumento') ) );
                 $obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributos );
 
                 if ( $rsAtributos->getNumLinhas() > 0 ) {
                     $arAtributos = array();
                     while ( !$rsAtributos->eof() ) {
                             $stChave = 'Atributo_'.$rsAtributos->getCampo('cod_atributo').'_'.$rsAtributos->getCampo('cod_cadastro');
-                            $arAtributos[$stChave] = $_REQUEST[$stChave];
+                            $arAtributos[$stChave] = $request->get($stChave);
                             $rsAtributos->proximo();
                     }
                     $arDocs[$inCount]['atributos'] = $arAtributos;
@@ -343,84 +352,79 @@ switch ($_REQUEST['stCtrl']) {
                 Sessao::write('arDocs' , $arDocs);
 
                 $stJs .= montaListaDocumento( $arDocs );
-                $stJs .= "f.btIncluirDocumento.value='Incluir';\n";
-                $stJs .= "executaFuncaoAjax('limpaDocumento');\n";
-                $stJs .= "f.stAcaoSessao.value = '';\n";
-                $stJs .= desabilitaCampos( $_REQUEST['stAcao'] );
+                $stJs .= "f.btIncluirDocumento.value='Incluir';                                 \n";
+                $stJs .= "executaFuncaoAjax('limpaDocumento');                                  \n";
+                $stJs .= "f.stAcaoSessao.value = '';                                            \n";
+                $stJs .= desabilitaCampos( $request->get('stAcao') );
             } else {
-                $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');";
-                $stJs .= "f.".$stCampoFoco.".focus();\n";
+                $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');   \n";
+                $stJs .= "f.".$stCampoFoco.".focus();                                           \n";
             }
         }
     break;
 
     case "sincronizaDataValida":
-        sincronizarDataValidaDocumento($_REQUEST['inNumDiasValido'], $_REQUEST['stDataEmissao']);
+        sincronizarDataValidaDocumento($request->get('inNumDiasValido'), $request->get('stDataEmissao'));
     break;
 
     case "sincronizaDiasValidos":
-        sincronizaDiasValidosDocumento($_REQUEST['stDataValidade'], $_REQUEST['stDataEmissao']);
+        sincronizaDiasValidosDocumento($request->get('stDataValidade'), $request->get('stDataEmissao'));
     break;
 
     case "limpaDocumento":
-        $stJs  = "f.stDocumento.selectedIndex = 0;\n";
-        $stJs .= "f.inDocumento.value = '';\n";
-        $stJs .= "f.inNumDocumento.value = '';\n";
-        $stJs .= "f.stDataEmissao.value = '';\n";
-        $stJs .= "f.stDataValidade.value = '';\n";
-        $stJs .= "f.inNumDiasValido.value = '';\n";
-        $stJs .= "document.getElementById('btIncluirDocumento').value='Incluir';";
-        $stJs .= "f.stAcaoSessao.value = 'incluir';\n";
-        $stJs .= "executaFuncaoAjax('montaAtributos');\n";
+        $stJs  = "f.stDocumento.selectedIndex = 0;                                  \n";
+        $stJs .= "f.inDocumento.value = '';                                         \n";
+        $stJs .= "f.inNumDocumento.value = '';                                      \n";
+        $stJs .= "f.stDataEmissao.value = '';                                       \n";
+        $stJs .= "f.stDataValidade.value = '';                                      \n";
+        $stJs .= "f.inNumDiasValido.value = '';                                     \n";
+        $stJs .= "document.getElementById('btIncluirDocumento').value='Incluir';    \n";
+        $stJs .= "f.stAcaoSessao.value = 'incluir';                                 \n";
+        $stJs .= "executaFuncaoAjax('montaAtributos');                              \n";
     break;
 
     case "montaAtributos":
-        $stJs = montaAtributos( $_REQUEST['inDocumento'] );
+        $stJs = montaAtributos( $request->get('inDocumento') );
     break;
 
     case "montaLabelAtributos":
-        echo montaLabelAtributos( $_REQUEST['cod_documento'] );
+        echo montaLabelAtributos( $request->get('cod_documento') );
     break;
 
     case "alterarItem":
-
         $arDocs = Sessao::read('arDocs');
 
         foreach ($arDocs as $key => $value) {
-
-            if ($_REQUEST['id'] == $value['id']) {
-
+            if ($request->get('id') == $value['id']) {
                 $inDataValidade = $value['data_validade'];
                 $inDataEmissao = $value['data_emissao'];
 
                 $stJs  = montaAtributos( $value['cod_documento'] );
                 $arEmissao = explode('/', $value['data_emissao']);
                 $arValidade = explode('/', $value['data_validade']);
-                $stJs .= "f.inDocumento.value = ".$value['cod_documento'].";\n";
-                $stJs .= "f.stDocumento.value = ".$value['cod_documento'].";\n";
-                $stJs .= "f.inNumDocumento.value = '".$value['num_documento']."';\n";
-                $stJs .= "f.stDataEmissao.value = '".$arEmissao[0].$arEmissao[1].$arEmissao[2]."';\n";
-                $stJs .= "mascaraData(f.stDataEmissao,'');\n";
-                $stJs .= "f.stDataValidade.value = '".$arValidade[0].$arValidade[1].$arValidade[2]."';\n";
-                $stJs .= "mascaraData(f.stDataValidade,'');\n";
-                $stJs .= "f.btIncluirDocumento.value='Alterar';\n";
-
-                $stJs .= "f.stDataValidade.disabled = '';";
-                $stJs .= "f.inNumDiasValido.disabled = '';";
-
+                $stJs .= "f.inDocumento.value = ".$value['cod_documento'].";                            \n";
+                $stJs .= "f.stDocumento.value = ".$value['cod_documento'].";                            \n";
+                $stJs .= "f.inNumDocumento.value = '".$value['num_documento']."';                       \n";
+                $stJs .= "f.stDataEmissao.value = '".$arEmissao[0].$arEmissao[1].$arEmissao[2]."';      \n";
+                $stJs .= "mascaraData(f.stDataEmissao,'');                                              \n";
+                $stJs .= "f.stDataValidade.value = '".$arValidade[0].$arValidade[1].$arValidade[2]."';  \n";
+                $stJs .= "mascaraData(f.stDataValidade,'');                                             \n";
+                $stJs .= "f.btIncluirDocumento.value='Alterar';                                         \n";
+                $stJs .= "f.stDataValidade.disabled = '';                                               \n";
+                $stJs .= "f.inNumDiasValido.disabled = '';                                              \n";
                 $stJs .= sincronizaDiasValidosDocumento($inDataValidade,$inDataEmissao);
 
                 if ( is_array($value['atributos']) ) {
                     foreach ($value['atributos'] as $key => $value) {
-                        $stJs .= "f.".$key.".value = '".$value."';\n";
+                        $stJs .= "f.".$key.".value = '".$value."';                                      \n";
                     }
                 }
                 break;
             }
         }
 
-        $stJs .= "f.stAcaoSessao.value = 'alterar';\n";
-        $stJs .= "f.id.value = ".$_REQUEST['id'].";\n";
+        $stJs .= "f.stAcaoSessao.value = 'alterar';                                                     \n";
+        $stJs .= "f.id.value = ".$request->get('id').";                                                 \n";
     break;
 
     case "excluirItem":
@@ -428,7 +432,7 @@ switch ($_REQUEST['stCtrl']) {
         $arTemp = array();
         $inCount = 0;
         foreach ($arDocs as $key => $value) {
-            if ($_REQUEST['id'] != $value['id']) {
+            if ($request->get('id') != $value['id']) {
                 $arTemp[$inCount]['id'] = $inCount+1;
                 $arTemp[$inCount]['cod_documento' ] = $value['cod_documento'];
                 $arTemp[$inCount]['nom_documento' ] = $value['nom_documento'];
@@ -437,12 +441,12 @@ switch ($_REQUEST['stCtrl']) {
                 $arTemp[$inCount]['data_validade' ] = $value['data_validade'];
                 $arTemp[$inCount]['cod_fornecedor'] = $value['cod_fornecedor'];
                 $arTemp[$inCount]['cgm_fornecedor'] = $value['cgm_fornecedor'];
-                $arTemp[$inCount]['atributos'] = $value['atributos'];
+                $arTemp[$inCount]['atributos']      = $value['atributos'];
                 $inCount++;
             }
         }
         Sessao::write('arDocs' , $arTemp);
-        $stJs  = montaListaDocumento( Sessao::read('arDocs') );
+        $stJs = montaListaDocumento( Sessao::read('arDocs') );
     break;
 
     case "desabilitaCampos":
@@ -456,15 +460,15 @@ switch ($_REQUEST['stCtrl']) {
         Sessao::write('arDocs' , array());
         $inCount = 0;
 
-        include_once ( TLIC."TLicitacaoDocumentoAtributoValor.class.php" );
+        include_once TLIC."TLicitacaoDocumentoAtributoValor.class.php";
         $obTLicitacaoDocumentoAtributoValor = new TLicitacaoDocumentoAtributoValor();
 
-        include_once ( TLIC."TLicitacaoCertificacaoDocumentos.class.php" );
+        include_once TLIC."TLicitacaoCertificacaoDocumentos.class.php";
         $obTLicitacaoCertificacaoDocumentos = new TLicitacaoCertificacaoDocumentos();
 
-        $obTLicitacaoCertificacaoDocumentos->setDado( 'num_certificacao', $_REQUEST['inNumCertificacao'] );
-        $obTLicitacaoCertificacaoDocumentos->setDado( 'exercicio', $_REQUEST['stExercicio'] );
-        $obTLicitacaoCertificacaoDocumentos->setDado( 'cgm_fornecedor', $_REQUEST['inCodFornecedor'] );
+        $obTLicitacaoCertificacaoDocumentos->setDado( 'num_certificacao', $request->get('inNumCertificacao') );
+        $obTLicitacaoCertificacaoDocumentos->setDado( 'exercicio', $request->get('stExercicio') );
+        $obTLicitacaoCertificacaoDocumentos->setDado( 'cgm_fornecedor', $request->get('inCodFornecedor') );
         $stFiltro = $obTLicitacaoCertificacaoDocumentos->recuperaFiltroDocumentos();
         $obTLicitacaoCertificacaoDocumentos->recuperaDocumentos( $rsDocumento,$stFiltro );
         $obTLicitacaoDocumentoAtributoValor->TLicitacaoCertificacaoDocumentos = & $obTLicitacaoCertificacaoDocumentos;
@@ -479,23 +483,182 @@ switch ($_REQUEST['stCtrl']) {
             }
 
             $arDocs[$inCount]['id'] = $inCount+1;
-            $arDocs[$inCount]['cod_documento'] = $rsDocumento->getCampo('cod_documento');
-            $arDocs[$inCount]['nom_documento'] = $rsDocumento->getCampo('nom_documento');
-            $arDocs[$inCount]['num_documento'] = $rsDocumento->getCampo('num_documento');
-            $arDocs[$inCount]['data_emissao'] = $rsDocumento->getCampo('dt_emissao');
-            $arDocs[$inCount]['data_validade'] = $rsDocumento->getCampo('dt_validade');
+            $arDocs[$inCount]['cod_documento']  = $rsDocumento->getCampo('cod_documento');
+            $arDocs[$inCount]['nom_documento']  = $rsDocumento->getCampo('nom_documento');
+            $arDocs[$inCount]['num_documento']  = $rsDocumento->getCampo('num_documento');
+            $arDocs[$inCount]['data_emissao']   = $rsDocumento->getCampo('dt_emissao');
+            $arDocs[$inCount]['data_validade']  = $rsDocumento->getCampo('dt_validade');
             $arDocs[$inCount]['cgm_fornecedor'] = $rsDocumento->getCampo('cgm_fornecedor');
-            $arDocs[$inCount]['atributos'] = $arAtributos;
+            $arDocs[$inCount]['atributos']      = $arAtributos;
 
             $rsDocumento->proximo();
             $inCount++;
         }
         Sessao::write('arDocs' , $arDocs);
 
-        $stJs = montaListaDocumento( $arDocs, $_REQUEST['stAcao'] );
+        $stJs = montaListaDocumento( $arDocs, $request->get('stAcao') );
     break;
 
     case 'montaDetalheDocumento':
     break;
+
+    case 'carregaModalidade':
+        if ( !$request->get('stExercicioLicitacao') && !$request->get('inCodEntidade') ) {
+            $stJs.= "f.inCodModalidade.value = '';      \n";
+            $stJs.= "f.inCodLicitacao.value = '';       \n";
+            $stJs.= "limpaSelect(f.inCodLicitacao,1);   \n";
+        }
+    break;
+
+    case 'carregaLicitacao':
+        $stExercicioLicitacao = $request->get('stExercicioLicitacao', Sessao::getExercicio() );
+        
+        if ($stExercicioLicitacao && $request->get('inCodEntidade') && $request->get('inCodModalidade')) {
+            $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
+            $obTLicitacaoLicitacao->setDado( 'exercicio'     , $stExercicioLicitacao );
+            $obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $request->get('inCodEntidade') );
+            $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
+
+            $stFiltro = "";
+            
+            // verifica se a licitação já não foi vinculada a outro fornecedor.
+            if ($request->get('stFiltraLicitacao') == "true") {
+                $stFiltro .= " AND ll.cod_licitacao NOT IN ( SELECT cod_licitacao
+                                                               FROM licitacao.participante_certificacao_licitacao
+                                                              WHERE cod_licitacao  = ll.cod_licitacao
+                                                                AND cod_modalidade = ".$request->get('inCodModalidade')."
+                                                                AND cod_entidade   = ".$request->get('inCodEntidade')."
+                                                            ) ";
+            }
+
+            if ($request->get('stCtrl') == 'carregaLicitacaoContrato') {
+                $stFiltro.="
+                      AND EXISTS (
+                           SELECT 1
+                                 FROM licitacao.homologacao
+                            LEFT JOIN licitacao.homologacao_anulada
+                                   ON  homologacao_anulada.num_homologacao = homologacao.num_homologacao
+                                  AND  homologacao_anulada.num_adjudicacao = homologacao.num_adjudicacao
+                                  AND  homologacao_anulada.cod_entidade = homologacao.cod_entidade
+                                  AND  homologacao_anulada.cod_modalidade = homologacao.cod_modalidade
+                                  AND  homologacao_anulada.cod_licitacao = homologacao.cod_licitacao
+                                  AND  homologacao_anulada.exercicio_licitacao = homologacao.exercicio_licitacao
+                                  AND  homologacao_anulada.cod_item = homologacao.cod_item
+                                  AND  homologacao_anulada.cod_cotacao = homologacao.cod_cotacao
+                                  AND  homologacao_anulada.lote = homologacao.lote
+                                  AND  homologacao_anulada.exercicio_cotacao = homologacao.exercicio_cotacao
+                                  AND  homologacao_anulada.cgm_fornecedor = homologacao.cgm_fornecedor
+                                WHERE  homologacao.cod_entidade = ll.cod_entidade
+                                  AND  homologacao.cod_modalidade = ll.cod_modalidade
+                                  AND  homologacao.cod_licitacao = ll.cod_licitacao
+                                  AND  homologacao.exercicio_licitacao = ll.exercicio
+                                  AND  homologacao_anulada.num_homologacao is null
+                                )";
+            }
+            
+            if ($request->get('stFiltro') == 'adjudicacao' || $request->get('stFiltro') == 'julgamento') {
+                
+                $stFiltro.= "
+                    -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+                    AND CASE WHEN ll.cod_modalidade in (1,2,3,4,5,6,7,10,11) THEN
+                            
+                              EXISTS (
+                                    SELECT 1
+                                      FROM licitacao.edital
+                                     WHERE edital.cod_licitacao = ll.cod_licitacao
+                                       AND edital.cod_modalidade = ll.cod_modalidade
+                                       AND edital.cod_entidade = ll.cod_entidade
+                                       AND edital.exercicio = ll.exercicio
+                            )
+        
+                      -- Para as modalidades 8,9 é facultativo possuir um edital
+                      WHEN ll.cod_modalidade in (8,9) THEN
+                            
+                               EXISTS (
+                                    SELECT 1
+                                      FROM licitacao.edital
+                                     WHERE edital.cod_licitacao = ll.cod_licitacao
+                                       AND edital.cod_modalidade = ll.cod_modalidade
+                                       AND edital.cod_entidade = ll.cod_entidade
+                                       AND edital.exercicio = ll.exercicio
+                                     )
+        
+                        OR NOT EXISTS (
+                               SELECT 1
+                                 FROM licitacao.edital
+                                WHERE edital.cod_licitacao = ll.cod_licitacao
+                                  AND edital.cod_modalidade = ll.cod_modalidade
+                                  AND edital.cod_entidade = ll.cod_entidade
+                                  AND edital.exercicio = ll.exercicio
+                                )
+                     END
+                     
+                     AND EXISTS ( SELECT 1
+                                    FROM compras.mapa_cotacao
+                              INNER JOIN compras.julgamento
+                                      ON julgamento.exercicio   = mapa_cotacao.exercicio_cotacao
+                                     AND julgamento.cod_cotacao = mapa_cotacao.cod_cotacao
+                                   WHERE mapa_cotacao.cod_mapa       = ll.cod_mapa
+                                     AND mapa_cotacao.exercicio_mapa = ll.exercicio_mapa
+                                     AND NOT EXISTS ( SELECT 1
+                                                        FROM compras.cotacao_anulada
+                                                       WHERE cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
+                                                         AND cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
+                                                    )
+                                 )";
+    
+                if ($request->get('stFiltro') == 'adjudicacao') {
+                    $stFiltro.= "
+                     AND EXISTS (
+                              SELECT 1
+                                FROM compras.mapa_cotacao
+                          INNER JOIN licitacao.adjudicacao
+                                  ON adjudicacao.exercicio_cotacao   = mapa_cotacao.exercicio_cotacao
+                                 AND adjudicacao.cod_cotacao         = mapa_cotacao.cod_cotacao
+                                 AND adjudicacao.cod_licitacao       = ll.cod_licitacao
+                                 AND adjudicacao.cod_modalidade      = ll.cod_modalidade
+                                 AND adjudicacao.cod_entidade        = ll.cod_entidade
+                                 AND adjudicacao.exercicio_licitacao = ll.exercicio
+                     )
+                     AND (SELECT count(1)
+                            FROM compras.mapa_cotacao
+                      INNER JOIN licitacao.adjudicacao
+                              ON adjudicacao.exercicio_cotacao   = mapa_cotacao.exercicio_cotacao
+                             AND adjudicacao.cod_cotacao         = mapa_cotacao.cod_cotacao
+                             AND adjudicacao.cod_licitacao       = ll.cod_licitacao
+                             AND adjudicacao.cod_modalidade      = ll.cod_modalidade
+                             AND adjudicacao.cod_entidade        = ll.cod_entidade
+                             AND adjudicacao.exercicio_licitacao = ll.exercicio
+                           WHERE adjudicacao.adjudicado
+                         ) = (SELECT COUNT(1)
+                                FROM compras.mapa_cotacao
+                          INNER JOIN licitacao.adjudicacao
+                                  ON adjudicacao.exercicio_cotacao   = mapa_cotacao.exercicio_cotacao
+                                 AND adjudicacao.cod_cotacao         = mapa_cotacao.cod_cotacao
+                                 AND adjudicacao.cod_licitacao       = ll.cod_licitacao
+                                 AND adjudicacao.cod_modalidade      = ll.cod_modalidade
+                                 AND adjudicacao.cod_entidade        = ll.cod_entidade
+                                 AND adjudicacao.exercicio_licitacao = ll.exercicio
+                             ) ";
+                }
+            }
+    
+            $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao, $stFiltro );
+    
+            if ( $rsLicitacao->getNumLinhas() > 0 ) {
+                $stJs.= preencheLicitacao( $rsLicitacao, 'inCodLicitacao', $request->get('inCodLicitacao') );
+            } else {
+                $stJs.= "f.inCodLicitacao.selectedIndex =  0;   \n";
+                $stJs.= "limpaSelect(f.inCodLicitacao,1);       \n";
+            }
+            
+        } else {
+            $stJs = "f.inCodLicitacao.value = '';           \n";
+            $stJs.= "limpaSelect(f.inCodLicitacao,1);       \n";
+        }
+    break;
 }
+
 echo $stJs;
+
+?>

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioNotaLiquidacaoEmpenho.php 60708 2014-11-11 13:02:53Z franver $
+    * $Id: OCGeraRelatorioNotaLiquidacaoEmpenho.php 63351 2015-08-20 13:42:42Z evandro $
 
     * Casos de uso: uc-02.03.21
 */
@@ -834,6 +834,34 @@ foreach ($arRecordSetTodos as $inChave => $arRecordSet) {
         $obPDF->addCampo            ("vl_associado"     , 8, '', '', 'LBR');
         $obPDF->addCampo            ("vl_desconto"      , 8, '', '', 'LBR');
         $obPDF->addCampo            ("vl_total_liquido" , 8, '', '', 'LBR');
+    }
+
+
+    //TCMBA
+    if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 5 ) {        
+        $obPDF->addRecordSet        ($arRecordSet[20] ); 
+        $obPDF->setAlturaCabecalho  ( 5 );
+        $obPDF->setQuebraPaginaLista( false );
+        $obPDF->setAlinhamento      ("L" );
+        
+        $obPDF->addCabecalho        ("NÚMERO NOTA" , 10, 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("SERIE"       , 4 , 5, '', '', 'LTBR','205,206,205');        
+        $obPDF->addCabecalho        ("SUB"         , 4 , 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("DESCRIÇÃO"   , 52, 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("DATA"        , 10, 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("UF"          , 5 , 5, '', '', 'LTBR','205,206,205');
+        $obPDF->setAlinhamento      ("R");
+        $obPDF->addCabecalho        ("VALOR"       , 15, 5, '', '', 'LTBR','205,206,205');
+        
+        $obPDF->setAlinhamento      ("L");
+        $obPDF->addCampo            ("nro_nota"     , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("nro_serie"    , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("nro_subserie" , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("descricao"    , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("data_emissao" , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("sigla_uf"     , 8, '', '', 'LTBR');
+        $obPDF->setAlinhamento      ("R");
+        $obPDF->addCampo            ("vl_nota"      , 8, '', '', 'LTBR');        
     }
 
     $arAssinaturas = Sessao::read('assinaturas');

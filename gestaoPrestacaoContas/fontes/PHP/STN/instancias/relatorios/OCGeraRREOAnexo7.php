@@ -96,7 +96,7 @@ $preview->addParametro( 'tipo_periodo', $_REQUEST['stTipoRelatorio'] );
 if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($_REQUEST['inCodEntidade']) > 1 ) ) {
     $preview->addParametro( 'poder' , 'Executivo' );
 } else {
-    if (preg_match("/c[âa]mara/i", $rsEntidade->getCampo( 'nom_cgm' )) and count($_REQUEST['inCodEntidade']) == 1) {
+    if (preg_match("/c(â|a)mara/i", $rsEntidade->getCampo( 'nom_cgm' )) and count($_REQUEST['inCodEntidade']) == 1) {
        $preview->addParametro( 'poder' , 'Legislativo' );
     } else {
        $preview->addParametro( 'poder' , 'Executivo' );

@@ -33,6 +33,9 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once(TLIC."TLicitacaoContrato.class.php");
 include_once(TLIC."TLicitacaoContratoAditivos.class.php");
 include_once(TLIC."TLicitacaoPublicacaoContratoAditivos.class.php");
+include_once(TLIC."TLicitacaoTipoTermoAditivo.class.php");
+include_once(TLIC."TLicitacaoTipoAlteracaoValor.class.php");
+
 include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
 
 $stAcao = $request->get('stAcao');
@@ -58,18 +61,18 @@ $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
 $obTLicitacaoContrato = new TLicitacaoContrato;
-$obTLicitacaoContrato->setDado('num_contrato', $_REQUEST["inNumContrato"]);
-$obTLicitacaoContrato->setDado('cod_entidade', $_REQUEST["inCodEntidade"]);
-$obTLicitacaoContrato->setDado('exercicio', $_REQUEST["stExercicioContrato"]);
+$obTLicitacaoContrato->setDado('num_contrato', $request->get("inNumContrato"));
+$obTLicitacaoContrato->setDado('cod_entidade', $request->get("inCodEntidade"));
+$obTLicitacaoContrato->setDado('exercicio', $request->get("stExercicioContrato"));
 $obTLicitacaoContrato->recuperaDadosAditivosCompraDireta($rsLicitacaoContrato);
 
 $obLblNumeroContrato = new Label;
 $obLblNumeroContrato->setRotulo('Número do Contrato');
-$obLblNumeroContrato->setValue($_REQUEST["inNumContrato"]."/".$_REQUEST["stExercicioContrato"]);
+$obLblNumeroContrato->setValue($request->get("inNumContrato")."/".$request->get("stExercicioContrato"));
 
 $obLblEntidade = new Label;
 $obLblEntidade->setRotulo('Entidade');
-$obLblEntidade->setValue($_REQUEST["inCodEntidade"]." - ".$rsLicitacaoContrato->getCampo('nom_entidade'));
+$obLblEntidade->setValue($request->get("inCodEntidade")." - ".$rsLicitacaoContrato->getCampo('nom_entidade'));
 
 $obLblObjeto = new Label;
 $obLblObjeto->setRotulo('Objeto');
@@ -99,7 +102,7 @@ $obLblVlContratado->setValue(number_format(str_replace(".", ",", $rsLicitacaoCon
 if ($stAcao != "incluirCD") {
     $obNumeroAditivo = new Label;
     $obNumeroAditivo->setRotulo('Número do Aditivo');
-    $obNumeroAditivo->setValue($_REQUEST["inNumeroAditivo"]."/".$_REQUEST["stExercicioAditivo"]);
+    $obNumeroAditivo->setValue($request->get("inNumeroAditivo")."/".$request->get("stExercicioAditivo"));
 }
 
 $dtAssinatura = "";
@@ -112,20 +115,27 @@ $vlValorContratado = "";
 
 if ($stAcao != "incluirCD") {
     $obLicitacaoContratoAditivos = new TLicitacaoContratoAditivos;
-    $obLicitacaoContratoAditivos->setDado("num_contrato", $_REQUEST["'inNumContrato'"]);
-    $obLicitacaoContratoAditivos->setDado("exercicio", $_REQUEST["'stExercicioAditivo'"]);
-    $obLicitacaoContratoAditivos->setDado("exercicio_contrato", $_REQUEST["'tExercicioContrato'"]);
-    $obLicitacaoContratoAditivos->setDado("cod_entidade", $_REQUEST["'inCodEntidade'"]);
-    $obLicitacaoContratoAditivos->setDado("num_aditivo", $_REQUEST["'inNumeroAditivo'"]);
+    $obLicitacaoContratoAditivos->setDado("num_contrato", $request->get('inNumContrato'));
+    $obLicitacaoContratoAditivos->setDado("exercicio", $request->get('stExercicioAditivo'));
+    $obLicitacaoContratoAditivos->setDado("exercicio_contrato", $request->get('tExercicioContrato'));
+    $obLicitacaoContratoAditivos->setDado("cod_entidade", $request->get('inCodEntidade'));
+    $obLicitacaoContratoAditivos->setDado("num_aditivo", $request->get('inNumeroAditivo'));
     $obLicitacaoContratoAditivos->recuperaContratosAditivosCompraDireta($rsLicitacaoContratoAditivo);
 
     $inCodRespJuridico = $rsLicitacaoContratoAditivo->getCampo("responsavel_juridico");
     $stRespJuridico = $rsLicitacaoContratoAditivo->getCampo("cgm_responsavel_juridico");
+    $inCodTipoTermo = $rsLicitacaoContratoAditivo->getCampo("tipo_termo_aditivo");
+    $stTermoAditivo = $rsLicitacaoContratoAditivo->getCampo("descricao_termo_aditivo");
+    $inCodTipoAlteracaoValor = $rsLicitacaoContratoAditivo->getCampo("tipo_valor");
+    $stAlteracaoValor = $rsLicitacaoContratoAditivo->getCampo("descricao_tipo_alteracao_valor");
     $dtAssinatura = $rsLicitacaoContratoAditivo->getCampo("dt_assinatura");
     $dtInicioExcucao = $rsLicitacaoContratoAditivo->getCampo("inicio_execucao");
+    $dtFimExecucao = $rsLicitacaoContratoAditivo->getCampo("fim_execucao");
     $dtFinalVigencia = $rsLicitacaoContratoAditivo->getCampo("dt_vencimento");
     $stObjeto = $rsLicitacaoContratoAditivo->getCampo("objeto");
+    $stJustificativa = $rsLicitacaoContratoAditivo->getCampo("justificativa");
     $stFundamentacaoLegal = $rsLicitacaoContratoAditivo->getCampo("fundamentacao");
+    
     $vlValorContratado = number_format(str_replace(".", ",", $rsLicitacaoContratoAditivo->getCampo("valor_contratado")), 2, ",", ".");
 }
 
@@ -146,6 +156,40 @@ if ($stAcao != "anularCD") {
     $obResponsavelJuridico->obCampoCod->setNull( true );
     $obResponsavelJuridico->setNull( false );
 
+    //recupera os tipos de termos de aditivo
+    $obTLicitacaoTipoTermoAditivo = new TLicitacaoTipoTermoAditivo();
+    $obTLicitacaoTipoTermoAditivo->recuperaTodos( $rsTipoTermoAditivo, ' ORDER BY cod_tipo ' );
+    
+    //preenche o select com os tipos de veiculo
+    $obTipoTermoAditivo = new Select();
+    $obTipoTermoAditivo->setRotulo ( 'Tipo de Termo do Aditivo' );
+    $obTipoTermoAditivo->setTitle  ( 'Selecione o tipo de termo.' );
+    $obTipoTermoAditivo->setName   ( 'inCodTipoTermoAditivo' );
+    $obTipoTermoAditivo->setId     ( 'inCodTipoTermoAditivo' );
+    $obTipoTermoAditivo->addOption ( '', 'Selecione' );
+    $obTipoTermoAditivo->setCampoId( 'cod_tipo' );
+    $obTipoTermoAditivo->setCampoDesc( 'descricao' );
+    $obTipoTermoAditivo->preencheCombo( $rsTipoTermoAditivo );
+    $obTipoTermoAditivo->setValue( $inCodTipoTermo );
+    $obTipoTermoAditivo->setNull   ( false );
+    
+    //recupera os tipos de valores
+    $obTLicitacaoTipoAlteracaoValor = new TLicitacaoTipoAlteracaoValor();
+    $obTLicitacaoTipoAlteracaoValor->recuperaTodos( $rsTipoAlteracaoValor, ' ORDER BY cod_tipo ' );
+    
+    //preenche o select com os tipos de veiculo
+    $obTipoAlteracaoValor = new Select();
+    $obTipoAlteracaoValor->setRotulo ( 'Tipo de Alteração do Valor' );
+    $obTipoAlteracaoValor->setTitle  ( 'Selecione o tipo de alteração do valor.' );
+    $obTipoAlteracaoValor->setName   ( 'inCodTipoAlteracaoValor' );
+    $obTipoAlteracaoValor->setId     ( 'inCodTipoAlteracaoValor' );
+    $obTipoAlteracaoValor->addOption ( '', 'Selecione' );
+    $obTipoAlteracaoValor->setCampoId( 'cod_tipo' );
+    $obTipoAlteracaoValor->setCampoDesc( 'descricao' );
+    $obTipoAlteracaoValor->preencheCombo( $rsTipoAlteracaoValor );
+    $obTipoAlteracaoValor->setValue( $inCodTipoAlteracaoValor );
+    $obTipoAlteracaoValor->setNull   ( false );
+    
     //monta o campo Data de Assinatura
     $obDtAssinatura = new Data;
     $obDtAssinatura->setRotulo('Data da Assinatura');
@@ -161,6 +205,14 @@ if ($stAcao != "anularCD") {
     $obDtInicioExecucao->setName('dtInicioExcucao');
     $obDtInicioExecucao->setValue($dtInicioExcucao);
     $obDtInicioExecucao->setNull(false);
+    
+    //monta o campo Data Final de Vigência
+    $obDtFimExecucao = new Data;
+    $obDtFimExecucao->setRotulo('Data de Término da Execução');
+    $obDtFimExecucao->setTitle('Informe a final da execução do aditivo.');
+    $obDtFimExecucao->setName('dtFimExecucao');
+    $obDtFimExecucao->setValue($dtFimExecucao);
+    $obDtFimExecucao->setNull(true);
 
     //monta o campo Data Final de Vigência
     $obDtFinalVigencia = new Data;
@@ -170,14 +222,25 @@ if ($stAcao != "anularCD") {
     $obDtFinalVigencia->setValue($dtFinalVigencia);
     $obDtFinalVigencia->setNull(false);
 
-    $obTxtObjeto = new TextBox;
+    $obTxtObjeto = new TextArea;
+    $obTxtObjeto->setName('stObjeto');
+    $obTxtObjeto->setId('stObjeto');
     $obTxtObjeto->setRotulo('Objeto');
     $obTxtObjeto->setTitle('Informe o objeto do aditivo.');
-    $obTxtObjeto->setName('stObjeto');
-    $obTxtObjeto->setNull(false);
-    $obTxtObjeto->setMaxLength(50);
-    $obTxtObjeto->setSize(60);
+    $obTxtObjeto->setRows(2);
+    $obTxtObjeto->setCols(100);
     $obTxtObjeto->setValue($stObjeto);
+    $obTxtObjeto->setNull(false );
+    
+    $obTxtJustificativa = new TextArea;
+    $obTxtJustificativa->setName('stJustificativa');
+    $obTxtJustificativa->setId('stJustificativa');
+    $obTxtJustificativa->setRotulo('Justificativa');
+    $obTxtJustificativa->setTitle('Informe a justificativa do aditivo.');
+    $obTxtJustificativa->setRows(2);
+    $obTxtJustificativa->setCols(100);
+    $obTxtJustificativa->setValue($stJustificativa);
+    $obTxtJustificativa->setNull(false );
 
     $obTxtFundLegal = new TextBox;
     $obTxtFundLegal->setRotulo('Fundamentação Legal');
@@ -198,6 +261,14 @@ if ($stAcao != "anularCD") {
     $obResponsavelJuridico = new Label;
     $obResponsavelJuridico->setRotulo('Responsável Jurídico');
     $obResponsavelJuridico->setValue($inCodRespJuridico." - ".$stRespJuridico);
+    
+    $obTipoTermoAditivo = new Label;
+    $obTipoTermoAditivo->setRotulo('Tipo de Termo do Aditivo');
+    $obTipoTermoAditivo->setValue($inCodTipoTermo." - ".$stTermoAditivo);
+    
+    $obTipoAlteracaoValor = new Label;
+    $obTipoAlteracaoValor->setRotulo('Tipo de Alteração do Valor');
+    $obTipoAlteracaoValor->setValue($inCodTipoAlteracaoValor." - ".$stAlteracaoValor);
 
     $obDtAssinatura = new Label;
     $obDtAssinatura->setRotulo('Data da Assinatura');
@@ -207,6 +278,10 @@ if ($stAcao != "anularCD") {
     $obDtInicioExecucao->setRotulo('Data de Início de Execução');
     $obDtInicioExecucao->setValue($dtInicioExcucao);
 
+    $obDtFimExecucao = new Label;
+    $obDtFimExecucao->setRotulo('Data de Término da Execução');
+    $obDtFimExecucao->setValue($dtFimExecucao);
+    
     $obDtFinalVigencia = new Label;
     $obDtFinalVigencia->setRotulo('Data Final de Vigência');
     $obDtFinalVigencia->setValue($dtFinalVigencia);
@@ -214,6 +289,10 @@ if ($stAcao != "anularCD") {
     $obTxtObjeto = new Label;
     $obTxtObjeto->setRotulo('Objeto');
     $obTxtObjeto->setValue($stObjeto);
+    
+    $obTxtJustificativa = new Label;
+    $obTxtJustificativa->setRotulo('Justificativa');
+    $obTxtJustificativa->setValue($stJustificativa);
 
     $obTxtFundLegal = new Label;
     $obTxtFundLegal->setRotulo('Fundamentação Legal');
@@ -223,6 +302,12 @@ if ($stAcao != "anularCD") {
     $obVlValorContratado->setRotulo('Valor');
     $obVlValorContratado->setValue($vlValorContratado);
 
+    $obVlValorAnulacao = new Moeda;
+    $obVlValorAnulacao->setRotulo('Valor Anulação');
+    $obVlValorAnulacao->setTitle('Informe o valor da anulação.');
+    $obVlValorAnulacao->setName('vlValorAnulacao');
+    $obVlValorAnulacao->setNull(false);
+    
     $obDataAnulacao = new Data;
     $obDataAnulacao->setName("dtAnulacao");
     $obDataAnulacao->setRotulo("Data Anulação");
@@ -242,34 +327,34 @@ if ($stAcao != "anularCD") {
 //objetos hidden das labels
 $obHdnInNumContrato = new Hidden;
 $obHdnInNumContrato->setName( "inNumContrato" );
-$obHdnInNumContrato->setValue( $_REQUEST["inNumContrato"] );
+$obHdnInNumContrato->setValue( $request->get("inNumContrato") );
 
 $obHdnStExercicio = new Hidden;
 $obHdnStExercicio->setName( "stExercicioContrato" );
-$obHdnStExercicio->setValue( $_REQUEST["stExercicioContrato"] );
+$obHdnStExercicio->setValue( $request->get("stExercicioContrato") );
 
 $obHdnInCodEntidade = new Hidden;
 $obHdnInCodEntidade->setName( "inCodEntidade" );
-$obHdnInCodEntidade->setValue( $_REQUEST["inCodEntidade"] );
+$obHdnInCodEntidade->setValue( $request->get("inCodEntidade") );
 
 if ($stAcao != "incluirCD") {
     $obHdnInNumeroAditivo = new Hidden;
     $obHdnInNumeroAditivo->setName( "inNumeroAditivo" );
-    $obHdnInNumeroAditivo->setValue( $_REQUEST["inNumeroAditivo"] );
+    $obHdnInNumeroAditivo->setValue( $request->get("inNumeroAditivo") );
 
     $obHdnStExercicioAditivo = new Hidden;
     $obHdnStExercicioAditivo->setName( "stExercicioAditivo" );
-    $obHdnStExercicioAditivo->setValue( $_REQUEST["stExercicioAditivo"] );
+    $obHdnStExercicioAditivo->setValue( $request->get("stExercicioAditivo") );
 }
 
 if ($stAcao == 'alterarCD') {
     //recupera os veiculos de publicacao, coloca na sessao e manda para o oculto
     $obTLicitacaoPublicacaoContrato = new TLicitacaoPublicacaoContratoAditivos();
-    $obTLicitacaoPublicacaoContrato->setDado('num_contrato', $_REQUEST['inNumContrato']);
-    $obTLicitacaoPublicacaoContrato->setDado('exercicio', "'".Sessao::getExercicio()."'");
-    $obTLicitacaoPublicacaoContrato->setDado('exercicio_contrato', "'".$_REQUEST["stExercicioContrato"]."'");
-    $obTLicitacaoPublicacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-    $obTLicitacaoPublicacaoContrato->setDado('num_aditivo', $_REQUEST['inNumeroAditivo']);
+    $obTLicitacaoPublicacaoContrato->setDado('num_contrato', $request->get('inNumContrato'));
+    $obTLicitacaoPublicacaoContrato->setDado('exercicio', Sessao::getExercicio());
+    $obTLicitacaoPublicacaoContrato->setDado('exercicio_contrato', $request->get("stExercicioContrato"));
+    $obTLicitacaoPublicacaoContrato->setDado('cod_entidade', $request->get('inCodEntidade'));
+    $obTLicitacaoPublicacaoContrato->setDado('num_aditivo', $request->get('inNumeroAditivo'));
 
     $inCount = 0;
     $arValores = array();
@@ -384,15 +469,21 @@ if ($stAcao != "incluirCD") {
 }
 
 $obFormulario->addComponente( $obResponsavelJuridico );
+$obFormulario->addComponente( $obTipoTermoAditivo );
+$obFormulario->addComponente( $obTipoAlteracaoValor );
 $obFormulario->addComponente( $obDtAssinatura );
 $obFormulario->addComponente( $obDtInicioExecucao );
+$obFormulario->addComponente( $obDtFimExecucao );
 $obFormulario->addComponente( $obDtFinalVigencia );
 $obFormulario->addComponente( $obTxtObjeto );
+$obFormulario->addComponente( $obTxtJustificativa );
 $obFormulario->addComponente( $obTxtFundLegal );
 $obFormulario->addComponente( $obVlValorContratado );
 
+
 if ($stAcao == "anularCD") {
     $obFormulario->addTitulo( "Dados da Anulação do Aditivo" );
+    $obFormulario->addComponente( $obVlValorAnulacao );
     $obFormulario->addComponente( $obDataAnulacao );
     $obFormulario->addComponente( $obTxtMotivoAnulacao );
 }

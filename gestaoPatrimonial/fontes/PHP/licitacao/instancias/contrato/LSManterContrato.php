@@ -32,7 +32,7 @@
 
 * @ignore
 
-* $Id: LSManterContrato.php 59612 2014-09-02 12:00:51Z gelson $
+* $Id: LSManterContrato.php 63565 2015-09-11 11:25:25Z carlos.silva $
 
 * Casos de uso: uc-03.05.22
 */
@@ -162,7 +162,7 @@ $obLista->commitDado();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
-$obLista->ultimoDado->setCampo( "[num_contrato]/[exercicio_contrato]" );
+$obLista->ultimoDado->setCampo( "[numero_contrato]/[exercicio_contrato]" );
 $obLista->commitDado();
 
 $obLista->addDado();
@@ -179,7 +179,8 @@ $obLista->addAcao();
 
 $obLista->ultimaAcao->setAcao ( $stAcao );
 $obLista->ultimaAcao->addCampo( "&inNumContrato", "num_contrato" );
-$obLista->ultimaAcao->addCampo( "&inCodEntidade", "cod_entidade" );
+$obLista->ultimaAcao->addCampo( "inCodEntidade", "cod_entidade" );
+$obLista->ultimaAcao->addCampo( "stExercicio", "exercicio_contrato" );
 $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
 $obLista->commitAcao();
 

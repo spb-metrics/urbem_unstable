@@ -2,22 +2,22 @@
 /*
     **********************************************************************************
     *                                                                                *
-    * @package URBEM CNM - Solu��es em Gest�o P�blica                                *
-    * @copyright (c) 2013 Confedera��o Nacional de Munic�pos                         *
-    * @author Confedera��o Nacional de Munic�pios                                    *
+    * @package URBEM CNM - Soluções em Gestão Pública                                *
+    * @copyright (c) 2013 Confederação Nacional de Municípos                         *
+    * @author Confederação Nacional de Municípios                                    *
     *                                                                                *
-    * Este programa � software livre; voc� pode redistribu�-lo e/ou modific�-lo  sob *
-    * os termos da Licen�a P�blica Geral GNU conforme publicada pela  Free  Software *
-    * Foundation; tanto a vers�o 2 da Licen�a, como (a seu crit�rio) qualquer vers�o *
+    * O URBEM CNM é um software livre; você pode redistribuí-lo e/ou modificá-lo sob *
+    * os  termos  da Licença Pública Geral GNU conforme  publicada  pela Fundação do *
+    * Software Livre (FSF - Free Software Foundation); na versão 2 da Licença.       *
     *                                                                                *
-    * Este  programa  �  distribu�do  na  expectativa  de  que  seja  �til,   por�m, *
-    * SEM NENHUMA GARANTIA; nem mesmo a garantia impl�cita  de  COMERCIABILIDADE  OU *
-    * ADEQUA��O A UMA FINALIDADE ESPEC�FICA. Consulte a Licen�a P�blica Geral do GNU *
+    * Este  programa  é  distribuído  na  expectativa  de  que  seja  útil,   porém, *
+    * SEM NENHUMA GARANTIA; nem mesmo a garantia implícita  de  COMERCIABILIDADE  OU *
+    * ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral do GNU *
     * para mais detalhes.                                                            *
     *                                                                                *
-    * Voc� deve ter recebido uma c�pia da Licen�a P�blica Geral  do  GNU  junto  com *
-    * este programa; se n�o, escreva para  a  Free  Software  Foundation,  Inc.,  no *
-    * endere�o 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.               *
+    * Você deve ter recebido uma cópia da Licença Pública Geral do GNU "LICENCA.txt" *
+    * com  este  programa; se não, escreva para  a  Free  Software Foundation  Inc., *
+    * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
 */
@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalCVC.class.php 62603 2015-05-22 17:25:16Z carlos.silva $
+    $Id: TTCEMGArquivoMensalCVC.class.php 63551 2015-09-10 14:18:29Z franver $
 
 */
 
@@ -42,7 +42,7 @@ include_once ( CLA_PERSISTENTE );
 
 class TTCEMGArquivoMensalCVC extends Persistente
 {
-    public function TTCEMGArquivoMensalCVC() {
+    public function __construct() {
         parent::Persistente();
         $this->setDado('exercicio', Sessao::getExercicio() );
     }
@@ -136,17 +136,17 @@ class TTCEMGArquivoMensalCVC extends Persistente
                              ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                             AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                             
-                      LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.num_orgao
-                                               ELSE veiculo_uniorcam.num_orgao
+                      LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.num_orgao
+                                               ELSE despesa.num_orgao
                                            END AS cod_orgao
-                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.num_unidade
-                                               ELSE veiculo_uniorcam.num_unidade
+                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.num_unidade
+                                               ELSE despesa.num_unidade
                                            END AS cod_unidade
-                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.exercicio
-                                               ELSE veiculo_uniorcam.exercicio
+                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.exercicio
+                                               ELSE despesa.exercicio
                                                
                                            END AS exercicio_locacao
                                         , veiculo_propriedade.cod_veiculo
@@ -373,17 +373,17 @@ class TTCEMGArquivoMensalCVC extends Persistente
                              ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                             AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                             
-                      LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.num_orgao
-                                               ELSE veiculo_uniorcam.num_orgao
+                      LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.num_orgao
+                                               ELSE despesa.num_orgao
                                            END AS cod_orgao
-                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.num_unidade
-                                               ELSE veiculo_uniorcam.num_unidade
+                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.num_unidade
+                                               ELSE despesa.num_unidade
                                            END AS cod_unidade
-                                        , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                               THEN despesa.exercicio
-                                               ELSE veiculo_uniorcam.exercicio
+                                        , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                               THEN veiculo_uniorcam.exercicio
+                                               ELSE despesa.exercicio
                                            END AS exercicio_locacao
                                         , veiculo_propriedade.cod_veiculo
                                         , MAX(veiculo_propriedade.timestamp) AS timestamp
@@ -645,17 +645,17 @@ class TTCEMGArquivoMensalCVC extends Persistente
                      ON  descricao_veiculo.cod_veiculo = veiculo_propriedade.cod_veiculo
                     AND descricao_veiculo.timestamp = veiculo_propriedade.timestamp
                     
-              LEFT JOIN ( SELECT CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                       THEN despesa.num_orgao
-                                       ELSE veiculo_uniorcam.num_orgao
+              LEFT JOIN ( SELECT CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                       THEN veiculo_uniorcam.num_orgao
+                                       ELSE despesa.num_orgao
                                    END AS cod_orgao
-                                , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                       THEN despesa.num_unidade
-                                       ELSE veiculo_uniorcam.num_unidade
+                                , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                       THEN veiculo_uniorcam.num_unidade
+                                       ELSE despesa.num_unidade
                                    END AS cod_unidade
-                                , CASE WHEN despesa.num_orgao IS NOT NULL AND despesa.num_unidade IS NOT NULL
-                                       THEN despesa.exercicio
-                                       ELSE veiculo_uniorcam.exercicio
+                                , CASE WHEN veiculo_uniorcam.num_orgao IS NOT NULL AND veiculo_uniorcam.num_unidade IS NOT NULL
+                                       THEN veiculo_uniorcam.exercicio
+                                       ELSE despesa.exercicio
                                        
                                    END AS exercicio_locacao
                                 , veiculo_propriedade.cod_veiculo

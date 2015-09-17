@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63468 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -88,77 +88,82 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   liq.exercicio                                      \n";
-    $stSql .= "         ,des.num_orgao                                      \n";
-    $stSql .= "         ,des.num_unidade                                    \n";
-    $stSql .= "         ,emp.cod_empenho                                    \n";
-    $stSql .= "         ,to_char(liq.dt_liquidacao,'dd/mm/yyyy') as data_liquidacao \n";
-    $stSql .= "         ,(sum(sum.valor)-sum(sumanu.valor) ) as saldo       \n";
-    $stSql .= " FROM     empenho.empenho             as emp                 \n";
-    $stSql .= "         ,empenho.nota_liquidacao     as liq                 \n";
-    $stSql .= "         LEFT JOIN                                           \n";
-    $stSql .= "         (                                                   \n";
-    $stSql .= "             SELECT   exercicio                              \n";
-    $stSql .= "                     ,cod_entidade                           \n";
-    $stSql .= "                     ,cod_nota                               \n";
-    $stSql .= "                     ,sum(vl_anulado) as valor               \n";
-    $stSql .= "             FROM    empenho.nota_liquidacao_item_anulado as nli        \n";
-    $stSql .= "             WHERE   exercicio = '".$this->getDado('exercicio')."'         \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "           AND   cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= "             GROUP BY exercicio, cod_entidade, cod_nota      \n";
-    $stSql .= "         ) as sumanu                                         \n";
-    $stSql .= "         ON (                                                \n";
-    $stSql .= "             liq.exercicio    = sumanu.exercicio             \n";
-    $stSql .= "         AND liq.cod_entidade = sumanu.cod_entidade          \n";
-    $stSql .= "         AND liq.cod_nota     = sumanu.cod_nota              \n";
-    $stSql .= "         )                                                   \n";
-    $stSql .= "         ,empenho.pre_empenho         as pre                 \n";
-    $stSql .= "         ,empenho.pre_empenho_despesa as ped                 \n";
-    $stSql .= "         ,orcamento.conta_despesa     as cde                 \n";
-    $stSql .= "         ,orcamento.despesa           as des                 \n";
-    $stSql .= "         ,(                                                  \n";
-    $stSql .= "             SELECT   exercicio                              \n";
-    $stSql .= "                     ,cod_entidade                           \n";
-    $stSql .= "                     ,cod_nota                               \n";
-    $stSql .= "                     ,sum(vl_total) as valor                 \n";
-    $stSql .= "             FROM    empenho.nota_liquidacao_item as nli     \n";
-    $stSql .= "             WHERE   exercicio = '".$this->getDado('exercicio')."'         \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "           AND   cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= "             GROUP BY exercicio, cod_entidade, cod_nota      \n";
-    $stSql .= "         ) as sum                                            \n";
-    $stSql .= " WHERE   emp.exercicio       = pre.exercicio                 \n";
-    $stSql .= " AND     emp.cod_pre_empenho = pre.cod_pre_empenho           \n";
-    $stSql .= " AND     emp.exercicio       = liq.exercicio_empenho         \n";
-    $stSql .= " AND     emp.cod_entidade    = liq.cod_entidade              \n";
-    $stSql .= " AND     emp.cod_empenho     = liq.cod_empenho               \n";
-    $stSql .= " AND     pre.exercicio       = ped.exercicio                 \n";
-    $stSql .= " AND     pre.cod_pre_empenho = ped.cod_pre_empenho           \n";
-    $stSql .= " AND     ped.exercicio       = des.exercicio                 \n";
-    $stSql .= " AND     ped.cod_despesa     = des.cod_despesa               \n";
-    $stSql .= " AND     ped.exercicio       = cde.exercicio                 \n";
-    $stSql .= " AND     ped.cod_conta       = cde.cod_conta                 \n";
-    $stSql .= " AND     liq.exercicio       = sum.exercicio                 \n";
-    $stSql .= " AND     liq.cod_entidade    = sum.cod_entidade              \n";
-    $stSql .= " AND     liq.cod_nota        = sum.cod_nota                  \n";
-    $stSql .= " AND     liq.exercicio       = '".$this->getDado('exercicio')."'             \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= " AND   liq.cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= " GROUP BY  liq.exercicio                                     \n";
-    $stSql .= "         ,des.num_orgao                                      \n";
-    $stSql .= "         ,des.num_unidade                                    \n";
-    $stSql .= "         ,emp.cod_empenho                                    \n";
-    $stSql .= "         ,liq.dt_liquidacao                                  \n";
-    $stSql .= " ORDER BY  liq.exercicio                                     \n";
-    $stSql .= "         ,des.num_orgao                                      \n";
-    $stSql .= "         ,des.num_unidade                                    \n";
-    $stSql .= "         ,emp.cod_empenho                                    \n";
-    $stSql .= "         ,liq.dt_liquidacao                                  \n";
+    $stSql .= " SELECT 1 AS tipo_registro
+                     , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                     , despesa.num_unidade AS unidade_orcamentaria
+                     , empenho.cod_empenho
+                     , TO_CHAR(nota_liquidacao.dt_liquidacao,'dd/mm/yyyy') AS data_liquidacao
+                     , ( COALESCE(SUM(sum.valor),0.00) - COALESCE(SUM(sumanu.valor),0.00) ) AS saldo
+                     , nota_liquidacao.exercicio
+                     , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia
+                     , despesa.num_orgao
+                     , '' AS reservado_tcm
 
+                  FROM empenho.empenho
+
+            INNER JOIN empenho.nota_liquidacao
+                    ON empenho.exercicio = nota_liquidacao.exercicio_empenho         
+                   AND empenho.cod_entidade = nota_liquidacao.cod_entidade              
+                   AND empenho.cod_empenho = nota_liquidacao.cod_empenho
+
+             LEFT JOIN ( SELECT exercicio                              
+                               ,cod_entidade                           
+                               ,cod_nota                               
+                               ,sum(vl_anulado) as valor
+                           FROM empenho.nota_liquidacao_item_anulado as nli        
+                          WHERE exercicio = '".$this->getDado('exercicio')."'         
+                            AND cod_entidade IN ( ".$this->getDado('entidades')." )   
+                       GROUP BY exercicio, cod_entidade, cod_nota      
+                        ) AS sumanu                                         
+                    ON nota_liquidacao.exercicio = sumanu.exercicio             
+                   AND nota_liquidacao.cod_entidade = sumanu.cod_entidade          
+                   AND nota_liquidacao.cod_nota = sumanu.cod_nota
+
+            INNER JOIN empenho.pre_empenho
+                    ON empenho.exercicio = pre_empenho.exercicio                 
+                   AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+
+            INNER JOIN empenho.pre_empenho_despesa
+                    ON pre_empenho.exercicio = pre_empenho_despesa.exercicio                 
+                   AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+
+            INNER JOIN orcamento.conta_despesa
+                    ON pre_empenho_despesa.exercicio = conta_despesa.exercicio                 
+                   AND pre_empenho_despesa.cod_conta = conta_despesa.cod_conta
+
+            INNER JOIN orcamento.despesa
+                    ON pre_empenho_despesa.exercicio = despesa.exercicio                 
+                   AND pre_empenho_despesa.cod_despesa = despesa.cod_despesa
+
+            INNER JOIN ( SELECT exercicio                              
+                               ,cod_entidade                           
+                               ,cod_nota                               
+                               ,sum(vl_total) as valor                 
+                          FROM empenho.nota_liquidacao_item as nli     
+                         WHERE exercicio = '".$this->getDado('exercicio')."'         
+                           AND cod_entidade IN ( ".$this->getDado('entidades')." )   
+                      GROUP BY exercicio, cod_entidade, cod_nota      
+                        ) AS sum
+                    ON nota_liquidacao.exercicio = sum.exercicio                 
+                   AND nota_liquidacao.cod_entidade = sum.cod_entidade              
+                   AND nota_liquidacao.cod_nota = sum.cod_nota 
+
+                 WHERE nota_liquidacao.exercicio = '".$this->getDado('exercicio')."'             
+                   AND nota_liquidacao.cod_entidade IN ( ".$this->getDado('entidades')." )   
+                   AND nota_liquidacao.dt_liquidacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+
+              GROUP BY  nota_liquidacao.exercicio                                     
+                        ,despesa.num_orgao                                      
+                        ,despesa.num_unidade                                    
+                        ,empenho.cod_empenho                                    
+                        ,nota_liquidacao.dt_liquidacao       
+
+              ORDER BY  nota_liquidacao.exercicio                                     
+                        ,despesa.num_orgao                                      
+                        ,despesa.num_unidade                                    
+                        ,empenho.cod_empenho                                    
+                        ,nota_liquidacao.dt_liquidacao          
+        ";                        
     return $stSql;
 }
 

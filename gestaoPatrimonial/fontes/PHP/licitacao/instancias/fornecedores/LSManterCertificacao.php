@@ -33,12 +33,12 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: LSManterCertificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterCertificacao.php 63428 2015-08-27 18:15:12Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( TLIC."TLicitacaoParticipanteCertificacao.class.php" );
+include_once TLIC."TLicitacaoParticipanteCertificacao.class.php";
 
 $stPrograma = "ManterCertificacao";
 $pgFilt       = "FL".$stPrograma.".php";
@@ -67,42 +67,46 @@ switch ($stAcao) {
         $pgProx = $pgForm; break;
 }
 
-$filtro = '';
-if ($_REQUEST['inCodFornecedor'] || $_REQUEST['inNumCertificacao']) {
-    foreach ($_REQUEST as $key => $value) {
-        #sessao->transf4['filtro'][$key] = $value;
-        $filtro[$key] = $value;
-    }
-} else {
-    if ( Sessao::read('filtro') ) {
-        foreach ( Sessao::read('filtro') as $key => $value ) {
-            $_REQUEST[$key] = $value;
-        }
-    }
-    Sessao::write('paginando' , true);
-}
-
-Sessao::write('filtro' , $filtro);
-
 if (empty( $stAcao )) {
     $stAcao = "alterar";
 }
 
-if ($_REQUEST['inCodFornecedor']) {
-    $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $_REQUEST['inCodFornecedor'] );
+$stLink = "";
+
+if (!is_array(Sessao::read('stLink'))) {
+    foreach ($_REQUEST as $key => $valor) {
+        if( $valor != "" )
+            $stLink .= "&".$key."=".$valor;
+    }
+    Sessao::write('stLink' , $stLink);
 }
 
-if ($_REQUEST['inNumCertificacao']) {
-    $inNumCertificacao = substr( $_REQUEST['inNumCertificacao'],0,6 );
+if ($request->get('stExercicioLicitacao')) {
+    $obTLicitacaoParticipanteCertificacao->setDado( 'exercicio_licitacao', $request->get('stExercicioLicitacao') );
+}
+
+if ($request->get('inCodEntidade')) {
+    $obTLicitacaoParticipanteCertificacao->setDado( 'cod_entidade', $request->get('inCodEntidade') );
+}
+
+if ($request->get('inCodModalidade')) {
+    $obTLicitacaoParticipanteCertificacao->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
+}
+
+if ($request->get('inCodLicitacao')) {
+    $obTLicitacaoParticipanteCertificacao->setDado( 'cod_licitacao', $request->get('inCodLicitacao') );
+}
+
+if ($request->get('inCodFornecedor')) {
+    $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $request->get('inCodFornecedor') );
+}
+
+if ($request->get('inNumCertificacao')) {
+    $inNumCertificacao = substr( $request->get('inNumCertificacao'),0,6 );
     $obTLicitacaoParticipanteCertificacao->setDado( 'num_certificacao', $inNumCertificacao );
 }
 
-$stFiltro = "";
-$stLink   = "";
-
-$stLink .= "&stAcao=".$stAcao;
-
-$obTLicitacaoParticipanteCertificacao->recuperaListaCertificacao( $rsParticipantes,'','order by cgm.nom_cgm' );
+$obTLicitacaoParticipanteCertificacao->recuperaListaCertificacao( $rsParticipantes,'','ORDER BY cgm.nom_cgm' );
 
 while ( !$rsParticipantes->eof() ) {
     $rsParticipantes->setCampo( 'num_certificacao', str_pad( $rsParticipantes->getCampo('num_certificacao'), 6, "0", STR_PAD_LEFT) );
@@ -112,6 +116,7 @@ while ( !$rsParticipantes->eof() ) {
 $rsParticipantes->setPrimeiroElemento();
 
 $obLista = new Lista();
+$obLista->obPaginacao->setFiltro("&stLink=".$stLink );
 $obLista->setRecordSet( $rsParticipantes );
 
 $obLista->addCabecalho();
@@ -158,6 +163,11 @@ $obLista->ultimaAcao->addCampo("&dtDataRegistro", "dt_registro" );
 $obLista->ultimaAcao->addCampo("&dtDataVigencia", "final_vigencia" );
 $obLista->ultimaAcao->addCampo("&stObservacao", "observacao" );
 $obLista->ultimaAcao->addCampo("&stNomFornecedor", "nom_cgm" );
+$obLista->ultimaAcao->addCampo("&inCodLicitacao", "cod_licitacao" );
+$obLista->ultimaAcao->addCampo("&stExercicioLicitacao", "exercicio_licitacao" );
+$obLista->ultimaAcao->addCampo("&inCodModalidade", "cod_modalidade" );
+$obLista->ultimaAcao->addCampo("&inCodEntidade", "cod_entidade" );
+$obLista->ultimaAcao->addCampo("&stEntidade", "nome_entidade" );
 $obLista->ultimaAcao->addCampo("&stDescQuestao" ,"");
 
 if ( ($stAcao == 'alterar') || ($stAcao == 'consultar') ) {
@@ -171,3 +181,5 @@ $obLista->commitAcao();
 
 $obLista->setAjuda("UC-03.05.13");
 $obLista->Show();
+
+?>

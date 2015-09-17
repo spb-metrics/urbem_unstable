@@ -55,7 +55,12 @@ class TTBAResCont extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTBAResCont() {}
+    public function __construct () 
+    {
+        $this->setEstrutura( array() );
+        $this->setEstruturaAuxiliar( array() );
+        $this->setDado('exercicio', Sessao::getExercicio() );
+    }
 
     public function recuperaDadosRescisaoContrato(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
     {
@@ -73,11 +78,11 @@ class TTBAResCont extends Persistente
     public function montarRecuperaDadosRescisaoContrato()
     {
         $stSql .= " SELECT 1 AS tipo_registro
-                        , configuracao_entidade.valor AS unidade_gestora
+                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , contrato.num_contrato
                         , rescisao_contrato.num_rescisao
                         , SUBSTR(TRIM(rescisao_contrato.motivo), 1, 50) AS motivo_rescisao
-                        , TO_CHAR(rescisao_contrato.dt_rescisao, 'dd/mm/yyyy') as dt_rescisao
+                        , TO_CHAR(rescisao_contrato.dt_rescisao, 'dd/mm/yyyy') AS dt_rescisao
                         , TO_CHAR(publicacao_rescisao_contrato.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao
                         , rescisao_contrato.vlr_multa
                         , rescisao_contrato.vlr_indenizacao
@@ -88,38 +93,39 @@ class TTBAResCont extends Persistente
 
                     FROM licitacao.contrato
 
-                    INNER JOIN licitacao.rescisao_contrato
-                            ON contrato.exercicio = rescisao_contrato.exercicio_contrato
-                            AND contrato.cod_entidade = rescisao_contrato.cod_entidade
-                            AND contrato.num_contrato = rescisao_contrato.num_contrato
+              INNER JOIN licitacao.contrato_licitacao
+                      ON contrato_licitacao.num_contrato = contrato.num_contrato
+                     AND contrato_licitacao.exercicio = contrato.exercicio
+                     AND contrato_licitacao.cod_entidade = contrato.cod_entidade
 
-                    INNER JOIN licitacao.publicacao_rescisao_contrato
-                            ON rescisao_contrato.num_contrato = publicacao_rescisao_contrato.num_contrato
-                        AND rescisao_contrato.exercicio_contrato = publicacao_rescisao_contrato.exercicio_contrato
-                        AND rescisao_contrato.cod_entidade = publicacao_rescisao_contrato.cod_entidade
+              INNER JOIN licitacao.rescisao_contrato
+                      ON contrato.exercicio = rescisao_contrato.exercicio_contrato
+                     AND contrato.cod_entidade = rescisao_contrato.cod_entidade
+                     AND contrato.num_contrato = rescisao_contrato.num_contrato
 
-                    INNER JOIN sw_cgm AS cgm_imprensa
-                            ON publicacao_rescisao_contrato.cgm_imprensa = cgm_imprensa.numcgm
+              INNER JOIN licitacao.publicacao_rescisao_contrato
+                      ON rescisao_contrato.num_contrato = publicacao_rescisao_contrato.num_contrato
+                     AND rescisao_contrato.exercicio_contrato = publicacao_rescisao_contrato.exercicio_contrato
+                     AND rescisao_contrato.cod_entidade = publicacao_rescisao_contrato.cod_entidade
 
-                    INNER JOIN licitacao.licitacao
-                            ON contrato.cod_licitacao = licitacao.cod_licitacao
-                        AND contrato.cod_modalidade = licitacao.cod_modalidade
-                        AND contrato.cod_entidade = licitacao.cod_entidade
-                        AND contrato.exercicio = licitacao.exercicio
+              INNER JOIN sw_cgm AS cgm_imprensa
+                      ON publicacao_rescisao_contrato.cgm_imprensa = cgm_imprensa.numcgm
 
-                    INNER JOIN administracao.configuracao_entidade
-                            ON licitacao.cod_entidade = configuracao_entidade.cod_entidade
-                        AND licitacao.exercicio = configuracao_entidade.exercicio
+              INNER JOIN licitacao.licitacao
+                      ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
+                     AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
+                     AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
+                     AND contrato_licitacao.exercicio = licitacao.exercicio
 
-                    WHERE NOT EXISTS (
+                   WHERE NOT EXISTS (
                                         SELECT 1
                                         FROM licitacao.contrato_anulado
                                         WHERE num_contrato = contrato_anulado.num_contrato
                                         AND contrato.exercicio = contrato_anulado.exercicio
                                         AND contrato.cod_entidade = contrato_anulado.cod_entidade
                                     )
-                    AND configuracao_entidade.parametro = 'tcm_unidade_gestora'";
-
+                     AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+        ";
         return $stSql;
     }
 

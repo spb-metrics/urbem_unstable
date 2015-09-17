@@ -40,19 +40,6 @@
     * Casos de uso: uc-02.04.20
 */
 
-/*
-$Log$
-Revision 1.6  2006/10/23 16:32:51  domluc
-Add opção para multiplos boletins
-
-Revision 1.5  2006/08/10 14:22:43  jose.eduardo
-Bug #6368#
-
-Revision 1.4  2006/07/05 20:39:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once( CAM_FW_PDF."RRelatorio.class.php"                             );

@@ -55,7 +55,10 @@ class TTBAConvenio extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTBAConvenio() {}
+    public function __construct()
+    {
+        parent::Persistente();
+    }
 
     public function recuperaDadosConvenio(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
     {
@@ -73,12 +76,12 @@ class TTBAConvenio extends Persistente
     public function montaRecuperaDadosConvenio()
     {
         $stSql .= " SELECT 1 AS tipo_registro
-                        , 0 AS unidade_gestora
+                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , convenio.num_convenio
                         , SUBSTR(TRIM(objeto.descricao), 1, 60) AS objeto_convenio
                         , TO_CHAR(convenio.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura_convenio
                         , TO_CHAR(convenio.dt_vigencia, 'dd/mm/yyyy') AS dt_vigencia_convenio
-                        , SUBSTR(TRIM(convenio.fundamentacao), 1, 26) AS fundamentacao_legal
+                        , norma.num_norma::VARCHAR||'/'||norma.exercicio::VARCHAR AS fundamentacao_legal
                         , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial
                         , TO_CHAR(publicacao_convenio.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao_convenio
                         , convenio.valor
@@ -95,7 +98,7 @@ class TTBAConvenio extends Persistente
                         , convenio.exercicio AS ano
                         , 0 AS cod_funcao
                         , 0 AS cod_subfuncao
-                        , '1' AS contrato_anterior_SIGA
+                        , '1'::VARCHAR AS contrato_anterior_siga
 
                     FROM licitacao.convenio
 
@@ -109,13 +112,15 @@ class TTBAConvenio extends Persistente
                     INNER JOIN sw_cgm AS cgm_imprensa
                             ON publicacao_convenio.numcgm = cgm_imprensa.numcgm
 
+                    INNER JOIN normas.norma
+                            ON norma.cod_norma = convenio.cod_norma_autorizativa
+
                     WHERE NOT EXISTS (
                                         SELECT 1
                                         FROM licitacao.convenio_anulado
                                         WHERE convenio.num_convenio = convenio_anulado.num_convenio
                                             AND convenio.exercicio = convenio_anulado.exercicio
                                     )";
-
         return $stSql;
     }
 

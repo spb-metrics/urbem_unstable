@@ -35,7 +35,7 @@
 
 Casos de uso: uc-01.01.00
 
-$Id: cgmLegado.class.php 61137 2014-12-10 21:41:22Z carlos.silva $
+$Id: cgmLegado.class.php 63446 2015-08-28 15:00:01Z michel $
 
 */
 
@@ -71,7 +71,7 @@ Retorna bool
                 nom_cgm, tipo_logradouro, logradouro, numero,  complemento, bairro, cep,
                 tipo_logradouro_corresp, logradouro_corresp, numero_corresp,  complemento_corresp,
                 bairro_corresp, cep_corresp, fone_residencial, ramal_residencial, fone_comercial, ramal_comercial,
-                fone_celular, e_mail, e_mail_adcional, cod_responsavel
+                fone_celular, e_mail, e_mail_adcional, cod_responsavel, site
                 ) Values('".$vetCgm['numCgm']."', '".$vetCgm['pais']."', '".$vetCgm['paisCorresp']."',
                 '".$vetCgm['codMunicipio']."', '".$vetCgm['codUf']."',
                 '".$vetCgm['codMunicipioCorresp']."', '".$vetCgm['codUfCorresp']."',
@@ -82,7 +82,7 @@ Retorna bool
                 '".$vetCgm['numeroCorresp']."', '".$vetCgm['complementoCorresp']."',
                 '".$vetCgm['stNomeBairroCorresp']."', '".$vetCgm['cepCorresp']."',
                 '".$vetCgm['foneRes']."', '".$vetCgm['ramalRes']."', '".$vetCgm['foneCom']."', '".$vetCgm['ramalCom']."',
-                '".$vetCgm['foneCel']."', '".$vetCgm['email']."', '".$vetCgm['emailAdic']."', '".$vetCgm['codResp']."'
+                '".$vetCgm['foneCel']."', '".$vetCgm['email']."', '".$vetCgm['emailAdic']."', '".$vetCgm['codResp']."', '".$vetCgm['site']."'
                 ); ";
         
         $sql .= $this->montaIncluiAtributos( $vetCgm['numCgm'] );
@@ -219,7 +219,8 @@ Retorna bool
                         fone_celular            = '".$altCgm['foneCel']."',
                         e_mail                  = '".$altCgm['email']."',
                         e_mail_adcional         = '".$altCgm['emailAdic']."',
-                        cod_responsavel         = ".$altCgm['codResp']."
+                        cod_responsavel         = ".$altCgm['codResp'].",
+                        site                    = '".$altCgm['site']."'
                     WHERE numcgm = ".$altCgm['numCgm']."; \n";
 
            $sql .= $this->montaExcluiAtributos( $altCgm['numCgm'] )."; \n";
@@ -703,7 +704,8 @@ Recebe um número CGM e retorna todos os dados da tabela em forma de um vetor
                 'cnpj'=>"",
                 'inscEst'=>"",
                 'cpf'=>"",
-                'rg'=>""
+                'rg'=>"",
+                'site'=>$dataBase->pegaCampo("site")
                 );
             }
 
@@ -1150,7 +1152,6 @@ Retorna bool
             if (strlen($vetPesq[rg]) > 0) {
                 $sql .= " And F.rg = '$vetPesq[rg]' ";
             }
-
         return $sql;
     }
 

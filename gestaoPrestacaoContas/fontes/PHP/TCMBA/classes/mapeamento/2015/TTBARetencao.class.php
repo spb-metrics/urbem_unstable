@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63436 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -90,66 +90,72 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   to_char(pag.timestamp,'yyyy') as exercicio    \n";
-    $stSql .= "         ,plc.exercicio as exercicio_conta   \n";
-    $stSql .= "         ,des.num_orgao    \n";
-    $stSql .= "         ,des.num_unidade    \n";
-    $stSql .= "         ,emp.cod_empenho    \n";
-    $stSql .= "         ,to_char(pag.timestamp,'dd/mm/yyyy') as data_pagamento    \n";
-    $stSql .= "         ,plc.cod_estrutural    \n";
-    $stSql .= "         ,opr.vl_retencao       \n";
-    $stSql .= " FROM     empenho.empenho                as emp    \n";
-    $stSql .= "         ,empenho.nota_liquidacao        as liq    \n";
-    $stSql .= "     \n";
-    $stSql .= "         ,empenho.pagamento_liquidacao   as pli    \n";
-    $stSql .= "         ,empenho.ordem_pagamento        as opa    \n";
-    $stSql .= "         ,empenho.ordem_pagamento_retencao as opr    \n";
-    $stSql .= "     \n";
-    $stSql .= "         ,empenho.nota_liquidacao_paga   as pag    \n";
-    $stSql .= "         ,contabilidade.plano_analitica  as pla    \n";
-    $stSql .= "         ,contabilidade.plano_conta      as plc    \n";
-    $stSql .= "         ,empenho.pre_empenho            as pre    \n";
-    $stSql .= "         ,empenho.pre_empenho_despesa    as ped    \n";
-    $stSql .= "         ,orcamento.despesa              as des    \n";
-    $stSql .= " WHERE   emp.exercicio       = pre.exercicio    \n";
-    $stSql .= " AND     emp.cod_pre_empenho = pre.cod_pre_empenho    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     emp.exercicio       = liq.exercicio_empenho    \n";
-    $stSql .= " AND     emp.cod_entidade    = liq.cod_entidade    \n";
-    $stSql .= " AND     emp.cod_empenho     = liq.cod_empenho    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     liq.exercicio       = pli.exercicio    \n";
-    $stSql .= " AND     liq.cod_entidade    = pli.cod_entidade    \n";
-    $stSql .= " AND     liq.cod_nota        = pli.cod_nota    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     pli.exercicio       = opa.exercicio    \n";
-    $stSql .= " AND     pli.cod_entidade    = opa.cod_entidade    \n";
-    $stSql .= " AND     pli.cod_ordem       = opa.cod_ordem    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     opa.exercicio       = opr.exercicio    \n";
-    $stSql .= " AND     opa.cod_entidade    = opr.cod_entidade    \n";
-    $stSql .= " AND     opa.cod_ordem       = opr.cod_ordem    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     opr.exercicio       = pla.exercicio    \n";
-    $stSql .= " AND     opr.cod_plano       = pla.cod_plano    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     pla.exercicio       = plc.exercicio    \n";
-    $stSql .= " AND     pla.cod_conta       = plc.cod_conta    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     liq.exercicio       = pag.exercicio    \n";
-    $stSql .= " AND     liq.cod_entidade    = pag.cod_entidade    \n";
-    $stSql .= " AND     liq.cod_nota        = pag.cod_nota    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     pre.exercicio       = ped.exercicio    \n";
-    $stSql .= " AND     pre.cod_pre_empenho = ped.cod_pre_empenho    \n";
-    $stSql .= " AND     ped.exercicio       = des.exercicio    \n";
-    $stSql .= " AND     ped.cod_despesa     = des.cod_despesa    \n";
-    $stSql .= "     \n";
-    $stSql .= " AND     to_char(pag.timestamp,'yyyy')  = '".$this->getDado('exercicio')."'    \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     liq.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
+    $stSql = " SELECT   to_char(pag.timestamp,'yyyy') as ano    
+                         ,plc.exercicio as ano_criacao   
+                         ,des.num_orgao AS cod_orgao    
+                         ,des.num_unidade AS unidade_orcamentaria  
+                         ,emp.cod_empenho AS num_empenho   
+                         ,to_char(pag.timestamp,'dd/mm/yyyy') as dt_pagamento_empenho    
+                         ,REPLACE(plc.cod_estrutural,'.','') AS conta_contabil
+                         ,COALESCE(SUM(opr.vl_retencao),0.00) AS vl_retencao
+                         ,1 as tipo_registro
+                         ,".$this->getDado('unidade_gestora')." AS unidade_gestora
+                         ,".$this->getDado('exercicio')."::VARCHAR||".$this->getDado('inMes')."::VARCHAR AS competencia
 
+                 FROM empenho.empenho                  as emp    
+                     ,empenho.nota_liquidacao          as liq    
+                     ,empenho.pagamento_liquidacao     as pli    
+                     ,empenho.ordem_pagamento          as opa    
+                     ,empenho.ordem_pagamento_retencao as opr    
+                     ,empenho.nota_liquidacao_paga     as pag    
+                     ,contabilidade.plano_analitica    as pla    
+                     ,contabilidade.plano_conta        as plc    
+                     ,empenho.pre_empenho              as pre    
+                     ,empenho.pre_empenho_despesa      as ped    
+                     ,orcamento.despesa                as des    
+
+                 WHERE emp.exercicio       = pre.exercicio    
+                   AND emp.cod_pre_empenho = pre.cod_pre_empenho    
+                     
+                   AND emp.exercicio       = liq.exercicio_empenho    
+                   AND emp.cod_entidade    = liq.cod_entidade    
+                   AND emp.cod_empenho     = liq.cod_empenho    
+                     
+                   AND liq.exercicio       = pli.exercicio    
+                   AND liq.cod_entidade    = pli.cod_entidade    
+                   AND liq.cod_nota        = pli.cod_nota    
+                     
+                   AND pli.exercicio       = opa.exercicio    
+                   AND pli.cod_entidade    = opa.cod_entidade    
+                   AND pli.cod_ordem       = opa.cod_ordem    
+                     
+                   AND opa.exercicio       = opr.exercicio    
+                   AND opa.cod_entidade    = opr.cod_entidade    
+                   AND opa.cod_ordem       = opr.cod_ordem    
+                     
+                   AND opr.exercicio       = pla.exercicio    
+                   AND opr.cod_plano       = pla.cod_plano    
+                     
+                   AND pla.exercicio       = plc.exercicio    
+                   AND pla.cod_conta       = plc.cod_conta    
+                     
+                   AND liq.exercicio       = pag.exercicio    
+                   AND liq.cod_entidade    = pag.cod_entidade    
+                   AND liq.cod_nota        = pag.cod_nota    
+                     
+                   AND pre.exercicio       = ped.exercicio    
+                   AND pre.cod_pre_empenho = ped.cod_pre_empenho    
+                   AND ped.exercicio       = des.exercicio    
+                   AND ped.cod_despesa     = des.cod_despesa    
+                     
+                   AND to_char(pag.timestamp,'yyyy')  = '".$this->getDado('exercicio')."'
+                   AND to_date(to_char(pag.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                   AND liq.cod_entidade IN (".$this->getDado('stEntidades').")
+
+                   GROUP BY pag.timestamp,plc.exercicio,des.num_orgao,des.num_unidade,emp.cod_empenho,plc.cod_estrutural
+
+                   ORDER BY num_empenho,dt_pagamento_empenho
+            ";
     return $stSql;
 }
 

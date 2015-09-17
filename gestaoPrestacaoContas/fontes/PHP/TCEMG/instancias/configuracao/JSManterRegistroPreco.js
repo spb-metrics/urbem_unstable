@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: JSManterRegistroPreco.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+  * $Id: JSManterRegistroPreco.js 63282 2015-08-12 14:11:42Z michel $
   *
 */
 ?>
@@ -79,8 +79,28 @@ function alertaQuestaoValor(pagina,tipo,sessao,valorEnt){
     var sessaoid = sessao.substr(15,8);
     var sArq = '../../../../../../gestaoAdministrativa/fontes/PHP/framework/popups/alerta/alerta.php?'+sessaoid+'&tipo='+tipo+'&chamada=sn'+valorEnt+'&pagQuestao='+pagina;
     var wVolta=false;
-    var sAux = "msgc"+ sessaoid +" = window.open(sArq,'msgc"+ sessaoid +"','width=400px,height=230px,resizable=1,scrollbars=0,left="+x+",top="+y+"');";
+    var sAux = "msgc"+ sessaoid +" = window.open(sArq,'msgc"+sessaoid+"','width=400px,height=230px,resizable=1,scrollbars=0,left="+x+",top="+y+"');";
     eval(sAux);
+}
+
+function ValidaRegistroPreco()
+{
+    if( Valida() ){
+        var erro = false;
+        var mensagem = "";
+
+        if (document.getElementById('boResponsavelOrgao').value=='false') {
+            erro = true;
+            mensagem += "@Preencha o campo CGM do Responsável da Lista de Orgãos!";
+        }
+
+        if( erro ){
+            alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
+        }
+        else{
+            Salvar();
+        }
+    }
 }
 
 </script>

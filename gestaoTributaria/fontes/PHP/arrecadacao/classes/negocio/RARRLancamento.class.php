@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRLancamento.class.php 60961 2014-11-26 15:57:45Z evandro $
+    * $Id: RARRLancamento.class.php 63509 2015-09-04 14:32:22Z michel $
 
     * Casos de uso: uc-05.03.05
 */
@@ -1158,6 +1158,11 @@ function efetuarLancamentoManualCredito($boTransacao = "")
                     $this->roRARRCalculo->obRARRGrupo->obRMONCredito->setCodEspecie( $this->roRARRCalculo->obRMONCredito->getCodEspecie() );
                     $this->roRARRCalculo->obRARRGrupo->obRMONCredito->listarCreditos( $rsListaCreditos, $boTransacao );
                     $inCodConvenio = $rsListaCreditos->getCampo("cod_convenio");
+
+                    if(empty($inCodConvenio)){
+                        $obErro->setDescricao ( "Obrigatório configurar o Convênio para o Crédito (".$this->roRARRCalculo->obRMONCredito->getCodCredito() .")." );
+                        break;
+                    }
 
                     $this->obRARRCarne->obRMONConvenio->setCodigoConvenio( $inCodConvenio );
 

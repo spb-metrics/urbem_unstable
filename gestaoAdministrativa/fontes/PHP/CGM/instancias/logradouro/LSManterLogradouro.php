@@ -96,6 +96,8 @@ if ($request->get("stCadastro")) {
 }
 
 $stLink .= "&stAcao=".$request->get('stAcao');
+
+Sessao::write('stLink',$stLink);
 $obRCIMTrecho->listarLogradourosTrecho( $rsLista, "", $request->get("inCodPais") );
 
 //DEFINICAO DA LISTA

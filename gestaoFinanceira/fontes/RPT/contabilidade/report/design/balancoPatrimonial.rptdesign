@@ -318,11 +318,130 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="total_atual_ativo_financeiro" id="6908">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_atual_ativo_permanente" id="6909">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_anterior_ativo_permanente" id="6910">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_anterior_ativo_financeiro" id="6911">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_atual_passivo_financeiro" id="6912">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_atual_passivo_permanente" id="6913">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_anterior_passivo_permanente" id="6914">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="total_anterior_passivo_financeiro" id="6915">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsAtivos" id="1434">
@@ -857,18 +976,25 @@ ORDER BY cod_estrutural;]]></xml-property>
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value">if (row["cod_estrutural"] == '1.1.0.0.0.00.00') {
+                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '1.1.0.0.0.00.00') {
 	params["total_atual_ativo_circulante"].value = row["saldo_atual"];
 }
 
 if (row["cod_estrutural"] == '1.2.0.0.0.00.00') {
 	params["total_atual_ativo_nao_circulante"].value = row["saldo_atual"];
 }
+if (row["cod_estrutural"] == '1.0.0.0.0.00.00') {
+	params["total_atual_ativo_financeiro"].value = row["saldo_atual"];
+}
 
+if (row["cod_estrutural"] == '1.0.0.0.0.00.01') {
+	params["total_atual_ativo_permanente"].value = row["saldo_atual"];
+}
 row["saldo_atual"]</expression>
                                     </structure>
                                 </list-property>
-                                <expression name="filterExpr">row["nivel"] == 2</expression>
+                                <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_anterior_ativo</property>
@@ -877,7 +1003,7 @@ row["saldo_atual"]</expression>
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value">if (row["cod_estrutural"] == '1.1.0.0.0.00.00') {
+                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '1.1.0.0.0.00.00') {
 	params["total_anterior_ativo_circulante"].value = row["saldo_anterior"];
 }
 
@@ -885,10 +1011,18 @@ if (row["cod_estrutural"] == '1.2.0.0.0.00.00') {
 	params["total_anterior_ativo_nao_circulante"].value = row["saldo_anterior"];
 }
 
+if (row["cod_estrutural"] == '1.0.0.0.0.00.00') {
+	params["total_anterior_ativo_financeiro"].value = row["saldo_anterior"];
+}
+
+if (row["cod_estrutural"] == '1.0.0.0.0.00.01') {
+	params["total_anterior_ativo_permanente"].value = row["saldo_anterior"];
+}
 row["saldo_anterior"]</expression>
                                     </structure>
                                 </list-property>
-                                <expression name="filterExpr">row["nivel"] == 2</expression>
+                                <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="repeatHeader">false</property>
@@ -921,7 +1055,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopStyle">solid</property>
                                     <property name="borderTopWidth">thin</property>
                                     <text id="1496">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -943,7 +1077,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1497">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -958,7 +1092,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1498">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -973,7 +1107,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1499">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1058,7 +1192,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1500">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
                                         <property name="contentType">auto</property>
@@ -1157,12 +1291,12 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value">if (row["cod_estrutural"] == '2.1.0.0.0.00.00') {
-	params["total_atual_passivo_circulante"].value = row["saldo_atual"];
+                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '2.0.0.0.0.00.00') {
+	params["total_atual_passivo_financeiro"].value = row["saldo_atual"];
 }
 
-if (row["cod_estrutural"] == '2.2.0.0.0.00.00') {
-	params["total_atual_passivo_nao_circulante"].value = row["saldo_atual"];
+if (row["cod_estrutural"] == '2.0.0.0.0.00.01') {
+	params["total_atual_passivo_permanente"].value = row["saldo_atual"];
 }
 
 params["total_passivo_exercicio_atual"].value += row["saldo_atual"];
@@ -1170,7 +1304,8 @@ params["total_passivo_exercicio_atual"].value += row["saldo_atual"];
 row["saldo_atual"]</expression>
                                     </structure>
                                 </list-property>
-                                <expression name="filterExpr">row["nivel"] == 2</expression>
+                                <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_passivo_anterior</property>
@@ -1179,12 +1314,12 @@ row["saldo_atual"]</expression>
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value">if (row["cod_estrutural"] == '2.1.0.0.0.00.00') {
-	params["total_anterior_passivo_circulante"].value = row["saldo_anterior"];
+                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '2.0.0.0.0.00.00') {
+	params["total_anterior_passivo_financeiro"].value = row["saldo_anterior"];
 }
 
-if (row["cod_estrutural"] == '2.2.0.0.0.00.00') {
-	params["total_anterior_passivo_nao_circulante"].value = row["saldo_anterior"];
+if (row["cod_estrutural"] == '2.0.0.0.0.00.01') {
+	params["total_anterior_passivo_permanente"].value = row["saldo_anterior"];
 }
 
 params["total_passivo_exercicio_anterior"].value += row["saldo_anterior"];
@@ -1192,7 +1327,8 @@ params["total_passivo_exercicio_anterior"].value += row["saldo_anterior"];
 row["saldo_anterior"]</expression>
                                     </structure>
                                 </list-property>
-                                <expression name="filterExpr">row["nivel"] == 2</expression>
+                                <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="repeatHeader">false</property>
@@ -1225,7 +1361,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopStyle">solid</property>
                                     <property name="borderTopWidth">thin</property>
                                     <text id="1719">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1236,6 +1372,7 @@ row["saldo_anterior"]</expression>
                             <row id="1720">
                                 <property name="backgroundColor">#E5E5E5</property>
                                 <property name="verticalAlign">middle</property>
+                                <property name="height">0.3333333333333333in</property>
                                 <cell id="1721">
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
@@ -1247,7 +1384,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1722">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1262,7 +1399,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1724">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1277,7 +1414,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1726">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1374,7 +1511,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1736">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
                                         <property name="contentType">auto</property>
@@ -1532,9 +1669,11 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                         <header>
                             <row id="1777">
                                 <property name="backgroundColor">#E5E5E5</property>
+                                <property name="fontSize">5px</property>
                                 <cell id="1778">
                                     <property name="colSpan">3</property>
                                     <property name="rowSpan">1</property>
+                                    <property name="fontSize">5%</property>
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
                                     <property name="borderBottomWidth">thin</property>
@@ -1548,7 +1687,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderTopStyle">solid</property>
                                     <property name="borderTopWidth">thin</property>
                                     <text id="1779">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1570,7 +1709,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1782">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1585,7 +1724,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1784">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1600,7 +1739,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1786">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -1680,7 +1819,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                         </detail>
                         <footer>
                             <row id="1805">
-                                <property name="height">0.22772277227722773in</property>
+                                <property name="height">0.21875in</property>
                                 <cell id="1806">
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
@@ -1696,9 +1835,10 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1809">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
+                                        <structure name="toc"/>
                                         <property name="contentType">auto</property>
                                         <text-property name="content"><![CDATA[TOTAL PATRIMÔNIO LÍQUIDO
 ]]></text-property>
@@ -1767,7 +1907,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1796">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
                                         <property name="contentType">auto</property>
@@ -1891,7 +2031,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">bottom</property>
                                 <text id="1953">
-                                    <property name="fontSize">small</property>
+                                    <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[ATIVO FINANCEIRO]]></text-property>
@@ -1909,8 +2049,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_atual_ativo_circulante</property>
-                                            <expression name="expression">params["total_atual_ativo_circulante"].value</expression>
-                                            <property name="dataType">string</property>
+                                            <expression name="expression" type="javascript">params["total_atual_ativo_financeiro"].value</expression>
+                                            <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_atual_ativo_circulante</property>
@@ -1932,8 +2073,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_anterior_ativo_circulante</property>
-                                            <expression name="expression">params["total_anterior_ativo_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_anterior_ativo_financeiro"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_anterior_ativo_circulante</property>
@@ -1948,7 +2090,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">middle</property>
                                 <text id="1955">
-                                    <property name="fontSize">small</property>
+                                    <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[PASSIVO FINANCEIRO]]></text-property>
@@ -1970,8 +2112,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_atual_passivo_circulante</property>
-                                            <expression name="expression">params["total_atual_passivo_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_atual_passivo_financeiro"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_atual_passivo_circulante</property>
@@ -1990,8 +2133,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_anterior_passivo_circulante</property>
-                                            <expression name="expression">params["total_anterior_passivo_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_anterior_passivo_financeiro"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_anterior_passivo_circulante</property>
@@ -2016,7 +2160,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="borderRightWidth">thin</property>
                                 <property name="textAlign">left</property>
                                 <text id="1954">
-                                    <property name="fontSize">small</property>
+                                    <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[ATIVO PERMANENTE]]></text-property>
@@ -2038,8 +2182,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_atual_ativo_nao_circulante</property>
-                                            <expression name="expression">params["total_atual_ativo_nao_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_atual_ativo_permanente"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_atual_ativo_nao_circulante</property>
@@ -2061,8 +2206,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_anterior_ativo_nao_circulante</property>
-                                            <expression name="expression">params["total_anterior_ativo_nao_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_anterior_ativo_permanente"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_anterior_ativo_nao_circulante</property>
@@ -2077,7 +2223,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">middle</property>
                                 <text id="1956">
-                                    <property name="fontSize">small</property>
+                                    <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[PASSIVO PERMANENTE]]></text-property>
@@ -2099,8 +2245,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_atual_passivo_nao_circulante</property>
-                                            <expression name="expression">params["total_atual_passivo_nao_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_atual_passivo_permanente"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_atual_passivo_nao_circulante</property>
@@ -2119,8 +2266,9 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_anterior_passivo_nao_circulante</property>
-                                            <expression name="expression">params["total_anterior_passivo_nao_circulante"].value</expression>
+                                            <expression name="expression" type="javascript">params["total_anterior_passivo_permanente"].value</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_anterior_passivo_nao_circulante</property>
@@ -2148,7 +2296,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">middle</property>
                                 <text id="1957">
-                                    <property name="fontSize">small</property>
+                                    <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[SALDO PATRIMONIAL]]></text-property>
@@ -2317,7 +2465,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopStyle">solid</property>
                                     <property name="borderTopWidth">thin</property>
                                     <text id="2017">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2341,7 +2489,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="2019">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2365,7 +2513,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="2021">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2387,7 +2535,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="2014">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2464,7 +2612,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="2031">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
                                         <property name="contentType">auto</property>
@@ -2629,7 +2777,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopStyle">solid</property>
                                     <property name="borderTopWidth">thin</property>
                                     <text id="1989">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2653,7 +2801,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1991">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2677,7 +2825,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="1993">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2699,7 +2847,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <text id="1986">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
                                         <property name="contentType">auto</property>
@@ -2787,7 +2935,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderTopWidth">thin</property>
                                     <property name="verticalAlign">middle</property>
                                     <text id="2003">
-                                        <property name="fontSize">small</property>
+                                        <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">left</property>
                                         <property name="contentType">auto</property>

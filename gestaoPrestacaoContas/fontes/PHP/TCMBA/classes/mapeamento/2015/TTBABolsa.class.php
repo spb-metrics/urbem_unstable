@@ -82,7 +82,7 @@ class TTBABolsa extends Persistente
                         , sw_cgm.nom_cgm
                         , '' AS num_doe
                         , '' AS dt_publicacao
-                        , 0 AS tipo_moeda
+                        , 1 AS tipo_moeda
                         , '' AS num_bilhete
                         , estagiario_estagio_bolsa.vl_bolsa AS vl_mensal
                         , '' AS reservado_tcm

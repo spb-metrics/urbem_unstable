@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 62404 2015-05-04 20:44:10Z arthur $
+    $Id: TOrcamentoReceita.class.php 63518 2015-09-08 17:27:56Z franver $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -1418,5 +1418,32 @@ function montaRecuperaLancamentosCreditosReceber()
              
     return $stSql;
 }
+
+    public function verificaClassificacaoReceita(&$rsRecordSet, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaVerificaClassificacaoReceita();
+        $this->setDebug( $stSql);
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+    }
+
+    public function montaVerificaClassificacaoReceita()
+    {
+        $stSql = "
+          SELECT *
+            FROM orcamento.valida_receita('".$this->getDado('exercicio_classificacao')."','".$this->getDado('classificacao_receita')."')
+              AS classificacao_receita ( cod_estrutural varchar
+                                       , nivel integer
+                                       , descricao VARCHAR
+                                       , bo_validacao VARCHAR
+                                       );
+        ";
+        return $stSql;
+    }
+
 
 }

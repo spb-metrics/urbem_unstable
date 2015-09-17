@@ -45,10 +45,10 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkDB.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/Table.class.php';
 
-$arDetalhes[0]["rubrica_despesa"]= $_GET["rubrica_despesa"];
-$arDetalhes[0]["descricao_despesa"]     = $_GET["descricao_despesa"];
-$arDetalhes[0]["red_dotacao"]   = $_GET["red_dotacao"];
-$arDetalhes[0]["cargo"]         = $_GET["cargo"];
+$arDetalhes[0]["rubrica_despesa"]   = $_GET["rubrica_despesa"];
+$arDetalhes[0]["descricao_despesa"] = $_GET["descricao_despesa"];
+$arDetalhes[0]["red_dotacao"]       = $_GET["red_dotacao"];
+$arDetalhes[0]["cargo"]             = $_GET["cargo"];
 $rsDetalhes = new RecordSet();
 $rsDetalhes->preenche($arDetalhes);
 

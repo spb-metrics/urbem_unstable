@@ -632,11 +632,11 @@ switch ($request->get("stCtrl")) {
                     $inCodLogradouroAtual   = $arBairrosSessao[$inCount][ "cod_logradouro" ];
                     $inCodMunicipioAtual    = $arBairrosSessao[$inCount][ "cod_municipio" ];
                     $inCodUFAtual           = $arBairrosSessao[$inCount][ "cod_uf" ];
-                    $inCodLogradouro        = $request->get('inCodLogradouro');
+                    $inCodLogradouro        = (null !== $request->get('inCodLogradouro')) ? $request->get('inCodLogradouro') : $request->get('inCodigoLogradouro');
                     
                     include_once( CAM_GT_CEM_MAPEAMENTO."TCEMDomicilioInformado.class.php" );
                     $obTCEMDomicilioInformado = new TCEMDomicilioInformado;
-                    
+
                     $stFiltro  =" cod_logradouro = ". $inCodLogradouro." AND\n";
                     $stFiltro .=" cod_bairro = ". $inCodBairroAtual." AND\n";
                     $stFiltro .=" cod_municipio = ". $inCodMunicipioAtual." AND\n";
@@ -791,12 +791,10 @@ switch ($request->get("stCtrl")) {
         montaListaCEP ( $arCepSessao );
     break;
 
-    case 'limparListas' :
-        $stJs .= "f.inCodigoTipo.value = '';\n";
-        $stJs .= "f.inCodTipo.options[0].selected = true;\n";
-        $stJs .= "f.stNomeLogradouro.value = '';\n";
-        $stJs .= "f.inCodigoBairro.value = '';\n";
-        $stJs .= "f.inCodBairro.options[0].selected = true;\n";
+    case 'limparListas' :        
+        $stJs .= "jq_('#inCodigoTipo').val('');\n";
+        $stJs .= "jq_('#stNomeLogradouro').val('');\n";
+        $stJs .= "jq_('#inCodigoBairro').val('');\n";
         $stJs .= montaListaBairro ( Sessao::write('bairros', array()), true);
         $stJs .= montaListaCEP ( Sessao::write('cep', array()) , true);
         SistemaLegado::executaFrameOculto($stJs);

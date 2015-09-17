@@ -17,11 +17,11 @@
     <tbody>
         <?php foreach($arDespElementos as $arDespElemento) { ?>
         <tr>
-            <td style="width: 36%;" class=""> <?= $arDespElemento["cod_estrutural"] ?> - <?= $arDespElemento["descricao"] ?></td>
-            <td style="width: 16%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_nao_processados_pago"] ?></td>
-            <td style="width: 16%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_nao_processados_cancelado"] ?></td>
-            <td style="width: 16%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_processados_pago"] ?></td>
-            <td style="width: 16%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_processados_cancelado"] ?></td>
+            <td style="width: 60%;" class="tabulacao_nivel_<?=$arDespElemento['nivel']?>"><?= $arDespElemento["cod_estrutural"] ?> - <?= $arDespElemento["descricao"] ?></td>
+            <td style="width: 10%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_nao_processados_pago"] ?></td>
+            <td style="width: 10%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_nao_processados_cancelado"] ?></td>
+            <td style="width: 10%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_processados_pago"] ?></td>
+            <td style="width: 10%;" class="text_align_right border_left border_right"><?= $arDespElemento["vl_processados_cancelado"] ?></td>
         </tr>
         <?php } ?>
     </tbody>

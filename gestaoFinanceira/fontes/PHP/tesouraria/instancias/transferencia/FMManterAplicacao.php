@@ -40,43 +40,6 @@
     * Casos de uso: uc-02.04.28
 
 */
-/*
-$Log$
-Revision 1.11  2007/09/17 15:05:04  luciano
-Ticket#10187#
-
-Revision 1.10  2007/07/17 14:50:16  rodrigo_sr
-Bug#9584#
-
-Revision 1.9  2007/07/06 18:49:41  rodrigo_sr
-Bug#9584#
-
-Revision 1.8  2007/04/05 15:54:36  cako
-Bug #8910#
-
-Revision 1.7  2007/01/03 11:08:28  cako
-Bug #7792#
-
-Revision 1.6  2006/10/23 19:55:26  cako
-Bug #7282#
-
-Revision 1.5  2006/10/23 16:27:48  domluc
-Add opção para multiplos boletins
-
-Revision 1.4  2006/09/18 11:07:21  cako
-implementação do uc-02.04.28
-
-Revision 1.3  2006/09/14 10:27:24  cako
-adição do tipo de transferencia
-
-Revision 1.2  2006/09/01 10:29:45  cako
-Implementação do uc-02.04.28
-
-Revision 1.1  2006/08/31 12:14:09  cako
-Implementação do uc-02.04.28
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CLA_IAPPLETTERMINAL );
@@ -363,4 +326,5 @@ $obFormulario->defineBarra( array( $obOk, $obLimpar ) );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

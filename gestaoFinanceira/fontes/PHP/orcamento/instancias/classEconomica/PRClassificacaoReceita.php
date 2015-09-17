@@ -39,16 +39,6 @@
     * Casos de uso: uc-02.01.04
 */
 
-/*
-$Log$
-Revision 1.6  2006/07/10 18:15:52  andre.almeida
-Correções na paginação.
-
-Revision 1.5  2006/07/05 20:42:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include( CAM_GF_ORC_NEGOCIO."ROrcamentoClassificacaoReceita.class.php" );
@@ -64,9 +54,7 @@ $pgOcul    = "OC".$stPrograma.".php";
 $obROrcamentoClassificacaoReceita  = new ROrcamentoClassificacaoReceita;
 $obRNorma = new RNorma;
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
-
-switch ($stAcao) {
+switch ($request->get('stAcao')) {
     case "incluir":
         $arClassificacao    = explode( "." , $_POST['inCodClassificacao'] );
         $arClassificacaoBD  = explode( "." , $_POST['inCodClassificacao'] );
@@ -92,6 +80,7 @@ switch ($stAcao) {
         $checkClass = false;
         $obROrcamentoClassificacaoReceita->setExercicio( Sessao::getExercicio() );
         $obROrcamentoClassificacaoReceita->listar      ( $rsClass );
+        
         if ($inPosicao > 0) {
             while ( !$rsClass->eof() ) {
                 if ( $rsClass->getCampo('mascara_classificacao') == $stVerificaClassReceita ) {
@@ -140,9 +129,9 @@ switch ($stAcao) {
         }
     break;
     case "alterar":
-        $obROrcamentoClassificacaoReceita->setCodConta ( $_POST['inCodConta']          );
-        $obROrcamentoClassificacaoReceita->setDescricao( $_POST['stDescricao']         );
-        $obRNorma->setCodNorma                ( $_REQUEST['inCodNorma']       );
+        $obROrcamentoClassificacaoReceita->setCodConta ( $request->get('inCodConta')  );
+        $obROrcamentoClassificacaoReceita->setDescricao( $request->get('stDescricao') );
+        $obRNorma->setCodNorma                         ( $request->get('inCodNorma')  );
         $obErro = $obROrcamentoClassificacaoReceita->alterar();
 
         $stFiltro = "";
@@ -154,9 +143,9 @@ switch ($stAcao) {
         }
         $stFiltro .= "pg=".Sessao::read('pg')."&";
         $stFiltro .= "pos=".Sessao::read('pos')."&";
-        $stFiltro .= "stAcao=".$_REQUEST['stAcao'];
+        $stFiltro .= "stAcao=".$request->get('stAcao');
         if ( !$obErro->ocorreu() ) {
-            SistemaLegado::alertaAviso($pgList."?".$stFiltro, $_POST['inCodClassificacao']." - ".$_POST['stDescricao'], "alterar", "aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList."?".$stFiltro, $request->get('inCodClassificacao')." - ".$request->get('stDescricao'), "alterar", "aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
         }

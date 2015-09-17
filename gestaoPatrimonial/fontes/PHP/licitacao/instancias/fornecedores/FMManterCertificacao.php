@@ -33,13 +33,16 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: FMManterCertificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterCertificacao.php 63516 2015-09-08 13:48:28Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php" );
-include_once ( CAM_GA_ADM_COMPONENTES. "ITextBoxSelectDocumento.class.php" );
+include_once CAM_GP_COM_COMPONENTES.'IPopUpFornecedor.class.php';
+include_once CAM_GA_ADM_COMPONENTES.'ITextBoxSelectDocumento.class.php';
+include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeUsuario.class.php';
+include_once CAM_GP_COM_COMPONENTES.'ISelectModalidade.class.php';
+include_once TLIC.'TLicitacaoDocumento.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterCertificacao";
@@ -52,19 +55,18 @@ $pgJS         = "JS".$stPrograma.".js";
 
 include_once ( $pgJS );
 
-$stAcao = $request->get('stAcao');
+$stAcao            = $request->get('stAcao');
 $inNumCertificacao = $request->get('inNumCertificacao');
-$id = $request->get('id');
-$stAcaoSessao = $request->get('stAcaoSessao');
-$hdnObservacao = $request->get('stObservacao');
-$stCtrl = $request->get('stCtrl');
+$id                = $request->get('id');
+$stAcaoSessao      = $request->get('stAcaoSessao');
+$hdnObservacao     = $request->get('stObservacao');
+$stCtrl            = $request->get('stCtrl');
 
 Sessao::remove('arDocs');
 Sessao::write('arDocs' , array());
 
-if (( $stAcao == "alterar" ) || ( $stAcao == "consultar" )) {
-    $jsOnload = "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stNomFornecedor=".$request->get('stNomFornecedor'). "&inCodFornecedor=".$request->get('inCodFornecedor')."&inNumCertificacao=".$request->get('inNumCertificacao')." &stExercicio=".$request->get('stExercicio')."&stAcao=".$stAcao."','montaAlteracao');\n";
-}
+//MANTEM O FILTRO E A PAGINACAO
+$stLink = Sessao::read('stLink');
 
 //DEFINICAO DOS COMPONENTES DO FORMULARIO
 $obForm = new Form();
@@ -134,6 +136,57 @@ if (( $stAcao == 'alterar' ) || ( $stAcao == 'consultar' )) {
     $obFornecedor->setNull( false );
 }
 
+if( ( $stAcao == 'incluir' ) || ( $stAcao == 'alterar' ) ){
+    $rsLicitacao = new RecordSet();
+    
+    $obExercicio = new Exercicio();
+    $obExercicio->setName( 'stExercicioLicitacao' );
+    $obExercicio->setId  ( 'stExercicioLicitacao' );
+    $obExercicio->setNull( false );
+    $obExercicio->setValue ( $request->get('stExercicioLicitacao') ? $request->get('stExercicioLicitacao') : Sessao::getExercicio() );
+    if($stAcao == 'alterar')
+        $obExercicio->setLabel(true);
+
+    $obITextBoxSelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
+    $obITextBoxSelectEntidadeUsuario->obSelect->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
+    $obITextBoxSelectEntidadeUsuario->obTextBox->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+this.value, 'carregaModalidade');");
+    $obITextBoxSelectEntidadeUsuario->setNull( false );
+    $obITextBoxSelectEntidadeUsuario->setCodEntidade($request->get('inCodEntidade') ? $request->get('inCodEntidade') : '');
+  
+    $obISelectModalidade = new ISelectModalidade();
+    $obISelectModalidade->setNull( false );
+    
+    // verifica pois não pode incluir licitações já utilizadas por outros fornecedores na mesma modalidade stFiltraLicitacao = true
+    if ( $stAcao == 'incluir' ) {
+        $obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=true&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");
+    } else {
+        $obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=false&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");    
+    }
+    
+    $obISelectModalidade->setValue($request->get('inCodModalidade') ? $request->get('inCodModalidade') : '');    
+    
+    //Carrega as informações na alteração
+    if ( $stAcao == "alterar" ){
+        $jsOnload .= " executaFuncaoAjax('carregaLicitacao', '&inCodLicitacao=".$request->get('inCodLicitacao')."&stExercicioLicitacao=".$request->get('stExercicioLicitacao')."&inCodEntidade=".$request->get('inCodEntidade')."&inCodModalidade=".$request->get('inCodModalidade')."&stFiltraLicitacao=false&numLicitacao=".$request->get('inCodLicitacao')."&stFiltro=');";
+    }
+    
+    $obCmbLicitacao = new Select();
+    $obCmbLicitacao->setRotulo    ( 'Licitação'        );
+    $obCmbLicitacao->setTitle     ( 'Selecione a Licitação.' );
+    $obCmbLicitacao->setId        ( 'inCodLicitacao'   );
+    $obCmbLicitacao->setName      ( 'inCodLicitacao'   );
+    $obCmbLicitacao->setCampoID   ( 'cod_licitacao'    );
+    $obCmbLicitacao->setCampoDesc ( 'cod_licitacao'    );
+    $obCmbLicitacao->addOption    ( '','Selecione'     );
+    $obCmbLicitacao->preencheCombo( $rsLicitacao       );        
+    $obCmbLicitacao->setNull      ( false );
+        
+    $obHdnNumLicitacao = new Hidden();
+    $obHdnNumLicitacao->setName ( 'hdnNumLicitacao' );
+    $obHdnNumLicitacao->setId   ( 'hdnNumLicitacao' );
+    $obHdnNumLicitacao->setValue( $request->get('inCodLicitacao') ? $request->get('inCodLicitacao') : '' );
+}
+
 if (( $stAcao == 'alterar' ) || ( $stAcao == 'consultar' )) {
     $obLblDataRegistro = new Label();
     $obLblDataRegistro->setId( 'dtDataRegistro' );
@@ -167,10 +220,36 @@ if (( $stAcao == 'alterar' ) || ( $stAcao == 'consultar' )) {
 }
 
 if ($stAcao == 'consultar') {
+    
+    $obLblExercicio = new Label();
+    $obLblExercicio->setId( 'stExercicioLicitacao' );
+    $obLblExercicio->setName( 'stExercicioLicitacao' );
+    $obLblExercicio->setValue( $request->get('stExercicioLicitacao') );
+    $obLblExercicio->setRotulo( 'Exercício' );
+    
+    $obLblEntidade = new Label();
+    $obLblEntidade->setId( 'stEntidade' );
+    $obLblEntidade->setName( 'stEntidade' );
+    $obLblEntidade->setValue( $request->get('stEntidade') );
+    $obLblEntidade->setRotulo( 'Entidade' );
+    
+    $obLblModalidade = new Label();
+    $obLblModalidade->setId  ( 'stModalidade' );
+    $obLblModalidade->setName( 'stModalidade' );
+    $obLblModalidade->setValue( $request->get('inCodModalidade') );
+    $obLblModalidade->setRotulo( 'Modalidade' );
+    
+    $obLblLicitacao = new Label();
+    $obLblLicitacao->setId  ( 'stLicitacao' );
+    $obLblLicitacao->setName( 'stLicitacao' );
+    $obLblLicitacao->setValue( $request->get('inCodLicitacao') );
+    $obLblLicitacao->setRotulo( 'Licitação' );
+    
     $obLblObservacao = new Label();
     $obLblObservacao->setId( 'stObservacao' );
     $obLblObservacao->setValue( $request->get('stObservacao') );
     $obLblObservacao->setRotulo( 'Observações' );
+    
 } else {
     $obTxtObservacao = new TextArea;
     $obTxtObservacao->setName  ( "stObservacao" );
@@ -181,7 +260,6 @@ if ($stAcao == 'consultar') {
     $obTxtObservacao->setValue ( $hdnObservacao );
 }
 
-include_once( TLIC."TLicitacaoDocumento.class.php");
 $obTLicitacaoDocumento = new TLICitacaoDocumento;
 $obTLicitacaoDocumento->recuperaTodos( $rsDocumento );
 
@@ -245,6 +323,10 @@ $obSpnAtributos->setId( 'spnAtributos' );
 $obSpnDocumentos = new Span();
 $obSpnDocumentos->setId( 'spnDocumentos' );
 
+if (( $stAcao == "alterar" ) || ( $stAcao == "consultar" )) {
+    $jsOnload .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stNomFornecedor=".$request->get('stNomFornecedor'). "&inCodFornecedor=".$request->get('inCodFornecedor')."&inNumCertificacao=".$request->get('inNumCertificacao')." &stExercicio=".$request->get('stExercicio')."&stAcao=".$stAcao."','montaAlteracao');\n";
+}
+
 $obFormulario = new Formulario();
 $obFormulario->addForm($obForm);
 $obFormulario->addHidden( $obHdnCtrl );
@@ -254,18 +336,44 @@ $obFormulario->addHidden( $obHdnAcaoSessao );
 $obFormulario->addHidden( $obHdnId );
 $obFormulario->addHidden( $obHdnObservacao );
 
+if (( $stAcao == 'incluir' ) || ( $stAcao == 'alterar' )) {
+    $obFormulario->addComponente( $obExercicio    );
+    $obFormulario->addComponente( $obITextBoxSelectEntidadeUsuario );
+    $obFormulario->addComponente( $obISelectModalidade );
+    $obFormulario->addComponente( $obCmbLicitacao );
+    $obFormulario->addHidden( $obHdnNumLicitacao  );
+}
+
 if ($stAcao == 'alterar') {
     $obFormulario->addHidden( $obHdnExercicio );
     $obFormulario->addHidden( $obHdnNomFornecedor );
     $obFormulario->addHidden( $obHdnCodFornecedor );
     $obFormulario->addHidden( $obHdnDataRegistro  );
     $obFormulario->addHidden( $obHdnDataVigencia  );
+    $obFormulario->addComponente( $obLblNumCertificacao );
 }
 
-$stAcao == 'alterar' ? $obFormulario->addComponente( $obLblNumCertificacao ) : '';
-$obFormulario->addComponente( ($stAcao == 'alterar' || $stAcao == 'consultar') ? $obLblFornecedor : $obFornecedor );
-$obFormulario->addComponente( ($stAcao == 'alterar' || $stAcao == 'consultar') ? $obLblDataRegistro : $obDataRegistro );
-$obFormulario->addComponente( ($stAcao == 'alterar' || $stAcao == 'consultar') ? $obLblDataVigencia : $obDataVigencia );
+if ($stAcao == 'consultar') {
+    $obFormulario->addComponente( $obLblExercicio );
+    $obFormulario->addComponente( $obLblEntidade );
+    $obFormulario->addComponente( $obLblModalidade );
+    $obFormulario->addComponente( $obLblLicitacao );
+}
+
+if ( $stAcao == 'alterar' || $stAcao == 'consultar' ) {
+
+$obFormulario->addComponente( $obLblFornecedor   );
+$obFormulario->addComponente( $obLblDataRegistro );
+$obFormulario->addComponente( $obLblDataVigencia );
+    
+} else {
+
+$obFormulario->addComponente( $obFornecedor   );
+$obFormulario->addComponente( $obDataRegistro );
+$obFormulario->addComponente( $obDataVigencia );
+   
+}
+
 $obFormulario->addComponente( $stAcao == 'consultar' ? $obLblObservacao : $obTxtObservacao );
 
 if ($stAcao != 'consultar') {
@@ -279,11 +387,12 @@ if ($stAcao != 'consultar') {
     $obFormulario->addSpan( $obSpnAtributos );
     $obFormulario->Incluir( 'Documento', array( $obTxtDocumento, $obCmbDocumento, $obTxtNumDocumento, $obDataEmissao, $obDataValidade,$obTxtNumDiasVcto) );
 }
+
 $obFormulario->addTitulo( 'Documentos Exigidos' );
 $obFormulario->addSpan( $obSpnDocumentos );
 
 if ($stAcao == 'consultar') {
-    $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao;
+    $stLocation = $pgList.'?'.Sessao::getId().$stLink;
     $obBtnCancelar = new Cancelar;
     $obBtnCancelar->setValue ( 'Voltar' );
     $obBtnCancelar->obEvento->setOnClick("Cancelar('".$stLocation."','telaPrincipal');");
@@ -293,8 +402,9 @@ if ($stAcao == 'consultar') {
         $obBtnOk = new Ok;
         $obBtnOk->setId( 'Ok');
 
-        $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao;
+        $stLocation = $pgList.'?'.Sessao::getId().$stLink;
         $obBtnCancelar = new Cancelar;
+        
         $obBtnCancelar->obEvento->setOnClick("Cancelar('".$stLocation."','telaPrincipal');");
         $obFormulario->defineBarra( array( $obBtnOk, $obBtnCancelar  ), '', '' );
     } else {
@@ -302,7 +412,11 @@ if ($stAcao == 'consultar') {
     }
 }
 $obFormulario->Show();
-if ($_GET['stAcao'] == 'consultar') {
+
+if ($request->get('stAcao') == 'consultar') {
     include_once( $pgJS );
 }
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

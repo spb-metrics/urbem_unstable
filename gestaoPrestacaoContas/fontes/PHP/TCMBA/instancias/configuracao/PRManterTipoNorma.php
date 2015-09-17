@@ -23,35 +23,11 @@
 */
 ?>
 <?php
-/**
-    * Página de Processamento - Parâmetros do Arquivo
-    * Data de Criação   : 13/10/2007
-
-    * @author Analista: Diego Barbosa Victoria
-    * @author Desenvolvedor: Diego Barbosa Victoria
-
-    * @ignore
-
-    $Revision: 59612 $
-    $Name$
-    $Autor: $
-    $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
-
-    * Casos de uso: uc-06.05.00
-*/
-
-/*
-$Log$
-Revision 1.1  2007/10/13 21:51:01  diego
-Arquivos novos
-
-*/
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GPC_TCMBA_MAPEAMENTO ."TTBATipoNorma.class.php" );
+include_once CAM_GPC_TCMBA_MAPEAMENTO ."TTCMBAVinculoTipoNorma.class.php";
 
-//Define o nome dos arquivos PHP
 $stPrograma = "ManterTipoNorma";
 $pgFilt    = "FL".$stPrograma.".php";
 $pgList    = "LS".$stPrograma.".php";
@@ -59,34 +35,43 @@ $pgForm    = "FM".$stPrograma.".php";
 $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 
+$obTTCMBAVinculoTipoNorma = new TTCMBAVinculoTipoNorma();
+
+# Inicia o controle de transação
+$obTransacao = new Transacao();
 $obErro = new Erro();
-$obPersistente = new TTBATipoNorma();
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
-$stAcao = 'incluir';
-//echo $stAcao;
-foreach ($_POST as $key=>$value) {
-    if (strstr($key,"inTipo")) {
-        $arIdentificador = explode('_',$key);
-        $inCod = $arIdentificador[1];
-        $value=(trim($value) <> "")?$value:'null';
-        //if (trim($value) <> "") {
-            $obPersistente->setDado('cod_tipo_tcm' ,$inCod);
-            $obPersistente->setDado('cod_tipo'     ,$value);
-            $obErro = $obPersistente->alteracao();
-            if( $obErro->ocorreu() )
-                break;
-        //}
+# Exclui todos os registros da tabela e insere novamente.
+
+if (!$obErro->ocorreu()) {
+    $obErro = $obTTCMBAVinculoTipoNorma->excluirTodos($boTransacao);
+    if (!$obErro->ocorreu()) {
+        foreach ($_REQUEST as $stKey => $stValue) {
+            $stKey = explode("_",$stKey);
+            if (($stKey[0] == "inTipo") && ($stKey[1] != '') && ($stValue != '')) {
+                $inCodTipoNormaUrbem = $stKey[1];
+                $inCodTipoNorma = $stValue;
+
+                $obTTCMBAVinculoTipoNorma->setDado('cod_tipo_norma', $inCodTipoNormaUrbem);
+                $obTTCMBAVinculoTipoNorma->setDado('cod_tipo'      , $inCodTipoNorma);
+                $obErro = $obTTCMBAVinculoTipoNorma->inclusao($boTransacao);
+
+                if ($obErro->ocorreu()) {
+                    break;
+                }
+            }
+        }   
     }
 }
 
-if ( !$obErro->ocorreu() ) {
-    SistemaLegado::alertaAviso($pgForm."?".$stFiltro, " ".$cont." Dados alterados ", "alterar", "aviso", Sessao::getId(), "../");
-} else {
-    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
-}
+$obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTCMBAVinculoTipoNorma );
 
-SistemaLegado::LiberaFrames();
+if (!$obErro->ocorreu()) {
+    SistemaLegado::alertaAviso($pgForm."?".$stFiltro, " ".$cont." Configurar Tipos de Norma ", "alterar", "aviso", Sessao::getId(), "../");
+} else {
+    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()) , "n_alterar" , "erro");
+}
 
 ?>

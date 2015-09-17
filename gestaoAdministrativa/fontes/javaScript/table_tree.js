@@ -104,11 +104,14 @@ function TableTreeReq( id , arquivo){
 
 function carregandoContainer(id){
     // captura imagem
-    var loading = window.parent.frames["telaPrincipal"].document.getElementById("carregando");    
-    var src = loading.innerHTML;    
-
+    var loading = window.parent.frames["telaPrincipal"].document.getElementById("carregando");
+    var src = loading.innerHTML;
+    
+    var src_loading = window.parent.frames["telaPrincipal"].document.getElementById("ajax_carregando").src;
+    var alt_loading = window.parent.frames["telaPrincipal"].document.getElementById("ajax_carregando").alt;
     // cria imagem de loading dinamicamente
     var newLoading=document.createElement("img");
-    newLoading.setAttribute('src' , src );
+    newLoading.setAttribute('src' , src_loading );
+    newLoading.setAttribute('alt' , alt_loading );
     document.getElementById(id+'_sub_cell_2').innerHTML = src;
 }

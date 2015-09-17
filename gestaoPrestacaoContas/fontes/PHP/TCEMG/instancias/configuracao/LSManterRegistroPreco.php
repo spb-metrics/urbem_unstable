@@ -32,11 +32,11 @@
 
   * @ignore
   *
-  * $Id: LSManterRegistroPreco.php 62832 2015-06-25 16:55:06Z michel $
+  * $Id: LSManterRegistroPreco.php 63502 2015-09-03 17:48:32Z michel $
   *
-  * $Revision: 62832 $
+  * $Revision: 63502 $
   * $Author: michel $
-  * $Date: 2015-06-25 13:55:06 -0300 (Qui, 25 Jun 2015) $
+  * $Date: 2015-09-03 14:48:32 -0300 (Qui, 03 Set 2015) $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -58,7 +58,12 @@ $stCaminho     = CAM_GPC_TCEMG_INSTANCIAS."configuracao/";
 
 $stAcao        = $request->get('stAcao');
 $inCodEntidade = $request->get('inCodEntidade');
-$stExercicioRegistroPreco  = $request->get('stExercicioRegistroPreco');
+$stExercicioRegistroPreco = $request->get('stExercicioRegistroPreco');
+$stCodigoProcesso = $request->get('stCodigoProcesso');
+$inCodModalidade = $request->get('inCodModalidade');
+$inCodLicitacao = $request->get('inCodLicitacao');
+$stExercicioEmpenho = $request->get('stExercicioEmpenho');
+$inNumEmpenho = $request->get('numEmpenho');
 
 if ($stAcao == 'alterar') {
     $stCaminho = $stCaminho.$pgForm;
@@ -72,8 +77,14 @@ if (empty($inCodEntidade)){
 
 $rsRegistroPrecos = new RecordSet();
 $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
-$obTTCEMGRegistroPrecos->setDado('cod_entidade' , $inCodEntidade);
-$obTTCEMGRegistroPrecos->setDado('exercicio'    , $stExercicioRegistroPreco);
+$obTTCEMGRegistroPrecos->setDado('cod_entidade'         , $inCodEntidade);
+$obTTCEMGRegistroPrecos->setDado('exercicio'            , $stExercicioRegistroPreco);
+$obTTCEMGRegistroPrecos->setDado('stCodigoProcesso'     , $stCodigoProcesso);
+$obTTCEMGRegistroPrecos->setDado('inCodModalidade'      , $inCodModalidade);
+$obTTCEMGRegistroPrecos->setDado('inCodLicitacao'       , $inCodLicitacao);
+$obTTCEMGRegistroPrecos->setDado('stExercicioEmpenho'   , $stExercicioEmpenho);
+$obTTCEMGRegistroPrecos->setDado('inNumEmpenho'         , $inNumEmpenho);
+
 $obTTCEMGRegistroPrecos->recuperaListaProcesso( $rsRegistroPrecos );
 
 $obLista = new Lista;
@@ -166,7 +177,7 @@ $obLista->ultimaAcao->addCampo("&stExercicioRegistroPrecos" , "exercicio");
 $obLista->ultimaAcao->addCampo("&boInterno"                 , "interno");
 $obLista->ultimaAcao->addCampo("&numcgmGerenciador"         , "numcgm_gerenciador");
 $obLista->ultimaAcao->addCampo("&stDescQuestao"             , "[numero_registro_precos]/[exercicio]");
-$obLista->ultimaAcao->setLink( $stCaminho."?".Sessao::getId()."&stAcao=".$stAcao );
+$obLista->ultimaAcao->setLink( $stCaminho."?".Sessao::getId()."&stAcao=".$stAcao."&stCodigoProcesso=".$stCodigoProcesso."&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$inCodLicitacao."&stExercicioEmpenho=".$stExercicioEmpenho."&numEmpenho=".$inNumEmpenho );
 $obLista->commitAcao();
 $obLista->show();
 

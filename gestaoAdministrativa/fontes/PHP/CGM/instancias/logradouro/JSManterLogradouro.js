@@ -102,7 +102,7 @@ function preencheBairro(){
 function filtrar(){
     var stTraget = document.frm.target;
     var stAction = document.frm.action;   
-    document.frm.action = '<?=$pgFilt;?>?<?=Sessao::getId();?>';
+    document.frm.action = '<?=$pgFilt;?>?<?=Sessao::getId();?>&stAcao=<?=$request->get("stAcao");?>';
     document.frm.submit();
     document.frm.target = stTraget;
     document.frm.action = stAction;

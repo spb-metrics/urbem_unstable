@@ -30,7 +30,7 @@
 * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
 * @author Documentor: Cassiano de Vasconcellos Ferreira
 
-  $Id: ArquivoExportador.class.php 63058 2015-07-20 19:42:03Z jean $
+  $Id: ArquivoExportador.class.php 63223 2015-08-05 14:41:50Z franver $
 
 * @package framework
 * @subpackage componentes
@@ -446,7 +446,29 @@ function FormataTipoDocumento()
                 $this->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
             }
         break;
+        case 'TCM_GO':
+            // Array arquivo sequencial automático
+            $arArquivoSequencial = array( "HML", "ABL", "HBL", "JGL" );
+            $arArquivo = explode('_',$this->getNomeArquivo());
+            $arArquivo = explode('.',$arArquivo[1]);
 
+            if( in_array(substr($arArquivo[0],0,-4), $arArquivoSequencial) ) {
+                //Adiciona o sequencial
+                $inCountBlocos = count($this->arBlocos)-1;
+                $inSequencial = 0;
+    
+                for ($inTmp=0; $inTmp<=$inCountBlocos; $inTmp++) {
+                    $arElementos = $this->arBlocos[ $inTmp ]->rsRecordSet->arElementos;
+                    for ($inCount=1; $inCount<=count($arElementos); $inCount++) {
+                        $arElementos[ ($inCount-1) ]['sequencial_registros'] = str_pad(++$inSequencial, 6, "0", STR_PAD_LEFT);
+                    }
+                    $this->arBlocos[ $inTmp ]->rsRecordSet->arElementos = $arElementos;
+                    $this->arBlocos[ $inTmp ]->addColuna("sequencial_registros");
+                    $this->arBlocos[ $inTmp ]->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
+                    $this->arBlocos[ $inTmp ]->roUltimaColuna->setTamanhoFixo(6);
+                }
+            }        
+            break;
     }
 }
 

@@ -32,10 +32,10 @@
   * 
   * @ignore
   * 
-  * $Id: PRManterRegistroPreco.php 62915 2015-07-08 14:10:35Z michel $
-  * $Date: 2015-07-08 11:10:35 -0300 (Qua, 08 Jul 2015) $
+  * $Id: PRManterRegistroPreco.php 63322 2015-08-18 13:58:14Z michel $
+  * $Date: 2015-08-18 10:58:14 -0300 (Ter, 18 Ago 2015) $
   * $Author: michel $
-  * $Rev: 62915 $
+  * $Rev: 63322 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -245,22 +245,25 @@ switch ($stAcao) {
                 if (!$obErro->ocorreu()) {
                     if (is_array($arOrgaos) && count($arOrgaos) > 0) {
                         foreach( $arOrgaos as $arOrgao ){
-                            $arProcessoAdesao = explode('/',$arOrgao['stCodigoProcessoAdesao']);
-                            
-                            $arUnidadeOrcamentaria = explode('.',$arOrgao['stUnidadeOrcamentaria']);
-                            
-                            $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_unidade'           ,$arOrgao['stExercicioOrgao']);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('num_orgao'                   ,(int)$arUnidadeOrcamentaria[0]);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('num_unidade'                 ,(int)$arUnidadeOrcamentaria[1]);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('participante'                ,($arOrgao['inNaturezaProcedimento'] == 1) ? true : false);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('numero_processo_adesao'      ,(int)$arProcessoAdesao[0]);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_adesao'            ,$arProcessoAdesao[1]);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('dt_publicacao_aviso_intencao',$arOrgao['dtPublicacaoAvisoIntencao']);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('dt_adesao'                   ,$arOrgao['dtAdesao']);
-                            $obTTCEMGRegistroPrecosOrgao->setDado('gerenciador'                 ,($arOrgao['inOrgaoGerenciador'] == 1)? true : false );
-                            $obTTCEMGRegistroPrecosOrgao->setDado('cgm_aprovacao'               ,$arOrgao['inResponsavel']);
-                            
-                            $obErro = $obTTCEMGRegistroPrecosOrgao->inclusao($boTransacao);
+                            if($arOrgao['inResponsavel']!=''){
+                                $arUnidadeOrcamentaria = explode('.',$arOrgao['stUnidadeOrcamentaria']);
+
+                                $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_unidade'           ,$arOrgao['stExercicioOrgao']);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('num_orgao'                   ,(int)$arUnidadeOrcamentaria[0]);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('num_unidade'                 ,(int)$arUnidadeOrcamentaria[1]);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('participante'                ,($arOrgao['inNaturezaProcedimento'] == 1) ? true : false);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('numero_processo_adesao'      ,$arOrgao['stCodigoProcessoAdesao']);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_adesao'            ,$arOrgao['stExercicioProcessoAdesao']);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('dt_publicacao_aviso_intencao',$arOrgao['dtPublicacaoAvisoIntencao']);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('dt_adesao'                   ,$arOrgao['dtAdesao']);
+                                $obTTCEMGRegistroPrecosOrgao->setDado('gerenciador'                 ,($arOrgao['inOrgaoGerenciador'] == 1)? true : false );
+                                $obTTCEMGRegistroPrecosOrgao->setDado('cgm_aprovacao'               ,$arOrgao['inResponsavel']);
+
+                                $obErro = $obTTCEMGRegistroPrecosOrgao->inclusao($boTransacao);
+                            }else{
+                                $obErro->setDescricao('Informe o CGM do Responsável pela Aprovação do Orgão: '.$arOrgao['stMontaCodOrgaoM'].' - '.$arOrgao['stMontaCodUnidadeM']);
+                                break;
+                            }
                         }
                     }
                 }
@@ -312,6 +315,10 @@ switch ($stAcao) {
                                     $obTTCEMGItemRegistroPrecos->setDado('cgm_fornecedor'                 , $item['inNumCGMVencedor']);
                                     $obTTCEMGItemRegistroPrecos->setDado('ordem_classificacao_fornecedor' , $item['inOrdemClassifFornecedor']);
                                     $obErro = $obTTCEMGItemRegistroPrecos->inclusao($boTransacao);
+
+                                    if (!$obErro->ocorreu() && $item['nuQtdeAderida'] > $item['nuQtdeLicitada']) {
+                                        $boItemAderidaSuperior = true;
+                                    }
                                 }
                             }
                         }
@@ -352,10 +359,13 @@ switch ($stAcao) {
                 Sessao::remove('arItens');
                 Sessao::remove('arOrgaos');
                 Sessao::remove('arOrgaoItemQuantitativos');
-        
-                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=alterar","Adesão a Registro de Preço.","incluir","aviso", Sessao::getId(), "../");
-            } else {
-                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+
+                $stMsg = "Adesão a Registro de Preço";
+
+                if($boItemAderidaSuperior)
+                    $stMsg = "Itens foram incluidos/alterados com Quantidade Aderida superior a Quantidade Licitada";
+
+                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=alterar",$stMsg,"incluir","aviso", Sessao::getId(), "../");
             }
         }
 

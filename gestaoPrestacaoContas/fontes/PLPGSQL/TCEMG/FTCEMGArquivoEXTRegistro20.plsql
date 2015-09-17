@@ -25,11 +25,11 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-* $Id: FTCEMGArquivoEXTRegistro20.plsql 62516 2015-05-15 19:50:54Z arthur $
-* $Revision: 62516 $
+* $Id: FTCEMGArquivoEXTRegistro20.plsql 63539 2015-09-09 19:36:23Z jean $
+* $Revision: 63539 $
 * $Name$
-* $Author: arthur $
-* $Date: 2015-05-15 16:50:54 -0300 (Sex, 15 Mai 2015) $
+* $Author: jean $
+* $Date: 2015-09-09 16:36:23 -0300 (Qua, 09 Set 2015) $
 *
 */
 
@@ -506,8 +506,26 @@ BEGIN
         reRegistro.vl_saldo_debitos  := arRetorno[2];
         reRegistro.vl_saldo_creditos := arRetorno[3];
         reRegistro.vl_saldo_atual    := arRetorno[4];
-        
-            RETURN NEXT reRegistro;
+
+        IF reRegistro.vl_saldo_anterior <> 0.00
+          THEN
+             IF (substr(reRegistro.cod_estrutural,1,1) = '2')
+                  THEN reRegistro.vl_saldo_anterior := (reRegistro.vl_saldo_anterior * -1);
+                       reRegistro.nat_saldo_anterior_fonte := 'C';
+                  ELSE reRegistro.nat_saldo_anterior_fonte := 'D';
+              END IF;
+        END IF;
+
+        IF reRegistro.vl_saldo_atual <> 0.00
+          THEN
+            IF (substr(reRegistro.cod_estrutural,1,1) = '2')
+              THEN reRegistro.vl_saldo_atual := (reRegistro.vl_saldo_atual * -1);
+                   reRegistro.nat_saldo_atual_fonte := 'C';
+              ELSE reRegistro.nat_saldo_atual_fonte := 'D';
+            END IF;
+        END IF;
+
+        RETURN NEXT reRegistro;
         
     END LOOP;
 

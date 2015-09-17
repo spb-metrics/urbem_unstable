@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSAnularLiquidacao.php 60003 2014-09-25 12:51:26Z michel $
+    * $Id: LSAnularLiquidacao.php 63536 2015-09-09 18:44:23Z carlos.silva $
 
     * Casos de uso: uc-02.03.04
                     uc-02.03.18
@@ -71,62 +71,64 @@ switch ($stAcao) {
 
 //MANTEM FILTRO E PAGINACAO
 $stLink .= "&stAcao=".$stAcao;
-if ($_REQUEST['pg'] and  $_REQUEST['pos']) {
-    Sessao::write('pg', $_REQUEST['pg']);
-    Sessao::write('pos', $_REQUEST['pos']);
+if ( $request->get('pg') and $request->get('pos')) {
+    Sessao::write('pg', $request->get('pg'));
+    Sessao::write('pos', $request->get('pos'));
 }
 
 //USADO QUANDO EXISTIR FILTRO
 //NA FL O VAR LINK DEVE SER RESETADA
 $arFiltro = Sessao::read('arFiltro');
 if ($arFiltro['paginando']) {
-    $arFiltro['pg']        = $_REQUEST['pg'];
-    $arFiltro['pos']       = $_REQUEST['pos'];
+    $arFiltro['pg']        = $request->get('pg');
+    $arFiltro['pos']       = $request->get('pos');
     $_REQUEST = $arFiltro;
 } else {
     $arFiltro = $_REQUEST;
     $arFiltro['paginando'] = true;
-    $arFiltro['pg']        = $_REQUEST['pg'];
-    $arFiltro['pos']       = $_REQUEST['pos'];
+    $arFiltro['pg']        = $request->get('pg');
+    $arFiltro['pos']       = $request->get('pos');
 }
+
 Sessao::write('arFiltro', $arFiltro);
 
-foreach ($_REQUEST['inCodEntidade'] as $value) {
-    $stCodEntidade .= $value . " , ";
+if (is_array($request->get('inCodEntidade'))) {
+    $stCodEntidade = implode(",", $request->get('inCodEntidade'));
+} else {
+    $stCodEntidade = $request->get('inCodEntidade');
 }
-$stCodEntidade = substr($stCodEntidade,0,strlen($stCodEntidade)-2);
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodDespesa( $_REQUEST['inCodDespesa'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodFornecedor( $_REQUEST['inCodFornecedor'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_REQUEST['dtExercicioEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenhoInicial( $_REQUEST['inCodEmpenhoInicial'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenhoFinal( $_REQUEST['inCodEmpenhoFinal'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtVencimento( $_REQUEST['stDtVencimento'] );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodDespesa( $request->get('inCodDespesa') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodFornecedor( $request->get('inCodFornecedor') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $request->get('dtExercicioEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenhoInicial( $request->get('inCodEmpenhoInicial') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenhoFinal( $request->get('inCodEmpenhoFinal') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtVencimento( $request->get('stDtVencimento') );
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->stDtLiquidacaoInicial = $_REQUEST['stDtInicial'];
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->stDtLiquidacaoFinal = $_REQUEST['stDtFinal'];
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->stDtLiquidacaoInicial = $request->get('stDtInicial');
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->stDtLiquidacaoFinal = $request->get('stDtFinal');
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodLiquidacaoInicial( $_REQUEST['inCodLiquidacaoInicial'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodLiquidacaoFinal( $_REQUEST['inCodLiquidacaoFinal'] );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodLiquidacaoInicial( $request->get('inCodLiquidacaoInicial') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodLiquidacaoFinal( $request->get('inCodLiquidacaoFinal') );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $stCodEntidade );
 
-if ($_REQUEST['inCodTipoDocumento']) {
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodTipoDocumento( $_REQUEST['inCodTipoDocumento'] );
+if ($request->get('inCodTipoDocumento')) {
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodTipoDocumento( $request->get('inCodTipoDocumento') );
 }
 
 if ($stAcao == 'anular') {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setSomarLiquidacao( true  );
 }
-if ( $_REQUEST['dtExercicioEmpenho'] == Sessao::getExercicio() ) {
+if ( $request->get('dtExercicioEmpenho') == Sessao::getExercicio() ) {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->listarPorNota( $rsLista );
-} elseif ( $_REQUEST['dtExercicioEmpenho'] < Sessao::getExercicio() ) {
+} elseif ( $request->get('dtExercicioEmpenho') < Sessao::getExercicio() ) {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->listarRestosPorNota( $rsLista );
 } else {
     $rsLista = new RecordSet;
 }
 
-if ($_REQUEST['pg'] and  $_REQUEST['pos']) {
-    $stLink.= '&pg='.$_REQUEST['pg'].'&pos='.$_REQUEST['pos'];
+if ($request->get('pg') and  $request->get('pos')) {
+    $stLink.= '&pg='.$request->get('pg').'&pos='.$request->get('pos');
 }
 
 Sessao::write('rsListaImpressao', $rsLista);

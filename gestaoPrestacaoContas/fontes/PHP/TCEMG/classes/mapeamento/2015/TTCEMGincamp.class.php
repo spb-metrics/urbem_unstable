@@ -203,8 +203,16 @@ class TTCEMGincamp extends Persistente
                           , LPAD(programa.num_programa::VARCHAR,4,'0') AS cod_programa
                           , acao.cod_acao
                           , LPAD(acao.num_acao::VARCHAR, 4, '0') AS id_acao
-                          , LPAD('',4,'0') AS id_sub_acao
-                          
+                          , ' ' AS id_sub_acao
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'1',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_1
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'2',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_2
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'3',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_3
+                          , COALESCE((SELECT ppa.busca_valor_meta_ano_ppa(acao.cod_acao,'4',acao.ultimo_timestamp_acao_dados)), 0.00) AS metas_ano_4
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'1',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_1
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'2',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_2
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'3',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_3
+                          , COALESCE((SELECT ppa.busca_valor_recurso_ano_ppa(acao.cod_acao,'4',acao.ultimo_timestamp_acao_dados)), 0.00) AS recursos_ano_4
+
                        FROM ppa.acao
                        
                        JOIN ppa.acao_dados
@@ -217,7 +225,7 @@ class TTCEMGincamp extends Persistente
                         
                        JOIN ppa.programa
                          ON programa.cod_programa = acao.cod_programa
-                         
+                          
                       WHERE NOT EXISTS (
                                          SELECT cod_acao
                                            FROM tcemg.inscricao_acao

@@ -32,37 +32,20 @@
 
     * @ignore
 
-    * $Id: PRManterCondominio.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRManterCondominio.php 63230 2015-08-05 20:49:42Z arthur $
 
     * Casos de uso: uc-05.01.14
 */
 
-/*
-$Log$
-Revision 1.14  2007/02/06 11:54:00  cercato
-Bug #6980#
-
-Revision 1.13  2007/02/05 18:17:34  cercato
-Bug #7718#
-
-Revision 1.12  2006/11/21 16:34:39  cercato
-bug #6795#
-
-Revision 1.11  2006/09/18 10:30:12  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-//include_once    ( "../../../includes/Constante.inc.php"     );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMCondominio.class.php"      );
 
 $stAcao = $request->get('stAcao');
 
 //MANTEM O FILTRO E A PAGINACAO
 $stLink = Sessao::read('stLink');
+
 //Define o nome dos arquivos PHP
 $stPrograma    = "ManterCondominio";
 $pgFilt        = "FL".$stPrograma.".php";
@@ -71,6 +54,7 @@ $pgForm        = "FM".$stPrograma.".php";
 $pgProc        = "PR".$stPrograma.".php";
 $pgOcul        = "OC".$stPrograma.".php";
 $pgJs          = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
 $pgFormConstrucao = "../construcao/FMManterConstrucaoVinculo.php";
@@ -263,7 +247,7 @@ switch ($stAcao) {
         $obErro = $obRCIMCondominio->alterarCaracteristica();
 
         if ( !$obErro->ocorreu() ) {
-            SistemaLegado::alertaAviso($pgList."?stAcao=alterar","Condomínio: ".$obRCIMCondominio->getCodigoCondominio()." - ".$_REQUEST["stNomCondominio"], "alterar", "aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList.$stLink,"Condomínio: ".$obRCIMCondominio->getCodigoCondominio()." - ".$_REQUEST["stNomCondominio"], "alterar", "aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
         }
@@ -297,4 +281,5 @@ switch ($stAcao) {
         }
 
 }
+
 ?>

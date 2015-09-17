@@ -56,11 +56,12 @@ $pgOcul     = "OC".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js" ;
 
 $obRCIMLogradouro = new RCIMLogradouro;
+$boTransacao = new Transacao();
 
-switch ($_REQUEST['stAcao']) {
+switch ( $request->get('stAcao') ) {
     case "incluir":
         $obErro = new Erro;
-        $obRCIMLogradouro->setCodigoLogradouro( $_REQUEST["inCodLogradouro"]       );
+        $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodLogradouro")       );
         $obRCIMLogradouro->consultarLogradouro($rsLogradouro);
 
         if ($rsLogradouro->inNumLinhas > 0) {
@@ -71,10 +72,10 @@ switch ($_REQUEST['stAcao']) {
             sistemaLegado::executaIFrameOculto($stJs);
         }
 
-        $obRCIMLogradouro->setCodigoUF        ( $_REQUEST["inCodUF"]          );
-        $obRCIMLogradouro->setCodigoMunicipio ( $_REQUEST["inCodMunicipio"]   );
-        $obRCIMLogradouro->setCodigoTipo      ( $_REQUEST["inCodTipo"]        );
-        $obRCIMLogradouro->setNomeLogradouro  ( trim( $_REQUEST["stNomeLogradouro"] ) );
+        $obRCIMLogradouro->setCodigoUF        ( $request->get("inCodUF")          );
+        $obRCIMLogradouro->setCodigoMunicipio ( $request->get("inCodMunicipio")   );
+        $obRCIMLogradouro->setCodigoTipo      ( $request->get("inCodTipo")        );
+        $obRCIMLogradouro->setNomeLogradouro  ( trim( $request->get("stNomeLogradouro") ) );
 
         $arBairrosSessao = Sessao::read('bairros');
         $arCepSessao     = Sessao::read('cep');
@@ -89,22 +90,22 @@ switch ($_REQUEST['stAcao']) {
 
         } else {
             $obRCIMLogradouro->setCEP ( $arCepSessao );
-            $obErro = $obRCIMLogradouro->addBairro( $arBairrosSessao );
+            $obErro = $obRCIMLogradouro->addBairro( $arBairrosSessao, $boTransacao );
         }
 
-        if (!$_REQUEST['inCodUF']) {
+        if (!$request->get('inCodUF')) {
             $obErro->setDescricao('Deve-se informar o Estado do novo Logradouro');
         }
 
-        if (!$_REQUEST['inCodMunicipio']) {
+        if (!$request->get('inCodMunicipio')) {
             $obErro->setDescricao('Deve-se informar o Município do novo Logradouro');
         }
 
-        if (!$_REQUEST['inCodTipo']) {
+        if (!$request->get('inCodTipo')) {
             $obErro->setDescricao('Deve-se informar o tipo do novo Logradouro');
         }
 
-        if (!$_REQUEST['stNomeLogradouro']) {
+        if (!$request->get('stNomeLogradouro')) {
             $obErro->setDescricao('Deve-se informar o nome do novo Logradouro');
         }
 
@@ -113,13 +114,12 @@ switch ($_REQUEST['stAcao']) {
         }
 
         if ( !$obErro->ocorreu() ) {            
-            sistemaLegado::alertaAviso($pgForm,"Nome Logradouro: ".$_REQUEST["stNomeLogradouro"],"incluir","aviso","","../");
+            SistemaLegado::alertaAviso($pgForm."?stAcao=".$request->get('stAcao'),"Nome Logradouro: ".$request->get("stNomeLogradouro"),"incluir","aviso",Sessao::getId(),"../");
         } else {            
-            sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
     break;
     case "alterar":
-
         $obErro = new Erro;
 
         $obRCIMLogradouro->setCodigoLogradouro ( $request->get("inCodigoLogradouro") );
@@ -130,7 +130,7 @@ switch ($_REQUEST['stAcao']) {
         $obRCIMLogradouro->setCodigoTipo     ( $request->get("inCodigoTipo")     );
         $obRCIMLogradouro->setCEP            ( Sessao::read('cep')               );
 
-        $obErro = $obRCIMLogradouro->addBairro( Sessao::read('bairros') );
+        $obErro = $obRCIMLogradouro->addBairro( Sessao::read('bairros'), $boTransacao );
         if ( $obErro->ocorreu() ) {
             break;
         }
@@ -140,28 +140,27 @@ switch ($_REQUEST['stAcao']) {
         }
 
         if ( !$obErro->ocorreu() ) {
-            $stLink  = "&inCodigoLogradouro=".$request->get('inCodigoLogradouro')."&stNomeLogradouro=".$request->get('stNomeLogradouro');
-            $stLink .= "&inCodUF=".$request->get('inCodUF')."&inCodMunicipio=".$request->get('inCodMunicipio')."&stAcao=".$request->get('stAcao');
-            sistemaLegado::alertaAviso($pgList.$stLink,"Nome Logradouro: ".$request->get('stNomeLogradouro'),"alterar","aviso",Sessao::getId(),"../");
+            SistemaLegado::alertaAviso($pgList.Sessao::read('link'),"Nome Logradouro: ".$request->get('stNomeLogradouro'),"alterar","aviso", Sessao::getId(), "../");
         } else {
-            sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
+            SistemaLegado::alertaAviso($pgList.Sessao::read('link')."&stErro=".urlencode($obErro->getDescricao()),"" ,"n_alterar","erro", Sessao::getId(), "../");
         }
     break;
 
     case "excluir";
-        $obRCIMLogradouro->setCodigoLogradouro ( $_REQUEST["inCodigoLogradouro"] );
-        $obRCIMLogradouro->setCodigoMunicipio  ( $_REQUEST["inCodigoMunicipio"]  );
-        $obRCIMLogradouro->setCodigoUF         ( $_REQUEST["inCodigoUF"]         );
+        $obRCIMLogradouro->setCodigoLogradouro ( $request->get("inCodigoLogradouro") );
+        $obRCIMLogradouro->setCodigoMunicipio  ( $request->get("inCodigoMunicipio")  );
+        $obRCIMLogradouro->setCodigoUF         ( $request->get("inCodigoUF")         );
 
         $obErro = $obRCIMLogradouro->excluirLogradouro();
 
         if ( !$obErro->ocorreu() ) {
-            $stLink  = "&inCodigoLogradouro=".$request->get('inCodigoLogradouro')."&stNomeLogradouro=".$request->get('stNomeLogradouro');
-            $stLink .= "&inCodUF=".$request->get('inCodUF')."&inCodMunicipio=".$request->get('inCodMunicipio')."&stAcao=".$request->get('stAcao');
-            sistemaLegado::alertaAviso($pgList.$stLink,"Nome Logradouro: ".$_REQUEST["stNomeLogradouro"],"excluir","aviso",Sessao::getId(),"../");
+            SistemaLegado::alertaAviso($pgList.Sessao::read('link'),"Nome Logradouro: ".$request->get("stNomeLogradouro") ,"excluir","aviso", Sessao::getId(), "../");
         } else {
-            sistemaLegado::alertaAviso($pgList.Sessao::read('link')."&stErro=".urlencode($obErro->getDescricao()),"" ,"excluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgList.Sessao::read('link')."&stErro=".urlencode($obErro->getDescricao()),"" ,"n_excluir","aviso", Sessao::getId(), "../");
         }
+    break;
+    case "consultar";
+        SistemaLegado::mudaFramePrincipal($pgList.Sessao::read('link'));
     break;
 }
 

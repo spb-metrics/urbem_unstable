@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63051 $
+    $Revision: 63145 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -94,8 +94,8 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 function montaRecuperaDadosTribunal()
 {
       $stSql = " SELECT 1 AS tipo_registro
-                      , coli.exercicio_licitacao AS exercicio   
-                      , coli.cod_licitacao         
+                      , coli.exercicio_licitacao AS exercicio
+                      ,coli.exercicio_licitacao||LPAD(coli.cod_entidade::VARCHAR,2,'0')||LPAD(coli.cod_modalidade::VARCHAR,2,'0')||LPAD(coli.cod_licitacao::VARCHAR,4,'0') AS cod_licitacao
                       , CASE WHEN pf.cpf IS NOT NULL THEN pf.cpf    
                              WHEN pj.cnpj IS NOT NULL THEN pj.cnpj    
                              ELSE ''    
@@ -136,7 +136,8 @@ function montaRecuperaDadosTribunal()
                      ON ( cgm.numcgm = pf.numcgm )    
               LEFT JOIN sw_cgm_pessoa_juridica as pj    
                      ON ( cgm.numcgm = pj.numcgm )    
-                  WHERE coli.exercicio_licitacao = '".$this->getDado('exercicio')."' \n"; 
+                  WHERE coli.exercicio_licitacao = '".$this->getDado('exercicio')."'
+                    AND coli.cod_modalidade NOT IN (8,9)\n"; 
         if (trim($this->getDado('stEntidades'))) {
             $stSql .= " AND coli.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
            }
@@ -144,7 +145,9 @@ function montaRecuperaDadosTribunal()
             $stSql .= "  AND TO_CHAR( cofi.timestamp,'mm') = ('".$this->getDado('inMes')."')              \n";
            }    
             $stSql .= " GROUP BY coli.exercicio_licitacao 
-                               , coli.cod_licitacao    
+                               , coli.cod_licitacao
+                               , coli.cod_entidade
+                               , coli.cod_modalidade
                                , pf.cpf    
                                , pj.cnpj    
                                , pf.numcgm    

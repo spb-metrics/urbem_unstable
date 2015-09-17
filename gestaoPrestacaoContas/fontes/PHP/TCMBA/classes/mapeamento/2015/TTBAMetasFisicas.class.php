@@ -74,7 +74,10 @@ class TTBAMetasFisicas extends Persistente
         $stSql = "
             SELECT 1 AS tipo_registro
                  , '".$this->getDado('inCodUnidadeGestora')."' AS unidade_gestora
-                 , 0 AS tipo_atividade
+                 , CASE WHEN (SUBSTR(LPAD(acao.cod_acao::VARCHAR,4,'0'), 1,1 )) = '0' THEN 3
+                        WHEN (SUBSTR(LPAD(acao.cod_acao::VARCHAR,4,'0'), 1,1 )) = '1' THEN 1
+                        WHEN (SUBSTR(LPAD(acao.cod_acao::VARCHAR,4,'0'), 1,1 )) = '2' THEN 2
+                        END AS tipo_projeto 
                  , LPAD(acao.cod_acao::VARCHAR,4,'0') AS cod_acao
                  , LPAD(acao.num_acao::VARCHAR,4,'0') AS num_acao
                  , LPAD(programa.cod_programa::VARCHAR,4,'0') AS cod_programa

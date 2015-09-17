@@ -41,6 +41,7 @@
     $obTTBAConsContRazao->setDado('dt_final_ant', $stDtFinalAnterior);
     $obTTBAConsContRazao->setDado('entidades', $stEntidades);
     $obTTBAConsContRazao->setDado('unidade_gestora', $inCodUnidadeGestora);
+    $obTTBAConsContRazao->setDado('exercicio_ant', (Sessao::getExercicio()-1));
     $obTTBAConsContRazao->recuperaDados($rs);
 
     $obExportador->roUltimoArquivo->addBloco($rs);
@@ -60,43 +61,43 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_deb_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cred_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_deb_mes_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_mes_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cred_mes_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_mes_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_deb_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_mes");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cred_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_mes");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_deb_ate_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ate_mes");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cred_ate_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ate_mes");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_deb_exercicio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_exercicio");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_cred_exercicio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_exercicio");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 

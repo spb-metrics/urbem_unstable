@@ -1591,71 +1591,72 @@ function imprimirCarne($diffBaixa = FALSE)
         include_once ( CAM_GT_ARR_MAPEAMENTO."TARRCarne.class.php" );
         require_once( CAM_GT_ARR_MAPEAMENTO . 'TARRCadastroEconomicoCalculo.class.php');
 
-        //dados notas
-        $stFiltro  = " ece.inscricao_economica = ".$chave[0]["inscricao"]." and ";
-        $stFiltro .= " acne.numeracao = '".$chave[0]['numeracao']."'";
 
-        $obTARRCadastroEconomicoCalculo = new TARRCadastroEconomicoCalculo();
-        $obTARRCadastroEconomicoCalculo->recuperaConsultaReqReceita( $rsDadosCarne , $stFiltro, "", "", date ("Y-m-d"));
-        //$obTARRCadastroEconomicoCalculo->debug(); die;
-
-        $stNumeracaoCarne = "";
-        $inX = 0;
-        $stPrestador = "";
-        $flValorDeclarado = 0.00;
-        $arPrestadores = array();
-        $arServicos = array();
-        $arNotas = array();
-        while ( !$rsDadosCarne->Eof() ) {
-            $boAchou = false;
-            for ( $inX=0; $inX<count($arServicos); $inX++ ) {
-                if ( $arServicos[$inX] == $rsDadosCarne->getCampo("cod_servico") ) {
-                    $boAchou = true;
-                    break;
+        if ($chave[0]["inscricao"] != '') {
+            //dados notas
+            $stFiltro  = " ece.inscricao_economica = ".$chave[0]["inscricao"]." and ";
+            $stFiltro .= " acne.numeracao = '".$chave[0]['numeracao']."'";
+    
+            $obTARRCadastroEconomicoCalculo = new TARRCadastroEconomicoCalculo();
+            $obTARRCadastroEconomicoCalculo->recuperaConsultaReqReceita( $rsDadosCarne , $stFiltro, "", "", date ("Y-m-d"));
+    
+            $stNumeracaoCarne = "";
+            $inX = 0;
+            $stPrestador = "";
+            $flValorDeclarado = 0.00;
+            $arPrestadores = array();
+            $arServicos = array();
+            $arNotas = array();
+            while ( !$rsDadosCarne->Eof() ) {
+                $boAchou = false;
+                for ( $inX=0; $inX<count($arServicos); $inX++ ) {
+                    if ( $arServicos[$inX] == $rsDadosCarne->getCampo("cod_servico") ) {
+                        $boAchou = true;
+                        break;
+                    }
                 }
-            }
-
-            if (!$boAchou) {
-                $arServicos[] = $rsDadosCarne->getCampo("cod_servico");
-                $flValorDeclarado += $rsDadosCarne->getCampo("valor_declarado");
-            }
-
-            $boAchou = false;
-            for ( $inX=0; $inX<count($arPrestadores); $inX++ ) {
-                if ( $arPrestadores[$inX] == $rsDadosCarne->getCampo("prestador") ) {
-                    $boAchou = true;
-                    break;
+    
+                if (!$boAchou) {
+                    $arServicos[] = $rsDadosCarne->getCampo("cod_servico");
+                    $flValorDeclarado += $rsDadosCarne->getCampo("valor_declarado");
                 }
-            }
-
-            if (!$boAchou) {
-                if ( count($arPrestadores) > 0 )
-                    $stPrestador = $stPrestador."; ";
-
-                $stPrestador = $stPrestador.$rsDadosCarne->getCampo("prestador");
-                $arPrestadores[] = $rsDadosCarne->getCampo("prestador");
-            }
-
-            $boAchou = false;
-            for ( $inX=0; $inX<count($arNotas); $inX++ ) {
-                if ( $arNotas[$inX] == $rsDadosCarne->getCampo("nro_nota") ) {
-                    $boAchou = true;
-                    break;
+    
+                $boAchou = false;
+                for ( $inX=0; $inX<count($arPrestadores); $inX++ ) {
+                    if ( $arPrestadores[$inX] == $rsDadosCarne->getCampo("prestador") ) {
+                        $boAchou = true;
+                        break;
+                    }
                 }
+    
+                if (!$boAchou) {
+                    if ( count($arPrestadores) > 0 )
+                        $stPrestador = $stPrestador."; ";
+    
+                    $stPrestador = $stPrestador.$rsDadosCarne->getCampo("prestador");
+                    $arPrestadores[] = $rsDadosCarne->getCampo("prestador");
+                }
+    
+                $boAchou = false;
+                for ( $inX=0; $inX<count($arNotas); $inX++ ) {
+                    if ( $arNotas[$inX] == $rsDadosCarne->getCampo("nro_nota") ) {
+                        $boAchou = true;
+                        break;
+                    }
+                }
+    
+                if (!$boAchou) {
+                    if ( count($arNotas) > 0 )
+                        $stNumeracaoCarne = $stNumeracaoCarne."; ";
+    
+                    $stNumeracaoCarne = $stNumeracaoCarne.$rsDadosCarne->getCampo("nro_nota");
+                    $arNotas[] = $rsDadosCarne->getCampo("nro_nota");
+                }
+    
+                $rsDadosCarne->proximo();
             }
-
-            if (!$boAchou) {
-                if ( count($arNotas) > 0 )
-                    $stNumeracaoCarne = $stNumeracaoCarne."; ";
-
-                $stNumeracaoCarne = $stNumeracaoCarne.$rsDadosCarne->getCampo("nro_nota");
-                $arNotas[] = $rsDadosCarne->getCampo("nro_nota");
-            }
-
-            $rsDadosCarne->proximo();
         }
         //dados notas fim-------------
-
         $obTARRCarne = new TARRCarne;
         $obTARRCarne->recuperaDadosPrefeituraIPTUGenerico( $rsListaCarnePrefeitura, Sessao::getExercicio() );
 
@@ -1746,17 +1747,6 @@ function imprimirCarne($diffBaixa = FALSE)
         $flValorTotalMulta = 0.00;
         $flValorTotalCorrecao = 0.00;
         $flValorTotalGeral = 0.00;
-
-/*
-echo "total geral = ".$flValorTotalGeral."<br>";
-echo "total correcao = ".$flValorTotalCorrecao."<br>";
-echo "total multa = ".$flValorTotalMulta."<br>";
-echo "total juros = ".$flValorTotalJuros."<br>";
-echo "total = ".$flValorTotal."<br>";
-
-sistemaLegado::mostravar( $rsGeraCarneCabecalho );
-sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
-*/
 
         if ( $obErro->ocorreu() ) {
             break;
@@ -1890,28 +1880,16 @@ sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
             $this->obRCarneMata->arDados[0]["tributo"] = $stGrupoTotal;
         }
 */
+        $nuValorVenalTotal = $rsGeraCarneCabecalho->getCampo( 'valor_venal_total' );        
+        $nuValorVenalTotal = !empty($nuValorVenalTotal) ? $nuValorVenalTotal : "0.00";
 
-        $this->obRCarneMata->setValorTributoReal  ( $rsGeraCarneCabecalho->getCampo( 'valor_venal_total' )      );
-        //$this->obRCarneMata->setObservacao        ( wordwrap($rsGeraCarneCabecalho->getCampo('observacao' ),100,chr(13)) );
+        $this->obRCarneMata->setValorTributoReal  ( $nuValorVenalTotal );
         $this->obRCarneMata->setObservacao        ( $rsGeraCarneCabecalho->getCampo('observacao') );
         $this->obRCarneMata->setNomBairro         ( $rsGeraCarneCabecalho->getCampo( 'nom_bairro' )             );
         $this->obRCarneMata->setCodDivida         ( $rsGeraCarneCabecalho->getCampo( 'cod_grupo' )              );
 
-/*
-        if ( preg_match( '/LIMPEZA.*/i',$rsGeraCarneCabecalho->getCampo( 'descricao_credito' ) ) ) {
-            $this->obRCarneMata->setTaxaLimpezaAnual  ( $rsGeraCarneCabecalho->getCampo( 'valor' )              );
-        } else {
-            $flImpostoAnualReal = $rsGeraCarneCabecalho->getCampo( 'valor' );
-            $this->obRCarneMata->setImpostoAnualReal  ( $flImpostoAnualReal                                     );
-        }
-        $this->obRCarneMata->setReferencia        ( ""                                                          );
-        $this->obRCarneMata->setNumeroPlanta      ( ""                                                          );
-*/
-
         // capturar creditos
         $this->obRCarneMata->setObservacaoL1 ( $this->obRCarneMata->getObservacaoL1().$rsGeraCarneCabecalho->getCampo( 'descricao_credito').": ".$rsGeraCarneCabecalho->getCampo( 'valor' )."  ");
-
-//            $rsGeraCarneCabecalho->proximo();
 
   //      } //fim do loop de reemitirCarne
         $this->obRCarneMata->setValorAnualReal        ( $flImpostoAnualReal + $this->obRCarneMata->getTaxaLimpezaAnual() );

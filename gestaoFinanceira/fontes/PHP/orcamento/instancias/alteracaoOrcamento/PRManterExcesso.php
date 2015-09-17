@@ -40,13 +40,6 @@
     * Casos de uso: uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.4  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include( CAM_GF_ORC_NEGOCIO."ROrcamentoSuplementacao.class.php" );
@@ -61,7 +54,7 @@ $pgOcul    = "OC".$stPrograma.".php";
 
 $obROrcamentoSuplementacao = new ROrcamentoSuplementacao();
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //valida a utilização da rotina de encerramento do mês contábil
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
@@ -71,7 +64,7 @@ $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
-$arDtAutorizacao = explode('/', $_POST['stData']);
+$arDtAutorizacao = explode('/', $request->get('stData'));
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
     SistemaLegado::exibeAviso(urlencode("Mês do Crédito encerrado!"),"n_incluir","erro");
     exit;
@@ -81,18 +74,18 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
 switch ($stAcao) {
     case "Suplementa":
     case "Especial":
-        $nuVlNorma = str_replace( '.','' , $_POST['nuVlTotal'] );
+        $nuVlNorma = str_replace( '.','' , $request->get('nuVlTotal') );
         $nuVlNorma = str_replace( ',','.', $nuVlNorma );
 
         $obROrcamentoSuplementacao->setExercicio( Sessao::getExercicio() );
-        $obROrcamentoSuplementacao->setCodTipo( $_POST['inCodTipo'] );
-        $obROrcamentoSuplementacao->obRNorma->setCodNorma( $_POST['inCodNorma'] );
+        $obROrcamentoSuplementacao->setCodTipo( $request->get('inCodTipo') );
+        $obROrcamentoSuplementacao->obRNorma->setCodNorma( $request->get('inCodNorma') );
         $obROrcamentoSuplementacao->setVlTotal( $nuVlNorma );
         $obROrcamentoSuplementacao->setDecreto( $stDecreto );
         $obROrcamentoSuplementacao->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
         $obROrcamentoSuplementacao->setCredSuplementar( 'Excesso' );
-        $obROrcamentoSuplementacao->setMotivo( $_POST['stMotivo'] );
-        $obROrcamentoSuplementacao->setDtLancamento( $_POST['stData'] );
+        $obROrcamentoSuplementacao->setMotivo( $request->get('stMotivo') );
+        $obROrcamentoSuplementacao->setDtLancamento( $request->get('stData') );
 
         $arDespesaSuplementarSessao = Sessao::read('arDespesaSuplementar');
         $inCount = count( $arDespesaSuplementarSessao );
@@ -112,4 +105,5 @@ switch ($stAcao) {
         }
     break;
 }
+
 ?>

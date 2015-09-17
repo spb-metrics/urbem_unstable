@@ -34,7 +34,7 @@ class TTCMBABenefPen extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTCMBABenefPen() {
+    public function __construct() {
       parent::Persistente();
       $this->setEstrutura( array() );
       $this->setEstruturaAuxiliar( array() );
@@ -63,9 +63,10 @@ class TTCMBABenefPen extends Persistente
                         , contrato_pensionista.dt_inicio_beneficio AS dt_validade
                         , (SELECT registro FROM pessoal".$this->getDado('entidade_rh').".contrato WHERE contrato.cod_contrato = contrato_pensionista.cod_contrato) AS seq_benef
                         , sw_cgm.nom_cgm AS nom_benef
-                        , ".$this->getDado('exercicio')." AS competencia
+                        , ".$this->getDado('exercicio')."||TO_CHAR(contrato_pensionista.dt_inicio_beneficio,'mm') AS competencia
                         , sw_cgm_pessoa_fisica.cpf
                         , contrato_pensionista.percentual_pagamento AS percent_pensao
+                        , contrato_pensionista.dt_inicio_beneficio AS dt_ato
 
                     FROM pessoal".$this->getDado('entidade_rh').".pensionista
 

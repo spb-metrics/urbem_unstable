@@ -32,24 +32,15 @@
 
     * @ignore
 
-    * $Id: FMManterCondominioCaracteristicaAbaCaracteristica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterCondominioCaracteristicaAbaCaracteristica.php 63161 2015-07-30 19:45:43Z arthur $
 
     * Casos de uso: uc-05.01.14
-*/
-
-/*
-$Log$
-Revision 1.5  2006/09/18 10:30:12  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
 // DEFINICAO DOS COMPONENTES DO FORMULARIO
-
 $obLblCodigoCondominio = new Label;
 $obLblCodigoCondominio->setRotulo  ( "Código"                        );
 $obLblCodigoCondominio->setName    ( "inCodigoCondominio"            );
@@ -98,7 +89,9 @@ $obBscProcesso->setRotulo ( "Processo" );
 $obBscProcesso->setTitle  ( "Número do processo no protocolo que formaliza este imóvel" );
 $obBscProcesso->obCampoCod->setName ("inProcesso");
 $obBscProcesso->obCampoCod->setId   ("inProcesso");
-//$obBscProcesso->obCampoCod->setValue( $inProcesso );
+
 $obBscProcesso->obCampoCod->obEvento->setOnChange( "buscaValor('buscaProcesso');" );
 $obBscProcesso->obCampoCod->obEvento->setOnKeyUp( "mascaraDinamico('".$stMascaraProcesso."', this, event);" );
-$obBscProcesso->setFuncaoBusca( "abrePopUp('../../popups/processo/FLBuscaProcessos.php','frm','inProcesso','campoInner2','','".Sessao::getId()."','800','550')" );
+$obBscProcesso->setFuncaoBusca( "abrePopUp('".CAM_GA_PROT_POPUPS."processo/FLBuscaProcessos.php','frm','inProcesso','campoInner2','','".Sessao::getId()."','800','550')" );
+
+?>

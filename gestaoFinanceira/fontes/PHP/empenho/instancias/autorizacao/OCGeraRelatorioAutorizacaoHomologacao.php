@@ -222,6 +222,7 @@ while ( $inCount <  count($arAutorizacoesHomologacao) ) {
 
     $stTitulo = "Nota de Autorização de Empenho";
     $obMap->recuperaDadosAutorizacao($rsAutorizacao,'','',$boTransacao);
+
     $stData = SistemaLegado::dataToBr( $rsAutorizacao->getCampo("dt_autorizacao") );
     $arDt[] = $rsAutorizacao->getCampo("dt_autorizacao");
 
@@ -295,7 +296,7 @@ while ( $inCount <  count($arAutorizacoesHomologacao) ) {
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCampo       ( "orgao"     , 8 ,'','','L');
     $obPDF->addCampo       ( "unidade"   , 8 ,'','','R');
-
+       
     $obPDF->addRecordSet( $rsRecordSet[3] );
     $obPDF->setQuebraPaginaLista( false );
 
@@ -306,7 +307,10 @@ while ( $inCount <  count($arAutorizacoesHomologacao) ) {
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCampo       ( "dotacao"     , 8 ,'','','LR');
 
-    $obPDF->addRecordSet( $rsRecordSet[3] );
+    $rsRecordSetPAO = new RecordSet();
+    $rsRecordSetPAO->preenche($rsRecordSet[3]->getElementos());
+
+    $obPDF->addRecordSet( $rsRecordSetPAO );
     $obPDF->setQuebraPaginaLista( false );
 
     $obPDF->setAlinhamento ( "L" );
@@ -316,7 +320,10 @@ while ( $inCount <  count($arAutorizacoesHomologacao) ) {
     $obPDF->setAlinhamento ( "L" );
     $obPDF->addCampo       ( "pao"     , 8 ,'','','LR');
 
-    $obPDF->addRecordSet( $rsRecordSet[3] );
+    $rsRecordSetRecurso = new RecordSet();
+    $rsRecordSetRecurso->preenche($rsRecordSet[3]->getElementos());
+
+    $obPDF->addRecordSet( $rsRecordSetRecurso );
     $obPDF->setQuebraPaginaLista( false );
 
     $obPDF->setAlinhamento ( "L" );

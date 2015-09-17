@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63045 $
+    $Revision: 63235 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -42,21 +42,22 @@
 */
 
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAParticipanteLicitacao.class.php" );
+    
     $obTTBAParticipanteLicitacao = new TTBAParticipanteLicitacao();
     $obTTBAParticipanteLicitacao->setDado('mes'      , $inMes );
     $obTTBAParticipanteLicitacao->setDado('entidades', $stEntidades );
     $obTTBAParticipanteLicitacao->setDado('unidade_gestora', $inCodUnidadeGestora );
     $obTTBAParticipanteLicitacao->setDado('dt_inicial', $stDataInicial );
-    $obTTBAParticipanteLicitacao->setDado('dt_final', $stDataFinal );
-    $obTTBAParticipanteLicitacao->recuperaDadosTribunal($rsRecordSet);
+    $obTTBAParticipanteLicitacao->setDado('dt_final'  , $stDataFinal );
+    $obTTBAParticipanteLicitacao->recuperaDadosTribunal($rsParticipanteLicitacao);
 
-    $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
+    $obExportador->roUltimoArquivo->addBloco($rsParticipanteLicitacao);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_licitacao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(36);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
@@ -68,7 +69,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_cnpj_part");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_participante");
@@ -76,11 +77,11 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nome_participante");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cnpj_consorcio");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia");
@@ -88,5 +89,10 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("indicador_habilitacao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+    
+    unset($obTTBAParticipanteLicitacao);
+    unset($rsParticipanteLicitacao);
+
+?>

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63481 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,36 +41,19 @@
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/07/16 02:39:13  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoAnulado.class.php" );
 
-/**
-  *
-  * Data de Criação: 12/07/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAEmpenhoAnulado extends TEmpenhoEmpenhoAnulado
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TTBAEmpenhoAnulado()
+function __construct()
 {
     parent::TEmpenhoEmpenhoAnulado();
-
-    $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
 function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -88,72 +71,100 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   des.exercicio                                                      \n";
-    $stSql .= "         ,des.num_orgao                                                      \n";
-    $stSql .= "         ,des.num_unidade                                                    \n";
-    $stSql .= "         ,emp.cod_empenho                                                    \n";
-    $stSql .= "         ,substr(ean.oid,length(ean.oid)-6,7) as numero_empenho_anulado      \n";
-    $stSql .= "         ,sume.valor_anulado                                                 \n";
-    $stSql .= "         ,case when liq.cod_entidade is not null then 1 else  2 end as foi_liquidada  \n";
-    $stSql .= "         ,to_char(ean.timestamp,'dd/mm/yyyy') as data_anulacao               \n";
-    $stSql .= " FROM     empenho.empenho             as emp                                 \n";
-    $stSql .= "          LEFT JOIN                                                          \n";
-    $stSql .= "              ( SELECT  exercicio_empenho                                    \n";
-    $stSql .= "                       ,cod_entidade                                         \n";
-    $stSql .= "                       ,cod_empenho                                          \n";
-    $stSql .= "               FROM    empenho.nota_liquidacao as liq                        \n";
-    $stSql .= "               WHERE   exercicio = '".$this->getDado('exercicio')."'         \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "             AND   cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= "               GROUP BY exercicio_empenho, cod_entidade, cod_empenho         \n";
-    $stSql .= "               ) as liq                                                      \n";
-    $stSql .= "             ON (                                                            \n";
-    $stSql .= "                   emp.exercicio    = liq.exercicio_empenho                  \n";
-    $stSql .= "               AND emp.cod_entidade = liq.cod_entidade                       \n";
-    $stSql .= "               AND emp.cod_empenho  = liq.cod_empenho                        \n";
-    $stSql .= "               )                                                             \n";
-    $stSql .= "         ,empenho.empenho_anulado     as ean                                 \n";
-    $stSql .= "         ,empenho.pre_empenho         as pre                                 \n";
-    $stSql .= "         ,empenho.pre_empenho_despesa as ped                                 \n";
-    $stSql .= "         ,orcamento.conta_despesa     as cde                                 \n";
-    $stSql .= "         ,orcamento.despesa           as des                                 \n";
-    $stSql .= "         ,(                                                                  \n";
-    $stSql .= "             SELECT   exercicio                                              \n";
-    $stSql .= "                     ,cod_entidade                                           \n";
-    $stSql .= "                     ,cod_empenho                                            \n";
-    $stSql .= "                     ,timestamp                                              \n";
-    $stSql .= "                     ,sum(vl_anulado) as valor_anulado                       \n";
-    $stSql .= "             FROM    empenho.empenho_anulado_item as ipe                     \n";
-    $stSql .= "             WHERE   to_char(timestamp,'yyyy') = '".$this->getDado('exercicio')."' \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= "             AND   cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= "             GROUP BY exercicio, cod_entidade, cod_empenho, timestamp        \n";
-    $stSql .= "         ) as sume                                                           \n";
-    $stSql .= "                                                                             \n";
-    $stSql .= " WHERE   emp.exercicio       = pre.exercicio                                 \n";
-    $stSql .= " AND     emp.cod_pre_empenho = pre.cod_pre_empenho                           \n";
-    $stSql .= " AND     emp.exercicio       = ean.exercicio                                 \n";
-    $stSql .= " AND     emp.cod_entidade    = ean.cod_entidade                              \n";
-    $stSql .= " AND     emp.cod_empenho     = ean.cod_empenho                               \n";
-    $stSql .= " AND     ean.exercicio       = sume.exercicio                                \n";
-    $stSql .= " AND     ean.cod_entidade    = sume.cod_entidade                             \n";
-    $stSql .= " AND     ean.cod_empenho     = sume.cod_empenho                              \n";
-    $stSql .= " AND     ean.timestamp       = sume.timestamp                                \n";
-    $stSql .= " AND     pre.exercicio       = ped.exercicio                                 \n";
-    $stSql .= " AND     pre.cod_pre_empenho = ped.cod_pre_empenho                           \n";
-    $stSql .= " AND     ped.exercicio       = des.exercicio                                 \n";
-    $stSql .= " AND     ped.cod_despesa     = des.cod_despesa                               \n";
-    $stSql .= " AND     ped.exercicio       = cde.exercicio                                 \n";
-    $stSql .= " AND     ped.cod_conta       = cde.cod_conta                                 \n";
-    $stSql .= " AND     des.exercicio       = '".$this->getDado('exercicio')."'             \n";
-    if ( $this->getDado('stEntidades') ) {
-        $stSql .= " AND   emp.cod_entidade in ( ".$this->getDado('stEntidades')." )   \n";
-    }
-    $stSql .= " ORDER BY des.exercicio, emp.cod_empenho                                     \n";
+    $stSql = "
+            SELECT 1 AS tipo_registro
+                 , ".$this->getDado('inCodGestora')." AS unidade_gestora
+                 , despesa.num_unidade AS unidade_orcamentaria
+                 , empenho.cod_empenho AS num_empenho
+                 , despesa.exercicio     
+                 , ROW_NUMBER () OVER (PARTITION BY empenho_anulado.cod_empenho ORDER BY empenho_anulado.cod_empenho) AS numero_empenho_anulado
+                 , to_char(empenho_anulado.timestamp,'ddmmyyyy') AS data_anulacao
+                 , empenho_anulado.motivo
+                 , sume.valor_anulado                                                 
+                 , CASE WHEN liquidadas.cod_entidade IS NOT NULL
+                        THEN 1
+                        ELSE 2
+                   END AS despesa_liquidada  
+                 , to_char(empenho_anulado.timestamp,'yyyymm') AS competencia
+                 , despesa.num_orgao
+       
+             FROM empenho.empenho
+       
+       INNER JOIN empenho.pre_empenho
+               ON empenho.exercicio       = pre_empenho.exercicio                                 
+              AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+       
+       INNER JOIN empenho.pre_empenho_despesa
+               ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio                                 
+              AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+       
+       INNER JOIN orcamento.despesa
+               ON pre_empenho_despesa.exercicio   = despesa.exercicio                                 
+              AND pre_empenho_despesa.cod_despesa = despesa.cod_despesa
+       
+       INNER JOIN orcamento.conta_despesa
+               ON pre_empenho_despesa.exercicio = conta_despesa.exercicio                                 
+              AND pre_empenho_despesa.cod_conta = conta_despesa.cod_conta                                 
+       
+       INNER JOIN empenho.empenho_anulado 
+               ON empenho.exercicio       = empenho_anulado.exercicio                                 
+              AND empenho.cod_entidade    = empenho_anulado.cod_entidade                              
+              AND empenho.cod_empenho     = empenho_anulado.cod_empenho
+       
+        INNER JOIN ( SELECT exercicio                                              
+                          , cod_entidade                                           
+                          , cod_empenho                                            
+                          , timestamp                                              
+                          , sum(vl_anulado) as valor_anulado                       
+                       FROM empenho.empenho_anulado_item
+                      WHERE TO_CHAR(timestamp,'yyyy') = '".$this->getDado('stExercicio')."' \n";
 
-    return $stSql;
+    if ( $this->getDado('stEntidades') ) {
+        $stSql .= "      AND cod_entidade IN ( ".$this->getDado('stEntidades')." ) \n";
+    }
+
+        $stSql .= " GROUP BY exercicio
+                           , cod_entidade
+                           , cod_empenho
+                           , timestamp        
+               ) AS sume 
+              ON empenho_anulado.exercicio    = sume.exercicio                                
+             AND empenho_anulado.cod_entidade = sume.cod_entidade                             
+             AND empenho_anulado.cod_empenho  = sume.cod_empenho                              
+             AND empenho_anulado.timestamp    = sume.timestamp
+             
+       LEFT JOIN ( SELECT exercicio_empenho                                    
+                        , cod_entidade                                         
+                        , cod_empenho                                          
+                     FROM empenho.nota_liquidacao
+                    WHERE exercicio = '".$this->getDado('stExercicio')."' \n";
+    
+    if ( $this->getDado('stEntidades') ) {
+        $stSql .= "  AND cod_entidade IN ( ".$this->getDado('stEntidades')." ) \n";
+    }
+    
+    $stSql .= "  GROUP BY exercicio_empenho
+                        , cod_entidade
+                        , cod_empenho         
+               ) AS liquidadas
+              ON empenho.exercicio    = liquidadas.exercicio_empenho                  
+             AND empenho.cod_entidade = liquidadas.cod_entidade                       
+             AND empenho.cod_empenho  = liquidadas.cod_empenho                        
+      
+           WHERE despesa.exercicio    = '".$this->getDado('stExercicio')."'  \n";
+            
+    if ( $this->getDado('stEntidades') ) {
+        $stSql .= " AND empenho.cod_entidade IN ( ".$this->getDado('stEntidades')." )   \n";
+    }    
+            
+    $stSql .= " AND TO_DATE(empenho_anulado.timestamp::VARCHAR,'yyyy-mm-dd') BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
+                                                                                 AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+       
+       ORDER BY despesa.exercicio
+              , empenho.cod_empenho ";
+  return $stSql;
 }
 
 }
+
+?>

@@ -35,29 +35,19 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: TLicitacaoHomologacao.class.php 60438 2014-10-21 17:13:33Z carolina $
+    $Id: TLicitacaoHomologacao.class.php 63367 2015-08-20 21:27:34Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.homologacao
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Nome do Programador
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TLicitacaoHomologacao extends Persistente
 {
     /**
     * Método Construtor
     * @access Private
 */
-    public function TLicitacaoHomologacao()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("licitacao.homologacao");
@@ -90,16 +80,16 @@ class TLicitacaoHomologacao extends Persistente
         $rsRecordSet = new RecordSet;
 
         if( $this->obTLicitacaoAdjudicacao->obTLicitacaoCotacaoLicitacao->obTLicitacaoLicitacao->getDado( "exercicio" ) != "" )
-        $stFiltro .= "and adjudicacao.exercicio_licitacao = '".$this->obTLicitacaoAdjudicacao->obTLicitacaoCotacaoLicitacao->obTLicitacaoLicitacao->getDado( "exercicio" )."' \n";
+            $stFiltro .= "and adjudicacao.exercicio_licitacao = '".$this->obTLicitacaoAdjudicacao->obTLicitacaoCotacaoLicitacao->obTLicitacaoLicitacao->getDado( "exercicio" )."' \n";
         if( $this->obTLicitacaoAdjudicacao->getDado( "cod_entidade" ) != "" )
-        $stFiltro .= "and adjudicacao.cod_entidade   = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_entidade" )." \n";
+            $stFiltro .= "and adjudicacao.cod_entidade   = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_entidade" )." \n";
         if( $this->obTLicitacaoAdjudicacao->getDado( "cod_modalidade" ) != "" )
-        $stFiltro .= "and adjudicacao.cod_modalidade = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_modalidade" )." \n";
+            $stFiltro .= "and adjudicacao.cod_modalidade = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_modalidade" )." \n";
         if( $this->obTLicitacaoAdjudicacao->getDado( "cod_licitacao" ) != "" )
-        $stFiltro .= "and adjudicacao.cod_licitacao  = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_licitacao" )." \n";
+            $stFiltro .= "and adjudicacao.cod_licitacao  = ".$this->obTLicitacaoAdjudicacao->getDado( "cod_licitacao" )." \n";
 
         if( $stFiltro )
-        $stFiltro = " WHERE ".substr($stFiltro,4,strlen($stFiltro)-4);
+            $stFiltro = " WHERE ".substr($stFiltro,4,strlen($stFiltro)-4);
 
         $stFiltro .= "
         group by
@@ -370,7 +360,7 @@ class TLicitacaoHomologacao extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
 
-        $stSql  = $this->montaRecuperaItensHomologacao  ().$stFiltro.$stOrdem;
+        $stSql  = $this->montaRecuperaItensHomologacao().$stFiltro.$stOrdem;
         $this->stDebug = $stSql;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -754,6 +744,7 @@ from (
                    and cotacao_licitacao.lote                = adjudicacao.lote
                    and cotacao_licitacao.cod_item            = adjudicacao.cod_item
                    and cotacao_licitacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                   and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                    and cotacao_licitacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
             inner join licitacao.licitacao
                     on licitacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
@@ -846,6 +837,215 @@ from (
                    and mapa_item_reserva.lote                  = mapa_item_dotacao.lote
                    and mapa_item_reserva.cod_despesa           = mapa_item_dotacao.cod_despesa
                    and mapa_item_reserva.cod_conta             = mapa_item_dotacao.cod_conta
+
+                 where homologacao_anulada.cod_licitacao is null
+                   and adjudicacao_anulada.cod_licitacao is null";
+
+        return $stSql;
+    }
+    
+    public function recuperaItensAgrupadosSolicitacaoLicitacaoMapa(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stGroupBy = " group by cotacao_fornecedor_item.cgm_fornecedor
+                              , cotacao_fornecedor_item.lote
+                              , solicitacao_item_dotacao.cod_despesa
+                              , solicitacao_item_dotacao.cod_conta
+                              , solicitacao_item_dotacao.cod_entidade
+                              , cotacao_item.cod_cotacao
+                              , cotacao_item.exercicio
+                              , cotacao_item.cod_item
+                              , cotacao_item.lote
+                              , mapa_item.quantidade
+                              , cotacao_fornecedor_item.vl_cotacao
+                              , catalogo_item.descricao_resumida
+                              , catalogo_item.descricao
+                              , unidade_medida.cod_unidade
+                              , unidade_medida.cod_grandeza
+                              , unidade_medida.nom_unidade
+                              , unidade_medida.simbolo
+                              , mapa.cod_mapa
+                              , mapa.exercicio
+                              , solicitacao_item.exercicio
+                              , cotacao_item.quantidade
+                              , solicitacao_item.quantidade
+                              , solicitacao_item.cod_solicitacao
+                              , solicitacao_item_dotacao.cod_centro
+                              , solicitacao_item_dotacao.vl_reserva
+                              , solicitacao_item_anulacao.quantidade
+                              , solicitacao_item.cod_entidade
+                              , solicitacao_item.cod_centro
+                              , solicitacao_item.cod_item
+                              , sw_cgm.nom_cgm";
+        $stSql = $this->montaRecuperaItensAgrupadosSolicitacaoLicitacaoMapa().$stFiltro.$stGroupBy.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+    
+    public function montaRecuperaItensAgrupadosSolicitacaoLicitacaoMapa()
+    {
+        $stSql = "select cotacao_item.cod_cotacao
+                       , cotacao_item.exercicio
+                       , cotacao_item.cod_item
+                       , solicitacao_item.cod_centro
+                       , cotacao_item.lote
+                       , solicitacao_item.cod_solicitacao
+                       , solicitacao_item.exercicio as exercicio_solicitacao
+                       , cotacao_fornecedor_item.cgm_fornecedor as fornecedor
+                       , cotacao_fornecedor_item.lote
+                       , solicitacao_item_dotacao.cod_despesa
+                       , solicitacao_item_dotacao.cod_conta
+                       , solicitacao_item_dotacao.cod_entidade
+                       , sw_cgm.nom_cgm as nom_entidade
+                       , 0 as historico
+                       , 0 as cod_tipo
+                       , false as implantado
+                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * sum(mapa_item_dotacao.quantidade))::numeric(14,2) as reserva
+                       , sum(mapa_item_dotacao.quantidade) as qtd_cotacao
+                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * sum(mapa_item_dotacao.quantidade))::numeric(14,2) as vl_cotacao
+                       , catalogo_item.descricao_resumida
+                       , catalogo_item.descricao as descricao_completa
+                       , unidade_medida.cod_unidade
+                       , unidade_medida.cod_grandeza
+                       , unidade_medida.nom_unidade
+                       , unidade_medida.simbolo
+                       , mapa.cod_mapa
+                       , mapa.exercicio as exercicio_mapa
+
+                  from licitacao.homologacao
+             left join licitacao.homologacao_anulada
+                    on homologacao.num_homologacao     = homologacao_anulada.num_homologacao
+                   and homologacao.cod_licitacao       = homologacao_anulada.cod_licitacao
+                   and homologacao.cod_modalidade      = homologacao_anulada.cod_modalidade
+                   and homologacao.cod_entidade        = homologacao_anulada.cod_entidade
+                   and homologacao.num_adjudicacao     = homologacao_anulada.num_adjudicacao
+                   and homologacao.exercicio_licitacao = homologacao_anulada.exercicio_licitacao
+                   and homologacao.lote                = homologacao_anulada.lote
+                   and homologacao.cod_cotacao         = homologacao_anulada.cod_cotacao
+                   and homologacao.cod_item            = homologacao_anulada.cod_item
+                   and homologacao.exercicio_cotacao   = homologacao_anulada.exercicio_cotacao
+                   and homologacao.cgm_fornecedor      = homologacao_anulada.cgm_fornecedor
+            inner join licitacao.adjudicacao
+                    on homologacao.cod_licitacao       = adjudicacao.cod_licitacao
+                   and homologacao.cod_modalidade      = adjudicacao.cod_modalidade
+                   and homologacao.cod_entidade        = adjudicacao.cod_entidade
+                   and homologacao.num_adjudicacao     = adjudicacao.num_adjudicacao
+                   and homologacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
+                   and homologacao.lote                = adjudicacao.lote
+                   and homologacao.cod_cotacao         = adjudicacao.cod_cotacao
+                   and homologacao.cod_item            = adjudicacao.cod_item
+                   and homologacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                   and homologacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
+             left join licitacao.adjudicacao_anulada
+                    on adjudicacao.num_adjudicacao     = adjudicacao_anulada.num_adjudicacao
+                   and adjudicacao.cod_licitacao       = adjudicacao_anulada.cod_licitacao
+                   and adjudicacao.cod_modalidade      = adjudicacao_anulada.cod_modalidade
+                   and adjudicacao.cod_entidade        = adjudicacao_anulada.cod_entidade
+                   and adjudicacao.exercicio_licitacao = adjudicacao_anulada.exercicio_licitacao
+                   and adjudicacao.lote                = adjudicacao_anulada.lote
+                   and adjudicacao.cod_cotacao         = adjudicacao_anulada.cod_cotacao
+                   and adjudicacao.cod_item            = adjudicacao_anulada.cod_item
+                   and adjudicacao.exercicio_cotacao   = adjudicacao_anulada.exercicio_cotacao
+                   and adjudicacao.cgm_fornecedor      = adjudicacao_anulada.cgm_fornecedor
+            inner join licitacao.cotacao_licitacao
+                    on cotacao_licitacao.cod_licitacao       = adjudicacao.cod_licitacao
+                   and cotacao_licitacao.cod_modalidade      = adjudicacao.cod_modalidade
+                   and cotacao_licitacao.cod_entidade        = adjudicacao.cod_entidade
+                   and cotacao_licitacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
+                   and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
+                   and cotacao_licitacao.lote                = adjudicacao.lote
+                   and cotacao_licitacao.cod_item            = adjudicacao.cod_item
+                   and cotacao_licitacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                   and cotacao_licitacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
+            inner join licitacao.licitacao
+                    on licitacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
+                   and licitacao.cod_modalidade      = cotacao_licitacao.cod_modalidade
+                   and licitacao.cod_entidade        = cotacao_licitacao.cod_entidade
+                   and licitacao.exercicio           = cotacao_licitacao.exercicio_licitacao
+            inner join compras.cotacao_fornecedor_item
+                    on cotacao_licitacao.cod_cotacao          = cotacao_fornecedor_item.cod_cotacao
+                   and cotacao_licitacao.exercicio_cotacao    = cotacao_fornecedor_item.exercicio
+                   and cotacao_licitacao.cod_item             = cotacao_fornecedor_item.cod_item
+                   and cotacao_licitacao.cgm_fornecedor       = cotacao_fornecedor_item.cgm_fornecedor
+                   and cotacao_licitacao.lote                 = cotacao_fornecedor_item.lote
+            inner join compras.cotacao_item
+                    on cotacao_item.cod_cotacao   = cotacao_fornecedor_item.cod_cotacao
+                   and cotacao_item.exercicio     = cotacao_fornecedor_item.exercicio
+                   and cotacao_item.lote          = cotacao_fornecedor_item.lote
+                   and cotacao_item.cod_item      = cotacao_fornecedor_item.cod_item
+            inner join compras.cotacao
+                    on cotacao.cod_cotacao    = cotacao_item.cod_cotacao
+                   and cotacao.exercicio      = cotacao_item.exercicio
+            inner join compras.mapa_cotacao
+                    on cotacao.cod_cotacao    = mapa_cotacao.cod_cotacao
+                   and cotacao.exercicio      = mapa_cotacao.exercicio_cotacao
+            inner join compras.mapa_item
+                    on mapa_cotacao.cod_mapa      = mapa_item.cod_mapa
+                   and mapa_cotacao.exercicio_mapa= mapa_item.exercicio
+                   and mapa_item.cod_item      = cotacao_licitacao.cod_item
+                   and mapa_item.lote          = cotacao_licitacao.lote
+            inner join compras.mapa_item_dotacao
+                    on mapa_item_dotacao.exercicio             = mapa_item.exercicio
+                   and mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+                   and mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+                   and mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+                   and mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                   and mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+                   and mapa_item_dotacao.cod_item              = mapa_item.cod_item
+                   and mapa_item_dotacao.lote                  = mapa_item.lote
+            inner join compras.mapa
+                   on mapa.cod_mapa      = mapa_item.cod_mapa
+                   and mapa.exercicio      = mapa_item.exercicio
+            inner join compras.mapa_solicitacao
+                    on mapa_solicitacao.exercicio             = mapa_item.exercicio
+                   and mapa_solicitacao.cod_entidade          = mapa_item.cod_entidade
+                   and mapa_solicitacao.cod_solicitacao       = mapa_item.cod_solicitacao
+                   and mapa_solicitacao.cod_mapa              = mapa_item.cod_mapa
+                   and mapa_solicitacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+            inner join compras.solicitacao_homologada
+                    on solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                   and solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                   and solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+            inner join compras.solicitacao
+                    on solicitacao.exercicio       = solicitacao_homologada.exercicio
+                   and solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                   and solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+            inner join compras.solicitacao_item
+                    on solicitacao_item.exercicio          = mapa_item.exercicio
+                   and solicitacao_item.cod_entidade       = mapa_item.cod_entidade
+                   and solicitacao_item.cod_solicitacao    = mapa_item.cod_solicitacao
+                   and solicitacao_item.cod_centro         = mapa_item.cod_centro
+                   and solicitacao_item.cod_item           = mapa_item.cod_item
+                   and solicitacao_item.exercicio          = solicitacao.exercicio
+                   and solicitacao_item.cod_entidade       = solicitacao.cod_entidade
+                   and solicitacao_item.cod_solicitacao    = solicitacao.cod_solicitacao
+             left join compras.solicitacao_item_anulacao
+                    on solicitacao_item_anulacao.exercicio = solicitacao_item.exercicio
+                   and solicitacao_item_anulacao.cod_entidade  = solicitacao_item.cod_entidade
+                   and solicitacao_item_anulacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+                   and solicitacao_item_anulacao.cod_centro = solicitacao_item.cod_centro
+                   and solicitacao_item_anulacao.cod_item = solicitacao_item.cod_item
+            inner join almoxarifado.catalogo_item
+                    on catalogo_item.cod_item = solicitacao_item.cod_item
+            inner join administracao.unidade_medida
+                    on unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
+                   and unidade_medida.cod_unidade = catalogo_item.cod_unidade
+            inner join compras.solicitacao_item_dotacao
+                    on solicitacao_item.exercicio        = solicitacao_item_dotacao.exercicio
+                   and solicitacao_item.cod_entidade     = solicitacao_item_dotacao.cod_entidade
+                   and solicitacao_item.cod_solicitacao  = solicitacao_item_dotacao.cod_solicitacao
+                   and solicitacao_item.cod_centro       = solicitacao_item_dotacao.cod_centro
+                   and solicitacao_item.cod_item         = solicitacao_item_dotacao.cod_item
+                   and mapa_item_dotacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
+            inner join orcamento.entidade
+                    on entidade.cod_entidade = solicitacao_item_dotacao.cod_entidade
+                   and entidade.exercicio = solicitacao_item_dotacao.exercicio
+            inner join sw_cgm
+                    on sw_cgm.numcgm = entidade.numcgm
 
                  where homologacao_anulada.cod_licitacao is null
                    and adjudicacao_anulada.cod_licitacao is null";
@@ -959,6 +1159,7 @@ from (
                    and cotacao_licitacao.lote                = adjudicacao.lote
                    and cotacao_licitacao.cod_item            = adjudicacao.cod_item
                    and cotacao_licitacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                   and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                    and cotacao_licitacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
             inner join licitacao.licitacao
                     on licitacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
@@ -1403,6 +1604,7 @@ from (
                          and cotacao_licitacao.lote                = adjudicacao.lote
                          and cotacao_licitacao.cod_item            = adjudicacao.cod_item
                          and cotacao_licitacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                         and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                          and cotacao_licitacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
                  and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                   inner join licitacao.licitacao
@@ -1676,4 +1878,6 @@ function recuperaSolicitacaoLicitacaoNaoAnulada(&$rsRecordSet, $stFiltro = "", $
 
         return $this->executaRecuperaSql($stSql, $rsRecordSet, '', '', $boTransacao);
     }
+    
+    public function __destruct() {}   
 }

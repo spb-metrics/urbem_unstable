@@ -26,7 +26,7 @@
 /**
     * @author Analista: Gelson Goncalves
     * @author Desenvolvedor: Lisiane Morais
-    * $Id: TLicitacaoJustificativaRazao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TLicitacaoJustificativaRazao.class.php 63178 2015-07-31 20:11:32Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -42,11 +42,12 @@ class TLicitacaoJustificativaRazao extends Persistente
         $this->setCampoCod('cod_licitacao');
         $this->setComplementoChave('cod_entidade,exercicio,cod_modalidade');
 
-        $this->AddCampo( 'cod_licitacao'	,'integer'     , true	, ''	,true	,false  );
-        $this->AddCampo( 'cod_entidade'       	,'integer'	, true	, '' 	,true  	,true	);
-        $this->AddCampo( 'cod_modalidade'   	,'integer'      , true	, '' 	,true  	,true   );
-        $this->AddCampo( 'exercicio'            ,'char'		, true	, '4' 	,true  	,true	);
-        $this->AddCampo( 'justificativa'        ,'varchar'      , false , '250' ,false  ,false  );
-        $this->AddCampo( 'razao'                ,'varchar'      , false , '250' ,false  ,false  );
+        $this->AddCampo( 'cod_licitacao'	   ,'integer' , true  , ''	  , true  , false );
+        $this->AddCampo( 'cod_entidade'        ,'integer' , true  , ''    , true  , true  );
+        $this->AddCampo( 'cod_modalidade'      ,'integer' , true  , ''    , true  , true  );
+        $this->AddCampo( 'exercicio'           ,'char'	  , true  , '4'   , true  , true  );
+        $this->AddCampo( 'justificativa'       ,'varchar' , false , '250' , false , false );
+        $this->AddCampo( 'razao'               ,'varchar' , false , '250' , false , false );
+        $this->AddCampo( 'fundamentacao_legal' ,'varchar' , false , '250' , false , false );
     }
 }

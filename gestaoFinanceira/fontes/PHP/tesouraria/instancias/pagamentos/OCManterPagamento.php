@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterPagamento.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterPagamento.php 63464 2015-08-31 17:30:39Z michel $
 
     $Revision: 31732 $
     $Name$
@@ -44,11 +44,11 @@
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoBanco.class.php" );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php" );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaSaldoTesouraria.class.php" );
-include_once( CAM_GF_TES_MAPEAMENTO."TTesourariaChequeEmissaoOrdemPagamento.class.php" );
-include_once( CAM_GPC_TCEAL_MAPEAMENTO."TTCEALPagamentoTipoDocumento.class.php");
+include_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoBanco.class.php';
+include_once CAM_GF_TES_NEGOCIO.'RTesourariaBoletim.class.php';
+include_once CAM_GF_TES_NEGOCIO.'RTesourariaSaldoTesouraria.class.php';
+include_once CAM_GF_TES_MAPEAMENTO.'TTesourariaChequeEmissaoOrdemPagamento.class.php';
+include_once CAM_GPC_TCEAL_MAPEAMENTO.'TTCEALPagamentoTipoDocumento.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterPagamento";
@@ -544,5 +544,28 @@ switch ($stCtrl) {
                 SistemaLegado::executaFrameOculto("jq('#nuDoc').val(".$inNumCheque.");");
             break;
         }
+    break;
+
+    ###TCMBA
+    case 'montaDocumentoTCMBA':
+        $inNumCheque = '';
+        if ($_REQUEST['inCodTipoPagamento']==1) {
+            $idCodOrdem       = $_REQUEST['inCodOrdem'];
+            $stExercicioOrdem = $_REQUEST['stExercicioOrdem'];
+            $inCodEntidade    = $_REQUEST['inCodEntidade'];
+            $rsRecordset      = new RecordSet;
+
+            if (($idCodOrdem != '') && ($stExercicioOrdem != '')) {
+                $obTTesourariaChequeEmissaoOrdemPagamento = new TTesourariaChequeEmissaoOrdemPagamento;
+                $obTTesourariaChequeEmissaoOrdemPagamento->setDado('cod_ordem', $idCodOrdem);
+                $obTTesourariaChequeEmissaoOrdemPagamento->setDado('exercicio', $stExercicioOrdem);
+                $obTTesourariaChequeEmissaoOrdemPagamento->recuperaTodos($rsRecordset, " WHERE cod_ordem=".$idCodOrdem." AND exercicio='".$stExercicioOrdem."' AND cod_entidade =".$inCodEntidade);
+            }
+
+            if ($rsRecordset->inNumLinhas > 0) {
+                $inNumCheque = $rsRecordset->getCampo('num_cheque');
+            }
+        }
+        SistemaLegado::executaFrameOculto("jq_('#numDocPagamento').val('".$inNumCheque."');");
     break;
 }

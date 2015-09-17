@@ -273,15 +273,11 @@ function recuperaAnexoDCAIF(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTran
 function montaRecuperaAnexoDCAIF()
 {
     $stSql  = " SELECT 
-                        nom_entidade
-                      , cod_estrutural
+                        cod_estrutural
                       , COALESCE(descricao, 'Não há descrição informada') AS descricao
-                      , to_real(SUM(COALESCE(vl_processados_exercicios_anteriores, 0.00))) AS vl_processados_exercicios_anteriores
-                      , to_real(SUM(COALESCE(vl_processados_exercicio_anterior, 0.00))) AS vl_processados_exercicio_anterior
+                      , publico.fn_nivel(cod_estrutural) AS nivel                      
                       , to_real(SUM(COALESCE(vl_processados_cancelado, 0.00))) AS vl_processados_cancelado
-                      , to_real(SUM(COALESCE(vl_processados_pago, 0.00))) AS vl_processados_pago
-                      , to_real(SUM(COALESCE(vl_nao_processados_exercicios_anteriores, 0.00))) AS vl_nao_processados_exercicios_anteriores
-                      , to_real(SUM(COALESCE(vl_nao_processados_exercicio_anterior, 0.00))) AS vl_nao_processados_exercicio_anterior
+                      , to_real(SUM(COALESCE(vl_processados_pago, 0.00))) AS vl_processados_pago                      
                       , to_real(SUM(COALESCE(vl_nao_processados_cancelado, 0.00))) AS vl_nao_processados_cancelado
                       , to_real(SUM(COALESCE(vl_nao_processados_pago, 0.00))) AS vl_nao_processados_pago
     
@@ -289,8 +285,7 @@ function montaRecuperaAnexoDCAIF()
                                                     ,'".$this->getDado('cod_entidade')."'::varchar
                                                     ,'".$this->getDado('data_final')."'::varchar)
                   AS retorno(
-                        nom_entidade                             varchar
-                      , cod_estrutural                           varchar
+                        cod_estrutural                           varchar
                       , descricao                                varchar
                       , vl_processados_exercicios_anteriores     numeric
                       , vl_processados_exercicio_anterior        numeric
@@ -301,9 +296,12 @@ function montaRecuperaAnexoDCAIF()
                       , vl_nao_processados_cancelado             numeric
                       , vl_nao_processados_pago                  numeric
                     )
+                WHERE vl_processados_cancelado                 <> 0.00
+                   OR vl_processados_pago                      <> 0.00
+                   OR vl_nao_processados_cancelado             <> 0.00
+                   OR vl_nao_processados_pago                  <> 0.00
                
-               GROUP BY nom_entidade
-                      , cod_estrutural
+               GROUP BY cod_estrutural
                       , descricao
                
                ORDER BY cod_estrutural";

@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Leandro André Zis
 
-    * $Id: OCManterContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterContrato.php 63565 2015-09-11 11:25:25Z carlos.silva $
 
     * Casos de uso : uc-03.05.22
 */
@@ -113,6 +113,39 @@ function buscaDocumentoFornecedor($inCgmFornecedor, $inCodDocumento)
 }
 
 switch ($_REQUEST['stCtrl']) {
+   
+    case "MontaUnidade":
+        include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+        if ($_REQUEST["inNumOrgao"]) {
+            $stCombo  = "inNumUnidade";
+            $stComboTxt  = "inNumUnidadeTxt";
+            $stJs .= "limpaSelect(f.$stCombo,0); \n";
+            $stJs .= "f.$stComboTxt.value='".$_REQUEST["inNumUnidade"]."'; \n";
+            $stJs .= "f.$stCombo.value='".$_REQUEST["inNumUnidade"]."'; \n";
+            $stJs .= "f.$stCombo.options[0] = new Option('Selecione','', 'selected');\n";
+            
+            $obREmpenhoPreEmpenho = new REmpenhoPreEmpenho;
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($_REQUEST["inNumOrgao"]);
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->consultar( $rsCombo, $stFiltro,"", $boTransacao );
+            
+            $inCount = 0;
+            while (!$rsCombo->eof()) {
+                $inCount++;
+                $inId   = $rsCombo->getCampo("num_unidade");
+                $stDesc = $rsCombo->getCampo("nom_unidade");
+                if( $_REQUEST["inNumUnidade"] == $inId ) {
+                    $stJs .= 'jq("select#inNumUnidade").append("<option value=\"'.$inId.'\" selected=\"selected\">'.$stDesc.'</option>");';
+                } else {
+                    $stJs .= 'jq("select#inNumUnidade").append("<option value=\"'.$inId.'\">'.$stDesc.'</option>");';
+                }
+                
+                $rsCombo->proximo();
+            }
+        }
+        
+        echo $stJs;
+    break;
+    
     case "montaAtributos":
     $stJs = montaAtributos( $_REQUEST['inCodDocumento'] );
     $stJs .= buscaDocumentoFornecedor ( $_REQUEST['inCGMContratado']  , $_REQUEST['inCodDocumento'] ) ;
@@ -178,10 +211,10 @@ switch ($_REQUEST['stCtrl']) {
         $obTLicitacacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
         $obTLicitacacaoContrato->recuperaValorContrato($rsValorContrato);
 
-        $nmValorContrato = $rsValorContrato->getCampo('valor_contrato');
-        $nmValorContrato = number_format($nmValorContrato, 2, ',', '.');
-        $stJs.= " d.getElementById('nmValorContrato').innerHTML = '".$nmValorContrato."';";
-        $stJs.= " d.getElementById('hdnValorContrato').value = '".$nmValorContrato."';";
+        $vlContrato = $rsValorContrato->getCampo('valor_contrato');
+        $vlContrato = number_format($vlContrato, 2, ',', '.');
+        $stJs.= " d.getElementById('vlContrato').value = '".$vlContrato."';";
+        $stJs.= " d.getElementById('hdnValorContrato').value = '".$vlContrato."';";
         $selected = 'selected';
         }
         $selected = isset($selected) ? $selected : "";
@@ -192,7 +225,7 @@ switch ($_REQUEST['stCtrl']) {
     } else {
         $stJs = "d.getElementById('stDescObjeto').innerHTML = '&nbsp;';\n";
         $stJs.= "f.hdnDescObjeto.value = '';\n";
-        $stJs.= " d.getElementById('nmValorContrato').innerHTML = '';";
+        $stJs.= " d.getElementById('vlContrato').value = '';";
         $stJs.= " d.getElementById('hdnValorContrato').value = '';";
         $stJs.= "f.inCGMContratado.selectedIndex =  0;\n";
         $stJs.= "limpaSelect(f.inCGMContratado,1);\n";
@@ -908,14 +941,14 @@ function preencheValorContrato()
         $obTLicitacacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
         $obTLicitacacaoContrato->recuperaValorContrato($rsValorContrato);
 
-        $nmValorContrato = $rsValorContrato->getCampo('valor_contrato');
-        $nmValorContrato = number_format($nmValorContrato, 2, ',', '.');
-        $stJs.= " d.getElementById('nmValorContrato').innerHTML = '".$nmValorContrato."';";
-        $stJs.= " d.getElementById('hdnValorContrato').value = '".$nmValorContrato."';";
+        $vlContrato = $rsValorContrato->getCampo('valor_contrato');
+        $vlContrato = number_format($vlContrato, 2, ',', '.');
+        $stJs.= " d.getElementById('vlContrato').value = '".$vlContrato."';";
+        $stJs.= " d.getElementById('hdnValorContrato').value = '".$vlContrato."';";
 
         echo $stJs;
     } else {
-        $stJs.= " d.getElementById('nmValorContrato').innerHTML = '';";
+        $stJs.= " d.getElementById('vlContrato').value = '';";
         $stJs.= " d.getElementById('hdnValorContrato').value = '';";
         echo $stJs;
    }

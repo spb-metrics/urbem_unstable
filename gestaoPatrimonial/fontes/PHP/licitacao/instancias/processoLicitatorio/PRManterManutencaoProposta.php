@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-03.05.25
 
-    $Id: PRManterManutencaoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterManutencaoProposta.php 63367 2015-08-20 21:27:34Z michel $
 
 */
 
@@ -63,23 +63,23 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
     $link.="&".$campo."=".$valor;
     }
 
+    $inCodMapa = $_REQUEST['inCodMapa'];
+    $stExercicioMapa = $_REQUEST['stExercicioMapa'];
     SistemaLegado::alertaAviso($pgGera."?inCodCotacao=".$inCodCotacao.$link,"Manutenção de Proposta do Mapa ".$inCodMapa."/".$stExercicioMapa." gravada com sucesso!".$stAlerta.$stMensagemErro,"aviso","aviso", Sessao::getId(), "../");
-
 } else {
-
     function salvarProposta()
     {
         global $request;
 
-    //Define o nome dos arquivos PHP - Este tela é usada na compra direta e na licitação
-    $stPrograma = "ManterManutencaoProposta";
-    $pgFilt = "FL".$stPrograma.".php";
-    $pgForm = "FM".$stPrograma.".php";
-    $pgProc = "PR".$stPrograma.".php";
-    $pgOcul = "OC".$stPrograma.".php";
-    $pgGera = "OCGera".$stPrograma.".php";
+        //Define o nome dos arquivos PHP - Este tela é usada na compra direta e na licitação
+        $stPrograma = "ManterManutencaoProposta";
+        $pgFilt = "FL".$stPrograma.".php";
+        $pgForm = "FM".$stPrograma.".php";
+        $pgProc = "PR".$stPrograma.".php";
+        $pgOcul = "OC".$stPrograma.".php";
+        $pgGera = "OCGera".$stPrograma.".php";
 
-    $stAcao = $request->get('stAcao');
+        $stAcao = $request->get('stAcao');
 
         list( $diaM , $mesM , $anoM ) = explode( '/' , $_REQUEST['stDataManutencao'] );
         $dataM = $anoM."-".$mesM."-".$diaM." ".date("H:i:s");
@@ -101,7 +101,7 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
         }
 
         //inicia a transacao
-    Sessao::setTrataExcecao( true );
+        Sessao::setTrataExcecao( true );
 
         $arManterPropostas = Sessao::read('arManterPropostas');
         $rsParticipantes = $arManterPropostas['rsParticipantes'];
@@ -150,24 +150,24 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
 
             //verifica se possui marcas que não estão cadastradas no sistema (importação)
             while ( !$rsItensParticipante->eof() ) {
-            if ( ($rsItensParticipante->getCampo('desc_marca') != "") && ( $rsItensParticipante->getCampo('cod_marca') == "") ) {
-                $marcaJaExiste = SistemaLegado::pegaDado("descricao","almoxarifado.marca"," where descricao LIKE '".$rsItensParticipante->getCampo('desc_marca')."'");
-                $jaEstaNoArray = false;
+                if ( ($rsItensParticipante->getCampo('desc_marca') != "") && ( $rsItensParticipante->getCampo('cod_marca') == "") ) {
+                    $marcaJaExiste = SistemaLegado::pegaDado("descricao","almoxarifado.marca"," where descricao LIKE '".$rsItensParticipante->getCampo('desc_marca')."'");
+                    $jaEstaNoArray = false;
 
-                foreach ($arCadastrarMarcas as $chave =>$descricaoMarcas) {
-                    if ($descricaoMarcas['marca'] == $rsItensParticipante->getCampo('desc_marca')) {
-                    $jaEstaNoArray = true;
-                }
-                }
+                    foreach ($arCadastrarMarcas as $chave =>$descricaoMarcas) {
+                        if ($descricaoMarcas['marca'] == $rsItensParticipante->getCampo('desc_marca')) {
+                            $jaEstaNoArray = true;
+                        }
+                    }
 
-                if (($marcaJaExiste == "") && ($jaEstaNoArray==false)) {
-                $arCadastrarMarcas[]['marca'] = $rsItensParticipante->getCampo('desc_marca');
+                    if (($marcaJaExiste == "") && ($jaEstaNoArray==false)) {
+                        $arCadastrarMarcas[]['marca'] = $rsItensParticipante->getCampo('desc_marca');
+                    }
                 }
-            }
                 $rsItensParticipante->proximo();
-        }
+            }
 
-        $rsParticipantes->proximo();
+            $rsParticipantes->proximo();
         }
 
         //verifica se ao final do processamento pode encerrar o programa ou não
@@ -261,8 +261,8 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
 
             $obTComprasMapaCotacao->recuperaTodos($rsMapaCotacao,$stFiltroMapaCotacao);
 
-        if (Sessao::getExcecao()->getDescricao() == "Nenhum registro encontrado!") {
-            Sessao::getExcecao()->setDescricao("");
+            if (Sessao::getExcecao()->getDescricao() == "Nenhum registro encontrado!") {
+                Sessao::getExcecao()->setDescricao("");
             }
 
             $codCotacaoSessao = Sessao::read("codCotacao");
@@ -281,176 +281,174 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
 
             // se nao existir cotacao para o mapa, inclui!
             if (!$arManterPropostas["cod_cotacao"]) {
+                $exercicio = Sessao::getExercicio();
 
-            $exercicio = Sessao::getExercicio();
+                $obTComprasCotacao->setDado('exercicio', $exercicio);
+                $obTComprasCotacao->setDado('timestamp', $dataM);
 
-            $obTComprasCotacao->setDado('exercicio', $exercicio);
-            $obTComprasCotacao->setDado('timestamp', $dataM);
+                $obTComprasCotacao->inclusao();
 
-            $obTComprasCotacao->inclusao();
+                $inCodCotacao = $obTComprasCotacao->getDado('cod_cotacao');
+                $stExercicioCotacao = Sessao::getExercicio();
 
-            $inCodCotacao = $obTComprasCotacao->getDado('cod_cotacao');
-            $stExercicioCotacao = Sessao::getExercicio();
+                $obTComprasMapaCotacao->setDado( 'cod_cotacao'      , $inCodCotacao );
+                $obTComprasMapaCotacao->setDado( 'exercicio_cotacao', $stExercicioCotacao );
+                $obTComprasMapaCotacao->setDado( 'cod_mapa'         , $inCodMapa );
+                $obTComprasMapaCotacao->setDado( 'exercicio_mapa'	, $stExercicioMapa );
+                $obTComprasMapaCotacao->inclusao();
 
-            $obTComprasMapaCotacao->setDado( 'cod_cotacao'      , $inCodCotacao );
-            $obTComprasMapaCotacao->setDado( 'exercicio_cotacao', $stExercicioCotacao );
-            $obTComprasMapaCotacao->setDado( 'cod_mapa'         , $inCodMapa );
-            $obTComprasMapaCotacao->setDado( 'exercicio_mapa'	, $stExercicioMapa );
-            $obTComprasMapaCotacao->inclusao();
+                // inserir itens
+                $rsItens = $arManterPropostas["rsItens"];
+                $obTComprasCotacaoItem = new TComprasCotacaoItem;
+                $rsItens->setPrimeiroElemento();
+                while (  !$rsItens->eof() ) {
+                    $obTComprasCotacaoItem->setDado( 'exercicio' , $stExercicioCotacao);
+                    $obTComprasCotacaoItem->setDado( 'cod_cotacao' , $inCodCotacao );
+                    $obTComprasCotacaoItem->setDado( 'lote' , $rsItens->getCampo( 'lote' ) );
+                    $obTComprasCotacaoItem->setDado( 'cod_item' , $rsItens->getCampo( 'cod_item' ) );
+                    $obTComprasCotacaoItem->setDado( 'quantidade' , str_replace(",", ".", str_replace(".", "", $rsItens->getCampo( 'quantidade' ))) );
+                    $obTComprasCotacaoItem->inclusao();
 
-            // inserir itens
-            $rsItens = $arManterPropostas["rsItens"];
-            $obTComprasCotacaoItem = new TComprasCotacaoItem;
-            $rsItens->setPrimeiroElemento();
-            while (  !$rsItens->eof() ) {
-                $obTComprasCotacaoItem->setDado( 'exercicio' , $stExercicioCotacao);
-                $obTComprasCotacaoItem->setDado( 'cod_cotacao' , $inCodCotacao );
-                $obTComprasCotacaoItem->setDado( 'lote' , $rsItens->getCampo( 'lote' ) );
-                $obTComprasCotacaoItem->setDado( 'cod_item' , $rsItens->getCampo( 'cod_item' ) );
-                $obTComprasCotacaoItem->setDado( 'quantidade' , str_replace(",", ".", str_replace(".", "", $rsItens->getCampo( 'quantidade' ))) );
-                $obTComprasCotacaoItem->inclusao();
+                    $rsItens->proximo();
+                }
+            } else {
+                //se existir , deletar cotacoes de itens existentes
+                $inCodCotacao = $arManterPropostas["cod_cotacao"];
+                $stExercicioCotacao = $arManterPropostas["exercicio_cotacao"];
 
-                $rsItens->proximo();
-            }
-    } else {
-        //se existir , deletar cotacoes de itens existentes
+                if ($stAcao != "dispensaLicitacao") {
+                    $obTLicitacaoCotacaoLicitacao = new TLicitacaoCotacaoLicitacao();
+                    $obTLicitacaoCotacaoLicitacao->setDado('cod_cotacao',$inCodCotacao);
+                    $obTLicitacaoCotacaoLicitacao->setDado('exercicio_cotacao',$stExercicioCotacao);
+                    $obTLicitacaoCotacaoLicitacao->exclusao();
+                }
 
-        $inCodCotacao = $arManterPropostas["cod_cotacao"];
-        $stExercicioCotacao = $arManterPropostas["exercicio_cotacao"];
+                if ($_REQUEST['stDataManutencao'] != '') {
+                    $obTComprasCotacao = new TComprasCotacao();
+                    $obTComprasCotacao->setDado('exercicio', Sessao::getExercicio());
+                    $obTComprasCotacao->setDado('cod_cotacao', $inCodCotacao);
+                    $obTComprasCotacao->recuperaTodos($rsMapaCotacao);
 
-        if ($stAcao != "dispensaLicitacao") {
-            $obTLicitacaoCotacaoLicitacao = new TLicitacaoCotacaoLicitacao();
-            $obTLicitacaoCotacaoLicitacao->setDado('cod_cotacao',$inCodCotacao);
-            $obTLicitacaoCotacaoLicitacao->setDado('exercicio_cotacao',$stExercicioCotacao);
-            $obTLicitacaoCotacaoLicitacao->exclusao();
-        }
+                    $obTComprasCotacao->setDado('timestamp', $dataM);
+                    $obTComprasCotacao->alteracao();
+                }
 
-        if ($_REQUEST['stDataManutencao'] != '') {
-            $obTComprasCotacao = new TComprasCotacao();
-            $obTComprasCotacao->setDado('exercicio', Sessao::getExercicio());
-            $obTComprasCotacao->setDado('cod_cotacao', $inCodCotacao);
-            $obTComprasCotacao->recuperaTodos($rsMapaCotacao);
+                $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem;
 
-            $obTComprasCotacao->setDado('timestamp', $dataM);
-            $obTComprasCotacao->alteracao();
-        }
+                $stAux = $obTComprasCotacaoFornecedorItem->getComplementoChave();
+                $obTComprasCotacaoFornecedorItem->setComplementoChave('cod_cotacao,exercicio');
 
-        $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem;
+                $obTComprasCotacaoFornecedorItem->setDado('exercicio',$stExercicioCotacao );
+                $obTComprasCotacaoFornecedorItem->setDado('cod_cotacao',$inCodCotacao );
+                $obTComprasCotacaoFornecedorItem->exclusao();
 
-        $stAux = $obTComprasCotacaoFornecedorItem->getComplementoChave();
-        $obTComprasCotacaoFornecedorItem->setComplementoChave('cod_cotacao,exercicio');
-
-        $obTComprasCotacaoFornecedorItem->setDado('exercicio',$stExercicioCotacao );
-        $obTComprasCotacaoFornecedorItem->setDado('cod_cotacao',$inCodCotacao );
-        $obTComprasCotacaoFornecedorItem->exclusao();
-
-        $obTComprasCotacaoFornecedorItem->setComplementoChave($stAux);
-    }
-
-    // inserir contações por participantes
-    $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem;
-
-    // licitacao_cotacao
-    $obLicitacaoCotacaoLicitacao = new TLicitacaoCotacaoLicitacao;
-
-    $rsParticipantes = $arManterPropostas["rsParticipantes"];
-    $rsParticipantes->setPrimeiroElemento();
-    $inTotalParticipantes = $rsParticipantes->getNumLinhas();
-    $inTotalParticipantesCadastrados = 0;
-
-    $rsParticipantes->setPrimeiroElemento();
-    while (  !$rsParticipantes->eof() ) {
-    $rsItens = $rsParticipantes->getCampo('rsItens');
-    $rsItens->setPrimeiroElemento();
-    $boCadastrado = false;
-
-    while (  !$rsItens->eof() ) {
-        if ( (int) $rsItens->getCampo('cod_marca') >= 0 && is_numeric($rsItens->getCampo('cod_marca')) && $rsItens->getCampo('valor_unitario') != '0,00' && $rsItens->getCampo('valor_unitario') !='' ) {
-        if (!$boCadastrado) {
-            $inTotalParticipantesCadastrados++;
-            $boCadastrado = true;
-        }
-        //VALIDANDO ITEM MARCA
-        $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
-        $stFiltro = " AND acim.cod_marca = ".$rsItens->getCampo('cod_marca')." AND acim.cod_item = ".$rsItens->getCampo('cod_item');
-        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-
-        if ($rsItemMarca->getNumLinhas() < 1) {
-            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item',$rsItens->getCampo('cod_item'));
-            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca',$rsItens->getCampo('cod_marca'));
-            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
-        }
-
-        // tratar data
-        list( $dia , $mes , $ano ) = explode( '/' , $rsItens->getCampo('data_validade') );
-
-        // tratar valor cotacao
-        $nuValor = str_replace('.' , '' , $rsItens->getCampo('valor_total'));
-        $nuValor = str_replace(',' , '.' , $nuValor );
-
-        $obTComprasCotacaoFornecedorItem->setDado('exercicio',$stExercicioCotacao );
-        $obTComprasCotacaoFornecedorItem->setDado('cod_cotacao',$inCodCotacao );
-        $obTComprasCotacaoFornecedorItem->setDado('cod_item',$rsItens->getCampo('cod_item') );
-        $obTComprasCotacaoFornecedorItem->setDado('lote',$rsItens->getCampo('lote') );
-        $obTComprasCotacaoFornecedorItem->setDado('cgm_fornecedor',$rsParticipantes->getCampo('cgm_fornecedor') );
-        $obTComprasCotacaoFornecedorItem->setDado('cod_marca',$rsItens->getCampo('cod_marca') );
-        $obTComprasCotacaoFornecedorItem->setDado('dt_validade', '\''. $ano . '-' . $mes . '-' . $dia . '\'');
-        $obTComprasCotacaoFornecedorItem->setDado('vl_cotacao',$nuValor );
-            $obTComprasCotacaoFornecedorItem->setDado('timestamp', $dataM);
-            $obTComprasCotacaoFornecedorItem->inclusao();
-
-            // se tiver licitacao , ligar cotacao com licitacao
-        if ($stAcao != "dispensaLicitacao") {
-            if ($arManterPropostas['licitacao']['cod_licitacao']) {
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cod_licitacao' , $arManterPropostas['licitacao']['cod_licitacao'] );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cod_modalidade', $arManterPropostas['licitacao']['cod_modalidade'] );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cod_entidade' , $arManterPropostas['licitacao']['cod_entidade'] );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'exercicio_licitacao' , $arManterPropostas['licitacao']['exercicio'] );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'lote' , $rsItens->getCampo('lote') );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cod_cotacao' , $inCodCotacao );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cod_item' , $rsItens->getCampo('cod_item') );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'exercicio_cotacao' , $stExercicioCotacao );
-            $obLicitacaoCotacaoLicitacao->setDado ( 'cgm_fornecedor' , $rsParticipantes->getCampo('cgm_fornecedor') );
-            $obLicitacaoCotacaoLicitacao->inclusao();
-            }
-        }
-        }
-
-        $rsItens->proximo();
-        }
-
-        $rsParticipantes->proximo();
-    }
-
-    Sessao::write('arManterPropostas', $arManterPropostas);
-
-    if ($inTotalParticipantes != $inTotalParticipantesCadastrados) {
-        $stAlerta = " (Existem participantes sem proposta lançada!) ";
-    }
-
-    if (!Sessao::read('manutencaoPropostas')) {
-        $link = "";
-        $arLink = Sessao::read('link');
-
-        if (is_array($arLink)) {
-            foreach ($arLink as $campo =>$valor) {
-                $link.="&".$campo."=".$valor;
-            }
-        }
-
-        if ($_REQUEST['boImprimirComparativo'] == "sim") {
-              foreach ($_REQUEST as $campo =>$valor) {
-                $link.="&".$campo."=".$valor;
+                $obTComprasCotacaoFornecedorItem->setComplementoChave($stAux);
             }
 
-            SistemaLegado::alertaAviso($pgGera."?inCodCotacao=".$inCodCotacao.$link,"Manutenção de Proposta do Mapa ".$inCodMapa."/".$stExercicioMapa." gravada com sucesso!".$stAlerta.$stMensagemErro,"aviso","aviso", Sessao::getId(), "../");
-        } else {
-            SistemaLegado::alertaAviso($pgList."?stAcao=$stAcao&".Sessao::getId().$link,"Manutenção de Proposta do Mapa ".$inCodMapa."/".$stExercicioMapa." gravada com sucesso!".$stAlerta.$stMensagemErro,"aviso","aviso", Sessao::getId(), "../");
-    }
-    } else {
-        Sessao::write("codCotacao", $inCodCotacao);
-    }
-    }
+            // inserir contações por participantes
+            $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem;
+
+            // licitacao_cotacao
+            $obLicitacaoCotacaoLicitacao = new TLicitacaoCotacaoLicitacao;
+
+            $rsParticipantes = $arManterPropostas["rsParticipantes"];
+            $rsParticipantes->setPrimeiroElemento();
+            $inTotalParticipantes = $rsParticipantes->getNumLinhas();
+            $inTotalParticipantesCadastrados = 0;
+
+            $rsParticipantes->setPrimeiroElemento();
+            while (  !$rsParticipantes->eof() ) {
+                $rsItens = $rsParticipantes->getCampo('rsItens');
+                $rsItens->setPrimeiroElemento();
+                $boCadastrado = false;
+
+                while (  !$rsItens->eof() ) {
+                    if ( (int) $rsItens->getCampo('cod_marca') >= 0 && is_numeric($rsItens->getCampo('cod_marca')) && $rsItens->getCampo('valor_unitario') != '0,00' && $rsItens->getCampo('valor_unitario') !='' ) {
+                        if (!$boCadastrado) {
+                            $inTotalParticipantesCadastrados++;
+                            $boCadastrado = true;
+                        }
+                        //VALIDANDO ITEM MARCA
+                        $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
+                        $stFiltro = " AND acim.cod_marca = ".$rsItens->getCampo('cod_marca')." AND acim.cod_item = ".$rsItens->getCampo('cod_item');
+                        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
+
+                        if ($rsItemMarca->getNumLinhas() < 1) {
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item',$rsItens->getCampo('cod_item'));
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca',$rsItens->getCampo('cod_marca'));
+                            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                        }
+
+                        // tratar data
+                        list( $dia , $mes , $ano ) = explode( '/' , $rsItens->getCampo('data_validade') );
+
+                        // tratar valor cotacao
+                        $nuValor = str_replace('.' , '' , $rsItens->getCampo('valor_total'));
+                        $nuValor = str_replace(',' , '.' , $nuValor );
+
+                        $obTComprasCotacaoFornecedorItem->setDado('exercicio',$stExercicioCotacao );
+                        $obTComprasCotacaoFornecedorItem->setDado('cod_cotacao',$inCodCotacao );
+                        $obTComprasCotacaoFornecedorItem->setDado('cod_item',$rsItens->getCampo('cod_item') );
+                        $obTComprasCotacaoFornecedorItem->setDado('lote',$rsItens->getCampo('lote') );
+                        $obTComprasCotacaoFornecedorItem->setDado('cgm_fornecedor',$rsParticipantes->getCampo('cgm_fornecedor') );
+                        $obTComprasCotacaoFornecedorItem->setDado('cod_marca',$rsItens->getCampo('cod_marca') );
+                        $obTComprasCotacaoFornecedorItem->setDado('dt_validade', '\''. $ano . '-' . $mes . '-' . $dia . '\'');
+                        $obTComprasCotacaoFornecedorItem->setDado('vl_cotacao',$nuValor );
+                        $obTComprasCotacaoFornecedorItem->setDado('timestamp', $dataM);
+                        $obTComprasCotacaoFornecedorItem->inclusao();
+
+                        // se tiver licitacao , ligar cotacao com licitacao
+                        if ($stAcao != "dispensaLicitacao") {
+                            if ($arManterPropostas['licitacao']['cod_licitacao']) {
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cod_licitacao' , $arManterPropostas['licitacao']['cod_licitacao'] );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cod_modalidade', $arManterPropostas['licitacao']['cod_modalidade'] );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cod_entidade' , $arManterPropostas['licitacao']['cod_entidade'] );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'exercicio_licitacao' , $arManterPropostas['licitacao']['exercicio'] );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'lote' , $rsItens->getCampo('lote') );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cod_cotacao' , $inCodCotacao );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cod_item' , $rsItens->getCampo('cod_item') );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'exercicio_cotacao' , $stExercicioCotacao );
+                                $obLicitacaoCotacaoLicitacao->setDado ( 'cgm_fornecedor' , $rsParticipantes->getCampo('cgm_fornecedor') );
+                                $obLicitacaoCotacaoLicitacao->inclusao();
+                            }
+                        }
+                    }
+
+                    $rsItens->proximo();
+                }
+
+                $rsParticipantes->proximo();
+            }
+
+            Sessao::write('arManterPropostas', $arManterPropostas);
+
+            if ($inTotalParticipantes != $inTotalParticipantesCadastrados) {
+                $stAlerta = " (Existem participantes sem proposta lançada!) ";
+            }
+        
+            if (!Sessao::read('manutencaoPropostas')) {
+                $link = "";
+                $arLink = Sessao::read('link');
+
+                if (is_array($arLink)) {
+                    foreach ($arLink as $campo =>$valor) {
+                        $link.="&".$campo."=".$valor;
+                    }
+                }
+
+                if ($_REQUEST['boImprimirComparativo'] == "sim") {
+                    foreach ($_REQUEST as $campo =>$valor) {
+                        $link.="&".$campo."=".$valor;
+                    }
+
+                    SistemaLegado::alertaAviso($pgGera."?inCodCotacao=".$inCodCotacao.$link,"Manutenção de Proposta do Mapa ".$inCodMapa."/".$stExercicioMapa." gravada com sucesso!".$stAlerta.$stMensagemErro,"aviso","aviso", Sessao::getId(), "../");
+                } else {
+                    SistemaLegado::alertaAviso($pgList."?stAcao=$stAcao&".Sessao::getId().$link,"Manutenção de Proposta do Mapa ".$inCodMapa."/".$stExercicioMapa." gravada com sucesso!".$stAlerta.$stMensagemErro,"aviso","aviso", Sessao::getId(), "../");
+                }
+            } else {
+                Sessao::write("codCotacao", $inCodCotacao);
+            }
+        }
         //encerra a transacao
         Sessao::encerraExcecao();
 

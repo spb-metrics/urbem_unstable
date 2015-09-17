@@ -91,11 +91,15 @@ function TLicitacaoContratoAditivos()
     $this->AddCampo('exercicio', 'char', true, '4', true, false);
     $this->AddCampo('cod_entidade', 'integer', true, '', true, true);
     $this->AddCampo('responsavel_juridico', 'integer', true, '', false, true);
+    $this->AddCampo('tipo_termo_aditivo', 'integer', true, '', false, true);
+    $this->AddCampo('tipo_valor', 'integer', true, '', false, true);
     $this->AddCampo('dt_vencimento', 'date', true, '', false, false);
     $this->AddCampo('dt_assinatura', 'date', true, '', false, false);
     $this->AddCampo('inicio_execucao', 'date', true, '', false, false);
+    $this->AddCampo('fim_execucao', 'date', true, '', false, false);
     $this->AddCampo('valor_contratado', 'numeric', true, '14,2', false, false);
     $this->AddCampo('objeto', 'char', true, '50', false, false);
+    $this->AddCampo('justificativa', 'char', true, '250', false, false);
     $this->AddCampo('fundamentacao', 'char', true, '50', false, false);
 }
 
@@ -128,53 +132,66 @@ function recuperaContratosAditivosLicitacao(&$rsRecordSet, $stFiltro="",$stOrder
 
 function montaRecuperaContratosAditivosLicitacao()
 {
-    $stSQL = "\n SELECT contrato_aditivos.exercicio_contrato "
-            ."\n       , contrato_aditivos.cod_entidade "
-            ."\n       , contrato_aditivos.num_contrato "
-            ."\n       , contrato_aditivos.exercicio as exercicio_aditivo "
-            ."\n       , contrato_aditivos.num_aditivo "
-            ."\n       , contrato_aditivos.responsavel_juridico"
-            ."\n       , to_char(contrato_aditivos.dt_vencimento, 'dd/mm/yyyy') as dt_vencimento"
-            ."\n       , to_char(contrato_aditivos.dt_assinatura, 'dd/mm/yyyy') as dt_assinatura "
-            ."\n       , to_char(contrato_aditivos.inicio_execucao, 'dd/mm/yyyy') as inicio_execucao"
-            ."\n       , contrato_aditivos.valor_contratado"
-            ."\n       , contrato_aditivos.objeto"
-            ."\n       , contrato_aditivos.fundamentacao"
-            ."\n       , contrato.cgm_contratado"
-            ."\n       , sw_cgm.nom_cgm "
-            ."\n       , sw_cgm_responsavel_juridico.nom_cgm as cgm_responsavel_juridico"
-            ."\n FROM licitacao.contrato_aditivos "
-
-            ."\n INNER JOIN licitacao.contrato "
-            ."\n            ON contrato.exercicio = contrato_aditivos.exercicio_contrato "
-            ."\n            AND contrato.cod_entidade = contrato_aditivos.cod_entidade "
-            ."\n            AND contrato.num_contrato = contrato_aditivos.num_contrato "
-
-            ."\n INNER JOIN licitacao.contrato_licitacao"
-            ."\n         ON contrato_licitacao.num_contrato  = contrato.num_contrato"
-            ."\n        AND contrato_licitacao.cod_entidade  = contrato.cod_entidade"
-            ."\n        AND contrato_licitacao.exercicio  = contrato.exercicio"
-
-            ."\n INNER JOIN licitacao.licitacao"
-            ."\n         ON contrato_licitacao.cod_licitacao  = licitacao.cod_licitacao"
-            ."\n        AND contrato_licitacao.cod_entidade  = licitacao.cod_entidade"
-            ."\n        AND contrato_licitacao.exercicio  = licitacao.exercicio"
-            ."\n        AND contrato_licitacao.cod_modalidade  = licitacao.cod_modalidade"
-
-            ."\n INNER JOIN sw_cgm "
-            ."\n            ON sw_cgm.numcgm = contrato.cgm_contratado"
-
-            ."\n INNER JOIN sw_cgm as sw_cgm_responsavel_juridico"
-            ."\n            ON sw_cgm_responsavel_juridico.numcgm = contrato_aditivos.responsavel_juridico"
-
-            ."\n INNER JOIN  orcamento.entidade"
-            ."\n         ON  contrato.cod_entidade = entidade.cod_entidade"
-            ."\n         AND contrato.exercicio = entidade.exercicio"
-
-            ."\n INNER JOIN  sw_cgm AS cgm_entidade"
-            ."\n         ON entidade.numcgm = cgm_entidade.numcgm"
-
-            ."\n WHERE ";
+    $stSQL = "\n SELECT contrato_aditivos.exercicio_contrato 
+                      , contrato_aditivos.cod_entidade 
+                      , contrato_aditivos.num_contrato 
+                      , contrato_aditivos.exercicio as exercicio_aditivo 
+                      , contrato_aditivos.num_aditivo 
+                      , contrato_aditivos.responsavel_juridico
+                      , contrato_aditivos.tipo_termo_aditivo
+                      , contrato_aditivos.tipo_valor
+                      , to_char(contrato_aditivos.dt_vencimento, 'dd/mm/yyyy') as dt_vencimento
+                      , to_char(contrato_aditivos.dt_assinatura, 'dd/mm/yyyy') as dt_assinatura 
+                      , to_char(contrato_aditivos.inicio_execucao, 'dd/mm/yyyy') as inicio_execucao
+                      , to_char(contrato_aditivos.fim_execucao, 'dd/mm/yyyy') as fim_execucao
+                      , contrato_aditivos.valor_contratado
+                      , contrato_aditivos.objeto
+                      , contrato_aditivos.justificativa
+                      , contrato_aditivos.fundamentacao
+                      , contrato.cgm_contratado
+                      , sw_cgm.nom_cgm 
+                      , sw_cgm_responsavel_juridico.nom_cgm as cgm_responsavel_juridico
+                      , tipo_termo_aditivo.descricao as descricao_termo_aditivo
+                      , tipo_alteracao_valor.descricao as descricao_tipo_alteracao_valor
+                      
+                      FROM licitacao.contrato_aditivos 
+               
+                INNER JOIN licitacao.contrato 
+                        ON contrato.exercicio = contrato_aditivos.exercicio_contrato 
+                       AND contrato.cod_entidade = contrato_aditivos.cod_entidade 
+                       AND contrato.num_contrato = contrato_aditivos.num_contrato
+               
+                INNER JOIN licitacao.contrato_licitacao
+                        ON contrato_licitacao.num_contrato  = contrato.num_contrato
+                       AND contrato_licitacao.cod_entidade  = contrato.cod_entidade
+                       AND contrato_licitacao.exercicio  = contrato.exercicio
+               
+                INNER JOIN licitacao.licitacao
+                        ON contrato_licitacao.cod_licitacao  = licitacao.cod_licitacao
+                       AND contrato_licitacao.cod_entidade  = licitacao.cod_entidade
+                       AND contrato_licitacao.exercicio  = licitacao.exercicio
+                       AND contrato_licitacao.cod_modalidade  = licitacao.cod_modalidade
+               
+                INNER JOIN sw_cgm 
+                        ON sw_cgm.numcgm = contrato.cgm_contratado
+               
+                INNER JOIN sw_cgm as sw_cgm_responsavel_juridico
+                        ON sw_cgm_responsavel_juridico.numcgm = contrato_aditivos.responsavel_juridico
+               
+                INNER JOIN  orcamento.entidade
+                        ON  contrato.cod_entidade = entidade.cod_entidade
+                       AND contrato.exercicio = entidade.exercicio
+               
+                INNER JOIN sw_cgm AS cgm_entidade
+                        ON entidade.numcgm = cgm_entidade.numcgm
+                        
+                 LEFT JOIN licitacao.tipo_termo_aditivo
+                        ON tipo_termo_aditivo.cod_tipo = contrato_aditivos.tipo_termo_aditivo
+                 
+                 LEFT JOIN licitacao.tipo_alteracao_valor
+                        ON tipo_alteracao_valor.cod_tipo = contrato_aditivos.tipo_valor  
+               
+                 WHERE ";
 
     if ($this->getDado("num_aditivo")) {
         $stSQL .= " contrato_aditivos.num_aditivo = ".$this->getDado("num_aditivo")." AND  ";
@@ -186,13 +203,13 @@ function montaRecuperaContratosAditivosLicitacao()
         $stSQL .= " contrato_aditivos.num_contrato = ".$this->getDado("num_contrato")." AND  ";
     }
     if ($this->getDado("exercicio")) {
-        $stSQL .= " contrato_aditivos.exercicio = ".$this->getDado("exercicio")." AND  ";
+        $stSQL .= " contrato_aditivos.exercicio = '".$this->getDado("exercicio")."' AND  ";
     }
     if ($this->getDado("exercicio_contrato")) {
-        $stSQL .= " contrato_aditivos.exercicio_contrato = ".$this->getDado("exercicio_contrato")." AND  ";
+        $stSQL .= " contrato_aditivos.exercicio_contrato = '".$this->getDado("exercicio_contrato")."' AND  ";
     }
 
-    $stSQL = substr($stSQL, 0, strlen($stFiltro)-6);
+    $stSQL = substr($stSQL, 0, strlen($stSQL)-6);
 
     return $stSQL;
 }
@@ -210,47 +227,60 @@ function montaRecuperaContratosAditivosCompraDireta()
                         , contrato_aditivos.exercicio as exercicio_aditivo 
                         , contrato_aditivos.num_aditivo 
                         , contrato_aditivos.responsavel_juridico
+                        , contrato_aditivos.tipo_termo_aditivo
+                        , contrato_aditivos.tipo_valor
                         , to_char(contrato_aditivos.dt_vencimento, 'dd/mm/yyyy') as dt_vencimento
                         , to_char(contrato_aditivos.dt_assinatura, 'dd/mm/yyyy') as dt_assinatura 
                         , to_char(contrato_aditivos.inicio_execucao, 'dd/mm/yyyy') as inicio_execucao
+                        , to_char(contrato_aditivos.fim_execucao, 'dd/mm/yyyy') as fim_execucao
                         , contrato_aditivos.valor_contratado
                         , contrato_aditivos.objeto
+                        , contrato_aditivos.justificativa
                         , contrato_aditivos.fundamentacao
                         , contrato.cgm_contratado
                         , sw_cgm.nom_cgm 
                         , sw_cgm_responsavel_juridico.nom_cgm as cgm_responsavel_juridico
-                FROM licitacao.contrato_aditivos
+                        , tipo_termo_aditivo.descricao as descricao_termo_aditivo
+                        , tipo_alteracao_valor.descricao as descricao_tipo_alteracao_valor
+                        
+                      FROM licitacao.contrato_aditivos
 
-                JOIN licitacao.contrato 
-                     ON contrato.exercicio = contrato_aditivos.exercicio_contrato 
-                    AND contrato.cod_entidade = contrato_aditivos.cod_entidade 
-                    AND contrato.num_contrato = contrato_aditivos.num_contrato 
+                INNER JOIN licitacao.contrato 
+                        ON contrato.exercicio = contrato_aditivos.exercicio_contrato 
+                       AND contrato.cod_entidade = contrato_aditivos.cod_entidade 
+                       AND contrato.num_contrato = contrato_aditivos.num_contrato 
 
-                JOIN licitacao.contrato_compra_direta
-                     ON contrato_compra_direta.num_contrato  = contrato.num_contrato
-                    AND contrato_compra_direta.cod_entidade  = contrato.cod_entidade
-                    AND contrato_compra_direta.exercicio  = contrato.exercicio
+                INNER JOIN licitacao.contrato_compra_direta
+                        ON contrato_compra_direta.num_contrato  = contrato.num_contrato
+                       AND contrato_compra_direta.cod_entidade  = contrato.cod_entidade
+                       AND contrato_compra_direta.exercicio  = contrato.exercicio
 
-                JOIN compras.compra_direta
-                     ON contrato_compra_direta.cod_compra_direta  = compra_direta.cod_compra_direta
-                    AND contrato_compra_direta.cod_entidade  = compra_direta.cod_entidade
-                    AND contrato_compra_direta.exercicio  = compra_direta.exercicio_entidade
-                    AND contrato_compra_direta.cod_modalidade  = compra_direta.cod_modalidade
+                INNER JOIN compras.compra_direta
+                        ON contrato_compra_direta.cod_compra_direta  = compra_direta.cod_compra_direta
+                       AND contrato_compra_direta.cod_entidade  = compra_direta.cod_entidade
+                       AND contrato_compra_direta.exercicio  = compra_direta.exercicio_entidade
+                       AND contrato_compra_direta.cod_modalidade  = compra_direta.cod_modalidade
 
-                JOIN sw_cgm 
-                     ON sw_cgm.numcgm = contrato.cgm_contratado
+                INNER JOIN sw_cgm 
+                        ON sw_cgm.numcgm = contrato.cgm_contratado
 
-                JOIN sw_cgm as sw_cgm_responsavel_juridico
-                     ON sw_cgm_responsavel_juridico.numcgm = contrato_aditivos.responsavel_juridico
+                INNER JOIN sw_cgm as sw_cgm_responsavel_juridico
+                        ON sw_cgm_responsavel_juridico.numcgm = contrato_aditivos.responsavel_juridico
 
-                JOIN  orcamento.entidade
-                     ON  contrato.cod_entidade = entidade.cod_entidade
-                    AND contrato.exercicio = entidade.exercicio
+                INNER JOIN  orcamento.entidade
+                        ON  contrato.cod_entidade = entidade.cod_entidade
+                       AND contrato.exercicio = entidade.exercicio
 
-                JOIN  sw_cgm AS cgm_entidade
-                     ON entidade.numcgm = cgm_entidade.numcgm
+                INNER JOIN  sw_cgm AS cgm_entidade
+                        ON entidade.numcgm = cgm_entidade.numcgm
                 
-            ";
+                 LEFT JOIN licitacao.tipo_termo_aditivo
+                        ON tipo_termo_aditivo.cod_tipo = contrato_aditivos.tipo_termo_aditivo
+                 
+                 LEFT JOIN licitacao.tipo_alteracao_valor
+                        ON tipo_alteracao_valor.cod_tipo = contrato_aditivos.tipo_valor  
+                
+               WHERE ";
 
     if ($this->getDado("num_aditivo")) {
         $stSQL .= " contrato_aditivos.num_aditivo = ".$this->getDado("num_aditivo")." AND  ";

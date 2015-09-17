@@ -116,6 +116,7 @@ $obCmbUnidade->setTitle ("Selecione o nome da unidade");
 $obCmbUnidade->setCampoId ("[num_unidade]/[num_orgao]");
 $obCmbUnidade->setCampoDesc ("nom_unidade");
 $obCmbUnidade->addOption ("", "Selecione");
+$obCmbUnidade->setNull (false);
 $obCmbUnidade->preencheCombo ($rsUnidade);
 
 //****************************************//

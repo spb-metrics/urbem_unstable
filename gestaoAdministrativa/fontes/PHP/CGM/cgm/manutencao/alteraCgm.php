@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-01.02.93
 
-    $Id: alteraCgm.php 62988 2015-07-14 18:32:16Z evandro $
+    $Id: alteraCgm.php 63446 2015-08-28 15:00:01Z michel $
 
 */
 
@@ -620,6 +620,7 @@ switch ($controle) {
             dtNascimento=>$_REQUEST['dtNascimento'],
             chSexo=>$_REQUEST['chSexo'],
             rg=>$_REQUEST['rg'],
+            site=>$_REQUEST['stSite'],
             );
 
         $cpfigual = $cpf;

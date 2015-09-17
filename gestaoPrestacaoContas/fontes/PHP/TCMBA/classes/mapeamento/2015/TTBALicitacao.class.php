@@ -33,22 +33,12 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63125 $
+    $Revision: 63289 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
 
     * Casos de uso: uc-06.05.00
-*/
-
-/*
-$Log$
-Revision 1.2  2007/10/02 18:17:17  hboaventura
-inclusão do caso de uso uc-06.05.00
-
-Revision 1.1  2007/08/21 23:53:13  diego
-Primeira versão.
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -68,11 +58,11 @@ class TTBALicitacao extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBALicitacao()
+function __construct()
 {
+    parent::__construct();
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
-    $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
 function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -131,14 +121,14 @@ function montaRecuperaDadosTribunal()
                   FROM licitacao.licitacao
 
             INNER JOIN licitacao.edital
-                    ON edital.cod_licitacao = licitacao.cod_licitacao
-                   AND edital.cod_modalidade = licitacao.cod_modalidade
-                   AND edital.cod_entidade = licitacao.cod_entidade
+                    ON edital.cod_licitacao       = licitacao.cod_licitacao
+                   AND edital.cod_modalidade      = licitacao.cod_modalidade
+                   AND edital.cod_entidade        = licitacao.cod_entidade
                    AND edital.exercicio_licitacao = licitacao.exercicio
 
             INNER JOIN licitacao.publicacao_edital
                     ON publicacao_edital.num_edital = edital.num_edital
-                   AND publicacao_edital.exercicio = edital.exercicio
+                   AND publicacao_edital.exercicio  = edital.exercicio
 
             INNER JOIN licitacao.veiculos_publicidade
                     ON veiculos_publicidade.numcgm = publicacao_edital.numcgm
@@ -150,36 +140,36 @@ function montaRecuperaDadosTribunal()
                     ON objeto.cod_objeto = licitacao.cod_objeto
 
             INNER JOIN licitacao.cotacao_licitacao
-                    ON cotacao_licitacao.cod_licitacao = licitacao.cod_licitacao
-                   AND cotacao_licitacao.cod_modalidade = licitacao.cod_modalidade
-                   AND cotacao_licitacao.cod_entidade = licitacao.cod_entidade
+                    ON cotacao_licitacao.cod_licitacao       = licitacao.cod_licitacao
+                   AND cotacao_licitacao.cod_modalidade      = licitacao.cod_modalidade
+                   AND cotacao_licitacao.cod_entidade        = licitacao.cod_entidade
                    AND cotacao_licitacao.exercicio_licitacao = licitacao.exercicio
 
             INNER JOIN licitacao.adjudicacao
-                    ON adjudicacao.cod_licitacao = cotacao_licitacao.cod_licitacao
-                   AND adjudicacao.cod_modalidade = cotacao_licitacao.cod_modalidade
-                   AND adjudicacao.cod_entidade = cotacao_licitacao.cod_entidade
+                    ON adjudicacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
+                   AND adjudicacao.cod_modalidade      = cotacao_licitacao.cod_modalidade
+                   AND adjudicacao.cod_entidade        = cotacao_licitacao.cod_entidade
                    AND adjudicacao.exercicio_licitacao = cotacao_licitacao.exercicio_licitacao
-                   AND adjudicacao.lote = cotacao_licitacao.lote
-                   AND adjudicacao.cod_cotacao = cotacao_licitacao.cod_cotacao
-                   AND adjudicacao.cod_item = cotacao_licitacao.cod_item
-                   AND adjudicacao.exercicio_cotacao = cotacao_licitacao.exercicio_cotacao
-                   AND adjudicacao.cgm_fornecedor = cotacao_licitacao.cgm_fornecedor
+                   AND adjudicacao.lote                = cotacao_licitacao.lote
+                   AND adjudicacao.cod_cotacao         = cotacao_licitacao.cod_cotacao
+                   AND adjudicacao.cod_item            = cotacao_licitacao.cod_item
+                   AND adjudicacao.exercicio_cotacao   = cotacao_licitacao.exercicio_cotacao
+                   AND adjudicacao.cgm_fornecedor      = cotacao_licitacao.cgm_fornecedor
 
             INNER JOIN licitacao.homologacao
-                    ON homologacao.num_adjudicacao = adjudicacao.num_adjudicacao
-                   AND homologacao.cod_entidade = adjudicacao.cod_entidade
-                   AND homologacao.cod_modalidade = adjudicacao.cod_modalidade
-                   AND homologacao.cod_licitacao = adjudicacao.cod_licitacao
+                    ON homologacao.num_adjudicacao     = adjudicacao.num_adjudicacao
+                   AND homologacao.cod_entidade        = adjudicacao.cod_entidade
+                   AND homologacao.cod_modalidade      = adjudicacao.cod_modalidade
+                   AND homologacao.cod_licitacao       = adjudicacao.cod_licitacao
                    AND homologacao.exercicio_licitacao = adjudicacao.exercicio_licitacao
-                   AND homologacao.cod_item = adjudicacao.cod_item
-                   AND homologacao.cod_cotacao = adjudicacao.cod_cotacao
-                   AND homologacao.lote = adjudicacao.lote
-                   AND homologacao.exercicio_cotacao = adjudicacao.exercicio_cotacao
-                   AND homologacao.cgm_fornecedor = adjudicacao.cgm_fornecedor
+                   AND homologacao.cod_item            = adjudicacao.cod_item
+                   AND homologacao.cod_cotacao         = adjudicacao.cod_cotacao
+                   AND homologacao.lote                = adjudicacao.lote
+                   AND homologacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
+                   AND homologacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
 
-                 WHERE licitacao.cod_modalidade NOT IN (8,9)      
-                   AND licitacao.exercicio = '".$this->getDado('exercicio')."'
+                 WHERE licitacao.cod_modalidade NOT IN (8,9)
+                   AND licitacao.exercicio    = '".$this->getDado('exercicio')."'
                    AND licitacao.cod_entidade IN (".$this->getDado('entidade').")
                    AND TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_fim')."','dd/mm/yyyy')
 
@@ -190,3 +180,5 @@ function montaRecuperaDadosTribunal()
 }
 
 }
+
+?>

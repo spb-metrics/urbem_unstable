@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: PRManterCadastroFerias.php 62879 2015-07-02 18:03:08Z evandro $
+    $Id: PRManterCadastroFerias.php 63555 2015-09-10 17:00:04Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -285,7 +285,7 @@ switch ($stAcao) {
                         $inCodMes = $request->get('inCodMes') ? $request->get('inCodMes') : $request->get('hdninCodMes');
                         $inCodMes = str_pad($inCodMes,2,"0",STR_PAD_LEFT);
                         $boPagar = $request->get('boPagamento13') ? $request->get('boPagamento13') : '';
-                        $boPagar13 = ($boPagar = 1) ? 'true' : 'false';
+                        $boPagar13 = ($boPagar == 1) ? 'true' : 'false';
                         
                         $inCodTipo = $request->get('inCodTipo') ? $request->get('inCodTipo') : 1;
                         $inAnoCompetencia = $request->get('inAno') ? $request->get('inAno') : $request->get('hdninAno');

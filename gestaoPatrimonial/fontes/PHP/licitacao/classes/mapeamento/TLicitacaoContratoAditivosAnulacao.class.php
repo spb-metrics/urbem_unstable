@@ -72,5 +72,6 @@ class TLicitacaoContratoAditivosAnulacao extends Persistente
         $this->AddCampo('cod_entidade', 'integer', true, '', true, true);
         $this->AddCampo('dt_anulacao', 'date', true, '', false, false);
         $this->AddCampo('motivo', 'char', true, '100', false, false);
+        $this->AddCampo('valor_anulacao', 'numeric', true, '14,2', false, false);
     }
 }

@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage 
 
-    $Id:$
+    $Id: despFuncaoSubfuncao.plsql 63314 2015-08-17 13:48:57Z franver $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.fn_desp_funcao_subfuncao(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
@@ -58,7 +58,10 @@ BEGIN
                END AS cod_vinculo
              , CAST(LPAD(despesa.cod_funcao::VARCHAR, 2, ''0'') AS VARCHAR) AS cod_funcao
              , CAST(LPAD(despesa.cod_subfuncao::VARCHAR, 3, ''0'') AS VARCHAR) AS cod_subfuncao
-             , COALESCE(sum(despesa.vl_original), 0.00) AS vl_inicial
+             , CASE WHEN EXTRACT( month FROM TO_DATE('''||stDtInicial||''',''dd/mm/yyyy'') ) = 1
+                    THEN COALESCE(sum(despesa.vl_original), 0.00)
+                    ELSE 0.00
+                END AS vl_inicial
              , COALESCE((sum(coalesce(despesa.vl_original,0.00)) + (sum(coalesce(suplementado.vl_suplementado,0.00)) - sum(coalesce(reduzido.vl_reduzido,0.00)))), 0.00) as vl_atualizada
              , sum(COALESCE((SELECT * FROM tcemg.fn_desp_funcao_subfuncao_empenhada(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''' )), 0.00)) AS vl_empenhado
              , sum(COALESCE((SELECT * FROM stn.fn_rreo_despesa_liquidada_anexo2(despesa.cod_despesa, ''' || stExercicio || ''', ''' || stCodEntidade || ''', ''' || stDtInicial || ''', ''' || stDtFinal || ''', false )), 0.00)) AS vl_liquidado

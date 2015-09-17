@@ -77,235 +77,148 @@ class TTBAConsContRazao extends Persistente
     public function montaRecuperaDados()
     {
         $stSql = " SELECT 1 AS tipo_registro
-                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                        , ".$this->getDado('exercicio')."::VARCHAR||".$this->getDado('mes')." AS competencia
+                        , LPAD(".$this->getDado('unidade_gestora')."::VARCHAR,4,'0') AS unidade_gestora
+                        , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia
                         , '' AS reservado_tcm
-                        , tabela.*
+                        , cod_estrutural AS conta_contabil
+                        , SUM(deb_ant) AS deb_ant
+                        , SUM(cred_ant) AS cred_ant
+                        , SUM(deb_mes) AS deb_mes
+                        , SUM(cred_mes) AS cred_mes
+                        , SUM(deb_mes_ant) AS deb_mes_ant
+                        , SUM(cred_mes_ant) AS cred_mes_ant
+                        , (SUM(COALESCE(deb_mes,0.00))+SUM(COALESCE(deb_mes_ant,0.00))) AS deb_ate_mes
+                        , (SUM(COALESCE(cred_mes,0.00))+SUM(COALESCE(cred_mes_ant,0.00))) AS cred_ate_mes
+                        , (SUM(COALESCE(deb_mes,0.00))+SUM(COALESCE(deb_mes_ant,0.00))) AS deb_exercicio
+                        , (SUM(COALESCE(cred_mes,0.00))+SUM(COALESCE(cred_mes_ant,0.00))) AS cred_exercicio
 
-                    FROM (
-                            SELECT cod_estrutural AS conta_contabil
-                                 , SUM(vl_deb_ant) AS vl_deb_ant
-                                 , SUM(vl_cred_ant) AS vl_cred_ant
-                                 , SUM(vl_deb_mes_ant) AS vl_deb_mes_ant
-                                 , SUM(vl_cred_mes_ant) AS vl_cred_mes_ant
-                                 , SUM(vl_deb_mes) AS vl_deb_mes
-                                 , SUM(vl_cred_mes) AS vl_cred_mes
-                                 , SUM(vl_deb_ate_mes) AS vl_deb_ate_mes
-                                 , SUM(vl_cred_ate_mes) AS vl_cred_ate_mes
-                                 , SUM(vl_deb_exercicio) AS vl_deb_exercicio
-                                 , SUM(vl_cred_exercicio) AS vl_cred_exercicio
-
-                            FROM (
-                                    -- DEBITO
-
-                                    SELECT cod_estrutural
-                                         , 0.00 AS vl_deb_ant
-                                         , 0.00 AS vl_cred_ant
-                                         , COALESCE(SUM(saldo_anterior),0.00) AS vl_deb_mes_ant
-                                         , 0.00 AS vl_cred_mes_ant
-                                         , COALESCE(SUM(vl_lancamento),0.00) AS vl_deb_mes
-                                         , 0.00 AS vl_cred_mes
-                                         , (COALESCE(SUM(saldo_anterior),0.00) + COALESCE(SUM(vl_lancamento),0.00)) AS vl_deb_ate_mes
-                                         , 0.00 AS vl_cred_ate_mes
-                                         , 0.00 AS vl_deb_exercicio
-                                         , 0.00 AS vl_cred_exercicio
-                                    FROM contabilidade.fn_relatorio_razao ( '".$this->getDado('exercicio')."'
-                                                                           , ''
-                                                                           , '0.0.0.0.0.00.00.00.00.00'
-                                                                           , '9.9.9.9.9.99.99.99.99.99'
-                                                                           , '".$this->getDado('dt_inicial')."'
-                                                                           , '".$this->getDado('dt_final')."'
-                                                                           , '".$this->getDado('entidades')."'
-                                                                           , '".$this->getDado('dt_inicial_ant')."'
-                                                                           , '".$this->getDado('dt_final_ant')."'
-                                                                           , 'N'
-                                                                           , 'N'
-                                                        ) AS retorno ( 
-                                                                       cod_lote          INTEGER                                
-                                                                      ,sequencia         INTEGER                                
-                                                                      ,cod_historico     INTEGER                                
-                                                                      ,nom_historico     VARCHAR                                
-                                                                      ,complemento       VARCHAR                                
-                                                                      ,observacao        TEXT                                   
-                                                                      ,exercicio         CHAR(4)                                
-                                                                      ,cod_entidade      INTEGER                                
-                                                                      ,tipo              CHAR(1)                                
-                                                                      ,vl_lancamento     NUMERIC                                
-                                                                      ,tipo_valor        CHAR(1)                                
-                                                                      ,dt_lote           VARCHAR                                
-                                                                      ,dt_lote_formatado DATE                                
-                                                                      ,cod_plano         INTEGER                                
-                                                                      ,cod_estrutural    VARCHAR                                
-                                                                      ,nom_conta         VARCHAR                                
-                                                                      ,contra_partida    NUMERIC                                
-                                                                      ,saldo_anterior    NUMERIC                                
-                                                                      ,num_lancamentos   INTEGER      
-                                                                    )
-                                    WHERE tipo <> 'I'
-                                      AND saldo_anterior > 0
-                                      AND tipo_valor = 'D'
-                                    GROUP BY cod_estrutural
-
-                                    UNION ALL
-
-                                    -- CREDITO
-
-                                    SELECT cod_estrutural
-                                         , 0.00 AS vl_deb_ant
-                                         , 0.00 AS vl_cred_ant
-                                         , 0.00 AS vl_deb_mes_ant
-                                         , COALESCE(SUM(saldo_anterior),0.00) AS vl_cred_mes_ant
-                                         , 0.00 AS vl_deb_mes
-                                         , COALESCE(SUM(vl_lancamento),0.00) AS vl_cred_mes
-                                         , 0.00 AS vl_deb_ate_mes
-                                         , (COALESCE(SUM(saldo_anterior),0.00) + COALESCE(SUM(vl_lancamento),0.00)) AS vl_cred_ate_mes
-                                         , 0.00 AS vl_deb_exercicio
-                                         , 0.00 AS vl_cred_exercicio
-                                    FROM contabilidade.fn_relatorio_razao ( '".$this->getDado('exercicio')."'
-                                                                           , ''
-                                                                           , '0.0.0.0.0.00.00.00.00.00'
-                                                                           , '9.9.9.9.9.99.99.99.99.99'
-                                                                           , '".$this->getDado('dt_inicial')."'
-                                                                           , '".$this->getDado('dt_final')."'
-                                                                           , '".$this->getDado('entidades')."'
-                                                                           , '".$this->getDado('dt_inicial_ant')."'
-                                                                           , '".$this->getDado('dt_final_ant')."'
-                                                                           , 'N'
-                                                                           , 'N'
-                                                        ) AS retorno ( 
-                                                                       cod_lote          INTEGER                                
-                                                                      ,sequencia         INTEGER                                
-                                                                      ,cod_historico     INTEGER                                
-                                                                      ,nom_historico     VARCHAR                                
-                                                                      ,complemento       VARCHAR                                
-                                                                      ,observacao        TEXT                                   
-                                                                      ,exercicio         CHAR(4)                                
-                                                                      ,cod_entidade      INTEGER                                
-                                                                      ,tipo              CHAR(1)                                
-                                                                      ,vl_lancamento     NUMERIC                                
-                                                                      ,tipo_valor        CHAR(1)                                
-                                                                      ,dt_lote           VARCHAR                                
-                                                                      ,dt_lote_formatado DATE                                
-                                                                      ,cod_plano         INTEGER                                
-                                                                      ,cod_estrutural    VARCHAR                                
-                                                                      ,nom_conta         VARCHAR                                
-                                                                      ,contra_partida    NUMERIC                                
-                                                                      ,saldo_anterior    NUMERIC                                
-                                                                      ,num_lancamentos   INTEGER      
-                                                                    )
-                                    WHERE tipo <> 'I'
-                                      AND saldo_anterior <= 0
-                                      AND tipo_valor = 'C'
-                                    GROUP BY cod_estrutural
-
-                                    -- DEBITO ANO ANTERIOR
-
-                                    UNION ALL
-
-                                    SELECT cod_estrutural
-                                         , COALESCE(SUM(saldo_anterior),0.00) AS vl_deb_ant
-                                         , 0.00 AS vl_cred_ant
-                                         , 0.00 AS vl_deb_mes_ant
-                                         , 0.00 AS vl_cred_mes_ant
-                                         , 0.00 AS vl_deb_mes
-                                         , 0.00 AS vl_cred_mes
-                                         , 0.00 AS vl_deb_ate_mes
-                                         , 0.00 AS vl_cred_ate_mes
-                                         , COALESCE(SUM(vl_lancamento),0.00) AS vl_deb_exercicio
-                                         , 0.00 AS vl_cred_exercicio
-                                    FROM contabilidade.fn_relatorio_razao ( '".$this->getDado('exercicio')."'
-                                                                           , ''
-                                                                           , '0.0.0.0.0.00.00.00.00.00'
-                                                                           , '9.9.9.9.9.99.99.99.99.99'
-                                                                           , '01/01/".$this->getDado('exercicio')."'
-                                                                           , '".$this->getDado('dt_final')."'
-                                                                           , '".$this->getDado('entidades')."'
-                                                                           , '01/01/".($this->getDado('exercicio')-1)."'
-                                                                           , '31/12/".($this->getDado('exercicio')-1)."'
-                                                                           , 'N'
-                                                                           , 'N'
-                                                                        ) AS retorno ( 
-                                                                                       cod_lote          INTEGER                                
-                                                                                      ,sequencia         INTEGER                                
-                                                                                      ,cod_historico     INTEGER                                
-                                                                                      ,nom_historico     VARCHAR                                
-                                                                                      ,complemento       VARCHAR                                
-                                                                                      ,observacao        TEXT                                   
-                                                                                      ,exercicio         CHAR(4)                                
-                                                                                      ,cod_entidade      INTEGER                                
-                                                                                      ,tipo              CHAR(1)                                
-                                                                                      ,vl_lancamento     NUMERIC                                
-                                                                                      ,tipo_valor        CHAR(1)                                
-                                                                                      ,dt_lote           VARCHAR                                
-                                                                                      ,dt_lote_formatado DATE                                
-                                                                                      ,cod_plano         INTEGER                                
-                                                                                      ,cod_estrutural    VARCHAR                                
-                                                                                      ,nom_conta         VARCHAR                                
-                                                                                      ,contra_partida    NUMERIC                                
-                                                                                      ,saldo_anterior    NUMERIC                                
-                                                                                      ,num_lancamentos   INTEGER      
-                                                                                    )
-                                    WHERE tipo <> 'I'
-                                      AND saldo_anterior > 0
-                                      AND tipo_valor = 'D'
-                                    GROUP BY cod_estrutural
-
-                                    -- CREDITO ANO ANTERIOR
-
-                                    UNION ALL
-
-                                    SELECT cod_estrutural
-                                         , 0.00 AS vl_deb_ant
-                                         , COALESCE(SUM(saldo_anterior),0.00) AS vl_cred_ant
-                                         , 0.00 AS vl_deb_mes_ant
-                                         , 0.00 AS vl_cred_mes_ant
-                                         , 0.00 AS vl_deb_mes
-                                         , 0.00 AS vl_cred_mes
-                                         , 0.00 AS vl_deb_ate_mes
-                                         , 0.00 AS vl_cred_ate_mes
-                                         , 0.00 AS vl_deb_exercicio
-                                         , COALESCE(SUM(vl_lancamento),0.00) AS vl_cred_exercicio
-                                    FROM contabilidade.fn_relatorio_razao ( '".$this->getDado('exercicio')."'
-                                                                           , ''
-                                                                           , '0.0.0.0.0.00.00.00.00.00'
-                                                                           , '9.9.9.9.9.99.99.99.99.99'
-                                                                           , '01/01/".$this->getDado('exercicio')."'
-                                                                           , '".$this->getDado('dt_final')."'
-                                                                           , '".$this->getDado('entidades')."'
-                                                                           , '01/01/".($this->getDado('exercicio')-1)."'
-                                                                           , '31/12/".($this->getDado('exercicio')-1)."'
-                                                                           , 'N'
-                                                                           , 'N'
-                                                                        ) AS retorno ( 
-                                                                                       cod_lote          INTEGER                                
-                                                                                      ,sequencia         INTEGER                                
-                                                                                      ,cod_historico     INTEGER                                
-                                                                                      ,nom_historico     VARCHAR                                
-                                                                                      ,complemento       VARCHAR                                
-                                                                                      ,observacao        TEXT                                   
-                                                                                      ,exercicio         CHAR(4)                                
-                                                                                      ,cod_entidade      INTEGER                                
-                                                                                      ,tipo              CHAR(1)                                
-                                                                                      ,vl_lancamento     NUMERIC                                
-                                                                                      ,tipo_valor        CHAR(1)                                
-                                                                                      ,dt_lote           VARCHAR                                
-                                                                                      ,dt_lote_formatado DATE                                
-                                                                                      ,cod_plano         INTEGER                                
-                                                                                      ,cod_estrutural    VARCHAR                                
-                                                                                      ,nom_conta         VARCHAR                                
-                                                                                      ,contra_partida    NUMERIC                                
-                                                                                      ,saldo_anterior    NUMERIC                                
-                                                                                      ,num_lancamentos   INTEGER      
-                                                                                    )
-                                    WHERE tipo <> 'I'
-                                      AND saldo_anterior <= 0
-                                      AND tipo_valor = 'C'
-                                    GROUP BY cod_estrutural
-                                ) AS retorno
-                            GROUP BY cod_estrutural
-                            ORDER BY cod_estrutural
-                        ) AS tabela
-                    ORDER BY tabela.conta_contabil
+                    FROM
+                    (
+                      SELECT
+                            plano_conta.cod_estrutural
+                            ,0.00 AS deb_ant
+                            ,0.00 AS cred_ant
+                            ,COALESCE(SUM(retorno_mes.saldo_debitos),0.00) AS deb_mes
+                            ,COALESCE(SUM(retorno_mes.saldo_creditos),0.00) AS cred_mes
+                            ,0.00 AS deb_mes_ant
+                            ,0.00 AS cred_mes_ant
+                      FROM
+                          contabilidade.plano_conta
+                      
+                      INNER JOIN
+                        (
+                          SELECT *
+                          FROM
+                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '".$this->getDado('dt_inicial')."', '".$this->getDado('dt_final')."', 'S') AS retorno
+                          (
+                          cod_estrutural VARCHAR
+                          ,nivel INTEGER
+                          ,nom_conta VARCHAR
+                          ,cod_sistema INTEGER
+                          ,indicador_superavit CHAR(12)
+                          ,saldo_anterior NUMERIC
+                          ,saldo_debitos NUMERIC
+                          ,saldo_creditos NUMERIC
+                          ,saldo_atual NUMERIC
+                          )
+                        ) AS retorno_mes
+                       ON plano_conta.cod_estrutural = retorno_mes.cod_estrutural
+                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.indicador_superavit = retorno_mes.indicador_superavit
+                      AND plano_conta.cod_sistema = retorno_mes.cod_sistema
+                      AND plano_conta.nom_conta = retorno_mes.nom_conta
+                      
+                      GROUP BY plano_conta.cod_estrutural
+                      
+                      UNION ALL
+                      
+                      SELECT
+                            plano_conta.cod_estrutural
+                            ,0.00 AS deb_ant
+                            ,0.00 AS cred_ant
+                            ,0.00 AS deb_mes
+                            ,0.00 AS cred_mes
+                            ,COALESCE(SUM(retorno_mes_ant.saldo_debitos),0.00) AS deb_mes_ant
+                            ,COALESCE(SUM(retorno_mes_ant.saldo_creditos),0.00) AS cred_mes_ant
+                      FROM
+                          contabilidade.plano_conta
+                      
+                      INNER JOIN
+                        (
+                          SELECT
+                          
+                          *
+                          
+                          FROM
+                          
+                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '".$this->getDado('dt_inicial_ant')."', '".$this->getDado('dt_final_ant')."', 'A') AS retorno
+                          (
+                          cod_estrutural VARCHAR
+                          ,nivel INTEGER
+                          ,nom_conta VARCHAR
+                          ,cod_sistema INTEGER
+                          ,indicador_superavit CHAR(12)
+                          ,saldo_anterior NUMERIC
+                          ,saldo_debitos NUMERIC
+                          ,saldo_creditos NUMERIC
+                          ,saldo_atual NUMERIC
+                          )
+                        ) AS retorno_mes_ant
+                       ON plano_conta.cod_estrutural = retorno_mes_ant.cod_estrutural
+                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.indicador_superavit = retorno_mes_ant.indicador_superavit
+                      AND plano_conta.cod_sistema = retorno_mes_ant.cod_sistema
+                      AND plano_conta.nom_conta = retorno_mes_ant.nom_conta
+                      
+                      GROUP BY plano_conta.cod_estrutural
+                      
+                      UNION ALL
+                      
+                      SELECT
+                            plano_conta.cod_estrutural
+                            ,COALESCE(SUM(retorno_anterior.saldo_debitos),0.00) AS deb_ant
+                            ,COALESCE(SUM(retorno_anterior.saldo_creditos),0.00) AS cred_ant
+                            ,0.00 AS deb_mes
+                            ,0.00 AS cred_mes
+                            ,0.00 AS deb_mes_ant
+                            ,0.00 AS cred_mes_ant
+                      FROM
+                          contabilidade.plano_conta
+                      
+                      INNER JOIN
+                        (
+                          SELECT
+                          
+                          *
+                          
+                          FROM
+                          
+                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio_ant')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '01/01/".$this->getDado('exercicio_ant')."', '31/12/".$this->getDado('exercicio_ant')."', 'A') AS retorno
+                          (
+                          cod_estrutural VARCHAR
+                          ,nivel INTEGER
+                          ,nom_conta VARCHAR
+                          ,cod_sistema INTEGER
+                          ,indicador_superavit CHAR(12)
+                          ,saldo_anterior NUMERIC
+                          ,saldo_debitos NUMERIC
+                          ,saldo_creditos NUMERIC
+                          ,saldo_atual NUMERIC
+                          )
+                        ) AS retorno_anterior
+                       ON plano_conta.cod_estrutural = retorno_anterior.cod_estrutural
+                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.indicador_superavit = retorno_anterior.indicador_superavit
+                      AND plano_conta.cod_sistema = retorno_anterior.cod_sistema
+                      AND plano_conta.nom_conta = retorno_anterior.nom_conta
+                      
+                      GROUP BY plano_conta.cod_estrutural
+                      
+                    ) AS retorno
+                      
+                    GROUP BY cod_estrutural
+                      
+                    ORDER BY cod_estrutural
                 ";
         return $stSql;
     }

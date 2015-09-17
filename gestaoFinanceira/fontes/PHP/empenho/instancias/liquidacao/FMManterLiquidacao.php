@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterLiquidacao.php 60708 2014-11-11 13:02:53Z franver $
+    $Id: FMManterLiquidacao.php 63351 2015-08-20 13:42:42Z evandro $
 
     $Revision: 32093 $
     $Name:  $
@@ -646,6 +646,153 @@ switch ($stConfiguracaoUf) {
             Sessao::write('tipoEstado', 'AM');
         }
     break;
+    case '5':
+        $obTxtNumeroNF = new TextBox;
+        $obTxtNumeroNF->setName     ( 'stNumeroNF' );
+        $obTxtNumeroNF->setiD       ( 'stNumeroNF' );
+        $obTxtNumeroNF->setRotulo   ( 'Número da Nota Fiscal' );
+        $obTxtNumeroNF->setTitle    ( 'Informe o Número da Nota Fiscal' );
+        $obTxtNumeroNF->setSize     ( 10 );
+        $obTxtNumeroNF->setMaxLength( 10 );
+        $obTxtNumeroNF->setNull     ( true );
+
+        $obExercicioNotaFiscal = new Exercicio();
+        $obExercicioNotaFiscal->setRotulo        ( "Ano" );
+        $obExercicioNotaFiscal->setTitle         ( "Ano. Ex.: 2015" );
+        $obExercicioNotaFiscal->setName          ( "stAnoNotaFiscal" );
+        $obExercicioNotaFiscal->setId            ( "stAnoNotaFiscal" );
+        $obExercicioNotaFiscal->setInteiro       ( true );
+        $obExercicioNotaFiscal->setSize          ( 3 );
+        $obExercicioNotaFiscal->setMaxLength     ( 4 );
+        $obExercicioNotaFiscal->setDefinicao     ( "exercicio" );
+        $obExercicioNotaFiscal->setNull          ( true );
+        $obExercicioNotaFiscal->setValue         ( Sessao::getExercicio() );
+
+        $obTxtSerieNF = new TextBox;
+        $obTxtSerieNF->setName      ( 'stSerieNF' );
+        $obTxtSerieNF->setId        ( 'stSerieNF' );
+        $obTxtSerieNF->setRotulo    ( 'Série da Nota Fiscal' );
+        $obTxtSerieNF->setTitle     ( 'Informe a Série da Nota Fiscal' );
+        $obTxtSerieNF->setSize      ( 2 );
+        $obTxtSerieNF->setMaxLength ( 3 );
+        $obTxtSerieNF->setNull      ( true );
+
+        $obTxtSubSerieNF = new TextBox;
+        $obTxtSubSerieNF->setName       ( 'stSubSerieNF' );
+        $obTxtSubSerieNF->setId         ( 'stSubSerieNF' );
+        $obTxtSubSerieNF->setRotulo     ( 'SubSérie da Nota Fiscal' );
+        $obTxtSubSerieNF->setTitle      ( 'Informe a SubSérie da Nota Fiscal' );
+        $obTxtSubSerieNF->setSize       ( 2 );
+        $obTxtSubSerieNF->setMaxLength  ( 3 );
+        $obTxtSubSerieNF->setNull       ( true );
+
+        $obDtEmissaoNF = new Data;
+        $obDtEmissaoNF->setName     ( 'stDtEmissaoNF' );
+        $obDtEmissaoNF->setId       ( 'stDtEmissaoNF' );
+        $obDtEmissaoNF->setRotulo   ( 'Data da Emissão da Nota Fiscal' );
+        $obDtEmissaoNF->setTitle    ( 'Informe a Data da Emissão da Nota Fiscal' );
+        $obDtEmissaoNF->setSize     ( 7 );
+        $obDtEmissaoNF->setNull     ( true );
+        $obDtEmissaoNF->obEvento->setOnBlur( "validaDataEmissaoNF();" );
+
+        $obNuValorNota = new Numerico();
+        $obNuValorNota->setName     ( "nuValorNotaFiscal" );
+        $obNuValorNota->setId       ( "nuValorNotaFiscal" );
+        $obNuValorNota->setRotulo   ( 'Valor da Nota Fiscal' );
+        $obNuValorNota->setTitle    ( 'Informe o Valor da Nota Fiscal' );
+        $obNuValorNota->setSize     ( 12 );
+        $obNuValorNota->setMaxLength( 16 );
+        $obNuValorNota->setValue    ( '0,00' );
+        $obNuValorNota->setNegativo ( false );
+        
+        $obTxtObjetoNF = new TextBox;
+        $obTxtObjetoNF->setName      ( 'stObjetoNF' );
+        $obTxtObjetoNF->setId        ( 'stObjetoNF' );
+        $obTxtObjetoNF->setRotulo    ( 'Descrição do objeto da Nota Fiscal' );
+        $obTxtObjetoNF->setTitle     ( 'Informe a descricao do objeto da Nota Fiscal' );
+        $obTxtObjetoNF->setSize      ( 130 );
+        $obTxtObjetoNF->setMaxLength ( 150 );
+        $obTxtObjetoNF->setNull      ( true );
+
+        $obTxtUFDocumento = new TextBox;
+        $obTxtUFDocumento->setName      ( 'stUFUnidadeFederacao' );
+        $obTxtUFDocumento->setId        ( 'stUFUnidadeFederacao' );
+        $obTxtUFDocumento->setRotulo    ( 'Unidade de Federação do documento' );
+        $obTxtUFDocumento->setTitle     ( 'Informe a Unidade de Federação do documento' );
+        $obTxtUFDocumento->setSize      ( 2 );
+        $obTxtUFDocumento->setMaxLength ( 2 );
+        $obTxtUFDocumento->setNull      ( true );
+
+    break;
+    case '11':
+        $obHdnVlVlTotalDoctoFiscal = new Hidden;
+        $obHdnVlVlTotalDoctoFiscal->setName  ( "nuTotalNf" );
+        $obHdnVlVlTotalDoctoFiscal->setId    ( "nuTotalNf" );
+            
+        //Radio para definicao de Inclusão de Documento Fiscal
+        $obRdIncluirNFS = new Radio;
+        $obRdIncluirNFS->setRotulo  ( "*Incluir Documento Fiscal" );
+        $obRdIncluirNFS->setName    ( "stIncluirNF"  );
+        $obRdIncluirNFS->setId      ( "stIncluirNF1" );
+        $obRdIncluirNFS->setValue   ( "Sim" );
+        $obRdIncluirNFS->setLabel   ( "Sim" );
+        $obRdIncluirNFS->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
+        $obRdIncluirNFS->setChecked ( false );
+     
+        $obRdIncluirNFN = new Radio;
+        $obRdIncluirNFN->setRotulo  ( "*Incluir Documento Fiscal" );
+        $obRdIncluirNFN->setName    ( "stIncluirNF"    );
+        $obRdIncluirNFN->setId      ( "stIncluirNF2"   );
+        $obRdIncluirNFN->setValue   ( "Não" );
+        $obRdIncluirNFN->setLabel   ( "Não" );
+        $obRdIncluirNFN->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
+        $obRdIncluirNFN->setChecked ( true );
+        
+        $arRadiosNF = array( $obRdIncluirNFS, $obRdIncluirNFN );
+        
+        $obSpnNF = new Span();
+        $obSpnNF->setId( 'spnNF' );
+    break;
+    case '20':
+        $obTxtNumeroNF = new TextBox;
+        $obTxtNumeroNF->setName( 'stNumeroNF' );
+        $obTxtNumeroNF->setRotulo( 'Número da NF' );
+        $obTxtNumeroNF->setTitle( 'Informe o Número da NF' );
+        $obTxtNumeroNF->setSize( 12 );
+        $obTxtNumeroNF->setMaxLength( 12 );
+        $obTxtNumeroNF->setNull( true );
+
+        $obTxtSerieNF = new TextBox;
+        $obTxtSerieNF->setName( 'stSerieNF' );
+        $obTxtSerieNF->setRotulo( 'Série da NF' );
+        $obTxtSerieNF->setTitle( 'Informe a Série da NF' );
+        $obTxtSerieNF->setSize( 12 );
+        $obTxtSerieNF->setMaxLength( 12 );
+        $obTxtSerieNF->setNull( true );
+
+        $obDtEmissaoNF = new Data;
+        $obDtEmissaoNF->setName( 'stDtEmissaoNF' );
+        $obDtEmissaoNF->setRotulo( 'Data da Emissão da NF' );
+        $obDtEmissaoNF->setTitle( 'Informe a Data da Emissão da NF' );
+        $obDtEmissaoNF->setNull( true );
+        $obDtEmissaoNF->obEvento->setOnBlur( "validaDataEmissaoNF();" );
+    
+        $obTxtCodValidacaoNF = new TextBox;
+        $obTxtCodValidacaoNF->setName( 'stCodValidacaoNF' );
+        $obTxtCodValidacaoNF->setRotulo( 'Código de Validação da NF' );
+        $obTxtCodValidacaoNF->setTitle( 'Informe o Código de Validação da NF' );
+        $obTxtCodValidacaoNF->setSize( 50 );
+        $obTxtCodValidacaoNF->setMaxLength( 50 );
+        $obTxtCodValidacaoNF->setNull( true );
+
+        $obTxtModeloNF = new TextBox;
+        $obTxtModeloNF->setName( 'stModeloNF' );
+        $obTxtModeloNF->setRotulo( 'Modelo da NF' );
+        $obTxtModeloNF->setTitle( 'Informe o Modelo da NF' );
+        $obTxtModeloNF->setSize( 3 );
+        $obTxtModeloNF->setMaxLength( 3 );
+        $obTxtModeloNF->setNull( true );
+    break;
     case '16':
         $obComboEstados = 'true';
         include_once CAM_GPC_TCEPE_MAPEAMENTO.'TTCEPETipoDocumento.class.php';
@@ -659,6 +806,7 @@ switch ($stConfiguracaoUf) {
         $obTTCETOTipoDocumento = new TTCETOTipoDocumento;
         $obTTCETOTipoDocumento->recuperaTodos($rsTipoDocumento);
         Sessao::write('tipoEstado', 'TO');
+    break;
 }
 
 
@@ -731,89 +879,17 @@ $obTxtObservacao->setCols     ( 100            );
 $obTxtObservacao->setRows     ( 3              );
 $obTxtObservacao->setMaxCaracteres( 640        );
 
-//if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) {
-if ($stConfiguracaoUf == '20') {
-    $obTxtNumeroNF = new TextBox;
-    $obTxtNumeroNF->setName( 'stNumeroNF' );
-    $obTxtNumeroNF->setRotulo( 'Número da NF' );
-    $obTxtNumeroNF->setTitle( 'Informe o Número da NF' );
-    $obTxtNumeroNF->setSize( 12 );
-    $obTxtNumeroNF->setMaxLength( 12 );
-    $obTxtNumeroNF->setNull( true );
-
-    $obTxtSerieNF = new TextBox;
-    $obTxtSerieNF->setName( 'stSerieNF' );
-    $obTxtSerieNF->setRotulo( 'Série da NF' );
-    $obTxtSerieNF->setTitle( 'Informe a Série da NF' );
-    $obTxtSerieNF->setSize( 12 );
-    $obTxtSerieNF->setMaxLength( 12 );
-    $obTxtSerieNF->setNull( true );
-
-    $obDtEmissaoNF = new Data;
-    $obDtEmissaoNF->setName( 'stDtEmissaoNF' );
-    $obDtEmissaoNF->setRotulo( 'Data da Emissão da NF' );
-    $obDtEmissaoNF->setTitle( 'Informe a Data da Emissão da NF' );
-    $obDtEmissaoNF->setNull( true );
-    $obDtEmissaoNF->obEvento->setOnBlur( "validaDataEmissaoNF();" );
-
-    $obTxtCodValidacaoNF = new TextBox;
-    $obTxtCodValidacaoNF->setName( 'stCodValidacaoNF' );
-    $obTxtCodValidacaoNF->setRotulo( 'Código de Validação da NF' );
-    $obTxtCodValidacaoNF->setTitle( 'Informe o Código de Validação da NF' );
-    $obTxtCodValidacaoNF->setSize( 50 );
-    $obTxtCodValidacaoNF->setMaxLength( 50 );
-    $obTxtCodValidacaoNF->setNull( true );
-
-    $obTxtModeloNF = new TextBox;
-    $obTxtModeloNF->setName( 'stModeloNF' );
-    $obTxtModeloNF->setRotulo( 'Modelo da NF' );
-    $obTxtModeloNF->setTitle( 'Informe o Modelo da NF' );
-    $obTxtModeloNF->setSize( 3 );
-    $obTxtModeloNF->setMaxLength( 3 );
-    $obTxtModeloNF->setNull( true );
-}
-
-//if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()))==11){
-if ($stConfiguracaoUf == '11') {
-    $obHdnVlVlTotalDoctoFiscal = new Hidden;
-    $obHdnVlVlTotalDoctoFiscal->setName  ( "nuTotalNf" );
-    $obHdnVlVlTotalDoctoFiscal->setId    ( "nuTotalNf" );
-        
-    //Radio para definicao de Inclusão de Documento Fiscal
-    $obRdIncluirNFS = new Radio;
-    $obRdIncluirNFS->setRotulo  ( "*Incluir Documento Fiscal" );
-    $obRdIncluirNFS->setName    ( "stIncluirNF"  );
-    $obRdIncluirNFS->setId      ( "stIncluirNF1" );
-    $obRdIncluirNFS->setValue   ( "Sim" );
-    $obRdIncluirNFS->setLabel   ( "Sim" );
-    $obRdIncluirNFS->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
-    $obRdIncluirNFS->setChecked ( false );
- 
-    $obRdIncluirNFN = new Radio;
-    $obRdIncluirNFN->setRotulo  ( "*Incluir Documento Fiscal" );
-    $obRdIncluirNFN->setName    ( "stIncluirNF"    );
-    $obRdIncluirNFN->setId      ( "stIncluirNF2"   );
-    $obRdIncluirNFN->setValue   ( "Não" );
-    $obRdIncluirNFN->setLabel   ( "Não" );
-    $obRdIncluirNFN->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
-    $obRdIncluirNFN->setChecked ( true );
-    
-    $arRadiosNF = array( $obRdIncluirNFS, $obRdIncluirNFN );
-    
-    $obSpnNF = new Span();
-    $obSpnNF->setId( 'spnNF' );
-}
-
 $obIFrame = new IFrame;
 $obIFrame->setName("telaListaItemPreEmpenho");
 $obIFrame->setWidth("0");
 $obIFrame->setHeight("0");
 $obIFrame->show();
 
-if($boOPAutomatica=="true")
+if($boOPAutomatica=="true"){
     $stOPAutomatica = "SIM";
-else
+}else{
     $stOPAutomatica = "NAO";
+}
 
 // Define Objeto SimNao para emitir OP
 $obSimNaoEmitirOP = new SimNao();
@@ -887,50 +963,43 @@ $obFormulario->addComponente( $obLblVlTotalEmp        );
 $obFormulario->addComponente( $obLblVlTotal        );
 $obFormulario->addComponente( $obLblVlTotalSaldo      );
 
-/*
-if ($boMostrarCombo == 'true') {
-    $obFormulario->addTitulo('Tipo de Documento');
-    $obFormulario->addComponenteComposto($obTxtTipoDocumento, $obCboTipoDocumento);
-    $obFormulario->addSpan($obSpanTipoDocumento);
-}
-*/
-
 $obFormulario->addTitulo( "Liquidação" );
 $obFormulario->addComponente( $obDtLiquidacao );
 $obFormulario->addComponente( $obDataValidadeFinal );
 $obFormulario->addComponente( $obTxtObservacao );
 
-//if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) {
-if ($stConfiguracaoUf == '20') {
-    $obFormulario->addComponente( $obTxtNumeroNF );
-    $obFormulario->addComponente( $obTxtSerieNF );
-    $obFormulario->addComponente( $obDtEmissaoNF );
-    $obFormulario->addComponente( $obTxtCodValidacaoNF );
-    $obFormulario->addComponente( $obTxtModeloNF );
+switch ($stConfiguracaoUf) {
+    case '5':
+        $obFormulario->addTitulo( "Notas Fiscais" );
+        $obFormulario->addComponente( $obTxtNumeroNF );
+        $obFormulario->addComponente( $obExercicioNotaFiscal );
+        $obFormulario->addComponente( $obTxtSerieNF );
+        $obFormulario->addComponente( $obTxtSubSerieNF );
+        $obFormulario->addComponente( $obDtEmissaoNF );
+        $obFormulario->addComponente( $obNuValorNota );
+        $obFormulario->addComponente( $obTxtObjetoNF );
+        $obFormulario->addComponente( $obTxtUFDocumento );
+    break;
+    //se for prefeitura de Minas Gerais, inclui as informações de documento fiscal
+    case '11':
+        $obFormulario->addTitulo('Documento Fiscal');
+        $obFormulario->addHidden        ( $obHdnVlVlTotalDoctoFiscal );
+        $obFormulario->agrupaComponentes( $arRadiosNF );
+        $obFormulario->addSpan          ( $obSpnNF );
+    break;
+    case '20':
+        $obFormulario->addComponente( $obTxtNumeroNF );
+        $obFormulario->addComponente( $obTxtSerieNF );
+        $obFormulario->addComponente( $obDtEmissaoNF );
+        $obFormulario->addComponente( $obTxtCodValidacaoNF );
+        $obFormulario->addComponente( $obTxtModeloNF );
+    break;
 }
 
 if ($obComboEstados == 'true') {
     $obFormulario->addTitulo('Tipo de Documento');
     $obFormulario->addComponenteComposto($obTxtTipoDocumento, $obCboTipoDocumento);
     $obFormulario->addSpan($obSpanTipoDocumento);
-}
-
-
-/*
-//se for prefeitura de Alagoas, inclui as informações de documento
-if ($stConfiguracaoUf == 02 || $stConfiguracaoUf == '16') { 
-    $obFormulario->addTitulo('Tipo de Documento');
-    $obFormulario->addComponenteComposto($obTxtTipoDocumentoAl, $obCboTipoDocumentoAl);
-    $obFormulario->addSpan($obSpanTipoDocumento);
-}
-*/
-//se for prefeitura de Minas Gerais, inclui as informações de documento fiscal
-//if((SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()))==11){
-if ($stConfiguracaoUf == '11') {
-    $obFormulario->addTitulo('Documento Fiscal');
-    $obFormulario->addHidden        ( $obHdnVlVlTotalDoctoFiscal );
-    $obFormulario->agrupaComponentes( $arRadiosNF );
-    $obFormulario->addSpan          ( $obSpnNF );
 }
 
 $obMontaAtributosLiquidacao->geraFormulario ( $obFormulario );

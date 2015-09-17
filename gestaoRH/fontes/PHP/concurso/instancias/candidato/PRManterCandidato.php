@@ -47,9 +47,9 @@ include( CAM_GRH_CON_NEGOCIO."RConcursoCandidato.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterCandidato";
-$pgFilt = "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'];
-$pgList = "LS".$stPrograma.".php?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'];
-$pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'];
+$pgFilt = "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=".$request->get('stAcao');
+$pgList = "LS".$stPrograma.".php?".Sessao::getId()."&stAcao=".$request->get('stAcao')."&inCodEdital=".$request->get('inCodEdital');
+$pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=".$request->get('stAcao');
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
@@ -59,13 +59,13 @@ $obAtributos = new MontaAtributos;
 $obAtributos->setName      ( "Atributo_" );
 $obAtributos->recuperaVetor( $arChave    );
 
-$stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 switch ($stAcao) {
     case "incluir":
-        $obRCandidato->setNumCGM($_REQUEST['inNumCGM']);
-        $obRCandidato->obRConcursoConcurso->setCodEdital($_REQUEST['inCodEdital']);
-        $obRCandidato->setCodCargo($_REQUEST['inCodCargo']);
+        $obRCandidato->setNumCGM($request->get('inNumCGM'));
+        $obRCandidato->obRConcursoConcurso->setCodEdital($request->get('inCodEdital'));
+        $obRCandidato->setCodCargo($request->get('inCodCargo'));
 
         //monta array de atributos dinamicos
         foreach ($arChave as $key => $value) {
@@ -81,7 +81,7 @@ switch ($stAcao) {
 
         if ( !$obErro->ocorreu() ) {
             SistemaLegado::exibeAviso("Candidato: ".$obRCandidato->getCodCandidato(),"incluir","aviso");
-            $js .= 'f.inCodEdital.value = "'.$_REQUEST['inCodEdital'].'";';
+            $js .= 'f.inCodEdital.value = "'.$request->get('inCodEdital').'";';
             $js .= "f.inNumCGM.value='';";
             $js .= 'd.getElementById("nom_cgm").innerHTML       = "&nbsp;";';
             $js .= 'd.getElementById("stEndereco").innerHTML    = "&nbsp;";';
@@ -99,16 +99,16 @@ switch ($stAcao) {
     break;
 
     case "alterar":
-        $obRCandidato->obRConcursoConcurso->setCodEdital($_REQUEST['inCodEdital']);
-        $obRCandidato->setCodCandidato($_REQUEST['inCodCandidato']);
-        $obRCandidato->setNumCGM($_REQUEST['inNumCGM']);
-        if ($_REQUEST['inHdnTipoProva'] == '1') {
-               $obRCandidato->setNotaProva(str_replace(",",".",$_REQUEST['stNotaProvaPratica']));
+        $obRCandidato->obRConcursoConcurso->setCodEdital($request->get('inCodEdital'));
+        $obRCandidato->setCodCandidato($request->get('inCodCandidato'));
+        $obRCandidato->setNumCGM($request->get('inNumCGM'));
+        if ($request->get('inHdnTipoProva') == '1') {
+               $obRCandidato->setNotaProva(str_replace(",",".",$request->get('stNotaProvaPratica')));
         } else {
-               $obRCandidato->setNotaProva(str_replace(",",".",$_REQUEST['stNotaProvaTeoricoPratica']));
+               $obRCandidato->setNotaProva(str_replace(",",".",$request->get('stNotaProvaTeoricoPratica')));
         }
-        if( $_REQUEST['inHdnProvaTitulacao'] == 't' )
-            $obRCandidato->setNotaTitulo ( str_replace(",",".",$_REQUEST['stNotaTitulacao']));
+        if( $request->get('inHdnProvaTitulacao') == 't' )
+            $obRCandidato->setNotaTitulo ( str_replace(",",".",$request->get('stNotaTitulacao')));
         $obErro = $obRCandidato->classificarCandidato();
 
         if ( !$obErro->ocorreu() ) {
@@ -120,7 +120,7 @@ switch ($stAcao) {
                $pgForm = $pgList;
                if ( $rsCandidatos->getCampo("situacao")  == 'Sem nota' ) {
                     $stFiltro .= "&inCodCandidato=".$rsCandidatos->getCampo('cod_candidato')."&";
-                    $pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'];
+                    $pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=".$request->get('stAcao');
                     break;
                } else {
                     $rsCandidatos->proximo();
@@ -130,7 +130,6 @@ switch ($stAcao) {
         }
         if ( !$obErro->ocorreu() ) {
             if ($pgForm == $pgList) {
-                $stOrder = " ORDER BY media DESC ";
                 $obRCandidato->listarCandidatoPorEdital( $rsCandidatos,"",$stOrder, $boTransacao );
                 $rsCandidatos->setPrimeiroElemento();
                 $obRCandidato->obRConcursoConcurso->recuperaNotasEdital( $rsNotas );
@@ -176,10 +175,10 @@ switch ($stAcao) {
 
     case "reclassifi":
         $obRCandidato->obRConcursoConcurso->setCodEdital($inCodConcurso);
-        $obRCandidato->setNumCGM($_REQUEST['inNumCGM']);
-        $obRCandidato->setCodCandidato($_REQUEST['inCodCandidato']);
+        $obRCandidato->setNumCGM($request->get('inNumCGM'));
+        $obRCandidato->setCodCandidato($request->get('inCodCandidato'));
 
-        if ($_REQUEST['boReclassificar'] == 'false') {
+        if ($request->get('boReclassificar') == 'false') {
             $obRCandidato->setReclassificacao( true );
         } else {
             $obRCandidato->setReclassificacao( false );

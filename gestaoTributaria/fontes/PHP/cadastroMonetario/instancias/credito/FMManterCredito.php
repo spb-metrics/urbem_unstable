@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FMManterCredito.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterCredito.php 63509 2015-09-04 14:32:22Z michel $
 
     *Casos de uso: uc-05.05.10
 
@@ -40,11 +40,10 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GT_MON_NEGOCIO."RMONCredito.class.php" );
-include_once ( CAM_GT_MON_NEGOCIO."RMONCarteira.class.php" );
-include_once ( CAM_GT_MON_NEGOCIO."RMONConvenio.class.php" );
-include_once ( CAM_GT_MON_COMPONENTES."IPopUpAcrescimo.class.php" );
-//include_once ( CAM_GT_MON_NEGOCIO."RMONNaturezaCredito.class.php" );
+include_once CAM_GT_MON_NEGOCIO.'RMONCredito.class.php';
+include_once CAM_GT_MON_NEGOCIO.'RMONCarteira.class.php';
+include_once CAM_GT_MON_NEGOCIO.'RMONConvenio.class.php';
+include_once CAM_GT_MON_COMPONENTES.'IPopUpAcrescimo.class.php';
 
 $obRMONCredito =  new RMONCredito;
 $rsCarteira = new RecordSet();
@@ -61,14 +60,14 @@ $obBscDesoneracao->setRotulo           ( "Regra p/ Desoneração" );
 $obBscDesoneracao->setId               ( "stFormula"  );
 $obBscDesoneracao->setNull ( true );
 
-if ($_REQUEST["stNomFuncao"]) {
-    $obBscDesoneracao->setValue ( sprintf( "%03d - %s", $_REQUEST["inCodFuncao"], $_REQUEST["stNomFuncao"] ) );
+if ($request->get("stNomFuncao")) {
+    $obBscDesoneracao->setValue ( sprintf( "%03d - %s", $request->get("inCodFuncao"), $request->get("stNomFuncao") ) );
 }
 
 $obBscDesoneracao->obCampoCod->setName ( "inCodigoFormula" );
 
-if ($_REQUEST["inCodFuncao"]) {
-    $stCodDes = sprintf( "%02d.%d.%03d", $_REQUEST["inCodModulo"], $_REQUEST["inCodBiblioteca"], $_REQUEST["inCodFuncao"] );
+if ($request->get("inCodFuncao")) {
+    $stCodDes = sprintf( "%02d.%d.%03d", $request->get("inCodModulo"), $request->get("inCodBiblioteca"), $request->get("inCodFuncao") );
 }
 
 $obBscDesoneracao->obCampoCod->setValue( $stCodDes  );
@@ -80,17 +79,19 @@ $obBscDesoneracao->setFuncaoBusca      (  "abrePopUp('".CAM_GA_ADM_POPUPS."funca
 $obBscDesoneracao->obCampoCod->obEvento->setOnKeyUp("mascaraDinamico('".$stMascaraCalculo."', this, event);");
 $obBscDesoneracao->obCampoCod->setMinLength ( strlen($stMascaraCalculo) );
 
-if ($_REQUEST['stAcao'] == 'alterar') {
+if ($request->get('stAcao') == 'alterar') {
+    $obRMONCredito->setCodCredito   ( $request->get('inCodCredito') );
+    $obRMONCredito->setCodNatureza  ( $request->get('inCodNatureza') );
+    $obRMONCredito->setCodGenero    ( $request->get('inCodGenero') );
+    $obRMONCredito->ListarGeneroNatureza($rsGenero);
+    $obRMONCredito->ListarEspecie       ($rsEspecie);
 
-    $obRMONCredito->setCodCredito ( $_REQUEST['inCodCredito'] );
-    $obRMONCredito->setCodNatureza ( $_REQUEST['inCodNatureza'] );
-    $obRMONCredito->setCodGenero ( $_REQUEST['inCodGenero'] );
-    $obRMONCredito->ListarGeneroNatureza    ($rsGenero);
-    $obRMONCredito->ListarEspecie   ($rsEspecie);
-
-    $obRMONConvenio = new RMONConvenio;
-    $obRMONConvenio->setCodigoConvenio( $_REQUEST["inCodConvenio"] );
-    $obRMONConvenio->listarConvenio( $rsConvenio );
+    $rsConvenio = new Recordset();
+    if($request->get("inCodConvenio")){
+        $obRMONConvenio = new RMONConvenio;
+        $obRMONConvenio->setCodigoConvenio( $request->get("inCodConvenio") );
+        $obRMONConvenio->listarConvenio( $rsConvenio );
+    }
     $inNumConvenio = $rsConvenio->getCampo( "num_convenio" );
 
     $obErro = $obRMONCredito->buscaMoedaCredito( $rsRecordSetA, $boTransacao );
@@ -119,9 +120,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
 }
 
 //Define a funcao do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if ( empty( $_REQUEST['stAcao'] ) ) {
-    $_REQUEST['stAcao'] = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 //Define o nome dos arquivos PHP
 $stPrograma    = "ManterCredito";
@@ -139,19 +138,19 @@ include_once ( $pgJs );
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName ('stAcao');
-$obHdnAcao->setValue ( $_REQUEST['stAcao'] );
+$obHdnAcao->setValue ( $stAcao );
 
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ('stCtrl');
-$obHdnCtrl->setValue ( $_REQUEST['stCtrl'] );
+$obHdnCtrl->setValue ( $request->get('stCtrl') );
 
 $obHdnCodCredito = new Hidden;
 $obHdnCodCredito->setName  ('inCodCredito');
-$obHdnCodCredito->setValue ( $_REQUEST['inCodCredito'] );
+$obHdnCodCredito->setValue ( $request->get('inCodCredito') );
 
 $obHdnCodConta = new Hidden;
 $obHdnCodConta->setName  ('inCodConta');
-$obHdnCodConta->setValue ( $_REQUEST['inCodConta'] );
+$obHdnCodConta->setValue ( $request->get('inCodConta') );
 
 $obHdnSimboloMoeda = new Hidden;
 $obHdnSimboloMoeda->setName ('inSimboloMoeda');
@@ -159,26 +158,20 @@ $obHdnSimboloMoeda->setName ('inSimboloMoeda');
 $obHdnAbreviatura = new Hidden;
 $obHdnAbreviatura->setName ('inAbreviatura');
 
-    //------------------------------------------ PARAMETOS PARA O CAMPO DE INDEXACAO
-    $obHdnCodIndexacao = new Hidden;
-    $obHdnCodIndexacao->setName  ('inCodIndexacao');
-    $obHdnCodIndexacao->setValue ( $inCodIndexacao );
+//------------------------------------------ PARAMETOS PARA O CAMPO DE INDEXACAO
+$obHdnCodIndexacao = new Hidden;
+$obHdnCodIndexacao->setName  ('inCodIndexacao');
+$obHdnCodIndexacao->setValue ( $inCodIndexacao );
 
-    $obHdnNomeIndexacao = new Hidden;
-    $obHdnNomeIndexacao->setName  ('stNomeIndexacao');
-    $obHdnNomeIndexacao->setValue ( $stNomeIndexacao );
-
-/*
-$obHdnTipoIndexacao = new Hidden;
-$obHdnTipoIndexacao->setName  ('TipoIndexacao');
-$obHdnTipoIndexacao->setValue ( $qualindicador );
-*/
+$obHdnNomeIndexacao = new Hidden;
+$obHdnNomeIndexacao->setName  ('stNomeIndexacao');
+$obHdnNomeIndexacao->setValue ( $stNomeIndexacao );
 
 $obTxtCodAcrescimo = new TextBox;
 $obTxtCodAcrescimo->setRotulo  ( 'Código');
 $obTxtCodAcrescimo->setTitle   ( 'Código do Acréscimo');
 $obTxtCodAcrescimo->setName    ( 'inCodAcrescimo');
-$obTxtCodAcrescimo->setValue   ( $_REQUEST["inCodAcrescimo"] );
+$obTxtCodAcrescimo->setValue   ( $request->get("inCodAcrescimo") );
 $obTxtCodAcrescimo->setInteiro ( false );
 $obTxtCodAcrescimo->setSize    ( 10 );
 $obTxtCodAcrescimo->setMaxLength ( 10 );
@@ -188,51 +181,48 @@ $obTxtDescricao = new TextBox;
 $obTxtDescricao->setRotulo  ( 'Descrição');
 $obTxtDescricao->setTitle   ( 'Descrição do crédito');
 $obTxtDescricao->setName    ( 'stDescricao');
-$obTxtDescricao->setValue   ( $_REQUEST["stDescricao"] );
+$obTxtDescricao->setValue   ( $request->get("stDescricao") );
 $obTxtDescricao->setInteiro ( false );
 $obTxtDescricao->setSize    ( 80 );
 $obTxtDescricao->setMaxLength ( 80 );
 $obTxtDescricao->setNull    ( false );
 
-if ($_REQUEST['stAcao'] == 'alterar') {
-
+if ($stAcao == 'alterar') {
     $obHdnCodNatureza = new Hidden;
     $obHdnCodNatureza->setName  ('inCodNatureza');
-    $obHdnCodNatureza->setValue ( $_REQUEST['inCodNatureza'] );
+    $obHdnCodNatureza->setValue ( $request->get('inCodNatureza') );
 
     $obHdnCodGenero = new Hidden;
     $obHdnCodGenero->setName  ('inCodGenero');
-    $obHdnCodGenero->setValue ( $_REQUEST['inCodGenero'] );
+    $obHdnCodGenero->setValue ( $request->get('inCodGenero') );
 
     $obHdnCodEspecie = new Hidden;
     $obHdnCodEspecie->setName  ('inCodEspecie');
-    $obHdnCodEspecie->setValue ( $_REQUEST['inCodEspecie'] );
+    $obHdnCodEspecie->setValue ( $request->get('inCodEspecie') );
 
     $obLblCodNatureza = new Label;
     $obLblCodNatureza->setName   ( 'LabelCodNatureza' );
     $obLblCodNatureza->setTitle  ( 'Natureza' );
     $obLblCodNatureza->setRotulo ( 'Natureza' );
-    $obLblCodNatureza->setValue  ( $_REQUEST['inCodNatureza'] . ' - ' . $_REQUEST['stNomNatureza'] );
+    $obLblCodNatureza->setValue  ( $request->get('inCodNatureza') . ' - ' . $request->get('stNomNatureza') );
 
     $obLblCodGenero = new Label;
     $obLblCodGenero->setName   ( 'LabelCodGenero' );
     $obLblCodGenero->setTitle  ( 'Gênero' );
     $obLblCodGenero->setRotulo ( 'Gênero' );
-    $obLblCodGenero->setValue  ( $_REQUEST['inCodGenero'] . ' - ' . $_REQUEST['stNomGenero'] );
+    $obLblCodGenero->setValue  ( $request->get('inCodGenero') . ' - ' . $request->get('stNomGenero') );
 
     $obLblCodEspecie = new Label;
     $obLblCodEspecie->setName   ( 'LabelCodEspecie' );
     $obLblCodEspecie->setTitle  ( 'Espécie' );
     $obLblCodEspecie->setRotulo ( 'Espécie' );
-    $obLblCodEspecie->setValue  ( $_REQUEST['inCodEspecie'] . ' - ' . $_REQUEST['stNomEspecie'] );
-
+    $obLblCodEspecie->setValue  ( $request->get('inCodEspecie') . ' - ' . $request->get('stNomEspecie') );
 } else {
-
     $obTxtCodNatureza = new TextBox;
     $obTxtCodNatureza->setRotulo  ( 'Natureza ');
     $obTxtCodNatureza->setTitle   ( 'Natureza do Crédito');
     $obTxtCodNatureza->setName    ( 'inCodNatureza');
-    $obTxtCodNatureza->setValue   ( $_REQUEST["inCodNatureza"] );
+    $obTxtCodNatureza->setValue   ( $request->get("inCodNatureza") );
     $obTxtCodNatureza->setInteiro ( true );
     $obTxtCodNatureza->setSize    ( 10 );
     $obTxtCodNatureza->setMaxLength ( 10 );
@@ -243,7 +233,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
     $obTxtCodGenero->setRotulo  ( 'Gênero');
     $obTxtCodGenero->setTitle   ( 'Gênero do Crédito');
     $obTxtCodGenero->setName    ( 'inCodGenero');
-    $obTxtCodGenero->setValue   ( $_REQUEST["inCodGenero"] );
+    $obTxtCodGenero->setValue   ( $request->get("inCodGenero") );
     $obTxtCodGenero->setInteiro ( true );
     $obTxtCodGenero->setSize    ( 10 );
     $obTxtCodGenero->setMaxLength ( 10 );
@@ -254,7 +244,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
     $obTxtCodEspecie->setRotulo  ( 'Espécie');
     $obTxtCodEspecie->setTitle   ( 'Espécie do Crédito');
     $obTxtCodEspecie->setName    ( 'inCodEspecie');
-    $obTxtCodEspecie->setValue   ( $_REQUEST["inCodEspecie"] );
+    $obTxtCodEspecie->setValue   ( $request->get("inCodEspecie") );
     $obTxtCodEspecie->setInteiro ( true );
     $obTxtCodEspecie->setSize    ( 10 );
     $obTxtCodEspecie->setMaxLength ( 10 );
@@ -268,7 +258,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
     $obCmbNatureza->setTitle                ( "Natureza do crédito"    );
     $obCmbNatureza->setName                 ( "cmbNatureza"              );
     $obCmbNatureza->addOption               ( "", "Selecione"        );
-    $obCmbNatureza->setValue                ( $_REQUEST['inCodNatureza'] );
+    $obCmbNatureza->setValue                ( $request->get('inCodNatureza') );
     $obCmbNatureza->setCampoId              ( "cod_natureza"             );
     $obCmbNatureza->setCampoDesc            ( "nom_natureza"             );
     $obCmbNatureza->preencheCombo           ( $rsNatureza                );
@@ -281,7 +271,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
     $obCmbGenero->setTitle        ( "Genero do crédito"    );
     $obCmbGenero->setName         ( "cmbGenero"              );
     $obCmbGenero->addOption       ( "", "Selecione"        );
-    $obCmbGenero->setValue        ( $_REQUEST['inCodGenero'] );
+    $obCmbGenero->setValue        ( $request->get('inCodGenero') );
     $obCmbGenero->setCampoId      ( "cod_genero"             );
     $obCmbGenero->setCampoDesc    ( "nom_genero"             );
     $obCmbGenero->preencheCombo   ( $rsGenero                );
@@ -294,7 +284,7 @@ if ($_REQUEST['stAcao'] == 'alterar') {
     $obCmbEspecie->setTitle        ( "Espécie do crédito"    );
     $obCmbEspecie->setName         ( "cmbEspecie"              );
     $obCmbEspecie->addOption       ( "", "Selecione"        );
-    $obCmbEspecie->setValue        ( $_REQUEST['inCodEspecie'] );
+    $obCmbEspecie->setValue        ( $request->get('inCodEspecie') );
     $obCmbEspecie->setCampoId      ( "cod_especie"             );
     $obCmbEspecie->setCampoDesc    ( "nom_especie"             );
     $obCmbEspecie->preencheCombo   ( $rsEspecie                );
@@ -324,7 +314,7 @@ $obCmbCC->setRotulo       ( "Conta Corrente" );
 $obCmbCC->setTitle        ( "Conta corrente do convênio à qual o crédito estará vinculado." );
 $obCmbCC->setName         ( "cmbContaCorrente" );
 $obCmbCC->addOption       ( "", "Selecione" );
-$obCmbCC->setValue        ( $_REQUEST['inCodConta'] );
+$obCmbCC->setValue        ( $request->get('inCodConta') );
 $obCmbCC->setCampoId      ( "[cod_conta]-[cod_banco]-[cod_agencia]" );
 $obCmbCC->setCampoDesc    ( "nom_conta" );
 $obCmbCC->preencheCombo   ( $rsConta );
@@ -336,7 +326,7 @@ $obCmbCarteira->setRotulo       ( "Carteira" );
 $obCmbCarteira->setTitle        ( " Carteira do convênio no qual o crédito estará vinculado." );
 $obCmbCarteira->setName         ( "cmbCarteira" );
 $obCmbCarteira->addOption       ( "", "Selecione" );
-$obCmbCarteira->setValue        ( $_REQUEST['inCodCarteira'] );
+$obCmbCarteira->setValue        ( $request->get('inCodCarteira') );
 $obCmbCarteira->setCampoId      ( "cod_carteira" );
 $obCmbCarteira->setCampoDesc    ( "nom_carteira" );
 $obCmbCarteira->preencheCombo   ( $rsCarteira );
@@ -347,7 +337,7 @@ $obLblCodCredito = new Label;
 $obLblCodCredito->setName   ( 'LabelCodCredito' );
 $obLblCodCredito->setTitle  ( 'Código' );
 $obLblCodCredito->setRotulo ( 'Código do Crédito' );
-$obLblCodCredito->setValue  ( $_REQUEST['inCodCredito'] );
+$obLblCodCredito->setValue  ( $request->get('inCodCredito') );
 
 $obBscNorma= new BuscaInner;
 $obBscNorma->setRotulo ( "*Norma" );
@@ -455,8 +445,7 @@ $obFormulario->addHidden ( $obHdnCtrl );
 $obFormulario->addHidden ( $obHdnSimboloMoeda );
 $obFormulario->addHidden ( $obHdnAbreviatura );
 
-if ($_REQUEST['stAcao'] == "alterar") {
-
+if ($stAcao == "alterar") {
     $obFormulario->addHidden    ( $obHdnCodCredito );
     $obFormulario->addHidden    ( $obHdnCodIndexacao );
     $obFormulario->addHidden    ( $obHdnNomeIndexacao );
@@ -502,16 +491,15 @@ $obPopUpAcrescimo->geraFormulario( $obFormulario );
 $obFormulario->defineBarra   ( $botoesSpanAcrescimo,'left','' );
 $obFormulario->addSpan       ( $obSpnListaAcrescimo     );
 
-if ($_REQUEST['stAcao'] == "incluir") {
+if ($stAcao == "incluir") {
     $obFormulario->defineBarra   ( $botoesSpanOK,'left','' );
-    //$obFormulario->ok       ();
 } else {
     $obFormulario->cancelar();
 }
 
 $obFormulario->show();
 
-if ($_REQUEST['stAcao'] == 'alterar') { //funcao para buscar as indexacoes e os acrescimos do credito
+if ($stAcao == 'alterar') { //funcao para buscar as indexacoes e os acrescimos do credito
      $js = "buscaValor('BuscaDados')";
 }
 

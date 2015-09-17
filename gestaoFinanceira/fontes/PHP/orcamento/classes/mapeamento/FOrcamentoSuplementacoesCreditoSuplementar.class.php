@@ -42,13 +42,6 @@
                     uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.6  2006/07/05 20:42:02  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
@@ -58,7 +51,7 @@ class FOrcamentoSuplementacoesCreditoSuplementar extends Persistente
     * Método Construtor
     * @access Private
 */
-function FOrcamentoSuplementacoesCreditoSuplementar()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela('OrcamentoSuplementacoesCreditoSuplementar');
@@ -72,7 +65,7 @@ function FOrcamentoSuplementacoesCreditoSuplementar()
     $this->AddCampo('cred_suplementar'       ,'varchar',false,''    ,false,false);
 }
 
-function montaExecutaFuncao()
+public function montaExecutaFuncao()
 {
     $stSql  = " SELECT  \n";
     $stSql .= " ".$this->getTabela()."('".$this->getDado("exercicio")        ."', \n";
@@ -87,7 +80,7 @@ function montaExecutaFuncao()
     return $stSql;
 }
 
-function montaInsereLote()
+public function montaInsereLote()
 {
     $stSql  = "SELECT                                                             \n";
     $stSql .= " contabilidade.fn_insere_lote(                                     \n";
@@ -108,7 +101,7 @@ function montaInsereLote()
     * @param  Boolean $boTransacao
     * @return Object  Objeto Erro
 */
-function executaFuncao(&$rsRecordSet, $boTransacao = "")
+public function executaFuncao(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -133,3 +126,5 @@ function executaFuncao(&$rsRecordSet, $boTransacao = "")
 }
 
 }
+
+?>

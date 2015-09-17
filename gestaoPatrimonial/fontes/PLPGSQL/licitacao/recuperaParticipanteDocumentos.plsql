@@ -47,12 +47,11 @@ DECLARE
     stSql                 VARCHAR := '';
 
 BEGIN
-
     stSql := '
                   SELECT participante_documentos.*
                     FROM licitacao.participante_documentos
               INNER JOIN licitacao.licitacao_documentos
-                      ON participante_documentos.cod_licitacao = licitacao_documentos.cod_documento
+                      ON participante_documentos.cod_documento = licitacao_documentos.cod_documento
                      AND participante_documentos.cod_licitacao = licitacao_documentos.cod_licitacao
                      AND participante_documentos.cod_modalidade = licitacao_documentos.cod_modalidade
                      AND participante_documentos.cod_entidade = licitacao_documentos.cod_entidade
@@ -62,10 +61,9 @@ BEGIN
                    WHERE participante_documentos.exercicio = ''' || stExercicio || '''
                      AND participante_documentos.cod_entidade IN (' || stCodEntidades || ')
                      ';
-
               IF stFiltro <> '' THEN stSql := stSql || ' AND ' || stFiltro || '';
               END IF;
-    
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
       RETURN NEXT reRegistro;

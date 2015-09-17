@@ -33,9 +33,12 @@
 *
 * Caso de uso: uc-06.04.00
 */
-CREATE OR REPLACE FUNCTION tcemg.recupera_ppa_inclusao_programa(VARCHAR) RETURNS SETOF RECORD AS $$
+
+-- drop FUNCTION tcemg.recupera_ppa_inclusao_programa(VARCHAR);
+CREATE OR REPLACE FUNCTION tcemg.recupera_ppa_inclusao_programa(VARCHAR, VARCHAR) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio ALIAS FOR $1;
+    stDataFinal ALIAS FOR $2;
     stSql VARCHAR := '';
     rsProgramas RECORD;
     var INTEGER := 0;
@@ -44,23 +47,19 @@ BEGIN
     SELECT *
 	    FROM (
               SELECT pp.num_programa AS cod_programa
+                   , pp.cod_programa AS ppa_cod_programa
                    , ppd.identificacao AS nom_programa
                    , ppd.objetivo
                    , REPLACE(SUM(COALESCE(total_recursos.ano1, 0.00))::VARCHAR,''.'','','')::VARCHAR AS total_recurso_1_ano
                    , REPLACE(SUM(COALESCE(total_recursos.ano2, 0.00))::VARCHAR,''.'','','')::VARCHAR AS total_recurso_2_ano
                    , REPLACE(SUM(COALESCE(total_recursos.ano3, 0.00))::VARCHAR,''.'','','')::VARCHAR AS total_recurso_3_ano
                    , REPLACE(SUM(COALESCE(total_recursos.ano4, 0.00))::VARCHAR,''.'','','')::VARCHAR AS total_recurso_4_ano
-                   , nn.num_norma::INTEGER AS numero_lei
-                   , TO_CHAR(nn.dt_assinatura, ''DDMMYYYY'')::VARCHAR AS data_lei
-                   , TO_CHAR(nn.dt_publicacao, ''DDMMYYYY'')::VARCHAR AS data_publicacao_lei
+                   , normas_alteracoes.numero_lei
+                   , normas_alteracoes.data_lei
+                   , normas_alteracoes.data_publicacao_lei
                 FROM ppa.programa AS pp
                 JOIN ppa.programa_dados AS ppd
                   ON ppd.cod_programa = pp.cod_programa
-                JOIN ppa.programa_norma AS ppn
-                  ON ppn.cod_programa = ppd.cod_programa
-                 AND ppn.timestamp_programa_dados = ppd.timestamp_programa_dados
-                JOIN normas.norma as nn
-                  ON nn.cod_norma = ppn.cod_norma
                 JOIN ppa.acao AS pa
                   ON pa.cod_programa = pp.cod_programa
                 LEFT JOIN (
@@ -92,25 +91,41 @@ BEGIN
                       WHERE ano1.ano = ''1''
                    ) AS total_recursos
                   ON total_recursos.cod_acao = pa.cod_acao
-               WHERE pp.cod_programa NOT IN (
+                   , (SELECT nn.num_norma::INTEGER AS numero_lei
+                           , nn.exercicio
+                           , TO_CHAR(nn.dt_assinatura, ''DDMMYYYY'')::VARCHAR AS data_lei
+                           , TO_CHAR(nn.dt_publicacao, ''DDMMYYYY'')::VARCHAR AS data_publicacao_lei
+                        FROM tcemg.configuracao_leis_ppa
+                  INNER JOIN normas.norma as nn
+                          ON nn.cod_norma = configuracao_leis_ppa.cod_norma 
+                       WHERE configuracao_leis_ppa.exercicio = '''||stExercicio||'''
+                         AND configuracao_leis_ppa.tipo_configuracao = ''alteracao''
+                         AND nn.dt_publicacao < TO_DATE('''||stDataFinal||''',''dd/mm/yyyy'')
+                  ORDER BY nn.dt_publicacao DESC
+                  LIMIT 1
+                     ) AS normas_alteracoes
+               WHERE ppd.timestamp_programa_dados = (SELECT MAX(programa_dados.timestamp_programa_dados) FROM ppa.programa_dados WHERE ppa.programa_dados.cod_programa = ppd.cod_programa)
+                 AND pp.cod_programa NOT IN (
                               SELECT t_rap.cod_programa FROM tcemg.registros_arquivo_programa AS t_rap
                                WHERE t_rap.exercicio = '''||stExercicio||'''
                      )
                  AND pp.cod_programa NOT IN (
                               SELECT t_raip.cod_programa FROM tcemg.registros_arquivo_inclusao_programa AS t_raip
-                               WHERE t_raip.exercicio = '''||stExercicio||'''
+                               WHERE t_raip.exercicio = '''||stExercicio||''' 
+                                 AND TO_CHAR(t_raip.timestamp, ''mm'') < TO_CHAR(TO_DATE('''||stDataFinal||''', ''dd/mm/yyyy''), ''mm'')
                      )
               
-               GROUP BY pp.num_programa, ppd.objetivo, nn.num_norma, nn.dt_assinatura, nn.dt_publicacao, ppd.identificacao
+               GROUP BY pp.num_programa, ppa_cod_programa, ppd.objetivo, normas_alteracoes.numero_lei, normas_alteracoes.data_lei, normas_alteracoes.data_publicacao_lei, ppd.identificacao
                ORDER BY pp.num_programa ASC
         ) AS tmp
         ORDER BY tmp.cod_programa;
     ';
+
     FOR rsProgramas IN EXECUTE stSql
     LOOP
-        SELECT count(*) INTO var FROM tcemg.registros_arquivo_inclusao_programa WHERE exercicio = stExercicio AND cod_programa = rsProgramas.cod_programa;
+        SELECT count(*) INTO var FROM tcemg.registros_arquivo_inclusao_programa WHERE exercicio = stExercicio AND cod_programa = rsProgramas.ppa_cod_programa;
         IF var = 0 THEN
-            INSERT INTO tcemg.registros_arquivo_inclusao_programa (exercicio, cod_programa) VALUES (stExercicio, rsProgramas.cod_programa);
+            INSERT INTO tcemg.registros_arquivo_inclusao_programa (exercicio, cod_programa) VALUES (stExercicio, rsProgramas.ppa_cod_programa);
         END IF;
        
         IF rsProgramas.cod_programa = 999 THEN

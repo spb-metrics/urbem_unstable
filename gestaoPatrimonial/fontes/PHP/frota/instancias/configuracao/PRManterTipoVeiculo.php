@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterTipoVeiculo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterTipoVeiculo.php 63195 2015-08-03 20:45:09Z carlos.silva $
 
     * Casos de uso: uc-03.02.02
 */
@@ -57,24 +57,26 @@ switch ($stAcao) {
     case 'incluir':
         //verifica se nao existe ja no cadastro a descricao do tipo do veiculo
         $obTFrotaTipoVeiculo->recuperaTodos( $rsTipoVeiculo, " WHERE nom_tipo ILIKE '".$_REQUEST['stTipoVeiculo']."' " );
-
         if ( $rsTipoVeiculo->getNumLinhas() > 0 ) {
             $stMensagem = 'Já existe um tipo de veículo com esta descrição';
         }
+        
+        //verifica se nao existe ja no cadastro o cod_tipo da tipo
+        $obTFrotaTipoVeiculo->recuperaTodos( $rsTipoVeiculo, " WHERE cod_tipo = ".$_REQUEST['stCodigoTipoVeiculo']." ");
+        if ( $rsTipoVeiculo->getNumLinhas() > 0 ) {
+            $stMensagem = 'Já existe um tipo de veículo com este código';
+        }
 
         if (!$stMensagem) {
-            //recupera o cod_tipo
-            $obTFrotaTipoVeiculo->ProximoCod( $inCodTipoVeiculo );
-
             //seta os dados e cadastra no sistema
-            $obTFrotaTipoVeiculo->setDado( 'cod_tipo', $inCodTipoVeiculo );
+            $obTFrotaTipoVeiculo->setDado( 'cod_tipo', $_REQUEST['stCodigoTipoVeiculo'] );
             $obTFrotaTipoVeiculo->setDado( 'nom_tipo', $_REQUEST['stTipoVeiculo'] );
             $obTFrotaTipoVeiculo->setDado( 'placa', ( $_REQUEST['boPlaca'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->setDado( 'prefixo', ( $_REQUEST['boPrefixo'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->setDado( 'controlar_horas_trabalhadas', ( $_REQUEST['boHoras'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->inclusao();
 
-            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Veículo - '.$inCodTipoVeiculo.' - '.$_REQUEST['stTipoVeiculo'],"incluir","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Veículo - '.$_REQUEST['stCodigoTipoVeiculo'].' - '.$_REQUEST['stTipoVeiculo'],"incluir","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
         }
@@ -83,22 +85,21 @@ switch ($stAcao) {
 
     case 'alterar':
         //verifica se nao existe ja no cadastro a descricao do tipo do veiculo
-        $obTFrotaTipoVeiculo->recuperaTodos( $rsTipoVeiculo, " WHERE nom_tipo ILIKE '".$_REQUEST['stTipoVeiculo']."' AND cod_tipo <> ".$_REQUEST['inCodTipoVeiculo']." " );
-
+        $obTFrotaTipoVeiculo->recuperaTodos( $rsTipoVeiculo, " WHERE nom_tipo ILIKE '".$_REQUEST['stTipoVeiculo']."' AND cod_tipo <> ".$_REQUEST['stCodigoTipoVeiculo']." " );
         if ( $rsTipoVeiculo->getNumLinhas() > 0 ) {
             $stMensagem = 'Já existe um tipo de veículo com esta descrição';
         }
 
         if (!$stMensagem) {
             //seta os dados e cadastra no sistema
-            $obTFrotaTipoVeiculo->setDado( 'cod_tipo', $_REQUEST['inCodTipoVeiculo'] );
+            $obTFrotaTipoVeiculo->setDado( 'cod_tipo', $_REQUEST['stCodigoTipoVeiculo'] );
             $obTFrotaTipoVeiculo->setDado( 'nom_tipo', $_REQUEST['stTipoVeiculo'] );
             $obTFrotaTipoVeiculo->setDado( 'placa', ( $_REQUEST['boPlaca'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->setDado( 'prefixo', ( $_REQUEST['boPrefixo'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->setDado( 'controlar_horas_trabalhadas', ( $_REQUEST['boHoras'] == 1 ) ? true : false );
             $obTFrotaTipoVeiculo->alteracao();
 
-            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Veículo - '.$_REQUEST['inCodTipoVeiculo'].' - '.$_REQUEST['stTipoVeiculo'],"alterar","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,'Tipo de Veículo - '.$_REQUEST['stCodigoTipoVeiculo'].' - '.$_REQUEST['stTipoVeiculo'],"alterar","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
         }

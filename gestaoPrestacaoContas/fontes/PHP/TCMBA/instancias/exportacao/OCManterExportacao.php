@@ -33,36 +33,21 @@
 
     * @ignore
 
-    $Revision: 62963 $
-    $Name$
-    $Author: hboaventura $
-    $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
+    $Id: OCManterExportacao.php 63563 2015-09-10 19:09:46Z michel $
 
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.3  2007/10/01 04:46:08  diego
-Comentado rodapé e adicionada variavel de unidade gestora utilizada nos arquivos
-
-Revision 1.2  2007/09/27 12:53:57  hboaventura
-adicionando arquivos
-
-Revision 1.1  2007/06/22 22:50:37  diego
-Primeira versão.
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAConfiguracao.class.php" );
-include_once( CLA_EXPORTADOR );
+include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio().'/TTBAConfiguracao.class.php';
+include_once CLA_EXPORTADOR;
 
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 
 $arFiltro = Sessao::read('filtroRelatorio');
 
-$inMes           = $arFiltro['stMes'];
+list( $inDia,$inMes,$inAno ) = explode( '/', $arFiltro['stDataFinal'] ); 
 $stEntidades     = $arFiltro['inCodEntidade'];
 $stTipoDocumento = "TCM_BA";
 
@@ -87,12 +72,11 @@ if (SistemaLegado::pegaDado('parametro','administracao.configuracao', " WHERE va
 }
 
 foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
-    
     $obExportador->addArquivo($stArquivo);
     $obExportador->roUltimoArquivo->setTitulo(substr($stArquivo,0,strpos($stArquivo,'.txt')));
     $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
    
-    include( CAM_GPC_TCMBA_INSTANCIAS."layout_arquivos/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
+    include (CAM_GPC_TCMBA_INSTANCIAS."layout_arquivos/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')).".inc.php");
     $arRecordSet = null;
 }
 

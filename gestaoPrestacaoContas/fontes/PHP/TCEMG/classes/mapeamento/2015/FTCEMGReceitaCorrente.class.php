@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FTCEMGReceitaCorrente.class.php 62757 2015-06-16 17:28:52Z michel $
+    $Id: FTCEMGReceitaCorrente.class.php 63423 2015-08-26 20:27:31Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -78,7 +78,7 @@ class FTCEMGReceitaCorrente extends Persistente
                                            diferenca           NUMERIC
                                          )
          ORDER BY cod_estrutural; ";
-          
+
         return $stSql;
     }
 }

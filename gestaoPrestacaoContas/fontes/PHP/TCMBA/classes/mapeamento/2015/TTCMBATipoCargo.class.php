@@ -46,9 +46,9 @@ class TTCMBATipoCargo extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTCMBATipoCargo()
+function __construct()
 {
-    parent::Persistente();
+    parent::__construct();
     $this->setTabela("tcmba.tipo_cargo_tce");
 
     $this->setCampoCod('cod_tipo_cargo_tce');

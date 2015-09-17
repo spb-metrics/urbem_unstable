@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterMarca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterMarca.php 63194 2015-08-03 20:44:43Z carlos.silva $
 
     * Casos de uso: uc-03.02.03
 */
@@ -56,22 +56,24 @@ Sessao::getTransacao()->setMapeamento( $obTFrotaMarca );
 switch ($stAcao) {
     case 'incluir':
         //verifica se nao existe ja no cadastro o nome da marca
-        $obTFrotaMarca->recuperaTodos( $rsMarca, " WHERE nom_marca ILIKE '".$_REQUEST['stMarca']."' " );
-
+        $obTFrotaMarca->recuperaTodos( $rsMarca, " WHERE nom_marca ILIKE '".$_REQUEST['stMarca']."' ");
         if ( $rsMarca->getNumLinhas() > 0 ) {
             $stMensagem = 'Já existe uma marca com esta descrição';
         }
+        
+        //verifica se nao existe ja no cadastro o cod_marca da marca
+        $obTFrotaMarca->recuperaTodos( $rsMarca, " WHERE cod_marca = ".$_REQUEST['inCodMarca']." ");
+        if ( $rsMarca->getNumLinhas() > 0 ) {
+            $stMensagem = 'Já existe uma marca com este código';
+        }
 
         if (!$stMensagem) {
-            //recupera o cod_marca
-            $obTFrotaMarca->ProximoCod( $inCodMarca );
-
             //seta os dados e cadastra no sistema
-            $obTFrotaMarca->setDado( 'cod_marca', $inCodMarca );
+            $obTFrotaMarca->setDado( 'cod_marca', $_REQUEST['inCodMarca'] );
             $obTFrotaMarca->setDado( 'nom_marca', $_REQUEST['stMarca'] );
             $obTFrotaMarca->inclusao();
 
-            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Marca - '.$inCodMarca.' - '.$_REQUEST['stMarca'],"incluir","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,'Marca - '.$_REQUEST['inCodMarca'].' - '.$_REQUEST['stMarca'],"incluir","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
         }
@@ -80,8 +82,7 @@ switch ($stAcao) {
 
     case 'alterar':
         //verifica se nao existe ja no cadastro o nome da marca
-        $obTFrotaMarca->recuperaTodos( $rsMarca, " WHERE nom_marca ILIKE '".$_REQUEST['stMarca']."' AND cod_marca <> ".$_REQUEST['inCodMarca']." " );
-
+        $obTFrotaMarca->recuperaTodos( $rsMarca, " WHERE nom_marca ILIKE '".$_REQUEST['stMarca']."' AND cod_marca <> ".$_REQUEST['inCodMarca']." ");
         if ( $rsMarca->getNumLinhas() > 0 ) {
             $stMensagem = 'Já existe uma marca com esta descrição';
         }

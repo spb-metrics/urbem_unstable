@@ -58,26 +58,48 @@ switch ($stAcao) {
         $obTPessoalDeParaTipoCargo->recuperaTodos($rsDeParaTipoCargo);
 
         while (!$rsDeParaTipoCargo->EOF()) {
-            $obTPessoalDeParaTipoCargo->setDado('cod_sub_divisao', $rsDeParaTipoCargo->getCampo('cod_sub_divisao'));
-            $obTPessoalDeParaTipoCargo->setDado('cod_tipo_cargo_tce', $rsDeParaTipoCargo->getCampo('cod_tipo_cargo_tce'));
-            $obTPessoalDeParaTipoCargo->exclusao();
+            $obTPessoalDeParaTipoCargo->setDado('cod_sub_divisao'    , $rsDeParaTipoCargo->getCampo('cod_sub_divisao'));
+            $obTPessoalDeParaTipoCargo->setDado('cod_tipo_cargo_tce' , $rsDeParaTipoCargo->getCampo('cod_tipo_cargo_tce'));
+            $obTPessoalDeParaTipoCargo->setDado('cod_tipo_regime_tce', $rsDeParaTipoCargo->getCampo('cod_tipo_regime_tce'));
+            $obErro = $obTPessoalDeParaTipoCargo->exclusao();
             $rsDeParaTipoCargo->proximo();
         }
 
-        foreach ($_REQUEST as $stKey => $stValue) {
-            if (strpos($stKey,'cmbCargo') !== false AND $stValue != '') {
+        $arElementos = $_REQUEST;
+        $arDadosInsert = array();        
+        foreach ($arElementos as $stKey => $stValue) {
+            if (strpos($stKey,'cmbRegime') !== false AND $stValue != ''){                                
                 $arRetencao = explode('_',$stKey);
-
-                $obTPessoalDeParaTipoCargo->setDado('cod_tipo_cargo_tce',$stValue);
-                $obTPessoalDeParaTipoCargo->setDado('cod_sub_divisao',$arRetencao[1]);
-                $obErro = $obTPessoalDeParaTipoCargo->inclusao();
+                $arDadosInsert[$arRetencao[1]]['cod_sub_divisao']     = $arRetencao[1];
+                $arDadosInsert[$arRetencao[1]]['cod_tipo_regime_tce'] = $stValue;
+            } else if ($stValue == '') {
+                 $arRetencao = explode('_',$stKey);
+                 $obErro->setDescricao("O tipo de regime da subdivisão ".$arRetencao[1]." não foi selecionado!");
             }
-        }
+            if ( strpos($stKey,'cmbCargo') !== false AND $stValue != '' ) {
+                $arRetencao = explode('_',$stKey);
+                $arDadosInsert[$arRetencao[1]]['cod_tipo_cargo_tce'] = $stValue;
+            } else if ($stValue == '') {
+                 $arRetencao = explode('_',$stKey);
+                 $obErro->setDescricao("O tipo de cargo da subdivisão ".$arRetencao[1]." não foi selecionado!");
+            }
+        }            
+
         if (!$obErro->ocorreu) {
-            SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
-        } else {
-            sistemaLegado::exibeAviso($obErro->getDescricao() ,"n_incluir","erro");
+            foreach ($arDadosInsert as $key => $value) {
+                $obTPessoalDeParaTipoCargo->setDado('cod_tipo_regime_tce', $value['cod_tipo_regime_tce'] );
+                $obTPessoalDeParaTipoCargo->setDado('cod_tipo_cargo_tce' , $value['cod_tipo_cargo_tce']  );
+                $obTPessoalDeParaTipoCargo->setDado('cod_sub_divisao'    , $value['cod_sub_divisao']     );                
+                $obErro = $obTPessoalDeParaTipoCargo->inclusao();            
+            }
+                
+            if (!$obErro->ocorreu) {
+                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=$stAcao","Configuração ","incluir","incluir_n", Sessao::getId(), "../");
+            } else {
+                sistemaLegado::exibeAviso($obErro->getDescricao() ,"n_incluir","erro");
+            }
         }
 }
 
 Sessao::encerraExcecao();
+

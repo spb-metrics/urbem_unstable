@@ -30,7 +30,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-    * $Id: TCEMLicenca.class.php 59835 2014-09-15 14:41:31Z carolina $
+    * $Id: TCEMLicenca.class.php 63399 2015-08-25 13:39:55Z arthur $
 
 * Casos de uso: uc-05.02.12
 
@@ -39,23 +39,13 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-/**
-  * Efetua conexão com a tabela  ECONOMICO.LICENCA
-  * Data de Criação: 17/11/2004
-
-  * @author Analista: Ricardo Lopes de Alencar
-  * @author Desenvolvedor: Tonismar Régis Bernardo
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TCEMLicenca extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TCEMLicenca()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela('economico.licenca');
@@ -70,7 +60,7 @@ function TCEMLicenca()
 
 }
 
-function montaRecuperaRelacionamento()
+public function montaRecuperaRelacionamento()
 {
     $stSql  = " SELECT                                              \n";
     $stSql .= "     MAX (COD_LICENCA)                               \n";
@@ -81,20 +71,19 @@ function montaRecuperaRelacionamento()
 
 }
 
-function recuperaLicencasConsulta(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function recuperaLicencasConsulta(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaRecuperaLicencasConsulta().$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-    #$this->debug();
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 }
 
-function montaRecuperaLicencasConsulta()
+public function montaRecuperaLicencasConsulta()
 {
     $stSql .= " SELECT                                                                                  \n";
     $stSql .= "     l.cod_licenca                                                                       \n";
@@ -156,7 +145,7 @@ function montaRecuperaLicencasConsulta()
 
 }
 
-function buscaUltimoRegistro(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function buscaUltimoRegistro(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -169,7 +158,7 @@ function buscaUltimoRegistro(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTr
 
 }
 
-function montaBuscaUltimoRegistro()
+public function montaBuscaUltimoRegistro()
 {
     $stSql = "	SELECT                                                              \n";
     $stSql .="      max(cod_licenca) as valor                                       \n";
@@ -180,21 +169,20 @@ function montaBuscaUltimoRegistro()
 
 }
 
-function buscaAtributoInscricaoMunicipalLicensaManaquiri(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function buscaAtributoInscricaoMunicipalLicensaManaquiri(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montabuscaAtributoInscricaoMunicipalLicensaManaquiri( $inInscricaoEconomica ).$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-    //$this->debug(); exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 
 }
 
-function montabuscaAtributoInscricaoMunicipalLicensaManaquiri($inInscricaoEconomica)
+public function montabuscaAtributoInscricaoMunicipalLicensaManaquiri($inInscricaoEconomica)
 {
     $stSql  = " select CASE WHEN (aedv.inscricao_economica is not null)                                                                                     \n";
     $stSql .= "             THEN aedv.valor                                                                                                                 \n";
@@ -229,21 +217,20 @@ function montabuscaAtributoInscricaoMunicipalLicensaManaquiri($inInscricaoEconom
     return $stSql;
 }
 
-function buscaDadosConcederLicencaAtividade(&$rsRecordSet, $inExercicioConf, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function buscaDadosConcederLicencaAtividade(&$rsRecordSet, $inExercicioConf, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaBuscaDadosConcederLicencaAtividade( $inExercicioConf ).$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-    //$this->debug(); exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 
 }
 
-function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
+public function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
 {
     $stSql = "  SELECT DISTINCT                                                                     \n";
     $stSql .="      LPAD (ela.cod_licenca::varchar, 8, '0') as cod_licenca                                   \n";
@@ -257,7 +244,7 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
                        ELSE
                         edf.inscricao_municipal
                        end) as IM            \n";
-    $stSql .="      , coalesce ( eceA.numcgm, eceF.numcgm, eceD.numcgm ) as numcgm                  \n";
+    $stSql .="      , coalesce ( eceA.numcgm, eceD.numcgm, eceF.numcgm ) as numcgm                  \n";
     $stSql .="      , cgm.nom_cgm as razao_social                                                   \n";
     $stSql .="      , cgmPJ.nom_fantasia                                                            \n";
     $stSql .="      , cgmPF.rg                                                                      \n";
@@ -290,7 +277,7 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
 
     $stSql .="      , ( CASE WHEN edi.endereco is null OR ( edi.timestamp < COALESCE( edf.timestamp, '1900-01-01 00:00:00' ) ) THEN    \n";
     $stSql .="              split_part ( edf.endereco,'§',5)                                        \n";
-//    $stSql .= "  ''  ";
+
     $stSql .="          ELSE                                                                        \n";
     $stSql .="              split_part ( edi.endereco,'§',5)                                        \n";
     $stSql .="          END                                                                         \n";
@@ -299,22 +286,17 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="      , ( CASE WHEN edi.endereco is null OR ( edi.timestamp < COALESCE( edf.timestamp, '1900-01-01 00:00:00' ) ) THEN    \n";
     $stSql .="              split_part ( edf.endereco,'§',9) ||' / '||                              \n";
     $stSql .="              split_part ( edf.endereco,'§',11 )                                      \n";
-
-  //  $stSql .= "  ''  ";
     $stSql .="          ELSE                                                                        \n";
     $stSql .="              split_part ( edi.endereco,'§',9) ||' / '||                              \n";
     $stSql .="              split_part ( edi.endereco,'§',11 )                                      \n";
     $stSql .="          END                                                                         \n";
     $stSql .="      ) as cidade                                                                     \n";
-
     $stSql .="      , ( CASE WHEN edi.endereco is null OR ( edi.timestamp < COALESCE( edf.timestamp, '1900-01-01 00:00:00' ) ) THEN    \n";
     $stSql .="              split_part ( edf.endereco,'§',7)                                        \n";
-//    $stSql .= "  ''  ";
     $stSql .="          ELSE                                                                        \n";
     $stSql .="              split_part ( edi.endereco,'§',7)                                        \n";
     $stSql .="          END                                                                         \n";
     $stSql .="      ) as cep                                                                        \n";
-
     $stSql .="      , ativide_principal.cod_atividade                                               \n";
     $stSql .="      , ativide_principal.nom_atividade                                               \n";
     $stSql .="      , ativide_principal.dt_inicio as inicio_atividade                               \n";
@@ -361,7 +343,6 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="          )                                                                           \n";
     $stSql .="          END                                                                         \n";
     $stSql .="      ) as Lote                                                                       \n";
-//CASE WHEN edi.timestamp > edf.timestamp  THEN
     $stSql .="      , ( CASE WHEN (edf.inscricao_municipal IS NOT NULL) and (edf.timestamp > COALESCE( edi.timestamp, '1900-01-01 00:00:00' )) THEN                          \n";
     $stSql .="          (                                                                           \n";
     $stSql .="          select valor from imobiliario.atributo_lote_urbano_valor                    \n";
@@ -378,7 +359,6 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="          )                                                                           \n";
     $stSql .="          END                                                                         \n";
     $stSql .="      ) as quadra                                                                     \n";
-
     $stSql .="      , (CASE WHEN COALESCE( edi.timestamp, '1900-01-01 00:00:00' ) > COALESCE( edf.timestamp, '1900-01-01 00:00:00' )  THEN
                          ''
                        ELSE \n";
@@ -502,7 +482,7 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="  ON eceDNJ.inscricao_economica = ece.inscricao_economica                             \n";
 
     $stSql .="  INNER JOIN sw_cgm as cgm                                                            \n";
-    $stSql .="  ON cgm.numcgm = coalesce ( eceA.numcgm, eceF.numcgm, eceD.numcgm )                  \n";
+    $stSql .="  ON cgm.numcgm = coalesce ( eceA.numcgm, eceD.numcgm, eceF.numcgm )                  \n";
 
     $stSql .="  LEFT JOIN sw_cgm_pessoa_fisica as cgmPF                                             \n";
     $stSql .="  ON cgmPF.numcgm = cgm.numcgm                                                        \n";
@@ -606,10 +586,8 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
                         AND tmp.timestamp = dias_cadastro_economico.timestamp                       \n";
 
     $stSql .="      where dias_cadastro_economico.cod_dia = 1                                       \n";
-
     $stSql .="  ) as domingo                                                                        \n";
     $stSql .="  ON domingo.inscricao_economica = ece.inscricao_economica                            \n";
-
     $stSql .="  LEFT JOIN (                                                                         \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -633,11 +611,9 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
                         tmp.cod_dia = dias_cadastro_economico.cod_dia
                         AND tmp.inscricao_economica = dias_cadastro_economico.inscricao_economica
                         AND tmp.timestamp = dias_cadastro_economico.timestamp                       \n";
-
     $stSql .="      where dias_cadastro_economico.cod_dia = 2                                       \n";
     $stSql .="  ) as segunda                                                                        \n";
     $stSql .="  ON segunda.inscricao_economica = ece.inscricao_economica                            \n";
-
     $stSql .="  LEFT JOIN (                                                                         \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -665,7 +641,6 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="      where dias_cadastro_economico.cod_dia = 3                                       \n";
     $stSql .="  ) as terca                                                                          \n";
     $stSql .="  ON terca.inscricao_economica = ece.inscricao_economica                              \n";
-
     $stSql .="  LEFT JOIN (                                                                         \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -689,11 +664,9 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
                         tmp.cod_dia = dias_cadastro_economico.cod_dia
                         AND tmp.inscricao_economica = dias_cadastro_economico.inscricao_economica
                         AND tmp.timestamp = dias_cadastro_economico.timestamp                       \n";
-
     $stSql .="      where dias_cadastro_economico.cod_dia = 4                                       \n";
     $stSql .="  ) as quarta                                                                         \n";
     $stSql .="  ON quarta.inscricao_economica = ece.inscricao_economica                             \n";
-
     $stSql .="  LEFT JOIN (                                                                         \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -721,7 +694,6 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="      where dias_cadastro_economico.cod_dia = 5                                       \n";
     $stSql .="  ) as quinta                                                                         \n";
     $stSql .="  ON quinta.inscricao_economica = ece.inscricao_economica                             \n";
-
     $stSql .="  LEFT JOIN  (                                                                        \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -749,7 +721,6 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
     $stSql .="      where dias_cadastro_economico.cod_dia = 6                                       \n";
     $stSql .="  ) as sexta                                                                          \n";
     $stSql .="  ON sexta.inscricao_economica = ece.inscricao_economica                              \n";
-
     $stSql .="  LEFT JOIN (                                                                         \n";
     $stSql .="      SELECT                                                                          \n";
     $stSql .="          dias_cadastro_economico.inscricao_economica,                                \n";
@@ -933,7 +904,7 @@ function montaBuscaDadosConcederLicencaAtividade($inExercicioConf)
 
 }
 
-function buscaDadosConcederLicencaEspecial(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function buscaDadosConcederLicencaEspecial(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     return $this->executaRecupera   (   "montaBuscaDadosConcederLicencaEspecial",
                                         $rsRecordSet, $stFiltro, $stOrder, $boTransacao
@@ -941,7 +912,7 @@ function buscaDadosConcederLicencaEspecial(&$rsRecordSet, $stFiltro = "", $stOrd
 
 }
 
-function montaBuscaDadosConcederLicencaEspecial()
+public function montaBuscaDadosConcederLicencaEspecial()
 {
     $inExercicioConf = Sessao::getExercicio();
 
@@ -1542,21 +1513,20 @@ function montaBuscaDadosConcederLicencaEspecial()
 
 }
 
-function buscaDadosDocumentoSanitario(&$rsRecordSet, $boTransacao = "")
+public function buscaDadosDocumentoSanitario(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaBuscaDadosDocumentoSanitario();
     $this->stDebug = $stSql;
-    #$this->debug(); exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 
 }
 
-function montaBuscaDadosDocumentoSanitario()
+public function montaBuscaDadosDocumentoSanitario()
 {
     ;
     //-------------
@@ -1586,21 +1556,20 @@ function montaBuscaDadosDocumentoSanitario()
     return $stSql;
 }
 
-function buscaDadosConcederLicencaDiversa(&$rsRecordSet, $inExercicioConf, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function buscaDadosConcederLicencaDiversa(&$rsRecordSet, $inExercicioConf, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaBuscaDadosConcederLicencaDiversa( $inExercicioConf ).$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-    #$this->debug(); exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
 
 }
 
-function montaBuscaDadosConcederLicencaDiversa($inExercicioConf)
+public function montaBuscaDadosConcederLicencaDiversa($inExercicioConf)
 {
     $stSql = "  SELECT DISTINCT                                                                             \n";
     $stSql .="      LPAD (ela.cod_licenca::varchar, 8, '0') as cod_licenca                                           \n";
@@ -1859,7 +1828,8 @@ function montaBuscaDadosConcederLicencaDiversa($inExercicioConf)
     return $stSql;
 
 }
-function recuperaLicencasAlvaras(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+
+public function recuperaLicencasAlvaras(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -1870,7 +1840,7 @@ function recuperaLicencasAlvaras(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $
     return $obErro;
 }
 
-function montaRecuperaLicencasAlvaras()
+public function montaRecuperaLicencasAlvaras()
 {
     $stFiltro="";
     $stSql = "  SELECT licenca.cod_licenca::varchar || '/' || lpad( licenca.exercicio, 4, '0')::varchar as licenca   
@@ -1991,5 +1961,7 @@ function montaRecuperaLicencasAlvaras()
     return $stSql;
 
 }
+
 }
 
+?>

@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FMManterRegistroPrecoItem.php 62870 2015-07-01 13:39:45Z michel $
-  * $Date: 2015-07-01 10:39:45 -0300 (Qua, 01 Jul 2015) $
+  * $Id: FMManterRegistroPrecoItem.php 63282 2015-08-12 14:11:42Z michel $
+  * $Date: 2015-08-12 11:11:42 -0300 (Qua, 12 Ago 2015) $
   * $Author: michel $
-  * $Rev: 62870 $
+  * $Rev: 63282 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/HTML/IMontaQuantidadeValores.class.php';
@@ -97,6 +97,7 @@ $obIntQtdeLicitada->setName('nuQtdeLicitada');
 $obIntQtdeLicitada->setValue('0,0000');
 $obIntQtdeLicitada->setSize (23);
 $obIntQtdeLicitada->setNull( false );
+$obIntQtdeLicitada->obEvento->setOnChange("montaParametrosGET('preencheQuantidadeAderidaAbaItem');");
 
 $obIntQtdeAderida = new Quantidade();
 $obIntQtdeAderida->setRotulo('Quantidade Aderida');
@@ -104,7 +105,14 @@ $obIntQtdeAderida->setId('nuQtdeAderida');
 $obIntQtdeAderida->setName('nuQtdeAderida');
 $obIntQtdeAderida->setValue('0,0000');
 $obIntQtdeAderida->setSize (23);
-$obIntQtdeAderida->setNull( false );
+$obIntQtdeAderida->setNull( true );
+$obIntQtdeAderida->setLabel( true );
+
+$obLblSaldoItem = new Label();
+$obLblSaldoItem->setRotulo("Saldo");
+$obLblSaldoItem->setId("nuSaldoItem");
+$obLblSaldoItem->setName("nuSaldoItem");
+$obLblSaldoItem->setValue("0,0000");
 
 $obVlrPercentualItem = new Porcentagem();
 $obVlrPercentualItem->setId( 'nuPercentualItem' );
@@ -125,7 +133,7 @@ $obBscCGMVencedor->setValue($stNomCGMVencedor);
 $obBscCGMVencedor->obCampoCod->setName("inNumCGMVencedor");
 $obBscCGMVencedor->obCampoCod->setId("inNumCGMVencedor");
 $obBscCGMVencedor->obCampoCod->setValue( $inNumCGMVencedor );
-$obBscCGMVencedor->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumCGMVencedor='+this.value,'buscaCGMVencedor');");
+$obBscCGMVencedor->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumCGMVencedor='+this.value,'buscaCGMVencedor');");
 $obBscCGMVencedor->setFuncaoBusca( "abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumCGMVencedor','inNomCGMVencedor','','".Sessao::getId()."&stCtrl=buscaCGMVencedor','800','550');" );
 
 $obIntOrdemClassificacao = new Inteiro();

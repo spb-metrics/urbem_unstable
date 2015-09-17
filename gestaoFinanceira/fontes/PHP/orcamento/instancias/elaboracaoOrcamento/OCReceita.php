@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: OCReceita.php 60012 2014-09-25 17:09:54Z evandro $
+    $Id: OCReceita.php 63518 2015-09-08 17:27:56Z franver $
 
     $Revision: 30824 $
     $Name$
@@ -285,7 +285,7 @@ switch ($stCtrl) {
             if ($_POST['stMascClassificacao']) {
                 $arMascClassificacao = Mascara::validaMascaraDinamica( $_POST['stMascClassificacao'] , $_POST[ $_GET['stNomCampoCod'] ] );
                 $_POST[ $_GET['stNomCampoCod'] ] = $arMascClassificacao[1];
-                $js = "if( f.inCodReceita ) f.inCodReceita.value = '".$arMascClassificacao[1]."'; \n";
+                $js .= "if( f.inCodReceita ) f.inCodReceita.value = '".$arMascClassificacao[1]."'; \n";
             }
 
             $obROrcamentoClassificacaoReceita = new ROrcamentoClassificacaoReceita;
@@ -297,7 +297,7 @@ switch ($stCtrl) {
             if ( $rsLista->getCampo("tipo_nivel_conta") == 'A' ) {
                 $stDescricao = $rsLista->getCampo("descricao");
             } else {
-                $js  = 'alertaAviso("Classificação informada inválida, informe uma classificação de receita analítica! ('.$_GET['inCodReceita'].')","","","'.Sessao::getId().'");';                
+                $js .= 'alertaAviso("Classificação informada inválida, informe uma classificação de receita analítica! ('.$_GET['inCodReceita'].')","","","'.Sessao::getId().'");';                
                 $js .= ' f.inCodReceita.value = "";';
                 $js .= ' d.getElementById("stDescricaoReceita").innerHTML = "&nbsp;";';
                 echo $js;                

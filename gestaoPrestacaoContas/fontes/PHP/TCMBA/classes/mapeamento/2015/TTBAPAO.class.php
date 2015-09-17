@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63128 $
+    $Revision: 63479 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,42 +41,23 @@
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/07/04 02:46:21  diego
-Primeira versão.
-
-Revision 1.1  2007/06/22 22:50:29  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
-include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php" );
+include_once CLA_PERSISTENTE;
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php";
 
-/**
-  *
-  * Data de Criação: 13/06/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAPAO extends TOrcamentoProjetoAtividade
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TTBAPAO()
+public function __construct()
 {
-    parent::TOrcamentoProjetoAtividade();
-
+    parent::__construct();
     $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDados(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDados(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -89,7 +70,7 @@ function recuperaDados(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTran
     return $obErro;
 }
 
-function montaRecuperaDados()
+public function montaRecuperaDados()
 {
     $stSql .= " 
               SELECT * FROM (
@@ -144,10 +125,11 @@ function montaRecuperaDados()
                       ,meta
                       ,acao.num_acao
             ) AS tabela
-        WHERE tipo <> 4
-    ";
+        WHERE tipo <> 4 ";
     
     return $stSql;
 }
 
 }
+
+?>

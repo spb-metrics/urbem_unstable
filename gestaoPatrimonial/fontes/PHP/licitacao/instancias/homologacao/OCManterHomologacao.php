@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: OCManterHomologacao.php 62309 2015-04-20 19:43:33Z arthur $
+    $Id: OCManterHomologacao.php 63178 2015-07-31 20:11:32Z carlos.silva $
 
 */
 
@@ -597,14 +597,17 @@ function buscaJustificativaRazao()
     $obTLicitacaoJustificativaRazao->recuperaPorChave($rsJustificativaRazao);
     
     $stJustificativa = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('justificativa')));
-    $stRazao = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('razao')));
+    $stRazao         = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('razao')));
+    $stFundamentacao = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('fundamentacao_legal')));
 
     if ( $rsJustificativaRazao->getNumLinhas() > 0 ) {
         $stJs  = "jQuery('#stJustificativa').val('$stJustificativa');\n";
         $stJs .= "jQuery('#stRazao').val('$stRazao');\n";
+        $stJs .= "jQuery('#stFundamentacao').val('$stFundamentacao');\n";
     } else {
         $stJs  = "jQuery('#stJustificativa').val('');\n";
         $stJs .= "jQuery('#stRazao').val('');\n";
+        $stJs .= "jQuery('#stFundamentacao').val('');\n";
     }
     echo $stJs;
 }

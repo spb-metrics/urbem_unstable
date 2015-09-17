@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63081 $
+    $Revision: 63396 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -75,7 +75,7 @@ class TTBAEmpenho extends TEmpenhoEmpenho
     * Método Construtor
     * @access Private
 */
-function TTBAEmpenho()
+function __construct()
 {
     parent::TEmpenhoEmpenho();
 
@@ -125,9 +125,10 @@ function montaRecuperaDadosTribunal()
                       , 1 AS tipo_registro
                       , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                       , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia
-                      , licitacao.cod_licitacao AS processo_licitatorio
+                      , licitacao.exercicio::VARCHAR||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||licitacao.cod_licitacao::VARCHAR AS processo_licitatorio
                       , 'N' AS contrato_aplicavel
                       , 'N' AS licitacao_sujeito
+                      , pre_empenho.descricao AS historico
 
                   FROM empenho.empenho
 
@@ -156,26 +157,22 @@ function montaRecuperaDadosTribunal()
                     ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
                    AND despesa.exercicio = pre_empenho_despesa.exercicio
 
-             LEFT JOIN empenho.empenho_contrato
-                    ON empenho_contrato.exercicio = empenho.exercicio
-                   AND empenho_contrato.cod_entidade = empenho.cod_entidade
-                   AND empenho_contrato.cod_empenho = empenho.cod_empenho
+             LEFT JOIN empenho.item_pre_empenho_julgamento
+                    ON item_pre_empenho_julgamento.exercicio=pre_empenho.exercicio
+                   AND item_pre_empenho_julgamento.cod_pre_empenho=pre_empenho.cod_pre_empenho
+                   AND item_pre_empenho_julgamento.num_item = (SELECT E_IPEJ.num_item
+                                                                 FROM empenho.item_pre_empenho_julgamento AS E_IPEJ
+                                                                WHERE E_IPEJ.exercicio=pre_empenho.exercicio
+                                                                  AND E_IPEJ.cod_pre_empenho=pre_empenho.cod_pre_empenho LIMIT 1
+                                                              )
 
-             LEFT JOIN licitacao.contrato
-                    ON contrato.exercicio = empenho_contrato.exercicio
-                   AND contrato.cod_entidade = empenho_contrato.cod_entidade
-                   AND contrato.num_contrato = empenho_contrato.num_contrato
-
-             LEFT JOIN licitacao.contrato_licitacao
-                    ON contrato_licitacao.num_contrato = contrato.num_contrato
-                   AND contrato_licitacao.cod_entidade = contrato.cod_entidade
-                   AND contrato_licitacao.exercicio = contrato.exercicio
+             LEFT JOIN compras.mapa_cotacao
+                    ON mapa_cotacao.cod_cotacao = item_pre_empenho_julgamento.cod_cotacao
+                   AND mapa_cotacao.exercicio_cotacao = item_pre_empenho_julgamento.exercicio
 
              LEFT JOIN licitacao.licitacao
-                    ON licitacao.cod_licitacao = contrato_licitacao.cod_licitacao
-                   AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade
-                   AND licitacao.cod_entidade = contrato_licitacao.cod_entidade
-                   AND licitacao.exercicio = contrato_licitacao.exercicio
+                    ON licitacao.exercicio_mapa = mapa_cotacao.exercicio_mapa
+                   AND licitacao.cod_mapa = mapa_cotacao.cod_mapa                                            
 
             INNER JOIN (
                         SELECT exercicio
@@ -189,8 +186,10 @@ function montaRecuperaDadosTribunal()
                    AND sume.cod_pre_empenho = pre_empenho.cod_pre_empenho
                                                                   
                  WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
-                  AND  empenho.cod_entidade IN ( ".$this->getDado('entidades')." )
+                   AND empenho.cod_entidade IN ( ".$this->getDado('entidades')." )
+                   AND empenho.dt_empenho BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
         ";
+        
     return $stSql;
 }
 

@@ -39,19 +39,12 @@
 
     * Casos de uso: uc-02.01.03
 */
-
-/*
-$Log$
-Revision 1.1  2007/07/17 14:49:46  souzadl
-construção
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
 function preencherPAO()
 {
+    $stJs = "";
     $stExtensao = $_REQUEST["stExtensao"];
 
     $inExercicio = trim($_REQUEST['inExercicio']);
@@ -61,19 +54,33 @@ function preencherPAO()
 
     include_once(CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php");
     $obTOrcamentoProjetoAtividade = new TOrcamentoProjetoAtividade();
-    $obTOrcamentoProjetoAtividade->setDado("num_pao",trim($_GET['inNumPAO'.$stExtensao]));
-    $obTOrcamentoProjetoAtividade->setDado("exercicio",$inExercicio);
-    $obTOrcamentoProjetoAtividade->recuperaPorChave($rsPAO);
+    $stOrderBy = "
+          ORDER BY acao.num_acao
+                 , dotacao
+    ";
+    $obTOrcamentoProjetoAtividade->recuperaPorNumPAODotacao($rsPAO, "WHERE pao.exercicio = '".$inExercicio."' AND acao.num_acao = ".trim($_GET['inNumPAO'.$stExtensao]) , $stOrderBy , $boTransacao);
+
     if ($rsPAO->getNumLinhas() == 1) {
-        $stNomPAO = $rsPAO->getCampo("nom_pao");
-        $stNumPAO = $rsPAO->getCampo("num_pao");
+        $stNomPAO  = $rsPAO->getCampo("titulo");
+        $stNumPAO  = $rsPAO->getCampo("num_pao");
+        $stNumAcao = $rsPAO->getCampo("num_acao");
+        $stDotacao = $rsPAO->getCampo("dotacao");
     } else {
-        $stNomPAO = "&nbsp;";
-        $stNumPAO = "";
+        
+        $stNomPAO  = "&nbsp;";
+        $stNumPAO  = "";
+        $stNumAcao = "";
+        $stDotacao = "";
+        if ( $rsPAO->getNumLinhas() > 1 ) {
+            $stJs .= "alertaAviso('O código PAO ( ".$_GET['inNumPAO'.$stExtensao]." ) deverá ser selecionado apartir da PopUp.','form','aviso','".Sessao::getId()."');\n";
+        }
     }
-    $stJs  = "d.getElementById('campoInnerPAO$stExtensao').innerHTML = '$stNomPAO';\n";
+
+    $stJs .= "d.getElementById('campoInnerPAO$stExtensao').innerHTML = '$stNomPAO';\n";
     $stJs .= "f.campoInnerPAO$stExtensao.value = '".$stNomPAO."';";
-    $stJs .= "f.inNumPAO$stExtensao.value = '".$stNumPAO."';";
+    $stJs .= "f.inNumPAO$stExtensao.value = '".$stNumAcao."';";
+    $stJs .= "f.inHdnNumPAO$stExtensao.value = '".$stNumPAO."';";
+    $stJs .= "f.stHdnDotacao$stExtensao.value = '".$stDotacao."';";
 
     return $stJs;
 }

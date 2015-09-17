@@ -43,7 +43,9 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once CAM_GRH_PES_MAPEAMENTO.'TPessoalDeParaTipoCargo.class.php';
 include_once CAM_GRH_PES_MAPEAMENTO.'TPessoalSubDivisao.class.php';
 include_once CAM_GRH_ENT_MAPEAMENTO.'TEntidade.class.php';
-include_once CAM_GPC_TCMBA_MAPEAMENTO.'2015/TTCMBATipoCargo.class.php';
+include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBATipoCargo.class.php";
+include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBATipoRegimeCargo.class.php";
+
 include_once CAM_FW_COMPONENTES.'/Table/Table.class.php';
 
 $stPrograma = 'ManterTipoCargo';
@@ -115,6 +117,11 @@ $obTTCMBATipoCargo = new TTCMBATipoCargo();
 $stOrder = ' ORDER BY cod_tipo_cargo_tce';
 $obTTCMBATipoCargo->recuperaTodos($rsTipoCargo, '', $stOrder);
 
+//recupera os tipos de regime dos cargos do TCE
+$obTTCMBATipoRegimeCargo = new TTCMBATipoRegimeCargo();
+$stOrder = ' ORDER BY cod_tipo_regime_tce'; 
+$obTTCMBATipoRegimeCargo->recuperaTodos($rsTipoRegime, '', $stOrder);
+
 //recupera os tipos de cargo do sistema
 $obTPessoalSubDivisao = new TPessoalSubDivisao();
 $stOrder = ' ORDER BY cod_regime, cod_sub_divisao ';
@@ -130,18 +137,28 @@ $obCmbTipoCargo->addOption    ('','Selecione');
 $obCmbTipoCargo->preencheCombo($rsTipoCargo);
 $obCmbTipoCargo->setValue     ('[cod_tipo_cargo_tce]');
 
+$obCmbTipoRegime = new Select();
+$obCmbTipoRegime->setId        ('cmbRegime_[cod_sub_divisao]');
+$obCmbTipoRegime->setName      ('cmbRegime_[cod_sub_divisao]');
+$obCmbTipoRegime->setCampoId   ('[cod_tipo_regime_tce]');
+$obCmbTipoRegime->setCampoDesc ('[descricao]');
+$obCmbTipoRegime->addOption    ('','Selecione');
+$obCmbTipoRegime->preencheCombo($rsTipoRegime);
+$obCmbTipoRegime->setValue     ('[cod_tipo_regime_tce]');
+
 //cria uma table para demonstrar os valores para o vinculo
 $obTable = new Table;
 $obTable->setRecordset($rsSubDivisao);
-//$obTable->setConditional(true);
 $obTable->addLineNumber(true);
 
 $obTable->Head->addCabecalho('Regime', 5);
 $obTable->Head->addCabecalho('Descrição', 50);
+$obTable->Head->addCabecalho('Tipo de Regime', 15);
 $obTable->Head->addCabecalho('Tipo de Cargo', 15);
 
 $obTable->Body->addCampo('[descricao_regime]', 'C');
 $obTable->Body->addCampo('[cod_sub_divisao] - [descricao]', 'E');
+$obTable->Body->addCampo($obCmbTipoRegime, 'E');
 $obTable->Body->addCampo($obCmbTipoCargo, 'E');
 
 $obTable->montaHTML(true);

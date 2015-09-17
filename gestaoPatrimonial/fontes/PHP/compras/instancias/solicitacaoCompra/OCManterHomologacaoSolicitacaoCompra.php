@@ -30,7 +30,7 @@
 * @author Analista     : Cleisson
 * @author Desenvolvedor: Bruce Cruz de Sena
 
-  $Id: OCManterHomologacaoSolicitacaoCompra.php 62986 2015-07-14 18:08:54Z michel $
+  $Id: OCManterHomologacaoSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
 
 * Casos de uso: uc-03.04.02
 */
@@ -38,7 +38,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_precos)
+function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_precos, $stReserva)
 {
     include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItem.class.php';
     include_once CAM_GP_COM_MAPEAMENTO.'TComprasSolicitacaoItemDotacao.class.php';
@@ -52,21 +52,20 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
     $rsLista->setPrimeiroElemento();
 
     while ( !$rsLista->eof() ) {
-        if ($rsLista->getCampo('vl_item_solicitacao') > 0.00) {
+        if ($rsLista->getCampo('vl_item_solicitacao') > 0.00)
             $nuVlUnitario = $rsLista->getCampo('vl_item_solicitacao') / $rsLista->getCampo('qnt_item_solicitacao');
-        } else {
+        else
             $nuVlUnitario = 0.00;
-        }
 
         $rsLista->setCampo('vl_unitario'    , number_format($nuVlUnitario                               ,2,',','.') );
         $rsLista->setCampo('quantidade'     , number_format($rsLista->getCampo('qnt_item_solicitacao' ) ,4,',','.') );
         $rsLista->setCampo('vl_total'       , number_format($rsLista->getCampo('vl_item_solicitacao' )  ,2,',','.') );
         $rsLista->setCampo('saldo'          , number_format($rsLista->getCampo('saldo' )                ,2,',','.') );
-        if ($_REQUEST['stAcao'] == 'anular') {
+        if ($_REQUEST['stAcao'] == 'anular')
             $rsLista->setCampo('vl_reserva' , number_format($rsLista->getCampo('vl_reserva' )           ,2,',','.') );
-        } else {
+        else
             $rsLista->setCampo('vl_reserva' , number_format($rsLista->getCampo('vl_item_solicitacao' )  ,2,',','.') );
-        }
+
         $rsLista->proximo();
     }
 
@@ -108,8 +107,7 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
     $obLista->ultimoCabecalho->setColSpan( 3 );
     $obLista->commitCabecalho();
 
-    
-    if($registro_precos=='f'){
+    if($registro_precos=='f' && $stReserva=='reserva_rigida'){
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo("Reserva Saldos");
         $obLista->ultimoCabecalho->setWidth( 27 );
@@ -117,22 +115,22 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
         $obLista->commitCabecalho();
     }
     
-        $obLista->addCabecalho( true );
-        $obLista->ultimoCabecalho->addConteudo("Valor Unitário");
-        $obLista->ultimoCabecalho->setWidth( 8 );
-        $obLista->commitCabecalho();
+    $obLista->addCabecalho( true );
+    $obLista->ultimoCabecalho->addConteudo("Valor Unitário");
+    $obLista->ultimoCabecalho->setWidth( 8 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho( );
+    $obLista->ultimoCabecalho->addConteudo("Quantidade");
+    $obLista->ultimoCabecalho->setWidth( 8 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho( );
+    $obLista->ultimoCabecalho->addConteudo("Valor Total");
+    $obLista->ultimoCabecalho->setWidth( 8 );
+    $obLista->commitCabecalho();
     
-        $obLista->addCabecalho( );
-        $obLista->ultimoCabecalho->addConteudo("Quantidade");
-        $obLista->ultimoCabecalho->setWidth( 8 );
-        $obLista->commitCabecalho();
-    
-        $obLista->addCabecalho( );
-        $obLista->ultimoCabecalho->addConteudo("Valor Total");
-        $obLista->ultimoCabecalho->setWidth( 8 );
-        $obLista->commitCabecalho();
-    
-    if($registro_precos=='f'){
+    if($registro_precos=='f' && $stReserva=='reserva_rigida'){
         $obLista->addCabecalho( );
         $obLista->ultimoCabecalho->addConteudo("Dotação");
         $obLista->ultimoCabecalho->setWidth( 6 );
@@ -149,11 +147,11 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
         $obLista->commitCabecalho();
     
         $obLista->addCabecalho( );
-        if ($_REQUEST['stAcao'] == 'anular') {
+        if ($_REQUEST['stAcao'] == 'anular')
             $obLista->ultimoCabecalho->addConteudo("Valor a Anular");
-        } else {
+        else
             $obLista->ultimoCabecalho->addConteudo("Valor a Reservar");
-        }
+
         $obLista->ultimoCabecalho->setWidth( 8 );
         $obLista->commitCabecalho();
     }
@@ -185,7 +183,7 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
     $obLista->ultimoDado->setCampo( "vl_total" );
     $obLista->commitDado();
     
-    if($registro_precos=='f'){
+    if($registro_precos=='f' && $stReserva=='reserva_rigida'){
         $obLista->addDado();
         $obLista->ultimoDado->setCampo( "cod_despesa" );
         $obLista->commitDado();
@@ -207,11 +205,11 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
 
     $obLista->montaHTML();
     $stHTML = str_replace( "\n" ,"" ,$obLista->getHTML() );
-    $stHTML = str_replace( chr(13) ,"<br>" ,$stHTML );
+    $stHTML = str_replace( chr(13)  ,"<br>" ,$stHTML );
     $stHTML = str_replace( "  " ,"" ,$stHTML );
     $stHTML = str_replace( "'","\\'",$stHTML );
 
-    $stJS = "d.getElementById('spnItens').innerHTML = ' " .$stHTML. "';" ;
+    $stJS = "d.getElementById('spnItens').innerHTML = '".$stHTML."';";
 
     return $stJS;
 }

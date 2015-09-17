@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterHomologacao.php 62279 2015-04-16 18:38:45Z arthur $
+    * $Id: PRManterHomologacao.php 63178 2015-07-31 20:11:32Z carlos.silva $
 
     * Casos de uso: uc-03.05.21
 */
@@ -120,12 +120,14 @@ if ($stMensagemErro == '') {
     $obTLicitacaoJustificativaRazao->recuperaPorChave($rsJustificativaRazao);
     
     if($rsJustificativaRazao->getNumLinhas() > 0){
-        $obTLicitacaoJustificativaRazao->setDado( 'justificativa'          , $_REQUEST['stJustificativa']         );
-        $obTLicitacaoJustificativaRazao->setDado( 'razao'                  , $_REQUEST['stRazao']                 );
-        $obTLicitacaoJustificativaRazao->alteracao();
-    }else{
-        $obTLicitacaoJustificativaRazao->setDado( 'justificativa'          , $_REQUEST['stJustificativa']         );
-        $obTLicitacaoJustificativaRazao->setDado( 'razao'                  , $_REQUEST['stRazao']                 );
+        $obTLicitacaoJustificativaRazao->setDado( 'justificativa'       , $_REQUEST['stJustificativa'] );
+        $obTLicitacaoJustificativaRazao->setDado( 'razao'               , $_REQUEST['stRazao']         );
+        $obTLicitacaoJustificativaRazao->setDado( 'fundamentacao_legal' , $_REQUEST['stFundamentacao'] );
+        $obTLicitacaoJustificativaRazao->alteracao();                                                  
+    }else{                                                                                             
+        $obTLicitacaoJustificativaRazao->setDado( 'justificativa'       , $_REQUEST['stJustificativa'] );
+        $obTLicitacaoJustificativaRazao->setDado( 'razao'               , $_REQUEST['stRazao']         );
+        $obTLicitacaoJustificativaRazao->setDado( 'fundamentacao_legal' , $_REQUEST['stFundamentacao'] );
         $obTLicitacaoJustificativaRazao->inclusao();
     }
     

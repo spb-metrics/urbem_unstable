@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Evandro Melos
   *
   * @ignore
-  * $Id: OCGeraRelatorioAnexoIII.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCGeraRelatorioAnexoIII.php 63336 2015-08-19 17:17:13Z lisiane $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -89,7 +89,7 @@ list($dia,$mes,$ano) = explode('/', $request->get('stDataFinal'));
 $stDataFinalAnterior = $dia.'/'.$mes.'/'.($ano-1);
 
 $inCodEntidade = implode($request->get('inCodEntidade'), ',');
-$boRestos = $request->get("boRestos") == "Sim" ? "true" : "false";
+$boRestos =  "true";
 
 $preview->addParametro("exercicio_anterior" , (Sessao::getExercicio()-1)        );
 $preview->addParametro("bimestre"           , $inBimestre                       );

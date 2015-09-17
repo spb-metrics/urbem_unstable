@@ -215,15 +215,58 @@ BEGIN
     /**************************************************
     * Monta os filtros caso pesquisa por atributos
     ***************************************************/
-    IF TRIM(stValorAtributo) != '' AND stValorAtributo IS NOT NULL THEN
-        stSelectServidorAtributo := '   , ( CASE WHEN ultimo_atributo_contrato_servidor_valor.cod_tipo = 3 OR
-                                                      ultimo_atributo_contrato_servidor_valor.cod_tipo = 4
+    IF stValorAtributo = '''''' THEN
+        stSelectServidorAtributo := '   , ( CASE WHEN atributo_dinamico.cod_tipo = 3 OR
+                                                      atributo_dinamico.cod_tipo = 4
                                                 THEN ( SELECT atributo_valor_padrao.valor_padrao
                                                          FROM administracao.atributo_valor_padrao
                                                         WHERE atributo_valor_padrao.cod_cadastro = ultimo_atributo_contrato_servidor_valor.cod_cadastro
                                                           AND atributo_valor_padrao.cod_modulo   = ultimo_atributo_contrato_servidor_valor.cod_modulo
                                                           AND atributo_valor_padrao.cod_atributo = ultimo_atributo_contrato_servidor_valor.cod_atributo
-                                                          AND atributo_valor_padrao.cod_valor    = ultimo_atributo_contrato_servidor_valor.valor)
+                                                          AND atributo_valor_padrao.cod_valor::VARCHAR    = ultimo_atributo_contrato_servidor_valor.valor)
+                                                ELSE ultimo_atributo_contrato_servidor_valor.valor
+                                            END ) AS valor_label
+                                        , ultimo_atributo_contrato_servidor_valor.valor
+                                        , ultimo_atributo_contrato_servidor_valor.cod_atributo';
+        stFromServidorAtributo   := ' INNER JOIN ultimo_atributo_contrato_servidor_valor('|| quote_literal(stEntidade) ||', '|| inCodPeriodoMovimentacao ||') as ultimo_atributo_contrato_servidor_valor
+                                              ON ultimo_atributo_contrato_servidor_valor.cod_contrato = contrato_servidor.cod_contrato
+                                             AND ultimo_atributo_contrato_servidor_valor.cod_atributo = '|| inCodAtributo ||'                                             
+                                      INNER JOIN administracao.atributo_dinamico
+                                              ON atributo_dinamico.cod_atributo = ultimo_atributo_contrato_servidor_valor.cod_atributo
+                                             AND atributo_dinamico.cod_cadastro = ultimo_atributo_contrato_servidor_valor.cod_cadastro
+                                             AND atributo_dinamico.cod_modulo = ultimo_atributo_contrato_servidor_valor.cod_modulo
+                                    ';
+
+        stSelectPensionistaAtributo := ',  ( CASE WHEN atributo_dinamico.cod_tipo = 3 OR
+                                                        atributo_dinamico.cod_tipo = 4
+                                                THEN (  SELECT atributo_valor_padrao.valor_padrao
+                                                          FROM administracao.atributo_valor_padrao
+                                                         WHERE atributo_valor_padrao.cod_cadastro = ultimo_atributo_contrato_pensionista.cod_cadastro
+                                                           AND atributo_valor_padrao.cod_modulo   = ultimo_atributo_contrato_pensionista.cod_modulo
+                                                           AND atributo_valor_padrao.cod_atributo = ultimo_atributo_contrato_pensionista.cod_atributo
+                                                           AND atributo_valor_padrao.cod_valor::VARCHAR    = ultimo_atributo_contrato_pensionista.valor)
+                                                ELSE ultimo_atributo_contrato_pensionista.valor
+                                            END) AS valor_label
+                                       , ultimo_atributo_contrato_pensionista.valor
+                                       , ultimo_atributo_contrato_pensionista.cod_atributo';
+        stFromPensionistaAtributo   := ' INNER JOIN ultimo_atributo_contrato_pensionista('|| quote_literal(stEntidade) ||', '|| inCodPeriodoMovimentacao ||') as ultimo_atributo_contrato_pensionista
+                                                 ON ultimo_atributo_contrato_pensionista.cod_contrato = contrato_pensionista.cod_contrato
+                                                AND ultimo_atributo_contrato_pensionista.cod_atributo = '|| inCodAtributo ||'                                                
+                                         INNER JOIN administracao.atributo_dinamico
+                                                 ON atributo_dinamico.cod_atributo = ultimo_atributo_contrato_pensionista.cod_atributo
+                                                AND atributo_dinamico.cod_cadastro = ultimo_atributo_contrato_pensionista.cod_cadastro
+                                                AND atributo_dinamico.cod_modulo = ultimo_atributo_contrato_pensionista.cod_modulo
+                                       ';
+
+    ELSEIF TRIM(stValorAtributo) != '' AND stValorAtributo IS NOT NULL THEN
+        stSelectServidorAtributo := '   , ( CASE WHEN atributo_dinamico.cod_tipo = 3 OR
+                                                      atributo_dinamico.cod_tipo = 4
+                                                THEN ( SELECT atributo_valor_padrao.valor_padrao
+                                                         FROM administracao.atributo_valor_padrao
+                                                        WHERE atributo_valor_padrao.cod_cadastro = ultimo_atributo_contrato_servidor_valor.cod_cadastro
+                                                          AND atributo_valor_padrao.cod_modulo   = ultimo_atributo_contrato_servidor_valor.cod_modulo
+                                                          AND atributo_valor_padrao.cod_atributo = ultimo_atributo_contrato_servidor_valor.cod_atributo
+                                                          AND atributo_valor_padrao.cod_valor::VARCHAR    = ultimo_atributo_contrato_servidor_valor.valor)
                                                 ELSE ultimo_atributo_contrato_servidor_valor.valor
                                             END ) AS valor_label
                                         , ultimo_atributo_contrato_servidor_valor.valor
@@ -232,24 +275,32 @@ BEGIN
                                               ON ultimo_atributo_contrato_servidor_valor.cod_contrato = contrato_servidor.cod_contrato
                                              AND ultimo_atributo_contrato_servidor_valor.cod_atributo = '|| inCodAtributo ||'
                                              AND ultimo_atributo_contrato_servidor_valor.valor IN ('|| stValorAtributo ||')
+                                      INNER JOIN administracao.atributo_dinamico
+                                              ON atributo_dinamico.cod_atributo = ultimo_atributo_contrato_servidor_valor.cod_atributo
+                                             AND atributo_dinamico.cod_cadastro = ultimo_atributo_contrato_servidor_valor.cod_cadastro
+                                             AND atributo_dinamico.cod_modulo = ultimo_atributo_contrato_servidor_valor.cod_modulo
                                     ';
 
-        stSelectPensionistaAtributo := ',  ( CASE WHEN ultimo_atributo_contrato_pensionista.cod_tipo = 3 OR
-                                                        ultimo_atributo_contrato_pensionista.cod_tipo = 4
+        stSelectPensionistaAtributo := ',  ( CASE WHEN atributo_dinamico.cod_tipo = 3 OR
+                                                        atributo_dinamico.cod_tipo = 4
                                                 THEN (  SELECT atributo_valor_padrao.valor_padrao
                                                           FROM administracao.atributo_valor_padrao
                                                          WHERE atributo_valor_padrao.cod_cadastro = ultimo_atributo_contrato_pensionista.cod_cadastro
                                                            AND atributo_valor_padrao.cod_modulo   = ultimo_atributo_contrato_pensionista.cod_modulo
                                                            AND atributo_valor_padrao.cod_atributo = ultimo_atributo_contrato_pensionista.cod_atributo
-                                                           AND atributo_valor_padrao.cod_valor    = ultimo_atributo_contrato_pensionista.valor)
+                                                           AND atributo_valor_padrao.cod_valor::VARCHAR    = ultimo_atributo_contrato_pensionista.valor)
                                                 ELSE ultimo_atributo_contrato_pensionista.valor
                                             END) AS valor_label
                                        , ultimo_atributo_contrato_pensionista.valor
                                        , ultimo_atributo_contrato_pensionista.cod_atributo';
         stFromPensionistaAtributo   := ' INNER JOIN ultimo_atributo_contrato_pensionista('|| quote_literal(stEntidade) ||', '|| inCodPeriodoMovimentacao ||') as ultimo_atributo_contrato_pensionista
                                                  ON ultimo_atributo_contrato_pensionista.cod_contrato = contrato_pensionista.cod_contrato
-                                                AND atributo_contrato_pensionista.cod_atributo = '|| inCodAtributo ||'
-                                                AND atributo_contrato_pensionista.valor IN ('|| stValorAtributo ||')
+                                                AND ultimo_atributo_contrato_pensionista.cod_atributo = '|| inCodAtributo ||'
+                                                AND ultimo_atributo_contrato_pensionista.valor IN ('|| stValorAtributo ||')
+                                         INNER JOIN administracao.atributo_dinamico
+                                                 ON atributo_dinamico.cod_atributo = ultimo_atributo_contrato_pensionista.cod_atributo
+                                                AND atributo_dinamico.cod_cadastro = ultimo_atributo_contrato_pensionista.cod_cadastro
+                                                AND atributo_dinamico.cod_modulo = ultimo_atributo_contrato_pensionista.cod_modulo
                                        ';
     END IF;
 
@@ -1112,6 +1163,7 @@ DECLARE
     rwAnaliticaResumida         colunasAnaliticaResumida%ROWTYPE;
 BEGIN   
     stSql := montaConsultaFolhasAnaliticaResumida(inCodConfiguracao,inCodPeriodoMovimentacao,stFiltro,stOrdenacao,inCodAtributo,stValorAtributo,stEntidade,stExercicio,inCodComplementar);
+
     FOR reRegistro IN  EXECUTE stSql
     LOOP
         rwAnaliticaResumida.codigoP                    := reRegistro.codigoP;

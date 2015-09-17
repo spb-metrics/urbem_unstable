@@ -49,77 +49,66 @@ include_once ( CLA_PERSISTENTE );
 */
 
 class TTBAAdConv extends Persistente
-    {
-
+{
     /**
         * Método Construtor
         * @access Private
     */
-    public function TTBAAdConv() {}
+    public function __construct()
+    {
+        $this->setEstrutura( array() );
+        $this->setEstruturaAuxiliar( array() );
+        $this->setDado('exercicio', Sessao::getExercicio() );
+    }
 
-    public function recuperaDadosConvenioAditivo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
     {
         $obErro      = new Erro;
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
 
-        $stSql = $this->montaRecuperaDadosConvenioAditivo().$stCondicao.$stOrdem;
+        $stSql = $this->montaRecuperaDadosTribunal().$stCondicao.$stOrdem;
         $this->setDebug( $stSql );
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;
     }
 
-    public function montaRecuperaDadosConvenioAditivo()
+    public function montaRecuperaDadosTribunal()
     {
-        $stSql .= " SELECT 1 AS tipo_registro
-                        , 0 AS unidade_gestora
-                        , convenio.num_convenio
-                        , convenio_aditivos.num_aditivo
-                        -- reservado
-                        , SUBSTR(TRIM(objeto.descricao), 1, 300) AS objeto_convenio
-                        -- reservado
-                        , TO_CHAR(convenio_aditivos.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura_aditivo
-                        --, TO_CHAR(convenio.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura_convenio
-                        , TO_CHAR(convenio.dt_vigencia, 'dd/mm/yyyy') AS dt_vigencia_convenio
-                        , SUBSTR(TRIM(convenio_aditivos.fundamentacao), 1, 100) AS fundamentacao_legal_aditivo
-                        -- reservado
-                        , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial
-                        , TO_CHAR(publicacao_convenio.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao_convenio
-                        , convenio.valor
-                        , 1 AS tipo_moeda
-                        -- reservado
-                        , TO_CHAR(convenio.dt_assinatura, 'yyyymm') AS competencia
-                        , '' AS inicio_execucao
-                        -- reservado
-                        , 0 AS num_orgao
-                        , 0 AS num_unidade
-                        , 0 AS cod_programa
-                        , 0 AS tipo_projeto_atividade
-                        , 0 AS codigo_projeto_atividade
-                        , 0 AS cod_despesa
-                        , 0 AS fonte_recurso
-                        , convenio_aditivos.exercicio AS ano
-                        , 0 AS cod_funcao
-                        , 0 AS cod_subfuncao
-                        -- nro sequencial
+        $stSql = " SELECT 1 AS tipo_registro
+                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                         , convenio.num_convenio
+                         , convenio_aditivos.num_aditivo
+                         , SUBSTR(TRIM(convenio_aditivos.objeto), 1, 300) AS objeto_convenio
+                         , TO_CHAR(convenio_aditivos.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura_aditivo
+                         , TO_CHAR(convenio.dt_vigencia, 'dd/mm/yyyy') AS dt_vencimento_convenio
+                         , norma.num_norma||'/'||norma.exercicio AS fundamentacao_legal
+                         , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial
+                         , TO_CHAR(publicacao_convenio.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao_convenio
+                         , convenio_aditivos.valor_convenio
+                         , 1 AS tipo_moeda
+                         , TO_CHAR(convenio.dt_assinatura, 'yyyymm') AS competencia
+                         , TO_CHAR(convenio_aditivos.inicio_execucao,'dd/mm/yyyy') AS data_inicio
 
-                    FROM licitacao.convenio
+                     FROM licitacao.convenio
 
-                    INNER JOIN compras.objeto
-                            ON convenio.cod_objeto = objeto.cod_objeto
+               INNER JOIN compras.objeto
+                       ON convenio.cod_objeto = objeto.cod_objeto
 
-                    INNER JOIN licitacao.publicacao_convenio
-                            ON publicacao_convenio.num_convenio = publicacao_convenio.num_convenio
-                        AND publicacao_convenio.exercicio = publicacao_convenio.exercicio
+               INNER JOIN licitacao.publicacao_convenio
+                       ON publicacao_convenio.num_convenio = publicacao_convenio.num_convenio
+                      AND publicacao_convenio.exercicio = publicacao_convenio.exercicio
 
-                    INNER JOIN sw_cgm AS cgm_imprensa
-                            ON publicacao_convenio.numcgm = cgm_imprensa.numcgm
+               INNER JOIN sw_cgm AS cgm_imprensa
+                       ON publicacao_convenio.numcgm = cgm_imprensa.numcgm
 
-                    INNER JOIN licitacao.convenio_aditivos
-                            ON convenio.exercicio = convenio_aditivos.exercicio_convenio
-                        AND convenio.num_convenio = convenio_aditivos.num_convenio
+               INNER JOIN licitacao.convenio_aditivos
+                       ON convenio.exercicio = convenio_aditivos.exercicio_convenio
+                      AND convenio.num_convenio = convenio_aditivos.num_convenio
 
+               INNER JOIN normas.norma
+                       ON norma.cod_norma = convenio_aditivos.cod_norma_autorizativa
 
                     WHERE NOT EXISTS (
                                         SELECT 1
@@ -134,8 +123,11 @@ class TTBAAdConv extends Persistente
                                             AND convenio_aditivos.exercicio = convenio_aditivos_anulacao.exercicio
                                             AND convenio_aditivos.exercicio_convenio = convenio_aditivos_anulacao.exercicio_convenio
                                             AND convenio_aditivos.num_aditivo = convenio_aditivos_anulacao.num_aditivo
-                                    )";
-
+                                    )
+                    AND convenio_aditivos.exercicio = '".$this->getDado('exercicio')."'
+                    AND convenio_aditivos.dt_assinatura BETWEEN TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+        ";
+        
         return $stSql;
     }
 

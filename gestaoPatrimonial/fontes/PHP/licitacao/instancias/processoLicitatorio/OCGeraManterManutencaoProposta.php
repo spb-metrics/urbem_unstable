@@ -38,7 +38,7 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
-include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php"                                 );
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
 
 $stAcao             = $_REQUEST['stAcao'];
 $inCodCotacao       = $_REQUEST['inCodCotacao'];
@@ -59,7 +59,7 @@ if ($stAcao == 'reemitir') {
     $stModalidade       = SistemaLegado::pegaDado("descricao", "compras.modalidade", "WHERE cod_modalidade = ".$_REQUEST['inCodModalidade']);
     $inCodObjeto        = SistemaLegado::pegaDado("cod_objeto", "compras.mapa", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio = ".$_REQUEST['stExercicioMapa']."::VARCHAR");
     $inCodTipoObjeto    = SistemaLegado::pegaDado("cod_tipo_objeto", "licitacao.licitacao", "WHERE cod_licitacao = ".$inCodLicitacao." AND cod_modalidade = ".$_REQUEST['inCodModalidade']." AND cod_entidade = ".$inCodEntidade." AND exercicio = ".$stExercicioLicitacao."::VARCHAR");
-    $inCodCotacao       = SistemaLegado::pegaDado("cod_cotacao"      , "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = ".$_REQUEST['stExercicioMapa']."::VARCHAR");
+    $inCodCotacao       = SistemaLegado::pegaDado("cod_cotacao"      , "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = ".$_REQUEST['stExercicioMapa']."::VARCHAR AND NOT EXISTS (SELECT 1 FROM compras.cotacao_anulada AS CA WHERE CA.exercicio=mapa_cotacao.exercicio_cotacao AND CA.cod_cotacao=mapa_cotacao.cod_cotacao)");
     $stExercicioCotacao = SistemaLegado::pegaDado("exercicio_cotacao", "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = ".$_REQUEST['stExercicioMapa']."::VARCHAR");
     $inCodTipoLicitacao = $_REQUEST['inCodTipoLicitacao'];
 
@@ -74,7 +74,7 @@ if ($stAcao == 'reemitir') {
     $inCompraDireta      = $_REQUEST['inCompraDireta'];
     $stExercicioEntidade = $_REQUEST['stExercicioEntidade'];
 
-    $inCodCotacao       = SistemaLegado::pegaDado("cod_cotacao" , "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = '".$_REQUEST['stExercicioMapa']."'");
+    $inCodCotacao       = SistemaLegado::pegaDado("cod_cotacao" , "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = '".$_REQUEST['stExercicioMapa']."' AND NOT EXISTS (SELECT 1 FROM compras.cotacao_anulada AS CA WHERE CA.exercicio=mapa_cotacao.exercicio_cotacao AND CA.cod_cotacao=mapa_cotacao.cod_cotacao)");
     $stExercicioCotacao = SistemaLegado::pegaDado("exercicio_cotacao" , "compras.mapa_cotacao", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio_mapa = '".$_REQUEST['stExercicioMapa']."'");
 
     $inCodObjeto        = SistemaLegado::pegaDado("cod_objeto", "compras.mapa", "WHERE cod_mapa = ".$_REQUEST['inCodMapa']." AND exercicio = '".$_REQUEST['stExercicioMapa']."'");

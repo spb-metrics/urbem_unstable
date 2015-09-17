@@ -65,12 +65,9 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                 ,'".$this->getDado('exercicio')."' as exercicio
                                 ,'".$this->getDado('mes')."' as mes
                         FROM tcemg.balancete_extmmaa
-                        LEFT JOIN tcemg.arquivo_ext
-                            ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
-                            AND balancete_extmmaa.exercicio = arquivo_ext.exercicio
-                        WHERE arquivo_ext.cod_plano IS NULL
-                          AND balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
-                ";
+                   LEFT JOIN tcemg.arquivo_ext
+                          ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
+                       WHERE arquivo_ext.cod_plano IS NULL ";
         return $stSql;
     }
 

@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLogradouro.class.php 62960 2015-07-13 14:00:58Z evandro $
+    * $Id: RCIMLogradouro.class.php 63331 2015-08-18 19:53:27Z evandro $
 
      * Casos de uso: uc-05.01.04
                      uc-04.04.07
@@ -65,7 +65,7 @@ include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoCEPLogradouro.class.php"    
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoTipoLogradouro.class.php"   );
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoNomeLogradouro.class.php"   );
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoCEP.class.php"              );
-
+include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMLogradouro.class.php" );
 include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMImovelCorrespondencia.class.php"      );
 include_once ( CAM_GT_CEM_MAPEAMENTO."TCEMDomicilioInformado.class.php"      	);
 
@@ -257,7 +257,7 @@ function RCIMLogradouro()
     $this->arBairro             = array();
     $this->arCEP                = array();
     $this->obRCIMBairro         = new RCIMBairro;
-
+    $this->obTCGMLogradouro     = new TCGMLogradouro();
 
   $this->obTCIMImovelCorrespondencia 	= new TCIMImovelCorrespondencia;
   $this->obTCEMDomicilioInformado 	= new TCEMDomicilioInformado;
@@ -361,9 +361,9 @@ function excluirLogradouro($boTransacao = "")
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
     if ( !$obErro->ocorreu() ) {
-        $this->obTCEMDomicilioInformado->setDado ("cod_logradouro", $this->inCodigoLogradouro );
+        $this->obTCEMDomicilioInformado->setDado ("cod_logradouro"  , $this->inCodigoLogradouro );
         $this->obTCEMDomicilioInformado->setDado ("cod_municipio"	, $this->inCodigoMunicipio	);
-        $this->obTCEMDomicilioInformado->setDado ("cod_uf"		, $this->inCodigoUF 		);
+        $this->obTCEMDomicilioInformado->setDado ("cod_uf"		    , $this->inCodigoUF 		);
         $stFiltro = " WHERE cod_uf = ".$this->inCodigoUF;
         $stFiltro .=" AND cod_municipio = ". $this->inCodigoMunicipio;
         $stFiltro .=" AND cod_logradouro = ". $this->inCodigoLogradouro;
@@ -371,14 +371,20 @@ function excluirLogradouro($boTransacao = "")
         if ( $rsDomicilioI->getNumLinhas() > 0 ) {
             $boFlagExclusao = false;
             $obErro->setDescricao('Logradouro utilizado como <b>Domicilio Informado</b> por alguma inscrição econômica.');
-        } else {
-            $this->obTBairroLogradouro->recuperaTodos( $rsBairroLog, $stFiltro, null, $boTransacao);
-            if ( $rsBairroLog->getNumLinhas() > 0 ) {
-//               $boFlagExclusao = false;
-               $obErro->setDescricao('Logradouro utilizado como <b>Domicilio Informado</b> por alguma inscrição econômica.');
-            }
+        } 
+    }
+
+    if (!$obErro->ocorreu()) {
+        $this->obTCGMLogradouro->setDado( "cod_uf"          , $this->inCodigoUF        );
+        $this->obTCGMLogradouro->setDado( "cod_municipio"   , $this->inCodigoMunicipio );
+        $this->obTCGMLogradouro->setDado( "cod_logradouro"  , $this->inCodigoLogradouro );
+        $this->obTCGMLogradouro->recuperaLogradouroCgm($rsLogradouro,"","",$boTransacao);
+        if ( $rsLogradouro->getNumLinhas() > 0 ) {
+            $obErro->setDescricao("Logradouro está vinculado a um CGM.");
+            $boFlagExclusao = false;
         }
     }
+
     if ($boFlagExclusao == true) {
         $this->obTCIMImovelCorrespondencia->setDado ("cod_logradouro", $this->inCodigoLogradouro );
         $this->obTCIMImovelCorrespondencia->setDado ("cod_municipio", 	$this->inCodigoMunicipio );

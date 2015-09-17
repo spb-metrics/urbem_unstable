@@ -42,7 +42,7 @@ Adicionada tag Log aos arquivos
 */
 
 CREATE OR REPLACE FUNCTION empenho.fn_despesa_anulado_mes_ano(character varying, character varying, character varying, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) RETURNS numeric[]
-    AS '
+AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stDtInicial         ALIAS FOR $2;
@@ -58,7 +58,7 @@ DECLARE
     inCodRecurso        ALIAS FOR $12;
     inCodReduzido       ALIAS FOR $13;
 
-    stSql               VARCHAR   := '''';
+    stSql               VARCHAR   := '';
     nuSoma              NUMERIC   := 0;
     reRegistro          RECORD;
     dtInicioAno         VARCHAR;
@@ -66,36 +66,36 @@ DECLARE
     nuRetorno           NUMERIC[] := array[0.00];
 
 BEGIN
-    dtInicioAno := ''01/01/'' || stExercicio;
+    dtInicioAno := '01/01/' || stExercicio;
 
-    IF stExercicio >= TO_CHAR(now(), ''yyyy'') THEN
-        dtFim := TO_CHAR(NOW(), ''dd/mm/yyyy'');
+    IF stExercicio >= TO_CHAR(now(), 'yyyy') THEN
+        dtFim := TO_CHAR(NOW(), 'dd/mm/yyyy');
     ELSE
-        dtFim := ''31/12/'' || stExercicio;
+        dtFim := '31/12/' || stExercicio;
     END IF;
 
-    stSql := ''SELECT
-               Sum(Case When to_date(to_char(TA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') >= to_date(''''''|| dtInicioAno ||'''''',''''dd/mm/yyyy'''') And 
-                             to_date(to_char(TA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''')  
+    stSql := 'SELECT
+               Sum(Case When to_date(to_char(TA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') >= to_date('|| quote_literal( dtInicioAno ) ||',''dd/mm/yyyy'') And 
+                             to_date(to_char(TA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date('|| quote_literal( stDtFinal ) ||',''dd/mm/yyyy'')  
                         Then TA.vl_anulado
                         Else 0.00 End) as anulado_ano,
-               Sum( Case When to_date(to_char(TA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') >= to_date(''''''|| stDtInicial ||'''''',''''dd/mm/yyyy'''') And 
-                              to_date(to_char(TA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''') 
+               Sum( Case When to_date(to_char(TA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') >= to_date('|| quote_literal( stDtInicial ) ||',''dd/mm/yyyy'') And 
+                              to_date(to_char(TA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date('|| quote_literal( stDtFinal ) ||',''dd/mm/yyyy'') 
                         Then TA.vl_anulado
                         Else 0.00 End )as anulado_per
                from tmp_anulado  as TA
 
                Where
-                     TA.cod_conta             = ''|| inCodConta    ||''
-                 And TA.num_orgao             = ''|| inCodOrgao    ||''
-                 And TA.num_unidade           = ''|| inCodUnidade  ||''
-                 And TA.num_pao               = ''|| inCodNumPAO   ||''
-                 And TA.cod_recurso           = ''|| inCodRecurso  ||''
-                 And TA.cod_despesa           = ''|| inCodReduzido ||''
-                 And TA.cod_entidade          = ''|| inCodEntidade ||''
-                 And TA.cod_funcao            = ''|| inCodFuncao   ||''
-                 And TA.cod_subfuncao         = ''|| inCodSubFuncao  ||''
-                 And TA.cod_programa          = ''|| inCodPrograma;
+                     TA.cod_conta             = '|| inCodConta    ||'
+                 And TA.num_orgao             = '|| inCodOrgao    ||'
+                 And TA.num_unidade           = '|| inCodUnidade  ||'
+                 And TA.num_pao               = '|| inCodNumPAO   ||'
+                 And TA.cod_recurso           = '|| inCodRecurso  ||'
+                 And TA.cod_despesa           = '|| inCodReduzido ||'
+                 And TA.cod_entidade          = '|| inCodEntidade ||'
+                 And TA.cod_funcao            = '|| inCodFuncao   ||'
+                 And TA.cod_subfuncao         = '|| inCodSubFuncao  ||'
+                 And TA.cod_programa          = '|| inCodPrograma;
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -105,6 +105,5 @@ BEGIN
 
     RETURN nuRetorno;
 END;
-'
-    LANGUAGE plpgsql;
-
+$$
+LANGUAGE plpgsql;

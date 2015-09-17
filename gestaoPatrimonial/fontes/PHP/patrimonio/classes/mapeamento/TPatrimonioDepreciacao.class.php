@@ -46,9 +46,9 @@ class TPatrimonioDepreciacao extends Persistente
      * Método Construtor
      * @access Private
      */
-    public function TPatrimonioDepreciacao()
+    public function __construct()
     {
-        parent::Persistente();
+        parent::__construct();
         $this->setTabela('patrimonio.depreciacao');
         $this->setCampoCod('cod_depreciacao');
         $this->setComplementoChave('cod_bem,timestamp');

@@ -40,13 +40,6 @@
     * Casos de uso: uc-03.01.04
 */
 
-/*
-$Log$
-Revision 1.1  2007/09/18 15:10:55  hboaventura
-Adicionando ao repositório
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
@@ -56,9 +49,9 @@ class TPatrimonioGrupoPlanoAnalitica extends Persistente
     * Método Construtor
     * @access Private
 */
-function TPatrimonioGrupoPlanoAnalitica()
+function __construct()
 {
-    parent::Persistente();
+    parent::__construct();
     $this->setTabela('patrimonio.grupo_plano_analitica');
     $this->setCampoCod('cod_grupo');
     $this->setComplementoChave('cod_natureza,exercicio,cod_plano');
@@ -70,3 +63,5 @@ function TPatrimonioGrupoPlanoAnalitica()
 }
 
 }
+
+?>

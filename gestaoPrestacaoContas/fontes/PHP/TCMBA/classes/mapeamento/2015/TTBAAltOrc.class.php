@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63123 $
+    $Revision: 63389 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -65,14 +65,15 @@ class TTBAAltOrc extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBAAltOrc()
+public function __construct ()
 {
-    $this->setEstrutura( array() );
-    $this->setEstruturaAuxiliar( array() );
-    $this->setDado('exercicio', Sessao::getExercicio() );
+  parent::Persistente();
+  $this->setEstrutura( array() );
+  $this->setEstruturaAuxiliar( array() );
+  $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -85,7 +86,7 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+public function montaRecuperaDadosTribunal()
 {
     $stSql .= " SELECT 1 AS tipo_registro
                       ,".$this->getDado('unidade_gestora')." AS unidade_gestora
@@ -104,39 +105,38 @@ function montaRecuperaDadosTribunal()
                       ,su.cod_norma          
                       ,TO_CHAR(su.dt_suplementacao,'dd/mm/yyyy') AS data_suplementacao          
                       ,COALESCE(su.vl_suplementado,0.00) + COALESCE(su.vl_reducao,0.00) AS vl_suplementacao          
-                      ,tipo_norma.cod_tipo_tcm  AS tipo_fundamento        
+                      ,vinculo_tipo_norma.cod_tipo AS tipo_fundamento        
                       ,norma.num_norma          
                       ,norma.nom_norma
                       ,despesa.exercicio::VARCHAR || '".$this->getDado('mes')."' AS competencia    
                       ,TO_CHAR(norma.dt_publicacao,'dd/mm/yyyy') AS data_publicacao          
-                      ,CASE WHEN (su.cod_tipo = 15 )  THEN '1'          
-                            WHEN (su.cod_tipo = 1  )  THEN '26'         
-                            WHEN (su.cod_tipo = 2  )  THEN '15'         
-                            WHEN (su.cod_tipo = 3  )  THEN '28'         
-                            WHEN (su.cod_tipo = 4  )  THEN '9'          
-                            WHEN (su.cod_tipo = 5  )  THEN '12'         
-                            WHEN (su.cod_tipo = 6  )  THEN '25'         
-                            WHEN (su.cod_tipo = 7  )  THEN '13'         
-                            WHEN (su.cod_tipo = 8  )  THEN '28'         
-                            WHEN (su.cod_tipo = 9  )  THEN '7'          
-                            WHEN (su.cod_tipo = 10 )  THEN '10'         
-                            WHEN (su.cod_tipo = 11 )  THEN '5'          
-                            WHEN (su.cod_tipo = 12 )  THEN '30'         
-                            WHEN (su.cod_tipo = 13 )  THEN '29'         
-                            WHEN (su.cod_tipo = 14 )  THEN '31'         
-                            WHEN (su.cod_tipo = 15 )  THEN '1'          
-                            WHEN (su.cod_tipo = 16 )  THEN '1'          
-                        END AS tipo_alteracao         
+                      ,CASE WHEN (vl_reducao > 0.00)  THEN '19'
+                            ELSE
+                                  CASE WHEN (su.cod_tipo = 6  )  THEN '4'
+                                       WHEN (su.cod_tipo = 8  )  THEN '16'
+                                       WHEN (su.cod_tipo = 3  )  THEN '18'
+                                       WHEN (su.cod_tipo = 1  )  THEN '6'
+                                       WHEN (su.cod_tipo = 9  )  THEN '7'
+                                       WHEN (su.cod_tipo = 10 )  THEN '4'
+                                       WHEN (su.cod_tipo = 5  )  THEN '12'
+                                       WHEN (su.cod_tipo = 7  )  THEN '13'
+                                       WHEN (su.cod_tipo = 2  )  THEN '15'
+                                       WHEN (su.cod_tipo = 11 )  THEN '17'
+                                       WHEN (su.cod_tipo = 12 )  THEN '28'
+                                       WHEN (su.cod_tipo = 13 )  THEN '28'
+                                       WHEN (su.cod_tipo = 14 )  THEN '28'
+                                  END
+                        END AS tipo_alteracao
 
                 FROM  (          
-                        SELECT exercicio          
-                              ,cod_norma          
-                              ,cod_tipo          
-                              ,dt_suplementacao          
-                              ,cod_despesa          
-                              ,SUM(vl_suplementado) AS vl_suplementado          
-                              ,SUM(vl_reducao) AS vl_reducao          
-                        FROM (          
+                        SELECT exercicio
+                              ,cod_norma
+                              ,cod_tipo
+                              ,dt_suplementacao
+                              ,cod_despesa
+                              ,SUM(vl_suplementado) AS vl_suplementado
+                              ,SUM(vl_reducao) AS vl_reducao
+                        FROM (
                                 SELECT OS.exercicio          
                                       ,OS.cod_suplementacao          
                                       ,OS.cod_norma          
@@ -146,11 +146,17 @@ function montaRecuperaDadosTribunal()
                                       ,OSS.valor as vl_suplementado          
                                       ,0.00 as vl_reducao          
                                 FROM orcamento.suplementacao AS OS          
-                           LEFT JOIN orcamento.suplementacao_suplementada AS OSS          
+                          INNER JOIN orcamento.suplementacao_suplementada AS OSS          
                                   ON OSS.exercicio = OS.exercicio          
                                  AND OSS.cod_suplementacao = OS.cod_suplementacao         
-                                 AND OS.exercicio='".$this->getDado('exercicio')."'                    
+                                 AND OS.exercicio='".$this->getDado('exercicio')."' 
+                           LEFT JOIN orcamento.suplementacao_anulada
+                                  ON suplementacao_anulada.exercicio = OS.exercicio
+                                 AND suplementacao_anulada.cod_suplementacao = OS.cod_suplementacao
+                               WHERE suplementacao_anulada.cod_suplementacao_anulacao IS NULL
+
                                UNION          
+
                                SELECT OS.exercicio          
                                      ,OS.cod_suplementacao          
                                      ,OS.cod_norma          
@@ -160,10 +166,14 @@ function montaRecuperaDadosTribunal()
                                      ,0.00 as vl_suplementado          
                                      ,OSR.valor as vl_reducao          
                                 FROM orcamento.suplementacao AS OS          
-                           LEFT JOIN orcamento.suplementacao_reducao AS OSR          
+                          INNER JOIN orcamento.suplementacao_reducao AS OSR          
                                   ON OSR.exercicio = OS.exercicio          
                                  AND OSR.cod_suplementacao = OS.cod_suplementacao
-                                 AND OS.exercicio='".$this->getDado('exercicio')."'                    
+                                 AND OS.exercicio='".$this->getDado('exercicio')."'
+                           LEFT JOIN orcamento.suplementacao_anulada
+                                  ON suplementacao_anulada.exercicio = OS.exercicio
+                                 AND suplementacao_anulada.cod_suplementacao = OS.cod_suplementacao
+                               WHERE suplementacao_anulada.cod_suplementacao_anulacao IS NULL
                             ) as tbl          
                         GROUP BY exercicio,cod_despesa,cod_norma,cod_tipo,dt_suplementacao          
                     ) as su
@@ -179,24 +189,24 @@ function montaRecuperaDadosTribunal()
                 INNER JOIN normas.norma
                         ON norma.cod_norma = su.cod_norma
 
-                 LEFT JOIN tcmba.tipo_norma
-                        ON tipo_norma.cod_tipo = norma.cod_tipo_norma
+                 LEFT JOIN tcmba.vinculo_tipo_norma
+                        ON vinculo_tipo_norma.cod_tipo_norma = norma.cod_tipo_norma
 
                 WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
                   AND   despesa.cod_entidade IN ( ".$this->getDado('entidades')." )
                   AND su.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                  AND su.cod_tipo <> 16
 
-                ORDER BY  despesa.exercicio          
-                         ,despesa.num_orgao          
-                         ,despesa.num_unidade          
-                         ,despesa.cod_funcao          
-                         ,despesa.cod_subfuncao          
-                         ,despesa.cod_programa          
-                         ,estrutural       
-                         ,despesa.cod_recurso          
+                ORDER BY  despesa.exercicio
+                         ,despesa.num_orgao
+                         ,despesa.num_unidade
+                         ,despesa.cod_funcao
+                         ,despesa.cod_subfuncao
+                         ,despesa.cod_programa
+                         ,estrutural
+                         ,despesa.cod_recurso
             ";
-            
-    return $stSql;
+            return $stSql;
 }
 
 }

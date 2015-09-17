@@ -24,7 +24,7 @@
     * Script de função PLPGSQL - Relatório Anexo III TCEMG - Despesas Empenhadas.
     * Data de Criação: 12/08/2014
     * @author Evandro Melos
-    $Id: TCEMGRelatorioAnexoIIIDespesaEmpenhada.plsql 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TCEMGRelatorioAnexoIIIDespesaEmpenhada.plsql 63336 2015-08-19 17:17:13Z lisiane $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_empenhada(stMascRed VARCHAR
@@ -34,6 +34,7 @@ CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_empenhada(stMascRed 
                                                                     , stDtFim VARCHAR
                                                                     , stCodOrgao VARCHAR
                                                                     , boRestos BOOLEAN
+                                                                    , codPrograma INTEGER
                                                                     ) RETURNS NUMERIC(14,2) AS $$
 DECLARE 
 	stSQL 		VARCHAR;
@@ -63,7 +64,8 @@ BEGIN
         SELECT
             ped.exercicio,
             ped.cod_pre_empenho,
-            cd.cod_estrutural
+            cd.cod_estrutural,
+            d.cod_programa
         FROM
             orcamento.conta_despesa cd
             INNER JOIN
@@ -87,6 +89,7 @@ BEGIN
         e.dt_empenho BETWEEN to_date(''' || stDtIni || ''', ''dd/mm/yyyy'') AND
                              to_date(''' || stDtFim || ''', ''dd/mm/yyyy'') AND
         pedcd.cod_estrutural like ''' || stMascRed || '%''
+        AND pedcd.cod_programa = ' || codPrograma || '
     	-- não inclui as despesas intra-orçamentárias
         AND SUBSTRING(pedcd.cod_estrutural, 5, 3) <> ''9.1''  ';
 	

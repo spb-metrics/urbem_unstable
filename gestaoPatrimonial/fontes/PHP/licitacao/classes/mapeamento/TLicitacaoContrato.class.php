@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 61465 2015-01-20 16:36:30Z carolina $
+    $Id: TLicitacaoContrato.class.php 63565 2015-09-11 11:25:25Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -75,7 +75,21 @@ function TLicitacaoContrato()
     $this->AddCampo('valor_garantia','numeric',true,'14,2',false,false);
     $this->AddCampo('inicio_execucao', 'date',true,'',false,false );
     $this->AddCampo('fim_execucao', 'date',true,'',false,false );
-}
+    
+    $this->AddCampo('num_orgao','integer',true,'', true,'TOrcamentoOrgao');
+    $this->AddCampo('num_unidade','integer',true,'', true,'TOrcamentoUnidade');
+    $this->AddCampo('numero_contrato','integer',true,'', true, false);
+    $this->AddCampo('tipo_objeto','integer',true,'', true,'TComprasTipoObjeto');
+    $this->AddCampo('objeto','char',true,''  ,true, false);
+    $this->AddCampo('forma_fornecimento','char',true,'50', true, false);
+    $this->AddCampo('forma_pagamento','char',true,'100', true, false);
+    $this->AddCampo('cgm_signatario','integer',true,'', true,'TCGM');
+    $this->AddCampo('prazo_execucao','char',true,'100', true, false);
+    $this->AddCampo('multa_rescisoria','char',true,'250', true, false);
+    $this->AddCampo('justificativa','char',true,'250',true, false);
+    $this->AddCampo('razao','char',true,'250', true, false);
+    $this->AddCampo('fundamentacao_legal','char',true,'250' ,true, false);
+}    
 
 function recuperaDadosContrato(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
@@ -91,7 +105,7 @@ function recuperaDadosContrato(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $bo
 
 function montaRecuperaDadosContrato()
 {
-    $stSql  = " SELECT					   			                  \n";
+    $stSql  = " SELECT					   			                                  \n";
     $stSql .= "        contrato.exercicio          			    	                  \n";
     $stSql .= "		 , contrato.cod_entidade            			                  \n";
     $stSql .= "		 , contrato.num_contrato             			                  \n";
@@ -107,6 +121,20 @@ function montaRecuperaDadosContrato()
     $stSql .= "		 , contrato.fim_execucao        	 			                  \n";
     $stSql .= "      , sw_cgm.nom_cgm        as nom_entidade			              \n";
     $stSql .= "      , credor.nom_cgm        as nom_credor				              \n";
+
+    $stSql .= "      , contrato.num_orgao                                             \n";
+    $stSql .= "      , contrato.num_unidade                                           \n";
+    $stSql .= "      , contrato.numero_contrato                                       \n";
+    $stSql .= "      , contrato.objeto                                                \n";
+    $stSql .= "      , contrato.forma_fornecimento                                    \n";
+    $stSql .= "      , contrato.forma_pagamento                                       \n";
+    $stSql .= "      , contrato.cgm_signatario                                        \n";
+    $stSql .= "      , contrato.prazo_execucao                                        \n";
+    $stSql .= "      , contrato.multa_rescisoria                                      \n";
+    $stSql .= "      , contrato.justificativa                                         \n";
+    $stSql .= "      , contrato.razao                                                 \n";
+    $stSql .= "      , contrato.fundamentacao_legal                                   \n";
+    
     $stSql .= "   FROM													              \n";
     $stSql .= "   	  licitacao.contrato								              \n";
     $stSql .= "        JOIN ( SELECT numcgm								              \n";
@@ -176,48 +204,92 @@ function montaRecuperaContrato($stFiltro)
 
 function montaRecuperaRelacionamento()
 {
-    $stSql = "SELECT contrato.cgm_responsavel_juridico                                        \n";
-    $stSql.= "      ,TO_CHAR(contrato.dt_assinatura,'dd/mm/yyyy') as dt_assinatura            \n";
-    $stSql.= "      ,TO_CHAR(contrato.vencimento,'dd/mm/yyyy') as vencimento                  \n";
-    $stSql.= "      ,contrato.cgm_contratado                                                  \n";
-    $stSql.= "      ,sw_cgm.nom_cgm                                                           \n";
-    $stSql.= "      ,cgm_contratado.nom_cgm as nom_contratado                                 \n";
-    $stSql.= "      ,objeto.descricao                                                         \n";
-    $stSql.= "      ,contrato_licitacao.cod_licitacao                                         \n";
-    $stSql.= "      ,contrato_licitacao.cod_modalidade                                        \n";
-    $stSql.= "      ,contrato.cod_entidade                                                    \n";
-    $stSql.= "      ,contrato.num_contrato                                                    \n";
-    $stSql.= "      ,contrato.cod_documento                                                   \n";
-    $stSql.= "      ,contrato.cod_tipo_documento                                              \n";
-    $stSql.= "      ,contrato.valor_garantia                                                  \n";
-    $stSql.= "      ,contrato.valor_contratado                                                \n";
-    $stSql.= "      ,TO_CHAR( contrato.inicio_execucao,'dd/mm/yyyy') as inicio_execucao       \n";
-    $stSql.= "      ,TO_CHAR( contrato.fim_execucao   ,'dd/mm/yyyy') as fim_execucao          \n";
-    $stSql.= "      ,licitacao.cod_mapa                                                       \n";
-    $stSql.= "      ,contrato_licitacao.exercicio                                             \n";
-    $stSql.= "      ,contrato_licitacao.exercicio_licitacao                                   \n";
-    $stSql.= "      ,(SELECT descricao FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS tipo_descricao \n";
-    $stSql.= "  FROM licitacao.contrato                                                       \n";
-    $stSql.= "      ,licitacao.licitacao                                                      \n";
-
-    $stSql.= "      ,licitacao.contrato_licitacao                                             \n";
-
-    $stSql.= "      ,compras.objeto                                                           \n";
-    $stSql.= "      ,sw_cgm                                                                   \n";
-    $stSql.= "      ,sw_cgm as cgm_contratado                                                 \n";
-
-    $stSql.= " WHERE licitacao.cod_licitacao = contrato_licitacao.cod_licitacao               \n";
-    $stSql.= "   AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade             \n";
-    $stSql.= "   AND licitacao.cod_entidade = contrato_licitacao.cod_entidade                 \n";
-    $stSql.= "   AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao             \n";
-
-    $stSql.= "   AND contrato_licitacao.cod_entidade = contrato.cod_entidade                  \n";
-    $stSql.= "   AND contrato_licitacao.exercicio = contrato.exercicio                        \n";
-    $stSql.= "   AND contrato_licitacao.num_contrato = contrato.num_contrato                  \n";
-
-    $stSql.= "   AND licitacao.cod_objeto = objeto.cod_objeto                                 \n";
-    $stSql.= "   AND sw_cgm.numcgm = contrato.cgm_responsavel_juridico                        \n";
-    $stSql.= "   AND cgm_contratado.numcgm = contrato.cgm_contratado                          \n";
+    $stSql = "SELECT contrato.cgm_responsavel_juridico
+                   , TO_CHAR(contrato.dt_assinatura,'dd/mm/yyyy') as dt_assinatura           
+                   , TO_CHAR(contrato.vencimento,'dd/mm/yyyy') as vencimento                 
+                   , contrato.cgm_contratado                                                 
+                   , sw_cgm.nom_cgm                                                          
+                   , cgm_contratado.nom_cgm as nom_contratado                                
+                   , objeto.descricao                                                        
+                   , contrato_licitacao.cod_licitacao                                        
+                   , contrato_licitacao.cod_modalidade                                       
+                   , contrato.cod_entidade                                                   
+                   , contrato.num_contrato                                                   
+                   , contrato.cod_documento                                                  
+                   , contrato.cod_tipo_documento                                             
+                   , contrato.valor_garantia                                                 
+                   , contrato.valor_contratado                                               
+                   , TO_CHAR( contrato.inicio_execucao,'dd/mm/yyyy') as inicio_execucao      
+                   , TO_CHAR( contrato.fim_execucao   ,'dd/mm/yyyy') as fim_execucao         
+                   , licitacao.cod_mapa                                                      
+                   , contrato_licitacao.exercicio                                            
+                   , contrato_licitacao.exercicio_licitacao                                  
+                   , (SELECT descricao FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS tipo_descricao
+                   
+                   , contrato.num_orgao                                                     
+                   , contrato.num_unidade                                                   
+                   , contrato.numero_contrato                                               
+                   , contrato.objeto
+                   , contrato.tipo_objeto AS cod_tipo_objeto
+                   , tipo_objeto.descricao AS tipo_objeto
+                   , contrato.forma_fornecimento                                            
+                   , contrato.forma_pagamento                                               
+                   , contrato.cgm_signatario
+                   , cgm_signatario.nom_cgm AS nom_signatario
+                   , contrato.prazo_execucao                                                
+                   , contrato.multa_rescisoria                                              
+                   , contrato.justificativa                                                 
+                   , contrato.razao                                                         
+                   , contrato.fundamentacao_legal
+                   , orgao.nom_orgao
+                   , unidade.nom_unidade
+                   , entidade.nom_cgm AS nom_entidade
+    
+                FROM licitacao.licitacao
+                   , licitacao.contrato_licitacao
+                   , compras.objeto
+                   , sw_cgm                                                                  
+                   , sw_cgm as cgm_contratado                                                
+                   , licitacao.contrato                                                      
+        
+           LEFT JOIN sw_cgm as cgm_signatario                                            
+                  ON cgm_signatario.numcgm = contrato.cgm_signatario
+            
+          INNER JOIN ( SELECT sw_cgm.nom_cgm
+                            , entidade.cod_entidade
+                            , entidade.exercicio
+                         FROM orcamento.entidade
+                   INNER JOIN sw_cgm
+                           ON sw_cgm.numcgm    = entidade.numcgm
+                     ) AS entidade
+                   ON entidade.cod_entidade = contrato.cod_entidade
+                  AND entidade.exercicio    = contrato.exercicio
+                     
+           LEFT JOIN orcamento.orgao
+                  ON orgao.num_orgao = contrato.num_orgao
+                 AND orgao.exercicio = contrato.exercicio
+        
+           LEFT JOIN orcamento.unidade
+                  ON unidade.num_unidade = contrato.num_unidade
+                 AND unidade.num_orgao   = contrato.num_orgao
+                 AND unidade.exercicio   = contrato.exercicio
+                 
+           LEFT JOIN compras.tipo_objeto
+                  ON tipo_objeto.cod_tipo_objeto = contrato.tipo_objeto
+        
+               WHERE licitacao.cod_licitacao = contrato_licitacao.cod_licitacao              
+                 AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade            
+                 AND licitacao.cod_entidade = contrato_licitacao.cod_entidade                
+                 AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao            
+        
+                 AND contrato_licitacao.cod_entidade = contrato.cod_entidade                 
+                 AND contrato_licitacao.exercicio = contrato.exercicio                       
+                 AND contrato_licitacao.num_contrato = contrato.num_contrato                 
+                 
+                 AND licitacao.cod_objeto = objeto.cod_objeto                                
+                 AND sw_cgm.numcgm = contrato.cgm_responsavel_juridico                       
+                 AND cgm_contratado.numcgm = contrato.cgm_contratado    \n";
+                 
     if ( $this->getDado('num_contrato') ) {
         $stSql.= "   AND contrato.num_contrato = ".$this->getDado('num_contrato')."           \n";
     }
@@ -560,6 +632,7 @@ function montaRecuperaNaoAnuladosContratado()
     $stSql = " SELECT contrato.cgm_responsavel_juridico
                     , TO_CHAR(contrato.dt_assinatura,'dd/mm/yyyy') as dt_assinatura
                     , contrato.num_contrato
+                    , contrato.numero_contrato
                     , contrato.cod_entidade
                     , contrato.exercicio as exercicio_contrato
                     , contrato.valor_contratado

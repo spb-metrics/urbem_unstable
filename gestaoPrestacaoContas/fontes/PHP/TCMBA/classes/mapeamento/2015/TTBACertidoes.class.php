@@ -33,52 +33,31 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63407 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
 
     * Casos de uso: uc-06.05.00
 */
-
-/*
-$Log$
-Revision 1.3  2007/10/02 18:17:17  hboaventura
-inclusão do caso de uso uc-06.05.00
-
-Revision 1.2  2007/10/01 04:40:43  diego
-Adicionado campo exercicio ao retorno para compor a chave de competencia
-
-Revision 1.1  2007/09/11 03:14:16  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  *
-  * Data de Criação: 05/09/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBACertidoes extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TTBACertidoes()
+public function __construct()
 {
+    parent::Persistente();
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
     $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -91,53 +70,74 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+public function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   lido.exercicio             \n";
-    $stSql .= "         ,pado.cod_licitacao         \n";
-    $stSql .= "         ,case when  pf.cpf is not null  then pf.cpf         \n";
-    $stSql .= "               when pj.cnpj is not null  then pj.cnpj         \n";
-    $stSql .= "                else ''         \n";
-    $stSql .= "         end as cpf_cnpj         \n";
-    $stSql .= "         ,tice.cod_tipo_tcm         \n";
-    $stSql .= "         ,pado.num_documento         \n";
-    $stSql .= "         ,to_char(pado.dt_emissao ,'dd/mm/yyyy') as dt_emissao         \n";
-    $stSql .= "         ,to_char(pado.dt_validade,'dd/mm/yyyy') as dt_validade         \n";
-    $stSql .= " FROM     licitacao.documento                as docu         \n";
-    $stSql .= "         ,licitacao.licitacao_documentos     as lido         \n";
-    $stSql .= "         ,licitacao.participante_documentos  as pado         \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_fisica as pf         \n";
-    $stSql .= "             ON ( pado.cgm_fornecedor = pf.numcgm )         \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_juridica as pj         \n";
-    $stSql .= "             ON ( pado.cgm_fornecedor = pj.numcgm )         \n";
-    $stSql .= "         LEFT JOIN   tcmba.tipo_certidao    as tice         \n";
-    $stSql .= "             ON ( tice.cod_tipo = pado.cod_documento )         \n";
-    $stSql .= " WHERE   docu.cod_documento  = lido.cod_documento         \n";
-    $stSql .= " AND     lido.exercicio      = lido.exercicio         \n";
-    $stSql .= " AND     lido.cod_entidade   = lido.cod_entidade         \n";
-    $stSql .= " AND     lido.cod_modalidade = lido.cod_modalidade         \n";
-    $stSql .= " AND     lido.cod_licitacao  = lido.cod_licitacao         \n";
-    $stSql .= " AND     lido.cod_documento  = lido.cod_documento         \n";
-    $stSql .= " AND     lido.exercicio  = '".$this->getDado('exercicio')."'    \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     lido.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
-    $stSql .= " GROUP BY lido.exercicio, pado.cod_licitacao         \n";
-    $stSql .= "         ,pf.cpf         \n";
-    $stSql .= "         ,pj.cnpj         \n";
-    $stSql .= "         ,tice.cod_tipo_tcm         \n";
-    $stSql .= "         ,pado.num_documento         \n";
-    $stSql .= "         ,pado.dt_emissao         \n";
-    $stSql .= "         ,pado.dt_validade         \n";
-    $stSql .= " ORDER BY pado.cod_licitacao         \n";
-    $stSql .= "         ,pf.cpf         \n";
-    $stSql .= "         ,pj.cnpj         \n";
-    $stSql .= "         ,tice.cod_tipo_tcm         \n";
-    $stSql .= "         ,pado.num_documento         \n";
-    $stSql .= "         ,pado.dt_emissao         \n";
-    $stSql .= "         ,pado.dt_validade         \n";
+    $stSql .= " SELECT 1 AS tipo_registro
+                     , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                     , licitacao.exercicio::VARCHAR||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR ,4,'0') AS processo_licitatorio
+                     , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf         
+                            WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj         
+                            ELSE ''         
+                     END AS cpf_cnpj
+                    , documento_de_para.cod_documento_tcm AS cod_tipo
+                    , participante_documentos.num_documento AS num_certidao        
+                    , TO_CHAR(participante_documentos.dt_emissao ,'dd/mm/yyyy') AS dt_emissao         
+                    , TO_CHAR(participante_documentos.dt_validade,'dd/mm/yyyy') AS dt_validade
+                    , ".$this->getDado('exercicio')."::VARCHAR||".$this->getDado('mes')."::VARCHAR AS competencia
 
+                FROM licitacao.documento
+
+          INNER JOIN licitacao.licitacao_documentos
+                  ON licitacao_documentos.cod_documento = documento.cod_documento
+
+          INNER JOIN licitacao.licitacao
+                  ON licitacao.cod_licitacao  = licitacao_documentos.cod_licitacao
+                 AND licitacao.cod_modalidade = licitacao_documentos.cod_modalidade
+                 AND licitacao.cod_entidade   = licitacao_documentos.cod_entidade
+                 AND licitacao.exercicio      = licitacao_documentos.exercicio
+
+          INNER JOIN licitacao.participante_documentos
+                  ON participante_documentos.cod_documento  = licitacao_documentos.cod_documento
+                 AND participante_documentos.cod_licitacao  = licitacao_documentos.cod_licitacao
+                 AND participante_documentos.cod_modalidade = licitacao_documentos.cod_modalidade
+                 AND participante_documentos.cod_entidade   = licitacao_documentos.cod_entidade
+                 AND participante_documentos.exercicio      = licitacao_documentos.exercicio
+
+           LEFT JOIN sw_cgm_pessoa_fisica
+                  ON participante_documentos.cgm_fornecedor = sw_cgm_pessoa_fisica.numcgm
+
+           LEFT JOIN sw_cgm_pessoa_juridica
+                  ON participante_documentos.cgm_fornecedor = sw_cgm_pessoa_juridica.numcgm
+
+           LEFT JOIN tcmba.documento_de_para
+                  ON documento_de_para.cod_documento = participante_documentos.cod_documento
+                  
+               WHERE licitacao_documentos.exercicio  = '".$this->getDado('exercicio')."'
+                 AND licitacao.cod_modalidade NOT IN (8, 9)
+                 AND licitacao_documentos.cod_entidade IN (".$this->getDado('entidades').")
+                 AND TO_DATE(TO_CHAR(licitacao.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+
+     GROUP BY licitacao_documentos.exercicio
+            , participante_documentos.cod_licitacao         
+            , sw_cgm_pessoa_fisica.cpf         
+            , sw_cgm_pessoa_juridica.cnpj         
+            , documento_de_para.cod_documento_tcm
+            , participante_documentos.num_documento         
+            , participante_documentos.dt_emissao         
+            , participante_documentos.dt_validade
+            , processo_licitatorio
+
+     ORDER BY participante_documentos.cod_licitacao         
+            , sw_cgm_pessoa_fisica.cpf         
+            , sw_cgm_pessoa_juridica.cnpj         
+            , documento_de_para.cod_documento_tcm
+            , participante_documentos.num_documento         
+            , participante_documentos.dt_emissao         
+            , participante_documentos.dt_validade         
+";
     return $stSql;
 }
 
 }
+
+?>

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterMarca.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterMarca.php 63194 2015-08-03 20:44:43Z carlos.silva $
 
     * Casos de uso: uc-03.02.03
 */
@@ -46,21 +46,17 @@ $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
-
+    
 if ($stAcao == 'alterar') {
     $obTFrotaMarca = new TFrotaMarca();
     $obTFrotaMarca->setDado( 'cod_marca', $_REQUEST['inCodMarca'] );
     $obTFrotaMarca->recuperaPorChave( $rsMarca );
-
-    //cria um textbox para o codigo da marca
-    $obCodMarca = new TextBox();
-    $obCodMarca->setName( 'inCodMarca' );
-    $obCodMarca->setId( 'inCodMarca' );
-    $obCodMarca->setValue( $rsMarca->getCampo( 'cod_marca' ) );
-    $obCodMarca->setRotulo( 'Código' );
-    $obCodMarca->setLabel( true );
-
+    
+    $inCodMarca = $_REQUEST['inCodMarca'];
 } else {
+    $obTFrotaMarca = new TFrotaMarca();
+    $obTFrotaMarca->ProximoCod( $inCodMarca );
+    
     $rsMarca = new RecordSet();
 }
 
@@ -78,6 +74,18 @@ $obHdnAcao->setValue($stAcao);
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ("stCtrl" );
 $obHdnCtrl->setValue("");
+
+$obCodMarca = new Inteiro();
+$obCodMarca->setName( 'inCodMarca' );
+$obCodMarca->setId( 'inCodMarca' );
+$obCodMarca->setRotulo( 'Código' );
+$obCodMarca->setMaxLength( 8 );
+$obCodMarca->setSize( 8 );
+$obCodMarca->setNull( false );
+$obCodMarca->setValue( $inCodMarca );
+if ($stAcao == 'alterar') {
+    $obCodMarca->setLabel( true );
+}
 
 //cria textbox para a marca
 $obTxtMarca = new TextBox();
@@ -98,10 +106,7 @@ $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 
 $obFormulario->addTitulo    ( 'Marca do Veículo' );
-
-if ($stAcao == 'alterar') {
-    $obFormulario->addComponente( $obCodMarca );
-}
+$obFormulario->addComponente( $obCodMarca );
 $obFormulario->addComponente( $obTxtMarca );
 
 if ($stAcao == 'alterar') {

@@ -248,6 +248,23 @@ BEGIN
     
     EXECUTE stSql;
     
+     ---------------------------------------------
+    -- COD ESTRUTURAL : 1.1.1.2.04.34.00.00.00 --
+    ---------------------------------------------
+    
+    SELECT COUNT(*) INTO inCount FROM orcamento.conta_receita WHERE exercicio = stExercicio AND cod_estrutural ILIKE '1.1.1.2.04.34.00.00.00';
+    
+    IF inCount = 0 THEN
+        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,3,''00.1112.04.34    Retido Nas Fontes - Outros Rendimentos'', 0.00,0.00,0.00,0.00,0.00);';
+    ELSE
+        stSql := 'INSERT INTO tmp_tcemg_anI_receita
+            SELECT grupo, subgrupo, item, ''00.1112.04.34    Retido Nas Fontes - Outros Rendimentos'' as descricao, ini, atu, no_bi, ate_bi, pct 
+		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.2.04.34.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 3) ;
+        ';
+    END IF;
+
+    EXECUTE stSql;
+    
     ---------------------------------------------
     -- COD ESTRUTURAL : 1.1.1.2.08.00.00.00.00 --
     ---------------------------------------------
@@ -255,16 +272,16 @@ BEGIN
     SELECT COUNT(*) INTO inCount FROM orcamento.conta_receita WHERE exercicio = stExercicio AND cod_estrutural ILIKE '1.1.1.2.08.00.00.00.00';
     
     IF inCount = 0 THEN
-        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,3,''00.1112.08.00    Imposto sobre Transmissão "Inter-Vivos" de Bens Imóveis e de Direitos Reais sobre Imóveis'', 0.00,0.00,0.00,0.00,0.00);';
+        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,4,''00.1112.08.00    Imposto sobre Transmissão "Inter-Vivos" de Bens Imóveis e de Direitos Reais sobre Imóveis'', 0.00,0.00,0.00,0.00,0.00);';
     ELSE
         stSql := 'INSERT INTO tmp_tcemg_anI_receita
             SELECT grupo, subgrupo, item, ''00.1112.08.00    Imposto sobre Transmissão "Inter-Vivos" de Bens Imóveis e de Direitos Reais sobre Imóveis'' as descricao, ini, atu, no_bi, ate_bi, pct 
-		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.2.08.00.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 3) ;
+		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.2.08.00.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 4) ;
         ';
     END IF;
 
     EXECUTE stSql;
-
+        
     ---------------------------------------------
     -- COD ESTRUTURAL : 1.1.1.3.05.01.00.00.00 --
     ---------------------------------------------
@@ -272,11 +289,11 @@ BEGIN
     SELECT COUNT(*) INTO inCount FROM orcamento.conta_receita WHERE exercicio = stExercicio AND cod_estrutural ILIKE '1.1.1.3.05.01.00.00.00';
     
     IF inCount = 0 THEN
-        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,4,''00.1113.05.01    Imposto sobre Serviços de Qualquer Natureza'', 0.00,0.00,0.00,0.00,0.00);';
+        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,5,''00.1113.05.01    Imposto sobre Serviços de Qualquer Natureza'', 0.00,0.00,0.00,0.00,0.00);';
     ELSE
         stSql := 'INSERT INTO tmp_tcemg_anI_receita
             SELECT grupo, subgrupo, item, ''00.1113.05.01    Imposto sobre Serviços de Qualquer Natureza'' as descricao, ini, atu, no_bi, ate_bi, pct 
-		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.3.05.01.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 4) ;
+		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.3.05.01.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 5) ;
         ';
     END IF;
 
@@ -289,11 +306,11 @@ BEGIN
     SELECT COUNT(*) INTO inCount FROM orcamento.conta_receita WHERE exercicio = stExercicio AND cod_estrutural ILIKE '1.1.1.3.05.03.00.00.00';
     
     IF inCount = 0 THEN
-        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,5,''00.1113.05.03    ISS - Simples Nacional'', 0.00,0.00,0.00,0.00,0.00);';
+        stSql := 'INSERT INTO tmp_tcemg_anI_receita VALUES (1,1,6,''00.1113.05.03    ISS - Simples Nacional'', 0.00,0.00,0.00,0.00,0.00);';
     ELSE
         stSql := 'INSERT INTO tmp_tcemg_anI_receita
             SELECT grupo, subgrupo, item, ''00.1113.05.03    ISS - Simples Nacional'' as descricao, ini, atu, no_bi, ate_bi, pct 
-		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.3.05.03.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 5) ;
+		FROM tcemg.fn_relatorio_anexo_valor_conta(''' || stExercicio || ''', ''R'', ''1.1.1.3.05.03.00.00.00'','''||stEntidades||''', '''||stDtIni||''','''||stDtFim||''', true, 1, 1, 6) ;
         ';
     END IF;
 

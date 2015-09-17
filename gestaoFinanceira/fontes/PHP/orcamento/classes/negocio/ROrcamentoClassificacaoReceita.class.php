@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoClassificacaoReceita.class.php 62443 2015-05-11 17:35:07Z evandro $
+    $Id: ROrcamentoClassificacaoReceita.class.php 63193 2015-08-03 20:34:35Z arthur $
 
     * Casos de uso: uc-02.01.04, uc-02.01.06
 */
@@ -39,11 +39,6 @@ include_once ( CAM_GA_NORMAS_NEGOCIO        ."RNorma.class.php" );
 include_once ( CAM_FW_BANCO_DADOS."Transacao.class.php" );
 include_once( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
 
-/**
-    * Classe de Regra de Negócio Itens
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Marcelo Boezzio Paulino
-*/
 class ROrcamentoClassificacaoReceita
 {
 /**
@@ -405,10 +400,8 @@ function listar(&$rsLista, $stOrder = "", $obTransacao = "")
             $stFiltro .= " AND cod_estrutural like '".$this->getMascClassificacao()."%'";            
         }
     } else {
-        if($this->getExercicio() >= 2008){ // Utilização a partir de 2008
-            //if ( !SistemaLegado::is_tcems($boTransacao) ) {
+        if($this->getExercicio() >= 2008){
                 $stFiltro .= " AND cod_estrutural not like '9%'";
-            //}
         }
         if ( $this->getMascClassificacao() ) {            
             $stFiltro .= " AND cod_estrutural like '".$this->getMascClassificacao()."%'";

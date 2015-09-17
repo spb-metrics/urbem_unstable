@@ -33,29 +33,19 @@
     * Casos de uso: uc-03.04.33
                     uc-03.04.32
 
-    $Id: TComprasCompraDireta.class.php 61437 2015-01-16 16:29:21Z franver $
+    $Id: TComprasCompraDireta.class.php 63408 2015-08-25 17:10:37Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  compras.mapa
-  * Data de Criação: 30/06/2006
-
-  * @author Analista: Diego Victoria
-  * @author Desenvolvedor: Leandro André Zis
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TComprasCompraDireta extends Persistente
 {
     /**
     * Método Construtor
     * @access Private
-*/
-    public function TComprasCompraDireta()
+    **/
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("compras.compra_direta");
@@ -64,18 +54,18 @@ class TComprasCompraDireta extends Persistente
         $this->setComplementoChave('cod_entidade,exercicio_entidade,cod_modalidade');
 
         $this->AddCampo( 'cod_compra_direta'	,'sequence' ,true	, ''	,true	,false  );
-        $this->AddCampo( 'cod_entidade'       	,'integer'	,true	, '' 	,true  	,true	);
-        $this->AddCampo( 'exercicio_entidade'   ,'char'		,true	, '4' 	,true  	,true	);
-        $this->AddCampo( 'cod_modalidade'      	,'integer'	,true	, '' 	,true  	,true	);
-        $this->AddCampo( 'cod_tipo_objeto'      ,'integer'	,true	, '' 	,false 	,true 	);
-        $this->AddCampo( 'cod_objeto'           ,'integer'	,true	, '' 	,false 	,true 	);
-        $this->AddCampo( 'exercicio_mapa'       ,'char'		,true	, '4' 	,false 	,true	);
-        $this->AddCampo( 'cod_mapa'             ,'integer'	,true	, '' 	,false  ,true   );
-        $this->AddCampo( 'dt_entrega_proposta'  ,'date'		,true	, '' 	,false  ,false  );
-        $this->AddCampo( 'dt_validade_proposta' ,'date'		,true	, '' 	,false 	,false  );
-        $this->AddCampo( 'condicoes_pagamento'  ,'varchar'	,true	, '80' 	,false 	,false  );
-        $this->AddCampo( 'prazo_entrega'        ,'integer'	,true	, '3' 	,false 	,false  );
-        $this->AddCampo( 'timestamp'          	,'timestamp'    ,false 	, '' 	,false  ,false  );
+        $this->AddCampo( 'cod_entidade'       	,'integer'  ,true	, '' 	,true  	,true	);
+        $this->AddCampo( 'exercicio_entidade'   ,'char'     ,true	, '4' 	,true  	,true	);
+        $this->AddCampo( 'cod_modalidade'      	,'integer'  ,true	, '' 	,true  	,true	);
+        $this->AddCampo( 'cod_tipo_objeto'      ,'integer'  ,true	, '' 	,false 	,true 	);
+        $this->AddCampo( 'cod_objeto'           ,'integer'  ,true	, '' 	,false 	,true 	);
+        $this->AddCampo( 'exercicio_mapa'       ,'char'     ,true	, '4' 	,false 	,true	);
+        $this->AddCampo( 'cod_mapa'             ,'integer'  ,true	, '' 	,false  ,true   );
+        $this->AddCampo( 'dt_entrega_proposta'  ,'date'     ,true	, '' 	,false  ,false  );
+        $this->AddCampo( 'dt_validade_proposta' ,'date'     ,true	, '' 	,false 	,false  );
+        $this->AddCampo( 'condicoes_pagamento'  ,'varchar'  ,true	, '80' 	,false 	,false  );
+        $this->AddCampo( 'prazo_entrega'        ,'integer'  ,true	, '3' 	,false 	,false  );
+        $this->AddCampo( 'timestamp'            ,'timestamp',false 	, '' 	,false  ,false  );
     }
 
     public function recuperaMapaCompraDireta(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
@@ -92,15 +82,15 @@ class TComprasCompraDireta extends Persistente
 
     public function montaRecuperaMapaCompraDireta()
     {
-        $stSql = "select compra_direta.cod_mapa
+        $stSql = "SELECT compra_direta.cod_mapa
                        , compra_direta.exercicio_mapa
                        , objeto.descricao as objeto
-                    from compras.compra_direta
-                         inner join compras.mapa
-                                 on mapa.cod_mapa = compra_direta.cod_mapa
-                                and mapa.exercicio =  compra_direta.exercicio_mapa
-                          inner join compras.objeto
-                                 on objeto.cod_objeto = mapa.cod_objeto
+                    FROM compras.compra_direta
+              INNER JOIN compras.mapa
+                      ON mapa.cod_mapa      = compra_direta.cod_mapa
+                     AND mapa.exercicio     = compra_direta.exercicio_mapa
+              INNER JOIN compras.objeto
+                      ON objeto.cod_objeto  = mapa.cod_objeto
                     ";
 
         return $stSql;
@@ -229,7 +219,6 @@ class TComprasCompraDireta extends Persistente
         $rsRecordSet = new RecordSet;
         $stGroupBy = " group by cotacao_fornecedor_item.cgm_fornecedor
                             , vw_classificacao_despesa.mascara_classificacao
-                           -- , cotacao_fornecedor_item.lote
                             , solicitacao_item_dotacao.cod_despesa
                             , solicitacao_item_dotacao.cod_conta
                             , solicitacao_item_dotacao.cod_entidade
@@ -250,7 +239,6 @@ class TComprasCompraDireta extends Persistente
     {
         $stSql = "
             select  cotacao_fornecedor_item.cgm_fornecedor as fornecedor
---                  , cotacao_fornecedor_item.lote
                   , solicitacao_item_dotacao.cod_despesa
                   , solicitacao_item_dotacao.cod_conta
                   , solicitacao_item_dotacao.cod_entidade
@@ -383,7 +371,9 @@ class TComprasCompraDireta extends Persistente
                            , mapa.exercicio
                            , solicitacao_item.exercicio
                            , cotacao_item.quantidade
-                           , solicitacao_item.complemento";
+                           , solicitacao_item.complemento
+                           , solicitacao_item.cod_centro
+                           , solicitacao.cod_solicitacao";
         $stSql = $this->montaRecuperaInfoItensAgrupadosSolicitacao().$stFiltro.$stGroupBy.$stOrdem;
         $this->stDebug = $stSql;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -401,6 +391,7 @@ class TComprasCompraDireta extends Persistente
                        , cotacao_fornecedor_item.lote
                        , solicitacao_item_dotacao.cod_despesa
                        , solicitacao_item_dotacao.cod_conta
+                       , solicitacao.cod_solicitacao
                        , solicitacao_item.exercicio as exercicio_solicitacao
                        , solicitacao_item_dotacao.cod_entidade
                        , sw_cgm.nom_cgm as nom_entidade
@@ -425,6 +416,7 @@ class TComprasCompraDireta extends Persistente
                        , mapa.cod_mapa
                        , mapa.exercicio as exercicio_mapa
                        , solicitacao_item.complemento
+                       , solicitacao_item.cod_centro
 
                     from compras.compra_direta
                    inner join compras.mapa_cotacao
@@ -861,16 +853,16 @@ class TComprasCompraDireta extends Persistente
                  ,  modalidade.descricao AS modalidade
                  ,  compra_direta.cod_entidade
                  ,  sw_cgm.nom_cgm AS entidade
-         ,  entidade.exercicio AS entidade_exercicio
+                 ,  entidade.exercicio AS entidade_exercicio
                  ,  compra_direta.exercicio_entidade
                  ,  TO_CHAR(compra_direta.timestamp,'dd/mm/yyyy') as data
-         ,  TO_CHAR(compra_direta.timestamp,'HH24:MI') as hora
+                 ,  TO_CHAR(compra_direta.timestamp,'HH24:MI') as hora
                  ,  compra_direta.cod_mapa
                  ,  compra_direta.exercicio_mapa
                  ,  mapa.cod_tipo_licitacao
                  ,  tipo_objeto.descricao as desc_tipo_objeto
                  ,  objeto.descricao as desc_objeto
-         ,  compra_direta.timestamp
+                 ,  compra_direta.timestamp
         ";
 
         if ( $this->getDado('julgamento') || $request->get('stAcao') == 'reemitir') {
@@ -908,7 +900,7 @@ class TComprasCompraDireta extends Persistente
       
     if ($request->get('inCGMFornecedor') != '') {
         $stSql .= " INNER JOIN (   SELECT exercicio
-                              , ordem
+                                          , ordem
                                           , cod_cotacao
                                           , cgm_fornecedor
                                      FROM compras.julgamento_item
@@ -917,11 +909,17 @@ class TComprasCompraDireta extends Persistente
                                           , ordem
                                           , cod_cotacao
                                           , cgm_fornecedor ) AS j
-                   ON j.cod_cotacao = mapa_cot.cod_cotacao
+                           ON j.cod_cotacao = mapa_cot.cod_cotacao
                           AND j.exercicio   = mapa_cot.exercicio_cotacao
                           AND j.cgm_fornecedor = ".$request->get('inCGMFornecedor');
     }
-
+    if ($request->get('stAcao') == 'publicar') {
+        $stSql .= " LEFT JOIN compras.compra_direta_processo
+                           ON compra_direta_processo.cod_compra_direta = compra_direta.cod_compra_direta
+                          AND compra_direta_processo.cod_entidade = compra_direta.cod_entidade
+                          AND compra_direta_processo.cod_modalidade = compra_direta.cod_modalidade
+                          AND compra_direta_processo.exercicio_entidade = compra_direta.exercicio_entidade";
+    }
         $stSql .= " 
             LEFT JOIN (SELECT  homologacao.cod_compra_direta 
                                        , homologacao.cod_entidade
@@ -939,8 +937,6 @@ class TComprasCompraDireta extends Persistente
                       AND homologadas.cod_entidade = compra_direta.cod_entidade
                       AND homologadas.exercicio_compra_direta = compra_direta.exercicio_entidade
                       AND homologadas.cod_modalidade = compra_direta.cod_modalidade";
-   
-
         return $stSql;       
     }
 
@@ -1149,12 +1145,6 @@ class TComprasCompraDireta extends Persistente
                                  WHERE  julgamento_item.cod_cotacao = mapa_cotacao.cod_cotacao
                                    AND  julgamento_item.exercicio = mapa_cotacao.exercicio_cotacao
                                    AND  julgamento_item.ordem = 1
-                                   /*AND NOT EXISTS ( SELECT 1
-                                                     FROM licitacao.contrato , licitacao.contrato_compra_direta
-                                                    WHERE julgamento_item.cgm_fornecedor   = contrato.cgm_contratado
-                                                      AND contrato.num_contrato = contrato_compra_direta.num_contrato
-                                                      AND contrato_compra_direta.cod_compra_direta = compra_direta.cod_compra_direta
-                                                )*/
                             )
 
                 AND NOT EXISTS (
@@ -1306,17 +1296,6 @@ class TComprasCompraDireta extends Persistente
         $stSql.="                       AND compra_direta.cod_modalidade     = compra_direta_anulacao.cod_modalidade            \n";
         $stSql.="                  )                                                                                            \n";
 
-        
-        
-        
-       /* $stSql.="AND NOT EXISTS ( SELECT 1                                                                                      \n";
-        $stSql.="                   FROM licitacao.contrato , licitacao.contrato_compra_direta                                  \n";
-        $stSql.="                  WHERE julgamento_item.cgm_fornecedor   = contrato.cgm_contratado                             \n";
-        $stSql.="                    AND contrato.num_contrato = contrato_compra_direta.num_contrato                            \n";
-        $stSql.="                    AND contrato_compra_direta.cod_compra_direta = compra_direta.cod_compra_direta             \n";
-        $stSql.="               )                                                                                               \n";
-*/
-        
         if ( $this->getDado( 'cod_compra_direta' ) ) {
             $stSql.= ' AND compra_direta.cod_compra_direta = '.$this->getDado( 'cod_compra_direta' );
         }
@@ -1733,4 +1712,6 @@ class TComprasCompraDireta extends Persistente
 
         return $stSql;
     }
+    
+    public function __destruct() {}   
 }

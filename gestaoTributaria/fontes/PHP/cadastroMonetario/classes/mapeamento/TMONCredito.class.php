@@ -33,43 +33,11 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: TMONCredito.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TMONCredito.class.php 63344 2015-08-19 18:51:30Z arthur $
 
 * Casos de uso: uc-05.05.10
 */
 
-/*
-$Log$
-Revision 1.34  2007/08/24 13:58:56  dibueno
-Correções da mudança realizada pelo FINANCEIRO
-
-Revision 1.33  2007/08/14 19:56:59  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.32  2007/08/14 14:43:56  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.31  2007/08/13 19:03:43  vitor
-Ajustes em: Tesouraria :: Configuração :: Classificar Receitas
-
-Revision 1.30  2007/03/12 21:25:36  dibueno
-*** empty log message ***
-
-Revision 1.29  2007/02/22 13:17:36  rodrigo
-Bug #8423#
-
-Revision 1.28  2007/02/08 10:35:52  cercato
-alteracoes para o credito trabalhar com conta corrente.
-
-Revision 1.27  2006/11/30 15:44:05  fabio
-Bug #7678#
-
-Revision 1.26  2006/11/29 15:16:09  marson
-Bug #7678#
-
-*/
-
-/*include_once    ("../../../includes/Constante.inc.php");*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
@@ -79,7 +47,7 @@ class TMONCredito extends Persistente
     * Método Construtor
     * @access Private
 */
-function TMONCredito()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela('monetario.credito');
@@ -95,7 +63,7 @@ function TMONCredito()
     $this->AddCampo('cod_convenio','INTEGER',false,'',false,true);
 }
 
-function recuperaPermissaoGrupo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaPermissaoGrupo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -109,7 +77,8 @@ function recuperaPermissaoGrupo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
     return $obErro;
 
 }
-function montaRecuperaPermissaoGrupo()
+
+public function montaRecuperaPermissaoGrupo()
 {
     $stSql  = "    SELECT                                           \r\n";
     $stSql .= "        mc.cod_credito   ,                           \r\n";
@@ -131,7 +100,7 @@ function montaRecuperaPermissaoGrupo()
     return $stSql;
 }
 
-function recuperaMascaraCredito(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaMascaraCredito(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -144,7 +113,8 @@ function recuperaMascaraCredito(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
 
     return $obErro;
 }
-function montaRecuperaMascaraCredito()
+
+public function montaRecuperaMascaraCredito()
 {
     $stSql  = " SELECT                                                                    \r\n";
     $stSql .= "        trim(                                                              \r\n";
@@ -162,7 +132,7 @@ function montaRecuperaMascaraCredito()
     return $stSql;
 }
 
-function montaRecuperaRelacionamento()
+public function montaRecuperaRelacionamento()
 {
     $stSql  = " SELECT DISTINCT                                                                                                                                  \r\n ";
     $stSql .= "     mc.cod_credito,                                                                                                                               \r\n ";
@@ -217,7 +187,7 @@ function montaRecuperaRelacionamento()
 return $stSql;
 }
 
-function recuperaRelacionamentoGF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaRelacionamentoGF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -231,7 +201,7 @@ function recuperaRelacionamentoGF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "
     return $obErro;
 }
 
-function montaRecuperaRelacionamentoGF()
+public function montaRecuperaRelacionamentoGF()
 {
     $stSql ="SELECT DISTINCT
                    mccc.exercicio,
@@ -298,7 +268,8 @@ function montaRecuperaRelacionamentoGF()
 
 return $stSql;
 }
-function recuperaRelacionamentoUnico(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+
+public function recuperaRelacionamentoUnico(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -311,7 +282,8 @@ function recuperaRelacionamentoUnico(&$rsRecordSet, $stCondicao = "" , $stOrdem 
 
     return $obErro;
 }
-function montaRecuperaRelacionamentoUnico()
+
+public function montaRecuperaRelacionamentoUnico()
 {
     $stSql  = "     SELECT  DISTINCT                                                    \n";
     $stSql .= "         mc.cod_credito,                                     \n";
@@ -366,7 +338,7 @@ function montaRecuperaRelacionamentoUnico()
 return $stSql;
 }
 
-function recuperaRelacionamentoPopUp(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaRelacionamentoPopUp(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -380,7 +352,7 @@ function recuperaRelacionamentoPopUp(&$rsRecordSet, $stCondicao = "" , $stOrdem 
     return $obErro;
 }
 
-function montaRecuperaRelacionamentoPopUp()
+public function montaRecuperaRelacionamentoPopUp()
 {
     $stSql  = "     SELECT                                                \n";
     $stSql .= "         mc.cod_credito,                                   \n";
@@ -412,7 +384,7 @@ function montaRecuperaRelacionamentoPopUp()
 return $stSql;
 }
 
-function recuperaRelacionamentoPopUpGF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaRelacionamentoPopUpGF(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -425,7 +397,8 @@ function recuperaRelacionamentoPopUpGF(&$rsRecordSet, $stCondicao = "" , $stOrde
 
     return $obErro;
 }
-function montaRecuperaRelacionamentoPopUpGF()
+
+public function montaRecuperaRelacionamentoPopUpGF()
 {
     $stSql  = "     SELECT                                                \n";
     $stSql .= "         mccc.exercicio,                                   \n";
@@ -489,4 +462,7 @@ function montaRecuperaRelacionamentoPopUpGF()
 
 return $stSql;
 }
-} // fecha classe
+
+}
+
+?>

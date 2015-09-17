@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAtivoPermanenteCreditos.class.php 63111 2015-07-27 18:34:04Z arthur $
+    $Id: TTCMGOAtivoPermanenteCreditos.class.php 63478 2015-09-01 13:09:37Z arthur $
 
     * Casos de uso: uc-06.04.00
 */
@@ -68,6 +68,7 @@ class TTCMGOAtivoPermanenteCreditos  extends TContabilidadeBalancoFinanceiro
                        , 0.00 AS vl_cancelamento
                        , 0.00 AS vl_encampacao
                        , *
+                       , '".$this->getDado( 'stExercicio' )."' AS exercicio
                     FROM tcmgo.ativo_permanente_creditos ( '".$this->getDado( 'stExercicio' )."'
                                                           , ' cod_estrutural ilike ''1.2%'' '
                                                           ,'".$this->getDado( 'stDataInicio' )."'

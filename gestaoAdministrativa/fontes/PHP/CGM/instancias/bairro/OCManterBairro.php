@@ -34,7 +34,7 @@ include_once ( CAM_GT_CIM_NEGOCIO."RCIMBairro.class.php"        );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMLogradouro.class.php"    );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMConfiguracao.class.php"  );
 
-$stCtrl = $request->get('stCtrl');
+$stCtrl = $_REQUEST['stCtrl'];
 
 //Record Sets
 $rsMunicipios = new RecordSet;
@@ -42,7 +42,6 @@ $rsUFs        = new RecordSet;
 
 function carregaEstadoMunicipio()
 {
-    GLOBAL $request;
     $obRCIMConfiguracao = new RCIMConfiguracao;
     $obRCIMConfiguracao->consultarConfiguracao();
     $obRCIMConfiguracao->listaDadosMunicipio( $arConfiguracao );
@@ -60,9 +59,9 @@ function carregaEstadoMunicipio()
             $stJs .= " jq('#cmbUF').append(new Option('".$value['nom_uf']."','".$value['cod_uf']."') ); ";                    
         }
         //se vem valor pelo request ja seleciona
-        if ($request->get('inCodUF')) {
-            $stJs .= " jq('#inCodUF').val(".$request->get('inCodUF')."); ";
-            $stJs .= " jq('#cmbUF').val(".$request->get('inCodUF')."); ";
+        if ($_REQUEST['inCodUF']) {
+            $stJs .= " jq('#inCodUF').val(".$_REQUEST['inCodUF']."); ";
+            $stJs .= " jq('#cmbUF').val(".$_REQUEST['inCodUF']."); ";
         }else{
             $stJs .= " jq('#inCodUF').val('".$arConfiguracao['cod_uf']."'); ";
             $stJs .= " jq('#cmbUF').val('".$arConfiguracao['cod_uf']."'); ";  
@@ -75,9 +74,9 @@ function carregaEstadoMunicipio()
             $stJs .= " jq('#cmbMunicipio').append(new Option('".$value['nom_municipio']."','".$value['cod_municipio']."') ); ";                    
         }
         //se vem valor pelo request ja seleciona
-        if ($request->get('inCodMunicipio')) {
-            $stJs .= " jq('#inCodMunicipio').val(".$request->get('inCodMunicipio')."); ";
-            $stJs .= " jq('#cmbMunicipio').val(".$request->get('inCodMunicipio')."); ";
+        if ($_REQUEST['inCodMunicipio']) {
+            $stJs .= " jq('#inCodMunicipio').val(".$_REQUEST['inCodMunicipio']."); ";
+            $stJs .= " jq('#cmbMunicipio').val(".$_REQUEST['inCodMunicipio']."); ";
         }else{
             $stJs .= " jq('#inCodMunicipio').val('".$arConfiguracao['cod_municipio']."'); ";
             $stJs .= " jq('#cmbMunicipio').val('".$arConfiguracao['cod_municipio']."'); ";
@@ -89,12 +88,11 @@ function carregaEstadoMunicipio()
 
 function preencheMunicipio()
 {
-    GLOBAL $request;
     $stJs  = " jq('#inCodMunicipio').val(''); \n";
     $stJs .= " jq('#cmbMunicipio').empty().append(new Option('Selecione','')); \n";        
-    if ($request->get("inCodUF")) {
+    if ($_REQUEST["inCodUF"]) {
         $obRCIMBairro = new RCIMBairro;
-        $obRCIMBairro->setCodigoUF( $request->get("inCodUF"));
+        $obRCIMBairro->setCodigoUF( $_REQUEST["inCodUF"]);
         $obRCIMBairro->listarMunicipios( $rsMunicipios );
         if ( $rsMunicipios->getNumLinhas() > 0 ) {
             foreach ($rsMunicipios->getElementos() as $key => $value) {

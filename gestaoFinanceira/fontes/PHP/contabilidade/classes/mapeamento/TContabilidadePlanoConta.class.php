@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 62886 2015-07-03 19:16:30Z franver $
+    $Id: TContabilidadePlanoConta.class.php 63242 2015-08-06 21:09:37Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -65,7 +65,6 @@ function TContabilidadePlanoConta()
     $this->AddCampo('atributo_tcemg'     ,'integer',false,   '',false, true);
     $this->AddCampo('escrituracao_pcasp' ,'   char', true,  '1',false,false);
     $this->AddCampo('obrigatorio_tcmgo'  ,'boolean', true,   '',false,false);
-    $this->AddCampo('sequencial'         ,'integer',false,   '',false,false);
 }
 
 function montaRecuperaGrupos()

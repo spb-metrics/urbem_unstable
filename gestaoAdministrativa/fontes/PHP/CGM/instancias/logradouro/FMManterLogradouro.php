@@ -320,24 +320,7 @@ $obBtnLimparCEP->setId                ( "btnLimparCEP" );
 $obBtnLimparCEP->setValue             ( "Limpar"       );
 $obBtnLimparCEP->obEvento->setOnClick ( "limparCEP();" );
 
-$arBotoesCEP = array ( $obBtnIncluirCEP , $obBtnLimparCEP );
 
-$obBtnOk = new OK;
-$obBtnOk->obEvento->setOnClick("verificaCodigoLogradouro();");
-
-$obBtnLimpar = new Limpar;
-$obBtnLimpar->obEvento->setOnClick( "limparListas();" );
-
-if ($stAcao == "incluir") {
-    $arBotaoAcao = array( $obBtnOk, $obBtnLimpar );
-}elseif($stAcao == "consultar"){
-    $obBtnOk->obEvento->setOnClick("CancelarForm()");
-    $arBotaoAcao = array( $obBtnOk );
-}else{
-    $obBtnCancelar = new Cancelar;
-    $obBtnCancelar->obEvento->setOnClick( "CancelarForm();" );
-    $arBotaoAcao = array( $obBtnOk, $obBtnLimpar, $obBtnCancelar );
-}
 
 $obRdnTodos = new Radio;
 $obRdnTodos->setRotulo  ( "Numeração" );
@@ -362,6 +345,8 @@ $obRdnImpares->setId      ( "boNumeracao" );
 $obRdnImpares->setLabel   ( "Ímpares"     );
 $obRdnImpares->setValue   ( "Ímpares"     );
 $obRdnImpares->setChecked ( false         );
+
+$arBotoesCEP = array ( $obBtnIncluirCEP , $obBtnLimparCEP );
 
 $ArRdnCEP = array ($obRdnTodos,$obRdnPares,$obRdnImpares);
 
@@ -454,6 +439,22 @@ switch ($stAcao) {
         $obFormulario->addTitulo        ( "CEP"                 );
         $obFormulario->addSpan          ( $obSpnListarCEP       );
     break;
+}
+
+$obBtnOk = new OK;
+$obBtnOk->obEvento->setOnClick("verificaCodigoLogradouro();");
+
+$obBtnLimpar = new Limpar;
+$obBtnLimpar->obEvento->setOnClick( "limparListas();" );
+
+$obVoltar = new Voltar;
+
+if ($stAcao == "incluir") {
+    $arBotaoAcao = array( $obBtnOk, $obBtnLimpar );
+}elseif($stAcao == "consultar"){    
+    $arBotaoAcao = array( $obVoltar );
+}else{
+    $arBotaoAcao = array( $obBtnOk, $obVoltar );
 }
 
 $obFormulario->defineBarra ( $arBotaoAcao );

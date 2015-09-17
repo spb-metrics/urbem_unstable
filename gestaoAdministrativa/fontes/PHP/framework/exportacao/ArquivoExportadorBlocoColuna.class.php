@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: ArquivoExportadorBlocoColuna.class.php 63081 2015-07-22 18:56:09Z jean $
+$Id: ArquivoExportadorBlocoColuna.class.php 63232 2015-08-06 13:31:19Z arthur $
 
 Casos de uso: uc-01.01.00
 */
@@ -233,6 +233,7 @@ function FormataTipoDado($stCampo)
                     $stCampo = str_replace( chr(39) ,"",$stCampo); // retira aspas simples ou apóstrofes
                 break;
                 case "TCM_BA":
+                    $stCampo = str_ireplace( array("select","insert","update","delete","drop","xp_"), " ", $stCampo);
                     $stCampo = str_replace( array("'",';','--') ," ",$stCampo);
                 break;
             }
@@ -243,9 +244,19 @@ function FormataTipoDado($stCampo)
             $stCampo = preg_replace('/[\\n\\r]/',' ',$stCampo);
             $stCampo = str_replace("\r\n"," ",$stCampo);
             $stCampo = str_replace("\n"," ",$stCampo);
-            $stCampo = preg_replace ("[.|,|;|/|-]", "", $stCampo);
-            $stCampo = str_replace('  ', ' ', $stCampo);
             $stCampo = str_replace(chr(10)," ",$stCampo);
+            $stCampo = utf8_decode($stCampo);
+            switch ( trim($this->roBloco->roArquivo->getTipoDocumento()) ) {
+                case "TCM_BA":
+                    $stCampo = str_ireplace( array("select","insert","update","delete","drop","xp_"), " ", $stCampo);
+                    $stCampo = str_replace( array("'",';','--') ," ",$stCampo);
+                break;
+            default:
+                    $stCampo = preg_replace ("/[.|,|;|\/|-]/", " ", $stCampo);
+                    $stCampo = str_replace('  ', ' ', $stCampo);
+                break;
+            }
+
         break;
         case "CARACTER_ZEROS_ESQ":
             $this->stAlinhamento    = 'D';

@@ -69,7 +69,15 @@ BEGIN
                     INNER JOIN orcamento.recurso 
                             ON recurso.cod_recurso = despesa.cod_recurso
                            AND recurso.exercicio   = despesa.exercicio
-                         WHERE despesa.num_pao = '|| inNumPAO ||'
+                    INNER JOIN orcamento.pao
+                            ON pao.exercicio = despesa.exercicio
+                           AND pao.num_pao = despesa.num_pao
+                    INNER JOIN orcamento.pao_ppa_acao
+                            ON pao_ppa_acao.exercicio = pao.exercicio
+                           AND pao_ppa_acao.num_pao = pao.num_pao
+                    INNER JOIN ppa.acao
+                            ON acao.cod_acao = pao_ppa_acao.cod_acao
+                         WHERE acao.num_acao = '|| inNumPAO ||'
                            AND despesa.exercicio = '|| quote_literal(inExercicio) ||'
                            AND despesa.cod_entidade = '|| inCodEntidade ||'
                            AND conta_despesa.cod_estrutural ILIKE '|| quote_literal(stCodEstruturalTmp||'%')||'';

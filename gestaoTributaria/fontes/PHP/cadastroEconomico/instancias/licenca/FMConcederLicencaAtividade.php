@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: FMConcederLicencaAtividade.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConcederLicencaAtividade.php 63390 2015-08-24 19:17:05Z arthur $
 
     * Casos de uso: uc-05.02.12
 
@@ -57,6 +57,7 @@ $pgFormEspecial  = "FMConcederLicencaEspecial.php";
 $pgProc          = "PR".$stPrograma.".php";
 $pgOcul          = "OC".$stPrograma.".php";
 $pgJs            = "JS".$stPrograma.".js";
+
 include_once( $pgJs );
 
 $stAcao = $request->get('stAcao');
@@ -146,7 +147,6 @@ if ($stAcao == "atividade") {
     $stFiltro = " WHERE LCA.inscricao_economica = ". $IE;
     $stOrdem  = " ORDER BY LCA.ocorrencia_licenca DESC limit 1 ";
     $obTCEMLicencaAtividade->recuperaRelacionamento ($rsLicenca,$stFiltro,$stOrdem);
-//	sistemaLegado::mostravar( $rsLicenca );
     if ( $rsLicenca->getNumLinhas() < 1 ) {
         $inOcorrenciaLicencaTMP = 1 ;
     } else {
@@ -201,7 +201,6 @@ $obCBoxEmissaoDocumento->setLabel	( "Impressão Local"		);
 $obCBoxEmissaoDocumento->setRotulo	( "Emissão de Alvará"	);
 
 //documentos
-//sistemaLegado::mostravar(Sessao::read('acao'));
 $obITextBoxSelectDocumento = new ITextBoxSelectDocumento;
 $obITextBoxSelectDocumento->setCodAcao( Sessao::read('acao') );
 $obITextBoxSelectDocumento->obTextBoxSelectDocumento->setRotulo ( "Modelo do Alvará" );
@@ -290,7 +289,6 @@ if ($stAcao == "incAtiv") {
     $obFormulario->addComponente ( $obDtDataInicio          );
     $obFormulario->addComponente ( $obDtDataTermino         );
     $obFormulario->addTitulo     ( "Atividades"             );
-//    $obMontaAtividade->geraFormulario ( $obFormulario       );
     $obFormulario->addComponente ( $obCmbAtividade          );
     $obFormulario->defineBarra  ( $botoesSpanAtiv,'left','' );
     $obFormulario->addSpan       ( $obSpnListaAtividade     );
@@ -311,7 +309,6 @@ if ($stAcao == "incAtiv") {
     $obFormulario->addComponente ( $obDtDataInicio          );
     $obFormulario->addComponente ( $obDtDataTermino         );
     $obFormulario->addTitulo     ( "Atividades"             );
-//    $obMontaAtividade->geraFormulario ( $obFormulario       );
     $obFormulario->addComponente ( $obCmbAtividade          );
     $obFormulario->defineBarra  ( $botoesSpanAtiv,'left','' );
     $obFormulario->addSpan       ( $obSpnListaAtividade     );

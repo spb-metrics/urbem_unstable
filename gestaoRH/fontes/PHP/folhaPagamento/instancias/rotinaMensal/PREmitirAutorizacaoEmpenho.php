@@ -113,11 +113,16 @@ foreach (Sessao::read("arEmissaoEmpenho") as $arEmissaoEmpenho) {
         $obAutorizacaoEmpenho->obREmpenhoHistorico->setCodHistorico( $inCodHistorico );
         $obAutorizacaoEmpenho->setDescricao( $stDescricao );
         $obAutorizacaoEmpenho->setCodCategoria(1);
-
         $obAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $arEmissaoEmpenho["red_dotacao"] );
         $obAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $arEmissaoEmpenho["rubrica_despesa"] );
+        $obAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setCodConta( $arEmissaoEmpenho["cod_conta"] );
         $obAutorizacaoEmpenho->obRUsuario->obRCGM->setNumCGM( Sessao::read('numCgm') );
-        $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeInicial( date('d/m/Y') );
+        $obErro = $obAutorizacaoEmpenho->listarMaiorData($rsMaiorData);
+        if (!$obErro->ocorreu()) {
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeInicial( $rsMaiorData->getCampo('data_autorizacao') );
+        } else {
+            $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeInicial( date('d/m/Y') );
+        }
         $obAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeFinal( '31/12/'.date('Y') );
         $obAutorizacaoEmpenho->obROrcamentoReserva->setDtInclusao( date('d/m/Y'));
         $obAutorizacaoEmpenho->obROrcamentoReserva->setVlReserva( $arEmissaoEmpenho["valor"] );
@@ -151,7 +156,8 @@ foreach (Sessao::read("arEmissaoEmpenho") as $arEmissaoEmpenho) {
 
         //atributo modalidade
         //array temporario para relação entre modalidade licitacao e atributo modalidade do empenho
-        $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '101' , 8 );
+        // colocado o valor 7, que é referente a Modalidade "Não Aplicável"
+        $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '101' , 7 );
 
         //atributo tipo credor
         $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '103' , 1 );

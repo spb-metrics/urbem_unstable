@@ -33,35 +33,22 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 29121 $
-    $Name$
-    $Author: diogo.zarpelon $
-    $Date: 2008-04-10 16:40:05 -0300 (Qui, 10 Abr 2008) $
+    $Id: TComprasMapa.class.php 63367 2015-08-20 21:27:34Z michel $
 
     * Casos de uso: uc-03.04.05
                     uc-03.04.26
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  compras.mapa
-  * Data de Criação: 30/06/2006
-
-  * @author Analista: Diego Victoria
-  * @author Desenvolvedor: Leandro André Zis
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TComprasMapa extends Persistente
 {
     /**
      * Método Construtor
      * @access Private
      */
-    public function TComprasMapa()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("compras.mapa");
@@ -790,6 +777,13 @@ class TComprasMapa extends Persistente
                                                              AND mapa_item_reserva.cod_item              = mapa_item.cod_item
                                                              AND mapa_item_reserva.lote                  = mapa_item.lote
                                                          )
+                                          --Se a Reserva for do tipo Rigida, é Obrigatório ter Reserva de Saldo
+                                          AND (SELECT valor
+                                                 FROM administracao.configuracao AS AC
+                                                WHERE AC.cod_modulo = 35
+                                                  AND AC.parametro = 'reserva_rigida'
+                                                  AND AC.exercicio = mapa.exercicio
+                                              ) = 'true'
                                           AND mapa_item.exercicio = mapa.exercicio
                                           AND mapa_item.cod_mapa  = mapa.cod_mapa
                                       )
@@ -1131,4 +1125,6 @@ class TComprasMapa extends Persistente
         ";
         return $stSql;
     }
+
+    public function __destruct() {}   
 }

@@ -49,7 +49,7 @@ CREATE TYPE variacao_patrimonial_estrutural AS (
 );
 */
 
-CREATE OR REPLACE FUNCTION contabilidade.fn_variacao_patrimonial_estrutural(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF variacao_patrimonial_estrutural AS $$ 
+CREATE OR REPLACE FUNCTION contabilidade.fn_variacao_patrimonial_estrutural(VARCHAR, VARCHAR, VARCHAR, VARCHAR) RETURNS SETOF variacao_patrimonial_estrutural AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stEntidade          ALIAS FOR $2;
@@ -62,8 +62,6 @@ DECLARE
 BEGIN
 
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
-              SELECT *
-                FROM (
                   SELECT plano_conta.cod_estrutural
                        , plano_analitica.cod_plano
                        , valor_lancamento.tipo_valor
@@ -114,17 +112,21 @@ BEGIN
               INNER JOIN contabilidade.sistema_contabil 
                       ON sistema_contabil.cod_sistema  = plano_conta.cod_sistema
                      AND sistema_contabil.exercicio    = plano_conta.exercicio
-                
-                  WHERE plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
+              
+              INNER JOIN contabilidade.historico_contabil       
+                      ON historico_contabil.exercicio     = lancamento.exercicio
+                     AND historico_contabil.cod_historico = lancamento.cod_historico
+                  
+                  WHERE plano_analitica.exercicio = '||quote_literal(stExercicio)||'
+                  AND dt_lote BETWEEN to_date( ''01/01/'||stExercicio||''' , ''dd/mm/yyyy'' ) AND to_date('''||stDtFinal||''' , ''dd/mm/yyyy'' )
+                  AND lote.tipo <> ''I''
+                  AND valor_lancamento.cod_entidade IN ('||stEntidade||')
+                  AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
                ORDER BY plano_conta.cod_estrutural
-                ) AS tabela
-            WHERE cod_entidade IN (' || stEntidade || ')';
-
+            ';
     EXECUTE stSql;
 
     stSql := 'CREATE TEMPORARY TABLE tmp_credito AS
-                SELECT *
-                FROM (
                    SELECT plano_conta.cod_estrutural
                         , plano_analitica.cod_plano
                         , valor_lancamento.tipo_valor
@@ -176,35 +178,27 @@ BEGIN
                        ON sistema_contabil.cod_sistema  = plano_conta.cod_sistema
                       AND sistema_contabil.exercicio    = plano_conta.exercicio
                     
-                    WHERE plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
+               INNER JOIN contabilidade.historico_contabil       
+                      ON historico_contabil.exercicio     = lancamento.exercicio
+                     AND historico_contabil.cod_historico = lancamento.cod_historico
+
+                    WHERE plano_analitica.exercicio = '||quote_literal(stExercicio)||'
+                    AND dt_lote BETWEEN to_date( ''01/01/'||stExercicio||''' , ''dd/mm/yyyy'' ) AND to_date('''||stDtFinal||''' , ''dd/mm/yyyy'' )
+                    AND lote.tipo <> ''I''
+                    AND valor_lancamento.cod_entidade IN ('||stEntidade||')
+                    AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
                  ORDER BY plano_conta.cod_estrutural
-                ) AS tabela
-            WHERE cod_entidade IN (' || stEntidade || ')';
+                ';
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_debito  ON tmp_debito  (cod_estrutural varchar_pattern_ops, oid_temp);
     CREATE UNIQUE INDEX unq_credito ON tmp_credito (cod_estrutural varchar_pattern_ops, oid_temp);
-
-    CREATE TEMPORARY TABLE tmp_totaliza_debito AS
-        SELECT *
-          FROM tmp_debito
-         WHERE dt_lote BETWEEN to_date( stDtInicial::varchar , 'dd/mm/yyyy' ) AND to_date( stDtFinal::varchar , 'dd/mm/yyyy' )
-           AND tipo <> 'I';
-
-    CREATE TEMPORARY TABLE tmp_totaliza_credito AS
-        SELECT *
-          FROM tmp_credito
-         WHERE dt_lote BETWEEN to_date( stDtInicial::varchar , 'dd/mm/yyyy' ) AND to_date( stDtFinal::varchar , 'dd/mm/yyyy' )
-           AND tipo <> 'I';
-
-    CREATE UNIQUE INDEX unq_totaliza_credito    ON tmp_totaliza_credito (cod_estrutural varchar_pattern_ops, oid_temp);
-    CREATE UNIQUE INDEX unq_totaliza_debito     ON tmp_totaliza_debito  (cod_estrutural varchar_pattern_ops, oid_temp);
-
-    IF substr(stDtInicial,1,5) =  '01/01' THEN
-        stSqlComplemento := ' dt_lote = to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'') ';
-        stSqlComplemento := stSqlComplemento || ' AND tipo = ''I'' ';
+    
+    IF substr(stDtInicial,1,5) = '01/01' THEN
+        stSqlComplemento := ' dt_lote = to_date( ' || quote_literal(stDtInicial) || ',' || quote_literal('dd/mm/yyyy') || ') ';
+        stSqlComplemento := stSqlComplemento || ' AND tipo = '||quote_literal('I')||' ';
     ELSE
-        stSqlComplemento := 'dt_lote BETWEEN to_date( ''01/01/''||substr(to_char(to_date(''' || stDtInicial || ''',''dd/mm/yyyy'') - 1,''dd/mm/yyyy'') ,7) ,''dd/mm/yyyy'') AND to_date( ' || quote_literal(stDtInicial) || ',''dd/mm/yyyy'')-1';
+        stSqlComplemento := ' dt_lote <= to_date( ' || quote_literal(stDtInicial) || ',' || quote_literal('dd/mm/yyyy') || ')-1 ';
     END IF;
     
     stSql := 'CREATE TEMPORARY TABLE tmp_totaliza AS
@@ -212,12 +206,12 @@ BEGIN
                   FROM tmp_debito
                  WHERE ' || stSqlComplemento || '
                
-               UNION
+               UNION ALL
          
                SELECT *
                  FROM tmp_credito
-                WHERE ' || stSqlComplemento || ' ';
-      
+                WHERE ' || stSqlComplemento || '
+            ';
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_totaliza ON tmp_totaliza (cod_estrutural varchar_pattern_ops, oid_temp);
@@ -226,7 +220,7 @@ BEGIN
                 SELECT plano_conta.cod_estrutural
                      , publico.fn_nivel(plano_conta.cod_estrutural) as nivel
                      , plano_conta.nom_conta
-                     , sistema_contabil.cod_sistema
+                     , 1 as cod_sistema
                      , plano_conta.indicador_superavit::CHAR
                      , 0.00 as vl_saldo_anterior
                      , 0.00 as vl_saldo_debitos
@@ -234,22 +228,8 @@ BEGIN
                      , 0.00 as vl_saldo_atual
                  
                   FROM contabilidade.plano_conta
-                     
-            INNER JOIN contabilidade.sistema_contabil
-                    ON plano_conta.exercicio   = sistema_contabil.exercicio
-                   AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
-                   
-                 WHERE plano_conta.exercicio = ' || quote_literal(stExercicio) || '
-         
+                 WHERE plano_conta.exercicio = '||quote_literal(stExercicio)||'
                    AND plano_conta.cod_estrutural ILIKE ''3.%''
-                   AND publico.fn_nivel(plano_conta.cod_estrutural) <= 5
-                   
-                   AND NOT EXISTS ( SELECT 1
-                                      FROM contabilidade.plano_analitica
-                                     WHERE plano_analitica.cod_conta = plano_conta.cod_conta
-                                       AND plano_analitica.exercicio = plano_conta.exercicio
-                                       AND plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
-                                    )
                  ORDER BY cod_estrutural
                 )';
     EXECUTE stSql;
@@ -258,7 +238,7 @@ BEGIN
                 SELECT plano_conta.cod_estrutural
                      , publico.fn_nivel(plano_conta.cod_estrutural) as nivel
                      , plano_conta.nom_conta
-                     , sistema_contabil.cod_sistema
+                     , 1 as cod_sistema
                      , plano_conta.indicador_superavit::CHAR
                      , 0.00 as vl_saldo_anterior
                      , 0.00 as vl_saldo_debitos
@@ -266,58 +246,40 @@ BEGIN
                      , 0.00 as vl_saldo_atual
                  
                   FROM contabilidade.plano_conta
-                     
-            INNER JOIN contabilidade.sistema_contabil
-                    ON plano_conta.exercicio   = sistema_contabil.exercicio
-                   AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
                    
-                 WHERE plano_conta.exercicio = ' || quote_literal(stExercicio) || '
-         
+                 WHERE plano_conta.exercicio = '||quote_literal(stExercicio)||'
                    AND plano_conta.cod_estrutural ILIKE ''4.%''
-                   AND publico.fn_nivel(plano_conta.cod_estrutural) <= 5
                    
-                   AND NOT EXISTS ( SELECT 1
-                                      FROM contabilidade.plano_analitica
-                                     WHERE plano_analitica.cod_conta = plano_conta.cod_conta
-                                       AND plano_analitica.exercicio = plano_conta.exercicio
-                                       AND plano_analitica.exercicio = ' || quote_literal(stExercicio) || '
-                                    )
                  ORDER BY cod_estrutural
                 )';
+                
     EXECUTE stSql;
     
-    stSql := ' SELECT *
-                 FROM (
-                        SELECT *
-                          FROM tmp_diminutivas
-                       UNION
-                        SELECT *
-                          FROM tmp_aumentativas
-                 ) AS tabela';
-    
+    stSql := '  SELECT *
+                  FROM tmp_diminutivas
+                
+                UNION ALL
+                
+                SELECT *
+                  FROM tmp_aumentativas
+                ';
     FOR reRegistro IN EXECUTE stSql
     LOOP
-        arRetorno := contabilidade.fn_totaliza_balancete_verificacao( publico.fn_mascarareduzida(reRegistro.cod_estrutural) , stDtInicial, stDtFinal);
+        arRetorno := contabilidade.fn_totaliza_variacao_patrimonial_estrutrural( publico.fn_mascarareduzida(reRegistro.cod_estrutural) );
         reRegistro.vl_saldo_anterior := arRetorno[1];
-        reRegistro.vl_saldo_debitos  := arRetorno[2];
-        reRegistro.vl_saldo_creditos := arRetorno[3];
-        reRegistro.vl_saldo_atual    := arRetorno[4];
+        reRegistro.vl_saldo_atual    := arRetorno[2];
         
         RETURN NEXT reRegistro;
         
     END LOOP;
 
     DROP INDEX unq_totaliza;
-    DROP INDEX unq_totaliza_debito;
-    DROP INDEX unq_totaliza_credito;
     DROP INDEX unq_debito;
     DROP INDEX unq_credito;
-
+    
     DROP TABLE tmp_totaliza;
     DROP TABLE tmp_debito;
     DROP TABLE tmp_credito;
-    DROP TABLE tmp_totaliza_debito;
-    DROP TABLE tmp_totaliza_credito;
     DROP TABLE tmp_diminutivas;
     DROP TABLE tmp_aumentativas;
     

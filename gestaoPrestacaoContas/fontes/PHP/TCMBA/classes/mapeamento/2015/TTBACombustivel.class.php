@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63490 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -71,7 +71,7 @@ class TTBACombustivel extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBACombustivel()
+function __construct()
 {
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
@@ -93,18 +93,82 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   veic.placa                                     \n";
-    $stSql .= "         ,tico.cod_tipo_tcm                              \n";
-    $stSql .= "         ,sum(util.km_retorno-util.km_saida) / sum(abas.qt_litros) as km_ltr        \n";
-    $stSql .= " FROM     frota.veiculo as veic                          \n";
-    $stSql .= "         LEFT JOIN frota.utilizacao as util              \n";
-    $stSql .= "         ON ( veic.cod_veiculo = util.cod_veiculo )      \n";
-    $stSql .= "         LEFT JOIN frota.abastecimento as abas           \n";
-    $stSql .= "         ON ( veic.cod_veiculo = abas.cod_veiculo )      \n";
-    $stSql .= "         LEFT JOIN tcmba.tipo_veiculo as tico            \n";
-    $stSql .= "         ON ( veic.cod_combustivel  = tico.cod_tipo )    \n";
-    $stSql .= " GROUP BY veic.placa                                     \n";
-    $stSql .= "         ,tico.cod_tipo_tcm                              \n";
+  $stSql = " SELECT tipo_registro
+                  , placa
+                  , tipo_combustivel
+                  , SUM(km_ltr) AS km_ltr
+                  , SUM(custo_mensal) AS custo_mensal
+                  , competencia
+                  , unidade_gestora
+
+               FROM
+                  (
+                    SELECT 1 AS tipo_registro
+                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                         , veiculo.placa
+                         , CASE WHEN combustivel.cod_combustivel = 1 THEN 3
+                                WHEN combustivel.cod_combustivel = 2 THEN 1
+                                WHEN combustivel.cod_combustivel = 3 THEN 2
+                            END AS tipo_combustivel
+                         , SUM(COALESCE(manutencao_item.quantidade,0.00)) AS km_ltr
+                         , COALESCE(manutencao_item.valor,0.00) AS custo_mensal
+                         , TO_CHAR(manutencao.dt_manutencao, 'yyyymm') AS competencia
+                  
+                     FROM frota.manutencao
+
+               INNER JOIN frota.manutencao_item
+                       ON manutencao_item.cod_manutencao = manutencao.cod_manutencao
+                      AND manutencao_item.exercicio = manutencao.exercicio
+
+               INNER JOIN frota.item
+                       ON item.cod_item = manutencao_item.cod_item
+
+               INNER JOIN frota.tipo_item
+                       ON tipo_item.cod_tipo = item.cod_tipo
+
+               INNER JOIN almoxarifado.catalogo_item 
+                       ON catalogo_item.cod_item = item.cod_item
+
+               INNER JOIN frota.veiculo
+                       ON veiculo.cod_veiculo = manutencao.cod_veiculo
+
+               INNER JOIN frota.tipo_veiculo
+                       ON tipo_veiculo.cod_tipo = veiculo.cod_tipo_veiculo
+
+                LEFT JOIN frota.abastecimento
+                       ON veiculo.cod_veiculo = abastecimento.cod_veiculo
+
+                LEFT JOIN frota.veiculo_combustivel
+                       ON veiculo_combustivel.cod_veiculo = veiculo.cod_veiculo
+
+                LEFT JOIN frota.combustivel
+                       ON combustivel.cod_combustivel = veiculo_combustivel.cod_combustivel
+
+                    WHERE manutencao.exercicio = '".$this->getDado('exercicio')."'
+                      AND manutencao.dt_manutencao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                       AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                      AND EXISTS(SELECT veiculo_propriedade.cod_veiculo
+                                      , MAX(veiculo_propriedade.timestamp) AS timestamp
+                                   FROM frota.veiculo_propriedade
+                             INNER JOIN frota.proprio
+                                     ON proprio.cod_veiculo = veiculo_propriedade.cod_veiculo
+                                    AND proprio.timestamp = veiculo_propriedade.timestamp
+                              LEFT JOIN patrimonio.bem_comprado
+                                     ON bem_comprado.cod_bem = proprio.cod_bem
+                                  WHERE veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
+                                    AND bem_comprado.cod_entidade IN (2)
+                               GROUP BY veiculo_propriedade.cod_veiculo
+                                )
+                    GROUP BY veiculo.placa
+                           , tipo_combustivel
+                           , manutencao_item.valor
+                           , manutencao.dt_manutencao
+                  ) AS retorno
+          GROUP BY placa
+                 , tipo_registro
+                 , tipo_combustivel
+                 , competencia
+                 , unidade_gestora ";
 
     return $stSql;
 }

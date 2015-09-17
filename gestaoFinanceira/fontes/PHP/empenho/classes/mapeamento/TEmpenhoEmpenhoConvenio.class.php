@@ -48,7 +48,7 @@ class TEmpenhoEmpenhoConvenio extends Persistente
 function TEmpenhoEmpenhoConvenio()
 {
     parent::Persistente();
-    $this->setTabela("empenho".Sessao::getEntidade().".empenho_convenio");
+    $this->setTabela("empenho.empenho_convenio");
 
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_entidade,cod_empenho');

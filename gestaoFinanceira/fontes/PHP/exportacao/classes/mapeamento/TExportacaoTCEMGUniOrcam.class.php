@@ -33,11 +33,11 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TExportacaoTCEMGUniOrcam.class.php 60484 2014-10-23 18:43:36Z lisiane $
+    * $Id: TExportacaoTCEMGUniOrcam.class.php 63535 2015-09-09 17:25:06Z franver $
     * $Name: $
-    * $Revision: 60484 $
-    * $Author: lisiane $
-    * $Date: 2014-10-23 16:43:36 -0200 (Qui, 23 Out 2014) $
+    * $Revision: 63535 $
+    * $Author: franver $
+    * $Date: 2015-09-09 14:25:06 -0300 (Qua, 09 Set 2015) $
 
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -310,6 +310,7 @@ class TExportacaoTCEMGUniOrcam extends Persistente
                                           WHERE arquivo_iuoc.num_orgao   = uniorcam.num_orgao
                                             AND arquivo_iuoc.num_unidade = uniorcam.num_unidade
                                             AND arquivo_iuoc.exercicio   = '".$this->getDado('exercicio')."'
+                                            AND arquivo_iuoc.mes         < ".$this->getDado('mes')." 
                                         )
 
         ";

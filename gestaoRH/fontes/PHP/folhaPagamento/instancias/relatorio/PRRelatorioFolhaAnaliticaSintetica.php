@@ -339,15 +339,17 @@ function recuperaFiltro(&$obTFolhaPagamentoPeriodoMovimentacao, $inCodPeriodoMov
                 $arValorAtributos = $arFiltro[$stNomeVariavel.'_Selecionados'];
                 $stValorAtributo = '';
                 foreach ($arValorAtributos as $stTemp) {
-                    $stValorAtributo .= "\'".$stTemp."\',";
+                    $stValorAtributo .= "''".$stTemp."'',";
                 }
                 $stValorAtributo = substr($stValorAtributo,0,strlen($stValorAtributo)-1);
                 $obTFolhaPagamentoPeriodoMovimentacao->setDado('valor', $stValorAtributo);
                 $stFiltro .= " AND valor IN ($stValorAtributo)      \n";
             } else {
                 $stValorAtributo = $arFiltro[$stNomeVariavel];
-                $obTFolhaPagamentoPeriodoMovimentacao->setDado("valor","\'".$stValorAtributo."\'");
-                $stFiltro .= " AND valor = \'$stValorAtributo\'      \n";
+                $obTFolhaPagamentoPeriodoMovimentacao->setDado("valor","''".$stValorAtributo."''");
+                if (!empty($stValorAtributo) ) {
+                    $stFiltro .= " AND valor = ''$stValorAtributo''      \n";
+                }
             }
             break;
         case 'geral':
@@ -520,10 +522,13 @@ function recuperaOrdenacao()
             if ($arFiltro['boAtributoDinamico']) {
                 $stOrdenacao = 'valor_label,';
             }
+            if (!is_array($arFiltro['arrayOrdenacao'])) {
+                $arFiltro['arrayOrdenacao'] = array();
+            }
             $stOrdenacao .= ( $arFiltro['stOrdenacao'] == 'alfabetica' ) ? 'nom_cgm' : 'registro';
             break;
         case 'geral':
-
+        
             $stOrdenacao = '';
 
             if (!is_array($arFiltro['arrayOrdenacao'])) {

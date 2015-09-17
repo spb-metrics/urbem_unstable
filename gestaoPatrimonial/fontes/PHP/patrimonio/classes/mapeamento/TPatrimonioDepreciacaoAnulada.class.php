@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TPatrimonioDepreciacaoAnulada.class.php 61653 2015-02-20 19:35:15Z arthur $
+  $Id: TPatrimonioDepreciacaoAnulada.class.php 63222 2015-08-05 14:25:57Z arthur $
   $Date: $
   $Author: $
   $Rev: $
@@ -47,9 +47,9 @@ class TPatrimonioDepreciacaoAnulada extends Persistente
      * Método Construtor
      * @access Private
      */
-    public function TPatrimonioDepreciacaoAnulada()
+    public function __construct()
     {
-        parent::Persistente();
+        parent::__construct();
         
         $this->setTabela('patrimonio.depreciacao_anulada');
         $this->setCampoCod('');

@@ -35,10 +35,10 @@
  * 
  * Casos de uso: uc-02.09.04
  *
- * $Id: TTCEMGRegistrosArquivoPrograma.class.php 62269 2015-04-15 18:28:39Z franver $
- * $Revision: 62269 $
+ * $Id: TTCEMGRegistrosArquivoPrograma.class.php 63540 2015-09-09 20:30:56Z franver $
+ * $Revision: 63540 $
  * $Author: franver $
- * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
+ * $Date: 2015-09-09 17:30:56 -0300 (Qua, 09 Set 2015) $
  * 
  */
 
@@ -109,8 +109,9 @@ class TTCEMGRegistrosArquivoPrograma extends Persistente
     {
         $stSql = "
             SELECT *
-              FROM tcemg.recupera_ppa_inclusao_programa('".$this->getDado('exercicio')."')
+              FROM tcemg.recupera_ppa_inclusao_programa('".$this->getDado('exercicio')."', '".$this->getDado('dt_final')."')
                 AS retorno ( cod_programa        INTEGER
+                           , ppa_cod_programa    INTEGER
                            , nom_programa        VARCHAR
                            , objetivo            VARCHAR
                            , total_recurso_1_ano VARCHAR

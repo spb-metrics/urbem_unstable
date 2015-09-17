@@ -31,7 +31,7 @@
     * @author Desenvolvedor:  Lucas Teixeira Stephanou
     * @ignore
 
-    $Id: PRManterConvenios.php 59803 2014-09-11 20:53:06Z lisiane $
+    $Id: PRManterConvenios.php 63316 2015-08-17 14:21:56Z jean $
 
     *Casos de uso: uc-03.05.14
 */
@@ -41,7 +41,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoParticipanteConvenio.class.php" );
 include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoConvenio.class.php" );
 include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoPublicacaoConvenio.class.php" );
-SistemaLegado::mostraVar($_REQUEST);
+
 $stAcao = $request->get("stAcao");
 
 //MANTEM O FILTRO E A PAGINACAO

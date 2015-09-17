@@ -157,6 +157,7 @@ class TComprasContratoCompraDireta extends Persistente
     public function montaRecuperaContratosCompraDireta()
     {
         $stSql = "SELECT contrato.num_contrato
+                       , contrato.numero_contrato
                        , contrato.exercicio as exercicio_contrato
                        , contrato.cod_entidade
                        , contrato.valor_contratado
@@ -177,16 +178,57 @@ class TComprasContratoCompraDireta extends Persistente
                        , tipo_objeto.descricao
                        , (SELECT nom_cgm from sw_cgm where numcgm = contrato.cgm_contratado) as nom_contratado
                        , (SELECT nom_cgm from sw_cgm where numcgm = contrato.cgm_responsavel_juridico) as responsavel_juridico
-               , contrato_compra_direta.exercicio_compra_direta
-               , (SELECT descricao FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS tipo_descricao
+                       , contrato_compra_direta.exercicio_compra_direta
+                       , (SELECT descricao FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS tipo_descricao
 
-                    FROM licitacao.contrato
-                       , licitacao.contrato_compra_direta
+                       , contrato.num_orgao                                                     
+                       , contrato.num_unidade                                                   
+                       , contrato.numero_contrato                                               
+                       , contrato.objeto
+                       , contrato.tipo_objeto AS cod_tipo_objeto
+                       , tipo_objeto.descricao AS tipo_objeto
+                       , contrato.forma_fornecimento                                            
+                       , contrato.forma_pagamento                                               
+                       , contrato.cgm_signatario
+                       , cgm_signatario.nom_cgm AS nom_signatario
+                       , contrato.prazo_execucao                                                
+                       , contrato.multa_rescisoria                                              
+                       , contrato.justificativa                                                 
+                       , contrato.razao                                                         
+                       , contrato.fundamentacao_legal
+                       , orgao.nom_orgao
+                       , unidade.nom_unidade
+                       , entidade_contrato.nom_cgm AS nom_entidade
+               
+                    FROM licitacao.contrato_compra_direta
                        , orcamento.entidade
                        , sw_cgm
                        , compras.compra_direta
                        , compras.tipo_objeto
-
+                       , licitacao.contrato
+                       
+               LEFT JOIN sw_cgm as cgm_signatario                                            
+                      ON cgm_signatario.numcgm = contrato.cgm_signatario
+                
+              INNER JOIN ( SELECT sw_cgm.nom_cgm
+                                , entidade.cod_entidade
+                                , entidade.exercicio
+                             FROM orcamento.entidade
+                       INNER JOIN sw_cgm
+                               ON sw_cgm.numcgm    = entidade.numcgm
+                         ) AS entidade_contrato
+                       ON entidade_contrato.cod_entidade = contrato.cod_entidade
+                      AND entidade_contrato.exercicio    = contrato.exercicio
+                         
+               LEFT JOIN orcamento.orgao
+                      ON orgao.num_orgao = contrato.num_orgao
+                     AND orgao.exercicio = contrato.exercicio
+            
+               LEFT JOIN orcamento.unidade
+                      ON unidade.num_unidade = contrato.num_unidade
+                     AND unidade.num_orgao   = contrato.num_orgao
+                     AND unidade.exercicio   = contrato.exercicio
+                     
                    WHERE contrato.num_contrato = contrato_compra_direta.num_contrato
                      AND contrato.exercicio = contrato_compra_direta.exercicio
                      AND contrato.cod_entidade = contrato_compra_direta.cod_entidade

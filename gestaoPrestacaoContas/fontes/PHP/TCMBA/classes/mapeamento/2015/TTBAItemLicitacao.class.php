@@ -1,3 +1,4 @@
+
 <?php
 /*
     **********************************************************************************
@@ -33,7 +34,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63134 $
+    $Revision: 63248 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -96,9 +97,9 @@ function montaRecuperaDadosTribunal()
                        ,catalogo_item.descricao
                        ,TO_CHAR(homologacao.timestamp,'dd/mm/yyyy') AS data_homologacao     
                        ,TO_CHAR(homologacao.timestamp,'yyyymm') AS competencia     
-                       ,COALESCE(SUM(mapa_item.quantidade),0.00) AS qtd_licitacao     
-                       ,COALESCE(SUM(mapa_item_anulacao.qtd_anulacao),0.00) AS qtd_anulacao     
-                       ,COALESCE(SUM(mapa_item.quantidade),0.00) - COALESCE(SUM(mapa_item_anulacao.qtd_anulacao),0.00) AS qtd_saldo     
+                       ,COALESCE(mapa_item.quantidade,0.00) AS qtd_licitacao     
+                       ,COALESCE(mapa_item_anulacao.qtd_anulacao,0.00) AS qtd_anulacao     
+                       ,COALESCE(mapa_item.quantidade,0.00) - COALESCE(mapa_item_anulacao.qtd_anulacao,0.00) AS qtd_saldo     
                        ,unidade_medida.simbolo
                        ,1 AS tipo_registro
                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
@@ -209,6 +210,9 @@ function montaRecuperaDadosTribunal()
                     ,unidade_medida.simbolo
                     ,licitacao.cod_entidade
                     ,licitacao.cod_modalidade
+                    ,qtd_licitacao
+                    ,qtd_anulacao
+                    ,qtd_saldo
 
             ORDER BY licitacao.exercicio     
                     ,licitacao.cod_licitacao     

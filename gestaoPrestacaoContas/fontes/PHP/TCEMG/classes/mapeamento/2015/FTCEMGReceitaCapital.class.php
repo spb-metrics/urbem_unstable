@@ -30,7 +30,7 @@
  * @author Analista: Dagiane Vieira
  * @author Desenvolvedor: Michel Teixeira
  *
- * $Id: FTCEMGReceitaCapital.class.php 62751 2015-06-16 14:44:45Z michel $
+ * $Id: FTCEMGReceitaCapital.class.php 63297 2015-08-13 19:09:38Z franver $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -42,7 +42,7 @@ class FTCEMGReceitaCapital extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function FTCEMGReceitaCapital()
+    public function __construct()
     {
         parent::Persistente();
 
@@ -57,39 +57,38 @@ class FTCEMGReceitaCapital extends Persistente
 
     public function montaRecuperaTodos()
     {
-        $stSql  = " SELECT 
-                              EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS mes
-                            , cod_tipo
-                            , rec_alienacao
-                            , rec_amort
-                            , rec_transf_capital
-                            , rec_convenios
-                            , out_rec_cap
-                            , rec_ret_op_cred
-                            , rec_privat
-                            , rec_ref_divida
-                            , rec_out_op_cred
-                            , deducoes
-                    FROM ".$this->getTabela()." ( '".$this->getDado('exercicio')."'
-                                                , '".$this->getDado('cod_entidade')."'
-                                                , '".$this->getDado('dt_inicial')."'
-                                                , '".$this->getDado('dt_final')."') 
-                    AS retorno(
-                                cod_tipo               VARCHAR,
-                                rec_alienacao          VARCHAR,
-                                rec_amort              VARCHAR,
-                                rec_transf_capital     VARCHAR,
-                                rec_convenios          VARCHAR,
-                                out_rec_cap            VARCHAR,
-                                rec_ret_op_cred        VARCHAR,
-                                rec_privat             VARCHAR,
-                                rec_ref_divida         VARCHAR,
-                                rec_out_op_cred        VARCHAR,
-                                deducoes               VARCHAR
-                    )
-                ";
-
+        $stSql  = "
+          SELECT EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS mes
+               , cod_tipo
+               , rec_alienacao
+               , rec_amort
+               , rec_transf_capital
+               , rec_convenios
+               , out_rec_cap
+               , rec_ret_op_cred
+               , rec_privat
+               , rec_ref_divida
+               , rec_out_op_cred
+               , deducoes
+            FROM ".$this->getTabela()." ( '".$this->getDado('exercicio')."'
+                                        , '".$this->getDado('cod_entidade')."'
+                                        , '".$this->getDado('dt_inicial')."'
+                                        , '".$this->getDado('dt_final')."') 
+              AS retorno( cod_tipo           VARCHAR
+                        , rec_alienacao      VARCHAR
+                        , rec_amort          VARCHAR
+                        , rec_transf_capital VARCHAR
+                        , rec_convenios      VARCHAR
+                        , out_rec_cap        VARCHAR
+                        , rec_ret_op_cred    VARCHAR
+                        , rec_privat         VARCHAR
+                        , rec_ref_divida     VARCHAR
+                        , rec_out_op_cred    VARCHAR
+                        , deducoes           VARCHAR
+                        )
+        ";
         return $stSql;
     }
-
+    
+    public function __destruct() {}
 }

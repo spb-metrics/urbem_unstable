@@ -32,7 +32,7 @@
 
         * @ignore
 
-        $Id: PCT.inc.php 62688 2015-06-05 17:53:37Z lisiane $
+        $Id: PCT.inc.php 63600 2015-09-15 19:29:08Z franver $
 
         * Casos de uso: uc-06.04.00
 */
@@ -40,7 +40,7 @@
 include_once CAM_GPC_TGO_MAPEAMENTO.'TTGOPCT.class.php';
 
 $arFiltroRelatorio = Sessao::read('filtroRelatorio');
-
+$boValidaGeracaoRegistro11 = true;
 $inCount = 0;
 $obTTGOPCT = new TTGOPCT;
 $obTTGOPCT->recuperaRegistro10( $rsRegistro10 );
@@ -98,53 +98,64 @@ foreach ($rsRegistro10->arElementos as $arRegistro10) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
     
+        
+        if(array_key_exists("planocontas", $arRegistro10)){
+            if($arRegistro10["planocontas"] == 1){
+                $boValidaGeracaoRegistro11 = false;
+            } else {
+                $boValidaGeracaoRegistro11 = true;
+            }
+        } else {
+            $boValidaGeracaoRegistro11 = true;
+        }
         $arCodNivel = array();
-        foreach ($rsRegistro->arElementos as $arRegistro) {
-            if (!in_array($arRegistro['nivel'], $arCodNivel)) {
-                $arCodNivel[] = $arRegistro['nivel'];
-                //Registro Tipo 11
-                $arRegistro['numero_sequencial'] = ++$inCount;
-                $arRegistro11 = $arRegistro;
-    
-                $arRegistro11['tipo_registro_11'] = 11;
-                if ($arRegistro11['nivel'] <= 5) {
-                    $arRegistro11['quantidade_digitos'] = 1;
-                } else {
-                    $arRegistro11['quantidade_digitos'] = 2;
+        if ($boValidaGeracaoRegistro11) {
+            foreach ($rsRegistro->arElementos as $arRegistro) {
+                if (!in_array($arRegistro['nivel'], $arCodNivel)) {
+                    $arCodNivel[] = $arRegistro['nivel'];
+                    //Registro Tipo 11
+                    $arRegistro['numero_sequencial'] = ++$inCount;
+                    $arRegistro11 = $arRegistro;
+            
+                    $arRegistro11['tipo_registro_11'] = 11;
+                    if ($arRegistro11['nivel'] <= 5) {
+                        $arRegistro11['quantidade_digitos'] = 1;
+                    } else {
+                        $arRegistro11['quantidade_digitos'] = 2;
+                    }
+            
+                    $rsBloco = 'rsBloco_'.$inCount;
+                    unset($$rsBloco);
+                    $$rsBloco = new RecordSet();
+                    $$rsBloco->preenche(array($arRegistro11));
+            
+                    $obExportador->roUltimoArquivo->addBloco($$rsBloco);
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro_11");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_unidade_orcamentaria");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nivel");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("quantidade_digitos");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(171);
+            
+                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
                 }
-    
-                $rsBloco = 'rsBloco_'.$inCount;
-                unset($$rsBloco);
-                $$rsBloco = new RecordSet();
-                $$rsBloco->preenche(array($arRegistro11));
-    
-                $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro_11");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_unidade_orcamentaria");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nivel");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("quantidade_digitos");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(171);
-    
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
             }
         }
-    
         foreach ($rsRegistro->arElementos as $arRegistro) {
             //Registro Tipo 12
             $arRegistro['numero_sequencial'] = ++$inCount;

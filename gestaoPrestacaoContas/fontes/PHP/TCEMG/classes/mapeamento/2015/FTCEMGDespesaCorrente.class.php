@@ -37,50 +37,50 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FTCEMGDespesaCorrente extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FTCEMGDespesaCorrente()
-{
-    parent::Persistente();
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+    
+        $this->setTabela('tcemg.fn_despesa_corrente');
+    
+        $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
+        $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
+        $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
+    }
 
-    $this->setTabela('tcemg.fn_despesa_corrente');
+    public function montaRecuperaTodos()
+    {
+        $stSql  = "
+              SELECT periodo
+                   , cod_tipo
+                   , despPesEncSoc
+                   , despJurDivInt
+                   , despJurDivExt
+                   , despOutDespCor
+                FROM ".$this->getTabela()." ( '".$this->getDado("exercicio")."'
+                                            , '".$this->getDado("cod_entidade")."'
+                                            , '".$this->getDado("data_inicial")."'
+                                            , '".$this->getDado("data_final")."'
+                                            )
+                  AS retorno ( periodo                  INTEGER
+                             , cod_tipo                 TEXT
+                             , despPesEncSoc            NUMERIC
+                             , despJurDivInt            NUMERIC
+                             , despJurDivExt            NUMERIC
+                             , despOutDespCor           NUMERIC
+                             )
+            ORDER BY cod_tipo
+        ";
+        return $stSql;
+    }
 
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('cod_entidade'  ,'varchar',false,''    ,false,false);
-    $this->AddCampo('periodo'       ,'integer',false,''    ,false,false);
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "
-    SELECT LPAD(periodo::VARCHAR,2,'0') AS periodo,
-           LPAD(cod_tipo::VARCHAR,2,'0') AS cod_tipo,
-           LPAD(despPesEncSoc::VARCHAR,16,'0') AS despPesEncSoc,
-           LPAD(despJurDivInt::VARCHAR,16,'0') AS despJurDivInt,
-           LPAD(despJurDivExt::VARCHAR,16,'0') AS despJurDivExt,
-           LPAD(despOutDespCor::VARCHAR,16,'0') AS despOutDespCor
-
-          FROM ".$this->getTabela()."( '".$this->getDado("exercicio")."'
-                                     , '".$this->getDado("cod_entidade")."'
-                                     , '".$this->getDado("data_inicial")."'
-                                     , '".$this->getDado("data_final")."'
-                                     ) AS retorno(
-                                                  periodo                  INTEGER,
-                                                  cod_tipo                 TEXT,
-                                                  despPesEncSoc            TEXT,
-                                                  despJurDivInt            TEXT,
-                                                  despJurDivExt            TEXT,
-                                                  despOutDespCor           TEXT
-                                                 )
-          ORDER BY cod_tipo";
-
-return $stSql;
-}
-
+    public function __destruct() {}
 }

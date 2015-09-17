@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15, uc-03.05.00
 
-    $Id: IMontaNumeroLicitacao.class.php 62279 2015-04-16 18:38:45Z arthur $
+    $Id: IMontaNumeroLicitacao.class.php 63474 2015-08-31 21:54:15Z carlos.silva $
 
 */
 
@@ -42,9 +42,17 @@ class IMontaNumeroLicitacao extends Objeto
 {
     public $obForm;
     public $obExercicio;
+    public $boContrato;
+    
     public $obITextBoxSelectEntidadeGeral;
     public $obITextBoxSelectEntidadeUsuario;
+    public $obTxtOrgao;
+    public $obCmbOrgao;
+    public $obTxtUnidade;
+    public $obCmbUnidade;
+    public $obTxtNumeroContrato;
     public $obISelectModalidade;
+    public $obCmbTipoObjeto;
     public $obTxtLicitacao;
     public $obCmbLicitacao;
     public $obProcessoLicitatorio;
@@ -56,15 +64,17 @@ class IMontaNumeroLicitacao extends Objeto
     public $obHdnDtLicitacao;
 
     public function setRotulo($valor) { $this->stRotulo = $valor; }
+    public function setContrato($valor) { $this->boContrato = $valor; }
     public function setName($valor) { $this->stName   = $valor; }
     public function setSelecionaAutomaticamenteLicitacao($valor) { $this->boSelecionaAutomaticamenteLicitacao = $valor; }
     public function setEntidadeUsuario($valor) { $this->boEntidadeUsuario = $valor; }
     public function setPreencheValorLicitacao($valor) { $this->boSetarValorLiciticao = $valor;}
 
-    public function getEntidadeUsuario() { return $this->boEntidadeUsuario; }
     public function getRotulo() { return $this->stRotulo; }
+    public function getContrato() { return $this->boContrato; }
     public function getName() { return $this->stNme;    }
     public function getSelecionaAutomaticamenteLicitacao() { return $this->boSelecionaAutomaticamenteLicitacao; }
+    public function getEntidadeUsuario() { return $this->boEntidadeUsuario; }
     public function getPreencheValorLicitacao() { return $this->boSetarValorLiciticao;}
 
     public function setTipoBusca($stTipoBusca)
@@ -75,7 +85,7 @@ class IMontaNumeroLicitacao extends Objeto
         $this->obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('../../instancias/processamento/OCMontaNumeroLicitacao.php?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=".$boFiltraLicitacao."&numLicitacao='+document.getElementById('hdnNumLicitacao').value, '".$stTipoBusca."');");
     }
 
-    public function IMontaNumeroLicitacao(&$obForm, $boFiltraLicitacao=false, $stFiltro='', $preencherValorLicitacao='')
+    public function __construct(&$obForm, $boFiltraLicitacao=false, $stFiltro='', $preencherValorLicitacao='')
     {
         parent::Objeto();
         global $pgOcult;
@@ -84,9 +94,10 @@ class IMontaNumeroLicitacao extends Objeto
         $rsLicitacao = new RecordSet();
 
         include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
-        include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php"      );
+        include_once ( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php" );
         include_once ( CAM_GP_COM_COMPONENTES."ISelectModalidade.class.php" );
 
+        $this->boContrato  = false;
         $this->obExercicio = new Exercicio();
         $this->obExercicio->setName( 'stExercicioLicitacao' );
 
@@ -120,7 +131,7 @@ class IMontaNumeroLicitacao extends Objeto
         $this->obProcessoLicitatorio->setId( 'stProcesso' );
         $this->obProcessoLicitatorio->setValue( isset($stProcesso) ? $stProcesso : '&nbsp;' );
         $this->obProcessoLicitatorio->setRotulo( 'Processo Administrativo' );
-
+        
         $this->obHdnProcessoLicitatorio = new Hidden();
         $this->obHdnProcessoLicitatorio->setName( 'hdnProcesso' );
         $this->obHdnProcessoLicitatorio->setId( 'hdnProcesso' );
@@ -145,6 +156,7 @@ class IMontaNumeroLicitacao extends Objeto
         } else {
             $obFormulario->addComponente( $this->obITextBoxSelectEntidadeUsuario );
         }
+        
         $obFormulario->addComponente( $this->obISelectModalidade );
         $obFormulario->addComponente( $this->obCmbLicitacao );
         $obFormulario->addComponente( $this->obProcessoLicitatorio );

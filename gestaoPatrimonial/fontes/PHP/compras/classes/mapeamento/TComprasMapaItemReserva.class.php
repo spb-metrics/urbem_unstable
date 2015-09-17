@@ -36,7 +36,7 @@
  * Casos de uso: uc-03.04.05
                  uc-03.05.26
 
- $Id: TComprasMapaItemReserva.class.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: TComprasMapaItemReserva.class.php 63445 2015-08-28 13:44:54Z michel $
 
  */
 
@@ -49,7 +49,7 @@ class TComprasMapaItemReserva extends Persistente
      * Método Construtor
      * @access Private
      */
-    public function TComprasMapaItemReserva()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("compras.mapa_item_reserva");
@@ -139,7 +139,6 @@ class TComprasMapaItemReserva extends Persistente
 
     public function montaRecuperaMapaItemReserva()
     {
-
             $stSql = "
             SELECT  mapa_item.cod_solicitacao
                  ,  mapa_item.exercicio
@@ -148,15 +147,22 @@ class TComprasMapaItemReserva extends Persistente
         NOT EXISTS  (
                         SELECT  1
                           FROM  compras.mapa_item_reserva
+                     LEFT JOIN  orcamento.reserva_saldos_anulada
+                            ON  reserva_saldos_anulada.cod_reserva  = mapa_item_reserva.cod_reserva
+                           AND  reserva_saldos_anulada.exercicio    = mapa_item_reserva.exercicio_reserva
                          WHERE  mapa_item_reserva.exercicio_mapa  = mapa_item.exercicio
                            AND  mapa_item_reserva.cod_entidade    = mapa_item.cod_entidade
                            AND  mapa_item_reserva.cod_solicitacao = mapa_item.cod_solicitacao
                            AND  mapa_item_reserva.cod_centro      = mapa_item.cod_centro
                            AND  mapa_item_reserva.cod_item        = mapa_item.cod_item
+                           AND  mapa_item_reserva.cod_mapa        = mapa_item.cod_mapa 
+                           AND  mapa_item_reserva.exercicio_mapa  = mapa_item.exercicio
+                           AND  reserva_saldos_anulada.cod_reserva IS NULL
                     )
                AND  mapa_item.cod_solicitacao = ".$this->getDado('cod_solicitacao')."
                AND  mapa_item.cod_entidade    = ".$this->getDado('cod_entidade')."
                AND  mapa_item.exercicio       = '".$this->getDado('exercicio')."'
+               AND  mapa_item.cod_mapa        = ".$this->getDado('cod_mapa')."
             ";
 
         return $stSql;
@@ -194,6 +200,8 @@ class TComprasMapaItemReserva extends Persistente
 
         return $stSql;
     }
+    
+    public function __destruct() {}
 }
 
 ?>

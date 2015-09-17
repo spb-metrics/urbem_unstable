@@ -39,14 +39,6 @@
 
     * Casos de uso: uc-02.01.03
 */
-
-/*
-$Log$
-Revision 1.1  2007/07/17 14:49:34  souzadl
-construção
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
@@ -85,7 +77,7 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
-$stFncJavaScript .= " function inserePAO(num,nom) {  \n";
+$stFncJavaScript .= " function inserePAO(num,nom,nuPAO,sDotacao) {  \n";
 $stFncJavaScript .= " var sNum;                  \n";
 $stFncJavaScript .= " var sNom;                  \n";
 $stFncJavaScript .= " sNum = num;                \n";
@@ -94,6 +86,8 @@ $stFncJavaScript .= " if ( window.opener.parent.frames['telaPrincipal'].document
 $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom; } \n";
 $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNom"].".value = sNom; \n";
 $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sNum; \n";
+$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".inHdnNumPAO.value = nuPAO; \n";
+$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".stHdnDotacao.value = sDotacao; \n";
 $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus(); \n";
 $stFncJavaScript .= " window.close();            \n";
 $stFncJavaScript .= " }                          \n";
@@ -105,16 +99,22 @@ if ($inExercicio == "") {
 
 include_once(CAM_GF_ORC_MAPEAMENTO."TOrcamentoProjetoAtividade.class.php");
 $obTOrcamentoProjetoAtividade = new TOrcamentoProjetoAtividade();
-$stFiltro = " WHERE exercicio = '".$inExercicio."'";
+$stFiltro = " WHERE pao.exercicio = '".$inExercicio."'";
 if ($_REQUEST["stNumPAO"]) {
-    $stFiltro .= " AND num_pao = ".$_REQUEST["stNumPAO"];
+    $stFiltro .= " AND acao.num_acao = ".$_REQUEST["stNumPAO"];
     $stLink .= "&stNumPAO=".$_REQUEST["stNumPAO"];
 }
 if ($_REQUEST["stNomPAO"]) {
-    $stFiltro .= " AND nom_pao ilike '%".$_REQUEST["stNomPAO"]."%'";
+    $stFiltro .= " AND pao.nom_pao ilike '%".$_REQUEST["stNomPAO"]."%'";
     $stLink .= "&stNomPAO=".$_REQUEST["stNomPAO"];
 }
-$obTOrcamentoProjetoAtividade->recuperaTodos($rsPAO,$stFiltro," ORDER BY nom_pao");
+
+$stOrderBy = "
+          ORDER BY acao.num_acao
+                 , dotacao
+";
+
+$obTOrcamentoProjetoAtividade->recuperaPorNumPAODotacao($rsPAO,$stFiltro,$stOrderBy);
 
 //faz busca dos CGM's utilizando o filtro setado
 $stLink .= "&stAcao=".$stAcao;
@@ -141,10 +141,10 @@ $obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
 
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "num_pao" );
+$obLista->ultimoDado->setCampo( "dotacao" );
 $obLista->commitDado();
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "nom_pao" );
+$obLista->ultimoDado->setCampo( "titulo" );
 $obLista->commitDado();
 
 $stAcao = "SELECIONAR";
@@ -152,8 +152,10 @@ $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->setFuncao( true );
 $obLista->ultimaAcao->setLink( "JavaScript:inserePAO();" );
-$obLista->ultimaAcao->addCampo("1","num_pao");
-$obLista->ultimaAcao->addCampo("2","nom_pao");
+$obLista->ultimaAcao->addCampo("1","num_acao");
+$obLista->ultimaAcao->addCampo("2","titulo");
+$obLista->ultimaAcao->addCampo("3","num_pao");
+$obLista->ultimaAcao->addCampo("4","dotacao");
 $obLista->commitAcao();
 $obLista->show();
 

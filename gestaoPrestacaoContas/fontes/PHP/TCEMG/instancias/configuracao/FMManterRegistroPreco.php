@@ -135,13 +135,17 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
         $arOrgaos[$inCount]['inOrgaoGerenciador']        = ($rsOrgao->getCampo('gerenciador') == 't') ? 1 : 2;
         $arOrgaos[$inCount]['stOrgaoGerenciador']        = ($rsOrgao->getCampo('gerenciador') == 't') ? "Sim":"Não";
         $arOrgaos[$inCount]['stNaturezaProcedimento']    = ($rsOrgao->getCampo('participante') == 't') ? "Órgão Participante":"Órgão Não Participante";
-        $arOrgaos[$inCount]['stCodigoProcessoAdesao']    = ($rsOrgao->getCampo('exercicio_adesao')!=NULL) ? str_pad($rsOrgao->getCampo('numero_processo_adesao'), 12, "0", STR_PAD_LEFT)."/".$rsOrgao->getCampo('exercicio_adesao') : '';
+        $arOrgaos[$inCount]['stCodigoProcessoAdesao']    = ($rsOrgao->getCampo('numero_processo_adesao')!=NULL&&$rsOrgao->getCampo('exercicio_adesao')!=NULL) ? $rsOrgao->getCampo('numero_processo_adesao') : '';
+        $arOrgaos[$inCount]['stExercicioProcessoAdesao'] = ($rsOrgao->getCampo('numero_processo_adesao')!=NULL&&$rsOrgao->getCampo('exercicio_adesao')!=NULL) ? $rsOrgao->getCampo('exercicio_adesao') : '';
         $arOrgaos[$inCount]['dtAdesao']                  = $rsOrgao->getCampo('dt_adesao');
         $arOrgaos[$inCount]['dtPublicacaoAvisoIntencao'] = $rsOrgao->getCampo('dt_publicacao_aviso_intencao');
         $arOrgaos[$inCount]['inResponsavel']             = $rsOrgao->getCampo('numcgm_responsavel');
         $arOrgaos[$inCount]['stNomResponsavel']          = $rsOrgao->getCampo('nomcgm_responsavel');
         $arOrgaos[$inCount]['inStNomResponsavel']        = $rsOrgao->getCampo('st_cgm_responsavel'); 
         $arOrgaos[$inCount]['inId'] = ($inCount + 1);
+
+        if($rsOrgao->getCampo('numcgm_responsavel')=='')
+            $boResponsavelOrgao = true;
 
         $inCount++;
         $rsOrgao->proximo();
@@ -187,8 +191,6 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
         $inCount++;
         $rsItem->proximo();
     }
-
-    Sessao::write('arItens', $arItens);
     
     # Monta array Sessao para armazenar os Quantitativos.
     $obTTCEMGRegistroPrecosOrgaoItem = new TTCEMGRegistroPrecosOrgaoItem();
@@ -200,6 +202,7 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     $obTTCEMGRegistroPrecosOrgaoItem->recuperaPorChave($rsQuantitativo);
     
     $arQuantitativos = array();
+    $arQuantitativosItemTemp = array();
     $inCount = 0;
     $rsQuantitativo->ordena('num_item');
     while ( !($rsQuantitativo->eof()) ) {
@@ -217,9 +220,23 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
         $arQuantitativos[$inCount]['nuQtdeOrgao']      = number_format($rsQuantitativo->getCampo('quantidade'), 4, ',', '.');
         $arQuantitativos[$inCount]['inId']             = ($inCount + 1);
 
+        if(isset($arQuantitativosItemTemp[$rsQuantitativo->getCampo('num_item').'_'.$arQuantitativos[$inCount]['inCodLoteQ']]))
+            $arQuantitativosItemTemp[$rsQuantitativo->getCampo('num_item').'_'.$arQuantitativos[$inCount]['inCodLoteQ']]=$arQuantitativosItemTemp[$rsQuantitativo->getCampo('num_item').'_'.$arQuantitativos[$inCount]['inCodLoteQ']]+$rsQuantitativo->getCampo('quantidade');
+        else
+            $arQuantitativosItemTemp[$rsQuantitativo->getCampo('num_item').'_'.$arQuantitativos[$inCount]['inCodLoteQ']]=$rsQuantitativo->getCampo('quantidade');
+
         $inCount++;
         $rsQuantitativo->proximo();
     }
+
+    foreach($arItens as $key => $value) {
+        if(isset($arQuantitativosItemTemp[$value['inNumItemLote'].'_'.$value['stCodigoLote']]))
+            $arItens[$key]['nuQtdeAderida'] = number_format($arQuantitativosItemTemp[$value['inNumItemLote'].'_'.$value['stCodigoLote']], 4, ',', '.');
+        else
+            $arItens[$key]['nuQtdeAderida'] = '0,0000';
+    }
+
+    Sessao::write('arItens', $arItens);
     Sessao::write('arOrgaoItemQuantitativos', $arQuantitativos);
     
     $obTTCEMGEmpenhoRegistroPrecos = new TTCEMGEmpenhoRegistroPrecos();
@@ -232,13 +249,11 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
 
     $arEmpenhos = array();
     $inCount = 0;
-    
 
     $obErro = new Erro();
     $obTEmpenhoEmpenho = new TEmpenhoEmpenho();
     # Carrega os empenhos para alteração
     while (!($rsEmpenho->eof())) {
-        
         if ( $rsEmpenho->getCampo('exercicio_empenho') == Sessao::getExercicio() ) {
             $stOrder = "tabela.cod_entidade, tabela.cod_empenho, tabela.nom_fornecedor";
             $obTEmpenhoEmpenho->setDado( "tribunal", "TCEMG");
@@ -246,7 +261,7 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
             $stFiltro  = " AND tabela.exercicio = '".$rsEmpenho->getCampo('exercicio_empenho')."' ";
             $stFiltro .= " AND tabela.cod_entidade IN (".$rsEmpenho->getCampo('cod_entidade')." ) ";
             $stFiltro .= " AND tabela.cod_empenho = ".$rsEmpenho->getCampo('cod_empenho')." ";
-            
+
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 4, strlen($stFiltro)) : "";
             $stOrder = ($stOrder) ? $stOrder : "tabela.cod_empenho";
             $obErro = $obTEmpenhoEmpenho->recuperaConsultaEmpenho( $rsLista, $stFiltro, $stOrder, $boTransacao );
@@ -257,7 +272,7 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
             $stFiltro  = " AND tabela.exercicio = '".$rsEmpenho->getCampo('exercicio_empenho')."' ";
             $stFiltro .= " AND tabela.cod_entidade IN (".$rsEmpenho->getCampo('cod_entidade')." ) ";
             $stFiltro .= " AND tabela.cod_empenho = ".$rsEmpenho->getCampo('cod_empenho')." ";
-            
+
             $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 4, strlen($stFiltro)) : "";
             $stOrder  = ($stOrder) ? $stOrder : "tabela.cod_empenho";
             $obErro   = $obTEmpenhoEmpenho->recuperaRestosConsultaEmpenho( $rsLista, $stFiltro, $stOrder, $boTransacao );
@@ -278,7 +293,6 @@ if ($stAcao == 'alterar' && ($request->get('inNroRegistroPrecos') != '' && $requ
     Sessao::write('arEmpenhos', $arEmpenhos);
 }
 
-
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
@@ -296,6 +310,14 @@ $obHdnExercicio = new Hidden;
 $obHdnExercicio->setName( "stExercicio" );
 $obHdnExercicio->setId( "stExercicio" );
 $obHdnExercicio->setValue( Sessao::getExercicio() );
+
+$obHdnResponsavelOrgao = new Hidden;
+$obHdnResponsavelOrgao->setName( "boResponsavelOrgao" );
+$obHdnResponsavelOrgao->setId( "boResponsavelOrgao" );
+if($boResponsavelOrgao)
+    $obHdnResponsavelOrgao->setValue( 'false' );
+else
+    $obHdnResponsavelOrgao->setValue( 'true' );
 
 # Entidade Principal
 $obITextBoxSelectEntidade = new ITextBoxSelectEntidadeGeral();
@@ -616,6 +638,7 @@ $obFormulario->addTitulo( "Registro de Preços" );
 $obFormulario->addHidden( $obHdnCtrl );
 $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addHidden( $obHdnExercicio );
+$obFormulario->addHidden( $obHdnResponsavelOrgao );
 $obFormulario->addComponente( $obITextBoxSelectEntidade );
 $obFormulario->addComponente( $obTxtExercicioRegistroPreco );
 $obFormulario->addComponente( $obTxtCodigoProcesso );
@@ -660,6 +683,7 @@ $obFormulario->agrupaComponentes (array($obRdoGerenciadorSim,$obRdoGerenciadorNa
 $obFormulario->agrupaComponentes (array($obRadioNaturezaProcedimentoParticipante, $obRadioNaturezaProcedimentoNaoParticipante));
 $obFormulario->addComponente( $obIPopUpCGMResponsavel );
 $obFormulario->addComponente($obTxtCodigoProcessoAdesao);
+$obFormulario->addComponente($obTxtExercicioProcessoAdesao);
 $obFormulario->addComponente($obDtAdesao);
 $obFormulario->addComponente($obDtPublicacaoAvisoIntencao);
 $obFormulario->agrupaComponentes( array($obBtnSalvarOrgao, $obBtnLimparOrgao) );
@@ -677,6 +701,7 @@ $obMontaQuantidadeValores->geraFormulario($obFormulario);
 $obFormulario->addComponente( $obVlrPrecoUnitario );
 $obFormulario->addComponente( $obIntQtdeLicitada );
 $obFormulario->addComponente( $obIntQtdeAderida );
+$obFormulario->addComponente( $obLblSaldoItem );
 $obFormulario->addComponente( $obVlrPercentualItem );
 $obFormulario->addComponente( $obBscCGMVencedor );
 $obFormulario->addComponente( $obIntOrdemClassificacao );
@@ -694,10 +719,12 @@ $obFormulario->addComponente( $obTxtExercicioQ );
 $obFormulario->addComponente( $obSlcOrgao);
 $obFormulario->addSpan( $obSpnOrgao);
 $obFormulario->addSpan( $obSpnLoteQuantitativo );
-$obFormulario->addComponente( $obSlcItem);
-$obFormulario->addComponente( $obSlcFornecedor);
-$obFormulario->addComponente( $obLblQtdePermitidaFornecedor);
-$obFormulario->addComponente( $obQuantidadeOrgao);
+$obFormulario->addComponente( $obSlcItem );
+$obFormulario->addComponente( $obSlcFornecedor );
+$obFormulario->addComponente( $obLblQtdePermitidaFornecedor );
+$obFormulario->addComponente( $obQuantidadeOrgao );
+$obFormulario->addComponente( $obLblQtdeAderidaQ );
+$obFormulario->addComponente( $obLblSaldoItemQ );
 $obFormulario->agrupaComponentes( array($obBtnSalvarQuantitativo, $obBtnLimparQuantitativo) );
 
 $obFormulario->addSpan ( $spnQuantitativoOrgao );
@@ -710,10 +737,23 @@ $obFormulario->addComponente( $obBtnIncluirEmpenho );
 $obFormulario->addSpan ( $obSpnEmpenhos );
 
 $obOk = new Ok();
+$obOk->obEvento->setOnClick("ValidaRegistroPreco();");
+
 $obLimpar = new Limpar;
 $obLimpar->obEvento->setOnClick( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."', 'LimparForm');");
 
-$obFormulario->defineBarra( array( $obOk, $obLimpar ) );
+$obCancelar  = new Cancelar();
+$stLink  = '&stAcao='.$request->get('stAcao').'&inCodEntidade='.$request->get('inCodEntidade').'&stExercicioRegistroPreco='.$request->get('stExercicioRegistroPrecos');
+$stLink .= "&stCodigoProcesso=".$request->get('stCodigoProcesso')."&inCodModalidade=".$request->get('inCodModalidade')."&inCodLicitacao=".$request->get('inCodLicitacao');
+$stLink .= "&stExercicioEmpenho=".$request->get('stExercicioEmpenho')."&numEmpenho=".$request->get('numEmpenho');
+$obCancelar->obEvento->setOnClick("Cancelar('".$pgList.'?'.Sessao::getId().$stLink."','telaPrincipal');");
+
+if ($stAcao == 'alterar') {
+    $obFormulario->defineBarra( array( $obOk, $obCancelar ) );
+}else{
+    $obFormulario->defineBarra( array( $obOk, $obLimpar ) );
+}
+
 $obFormulario->show();
 
 if ($stAcao == 'alterar') {

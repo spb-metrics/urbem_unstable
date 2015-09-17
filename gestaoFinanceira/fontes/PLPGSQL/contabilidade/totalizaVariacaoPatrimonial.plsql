@@ -26,27 +26,16 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 12203 $
+* $Revision: $
 * $Name$
-* $Author: cleisson $
-* $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+* $Author: $
+* $Date: $
 *
-* Casos de uso: uc-02.02.22
-*/
-
-/*
-$Log$
-Revision 1.6  2006/07/05 20:37:31  cleisson
-Adicionada tag Log aos arquivos
-
 */
 
 CREATE OR REPLACE FUNCTION contabilidade.fn_totaliza_variacao_patrimonial(VARCHAR) RETURNS numeric[] AS $$
 DECLARE
     stCodEstrutural     ALIAS FOR $1;
-    --stDtInicial         ALIAS FOR $2;
-    --stDtFinal           ALIAS FOR $3;
-    --stExercicioAnterior ALIAS FOR $4;
     stSql               VARCHAR   := '';
     nuSaldoAnterior     NUMERIC   := 0;
     nuDebito            NUMERIC   := 0;
@@ -59,7 +48,6 @@ DECLARE
     nuSaldo             NUMERIC   := 0;
     arRetorno           NUMERIC[] := array[0];
     crCursor            REFCURSOR;
-
 
 BEGIN
 

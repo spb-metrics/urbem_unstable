@@ -31,7 +31,7 @@
 
  * @ignore
 
- * $Id: OCGeraRGFAnexo1.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+ * $Id: OCGeraRGFAnexo1.php 63275 2015-08-11 20:29:31Z evandro $
 
  * Casos de uso : uc-06.01.20
  */
@@ -44,20 +44,21 @@ include_once CAM_FW_LEGADO."funcoesLegado.lib.php";
 
 $obTOrcamentoEntidade = new TOrcamentoEntidade();
 $obTOrcamentoEntidade->setDado('exercicio', Sessao::getExercicio());
-$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")" );
+$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$request->get('inCodEntidade')).")" );
 
 $obErro = new Erro();
 
-if (!$_REQUEST['cmbBimestre'] && !$_REQUEST['cmbQuadrimestre'] && !$_REQUEST['cmbSemestre']) {
-    $obErro->setDescricao('É preciso selecionar ao menos um '.$_REQUEST['stTipoRelatorio'].'.');
+if (!$request->get('cmbBimestre') && !$request->get('cmbQuadrimestre') && !$request->get('cmbSemestre')) {
+    $obErro->setDescricao('É preciso selecionar ao menos um '.$request->get('stTipoRelatorio').'.');
 }
 
 $stAno = Sessao::getExercicio();
 
 // verifica se a entidade configurada como Consorcio foi selecionada sozinha ou se há outra entidade junto.
 $stEntidade = SistemaLegado::pegaDado("valor","administracao.configuracao","WHERE parametro = 'cod_entidade_consorcio' AND exercicio = '".Sessao::getExercicio()."'");
+$stEntidadeCamara = SistemaLegado::pegaDado("valor","administracao.configuracao","WHERE parametro = 'cod_entidade_camara' AND exercicio = '".Sessao::getExercicio()."'");
 
-if ((count($_POST['inCodEntidade']) == 1) && (in_array($stEntidade, $_POST['inCodEntidade'])) ) {
+if ((count($request->get('inCodEntidade')) == 1) && (in_array($stEntidade, $request->get('inCodEntidade'))) ) {
     $preview = new PreviewBirt(6,36,50);
     $preview->setTitulo('Demonstrativo da Despesa com Pessoal Consórcio');
 } else {
@@ -71,7 +72,12 @@ if ((count($_POST['inCodEntidade']) == 1) && (in_array($stEntidade, $_POST['inCo
     $preview->setTitulo('Demonstrativo da Despesa com Pessoal');
 }
 
-if ( (count($_POST['inCodEntidade']) > 1) && (in_array($stEntidade, $_POST['inCodEntidade'] )) ) {
+if ( (count($request->get('inCodEntidade')) > 1) && (in_array($stEntidadeCamara, $request->get('inCodEntidade') )) ) {
+    $obErro->setDescricao("A entidade Camara não pode ser gerada juntamente com a entidade Prefeitura e Instituto.");
+    $boPreview = false;
+}
+
+if ( (count($request->get('inCodEntidade')) > 1) && (in_array($stEntidade, $request->get('inCodEntidade') )) ) {
     $obErro->setDescricao("A Entidade setada como Consorcio ".$rsEntidade->getCampo('nom_cgm')." deve ser selecionada sozinha.");
     $boPreview = false;
 }
@@ -79,8 +85,8 @@ if ( (count($_POST['inCodEntidade']) > 1) && (in_array($stEntidade, $_POST['inCo
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel( true );
 
-$preview->addParametro( 'cod_entidade', implode(',', $_REQUEST['inCodEntidade'] ) );
-if ( count($_REQUEST['inCodEntidade']) == 1 ) {
+$preview->addParametro( 'cod_entidade', implode(',', $request->get('inCodEntidade') ) );
+if ( count($request->get('inCodEntidade')) == 1 ) {
     $preview->addParametro( 'nom_entidade', $rsEntidade->getCampo('nom_cgm') );
 } else {
     while ( !$rsEntidade->eof() ) {
@@ -92,7 +98,7 @@ if ( count($_REQUEST['inCodEntidade']) == 1 ) {
     }
 }
 
-if (($_REQUEST['cmbBimestre'] == 6 ) || ($_REQUEST['cmbQuadrimestre'] == 3) || ($_REQUEST['cmbSemestre'] == 2)) {
+if (($request->get('cmbBimestre') == 6 ) || ($request->get('cmbQuadrimestre') == 3) || ($request->get('cmbSemestre') == 2)) {
     $preview->addParametro('show_emp', 'false');
 } else {
     $preview->addParametro('show_emp', 'true');
@@ -101,38 +107,38 @@ if (($_REQUEST['cmbBimestre'] == 6 ) || ($_REQUEST['cmbQuadrimestre'] == 3) || (
 $preview->addParametro('percentagem_lim_max', 54);
 $preview->addParametro('percentagem_lim_pru', 0.513);
 
-switch ($_REQUEST['stTipoRelatorio']) {
+switch ($request->get('stTipoRelatorio')) {
     case 'Quadrimestre':
-        $preview->addParametro('periodo', $_REQUEST['cmbQuadrimestre']);
-        $numPeriodo = $_REQUEST['cmbQuadrimestre'];
+        $preview->addParametro('periodo', $request->get('cmbQuadrimestre'));
+        $numPeriodo = $request->get('cmbQuadrimestre');
     break;
     case 'Semestre':
-        $preview->addParametro('periodo', $_REQUEST['cmbSemestre']);
-        $numPeriodo = $_REQUEST['cmbSemestre'];
+        $preview->addParametro('periodo', $request->get('cmbSemestre'));
+        $numPeriodo = $request->get('cmbSemestre');
     break;
     case 'Bimestre':
-        $preview->addParametro('periodo', $_REQUEST['cmbBimestre']);
-        $numPeriodo = $_REQUEST['cmbBimestre'];
+        $preview->addParametro('periodo', $request->get('cmbBimestre'));
+        $numPeriodo = $request->get('cmbBimestre');
     break;
 }
 
-$preview->addParametro('tipo_periodo', $_REQUEST['stTipoRelatorio']);
+$preview->addParametro('tipo_periodo', $request->get('stTipoRelatorio'));
 
-if($_REQUEST["cmbBimestre"] == '') {
-    $inPeriodo = $_REQUEST['cmbQuadrimestre'] != '' ? $_REQUEST['cmbQuadrimestre'] : $_REQUEST['cmbSemestre'];
+if($request->get("cmbBimestre") == '') {
+    $inPeriodo = $request->get('cmbQuadrimestre') != '' ? $request->get('cmbQuadrimestre') : $request->get('cmbSemestre');
 } else {
-    $inPeriodo = $_REQUEST["cmbBimestre"];
+    $inPeriodo = $request->get("cmbBimestre");
 }
 
 switch ($inPeriodo) {
     case 1:
-        if ($_REQUEST['stTipoRelatorio'] == 'Quadrimestre') {
+        if ($request->get('stTipoRelatorio') == 'Quadrimestre') {
             $data_fim = '30/04/'.$stAno;
             $data_ini = '01/05/'.($stAno - 1);
-        } elseif ($_REQUEST['stTipoRelatorio'] == 'Semestre') {
+        } elseif ($request->get('stTipoRelatorio') == 'Semestre') {
             $data_fim = '30/06/'.$stAno;
             $data_ini = '01/07/'.($stAno - 1);
-        } elseif ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        } elseif ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/03/".($stAno - 1);
         }
@@ -140,15 +146,15 @@ switch ($inPeriodo) {
     break;
 
     case 2:
-        if ($_REQUEST['stTipoRelatorio'] == 'Quadrimestre') {
+        if ($request->get('stTipoRelatorio') == 'Quadrimestre') {
             $data_fim = '31/08/'.$stAno;
             $data_ini = '01/09/'.($stAno - 1);
             $preview->addParametro( 'exercicio_restos', ($stAno - 1));
-        } elseif ($_REQUEST['stTipoRelatorio'] == 'Semestre') {
+        } elseif ($request->get('stTipoRelatorio') == 'Semestre') {
             $data_fim = '31/12/'.$stAno;
             $data_ini = '01/01/'.$stAno;
             $preview->addParametro( 'exercicio_restos', $stAno);
-        } elseif ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        } elseif ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/05/".($stAno - 1);
             $preview->addParametro( 'exercicio_restos', ($stAno - 1));
@@ -156,7 +162,7 @@ switch ($inPeriodo) {
    break;
 
     case 3:
-        if ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        if ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/07/".($stAno - 1);
             $preview->addParametro( 'exercicio_restos', ($stAno - 1));
@@ -169,7 +175,7 @@ switch ($inPeriodo) {
    break;
 
    case 4:
-        if ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        if ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/09/".($stAno - 1);
         }
@@ -177,7 +183,7 @@ switch ($inPeriodo) {
    break;
 
    case 5:
-        if ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        if ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/11/".($stAno - 1);
         }
@@ -185,7 +191,7 @@ switch ($inPeriodo) {
    break;
 
    case 6:
-        if ($_REQUEST['stTipoRelatorio']  == 'Bimestre'){
+        if ($request->get('stTipoRelatorio')  == 'Bimestre'){
             $data_fim = SistemaLegado::retornaUltimoDiaMes(str_pad((string)($inPeriodo*2),2,'0',STR_PAD_LEFT),$stAno);
             $data_ini = "01/01/".$stAno;
         }
@@ -239,12 +245,12 @@ while ($inCont <= 12) {
 $preview->addParametro( 'data_ini', $data_ini );
 $preview->addParametro( 'data_fim', $data_fim );
 
-if (preg_match("/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) || (count($_REQUEST['inCodEntidade']) > 1)) {
+if (preg_match("/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) || (count($request->get('inCodEntidade')) > 1)) {
     $preview->addParametro('poder', 'Executivo');
     $preview->addParametro('limite_maximo', '54%');
     $preview->addParametro('limite_prudencial', '51,3%');
     $preview->addParametro('limite_alerta', '48,6%');
-} elseif (preg_match("/camara.*/i", $rsEntidade->getCampo('nom_cgm')) || preg_match("/camara.*/i", $rsEntidade->getCampo('nom_cgm'))) {
+} elseif ( preg_match("/c(â|a)mara.*/i", $rsEntidade->getCampo('nom_cgm')) ) {
     $preview->addParametro('poder', 'Legislativo');
     $preview->addParametro('limite_maximo', '6%');
     $preview->addParametro('limite_prudencial', '5,7%');
@@ -258,9 +264,9 @@ if (preg_match("/prefeitura.*/i", $rsEntidade->getCampo('nom_cgm')) || (count($_
 
 // verificando se foi selecionado Câmara e outra entidade junto
 $rsEntidade->setPrimeiroElemento();
-if (!$obErro->ocorreu() && (count($_REQUEST['inCodEntidade']) != 1)) {
+if (!$obErro->ocorreu() && (count($request->get('inCodEntidade')) != 1)) {
     while (!$rsEntidade->eof()) {
-        if (preg_match("/c[âa]mara/i", $rsEntidade->getCampo('nom_cgm'))) {
+        if (preg_match("/c(â|a)mara/i", $rsEntidade->getCampo('nom_cgm'))) {
             $obErro->setDescricao("Entidade ".$rsEntidade->getCampo('nom_cgm')." deve ser selecionada sozinha.");
             $boPreview = false;
             break;
@@ -293,5 +299,5 @@ $preview->addAssinaturas(Sessao::read('assinaturas'));
 if (!$obErro->ocorreu()) {
     $preview->preview();
 } else {
-    SistemaLegado::alertaAviso("FLModelosRGF.php?'.Sessao::getId().&stAcao=".$_REQUEST['stAcao']."", $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+    SistemaLegado::alertaAviso("FLModelosRGF.php?'.Sessao::getId().&stAcao=".$request->get('stAcao')."", $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
 }

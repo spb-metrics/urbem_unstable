@@ -29,7 +29,7 @@
 
     * @author Fernando Zank Correa Evangelista
 
-    * $Id: FMManterConfiguracao.php 61893 2015-03-12 17:33:33Z carlos.silva $
+    * $Id: FMManterConfiguracao.php 63445 2015-08-28 13:44:54Z michel $
 
     * Casos de uso : uc-03.04.08
     */
@@ -59,9 +59,9 @@ $rsResponsaveis = new RecordSet;
 $stFiltro = " and configuracao_entidade.exercicio = '".Sessao::getExercicio()."' ";
 $obTComprasConfiguracaoEntidade->recuperaResponsaveis ( $rsResponsaveis, $stFiltro );
 
-Sessao::write('arResponsaveisEntidades' , array());
-Sessao::write('arResponsaveisEntidadesExcluidos' , array());
-Sessao::write('inUltimoCodigoResp' , 0);
+Sessao::write( 'arResponsaveisEntidades'            , array()   );
+Sessao::write( 'arResponsaveisEntidadesExcluidos'   , array()   );
+Sessao::write( 'inUltimoCodigoResp'                 , 0         );
 
 if ($rsResponsaveis->getNumLinhas() > 0) {
     $inID = 0;
@@ -88,6 +88,10 @@ $obTConfiguracao->setDado("parametro","reserva_rigida");
 $obTConfiguracao->recuperaPorChave($rsConfiguracao);
 $boReservaRigida = $rsConfiguracao->getCampo('valor') == 'true' ? true : false;
 
+$obTConfiguracao->setDado("parametro","reserva_autorizacao");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$boReservaAutorizacao = $rsConfiguracao->getCampo('valor') == 'true' ? true : false;
+
 $obTConfiguracao = new TComprasConfiguracao();
 $obTConfiguracao->setDado("parametro","numeracao_licitacao");
 $obTConfiguracao->recuperaPorChave($rsConfiguracao);
@@ -95,6 +99,9 @@ $stNumeracaoSolicitacao = $rsConfiguracao->getCampo('valor');
 
 $obTSolicitacao = new TComprasSolicitacao();
 $obTSolicitacao->recuperaTodos($rsSolicitacao," where exercicio = '".Sessao::getExercicio()."'");
+
+$obTSolicitacao->setDado('stExercicio', Sessao::getExercicio());
+$obTSolicitacao->recuperaSolicitacoesMapaCompras($rsSolicitacaoMapa);
 
 $obTLicitacao = new TLicitacaoLicitacao();
 $obTLicitacao->recuperaTodos($rsLicitacao," where exercicio = '".Sessao::getExercicio()."'");
@@ -119,22 +126,16 @@ $obTConfiguracaoVlReferencia->setDado( "parametro" , "tipo_valor_referencia" );
 $obTConfiguracaoVlReferencia->recuperaPorChave($rsConfiguracao);
 $stValorReferencia = $rsConfiguracao->getCampo('valor');
 
-//$jsOnLoad = "executaFuncaoAjax('recuperaFormularioAlteracao')";
-$stAcao = $request->get('stAcao');
+$stAcao = $request->get('stAcao', 'alterar');
 
-if (empty( $stAcao )) {
-    $stAcao = "alterar";
-}
+$stLocation = $pgList."?".Sessao::getId()."&stAcao=".$stAcao;
 
-$stLocation = $pgList . "?". Sessao::getId() . "&stAcao=" . $stAcao;
-
-if ($inCodigo) {
+if ($inCodigo)
     $stLocation .= "&inCodigo=$inCodigo";
-}
 
 $obForm = new Form;
-$obForm->setAction                  ( $pgProc );
-$obForm->setTarget                  ( "oculto" );
+$obForm->setAction( $pgProc );
+$obForm->setTarget( "oculto" );
 
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName( "stAcao" );
@@ -154,7 +155,6 @@ if ($rsSolicitacao->getCampo('exercicio') == '') {
     $obRdbHomologado->setRotulo ( "Efetuar Homologação de Solicitação Automática");
     $obRdbHomologado->setTitle  ( "Informe se após a elaboração de uma solicitação de compra, será efetuada automaticamente a homologação." );
     $obRdbHomologado->setName   ( "stHomologacao" );
-    //$obRdbHomologado->setNull(false);
     $obRdbHomologado->obRadioSim->setValue('true');
     $obRdbHomologado->obRadioNao->setValue('false');
     if ($boEfetuarHomologacao)
@@ -166,7 +166,6 @@ if ($rsSolicitacao->getCampo('exercicio') == '') {
     $obRdbExigeDotacao->setRotulo ( "Exige Dotação na Solicitação/Mapa");
     $obRdbExigeDotacao->setTitle  ( "Informe se no momento da solicitação, será obrigatório informar a dotação, e será efetuada a reserva de saldos." );
     $obRdbExigeDotacao->setName   ( "stExigeDotacao" );
-    //$obRdbExigeDotacao->setNull(false);
     $obRdbExigeDotacao->obRadioSim->setValue('true');
     $obRdbExigeDotacao->obRadioNao->setValue('false');
     if ($boExigeDotacao)
@@ -286,33 +285,21 @@ $obRdbVlrRef10PorCento->setLabel   ( 'Até 10% do valor'  );
 $obRdbVlrRef10PorCento->setValue   ( '10%'               );
 $obRdbVlrRef10PorCento->setChecked ( ($stValorReferencia == '10%' ? true : false) );
 
-if ( $rsSolicitacao->getNumLinhas() > 0 ) {
-    $obHdnReservaRigida = new Label();
-    $obHdnReservaRigida->setRotulo('Reserva Rígida');
-    if ($boReservaRigida) {
-        $obHdnReservaRigida->setValue('Sim');
-    } else {
-        $obHdnReservaRigida->setValue('Não');
-    }
-} else {
-    $obRdbReservaRigidaSim = new Radio();
-    $obRdbReservaRigidaSim->setRotulo( "Reserva Rígida" );
-    $obRdbReservaRigidaSim->setTitle( "Informar se a dotação deve ter saldo para efetuar a solicitação." );
-    $obRdbReservaRigidaSim->setName( "boReservaRigida" );
-    $obRdbReservaRigidaSim->setLabel( "Sim" );
-    $obRdbReservaRigidaSim->setValue( "true" );
-    if ($boReservaRigida) {
-        $obRdbReservaRigidaSim->setChecked( true );
-    }
+$obRdbTipoReservaRigida = new Radio();
+$obRdbTipoReservaRigida->setRotulo( "Tipo de Reserva" );
+$obRdbTipoReservaRigida->setTitle( "Informar se a dotação deve ter saldo para efetuar a solicitação." );
+$obRdbTipoReservaRigida->setName( "boTipoReserva" );
+$obRdbTipoReservaRigida->setLabel( "Reserva Rígida" );
+$obRdbTipoReservaRigida->setValue( "rigida" );
+if ($boReservaRigida)
+    $obRdbTipoReservaRigida->setChecked( true );
 
-    $obRdbReservaRigidaNao = new Radio();
-    $obRdbReservaRigidaNao->setName( "boReservaRigida" );
-    $obRdbReservaRigidaNao->setLabel( "Não" );
-    $obRdbReservaRigidaNao->setValue( "false" );
-    if (!$boReservaRigida) {
-        $obRdbReservaRigidaNao->setChecked( true );
-    }
-}
+$obRdbTipoReservaAutorizacao = new Radio();
+$obRdbTipoReservaAutorizacao->setName( "boTipoReserva" );
+$obRdbTipoReservaAutorizacao->setLabel( "Reserva na Autorização" );
+$obRdbTipoReservaAutorizacao->setValue( "autorizacao" );
+if ($boReservaAutorizacao)
+    $obRdbTipoReservaAutorizacao->setChecked( true );
 
 ////////// seção para controle de responsáveis pelas entidades
 
@@ -353,11 +340,7 @@ $obFormulario->agrupaComponentes(array($obRdbIdLicitacaoAutomaticoSim, $obRdbIdL
 
 # Configuração para valor de referência.
 $obFormulario->agrupaComponentes(array($obRdbVlrRefExato, $obRdbVlrRefLivre, $obRdbVlrRef10PorCento));
-
-if ($rsSolicitacao->getNumLinhas() > 0)
-    $obFormulario->addComponente($obHdnReservaRigida);
-else
-    $obFormulario->agrupaComponentes(array($obRdbReservaRigidaSim,$obRdbReservaRigidaNao));
+$obFormulario->agrupaComponentes(array($obRdbTipoReservaRigida,$obRdbTipoReservaAutorizacao));
 
 $obFormulario->addTitulo ( 'Responsáveis' );
 $obFormulario->addComponente ( $obITextBoxSelectEntidadeGeral );

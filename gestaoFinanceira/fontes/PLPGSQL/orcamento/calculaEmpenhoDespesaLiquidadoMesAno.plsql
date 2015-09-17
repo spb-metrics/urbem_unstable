@@ -42,7 +42,7 @@ Adicionada tag Log aos arquivos
 */
 
 CREATE OR REPLACE  FUNCTION empenho.fn_despesa_liquidado_mes_ano(character varying, character varying, character varying, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) RETURNS numeric[]
-    AS '
+AS $$
 DECLARE
     stExercicio         ALIAS FOR $1;
     stDtInicial         ALIAS FOR $2;
@@ -58,7 +58,7 @@ DECLARE
     inCodRecurso        ALIAS FOR $12;
     inCodReduzido       ALIAS FOR $13;
 
-    stSql               VARCHAR   := '''';
+    stSql               VARCHAR   := '';
     nuSoma              NUMERIC   := 0;
     reRegistro          RECORD;
     nuRetorno           NUMERIC[] := array[0.00];
@@ -66,64 +66,64 @@ DECLARE
     dtFim               VARCHAR;
 BEGIN
 
-    dtInicioAno := ''01/01/'' || stExercicio;
+    dtInicioAno := '01/01/' || stExercicio;
 
-    IF stExercicio >= TO_CHAR(now(), ''yyyy'') THEN
-        dtFim := TO_CHAR(NOW(), ''dd/mm/yyyy'');
+    IF stExercicio >= TO_CHAR(now(), 'yyyy') THEN
+        dtFim := TO_CHAR(NOW(), 'dd/mm/yyyy');
     ELSE
-        dtFim := ''31/12/'' || stExercicio;
+        dtFim := '31/12/' || stExercicio;
     END IF;
 
-    stSql := ''SELECT (((coalesce(tliquidado.valor_liquidado_ano,0.00))) - (coalesce(tanulado.valor_anulado_ano,0.00))) as liquidado_ano,
+    stSql := ' SELECT (((coalesce(tliquidado.valor_liquidado_ano,0.00))) - (coalesce(tanulado.valor_anulado_ano,0.00))) as liquidado_ano,
                       (((coalesce(tliquidado.valor_liquidado_per,0.00))) - (coalesce(tanulado.valor_anulado_per,0.00))) as liquidado_per
                FROM
                    (SELECT
-                    Sum( Case When TNL.dt_liquidacao >= to_date(''''''|| dtInicioAno ||'''''',''''dd/mm/yyyy'''') And 
-                                   TNL.dt_liquidacao <=to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''')  
+                    Sum( Case When TNL.dt_liquidacao >= to_date('|| quote_literal( dtInicioAno ) ||',''dd/mm/yyyy'') And 
+                                   TNL.dt_liquidacao <= to_date('|| quote_literal( stDtFinal ) ||',''dd/mm/yyyy'')  
                               Then TNL.vl_total
                               Else 0.00 End ) as valor_liquidado_ano,
-                    Sum( Case When TNL.dt_liquidacao >= to_date(''''''|| stDtInicial ||'''''',''''dd/mm/yyyy'''') And 
-                                   TNL.dt_liquidacao <=to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''')
+                    Sum( Case When TNL.dt_liquidacao >= to_date('|| quote_literal( stDtInicial )||',''dd/mm/yyyy'') And 
+                                   TNL.dt_liquidacao <=to_date('|| quote_literal( stDtFinal )||',''dd/mm/yyyy'')
                               Then TNL.vl_total
                               Else 0.00 End ) as valor_liquidado_per
                     from
                          tmp_nota_liquidacao       as TNL
                     Where
-                          TNL.cod_conta                = ''|| inCodConta     ||''
-                      And TNL.cod_entidade             = ''|| inCodEntidade  ||''
-                      And TNL.num_unidade              = ''|| inCodUnidade   ||''
-                      And TNL.num_orgao                = ''|| inCodOrgao     ||''
-                      And TNL.num_pao                  = ''|| inCodNumPAO    ||''
-                      And TNL.cod_funcao               = ''|| inCodFuncao    ||''
-                      And TNL.cod_subfuncao            = ''|| inCodSubFuncao ||''
-                      And TNL.cod_programa             = ''|| inCodPrograma  ||''
-                      And TNL.cod_recurso              = ''|| inCodRecurso   ||''
-                      And TNL.cod_despesa              = ''|| inCodReduzido  ||'' ) as tliquidado,
+                          TNL.cod_conta                = '|| inCodConta     ||'
+                      And TNL.cod_entidade             = '|| inCodEntidade  ||'
+                      And TNL.num_unidade              = '|| inCodUnidade   ||'
+                      And TNL.num_orgao                = '|| inCodOrgao     ||'
+                      And TNL.num_pao                  = '|| inCodNumPAO    ||'
+                      And TNL.cod_funcao               = '|| inCodFuncao    ||'
+                      And TNL.cod_subfuncao            = '|| inCodSubFuncao ||'
+                      And TNL.cod_programa             = '|| inCodPrograma  ||'
+                      And TNL.cod_recurso              = '|| inCodRecurso   ||'
+                      And TNL.cod_despesa              = '|| inCodReduzido  ||' ) as tliquidado,
 
                      (Select
-                        Sum( Case When to_date(to_char(TNLA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') >= to_date(''''''|| dtInicioAno ||'''''',''''dd/mm/yyyy'''') And 
-                                       to_date(to_char(TNLA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''') 
+                        Sum( Case When to_date(to_char(TNLA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') >= to_date('|| quote_literal( dtInicioAno ) ||',''dd/mm/yyyy'') And 
+                                       to_date(to_char(TNLA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date('|| quote_literal( stDtFinal )||',''dd/mm/yyyy'') 
                                   Then TNLA.vl_anulado
                                   Else 0.00 End) as valor_anulado_ano,
-                        Sum( Case When to_date(to_char(TNLA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') >= to_date(''''''|| stDtInicial ||'''''',''''dd/mm/yyyy'''') And 
-                                       to_date(to_char(TNLA.timestamp,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= to_date(''''''|| stDtFinal ||'''''',''''dd/mm/yyyy'''') 
+                        Sum( Case When to_date(to_char(TNLA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') >= to_date('|| quote_literal( stDtInicial ) ||',''dd/mm/yyyy'') And 
+                                       to_date(to_char(TNLA.timestamp,''dd/mm/yyyy''),''dd/mm/yyyy'') <= to_date('|| quote_literal( stDtFinal )||',''dd/mm/yyyy'') 
                                   Then TNLA.vl_anulado
                                   Else 0.00 End ) as valor_anulado_per
                         from
                              tmp_nota_liquidacao_anulada  as TNLA
 
                         Where
-                              TNLA.cod_entidade          = ''|| inCodEntidade  ||''
-                          And TNLA.num_unidade           = ''|| inCodUnidade   ||''
-                          And TNLA.num_orgao             = ''|| inCodOrgao     ||''
-                          And TNLA.cod_conta             = ''|| inCodConta     ||''
-                          And TNLA.num_pao               = ''|| inCodNumPAO    ||''
-                          And TNLA.cod_funcao            = ''|| inCodFuncao    ||''
-                          And TNLA.cod_subfuncao         = ''|| inCodSubFuncao ||''
-                          And TNLA.cod_programa          = ''|| inCodPrograma  ||''
-                          And TNLA.cod_entidade          = ''|| inCodEntidade  ||''
-                          And TNLA.cod_recurso           = ''|| inCodRecurso   ||''
-                          And TNLA.cod_despesa           = ''|| inCodReduzido  ||'') as tanulado '';
+                              TNLA.cod_entidade          = '|| inCodEntidade  ||'
+                          And TNLA.num_unidade           = '|| inCodUnidade   ||'
+                          And TNLA.num_orgao             = '|| inCodOrgao     ||'
+                          And TNLA.cod_conta             = '|| inCodConta     ||'
+                          And TNLA.num_pao               = '|| inCodNumPAO    ||'
+                          And TNLA.cod_funcao            = '|| inCodFuncao    ||'
+                          And TNLA.cod_subfuncao         = '|| inCodSubFuncao ||'
+                          And TNLA.cod_programa          = '|| inCodPrograma  ||'
+                          And TNLA.cod_entidade          = '|| inCodEntidade  ||'
+                          And TNLA.cod_recurso           = '|| inCodRecurso   ||'
+                          And TNLA.cod_despesa           = '|| inCodReduzido  ||') as tanulado ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -133,5 +133,5 @@ BEGIN
 
     RETURN nuRetorno;
 END;
-'
-    LANGUAGE plpgsql;
+$$
+LANGUAGE plpgsql;

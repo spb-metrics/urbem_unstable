@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.04.08
 
-    $Id: PRManterConfiguracao.php 61893 2015-03-12 17:33:33Z carlos.silva $
+    $Id: PRManterConfiguracao.php 63367 2015-08-20 21:27:34Z michel $
 
     */
 
@@ -72,10 +72,22 @@ switch ($stAcao) {
         $obTConfiguracao->setDado("valor"     , $_REQUEST['stExigeDotacao']);
         $obTConfiguracao->alteracao();
 
-        if ( isset($_REQUEST['boReservaRigida']) ) {
+        if ( isset($_REQUEST['boTipoReserva']) ) {
+            $boReservaRigida        = ( $_REQUEST['boTipoReserva'] == 'rigida'      ) ? 'true' : 'false';
+            $boReservaAutorizacao   = ( $_REQUEST['boTipoReserva'] == 'autorizacao' ) ? 'true' : 'false';
+
             $obTConfiguracao->setDado( 'parametro' , 'reserva_rigida' );
-            $obTConfiguracao->setDado( 'valor'     , $_REQUEST['boReservaRigida'] );
-            $obTConfiguracao->alteracao();    
+            $obTConfiguracao->setDado( 'valor'     , $boReservaRigida );
+            $obTConfiguracao->alteracao();
+
+            $obTConfiguracao->setDado( 'parametro' , 'reserva_autorizacao');
+            $obTConfiguracao->setDado( 'valor'     , $boReservaAutorizacao );
+            $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+
+            if($rsConfiguracao->getNumLinhas()==1)
+                $obTConfiguracao->alteracao();
+            else
+                $obTConfiguracao->inclusao();
         }
 
         $obTConfiguracao->setDado( 'parametro' , 'tipo_valor_referencia' );

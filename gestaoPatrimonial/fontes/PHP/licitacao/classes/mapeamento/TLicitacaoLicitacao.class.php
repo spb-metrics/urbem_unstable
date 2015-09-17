@@ -32,30 +32,20 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 62654 2015-05-29 12:59:20Z evandro $
+    $Id: TLicitacaoLicitacao.class.php 63367 2015-08-20 21:27:34Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.licitacao
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Nome do Programador
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TLicitacaoLicitacao extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TLicitacaoLicitacao()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela("licitacao.licitacao");
@@ -90,7 +80,7 @@ function proximoCodigoLicitacao(&$inCodLicitacao , $boTransacao = "")
     $obConexao   = new Conexao;
 
     // buscar configuração na base
-    require_once(TCOM."TComprasConfiguracao.class.php");
+    require_once TCOM."TComprasConfiguracao.class.php";
     $obTComprasConf = new TComprasConfiguracao();
     $obTComprasConf->pegaConfiguracao( $valor , 'numeracao_licitacao' , $boTransacao);
 
@@ -158,50 +148,6 @@ function recuperaLicitacaoCompleta(&$rsRecordSet, $stFiltro = "", $stOrdem = "",
 
 function montaRecuperaLicitacaoCompleta()
 {
-/*    
-$stSql  ="SELECT                                              \n";
-$stSql .="     ll.cod_entidade                                \n";
-$stSql .="    ,ll.cod_licitacao                               \n";
-$stSql .="    ,ll.cod_processo||'/'||ll.exercicio_processo as processo \n";
-$stSql .="    ,cm.descricao                                   \n";
-$stSql .="    ,cm.cod_modalidade                              \n";
-$stSql .="    ,ll.cod_modalidade                              \n";
-$stSql .="    ,ll.cod_mapa||'/'||ll.exercicio_mapa as mapa_compra \n";
-$stSql .="    ,ll.cod_entidade||' - '||cgm.nom_cgm as entidade    \n";
-$stSql .="    ,ll.cod_modalidade||' - '||cm.descricao as modalidade \n";
-$stSql .="    ,ll.cod_objeto                                  \n";
-$stSql .="    ,ll.timestamp                                   \n";
-$stSql .="    ,ll.cod_tipo_objeto                             \n";
-$stSql .="    ,ll.cod_tipo_licitacao                          \n";
-$stSql .="    ,ll.cod_criterio                                \n";
-$stSql .="    ,ll.vl_cotado                                   \n";
-$stSql .="    ,ll.exercicio                                   \n";
-$stSql .="    ,to_char(ll.timestamp::date, 'dd/mm/yyyy') as dt_licitacao \n";
-
-$stSql .="    , to_char(edital.dt_entrega_propostas::date, 'dd/mm/yyyy') as dt_entrega_proposta \n";
-$stSql .="    , to_char(edital.dt_validade_proposta::date, 'dd/mm/yyyy') as dt_validade_proposta \n";
-$stSql .="    , to_char(edital.dt_aprovacao_juridico::date, 'dd/mm/yyyy') as dt_aprovacao_proposta \n";
-$stSql .="    , edital.condicoes_pagamento as condicoes_pagamento \n";
-
-$stSql .="FROM                                                \n";
-$stSql .="     licitacao.licitacao as ll                      \n";
-$stSql .="     LEFT JOIN licitacao.licitacao_anulada as la on (ll.cod_licitacao = la.cod_licitacao AND ll.cod_modalidade = la.cod_modalidade AND ll.cod_entidade = la.cod_entidade AND ll.exercicio = la.exercicio) \n";
-$stSql .="    ,compras.modalidade as cm                       \n";
-$stSql .="    ,licitacao.edital                               \n";
-$stSql .="    ,orcamento.entidade as oe                       \n";
-$stSql .="    ,sw_cgm as cgm                                  \n";
-$stSql .="WHERE                                               \n";
-$stSql .="    ll.cod_modalidade = cm.cod_modalidade           \n";
-$stSql .="    AND ll.cod_entidade = oe.cod_entidade           \n";
-$stSql .="    AND ll.exercicio = oe.exercicio                 \n";
-$stSql .="    AND oe.numcgm = cgm.numcgm                      \n";
-
-$stSql .="    AND ll.cod_licitacao = edital.cod_licitacao     \n";
-$stSql .="    AND ll.cod_modalidade = edital.cod_modalidade   \n";
-$stSql .="    AND ll.cod_entidade = edital.cod_entidade       \n";
-$stSql .="    AND ll.exercicio = edital.exercicio             \n";
-*/
-
 $stSql = "
        SELECT ll.cod_entidade                                
             , ll.cod_licitacao                               
@@ -1181,8 +1127,20 @@ function montaRecuperaLicitacaoNaoHomologada()
                                  , homologacao.homologado          
                                  , to_char(homologacao.timestamp::date, 'dd/mm/yyyy') as dt_homologacao    
                               
-                              FROM licitacao.cotacao_licitacao                      
+                              FROM licitacao.cotacao_licitacao
 
+                        INNER JOIN compras.mapa_cotacao
+                                ON mapa_cotacao.cod_cotacao         = cotacao_licitacao.cod_cotacao
+                               AND mapa_cotacao.exercicio_cotacao   = cotacao_licitacao.exercicio_cotacao
+
+                        INNER JOIN compras.cotacao
+                                ON cotacao.exercicio    = mapa_cotacao.exercicio_cotacao
+                               AND cotacao.cod_cotacao  = mapa_cotacao.cod_cotacao
+                               AND cotacao.cod_cotacao  = (SELECT MAX(MC.cod_cotacao)
+                                                             FROM compras.mapa_cotacao AS MC
+                                                            WHERE MC.exercicio_mapa = mapa_cotacao.exercicio_mapa
+                                                              AND MC.cod_mapa = mapa_cotacao.cod_mapa)
+  
                         INNER JOIN licitacao.adjudicacao
                                 ON adjudicacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
                                AND adjudicacao.cod_modalidade      = cotacao_licitacao.cod_modalidade
@@ -2082,6 +2040,8 @@ function montaRecuperaAutorizacaoLicitacao()
           
           return $stSql;
       }
+      
+    public function __destruct() {}
 }
 
 ?>

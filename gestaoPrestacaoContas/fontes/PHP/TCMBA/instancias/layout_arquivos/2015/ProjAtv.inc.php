@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62946 $
+    $Revision: 63479 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -42,13 +42,14 @@
 */
 
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAPAO.class.php" );
-    $obTMapeamento = new TTBAPAO();
-    $obTMapeamento->setDado('entidade', $stEntidades );
-    $obTMapeamento->setDado('data_inicial', $stDataInicial );
-    $obTMapeamento->setDado('data_final', $stDataFinal );
-    $obTMapeamento->recuperaDados($rsRecordSet);
 
-    $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
+    $obTTBAPAO = new TTBAPAO();
+    $obTTBAPAO->setDado('entidade', $stEntidades );
+    $obTTBAPAO->setDado('data_inicial', $stDataInicial );
+    $obTTBAPAO->setDado('data_final', $stDataFinal );
+    $obTTBAPAO->recuperaDados($rsProjAtiv);
+    
+    $obExportador->roUltimoArquivo->addBloco($rsProjAtiv);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
@@ -101,3 +102,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(120);
+
+    unset($obTTBAPAO);
+    unset($rsProjAtiv);
+?>

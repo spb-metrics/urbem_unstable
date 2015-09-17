@@ -68,24 +68,24 @@ class TLicitacaoPublicacaoContratoAditivos extends Persistente
 
     public function montaRecuperaVeiculosPublicacao()
     {
-        $stSql = " SELECT     publicacao_contrato_aditivos.num_contrato	                                    \n";
-        $stSql .= " 	    , publicacao_contrato_aditivos.exercicio 			                    \n";
-        $stSql .= "	    , publicacao_contrato_aditivos.cod_entidade			                    \n";
-        $stSql .= "	    , to_char( publicacao_contrato_aditivos.dt_publicacao, 'dd/mm/yyyy' ) as dt_publicacao   \n";
-        $stSql .= "	    , publicacao_contrato_aditivos.numcgm as num_veiculo	                    \n";
-        $stSql .= "	    , publicacao_contrato_aditivos.num_publicacao                                   \n";
-        $stSql .= "	    , sw_cgm.nom_cgm as nom_veiculo 				                    \n";
-        $stSql .= "	    , publicacao_contrato_aditivos.observacao 				            \n";
-        $stSql .= "       FROM licitacao.publicacao_contrato_aditivos     		                    \n";
-        $stSql .= " INNER JOIN sw_cgm 							                    \n";
-        $stSql .= "	    ON sw_cgm.numcgm        = publicacao_contrato_aditivos.numcgm 	                    \n";
-        $stSql .= "      WHERE num_contrato         = ".$this->getDado('num_contrato')."	                    \n";
-        $stSql .= "        AND exercicio            = ".$this->getDado('exercicio')." 		                    \n";
-        $stSql .= "        AND exercicio_contrato   = ".$this->getDado('exercicio_contrato')."                    \n";
-        $stSql .= "	   AND cod_entidade         = ".$this->getDado('cod_entidade')."                            \n";
+        $stSql = " SELECT publicacao_contrato_aditivos.num_contrato	                                              \n";
+        $stSql .= " 	  , publicacao_contrato_aditivos.exercicio 			                                      \n";
+        $stSql .= "	      , publicacao_contrato_aditivos.cod_entidade			                                  \n";
+        $stSql .= "	      , to_char( publicacao_contrato_aditivos.dt_publicacao, 'dd/mm/yyyy' ) as dt_publicacao  \n";
+        $stSql .= "	      , publicacao_contrato_aditivos.numcgm as num_veiculo	                                  \n";
+        $stSql .= "	      , publicacao_contrato_aditivos.num_publicacao                                           \n";
+        $stSql .= "	      , sw_cgm.nom_cgm as nom_veiculo 				                                          \n";
+        $stSql .= "	      , publicacao_contrato_aditivos.observacao 				                              \n";
+        $stSql .= "       FROM licitacao.publicacao_contrato_aditivos     		                                  \n";
+        $stSql .= " INNER JOIN sw_cgm 							                                                  \n";
+        $stSql .= "	    ON sw_cgm.numcgm        = publicacao_contrato_aditivos.numcgm 	                          \n";
+        $stSql .= "      WHERE num_contrato         = ".$this->getDado('num_contrato')."	                      \n";
+        $stSql .= "        AND exercicio            = '".$this->getDado('exercicio')."' 	                      \n";
+        $stSql .= "        AND exercicio_contrato   = '".$this->getDado('exercicio_contrato')."'                  \n";
+        $stSql .= "	   AND cod_entidade         = ".$this->getDado('cod_entidade')."                              \n";
 
         if ($this->getDado('num_aditivo') != '') {
-            $stSql .= "        AND num_aditivo      = ".$this->getDado('num_aditivo')."                             \n";
+            $stSql .= "        AND num_aditivo      = ".$this->getDado('num_aditivo')."                           \n";
         }
 
         return $stSql;

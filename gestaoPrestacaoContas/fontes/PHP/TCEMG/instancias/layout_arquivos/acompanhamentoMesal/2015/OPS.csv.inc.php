@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OPS.csv.inc.php 62396 2015-05-04 14:29:06Z michel $
-  * $Date: 2015-05-04 11:29:06 -0300 (Seg, 04 Mai 2015) $
-  * $Author: michel $
-  * $Rev: 62396 $
+  * $Id: OPS.csv.inc.php 63541 2015-09-09 20:30:59Z evandro $
+  * $Date: 2015-09-09 17:30:59 -0300 (Qua, 09 Set 2015) $
+  * $Author: evandro $
+  * $Rev: 63541 $
   *  
 */
 /**
@@ -76,53 +76,13 @@ $rsRecordSetOPS99->preenche($arRecordSetOPS99);
 
 $inCount=0;
 
-$map = array(
-    'á' => 'a',
-    'à' => 'a',
-    'ã' => 'a',
-    'â' => 'a',
-    'é' => 'e',
-    'ê' => 'e',
-    'í' => 'i',
-    'ó' => 'o',
-    'ô' => 'o',
-    'õ' => 'o',
-    'ú' => 'u',
-    'ü' => 'u',
-    'ç' => 'c',
-    'Á' => 'A',
-    'À' => 'A',
-    'Ã' => 'A',
-    'Â' => 'A',
-    'É' => 'E',
-    'Ê' => 'E',
-    'Í' => 'I',
-    'Ó' => 'O',
-    'Ô' => 'O',
-    'Õ' => 'O',
-    'Ú' => 'U',
-    'Ü' => 'U',
-    'Ç' => 'C',
-    '/' => '',
-    "'" => '',
-    'ª' => '',
-    'º' => '',
-    '¿' => '',
-    '°' => '',
-    '²' => '',
-    ';' => '',
-    '"' => '',
-    'ñ' => 'n',
-    'Ñ' => 'N',
-    '–' => '-'
-);
-
 if (count($rsRecordSetOPS10->getElementos()) > 0) {
     
     foreach ($rsRecordSetOPS10->getElementos() as $arOPS10) {
         $stChave10 = $arOPS10['codorgao'].$arOPS10['codunidadesub'].$arOPS10['nroop'];
         $stChave10Pagamento = $arOPS10['codorgao'].$arOPS10['codunidadesub'].$arOPS10['nroop'].$arOPS10['dtpagamento'];
-        $arOPS10['especificacaoop'] = strtr($arOPS10['especificacaoop'], $map);
+        SistemaLegado::removeAcentosSimbolos($arOPS10['especificacaoop']);
+        
         $inCount++;        
         
         $$rsBloco10 = 'rsBloco10_'.$inCount;
@@ -293,7 +253,9 @@ if (count($rsRecordSetOPS10->getElementos()) > 0) {
                     if ($arOPS12['tipodocumentoop'] == '05') {
                         $arOPS12['nrodocumento']    = '';
                         $arOPS12['codctb']          = '';
-                        $arOPS12['codfontectb']     = '';
+                        if( Sessao::getExercicio() < '2015' ){
+                            $arOPS12['codfontectb'] = '';
+                        }
                     }
 
                     $$rsBloco12 = new RecordSet();

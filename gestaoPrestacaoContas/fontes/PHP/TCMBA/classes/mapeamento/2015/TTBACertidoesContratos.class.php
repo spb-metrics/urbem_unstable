@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62823 $
+    $Revision: 63605 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -41,44 +41,24 @@
     * Casos de uso: uc-06.05.00
 */
 
-/*
-$Log$
-Revision 1.3  2007/10/07 22:31:11  diego
-Corrigindo formatação e informações
-
-Revision 1.2  2007/10/02 18:17:17  hboaventura
-inclusão do caso de uso uc-06.05.00
-
-Revision 1.1  2007/09/14 05:10:48  diego
-Primeira versão.
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  *
-  * Data de Criação: 05/09/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBACertidoesContratos extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TTBACertidoesContratos()
+public function __construct()
 {
+    parent::Persistente();
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
     $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -91,38 +71,65 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+public function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   codo.exercicio        \n";
-    $stSql .= "         ,tice.cod_tipo_tcm     \n";
-    $stSql .= "         ,codo.num_contrato    \n";
-    $stSql .= "         ,codo.num_documento    \n";
-    $stSql .= "         ,to_char(codo.dt_emissao ,'dd/mm/yyyy') as dt_emissao    \n";
-    $stSql .= "         ,to_char(codo.dt_validade,'dd/mm/yyyy') as dt_validade    \n";
-    $stSql .= " FROM     licitacao.documento                as docu    \n";
-    $stSql .= "         ,licitacao.participante_documentos  as pado    \n";
-    $stSql .= "         ,licitacao.contrato_documento       as codo    \n";
-    $stSql .= "         LEFT JOIN   tcmba.tipo_certidao    as tice    \n";
-    $stSql .= "             ON ( tice.cod_tipo = codo.cod_documento )    \n";
-    $stSql .= " WHERE   docu.cod_documento  = pado.cod_documento    \n";
-    $stSql .= " AND     codo.exercicio  = '".$this->getDado('exercicio')."'    \n";
-    if (trim($this->getDado('stEntidades'))) {
-        $stSql .= " AND     codo.cod_entidade IN (".$this->getDado('stEntidades').")              \n";
-    }
-    $stSql .= " GROUP BY codo.exercicio       \n";
-    $stSql .= "         ,tice.cod_tipo_tcm    \n";
-    $stSql .= "         ,codo.num_contrato    \n";
-    $stSql .= "         ,codo.num_documento    \n";
-    $stSql .= "         ,codo.dt_emissao    \n";
-    $stSql .= "         ,codo.dt_validade    \n";
-    $stSql .= " ORDER BY codo.exercicio       \n";
-    $stSql .= "         ,tice.cod_tipo_tcm    \n";
-    $stSql .= "         ,codo.num_contrato    \n";
-    $stSql .= "         ,codo.num_documento    \n";
-    $stSql .= "         ,codo.dt_emissao    \n";
-    $stSql .= "         ,codo.dt_validade    \n";
+    
+    $stSql = " SELECT 1 AS tipo_registro
+                    , ".$this->getDado('inCodGestora')." AS unidade_gestora
+                    , contrato_documento.exercicio        
+                    , documento_de_para.cod_tipo_tcm   
+                    , contrato_documento.num_contrato   
+                    , contrato_documento.num_documento  
+                    , TO_CHAR(contrato_documento.dt_emissao ,'DDMMYYYY') AS dt_emissao 
+                    , TO_CHAR(contrato_documento.dt_validade,'DDMMYYYY') AS dt_validade
+                    , TO_CHAR(participante_documentos.dt_emissao,'yyyymm') AS competencia
 
+                 FROM licitacao.documento
+
+           INNER JOIN licitacao.licitacao_documentos
+                   ON licitacao_documentos.cod_documento = documento.cod_documento
+
+           INNER JOIN licitacao.participante_documentos
+                   ON participante_documentos.cod_documento = licitacao_documentos.cod_documento
+                  AND participante_documentos.cod_licitacao = licitacao_documentos.cod_licitacao
+                  AND participante_documentos.cod_modalidade = licitacao_documentos.cod_modalidade
+                  AND participante_documentos.cod_entidade = licitacao_documentos.cod_entidade
+                  AND participante_documentos.exercicio = licitacao_documentos.exercicio
+
+           INNER JOIN licitacao.contrato_documento
+                   ON documento.cod_documento  = contrato_documento.cod_documento
+
+            LEFT JOIN ( SELECT documento_de_para.cod_documento_tcm AS cod_tipo_tcm
+                             , documento_de_para.cod_documento
+                          FROM tcmba.documento_de_para 
+                    INNER JOIN licitacao.documento
+                            ON documento.cod_documento = documento_de_para.cod_documento
+                      ) AS documento_de_para
+                   ON documento_de_para.cod_documento = contrato_documento.cod_documento
+
+                WHERE participante_documentos.dt_emissao BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy')
+                                                             AND TO_DATE('".$this->getDado('dtFinal')."', 'dd/mm/yyyy') 
+                  AND contrato_documento.cod_entidade IN (".$this->getDado('stEntidades').") 
+ 
+             GROUP BY contrato_documento.exercicio
+                    , documento_de_para.cod_tipo_tcm  
+                    , contrato_documento.num_contrato  
+                    , contrato_documento.num_documento 
+                    , contrato_documento.dt_emissao    
+                    , contrato_documento.dt_validade
+                    , participante_documentos.dt_emissao
+                       
+             ORDER BY contrato_documento.exercicio     
+                    , documento_de_para.cod_tipo_tcm  
+                    , contrato_documento.num_contrato  
+                    , contrato_documento.num_documento 
+                    , contrato_documento.dt_emissao    
+                    , contrato_documento.dt_validade
+    ";
+    
     return $stSql;
 }
 
 }
+
+?>

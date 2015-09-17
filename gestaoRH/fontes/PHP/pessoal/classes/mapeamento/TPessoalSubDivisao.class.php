@@ -33,7 +33,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-    $Id: TPessoalSubDivisao.class.php 62865 2015-06-30 21:05:01Z lisiane $
+    $Id: TPessoalSubDivisao.class.php 63224 2015-08-05 16:56:50Z evandro $
 
     Caso de uso: uc-04.04.06
 */
@@ -163,17 +163,20 @@ class TPessoalSubDivisao extends Persistente
 
     public function montaRecuperaDeParaTipoCargoTCMBA()
     {
-        $stSql  = "    SELECT sub_divisao.cod_sub_divisao                                       \n";
-        $stSql .= "         , sub_divisao.cod_regime                                            \n";
-        $stSql .= "         , sub_divisao.descricao                                             \n";
-        $stSql .= "         , de_para_tipo_cargo_tcmba.cod_tipo_cargo_tce                             \n";
-        $stSql .= "         , regime.descricao AS descricao_regime                              \n";
-        $stSql .= "      FROM pessoal".Sessao::getEntidade().".sub_divisao                      \n";
-        $stSql .= "      JOIN pessoal".Sessao::getEntidade().".regime                           \n";
-        $stSql .= "        ON regime.cod_regime = sub_divisao.cod_regime                        \n";
-        $stSql .= " LEFT JOIN pessoal".Sessao::getEntidade().".de_para_tipo_cargo_tcmba         \n";
-        $stSql .= "        ON de_para_tipo_cargo_tcmba.cod_sub_divisao = sub_divisao.cod_sub_divisao  \n";
-
+        $stSql  = " SELECT sub_divisao.cod_sub_divisao                                       
+                         , sub_divisao.cod_regime                                            
+                         , sub_divisao.descricao                                             
+                         , de_para_tipo_cargo_tcmba.cod_tipo_regime_tce
+                         , de_para_tipo_cargo_tcmba.cod_tipo_cargo_tce
+                         , regime.descricao AS descricao_regime                              
+                    FROM pessoal".Sessao::getEntidade().".sub_divisao                      
+                    
+                    JOIN pessoal".Sessao::getEntidade().".regime                           
+                      ON regime.cod_regime = sub_divisao.cod_regime                        
+                    
+                    LEFT JOIN pessoal".Sessao::getEntidade().".de_para_tipo_cargo_tcmba         
+                           ON de_para_tipo_cargo_tcmba.cod_sub_divisao = sub_divisao.cod_sub_divisao  
+                ";
         return $stSql;
     }
 

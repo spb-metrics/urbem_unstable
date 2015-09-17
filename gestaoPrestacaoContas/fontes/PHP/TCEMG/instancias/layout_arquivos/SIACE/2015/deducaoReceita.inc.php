@@ -20,38 +20,51 @@
     * no endereço 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.       *
     *                                                                                *
     **********************************************************************************
-
+*/
+?>
+<?php
+/**
     * Arquivo de geracao do arquivo deducaoReceita TCM/MG
     * Data de Criação   : 07/10/2013
     * @author Analista      Silvia
     * @author Desenvolvedor Evandro Melos
+    * 
+    * $Id: deducaoReceita.inc.php 63441 2015-08-28 13:32:42Z lisiane $
+    * $Date: 2015-08-28 10:32:42 -0300 (Sex, 28 Ago 2015) $
+    * $Rev: 63441 $
+    * $Author: lisiane $
+    * 
 */
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDeducaoReceita.class.php';
 
-    include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/FTCEMGDeducaoReceita.class.php');
+$arFiltros = Sessao::read('filtroRelatorio');
 
-    $arFiltros = Sessao::read('filtroRelatorio');
-
-    //Arquivo só é gerado no ultimo bimestre valor do "mes" fixo em 12 com data do inicio do exercicio e data final do exercicio
+foreach ($arDatasInicialFinal as $stDatas) {
     $obFTCEMGDeducaoReceita = new FTCEMGDeducaoReceita();
-    $obFTCEMGDeducaoReceita->setDado('exercicio'    , Sessao::read('exercicio')     );
+    $obFTCEMGDeducaoReceita->setDado('exercicio'    , Sessao::getExercicio() );
     $obFTCEMGDeducaoReceita->setDado('cod_entidade' , implode(',',$arFiltros['inCodEntidadeSelecionado']));
-    $obFTCEMGDeducaoReceita->setDado('dt_inicial'   , "01/01/".Sessao::getExercicio() );
-    $obFTCEMGDeducaoReceita->setDado('dt_final'     , "31/12/".Sessao::getExercicio() );
-
-    $obFTCEMGDeducaoReceita->recuperaTodos($rsDeducoesReceita);
+    $obFTCEMGDeducaoReceita->setDado('dt_inicial'   , $stDatas['stDtInicial'] );
+    $obFTCEMGDeducaoReceita->setDado('dt_final'     , $stDatas['stDtFinal'] );
+    $obFTCEMGDeducaoReceita->recuperaTodos($rsDeducoesReceita); 
 
     $obExportador->roUltimoArquivo->addBloco($rsDeducoesReceita);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(02);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_tipo");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('NUMERICO_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(02);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('CARACTER_ESPACOS_DIR');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado('VALOR_ZEROS_ESQ');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(16);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+}
 
+unset($obFTCEMGDeducaoReceita);
+unset($rsDeducoesReceita);
 ?>

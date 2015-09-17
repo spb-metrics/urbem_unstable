@@ -34,17 +34,37 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: PRManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
+    $Id: PRManterProcessoLicitatorio.php 63445 2015-08-28 13:44:54Z michel $
 
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(TLIC."TLicitacaoLicitacao.class.php"                                                    );
-include_once(TCOM."TComprasFornecedorAtividade.class.php"                                            );
-include_once(TCOM."TComprasMapaModalidade.class.php"				                     );
-include_once(TCOM."TComprasSolicitacao.class.php"				                     );
-include_once(CAM_GP_COM_MAPEAMENTO . "../../../licitacao/classes/mapeamento/TLicitacaoComissao.class.php");
+include_once TLIC.'TLicitacaoLicitacao.class.php';
+include_once TCOM.'TComprasFornecedorAtividade.class.php';
+include_once TCOM.'TComprasSolicitacao.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'../../../licitacao/classes/mapeamento/TLicitacaoComissao.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapa.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaItem.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaItemAnulacao.class.php';
+include_once TCOM.'TComprasMapaModalidade.class.php';
+include_once TCOM.'TComprasMapaSolicitacao.class.php';
+include_once TCOM.'TComprasMapaItemReserva.class.php';
+include_once CAM_GA_PROT_MAPEAMENTO.'TProcesso.class.php';
+include_once TLIC.'TLicitacaoComissaoLicitacao.class.php';
+include_once TLIC.'TLicitacaoMembroAdicional.class.php';
+include_once TLIC.'TLicitacaoLicitacaoDocumentos.class.php';
+include_once TLIC.'TLicitacaoComissaoLicitacaoMembros.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaSolicitacaoAnulacao.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoAutorizacaoEmpenho.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoAutorizacaoAnulada.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenhoJulgamento.class.php';
+include_once TLIC.'TLicitacaoLicitacaoAnulada.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasCotacaoAnulada.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasJulgamento.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasJulgamentoItem.class.php';
+include_once TLIC.'TLicitacaoParticipanteDocumentos.class.php';
+include_once CAM_GP_COM_MAPEAMENTO.'TComprasCompraDireta.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterProcessoLicitatorio";
@@ -64,6 +84,12 @@ $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
 Sessao::getTransacao()->setMapeamento( $obTLicitacaoLicitacao );
 
 $stAcao = $request->get('stAcao');
+
+$boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+$boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+$boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+$boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
 
 switch ($stAcao) {
     case "incluir":
@@ -90,17 +116,12 @@ switch ($stAcao) {
             }
 
             if (empty($stMensagem)) {
-
                 $arProcesso = explode('/',$_REQUEST['stChaveProcesso'] );
 
-                include_once(CAM_GA_PROT_MAPEAMENTO.'TProcesso.class.php');
                 $obTPROProcesso = new TProcesso();
                 $obTPROProcesso->setDado('cod_processo', (int) $arProcesso[0]);
                 $obTPROProcesso->setDado('ano_exercicio',$arProcesso[1]);
                 $obTPROProcesso->recuperaPorChave ($rsProcesso);
-
-                include_once(TCOM."TComprasMapaSolicitacao.class.php"	                );
-                include_once(TCOM."TComprasMapaItemReserva.class.php"	                );
 
                 $obTComprasMapaSolicitacao = new TComprasMapaSolicitacao();
                 $obTComprasMapaItemReserva = new TComprasMapaItemReserva();
@@ -125,20 +146,23 @@ switch ($stAcao) {
                     $rsSolicitacaoMapa->proximo();
                 }
 
+                $rsSolicitacaoMapa->setPrimeiroElemento();
                 while (!$rsSolicitacaoMapa->eof()) {
                     $obTComprasMapaItemReserva->setDado('cod_solicitacao'   , $rsSolicitacaoMapa->getCampo('cod_solicitacao'));
                     $obTComprasMapaItemReserva->setDado('cod_entidade'      , $rsSolicitacaoMapa->getCampo('cod_entidade'));
                     $obTComprasMapaItemReserva->setDado('exercicio'         , $rsSolicitacaoMapa->getCampo('exercicio'));
+                    $obTComprasMapaItemReserva->setDado('cod_mapa'          , $arMapa[0]);
                     $obTComprasMapaItemReserva->recuperaMapaItemReserva( $rsMapaItemReserva );
-                        if ( $rsMapaItemReserva->getNumLinhas() > 0 ) {
-                                $boReservaSaldo = false;
-                                break;
+                    if ( $rsMapaItemReserva->getNumLinhas() > 0 ) {
+                        if($boReservaRigida){
+                            $boReservaSaldo = false;
+                            break;
                         }
-
+                    }
                     $rsSolicitacaoMapa->proximo();
                 }
 
-                if ( isset($_REQUEST['inCodLicitacaoImplantacao'])  ) {
+                if ( isset($_REQUEST['inCodLicitacaoImplantacao']) ) {
                     if ($_REQUEST['inCodLicitacaoImplantacao'] == '' || $_REQUEST['inCodLicitacaoImplantacao'] == '0') {
                         $stMensagem = "Código da Licitação inválido.";
                     } else {
@@ -165,7 +189,6 @@ switch ($stAcao) {
                 }
 
                 if ($stMensagem == '') {
-
                     $dtLicitacao = $_REQUEST['stDtLicitacao'];
 
                     $arStUnidadeOrcamentaria = explode('.',$request->get('stUnidadeOrcamentaria'));
@@ -218,7 +241,6 @@ switch ($stAcao) {
                         $obTMapaModalidade->inclusao();
                     }
 
-                    include_once(TLIC."TLicitacaoComissaoLicitacao.class.php");
                     $obTLicitacaoComissaoLicitacao = new TLicitacaoComissaoLicitacao();
                     $obTLicitacaoComissaoLicitacao->setDado('exercicio'     , Sessao::getExercicio()                              );
                     $obTLicitacaoComissaoLicitacao->setDado('cod_entidade'  , $_REQUEST['inCodEntidade']                      );
@@ -233,7 +255,6 @@ switch ($stAcao) {
                     }
 
                     if (Sessao::read('arMembro')) {
-                        include_once(TLIC."TLicitacaoMembroAdicional.class.php");
                         $obTLicitacaoMembroAdicional = new TLicitacaoMembroAdicional();                        
                         foreach (Sessao::read('arMembro') as $value) {
                             if (trim($value['adicional']) == 'Sim') {
@@ -250,7 +271,6 @@ switch ($stAcao) {
                     }
 
                     if (Sessao::read('arDocumentos')) {
-                        include_once(TLIC."TLicitacaoLicitacaoDocumentos.class.php");
                         $obTLicitacaoLicitacaoDocumentos = new TLicitacaoLicitacaoDocumentos();
                         foreach (Sessao::read('arDocumentos') as $value) {
                             $obTLicitacaoLicitacaoDocumentos->setDado('cod_documento'   , $value['cod_documento']);
@@ -263,7 +283,6 @@ switch ($stAcao) {
                     }
 
                     if (is_array(Sessao::read('arMembros')) && count(Sessao::read('arMembros')) > 0) {
-                        include_once(TLIC."TLicitacaoComissaoLicitacaoMembros.class.php");
                         $obTLicitacaoComissaoLicitacaoMembros = new TLicitacaoComissaoLicitacaoMembros;
 
                         $obTLicitacaoComissaoLicitacaoMembros->setDado('exercicio'      , Sessao::getExercicio());
@@ -334,12 +353,30 @@ switch ($stAcao) {
             if ($request->get('inCodTipoObjeto') == 2 && $request->get('inCodRegime') == '' && $inCodUF == 11) {
                 $stMensagem = "O Regime de execução de Obras é obrigatório para o Tipo de Objeto selecionado.";
             }
+            
+            if (empty($stMensagem) && $boReservaRigida) {
+                $obTComprasMapaSolicitacao = new TComprasMapaSolicitacao();
+                $obTComprasMapaItemReserva = new TComprasMapaItemReserva();
+
+                $obTComprasMapaSolicitacao->setDado('cod_mapa'  , $arMapa[0]);
+                $obTComprasMapaSolicitacao->setDado('exercicio' , $arMapa[1]);
+                $obTComprasMapaSolicitacao->recuperaPorChave( $rsSolicitacaoMapa );
+
+                while (!$rsSolicitacaoMapa->eof()) {
+                    $obTComprasMapaItemReserva->setDado('cod_solicitacao'   , $rsSolicitacaoMapa->getCampo('cod_solicitacao'));
+                    $obTComprasMapaItemReserva->setDado('cod_entidade'      , $rsSolicitacaoMapa->getCampo('cod_entidade'));
+                    $obTComprasMapaItemReserva->setDado('exercicio'         , $rsSolicitacaoMapa->getCampo('exercicio'));
+                    $obTComprasMapaItemReserva->setDado('cod_mapa'          , $arMapa[0]);
+                    $obTComprasMapaItemReserva->recuperaMapaItemReserva( $rsMapaItemReserva );
+                    if ( $rsMapaItemReserva->getNumLinhas() > 0 ) {
+                        $stMensagem = "Todos itens do mapa (".$arMapa[0].'/'.$arMapa[1].") devem estar com reserva de saldo. Efetue a manutenção das dotações no mapa.";
+                        break;
+                    }
+                    $rsSolicitacaoMapa->proximo();
+                }
+            }
 
             if (empty($stMensagem)) {
-                include_once(TLIC."TLicitacaoComissaoLicitacao.class.php");
-                include_once(TLIC."TLicitacaoComissaoLicitacaoMembros.class.php");
-                include_once(TLIC."TLicitacaoMembroAdicional.class.php");
-
                 $obTLicitacaoComissaoLicitacao        = new TLicitacaoComissaoLicitacao;
                 $obTLicitacaoComissaoLicitacaoMembros = new TLicitacaoComissaoLicitacaoMembros;
                 $obTLicitacaoMembroAdicional          = new TLicitacaoMembroAdicional;
@@ -407,7 +444,6 @@ switch ($stAcao) {
 
                 $arItensChave = array();
 
-                include_once(TLIC."TLicitacaoLicitacaoDocumentos.class.php");
                 $obTLicitacaoLicitacaoDocumentos = new TLicitacaoLicitacaoDocumentos();
                 $obTLicitacaoLicitacaoDocumentos->setDado('cod_modalidade',$_REQUEST['inCodModalidade']);
                 $obTLicitacaoLicitacaoDocumentos->setDado('exercicio',Sessao::getExercicio());
@@ -429,7 +465,6 @@ switch ($stAcao) {
 
                 $arDocumentosExcluidos = Sessao::read("arDocumentosExcluidos");
 
-                include_once(TLIC."TLicitacaoParticipanteDocumentos.class.php");
                 $obTLicitacaoParticipanteDocumentos = new TLicitacaoParticipanteDocumentos();
 
                 $inQuantidadeExcluidos = Sessao::read("inQuantidadeDocumentosExcluidos");
@@ -546,12 +581,6 @@ switch ($stAcao) {
     break;
 
     case "anular":
-        include_once( TLIC."TLicitacaoLicitacaoAnulada.class.php"             );
-        include_once( CAM_GP_COM_MAPEAMENTO.'TComprasCotacaoAnulada.class.php');
-        include_once( CAM_GP_COM_MAPEAMENTO.'TComprasMapa.class.php'          );
-        include_once( CAM_GP_COM_MAPEAMENTO.'TComprasJulgamento.class.php'    );
-        include_once( CAM_GP_COM_MAPEAMENTO.'TComprasJulgamentoItem.class.php');
-
         list($inCodMapa, $stExercicioMapa) = explode("/", $_REQUEST['hdnMapaCompra']);
 
         if (!empty($inCodMapa) && !empty($stExercicioMapa)) {
@@ -569,7 +598,6 @@ switch ($stAcao) {
                 $obTComprasJulgamento->setDado ( 'exercicio'   , $rsCotacao->getCampo('exercicio_cotacao'));
                 $obTComprasJulgamento->recuperaPorChave( $rsJulgamento );
 
-                include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoJulgamento.class.php" );
                 $stFiltro = " WHERE cod_cotacao = "      .$rsCotacao->getCampo('cod_cotacao'      )." ";
                 $stFiltro.= " AND exercicio_julgamento ='".$rsCotacao->getCampo('exercicio_cotacao')."' ";
 
@@ -608,8 +636,6 @@ switch ($stAcao) {
                     foreach ($arItensAnulados as $cod_pre_empenho => $item) {
 
                         // verifica se a autorizacao, do empenho do item,  foi anulda
-                        include_once(CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoAnulada.class.php" );
-
                         $stFiltro = " WHERE ae.cod_pre_empenho = ". $cod_pre_empenho         ." \n";
                         $stFiltro.= "   AND ae.exercicio       = '". $item['exercicio']      ."' \n";
                         $stFiltro.= "   AND ae.cod_entidade    = ". $inCodEntidade           ." \n";
@@ -631,7 +657,6 @@ switch ($stAcao) {
                         }
 
                         $pre_empenhos = substr($pre_empenhos, 0, -1) ;
-                        include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenho.class.php"   );
 
                         $stFiltro   = " WHERE cod_pre_empenho in ($pre_empenhos) ";
                         $obTAutorizacaoEmpenho = new TEmpenhoAutorizacaoEmpenho();
@@ -665,8 +690,7 @@ switch ($stAcao) {
                     } else {
                         $stMotivo = "Anulação da Licitação ".$_REQUEST['hdnCodLicitacao'].", do Mapa de Compras ".$_REQUEST['hdnMapaCompra'];
 
-                        // inclui os itens em compras.mapa_item_anulacao
-                        include_once(CAM_GP_COM_MAPEAMENTO."TComprasMapaItem.class.php");
+                        // inclui os itens em compras.mapa_item_anulacao        
                         Sessao::write('stAcaoTela','anularProcessoLicitatório');
                         $obTComprasMapaItem = new TComprasMapaItem();
 
@@ -675,10 +699,8 @@ switch ($stAcao) {
 
                         $obTComprasMapaItem->recuperaItensMapa($rsComprasMapaItem, $stFiltro);
 
-                        include_once(CAM_GP_COM_MAPEAMENTO."TComprasMapaItemAnulacao.class.php");
                         $obTComprasMapaItemAnulacao = new TComprasMapaItemAnulacao;
 
-                        include_once(CAM_GP_COM_MAPEAMENTO."TComprasMapaSolicitacao.class.php");
                         $obTComprasMapaSolicitacao = new TComprasMapaSolicitacao;
 
                         $arCodSolicitacao = array();
@@ -695,7 +717,6 @@ switch ($stAcao) {
 
                         $obTComprasMapaSolicitacao->recuperaTodos($rsComprasMapaSolicitacao, $stFiltro);
 
-                        include_once(CAM_GP_COM_MAPEAMENTO."TComprasMapaSolicitacaoAnulacao.class.php");
                         $obTComprasMapaSolicitacaoAnulacao = new TComprasMapaSolicitacaoAnulacao;
 
                         foreach ($arCodSolicitacao as $codSolicitacao => $valor) {
@@ -800,7 +821,6 @@ function verificaMapaAnulado($inCodMapa, $stExercicioMapa, $stAcao)
 {
     $stMensagem = '';
     if ($stAcao == 'alterar' || $stAcao == 'incluir') {
-        include_once CAM_GP_COM_MAPEAMENTO."TComprasMapa.class.php";
         $obTComprasMapa = new TComprasMapa;
         $obTComprasMapa->setDado('exercicio', $stExercicioMapa);
         $obTComprasMapa->setDado('cod_mapa' , $inCodMapa);
@@ -817,7 +837,6 @@ function verificaUtilizacaoMapa($inCodMapa, $stExercicioMapa, $stAcao)
 {
     $stMensagem = '';
     if ($stAcao == 'alterar' || $stAcao == 'incluir') {
-        include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php";
         $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
         $stFiltro  = " WHERE cod_mapa       =  ".$inCodMapa."                                                   \n";
         $stFiltro .= "   AND exercicio_mapa = '".$stExercicioMapa."'                                            \n";
@@ -844,7 +863,6 @@ function verificaUtilizacaoMapa($inCodMapa, $stExercicioMapa, $stAcao)
             $stMensagem .= "pela licitação (".$inCodLicitacao."/".$stExercicioLicitacao.").";
         }
         if ($stMensagem == '') {
-            include_once CAM_GP_COM_MAPEAMENTO."TComprasCompraDireta.class.php";
             $obTComprasCompraDireta = new TComprasCompraDireta;
             $obTComprasCompraDireta->setDado('cod_mapa'       , $inCodMapa);
             $obTComprasCompraDireta->setDado('exercicio_mapa' , $stExercicioMapa);

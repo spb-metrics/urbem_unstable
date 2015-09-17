@@ -36,16 +36,7 @@
     * Casos de uso: uc-03.05.00, uc-03.05.15
 */
 
-/*$Log$
- *Revision 1.2  2006/11/10 18:11:48  larocca
- *Inclusão dos Casos de Uso
- *
-/*Revision 1.1  2006/10/09 16:26:15  leandro.zis
-/*Componente que seleciona a modalidade
-/*
-*/
-
-include_once ( CLA_SELECT );
+include_once CLA_SELECT;
 
 class  ISelectModalidade extends Select
 {
@@ -56,7 +47,6 @@ class  ISelectModalidade extends Select
         include_once(CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php");
         $obComprasModalidade = new TComprasModalidade();
         $rsRecordSet = new RecordSet;
-        //$stFiltro = " WHERE cod_modalidade NOT IN(4,5,6,7)  ";
         $stFiltro = " WHERE cod_modalidade NOT IN(4,5,10,11)  ";
         $stOrdem  = " ORDER BY cod_modalidade, descricao ";
         $obComprasModalidade->recuperaTodos($rsRecordSet, $stFiltro, $stOrdem);
@@ -74,4 +64,5 @@ class  ISelectModalidade extends Select
     }
 
 }
+
 ?>

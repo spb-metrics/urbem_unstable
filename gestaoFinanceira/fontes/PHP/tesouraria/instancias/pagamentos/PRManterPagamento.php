@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 62401 2015-05-04 17:36:47Z lisiane $
+    * $Id: PRManterPagamento.php 63464 2015-08-31 17:30:39Z michel $
 
     * Casos de uso: uc-02.04.05
 */
@@ -43,8 +43,9 @@ require_once CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php";
 require_once CAM_GF_TES_NEGOCIO."RTesourariaConfiguracao.class.php";
 require_once CAM_GF_TES_MAPEAMENTO."TTesourariaPagamento.class.php";
 require_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 $obTransacao = new Transacao();
 $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -60,12 +61,12 @@ $pgAutenticacao = "../autenticacao/FMManterAutenticacao.php";
 
 $obAdministracaoConfiguracao = new TAdministracaoConfiguracao();
 
-list( $inCodBoletim , $stDtBoletim ) = explode ( ':' , $_REQUEST[ 'inCodBoletim' ] );
+list( $inCodBoletim , $stDtBoletim ) = explode ( ':' , $request->get('inCodBoletim') );
 list($stDia, $stMes, $stAno) = explode( '/', $stDtBoletim );
 
 //valida a utilização da rotina de encerramento do mês contábil
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9, '', $boTransacao);
-include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
+
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
@@ -81,18 +82,17 @@ $obRTesourariaBoletim = new RTesourariaBoletim();
 $obRTesourariaBoletim->setExercicio  ( Sessao::getExercicio() );
 $obRTesourariaBoletim->setCodBoletim ( $inCodBoletim );
 $obRTesourariaBoletim->setDataBoletim( $stDtBoletim  );
-$obRTesourariaBoletim->obROrcamentoEntidade->setCodigoEntidade ( $_POST['inCodEntidade'] );
+$obRTesourariaBoletim->obROrcamentoEntidade->setCodigoEntidade ( $request->get('inCodEntidade') );
 $obRTesourariaBoletim->obRTesourariaUsuarioTerminal->obRCGM->setNumCGM( Sessao::read('numCgm') );
-$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->setTimestampUsuario( $_POST['stTimestampUsuario'] );
-$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->roRTesourariaTerminal->setCodTerminal( $_POST['inCodTerminal'] );
-$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->roRTesourariaTerminal->setTimestampTerminal( $_POST['stTimestampTerminal'] );
+$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->setTimestampUsuario( $request->get('stTimestampUsuario') );
+$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->roRTesourariaTerminal->setCodTerminal( $request->get('inCodTerminal') );
+$obRTesourariaBoletim->obRTesourariaUsuarioTerminal->roRTesourariaTerminal->setTimestampTerminal( $request->get('stTimestampTerminal') );
 $obRTesourariaBoletim->addPagamento();
 
 $obRTesourariaConfiguracao = new RTesourariaConfiguracao();
 $obRTesourariaConfiguracao->setExercicio( Sessao::getExercicio() );
 $obRTesourariaConfiguracao->consultarTesouraria($boTransacao);
 
-#$boTransacao = isset($boTransacao) ? $boTransacao : "";
 switch ($stAcao) {
     case 'incluir':
 
@@ -103,34 +103,47 @@ switch ($stAcao) {
         $stTimestamp = substr($stAno.'-'.$stMes.'-'.$stDia.' '.date('H:i:s.ms'),0,-1);
     }
     $obRTesourariaBoletim->roUltimoPagamento->setTimestamp( $stTimestamp );
+    
+    $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'","",$boTransacao);
+    $inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
+    $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."", $boTransacao);
 
     $obErro = new Erro;
-    if ($_POST['inDocTipo']) {
-        switch ($_POST['inDocTipo']) {
+    if ($request->get('inDocTipo')) {
+        switch ($request->get('inDocTipo')) {
             case 1 :
             case 2 :
             case 3 :
             case 99:
-                if ( !$_POST['nuDoc'] ) {
+                if ( !$request->get('nuDoc') ) {
                     $obErro->setDescricao("O número do documento é obrigatório");
                 }
         }
     }
-    if ($_POST['inCodOrdem']) {
-        if (SistemaLegado::comparaDatas($_POST['stDtEmissaoOrdem'],$stDtBoletim)) {
+    if ($request->get('inCodOrdem')) {
+        if (SistemaLegado::comparaDatas($request->get('stDtEmissaoOrdem'),$stDtBoletim)) {
             $obErro->setDescricao("A data do pagamento é anterior à data de emissão da OP");
         }
     }
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setCodigoOrdem   ( $_POST['inCodOrdem']        );
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setExercicio     ( $_POST['stExercicioOrdem']          );
+    if($stSiglaUf == "BA" && $inCodUf==5 && !$obErro->ocorreu()){
+        if($request->get('inCodTipoPagamento')==''){
+            $obErro->setDescricao("Informe o Tipo de Pagamento TCM-BA");
+        }
+        if($request->get('numDocPagamento')==''){
+            $obErro->setDescricao("Informe o Número de Detalhe do Tipo Pagamento TCM-BA");
+        }
+    }
+    
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setCodigoOrdem( $request->get('inCodOrdem') );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setExercicio( $request->get('stExercicioOrdem') );
     $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setDataVencimento( '31/12/'.Sessao::getExercicio() );
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade($_POST['inCodEntidade']);
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obRContabilidadePlanoContaAnalitica->setCodPlano ( $_POST['inCodPlano'] );
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio()   );
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setObservacao( $_POST['stObservacoes'] );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obRContabilidadePlanoContaAnalitica->setCodPlano( $request->get('inCodPlano') );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setObservacao( $request->get('stObservacoes') );
 
     // Verifica se já há algum valor prestado contas.
-    if ($_REQUEST['nuValorPrestado'] > 0) {
+    if ($request->get('nuValorPrestado') > 0) {
         $obErro->setDescricao('Esta OP é de adiantamentos/subvenções e não pode ser paga novamente.');
     }
 
@@ -143,13 +156,13 @@ switch ($stAcao) {
         foreach ($arrNota as $arNota) {
             list( $inCodEmpenho, $stExercicioEmpenho    ) = explode( '/', $arNota['empenho'] );
             list( $inCodNota   , $stExercicioLiquidacao ) = explode( '/', $arNota['liquidacao'] );
-            $nuValorPagar       = str_replace(',','.',str_replace('.','',$_POST["nuValorPagar_".($inCount+1)]    ));
-            $nuValorOriginal    = str_replace(',','.',str_replace('.','',$_POST["nuValorOriginal_".($inCount+1)] ));
+            $nuValorPagar       = str_replace(',','.',str_replace('.','', $request->get('nuValorPagar_'.($inCount+1)) ));
+            $nuValorOriginal    = str_replace(',','.',str_replace('.','', $request->get('nuValorOriginal_'.($inCount+1)) ));
 
             if (SistemaLegado::comparaDatas($arNota['dt_liquidacao'],$stDtBoletim)) {
                 $obErro->setDescricao("A data do pagamento é anterior à data da liquidaçao");
             } elseif ($nuValorPagar > $nuValorOriginal) {
-                $obErro->setDescricao("O valor a pagar da nota $inCodNota não pode ser superior a R$ ".$_POST["nuValorOriginal_".($inCount+1)].".");
+                $obErro->setDescricao("O valor a pagar da nota ".$inCodNota." não pode ser superior a R$ ".$request->get('nuValorOriginal_'.($inCount+1)).".");
             }
 
             $arNotaLiquidacao[$inCount]['cod_nota']        = $inCodNota;
@@ -157,10 +170,10 @@ switch ($stAcao) {
             $arNotaLiquidacao[$inCount]['cod_empeho']      = $inCodEmpenho;
             $arNotaLiquidacao[$inCount]['ex_empenho']      = $stExercicioEmpenho;
             $arNotaLiquidacao[$inCount]['dt_nota']         = $stDtBoletim;
-            $arNotaLiquidacao[$inCount]['valor_pagar']     = $_POST["nuValorPagar_".($inCount+1)];
-            $arNotaLiquidacao[$inCount]['max_valor_pagar'] = $_POST['nuValorPagamento'];
+            $arNotaLiquidacao[$inCount]['valor_pagar']     = $request->get('nuValorPagar_'.($inCount+1));
+            $arNotaLiquidacao[$inCount]['max_valor_pagar'] = $request->get('nuValorPagamento');
 
-            $nuVlPagar = str_replace(".", "", $_POST["nuValorPagar_".($inCount+1)]);
+            $nuVlPagar = str_replace(".", "", $request->get('nuValorPagar_'.($inCount+1)));
             $nuVlPagar = str_replace(",", ".", $nuVlPagar);
 
             $arNotaPaga[$inCount]['cod_nota']     = $inCodNota;
@@ -170,7 +183,7 @@ switch ($stAcao) {
             $arNotaPaga[$inCount]['ex_empenho']   = $stExercicioEmpenho;
             $arNotaPaga[$inCount]['dt_nota']      = $stDtBoletim;
             $arNotaPaga[$inCount]['vl_pago']      = $nuVlPagar;
-            $arNotaPaga[$inCount]['vl_a_pagar']   = $_POST['nuValorPagamento'];
+            $arNotaPaga[$inCount]['vl_a_pagar']   = $request->get('nuValorPagamento');
 
             $nuTotalPagamento = $nuTotalPagamento + $nuVlPagar; // Totaliza o valor do pagamento que está sendo feito
 
@@ -195,7 +208,7 @@ switch ($stAcao) {
         Sessao::write('pagamento',true);
     }
     if ( !$obErro->ocorreu() ) {
-        if ($_POST['inCodOrdem']) { // Se não estiver pagando uma op...
+        if ($request->get('inCodOrdem')) { // Se não estiver pagando uma op...
            $inCodOrdemPagarOutra = $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getCodigoOrdem();
             $stExercicioOrdemPagarOutra = $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getExercicio();
         } else { // .. continua pagando a nota que foi selecionada na lista (a única que foi paga anteriormente )
@@ -203,10 +216,10 @@ switch ($stAcao) {
             $stExercicioNotaPagarOutra = $stExercicioLiquidacao;
         }
 
-        if ($_REQUEST['boPagarOutra']) {
-            if ($nuTotalPagamento < $_POST['nuValorPagamento']) {
-                $stPagarOutraAuth = "inCodBoletim=".urlencode($_REQUEST['inCodBoletim'])."&inCodEntidade=".$_POST['inCodEntidade']."&stOrdem=".$inCodOrdemPagarOutra."%2F".$stExercicioOrdemPagarOutra."&stNota=".$inCodNotaPagarOutra."%2F".$stExercicioNotaPagarOutra."&pg_volta=../pagamentos/".$pgForm;
-                $stPagarOutra = $pgForm."?stAcao=incluir&inCodEntidade=".$_POST['inCodEntidade']."&stOrdem=".$inCodOrdemPagarOutra."%2F".$stExercicioOrdemPagarOutra."&stNota=".$inCodNotaPagarOutra."%2F".$stExercicioNotaPagarOutra."&inCodBoletim=".urlencode($_REQUEST['inCodBoletim']);
+        if ($request->get('boPagarOutra')) {
+            if ($nuTotalPagamento < $request->get('nuValorPagamento')) {
+                $stPagarOutraAuth = "inCodBoletim=".urlencode($request->get('inCodBoletim'))."&inCodEntidade=".$request->get('inCodEntidade')."&stOrdem=".$inCodOrdemPagarOutra."%2F".$stExercicioOrdemPagarOutra."&stNota=".$inCodNotaPagarOutra."%2F".$stExercicioNotaPagarOutra."&pg_volta=../pagamentos/".$pgForm;
+                $stPagarOutra = $pgForm."?stAcao=incluir&inCodEntidade=".$request->get('inCodEntidade')."&stOrdem=".$inCodOrdemPagarOutra."%2F".$stExercicioOrdemPagarOutra."&stNota=".$inCodNotaPagarOutra."%2F".$stExercicioNotaPagarOutra."&inCodBoletim=".urlencode($request->get('inCodBoletim'));
             } else {
                 $stPagarOutraAuth = "pg_volta=../pagamentos/".$pgList;
                 $stPagarOutra = $pgList;
@@ -239,8 +252,8 @@ switch ($stAcao) {
                       ";
             $obTTesourariaPagamento->recuperaTodos($rsPagamentos,$stFiltroPagamentos,"",$boTransacao);
 
-            if (isset($_POST['inCodOrigemRecurso'])) {
-                $arOrigemRecurso = explode('-', $_POST['inCodOrigemRecurso']);
+            if ($request->get('inCodOrigemRecurso')) {
+                $arOrigemRecurso = explode('-', $request->get('inCodOrigemRecurso'));
                 require_once CAM_GPC_TPB_MAPEAMENTO."TTPBPagamentoOrigemRecursosInterna.class.php";
                 while (!$rsPagamentos->eof()) {
                     $obTTPBPagamentoOrigemRecursosInterna = new TTPBPagamentoOrigemRecursosInterna;
@@ -265,8 +278,7 @@ switch ($stAcao) {
 
             $obTTesourariaPagamento->recuperaTodos($rsPagamentos, $stFiltroPagamentos,"",$boTransacao);
 
-            if (isset($_POST['inDocTipo'])) {
-
+            if ($request->get('inDocTipo')) {
                 ###TCMGO
                 $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE configuracao.parametro = 'seta_tipo_documento_tcmgo'","",$boTransacao);
 
@@ -277,9 +289,9 @@ switch ($stAcao) {
                         $obTTesourariaPagamentoTipoDocumento->setDado('cod_entidade', $arrNota['cod_entidade']);
                         $obTTesourariaPagamentoTipoDocumento->setDado('exercicio', $stExercicioLiquidacao);
                         $obTTesourariaPagamentoTipoDocumento->setDado('cod_nota', $inCodNota);
-                        $obTTesourariaPagamentoTipoDocumento->setDado('cod_tipo_documento',$_POST['inDocTipo']);
+                        $obTTesourariaPagamentoTipoDocumento->setDado('cod_tipo_documento',$request->get('inDocTipo'));
                         $obTTesourariaPagamentoTipoDocumento->setDado('timestamp',$stTimestamp );
-                        $obTTesourariaPagamentoTipoDocumento->setDado('num_documento', $_POST['nuDoc'] );
+                        $obTTesourariaPagamentoTipoDocumento->setDado('num_documento', $request->get('nuDoc') );
                         $obErro = $obTTesourariaPagamentoTipoDocumento->inclusao($boTransacao);
                         if ($obErro->ocorreu()) {
                             SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
@@ -298,9 +310,9 @@ switch ($stAcao) {
                         $obTTCEMGPagamentoTipoDocumento->setDado('cod_entidade', $arrNota['cod_entidade']);
                         $obTTCEMGPagamentoTipoDocumento->setDado('exercicio', $stExercicioLiquidacao);
                         $obTTCEMGPagamentoTipoDocumento->setDado('cod_nota', $inCodNota);
-                        $obTTCEMGPagamentoTipoDocumento->setDado('cod_tipo_documento',$_POST['inDocTipo']);
+                        $obTTCEMGPagamentoTipoDocumento->setDado('cod_tipo_documento',$request->get('inDocTipo') );
                         $obTTCEMGPagamentoTipoDocumento->setDado('timestamp',$stTimestamp );
-                        $obTTCEMGPagamentoTipoDocumento->setDado('num_documento', $_POST['nuDoc'] );
+                        $obTTCEMGPagamentoTipoDocumento->setDado('num_documento', $request->get('nuDoc') );
                         $obErro = $obTTCEMGPagamentoTipoDocumento->inclusao($boTransacao);
                         if ($obErro->ocorreu()) {
                             SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
@@ -321,9 +333,9 @@ switch ($stAcao) {
                         $obTTCEALPagamentoTipoDocumento->setDado('cod_entidade', $arrNota['cod_entidade']);
                         $obTTCEALPagamentoTipoDocumento->setDado('exercicio', $stExercicioLiquidacao);
                         $obTTCEALPagamentoTipoDocumento->setDado('cod_nota', $inCodNota);
-                        $obTTCEALPagamentoTipoDocumento->setDado('cod_tipo_documento',$_POST['inDocTipo']);
+                        $obTTCEALPagamentoTipoDocumento->setDado('cod_tipo_documento', $request->get('inDocTipo') );
                         $obTTCEALPagamentoTipoDocumento->setDado('timestamp',$stTimestamp );
-                        $obTTCEALPagamentoTipoDocumento->setDado('num_documento', $_POST['nuDoc'] );
+                        $obTTCEALPagamentoTipoDocumento->setDado('num_documento', $request->get('nuDoc') );
                         $obErro = $obTTCEALPagamentoTipoDocumento->inclusao($boTransacao);
                         if ($obErro->ocorreu()) {
                             SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
@@ -333,21 +345,17 @@ switch ($stAcao) {
                 }//fim TCEAL
             }
             
-            $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE exercicio = '".Sessao::getExercicio()."' and cod_modulo = 2 and parametro = 'cod_uf'","",$boTransacao);
-            $inCodUf = $rsAdministracaoConfiguracao->getCampo('valor');
-            $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."", $boTransacao);
-            
             if ($stSiglaUf == "TO") {
                 if ( !$obErro->ocorreu() ) {
                     if ( SistemaLegado::pegaConfiguracao("cod_uf", 2, Sessao::getExercicio(), $boTransacao) == 27 ) {
                         require_once CAM_GPC_TCETO_MAPEAMENTO."TTCETOPagamentoTipoPagamento.class.php";
-                       
+
                         $obTTCETOPagamentoTipoPagamento = new TTCETOPagamentoTipoPagamento;
                         $obTTCETOPagamentoTipoPagamento->setDado('cod_entidade', $arrNota['cod_entidade']);
                         $obTTCETOPagamentoTipoPagamento->setDado('exercicio', $stExercicioLiquidacao);
                         $obTTCETOPagamentoTipoPagamento->setDado('cod_nota', $inCodNota);
                         $obTTCETOPagamentoTipoPagamento->setDado('timestamp',$stTimestamp );
-                        $obTTCETOPagamentoTipoPagamento->setDado('cod_tipo_pagamento', $_POST['inCodTipoPagamento'] );
+                        $obTTCETOPagamentoTipoPagamento->setDado('cod_tipo_pagamento', $request->get('inCodTipoPagamento') );
                         $obErro = $obTTCETOPagamentoTipoPagamento->inclusao($boTransacao);
                        
                         if ($obErro->ocorreu()) {
@@ -357,15 +365,33 @@ switch ($stAcao) {
                     }
                 }
             }
+
+            if ($stSiglaUf == "BA" && $inCodUf==5 && !$obErro->ocorreu() ) {
+                include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBAPagamentoTipoPagamento.class.php';
+
+                $obTTCMBAPagamentoTipoPagamento = new TTCMBAPagamentoTipoPagamento;
+                $obTTCMBAPagamentoTipoPagamento->setDado('cod_entidade'   , $arrNota['cod_entidade']                );
+                $obTTCMBAPagamentoTipoPagamento->setDado('exercicio'      , $stExercicioLiquidacao                  );
+                $obTTCMBAPagamentoTipoPagamento->setDado('cod_nota'       , $inCodNota                              );
+                $obTTCMBAPagamentoTipoPagamento->setDado('timestamp'      , $stTimestamp                            );
+                $obTTCMBAPagamentoTipoPagamento->setDado('cod_tipo'       , $request->get('inCodTipoPagamento')     );
+                $obTTCMBAPagamentoTipoPagamento->setDado('num_documento'  , $request->get('numDocPagamento')        );
+                $obErro = $obTTCMBAPagamentoTipoPagamento->inclusao($boTransacao);
+
+                if ($obErro->ocorreu()) {
+                    SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
+                    SistemaLegado::LiberaFrames();
+                }
+            }
         }
 
         # Encerra Transação para validar o commit ou rollback
         $obErro = $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTesourariaPagamento );
 
         if ( $obRTesourariaConfiguracao->getFormaComprovacao() ) {
-            SistemaLegado::alertaAviso($pgAutenticacao."?".( $_REQUEST['boPagarOutra'] ? $stPagarOutraAuth : "pg_volta=../pagamentos/".$pgList ),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgAutenticacao."?".( $request->get('boPagarOutra') ? $stPagarOutraAuth : "pg_volta=../pagamentos/".$pgList ),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
         } else {
-            SistemaLegado::alertaAviso(($_REQUEST['boPagarOutra'] ? $stPagarOutra : $pgList),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso(($request->get('boPagarOutra') ? $stPagarOutra : $pgList),"Pagamento Concluído com Sucesso! (OP ".$inCodOrdem."/".$stExercicioOrdem.")","","aviso", Sessao::getId(), "../");
         }
     } else {
         $nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'), $boTransacao);
@@ -403,15 +429,15 @@ switch ($stAcao) {
             list( $inCodEmpenho, $stExercicioEmpenho    ) = explode( '/', $arNota['empenho'] );
             list( $inCodNota   , $stExercicioLiquidacao ) = explode( '/', $arNota['liquidacao'] );
 
-            $nuValorPagar       = str_replace(',','.',str_replace('.','',$_POST["nuValorPagar_".($inCount+1)]    ));  /// Valor do Estorno
+            $nuValorPagar       = str_replace(',','.',str_replace('.','',$request->get('nuValorPagar_'.($inCount+1))    ));  /// Valor do Estorno
             $nuValorEstornar    = $arNota['vl_estornar'];  // Valor Prestado Contas
-            $nuValorOriginal    = str_replace(',','.',str_replace('.','',$_POST["nuValorOriginal_".($inCount+1)] ));
+            $nuValorOriginal    = str_replace(',','.',str_replace('.','',$request->get('nuValorOriginal_'.($inCount+1)) ));
 
             if ($nuValorEstornar != $nuValorOriginal) {
                 $nuValorOriginal = $nuValorEstornar;
             }
             if ($nuValorPagar > $nuValorOriginal) {
-                $obErro->setDescricao("O valor a estornar da nota $inCodNota não pode ser superior a R$ ".number_format($nuValorOriginal,2,',','.').".");
+                $obErro->setDescricao("O valor a estornar da nota ".$inCodNota." não pode ser superior a R$ ".number_format($nuValorOriginal,2,',','.').".");
                 break;
             }
 
@@ -424,7 +450,7 @@ switch ($stAcao) {
                 $arNotaPaga[$inPos]['dt_nota']            = $stDtBoletim;
                 $arNotaPaga[$inPos]['timestamp']          = $arNota['timestamp'];
                 $arNotaPaga[$inPos]['vl_estornado']       = $nuValorPagar;
-                $arNotaPaga[$inPos]['vl_pago']            = $_POST['nuValorPagamento'];
+                $arNotaPaga[$inPos]['vl_pago']            = $request->get('nuValorPagamento');
                 $arNotaPaga[$inPos]['cod_plano']          = $arNota['cod_plano'];
                 $arNotaPaga[$inPos]['cod_plano_retencao'] = $arNota['cod_plano_retencao'];
                 $arNotaPaga[$inPos]['exercicio_plano']    = $arNota['exercicio_plano'];
@@ -445,12 +471,12 @@ switch ($stAcao) {
         }
         if ($nuTotalEstorno > 0.00) {
             if ($stDtEstorno >= $stMaiorData) {
-                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setCodigoOrdem   ( $_POST['inCodOrdem']       );
-                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setExercicio     ( $_POST['stExercicioOrdem']         );
-                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setValorAnulado  ( number_format( $_POST['nuValorPagamento'], 2, ',', '.' ) );
-                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade($_POST['inCodEntidade']);
+                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setCodigoOrdem   ( $request->get('inCodOrdem')       );
+                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setExercicio     ( $request->get('stExercicioOrdem')         );
+                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setValorAnulado  ( number_format( $request->get('nuValorPagamento'), 2, ',', '.' ) );
+                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->obROrcamentoEntidade->setCodigoEntidade($request->get('inCodEntidade'));
                 $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setDataPagamento( $dtMaiorData ); // data de pgto mais recente das notas com valor a estornar
-                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setObservacao( $_POST['stMotivo'] );
+                $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setObservacao( $request->get('stMotivo') );
                 $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->setValoresPagos( $arNotaPaga );
             } else {
                 $obErro->setDescricao('A data do boletim deve ser igual ou superior à data do pagamento mais recente com valor a estornar informado ('.$dtMaiorData.').');
@@ -475,9 +501,9 @@ switch ($stAcao) {
 
     if ( !$obErro->ocorreu() ) {
         if( $obRTesourariaConfiguracao->getFormaComprovacao() )
-            SistemaLegado::alertaAviso($pgAutenticacao."?pg_volta=../pagamentos/".$pgList."&".Sessao::getId(),"Estorno de Pagamento Concluído com Sucesso! (OP: ".$_POST['inCodOrdem'] . "/" . Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgAutenticacao."?pg_volta=../pagamentos/".$pgList."&".Sessao::getId(),"Estorno de Pagamento Concluído com Sucesso! (OP: ".$request->get('inCodOrdem') . "/" . Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");
         else
-            SistemaLegado::alertaAviso($pgList,"Estorno de Pagamento Concluído com Sucesso! (OP: ".$_POST['inCodOrdem'] . "/" . Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList,"Estorno de Pagamento Concluído com Sucesso! (OP: ".$request->get('inCodOrdem') . "/" . Sessao::getExercicio().")","","aviso", Sessao::getId(), "../");
     } else {
         SistemaLegado::exibeAviso(urlencode("Erro ao executar ação: ".$nomAcao." (".$obErro->getDescricao().")"),"n_estornar","erro");
         SistemaLegado::LiberaFrames();

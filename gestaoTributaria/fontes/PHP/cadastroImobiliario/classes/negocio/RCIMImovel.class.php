@@ -33,29 +33,9 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCIMImovel.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMImovel.class.php 63376 2015-08-21 18:55:42Z arthur $
 
     * Casos de uso: uc-05.01.09
-*/
-
-/*
-$Log$
-Revision 1.39  2007/05/08 19:19:30  cercato
-Bug #8436#
-
-Revision 1.38  2007/04/12 15:51:09  rodrigo
-Bug #8970#
-
-Revision 1.37  2007/03/01 12:54:35  rodrigo
-Bug #8436#
-
-Revision 1.36  2006/11/24 11:28:11  dibueno
-Bug #7590#
-
-Revision 1.35  2006/09/18 09:12:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -85,17 +65,6 @@ include_once ( CAM_GT_ARR_NEGOCIO."RARRAvaliacaoImobiliaria.class.php"          
 //INCLUSAO DAS CLASSES PARA  O TRATAMNTO DOS ATRIBUTOS
 include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php"                  );
 include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMAtributoImovelValor.class.php"         );
-
-/**
-* Classe de regra de negócio para Imovel
-* Data de Criação: 26/11/2004
-
-* @author Analista: Ricardo Lopes de Alencar
-* @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
-
-* @package URBEM
-* @subpackage Regra
-*/
 
 class RCIMImovel
 {

@@ -39,13 +39,27 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 
-$obTOrcamentoEntidade = new TOrcamentoEntidade();
-$obTOrcamentoEntidade->setDado( 'exercicio'   , $_REQUEST['stExercicio'] );
-$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$request->get('inCodEntidade')).")" );
-
 $obErro = new Erro();
-
 $preview = new PreviewBirt(6, 36, 7);
+$stAcao = $request->get('stAcao');
+$obTOrcamentoEntidade = new TOrcamentoEntidade();
+//Buscando todas as entidades
+$obTOrcamentoEntidade->setDado( 'exercicio'   , $request->get('stExercicio') );
+$obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$request->get('inCodEntidade')).")" );
+//Buscando dados da entidade Câmara
+$inCodEntidadeCamara = SistemaLegado::pegaConfiguracao("cod_entidade_camara",8,Sessao::getExercicio());
+if (!empty($inCodEntidadeCamara)) {
+    $obTOrcamentoEntidade->recuperaEntidades( $rsEntidadeCamara, "and e.cod_entidade = ".$inCodEntidadeCamara );
+}
+//Quantidade de entidade selecionadas no filtro
+$inCountEntidades = count($request->get('inCodEntidade'));
+//A entidade Câmara deve ser selecionada separadamente das demais
+if ( $inCountEntidades > 1 ) {
+    if (in_array($inCodEntidadeCamara, $request->get('inCodEntidade'))) {
+        $obErro->setDescricao('Entidade '.$rsEntidadeCamara->getCampo('nom_cgm').' deve ser selecionada sozinha das demais entidades.');
+        SistemaLegado::alertaAviso("FLModelosRGF.php?&stAcao=".$stAcao, $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");        
+    }
+}
 
 if (Sessao::getExercicio() < 2013) {
     $preview->setTitulo('Demonstrativo dos Limites');
@@ -56,7 +70,6 @@ $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel ( true );
 
 if ( count($request->get('inCodEntidade')) == 1 ) {
-
     $preview->addParametro('nom_entidade', $rsEntidade->getCampo('nom_cgm'));
     $preview->addParametro('cod_entidade', $_POST['inCodEntidade'][0]  );
 
@@ -102,27 +115,14 @@ $stDataFinal = "$stDataFinal/" . $request->get('stExercicio');
 
 $preview->addParametro( 'data_inicio', $stDataInicial );
 $preview->addParametro( 'data_fim', $stDataFinal );
-$preview->addParametro( 'exercicio', $_REQUEST['stExercicio'] );
+$preview->addParametro( 'exercicio', $request->get('stExercicio') );
 $preview->addParametro( 'periodo', $nuPeriodo );
-$preview->addParametro( 'tipo_periodo', $_REQUEST['stTipoRelatorio'] );
+$preview->addParametro( 'tipo_periodo', $request->get('stTipoRelatorio') );
 
-if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($_REQUEST['inCodEntidade']) > 1 ) ) {
+if ( preg_match( "/prefeitura/i", $rsEntidade->getCampo( 'nom_cgm' ) ) || ( count($request->get('inCodEntidade')) > 1 ) ) {
     $preview->addParametro( 'poder' , 'Poder Executivo' );
-} elseif ( preg_match( "/c[âa]mara/i", $rsEntidade->getCampo( 'nom_cgm' ) ) ) {
+} elseif ( preg_match( "/c(â|a)mara/i", $rsEntidade->getCampo( 'nom_cgm' ) ) ) {
     $preview->addParametro( 'poder' , 'Poder Legislativo' );
-}
-
-// verificando se foi selecionado Câmara e outra entidade junto
-$rsEntidade->setPrimeiroElemento();
-if ( !$obErro->ocorreu() && ( count($_REQUEST['inCodEntidade']) != 1 ) ) {
-    while ( !$rsEntidade->eof() ) {
-        if ( preg_match( "/c[âa]mara.*/i", $rsEntidade->getCampo( 'nom_cgm' ) ) ) {
-            $obErro->setDescricao( "Entidade " . $rsEntidade->getCampo('nom_cgm') . " deve ser selecionada sozinha.");
-            $boPreview = false;
-            break;
-        }
-        $rsEntidade->proximo();
-    }
 }
 
 #############################Modificações do tce para o novo layout##############################
@@ -145,7 +145,8 @@ $preview->addParametro( 'data_emissao', $stDataEmissao );
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
 
-if( !$obErro->ocorreu() )
+if( !$obErro->ocorreu() ){
     $preview->preview();
-else
-    SistemaLegado::alertaAviso("FLModelosRGF.php?'.Sessao::getId().&stAcao=$stAcao", $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}else{
+    SistemaLegado::alertaAviso("FLModelosRGF.php?&stAcao=".$stAcao, $obErro->getDescricao(),"","aviso", Sessao::getId(), "../");
+}

@@ -30,7 +30,10 @@
  * @package     Tesouraria
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: CTCEMGExportacao.class.php 62774 2015-06-17 12:51:49Z jean $
+ * $Id: CTCEMGExportacao.class.php 63326 2015-08-18 17:43:41Z franver $
+ * $Rev: 63326 $
+ * $Author: franver $
+ * $Date: 2015-08-18 14:43:41 -0300 (Ter, 18 Ago 2015) $
  */
 
 class CTCEMGExportacao
@@ -147,11 +150,6 @@ class CTCEMGExportacao
         $stJs .= "jq('#arArquivosDisponivel').removeOption(/./);";
 
         $arArquivo = array(
-                        'ambos'       => array(
-                                            'dispFinanceiras.txt',
-                                            'inscRestosAPagar.txt',
-                                            'servTerceiros.txt',
-                                         ),
                         'legislativo' => array(
                                             'comparativoPL.txt',
                                             'despesaTotalPessoalPL.txt',
@@ -169,11 +167,13 @@ class CTCEMGExportacao
                                             'despesaTotalPessoalPE.txt',
                                             'despFuncaoSubfuncao.txt',
                                             'discDividaConsolidadaRPPS.txt',
+                                            'dispFinanceiras.txt',
                                             'especifPrev.txt',
                                             'exclusaoDespesa.txt',
                                             'exclusaoReceita.txt',
                                             'execucaoVariacao.txt',
                                             'gestaoFiscalPE.txt',
+                                            'inscRestosAPagar.txt',
                                             'itemAtivoPassivo.txt',
                                             'metaArrecadacao.txt',
                                             'obsMetaArrecadacao.txt',
@@ -185,23 +185,12 @@ class CTCEMGExportacao
                                             'receitaCapital.txt',
                                             'recursoAlienacaoAtivo.txt',
                                             'receitaIntra.txt',
+                                            'servTerceiros.txt',
                                             'variacaoPatrimonial.txt'
                                          ),
                      );
 
         switch ($arParams['stTipoPoder']) {
-        case 'ambos':
-            if ($arParams['stTipoPeriodo'] == 'mensal') {
-                foreach ($arArquivo['ambos'] as $arquivo) {
-                    $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
-                }
-            } elseif ($arParams['stTipoPeriodo'] == 'bimestral') {
-                foreach ($arArquivo['ambos'] as $arquivo) {
-                    $stJs .= "jq('#arArquivosDisponivel').addOption('" . $arquivo . "','" . $arquivo . "');";
-                }
-            }
-
-            break;
         case 'legislativo':
             if ($arParams['stTipoPeriodo'] == 'mensal') {
                 foreach ($arArquivo['legislativo'] as $arquivo) {
@@ -288,57 +277,48 @@ class CTCEMGExportacao
     public function validaArquivoPeriodo($arParams)
     {
         if ( $_REQUEST['inPeriodo'] != 6 ) {
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"operacoesCreditoARO.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"operacoesCreditoARO.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"operacoesCreditoARO.txt\"]').remove(); ";
             
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"discDividaConsolidadaRPPS.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"discDividaConsolidadaRPPS.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"discDividaConsolidadaRPPS.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"inscRestosAPagar.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"inscRestosAPagar.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"inscRestosAPagar.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"deducaoReceita.txt\"]').remove(); ";
-            $stJs .= " jq('#arArquivosSelecionado option[value=\"deducaoReceita.txt\"]').remove(); ";
-
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"itemAtivoPassivo.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"itemAtivoPassivo.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"itemAtivoPassivo.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"passivoPerm.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"passivoPerm.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"passivoPerm.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"recursoAlienacaoAtivo.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"recursoAlienacaoAtivo.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"recursoAlienacaoAtivo.txt\"]').remove(); ";
             
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"receitaIntra.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"receitaIntra.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"receitaIntra.txt\"]').remove(); ";
             
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"DespesaIntra.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"DespesaIntra.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"DespesaIntra.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"ativoPerm.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"ativoPerm.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"ativoPerm.txt\"]').remove(); ";
 
-            $stJs .= " jq('#arArquivosDisponivel  option[value=\"execucaoVariacao.txt\"]').remove(); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"execucaoVariacao.txt\"]').prop('hidden', 'hidden'); ";
             $stJs .= " jq('#arArquivosSelecionado option[value=\"execucaoVariacao.txt\"]').remove(); ";
-        }else{
-            $stJs .= "jq('#arArquivosDisponivel').addOption('operacoesCreditoARO.txt','operacoesCreditoARO.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('discDividaConsolidadaRPPS.txt','discDividaConsolidadaRPPS.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('inscRestosAPagar.txt','inscRestosAPagar.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('deducaoReceita.txt','deducaoReceita.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('itemAtivoPassivo.txt','itemAtivoPassivo.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('passivoPerm.txt','passivoPerm.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('recursoAlienacaoAtivo.txt','recursoAlienacaoAtivo.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('receitaIntra.txt','receitaIntra.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('DespesaIntra.txt','DespesaIntra.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('ativoPerm.txt','ativoPerm.txt');";
-            $stJs .= "jq('#arArquivosDisponivel').addOption('execucaoVariacao.txt','execucaoVariacao.txt');";
+        } else {
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"operacoesCreditoARO.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"discDividaConsolidadaRPPS.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"inscRestosAPagar.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"itemAtivoPassivo.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"passivoPerm.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"recursoAlienacaoAtivo.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"receitaIntra.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"DespesaIntra.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"ativoPerm.txt\"]').removeProp('hidden'); ";
+            $stJs .= " jq('#arArquivosDisponivel  option[value=\"execucaoVariacao.txt\"]').removeProp('hidden'); ";
         }
-                
+
         echo $stJs;
-
     }
-
-
 }
-
-

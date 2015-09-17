@@ -77,7 +77,7 @@ switch ($_REQUEST['stAcao']) {
                 $obTTCMBAConfiguracaoOrdenador->setDado("num_orgao"              ,$_REQUEST['inMontaCodOrgaoM']);
                 $obTTCMBAConfiguracaoOrdenador->setDado("dt_inicio_vigencia"     ,$arOrdenador['dt_inicio_vigencia']);
                 $obTTCMBAConfiguracaoOrdenador->setDado("dt_fim_vigencia"        ,$arOrdenador['dt_fim_vigencia']);
-                $obTTCMBAConfiguracaoOrdenador->setDado("cod_tipo_responsavel_ordenador" ,$arOrdenador['cod_tipo_responsavel_ordenador']);
+                $obTTCMBAConfiguracaoOrdenador->setDado("cod_tipo_responsavel"   ,$arOrdenador['cod_tipo_responsavel']);
                 $obTTCMBAConfiguracaoOrdenador->recuperaPorChave($rsRecordSet, $boTransacao);
                 
                 if ($rsRecordSet->eof()) {

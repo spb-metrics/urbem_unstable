@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63102 $
+    $Revision: 63348 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -44,10 +44,11 @@
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBAConvidados.class.php" );
     
     $obTTCMBAConvidados = new TTCMBAConvidados();
-    $obTTCMBAConvidados->setDado('stExercicio' , Sessao::getExercicio());
-    $obTTCMBAConvidados->setDado('inMes'       , str_pad($inMes, 2, "0", STR_PAD_LEFT) );
-    $obTTCMBAConvidados->setDado('stEntidades' , $stEntidades );
-    $obTTCMBAConvidados->setDado('inCodGestora', $inCodUnidadeGestora );
+    $obTTCMBAConvidados->setDado('stExercicio'  , Sessao::getExercicio());
+    $obTTCMBAConvidados->setDado('stDataInicial', $stDataInicial);
+    $obTTCMBAConvidados->setDado('stDataFinal'  , $stDataFinal);
+    $obTTCMBAConvidados->setDado('stEntidades'  , $stEntidades );
+    $obTTCMBAConvidados->setDado('inCodGestora' , $inCodUnidadeGestora );
     $obTTCMBAConvidados->recuperaDadosTribunal($rsConvidados);
     
     $obExportador->roUltimoArquivo->addBloco($rsConvidados);

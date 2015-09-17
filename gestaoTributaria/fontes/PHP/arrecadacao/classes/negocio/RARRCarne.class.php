@@ -30,27 +30,20 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RARRCarne.class.php 61188 2014-12-12 19:11:24Z carolina $
+    $Id: RARRCarne.class.php 63415 2015-08-25 21:17:03Z arthur $
 
    * Casos de uso: uc-05.03.11, uc-02.04.04
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GT_ARR_MAPEAMENTO."TARRCarne.class.php"             );
-include_once ( CAM_GT_ARR_MAPEAMENTO."TARRCarneConsolidacao.class.php" );
-
-include_once ( CAM_GT_ARR_MAPEAMENTO."TARRParcela.class.php"           );
-include_once ( CAM_GT_ARR_MAPEAMENTO."TARRMotivoDevolucao.class.php"   );
-include_once ( CAM_GT_ARR_MAPEAMENTO."TARRCarneDevolucao.class.php"    );
-include_once ( CAM_GT_MON_NEGOCIO."RMONCredito.class.php"              );
-include_once ( CAM_GT_ARR_NEGOCIO."RARRCarneConsolidacao.class.php" );
-
-/**
-    * Classe de Regra de Assinatura
-    * @author Analista: ************
-    * @author Desenvolvedor: ***********
-*/
+include_once CAM_GT_ARR_MAPEAMENTO."TARRCarne.class.php"            ;
+include_once CAM_GT_ARR_MAPEAMENTO."TARRCarneConsolidacao.class.php";
+include_once CAM_GT_ARR_MAPEAMENTO."TARRParcela.class.php"          ;
+include_once CAM_GT_ARR_MAPEAMENTO."TARRMotivoDevolucao.class.php"  ;
+include_once CAM_GT_ARR_MAPEAMENTO."TARRCarneDevolucao.class.php"   ;
+include_once CAM_GT_MON_NEGOCIO."RMONCredito.class.php"             ;
+include_once CAM_GT_ARR_NEGOCIO."RARRCarneConsolidacao.class.php"   ;
 
 class RARRCarne
 {
@@ -1767,8 +1760,7 @@ function novaListaEmissaoIPTUDesoneradoMata(&$rsRecordSet, $boTransacao = '')
     }
 
     $obErro = $obListaEmissao->executaFuncao($rsRecordSet,'',$boTransacao);
-
-//    $this->obTARRCarne->debug();
+    
     return $obErro;
 }
 
@@ -1802,4 +1794,6 @@ function listarPagamentosCancelados(&$rsRecordSet , $boTransacao = "")
     return $obErro;
 }
 
-} // fecha classe
+}
+
+?>

@@ -39,9 +39,9 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 //include padrão do framework
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 //include padrão do framework
-include_once(CAM_GP_COM_MAPEAMENTO."TComprasContratoCompraDireta.class.php"                                 );
+include_once(CAM_GP_COM_MAPEAMENTO."TComprasContratoCompraDireta.class.php" );
 include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" );
-include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoDocumentosAtributos.class.php"                      );
+include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoDocumentosAtributos.class.php" );
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
 
 $stPrograma = "ManterContrato";
@@ -60,6 +60,37 @@ $stJs=""; $js="";
 
 switch ($_REQUEST['stCtrl']) {
 
+    case "MontaUnidade":
+        include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+        if ($_REQUEST["inNumOrgao"]) {
+            $stCombo  = "inNumUnidade";
+            $stComboTxt  = "inNumUnidadeTxt";
+            $stJs .= "limpaSelect(f.$stCombo,0); \n";
+            $stJs .= "f.$stComboTxt.value='".$_REQUEST["inNumUnidade"]."'; \n";
+            $stJs .= "f.$stCombo.value='".$_REQUEST["inNumUnidade"]."'; \n";
+            $stJs .= "f.$stCombo.options[0] = new Option('Selecione','', 'selected');\n";
+            
+            $obREmpenhoPreEmpenho = new REmpenhoPreEmpenho;
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($_REQUEST["inNumOrgao"]);
+            $obREmpenhoPreEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->consultar( $rsCombo, $stFiltro,"", $boTransacao );
+            
+            $inCount = 0;
+            while (!$rsCombo->eof()) {
+                $inCount++;
+                $inId   = $rsCombo->getCampo("num_unidade");
+                $stDesc = $rsCombo->getCampo("nom_unidade");
+                if( $_REQUEST["inNumUnidade"] == $inId )
+                    $stSelected = 'selected';
+                else
+                    $stSelected = '';
+                $stJs .= "f.$stCombo.options[$inCount] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
+                $rsCombo->proximo();
+            }
+        }
+        
+        echo $stJs;
+    break;
+
     case "carregaValorContratoCompraDireta":
         preencheValorContratoCompraDireta();
     break;
@@ -74,7 +105,7 @@ switch ($_REQUEST['stCtrl']) {
         } else {
             $stJs = " d.getElementById('stDescObjeto').innerHTML = '&nbsp;';\n";
             $stJs.= " f.hdnDescObjeto.value = '';\n";
-            $stJs.= " d.getElementById('nmValorContrato').innerHTML = '';";
+            $stJs.= " d.getElementById('vlContrato').value = '';";
             $stJs.= " d.getElementById('hdnValorContrato').value = '';";
             $stJs.= " f.inCGMContratado.selectedIndex =  0;\n";
             $stJs.= " limpaSelect(f.inCGMContratado,1);\n";
@@ -761,10 +792,10 @@ switch ($_REQUEST['stCtrl']) {
         $obTCompraDiretaContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
         $obTCompraDiretaContrato->recuperaValorContrato($rsValorContrato);
 
-        $nmValorContrato = $rsValorContrato->getCampo('valor_contrato');
-        $nmValorContrato = number_format($nmValorContrato, 2, ',', '.');
-        $stJs= " d.getElementById('nmValorContrato').innerHTML = '".$nmValorContrato."';";
-        $stJs.= " d.getElementById('hdnValorContrato').value = '".$nmValorContrato."';";
+        $vlContrato = $rsValorContrato->getCampo('valor_contrato');
+        $vlContrato = number_format($vlContrato, 2, ',', '.');
+        $stJs= " d.getElementById('vlContrato').value = '".$vlContrato."';";
+        $stJs.= " d.getElementById('hdnValorContrato').value = '".$vlContrato."';";
         echo $stJs;
     }
 
@@ -777,7 +808,7 @@ switch ($_REQUEST['stCtrl']) {
 
         } else {
 
-            $stJs.= " d.getElementById('nmValorContrato').innerHTML = '';";
+            $stJs.= " d.getElementById('vlContrato').value = '';";
             $stJs.= " d.getElementById('hdnValorContrato').value = '';";
             echo $stJs;
         }

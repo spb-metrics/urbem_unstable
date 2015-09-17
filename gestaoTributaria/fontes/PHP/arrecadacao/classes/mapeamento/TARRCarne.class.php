@@ -29,30 +29,20 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TARRCarne.class.php 61187 2014-12-12 18:59:43Z carolina $
+    $Id: TARRCarne.class.php 63415 2015-08-25 21:17:03Z arthur $
 
     * Casos de uso: uc-05.03.11
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-/**
-  * Efetua conexão com a tabela  ARRECADACAO.CARNE
-  * Data de Criação: 18/05/2005
-
-  * @author Analista: Fabio Bertoldi
-  * @author Desenvolvedor: Tonismar Régis Bernardo
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TARRCarne extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TARRCarne()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela('arrecadacao.carne');
@@ -7601,7 +7591,7 @@ function montaListaDadosPorGrupoParaCarneIPTU($stDataBase)
                     WHERE
                         parcela_desconto.cod_parcela = ap.cod_parcela";
                         if ($this->getDado("valida_desconto_itau") == false) {
-                            $stSql .=  "AND parcela_desconto.vencimento >= now()::date";
+                            $stSql .=  " AND parcela_desconto.vencimento >= now()::date";
                         }
         $stSql .="
                         
@@ -7985,3 +7975,5 @@ function montaRecuperaValorePorCreditoParaCarne($inCodParcela)
 }
 
 } // end of class
+
+?>

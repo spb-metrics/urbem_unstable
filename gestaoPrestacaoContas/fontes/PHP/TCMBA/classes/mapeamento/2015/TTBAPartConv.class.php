@@ -55,14 +55,14 @@ class TTBAPartConv extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBAPartConv()
+public function __construct()
 {
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
     $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
-function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -75,33 +75,41 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
-function montaRecuperaDadosTribunal()
+public function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT   conv.exercicio             \n";
-    $stSql .= "         ,conv.num_convenio            \n";
-    $stSql .= "         ,case when  pf.numcgm is not null then 1            \n";
-    $stSql .= "                else 2            \n";
-    $stSql .= "         end as pf_pj            \n";
-    $stSql .= "         ,case when  pf.cpf is not null  then pf.cpf            \n";
-    $stSql .= "               when pj.cnpj is not null  then pj.cnpj            \n";
-    $stSql .= "                else ''            \n";
-    $stSql .= "         end as cpf_cnpj            \n";
-    $stSql .= "         ,cgm.nom_cgm            \n";
-    $stSql .= "         ,part.valor_participacao            \n";
-    $stSql .= "         ,'' as nome_funcao            \n";
-    $stSql .= "         ,to_char(conv.dt_assinatura,'dd/mm/yyyy') as data_assinatura            \n";
-    $stSql .= "         ,to_char(conv.dt_vigencia,'dd/mm/yyyy') as data_vigencia            \n";
-    $stSql .= " FROM     licitacao.convenio              as conv            \n";
-    $stSql .= "         ,licitacao.participante_convenio as part            \n";
-    $stSql .= "         ,sw_cgm                          as cgm            \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_fisica as pf            \n";
-    $stSql .= "             ON ( cgm.numcgm = pf.numcgm )            \n";
-    $stSql .= "         LEFT JOIN   sw_cgm_pessoa_juridica as pj            \n";
-    $stSql .= "             ON ( cgm.numcgm = pj.numcgm )            \n";
-    $stSql .= " WHERE   conv.exercicio      = part.exercicio            \n";
-    $stSql .= " AND     conv.num_convenio   = part.num_convenio            \n";
-    $stSql .= " AND     part.cgm_fornecedor = cgm.numcgm            \n";
-    $stSql .= " AND     conv.exercicio='".$this->getDado('exercicio')."'                    \n";
+    $stSql .= " SELECT convenio.exercicio
+                     , convenio.num_convenio
+                     , CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1
+                            ELSE 2
+                     END AS tipo_pessoa
+                     , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf
+                            WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj
+                            ELSE ''            
+                     END AS cpf_cnpj            
+                    , sw_cgm.nom_cgm
+                    , participante_convenio.valor_participacao            
+                    , '' AS nome_funcao
+                    , TO_CHAR(convenio.dt_assinatura,'dd/mm/yyyy') AS data_assinatura
+                    , TO_CHAR(convenio.dt_vigencia,'dd/mm/yyyy') AS data_vigencia
+
+                 FROM licitacao.convenio
+
+           INNER JOIN licitacao.participante_convenio
+                   ON participante_convenio.exercicio = convenio.exercicio
+                  AND participante_convenio.num_convenio = convenio.num_convenio
+
+           INNER JOIN sw_cgm
+                   ON sw_cgm.numcgm = participante_convenio.cgm_fornecedor
+
+             LEFT JOIN sw_cgm_pessoa_fisica
+                    ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+             LEFT JOIN sw_cgm_pessoa_juridica
+                    ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
+
+                 WHERE convenio.exercicio = '".$this->getDado('exercicio')."'
+                   AND convenio.dt_assinatura BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+    ";
 
     return $stSql;
 }

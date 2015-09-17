@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: SistemaLegado.class.php 63138 2015-07-29 14:06:41Z evandro $
+ $Id: SistemaLegado.class.php 63542 2015-09-10 12:37:11Z evandro $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -1364,6 +1364,7 @@ public static function removeAcentosSimbolos(&$string)
                               ,'Ñ' => 'N'
                               ,'–' => '-'
                               ,"¨" => ''
+                              ,"/" => ''
                             );
     
     //Buscando o tipo de dado que veio por parametro

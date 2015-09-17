@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.04.05
 
-  $Id: OCManterMapaCompras.php 63099 2015-07-24 18:30:55Z franver $
+  $Id: OCManterMapaCompras.php 63445 2015-08-28 13:44:54Z michel $
 
   */
 
@@ -85,6 +85,12 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
     # Para saber a forma de execução (GF).
     $boFormaExecucao = SistemaLegado::pegaConfiguracao('forma_execucao_orcamento', '8', Sessao::getExercicio());
     $boFormaExecucao = ($boFormaExecucao == '1' ? true : false);
+    
+    $boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+    $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+    $boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+    $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
 
     if (($nuVlUnitario == 0) || (!$nuVlUnitario)) {
         $stMensagem = "Informe o Valor Unitário.";
@@ -92,9 +98,9 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
         $stMensagem = "Informe a Quantidade.";
     } elseif (($nuVlTotal == 0) || (!$nuVlTotal)) {
         $stMensagem = "Informe o Valor Total.";
-    } elseif ( $nuSaldoDotacao > 0 && $nuVlTotal > $nuSaldoDotacao && $boRegistroPreco == 'false' ) {
+    } elseif ( $nuSaldoDotacao > 0 && $nuVlTotal > $nuSaldoDotacao && $boRegistroPreco == 'false' && $boReservaRigida ) {
         $stMensagem = "O Valor de Reserva não pode ser <strong>maior</strong> que o Saldo da Dotação.";
-    } elseif ( $nuSaldoDotacao == 0 && $nuValorReserva > 0 && $boRegistroPreco == 'false' ) {
+    } elseif ( $nuSaldoDotacao == 0 && $nuValorReserva > 0 && $boRegistroPreco == 'false' && $boReservaRigida ) {
         $stMensagem = "O Valor de Reserva não pode ser <strong>maior</strong> que o Saldo da Dotação.";
     } elseif (($inTipoLicitacao == 2) and (!$inCodLote)) {
         $stMensagem = "Informe o número do Lote.";
@@ -114,8 +120,13 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
                     $itens[$item]['valor_unitario']   = $nuVlUnitario;
                     $itens[$item]['valor_total_mapa'] = $nuVlTotal;
                     $itens[$item]['quantidade_mapa']  = $nuQuantidade;
-                    if( $boRegistroPreco == 'false' )
-                        $itens[$item]['vl_reserva']   = $nuValorReserva;
+                    if( $boRegistroPreco == 'false' && $boReservaRigida){
+                        if($valor['cod_reserva']=='' && $valor['cod_reserva_solicitacao']=='')
+                            $itens[$item]['vl_reserva']   = $nuVlTotal;
+                        else
+                            $itens[$item]['vl_reserva']   = $nuValorReserva;
+                    }
+
                     $itens[$item]['lote']             = $inCodLote;
 
                     # Caso o item não tenha dotação informada na solicitação
@@ -152,19 +163,16 @@ function salvarDadosItem($inId, $nuVlUnitario, $nuQuantidade, $nuVlTotal, $nuVal
                         $obTOrcamentoDespesa->recuperaRelacionamento($rsOrcamentoDespesa, $stFiltro);
 
                         # Faz a busca do nome do recurso.
-                        $stFiltro  = "";
-                        $stFiltro .= " AND orcamento.recurso.exercicio = '".Sessao::getExercicio()."' \n";
+                        $stFiltro  = " AND orcamento.recurso.exercicio = '".Sessao::getExercicio()."' \n";
                         $obTOrcamentoRecurso->setDado('cod_recurso', $rsOrcamentoDespesa->getCampo('cod_recurso'));
                         $obTOrcamentoRecurso->recuperaRelacionamento( $rsOrcamentoRecurso, $stFiltro );
 
                         # Faz a busca do nome do projeto/atividade.
-                        $stFiltro  = "";
-                        $stFiltro .= " WHERE orcamento.pao.exercicio = '".Sessao::getExercicio()."' \n";
+                        $stFiltro  = " WHERE orcamento.pao.exercicio = '".Sessao::getExercicio()."' \n";
                         $stFiltro .= "   AND orcamento.pao.num_pao   = ".$rsOrcamentoDespesa->getCampo('num_pao')." \n";
                         $obTOrcamentoProjetoAtividade->recuperaSemMascara($rsOrcamentoProjetoAtividade, $stFiltro);
 
                         $itens[$item]['stTitle'] = $inCodDespesa.' - '.$rsOrcamentoDespesa->getCampo('descricao').' - '.$rsDotacao->getCampo('cod_estrutural').' - '.$rsOrcamentoProjetoAtividade->getCampo('num_acao').' - '.$rsOrcamentoProjetoAtividade->getCampo('nom_pao').' - '.$rsOrcamentoRecurso->getCampo('cod_recurso').' - '.$rsOrcamentoRecurso->getCampo('nom_recurso');
-
                     } else {
                         $itens[$item]['dotacao']        = "";
                         $itens[$item]['cod_despesa']    = "";
@@ -256,8 +264,7 @@ function alterarItem($inId, $stTipoCotacao)
     $obIMontaQtdeValores->obQuantidade->setValue  ($arItem['quantidade_solicitada']);
     $obIMontaQtdeValores->obQuantidade->obEvento->setOnChange( "montaParametrosGET('calculaValorReserva', 'nuVlUnitario,nuQuantidade' );" );
 
-    # Caso o item não possua dotação, não será possível desmembrá-lo em mais de
-    # um mapa.
+    # Caso o item não possua dotação, não será possível desmembrá-lo em mais de um mapa.
 
     if ($arItem['boDotacao'] == 'F') {
         $obIMontaQtdeValores->obQuantidade->setLabel (true);
@@ -270,8 +277,7 @@ function alterarItem($inId, $stTipoCotacao)
     $obIMontaQtdeValores->obValorUnitario->setValue (number_format($arItem['valor_unitario'], 4, ",","."));
     $obIMontaQtdeValores->obValorUnitario->obEvento->setOnChange("montaParametrosGET('calculaValorReserva', 'nuVlUnitario,nuQuantidade' );" );
 
-    # Se o usuário já informou a dotação na Solicitação ou anteriormente no Mapa,
-    # monta o Label não permitindo a alteração da Dotação.
+    # Se o usuário já informou a dotação na Solicitação ou anteriormente no Mapa, monta o Label não permitindo a alteração da Dotação.
 
     $nuSaldoDotacao = "";
 
@@ -302,19 +308,44 @@ function alterarItem($inId, $stTipoCotacao)
 
         $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
 
+        $nuVlReserva = 0.00;
         $nuSaldoDisponivelDotacao = 0.00;
 
         # Busca o valor disponível da Dotação no momento.
         if (is_numeric($arItem['cod_reserva']) && is_numeric($arItem['exercicio_reserva'])) {
+            $stFiltro = " WHERE reserva_saldos.cod_reserva = ".$arItem['cod_reserva']."
+                            AND exercicio = '".$arItem['exercicio_reserva']."'
+                            AND NOT EXISTS ( SELECT *
+                                               FROM orcamento.reserva_saldos_anulada AS RSA
+                                              WHERE RSA.cod_reserva=reserva_saldos.cod_reserva
+                                                AND RSA.exercicio=reserva_saldos.exercicio ) ";
 
             $obTOrcamentoReservaSaldos = new TOrcamentoReservaSaldos;
-            $obTOrcamentoReservaSaldos->setDado('cod_reserva' , $arItem['cod_reserva']);
-            $obTOrcamentoReservaSaldos->setDado('exercicio'   , $arItem['exercicio_reserva']);
-            $obTOrcamentoReservaSaldos->recuperaPorChave($rsReservaSaldos);
+            $obTOrcamentoReservaSaldos->recuperaTodos($rsReservaSaldos, $stFiltro);
 
             $nuSaldoDisponivelDotacao = ($nuSaldoDotacao + $rsReservaSaldos->getCampo('vl_reserva'));
+            $nuVlReserva = $rsReservaSaldos->getCampo('vl_reserva');
         } else {
             $nuSaldoDisponivelDotacao = $nuSaldoDotacao;
+        }
+        
+        if (is_numeric($arItem['cod_reserva_solicitacao']) &&
+            is_numeric($arItem['exercicio_reserva_solicitacao']) &&
+            $arItem['cod_reserva_solicitacao'].$arItem['exercicio_reserva_solicitacao'] != $arItem['cod_reserva'].$arItem['exercicio_reserva']
+           ) {
+
+            $stFiltro = " WHERE reserva_saldos.cod_reserva = ".$arItem['cod_reserva_solicitacao']."
+                            AND exercicio = '".$arItem['exercicio_reserva_solicitacao']."'
+                            AND NOT EXISTS ( SELECT *
+                                               FROM orcamento.reserva_saldos_anulada AS RSA
+                                              WHERE RSA.cod_reserva=reserva_saldos.cod_reserva
+                                                AND RSA.exercicio=reserva_saldos.exercicio ) ";
+
+            $obTOrcamentoReservaSaldos = new TOrcamentoReservaSaldos;
+            $obTOrcamentoReservaSaldos->recuperaTodos($rsReservaSaldos, $stFiltro);
+
+            $nuSaldoDisponivelDotacao = ($nuSaldoDisponivelDotacao + $rsReservaSaldos->getCampo('vl_reserva'));
+            $nuVlReserva = $nuVlReserva + $rsReservaSaldos->getCampo('vl_reserva');
         }
 
         $obHdnSaldoDotacao = new Hidden;
@@ -343,13 +374,13 @@ function alterarItem($inId, $stTipoCotacao)
     $obHdnValorReserva = new Hidden;
     $obHdnValorReserva->setId     ( "nuValorReserva" );
     $obHdnValorReserva->setName   ( "nuValorReserva" );
-    $obHdnValorReserva->setValue  ( number_format($arItem['vl_reserva'], 2, ",",".") );
+    $obHdnValorReserva->setValue  ( number_format($nuVlReserva, 2, ",",".") );
 
     $obLblValorReserva = new Label;
     $obLblValorReserva->setRotulo ( "Valor Reservado no Exercício" );
     $obLblValorReserva->setId     ( "stValorReserva" );
     $obLblValorReserva->setName   ( "stValorReserva" );
-    $obLblValorReserva->setValue  ( number_format($arItem['vl_reserva'], 2, ",",".") );
+    $obLblValorReserva->setValue  ( number_format($nuVlReserva, 2, ",",".") );
 
     if (Sessao::read('inTipoLicitacao') == 2) {
         $obTxtLote = new TextBox;
@@ -430,7 +461,6 @@ function alterarItem($inId, $stTipoCotacao)
 
     # Preenche o Desdobramento caso tenha sido informado a Dotação.
     if (is_numeric($arItem['cod_despesa']) && $arItem['boDotacao'] == 'F') {
-
         $stParam .= "&stCodEstrutural=".$arItem['cod_estrutural'];
         $stParam .= "&codClassificacao=".$arItem['cod_conta'];
         $stParam .= "&inCodDespesa=".$arItem['cod_despesa'];
@@ -526,7 +556,6 @@ function delItem($inId, $stTipo, $stTipoCotacao)
                 }
 
                 if ($stTipo == 'solicitacao') {
-
                     // APAGA TODOS ITENS DA SOLICITACAO
                     if ($itens[$item]['inId_solicitacao'] == $inId) {
                         $itens_excluidos[$cont]['cod_item']                      = $itens[$item]['cod_item'];
@@ -600,9 +629,6 @@ function delSolicitacao($inId, $stTipoCotacao)
 
     Sessao::write('solicitacoes_excluidas' , $solicitacoes_excluidas);
     Sessao::write('solicitacoes'           , $arSolicitacao);
-
-    # $rsRecordSet = new RecordSet;
-    # $rsRecordSet->preenche($solicitacoes);
 
     $stJs .= delItem($inId, "solicitacao", $stTipoCotacao); /* APAGA TODOS OS ITENS DA SOLICITACAO REMOVIDA */
     $stJs .= montaListaSolicitacoes($stTipoCotacao);
@@ -683,6 +709,12 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
     $obTComprasMapaItem->setDado("cod_solicitacao"       , $inCodSolicitacao);
     $obTComprasMapaItem->setDado("exercicio_solicitacao" , $stExercicio);
     $obErro = $obTComprasMapaItem->recuperaIncluirSolicitacaoMapa($rsItens, $boTransacao);
+    
+    $boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
+    $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
+
+    $boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+    $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
 
     if ($obErro->ocorreu()) {
         $boRetorno = false;
@@ -706,20 +738,17 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
                 # Código para montar o Hint com informações dos Desdobramentos.
                 if ($rsItens->getCampo('cod_despesa')) {
                     # Recupera o código de recurso, projeto e atividade.
-                    $stFiltro  = "";
-                    $stFiltro .= " AND OD.exercicio   = '".$stExercicio."' \n";
+                    $stFiltro  = " AND OD.exercicio   = '".$stExercicio."' \n";
                     $stFiltro .= " AND OD.cod_despesa = ".$rsItens->getCampo('cod_despesa')." \n";
                     $obTOrcamentoDespesa->recuperaRelacionamento($rsOrcamentoDespesa, $stFiltro);
 
                     # Recupera o nome do recurso.
-                    $stFiltro = "";
-                    $stFiltro .= " AND orcamento.recurso.exercicio = '".$stExercicio."' \n";
+                    $stFiltro = " AND orcamento.recurso.exercicio = '".$stExercicio."' \n";
                     $obTOrcamentoRecurso->setDado('cod_recurso', $rsOrcamentoDespesa->getCampo('cod_recurso'));
                     $obTOrcamentoRecurso->recuperaRelacionamento($rsOrcamentoRecurso, $stFiltro);
 
                     # Recupera o nome do projeto, atividade.
-                    $stFiltro = "";
-                    $stFiltro .= " WHERE orcamento.pao.exercicio = '".$stExercicio."' \n";
+                    $stFiltro  = " WHERE orcamento.pao.exercicio = '".$stExercicio."' \n";
                     $stFiltro .= " AND orcamento.pao.num_pao     = ".$rsOrcamentoDespesa->getCampo('num_pao')." \n";
                     $obTOrcamentoProjetoAtividade->recuperaSemMascara($rsOrcamentoProjetoAtividade, $stFiltro);
 
@@ -783,6 +812,7 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
                 $arItens['lote']                  = $rsItens->getCampo('lote');
 
                 # Dados da Dotação.
+                $arItens['dotacao']               = $rsItens->getCampo('cod_despesa');
                 $arItens['cod_despesa']           = $rsItens->getCampo('cod_despesa');
                 $arItens['dotacao_nom_conta']     = $rsItens->getCampo('dotacao_nom_conta');
                 $arItens['cod_conta']             = $rsItens->getCampo('cod_conta');
@@ -797,6 +827,11 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
                 $arItens['exercicio_reserva']      = $rsItens->getCampo('exercicio_reserva');
                 $arItens['vl_reserva']             = $rsItens->getCampo('vl_reserva');
                 $arItens['vl_reserva_homologacao'] = $rsItens->getCampo('vl_reserva');
+                
+                if($rsItens->getCampo('vl_reserva')<$rsItens->getCampo('vl_total')){
+                    $arItens['cod_reserva_solicitacao']         = $rsItens->getCampo('cod_reserva');
+                    $arItens['exercicio_reserva_solicitacao']   = $rsItens->getCampo('exercicio_reserva');
+                }
 
                 # Se existir reserva de saldo para o item, não permite alterar no mapa.
                 if (($rsItens->getCampo('vl_reserva') != '0.00') || ($rsItens->getCampo('cod_reserva'))) {
@@ -806,7 +841,7 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
                     $arItens['vl_reserva'] = $arItens['valor_total_mapa'];
                 }
 
-                if($boRegistroPreco=='true'){
+                if($boRegistroPreco=='true' || $boReservaAutorizacao){
                     $arItens['vl_reserva']             = '0.00';
                     $arItens['vl_reserva_homologacao'] = '0.00';
                 }
@@ -822,8 +857,7 @@ function addItens($arItem, $stTipoCotacao, $incluir = true, $boRegistroPreco)
                 $rsItens->proximo();
             }
 
-            # Validação para confirmar se existem itens disponíveis
-            # e que não foram atendidos na solicitação informada.
+            # Validação para confirmar se existem itens disponíveis e que não foram atendidos na solicitação informada.
             if (count($itens) == 0) {
                 $boRetorno = false;
             } else {
@@ -1010,7 +1044,6 @@ function montaListaItens($rsRecordSet, $stTipoCotacao, $stAcao = '')
     $table = new Table;
     $table->setRecordset( $rsRecordSet );
     $table->setSummary('Itens do Mapa');
-    //$table->setConditional( true , "#EFEFEF" );
 
     $table->Head->addCabecalho('Solicitação'           ,  8);
     $table->Head->addCabecalho('Item'                  , 30);
@@ -1290,6 +1323,9 @@ function montaMapa($inCodMapa, $stExercicio)
 {
     global $request;
 
+    $boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
+    $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+
     $stAcao = $request->get('stAcao');
 
     $rsOrcamentoDespesa	         = new RecordSet;
@@ -1338,6 +1374,7 @@ function montaMapa($inCodMapa, $stExercicio)
         $arSolicitacao['total_anulado']         = $rsMapaSolicitacao->getCampo('total_mapa_anulado');
         $arSolicitacao['valor_a_anular']        = 0;   /// este campo só será preenchi na rotina de anulação
         $arSolicitacao['incluir']               = false;
+        $arSolicitacao['registro_precos']       = ($rsMapaSolicitacao->getCampo('registro_precos')=='t') ? 'true' : 'false';
 
         $solicitacoes[] = $arSolicitacao;
 
@@ -1442,9 +1479,6 @@ function montaMapa($inCodMapa, $stExercicio)
             $arItens['quantidade_maxima']             = ($rsItens->getCampo('quantidade_solicitada') - $inQtdeAtendida);
             $arItens['quantidade_atendida']           = $inQtdeAtendida;
 
-            #$arItens['quantidade_atendida']           = $rsItens->getCampo('quantidade_atendida');
-            #$arItens['quantidade_maxima']             = ($rsItens->getCampo('quantidade_solicitada') - $quantidade_atendida) + $rsItens->getCampo('quantidade_mapa');
-
             $arItens['dotacao']                       = $rsItens->getCampo('dotacao');
             $arItens['cod_despesa']                   = $rsItens->getCampo('cod_despesa');
             $arItens['cod_conta']                     = $rsItens->getCampo('cod_conta');
@@ -1487,6 +1521,12 @@ function montaMapa($inCodMapa, $stExercicio)
                 $arItens['boReserva'] = 'T';
             } else {
                 $arItens['boReserva']  = 'F';
+                $arItens['vl_reserva']             = $arItens['valor_total_mapa'];
+            }
+            
+            if($boReservaAutorizacao){
+                $arItens['vl_reserva']             = '0.00';
+                $arItens['vl_reserva_homologacao'] = '0.00';
             }
 
             $arItens['incluir'] = false;
@@ -1532,7 +1572,6 @@ function totais()
     $rsItens->setPrimeiroElemento();
 
     while ( !$rsItens->eof() ) {
-
         $arTotais[ $rsItens->getCampo('cod_item') ]['valor']               = $arTotais[ $rsItens->getCampo('cod_item') ]['valor'] + $rsItens->getCampo( 'valor_total_mapa' );
         $arTotais[ $rsItens->getCampo('cod_item') ]['quantidade']          = $arTotais[ $rsItens->getCampo('cod_item') ]['quantidade'] + $rsItens->getCampo ( 'quantidade_mapa');
         $arTotais[ $rsItens->getCampo('cod_item') ]['nom_item']            = $rsItens->getCampo('nom_item');
@@ -1568,7 +1607,6 @@ function montaListaTotais($rsTotais)
     $table->setRecordset( $rsTotais );
 
     $table->setSummary('Totais por Item');
-    //$table->setConditional( true , "#ddd" );
 
     $table->setArquivo( CAM_GP_COM_INSTANCIAS . 'mapaCompras/OCManterMapaCompras.php');
     // parametros do recordSet
@@ -1639,7 +1677,6 @@ function montaSpamDetalheItem($rsDados)
    $table->setRecordset( $rsDados );
 
    $table->setSummary('Itens');
-   //$table->setConditional( true , "#ddd" );
 
    $table->Head->addCabecalho( 'Solicitação'           , 5 );
    $table->Head->addCabecalho( 'Quantidade Solicitada' , 5 );
@@ -1716,6 +1753,13 @@ function liberaMapaAnulacao($inCodMapa, $stExercicio)
                 $stJs .= "BloqueiaFrames(true,false);";
                 $stJs .= "alertPopUp('Mapa de Compras','Mapa de Compras possui vínculo com a Licitação.','window.location.href=\'LSManterMapaCompras.php\';');";
             }
+        }
+    }
+
+    if (!$boExecuta) {
+        $arSolicitacao = Sessao::read('solicitacoes');
+        foreach ($arSolicitacao as $key => $value) {
+            $stJs .= "jQuery('#boRegistroPreco').val('".$value['registro_precos']."'); \n ";
         }
     }
 

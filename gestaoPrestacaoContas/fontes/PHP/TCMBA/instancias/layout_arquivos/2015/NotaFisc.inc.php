@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62823 $
+    $Revision: 63459 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 09:58:01 -0300 (Seg, 18 Ago 2008) $
@@ -41,67 +41,93 @@
     * Casos de uso: uc-06.05.00
 */
 
-    include_once( CAM_GPC_TCMBA_MAPEAMENTO."TTBANotaFiscal.class.php" );
-    $obTMapeamento = new TTBANotaFiscal();
-    $obTMapeamento->setDado('inMes'      , $inMes );
-    $obTMapeamento->setDado('stEntidades', $stEntidades );
-    $obTMapeamento->recuperaDadosTribunal($arRecordSet[$stArquivo]);
+    include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBANotaFiscal.class.php" );
+    $obTTBANotaFiscal = new TTBANotaFiscal();
+    $obTTBANotaFiscal->setDado('competencia'     , Sessao::getExercicio().$inMes );
+    $obTTBANotaFiscal->setDado('entidades'       , $stEntidades );
+    $obTTBANotaFiscal->setDado('unidade_gestora' , $inCodUnidadeGestora );
+    $obTTBANotaFiscal->setDado('dt_inicial'      , $stDataInicial );
+    $obTTBANotaFiscal->setDado('dt_final'        , $stDataFinal );
+    $obTTBANotaFiscal->recuperaDadosTribunal($rsNotaFiscal);
 
-    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]1"); //Reservado
+    $obExportador->roUltimoArquivo->addBloco($rsNotaFiscal);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro"); 
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]".$inCodUnidadeGestora); //unidade_gestora
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora"); 
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_orcamentaria");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_empenho");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_empenho");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_pagamento");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_pagamento_empenho");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_nota");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_nota");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("serie");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_serie");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subserie");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_subserie");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_cnpj");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_cgm");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nome_emitente");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("pf_pj");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_emitente");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_nota");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_nota");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]"); //reservado
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm"); 
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("observacao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao_nota");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(120);
+
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_orgao");
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_empenho"); //sub_empenho
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_subempenho");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
+
+unset($obTTBANotaFiscal);
+unset($rsNotaFiscal);
+
+?>

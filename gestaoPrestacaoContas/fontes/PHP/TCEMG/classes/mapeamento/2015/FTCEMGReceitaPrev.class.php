@@ -45,54 +45,56 @@ class FTCEMGReceitaPrev extends Persistente
     * Método Construtor
     * @access Private
 */
-function FTCEMGReceitaPrev()
-{
-    parent::Persistente();
+    public function __construct()
+    {
+        parent::Persistente();
+    
+        $this->setTabela('tcemg.fn_receita_prev');
+    }
 
-    $this->setTabela('tcemg.fn_receita_prev');
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "
-                SELECT  EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS periodo
-                        , cod_tipo
-                        , contrib_pat
-                        , contrib_serv_ativo
-                        , contrib_serv_inat_pens
-                        , rec_patrimoniais
-                        , alienacao_bens
-                        , outras_rec_cap
-                        , comp_prev
-                        , outras_rec
-                        , deducoes_receita
-                        , 0.00 as contrib_pat_anterior
-                        , 0.00 as repasses_prev
-                        , 0.00 as receitas_prev_intra
-                        , 0.00 as plano_fin_recursos_cobertura
-                        , 0.00 as plano_fin_repasse_pag_resp
-                        , 0.00 as plano_fin_rec_formacao_reserva
-                        , 0.00 as plano_fin_outros_aportes_rpps
-                        , 0.00 as plano_prev_rec_cob_def_fin
-                        , 0.00 as plano_prev_rec_cob_def_atuarial
-                        , 0.00 as plano_prev_outros_aportes_rpps
+    public function montaRecuperaTodos()
+    {
+        $stSql  = "
+              SELECT EXTRACT( month FROM TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy') ) AS periodo
+                   , cod_tipo
+                   , contrib_pat
+                   , contrib_serv_ativo
+                   , contrib_serv_inat_pens
+                   , rec_patrimoniais
+                   , alienacao_bens
+                   , outras_rec_cap
+                   , comp_prev
+                   , outras_rec
+                   , deducoes_receita
+                   , 0.00 as contrib_pat_anterior
+                   , 0.00 as repasses_prev
+                   , receitas_prev_intra
+                   , 0.00 as plano_fin_recursos_cobertura
+                   , 0.00 as plano_fin_repasse_pag_resp
+                   , 0.00 as plano_fin_rec_formacao_reserva
+                   , 0.00 as plano_fin_outros_aportes_rpps
+                   , 0.00 as plano_prev_rec_cob_def_fin
+                   , 0.00 as plano_prev_rec_cob_def_atuarial
+                   , 0.00 as plano_prev_outros_aportes_rpps
                 FROM tcemg.fn_receita_prev( '".$this->getDado("exercicio")."'
-                                            , '".$this->getDado("cod_entidade")."'
-                                            , '".$this->getDado("dt_inicial")."'
-                                            , '".$this->getDado("dt_final")."'
-                ) AS retorno(
-                     cod_tipo                   VARCHAR
-                    , contrib_pat               VARCHAR
-                    , contrib_serv_ativo        VARCHAR
-                    , contrib_serv_inat_pens    VARCHAR
-                    , rec_patrimoniais          VARCHAR
-                    , alienacao_bens            VARCHAR
-                    , outras_rec_cap            VARCHAR
-                    , comp_prev                 VARCHAR
-                    , outras_rec                VARCHAR
-                    , deducoes_receita          VARCHAR
-                )";
-    return $stSql;
-}
-
+                                          , '".$this->getDado("cod_entidade")."'
+                                          , '".$this->getDado("dt_inicial")."'
+                                          , '".$this->getDado("dt_final")."')
+                  AS retorno( cod_tipo               VARCHAR
+                            , contrib_pat            VARCHAR
+                            , contrib_serv_ativo     VARCHAR
+                            , contrib_serv_inat_pens VARCHAR
+                            , rec_patrimoniais       VARCHAR
+                            , alienacao_bens         VARCHAR
+                            , outras_rec_cap         VARCHAR
+                            , comp_prev              VARCHAR
+                            , outras_rec             VARCHAR
+                            , deducoes_receita       VARCHAR
+                            , receitas_prev_intra    VARCHAR
+                            )
+        ";
+        return $stSql;
+    }
+    
+    public function __destruct(){}
 }

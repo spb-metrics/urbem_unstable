@@ -35,7 +35,7 @@ Arquivo de geracao do arquivo despesaTotalPessoalPE TCM/MG
 
     * @ignore
 
-    $Id: despesaTotalPessoalPE.inc.php 62767 2015-06-16 19:36:31Z jean $
+    $Id: despesaTotalPessoalPE.inc.php 63497 2015-09-02 20:06:21Z carlos.silva $
     */
 
     include_once( CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio().'/'.'FTCEMGDespesaTotalPessoalPE.class.php');
@@ -149,19 +149,4 @@ Arquivo de geracao do arquivo despesaTotalPessoalPE TCM/MG
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('corrperapurac');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despcorres');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-        
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna('despanteriores');
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     }
-?>

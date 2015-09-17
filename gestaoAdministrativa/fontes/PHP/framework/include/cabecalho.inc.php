@@ -33,7 +33,7 @@
  * @package framework
  * @subpackage componentes
 
- $Id: cabecalho.inc.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+ $Id: cabecalho.inc.php 63462 2015-08-31 17:12:23Z franver $
 
  Casos de uso: uc-01.01.00
 */
@@ -222,7 +222,7 @@ $dbEmp->fechaBD();
 <!-- Ajax Loading -->
 <p id="carregando"
     style="display: none; position: fixed; bottom: 0px; left: 1px; background-color: transparent;">
-<img src="<?=CAM_FW_IMAGENS;?>ajax_carregando.gif" alt="Carregando" /></p>
+<img id="ajax_carregando" src="<?php echo CAM_FW_IMAGENS; ?>ajax_carregando.gif" alt="Carregando" /></p>
 <span id="spnErro" style="display: none;"></span> <!-- FIM Ajax Loading -->
     <?php
     if (isset($_SERVER["HTTP_REFERER"])) {

@@ -34,19 +34,20 @@
 
  * Casos de uso: uc-03.05.21
 
- $Id: FMManterAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: FMManterAutorizacao.php 63584 2015-09-14 13:11:00Z michel $
 
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
-include_once CAM_GA_ADM_COMPONENTES."ITextBoxSelectDocumento.class.php";
-include_once CAM_GP_LIC_COMPONENTES."IMontaNumeroLicitacao.class.php";
-include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacao.class.php";
-include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
-include_once CAM_GP_COM_COMPONENTES."ILabelEditObjeto.class.php";
-require_once TCOM."TComprasMapaItem.class.php";
+include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
+include_once CAM_GA_ADM_COMPONENTES.'ITextBoxSelectDocumento.class.php';
+include_once CAM_GP_LIC_COMPONENTES.'IMontaNumeroLicitacao.class.php';
+include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoLicitacao.class.php';
+include_once CAM_GF_EMP_NEGOCIO.'REmpenhoAutorizacaoEmpenho.class.php';
+include_once CAM_GP_COM_COMPONENTES.'ILabelEditObjeto.class.php';
+require_once TCOM.'TComprasMapaItem.class.php';
+require_once TCOM.'TComprasMapa.class.php';
 
 function recuperaUltimaDataContabil()
 {
@@ -69,7 +70,7 @@ function recuperaUltimaDataContabil()
     */
     $obREmpenhoAutorizacaoEmpenho = new REmpenhoAutorizacaoEmpenho;
 
-    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade']);
+    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
     $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
     $obErro = $obREmpenhoAutorizacaoEmpenho->listarMaiorData( $rsMaiorData );
 
@@ -96,7 +97,7 @@ $pgOcul		= "OC".$stPrograma.".php";
 $pgJs		= "JS".$stPrograma.".js";
 
 $stAcao = $request->get('stAcao');
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 $obForm = new Form;
 $obForm->setAction( $pgProc );
@@ -105,11 +106,20 @@ $obForm->setTarget( "oculto" );
 $stUltimaDataContabil = recuperaUltimaDataContabil();
 
 $obTLicitacaoLicitacao = new TLicitacaoLicitacao;
-$obTLicitacaoLicitacao->setDado( 'cod_licitacao' , $_GET['inCodLicitacao']  );
-$obTLicitacaoLicitacao->setDado( 'exercicio'     , Sessao::getExercicio()   );
-$obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $_GET['inCodEntidade']   );
-$obTLicitacaoLicitacao->setDado( 'cod_modalidade', $_GET['inCodModalidade'] );
+$obTLicitacaoLicitacao->setDado( 'cod_licitacao' , $request->get('inCodLicitacao')  );
+$obTLicitacaoLicitacao->setDado( 'exercicio'     , Sessao::getExercicio()           );
+$obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $request->get('inCodEntidade')   );
+$obTLicitacaoLicitacao->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
 $obTLicitacaoLicitacao->recuperaLicitacaoCompleta( $rsLicitacao );
+
+list($inCodMapa, $stExercicioMapa) = explode('/', $rsLicitacao->getCampo('mapa_compra'));
+
+$obTComprasMapa = new TComprasMapa;
+$obTComprasMapa->setDado( 'cod_mapa'     , $inCodMapa        );
+$obTComprasMapa->setDado( 'exercicio'    , $stExercicioMapa  );
+$obTComprasMapa->recuperaTipoMapa($rsMapa);
+
+$boRegistroPreco = ($rsMapa->getCampo('registro_precos') == 't') ? TRUE : FALSE;
 
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName  ( "stCtrl" );
@@ -120,61 +130,61 @@ $obHdnAcao->setName  ( "stAcao" );
 $obHdnAcao->setValue ( $stAcao  );
 
 $obHdnLicitacao = new Hidden;
-$obHdnLicitacao->setName  ( 'inCodLicitacao'        );
-$obHdnLicitacao->setValue ( $_GET['inCodLicitacao'] );
+$obHdnLicitacao->setName  ( 'inCodLicitacao'                );
+$obHdnLicitacao->setValue ( $request->get('inCodLicitacao') );
 
 $obHdnEntidade = new Hidden;
 $obHdnEntidade->setId    ( 'inCodEntidade' );
 $obHdnEntidade->setName  ( 'inCodEntidade' );
-$obHdnEntidade->setValue ( $_GET['inCodEntidade']   );
+$obHdnEntidade->setValue ( $request->get('inCodEntidade') );
 
 $obHdnStUltimaDataContabil = new Hidden;
-$obHdnStUltimaDataContabil->setName  ( 'stUltimaDataContabil' );
-$obHdnStUltimaDataContabil->setValue ( $stUltimaDataContabil   );
+$obHdnStUltimaDataContabil->setName ( 'stUltimaDataContabil'    );
+$obHdnStUltimaDataContabil->setValue( $stUltimaDataContabil     );
 
 $obHdnModalidade = new Hidden;
-$obHdnModalidade->setName ( 'inCodModalidade' );
-$obHdnModalidade->setValue ( $_GET['inCodModalidade'] );
+$obHdnModalidade->setName   ( 'inCodModalidade' );
+$obHdnModalidade->setValue  ( $request->get('inCodModalidade') );
 
 $obHdnDtLicitacao = new Hidden;
-$obHdnDtLicitacao->setName ( 'inDataLicitacao' );
-$obHdnDtLicitacao->setValue ( $rsLicitacao->getCampo('dt_licitacao'));
+$obHdnDtLicitacao->setName  ( 'inDataLicitacao' );
+$obHdnDtLicitacao->setValue ( $rsLicitacao->getCampo('dt_licitacao') );
 
 $obLblExercicio = new Label;
 $obLblExercicio->setValue  ( Sessao::getExercicio() );
-$obLblExercicio->setRotulo ( 'Exercício'        );
+$obLblExercicio->setRotulo ( 'Exercício'            );
 
 $obLblEntidade = new Label;
 $obLblEntidade->setValue  ( $rsLicitacao->getCampo('entidade') );
 $obLblEntidade->setRotulo ( 'Entidade' );
 
 $obLblLicitacao = new Label;
-$obLblLicitacao->setRotulo ( 'Código Licitação' );
-$obLblLicitacao->setValue ( $rsLicitacao->getCampo('cod_licitacao')."/".$rsLicitacao->getCampo('exercicio') );
+$obLblLicitacao->setRotulo  ( 'Código Licitação' );
+$obLblLicitacao->setValue   ( $rsLicitacao->getCampo('cod_licitacao')."/".$rsLicitacao->getCampo('exercicio') );
 
 $obLblDtLicitacao = new Label;
-$obLblDtLicitacao->setRotulo ( 'Data Licitação' );
-$obLblDtLicitacao->setValue ( $rsLicitacao->getCampo('dt_licitacao'));
+$obLblDtLicitacao->setRotulo( 'Data Licitação' );
+$obLblDtLicitacao->setValue ( $rsLicitacao->getCampo('dt_licitacao') );
 
 $obLblTipoObjetoLicitacao = new Label;
-$obLblTipoObjetoLicitacao->setRotulo ( 'Tipo Objeto' );
-$obLblTipoObjetoLicitacao->setValue ($rsLicitacao->getCampo('cod_tipo_objeto').' - '.SistemaLegado::pegaDado('descricao','compras.tipo_objeto','where cod_tipo_objeto ='.$rsLicitacao->getCampo('cod_tipo_objeto')));
+$obLblTipoObjetoLicitacao->setRotulo( 'Tipo Objeto' );
+$obLblTipoObjetoLicitacao->setValue ( $rsLicitacao->getCampo('cod_tipo_objeto').' - '.SistemaLegado::pegaDado('descricao','compras.tipo_objeto','where cod_tipo_objeto ='.$rsLicitacao->getCampo('cod_tipo_objeto')) );
 
 $obLblObjetoLicitacao = new Label;
-$obLblObjetoLicitacao->setRotulo ( 'Objeto' );
-$obLblObjetoLicitacao->setValue ($rsLicitacao->getCampo('cod_objeto').' - '.SistemaLegado::pegaDado('descricao','compras.objeto','where cod_objeto ='.$rsLicitacao->getCampo('cod_objeto')));
+$obLblObjetoLicitacao->setRotulo( 'Objeto' );
+$obLblObjetoLicitacao->setValue ( $rsLicitacao->getCampo('cod_objeto').' - '.SistemaLegado::pegaDado('descricao','compras.objeto','where cod_objeto ='.$rsLicitacao->getCampo('cod_objeto')) );
 
 $obLblDtEntregaLicitacao = new Label;
 $obLblDtEntregaLicitacao->setRotulo ( 'Data Entrega Proposta' );
-$obLblDtEntregaLicitacao->setValue ($rsLicitacao->getCampo('dt_entrega_proposta'));
+$obLblDtEntregaLicitacao->setValue  ( $rsLicitacao->getCampo('dt_entrega_proposta') );
 
 $obLblValidadeLicitacao = new Label;
-$obLblValidadeLicitacao->setRotulo ( 'Data Validade Proposta' );
-$obLblValidadeLicitacao->setValue ($rsLicitacao->getCampo('dt_validade_proposta'));
+$obLblValidadeLicitacao->setRotulo  ( 'Data Validade Proposta' );
+$obLblValidadeLicitacao->setValue   ( $rsLicitacao->getCampo('dt_validade_proposta') );
 
 $obLblCondicoesPagamentoLicitacao = new Label;
-$obLblCondicoesPagamentoLicitacao->setRotulo ( 'Condições de Pagamento' );
-$obLblCondicoesPagamentoLicitacao->setValue ($rsLicitacao->getCampo('condicoes_pagamento'));
+$obLblCondicoesPagamentoLicitacao->setRotulo( 'Condições de Pagamento' );
+$obLblCondicoesPagamentoLicitacao->setValue ( $rsLicitacao->getCampo('condicoes_pagamento') );
 
 $obDtAprovacaoJuridicoLicitacao = new Data;
 $obDtAprovacaoJuridicoLicitacao->setName   ( "stDtAutorizacao" );
@@ -188,26 +198,32 @@ $oblblModalidade->setValue  ( $rsLicitacao->getCampo( 'modalidade' ) );
 $oblblModalidade->setRotulo ( 'Modalidade' );
 
 $obLblCotacao = new Label;
-$obLblCotacao->setValue  ( $_GET['inCodCotacao']."/".Sessao::getExercicio() );
+$obLblCotacao->setValue  ( $request->get('inCodCotacao')."/".Sessao::getExercicio() );
 $obLblCotacao->setRotulo ( 'Cotação' );
 
 $obLblMapaLicitacao = new Label;
 $obLblMapaLicitacao->setValue  ( $rsLicitacao->getCampo('mapa_compra'));
 $obLblMapaLicitacao->setRotulo ( 'Mapa' );
 
+if($boRegistroPreco){
+    $obLblRegistroPreco = new Label;
+    $obLblRegistroPreco->setValue   ( 'Sim' );
+    $obLblRegistroPreco->setRotulo  ( 'Registro de Preço' );
+}
+
 $obSpnAutorizacoes = new Span;
-$obSpnAutorizacoes->setId ( 'spnAutorizacoes' );
+$obSpnAutorizacoes->setId   ( 'spnAutorizacoes' );
 
 $obSpnSpace = new Span;
-$obSpnSpace->setId('spnLabels');
+$obSpnSpace->setId          ( 'spnLabels'       );
 
 $obSpnItens = new Span;
-$obSpnItens->setId( 'spnItens' );
+$obSpnItens->setId          ( 'spnItens'        );
 
 $obLblTotalMapa = new Label();
-$obLblTotalMapa->setRotulo( 'Total do Mapa' );
-$obLblTotalMapa->setId( 'stTotalMapa' );
-$obLblTotalMapa->setName( 'stTotalMapa' );
+$obLblTotalMapa->setRotulo  ( 'Total do Mapa'   );
+$obLblTotalMapa->setId      ( 'stTotalMapa'     );
+$obLblTotalMapa->setName    ( 'stTotalMapa'     );
 
 # Componente que monta as Assinaturas.
 $obMontaAssinaturas = new IMontaAssinaturas(null, 'autorizacao_empenho');
@@ -224,32 +240,43 @@ $obFormulario->addHidden ( $obHdnCtrl );
 $obFormulario->addHidden ( $obHdnDtLicitacao );
 $obFormulario->addHidden ( $obHdnStUltimaDataContabil );
 
-$obFormulario->addComponente ( $obLblExercicio );
-$obFormulario->addComponente ( $obLblEntidade );
-$obFormulario->addComponente ( $obLblLicitacao );
+if($boRegistroPreco)
+    $obFormulario->addComponente( $obLblRegistroPreco );
+    
+$obFormulario->addComponente    ( $obLblExercicio );
+$obFormulario->addComponente    ( $obLblEntidade );
+$obFormulario->addComponente    ( $obLblLicitacao );
 
-$obFormulario->addComponente ( $obLblDtLicitacao );
-$obFormulario->addComponente ( $obLblTipoObjetoLicitacao );
-$obFormulario->addComponente ( $obLblObjetoLicitacao );
-$obFormulario->addComponente ( $obLblDtEntregaLicitacao );
-$obFormulario->addComponente ( $obLblValidadeLicitacao );
-$obFormulario->addComponente ( $obLblCondicoesPagamentoLicitacao );
+$obFormulario->addComponente    ( $obLblDtLicitacao );
+$obFormulario->addComponente    ( $obLblTipoObjetoLicitacao );
+$obFormulario->addComponente    ( $obLblObjetoLicitacao );
+$obFormulario->addComponente    ( $obLblDtEntregaLicitacao );
+$obFormulario->addComponente    ( $obLblValidadeLicitacao );
+$obFormulario->addComponente    ( $obLblCondicoesPagamentoLicitacao );
 
-$obFormulario->addComponente ( $oblblModalidade );
-$obFormulario->addComponente ( $obLblCotacao );
+$obFormulario->addComponente    ( $oblblModalidade );
+$obFormulario->addComponente    ( $obLblCotacao );
 
-$obFormulario->addComponente ( $obLblMapaLicitacao );
-$obFormulario->addComponente ( $obLblTotalMapa );
+$obFormulario->addComponente    ( $obLblMapaLicitacao );
+$obFormulario->addComponente    ( $obLblTotalMapa );
 
 # Monta o componente de Assinaturas.
 $obMontaAssinaturas->geraFormulario( $obFormulario );
 
-$obFormulario->addSpan ( $obSpnSpace );
-$obFormulario->addTitulo ( $rsLicitacao->getCampo('entidade') );
-$obFormulario->addComponente ( $obDtAprovacaoJuridicoLicitacao  );
-$obFormulario->addSpan ( $obSpnItens );
+$obFormulario->addSpan          ( $obSpnSpace );
+$obFormulario->addTitulo        ( $rsLicitacao->getCampo('entidade') );
+$obFormulario->addComponente    ( $obDtAprovacaoJuridicoLicitacao  );
+$obFormulario->addSpan          ( $obSpnItens );
 
-$obFormulario->Cancelar($pgList, true);
+$obOk  = new Ok(true);
+if($boRegistroPreco)
+    $obOk->setDisabled(true);
+
+$obCancelar  = new Cancelar();
+$obCancelar->obEvento->setOnClick("Cancelar('".$pgList."','telaPrincipal');");
+
+$obFormulario->defineBarra( array( $obOk, $obCancelar ) );
+
 $obFormulario->Show();
 
 if ($obMontaAssinaturas->getOpcaoAssinaturas()) {
@@ -257,7 +284,7 @@ if ($obMontaAssinaturas->getOpcaoAssinaturas()) {
 }
 
 # Parâmetros necessários para requisitar as informações da Licitação.
-$stParams .= "&inCodCotacao=".$_REQUEST['inCodCotacao'];
+$stParams .= "&inCodCotacao=".$request->get('inCodCotacao');
 $stParams .= "&inCodLicitacao=".$rsLicitacao->getCampo('cod_licitacao');
 $stParams .= "&inCodEntidade=".$rsLicitacao->getCampo('cod_entidade');
 $stParams .= "&inCodModalidade=".$rsLicitacao->getCampo('cod_modalidade');
@@ -270,6 +297,9 @@ $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId().$stParams."','buscaInfoL
 $stJs .= "</script>	\n";
 
 echo $stJs;
+
+if($boRegistroPreco)
+    SistemaLegado::exibeAviso("Autorizações de Empenho de Registros de Preços devem ser feitas na ação: Gestão Financeira :: Empenho :: Autorização :: Incluir Autorização Diversos.","aviso","aviso");
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 

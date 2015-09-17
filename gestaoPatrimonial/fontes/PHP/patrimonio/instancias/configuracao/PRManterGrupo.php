@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.04
 
- * $Id: PRManterGrupo.php 61751 2015-02-27 21:30:49Z arthur $
+ * $Id: PRManterGrupo.php 63400 2015-08-25 13:49:35Z arthur $
 
  */
 
@@ -56,7 +56,7 @@ $pgJs     = "JS".$stPrograma.".js";
 $stAcao = $request->get('stAcao');
 
 $obTPatrimonioGrupo = new TPatrimonioGrupo();
-$obTPatrimonioGrupoPlanoAnalitica = new TPatrimonioGrupoPlanoAnalitica();
+$obTPatrimonioGrupoPlanoAnalitica   = new TPatrimonioGrupoPlanoAnalitica();
 $obTPatrimonioGrupoPlanoDepreciacao = new TPatrimonioGrupoPlanoDepreciacao();
 $obTPatrimonioDepreciacao = new TPatrimonioDepreciacao();
 
@@ -71,21 +71,23 @@ switch ($stAcao) {
 
         $stFiltro = "
           WHERE  1=1
-            AND  nom_grupo = '".$_REQUEST['stDescricaoGrupo']."'
-            AND  grupo.cod_natureza = ".$_REQUEST['inCodNatureza']."
+            AND  nom_grupo = '".$request->get('stDescricaoGrupo')."'
+            AND  grupo.cod_natureza = ".$request->get('inCodNatureza')."
         ";
         $obTPatrimonioGrupo->recuperaGrupo( $rsPatrimonioGrupo, $stFiltro );
         
         if ($rsPatrimonioGrupo->getNumLinhas() <= 0) {
-            $obTPatrimonioGrupo->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
+            $obTPatrimonioGrupo->setDado( 'cod_natureza', $request->get('inCodNatureza') );
             $obTPatrimonioGrupo->proximoCod( $inCodGrupo );
             $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $inCodGrupo );
-            $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $_REQUEST['stDescricaoGrupo'] );
+            $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $request->get('stDescricaoGrupo') );
             
-            $inDepreciacao = (!empty($_REQUEST['inDepreciacao'])&&$_REQUEST['inDepreciacao']>0) ? number_format(str_replace(',','.',$_REQUEST['inDepreciacao']),2,'.','') : '0.00';
+            $inDepreciacao = $request->get('inDepreciacao');
             
-            if(!empty($_REQUEST['inCodContaDepreciacao'])){
-                if(empty($_REQUEST['inDepreciacao'])||$_REQUEST['inDepreciacao']==0){
+            $inDepreciacao = ($inDepreciacao != "" && $inDepreciacao > 0) ? number_format(str_replace(',','.',$inDepreciacao),2,'.','') : '0.00';
+            
+            if($request->get('inCodContaDepreciacao') != ""){
+                if($request->get('inDepreciacao') == "" || $request->get('inDepreciacao') == 0){
                     SistemaLegado::exibeAviso(urlencode('Como o campo Conta Contábil de Depreciação Acumulada está preenchido, é obrigatório o preenchimento do campo Quota Depreciação Anual.'),"n_incluir","erro");
                     Sessao::encerraExcecao(); die;
                 }
@@ -97,19 +99,19 @@ switch ($stAcao) {
             
             $obTPatrimonioGrupo->inclusao();
             
-            if(!empty($_REQUEST['inCodConta'])){
+            if($request->get('inCodConta') != ""){
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_grupo'   , $inCodGrupo );
-                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza', $request->get('inCodNatureza') );
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'   , Sessao::getExercicio() );
-                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'   , $_REQUEST['inCodConta'] );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'   , $request->get('inCodConta') );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
             
-            if(!empty($_REQUEST['inCodContaDepreciacao'])){
+            if($request->get('inCodContaDepreciacao') != ""){
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'   , $inCodGrupo );
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza', $request->get('inCodNatureza') );
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'   , Sessao::getExercicio() );
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'   , $_REQUEST['inCodContaDepreciacao'] );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'   , $request->get('inCodContaDepreciacao') );
                 $obTPatrimonioGrupoPlanoDepreciacao->inclusao();
             }
             
@@ -123,48 +125,51 @@ switch ($stAcao) {
 
     case 'alterar' :
         $stFiltro = "
-          WHERE  1=1
-            AND  nom_grupo = '".$_REQUEST['stDescricaoGrupo']."'
-            AND  grupo.cod_natureza = ".$_REQUEST['inCodNatureza']."
-            AND  grupo.cod_grupo <> ".$_REQUEST['inCodGrupo']."";
+          WHERE nom_grupo          = '".$request->get('stDescricaoGrupo')."'
+            AND grupo.cod_natureza =  ".$request->get('inCodNatureza')."
+            AND grupo.cod_grupo    <> ".$request->get('inCodGrupo');
 
         $obTPatrimonioGrupo->recuperaGrupo($rsPatrimonioGrupo, $stFiltro);
-
+        
         if ($rsPatrimonioGrupo->getNumLinhas() <= 0) {
             
-            $obTPatrimonioGrupo->setDado('cod_plano_grupo' , $_REQUEST['inCodPlanoDepreciacao']);
+            $obTPatrimonioGrupo->setDado('cod_plano_grupo' , $request->get('inCodPlanoDepreciacao'));
+            $obTPatrimonioGrupo->setDado('cod_grupo'       , $request->get('inCodGrupo'));
+            $obTPatrimonioGrupo->setDado('cod_natureza'    , $request->get('inCodNatureza'));
             $obTPatrimonioGrupo->recuperaGrupoPlanoDepreciacao( $rsGrupoPlanoDepreciacao );
-                        
-            if ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo("cod_plano") != $_REQUEST['inCodContaDepreciacao']) {
+
+            if ($rsGrupoPlanoDepreciacao->getNumLinhas() >= 1 && $rsGrupoPlanoDepreciacao->getCampo("cod_plano") != $request->get('inCodContaDepreciacao')) {
                 SistemaLegado::exibeAviso(urlencode('Já existem depreciações lançadas para este Grupo. Anule-as para alterar a Conta Contábil de Depreciação.'),"n_incluir","erro");
                 Sessao::encerraExcecao();
                 die();
             } else {
             
                 //deleta da table grupo_plano_depreciacao
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $_REQUEST['inCodGrupo'] );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
+                $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $request->get('inCodGrupo') );
                 $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
                 $obTPatrimonioGrupoPlanoDepreciacao->exclusao();
     
                 //inclui na table grupo_plano_depreciacao
-                if(!empty($_REQUEST['inCodContaDepreciacao'])){
+                if($request->get('inCodContaDepreciacao') != ""){
                     $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
-                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'    , $_REQUEST['inCodContaDepreciacao'] );
+                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
+                    $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_plano'    , $request->get('inCodContaDepreciacao') );
                     $obTPatrimonioGrupoPlanoDepreciacao->inclusao();
                 }
             }
             
-            $obTPatrimonioGrupo->setDado( 'cod_natureza', $_REQUEST['inCodNatureza'] );
+            $obTPatrimonioGrupo->setDado( 'cod_natureza', $request->get('inCodNatureza') );
             $obTPatrimonioGrupo->proximoCod( $inCodGrupo );
-            $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $_REQUEST['inCodGrupo'] );
-            $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $_REQUEST['stDescricaoGrupo'] );
+            $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $request->get('inCodGrupo') );
+            $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $request->get('stDescricaoGrupo') );
             
-            $inDepreciacao = (!empty($_REQUEST['inDepreciacao'])) ? number_format(str_replace(',','.',$_REQUEST['inDepreciacao']),2,'.','') : '0.00';
+            $inDepreciacao = $request->get('inDepreciacao');
             
-            if(!empty($_REQUEST['inCodContaDepreciacao'])){
-                if(empty($_REQUEST['inDepreciacao'])||$inDepreciacao==0.00){
+            $inDepreciacao = ($inDepreciacao != "" ) ? number_format(str_replace(',','.',$inDepreciacao),2,'.','') : '0.00';
+            
+            if($request->get('inCodContaDepreciacao') != ""){
+                if($request->get('inDepreciacao' == "") || $inDepreciacao == 0.00){
                     SistemaLegado::exibeAviso(urlencode('Como o campo Conta Contábil de Depreciação Acumulada está preenchido, é obrigatório o preenchimento do campo Quota Depreciação Anual.'),"n_incluir","erro");
                     Sessao::encerraExcecao(); die;
                 }
@@ -176,20 +181,20 @@ switch ($stAcao) {
             $obTPatrimonioGrupo->alteracao();
 
             //deleta da table grupo_plano_analitica
-            $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-            $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_grupo'    , $_REQUEST['inCodGrupo'] );
+            $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
+            $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_grupo'    , $request->get('inCodGrupo') );
             $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'    , Sessao::getExercicio() );
             $obTPatrimonioGrupoPlanoAnalitica->exclusao();
 
             //inclui na table grupo_plano_analitica
-            if(!empty($_REQUEST['inCodConta'])){
+            if($request->get('inCodConta') != ""){
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'    , Sessao::getExercicio() );
-                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'    , $_REQUEST['inCodConta'] );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'    , $request->get('inCodConta') );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
             
-            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$_REQUEST['inCodGrupo'],"alterar","aviso", Sessao::getId(), "../");
+            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$request->get('inCodGrupo'),"alterar","aviso", Sessao::getId(), "../");
         } else {
             SistemaLegado::exibeAviso(urlencode('Já existe um grupo com esta descrição para esta natureza'),"n_incluir","erro");
         }
@@ -197,25 +202,27 @@ switch ($stAcao) {
     break;
 
     case 'excluir' :
-        $obTPatrimonioGrupoPlanoAnalitica->setDado('cod_grupo'    , $_REQUEST['inCodGrupo'] );
-        $obTPatrimonioGrupoPlanoAnalitica->setDado('cod_natureza' , $_REQUEST['inCodNatureza'] );
+        $obTPatrimonioGrupoPlanoAnalitica->setDado('cod_grupo'    , $request->get('inCodGrupo') );
+        $obTPatrimonioGrupoPlanoAnalitica->setDado('cod_natureza' , $request->get('inCodNatureza') );
         $obTPatrimonioGrupoPlanoAnalitica->setDado('exercicio'    , Sessao::getExercicio() );
         $obTPatrimonioGrupoPlanoAnalitica->exclusao();
         
         //deleta da table grupo_plano_depreciacao
-        $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $_REQUEST['inCodNatureza'] );
-        $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $_REQUEST['inCodGrupo'] );
+        $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
+        $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'cod_grupo'    , $request->get('inCodGrupo') );
         $obTPatrimonioGrupoPlanoDepreciacao->setDado( 'exercicio'    , Sessao::getExercicio() );
         $obTPatrimonioGrupoPlanoDepreciacao->exclusao();
 
-        $obTPatrimonioGrupo->setDado('cod_natureza' , $_REQUEST['inCodNatureza'] );
-        $obTPatrimonioGrupo->setDado('cod_grupo'    , $_REQUEST['inCodGrupo'] );
+        $obTPatrimonioGrupo->setDado('cod_natureza' , $request->get('inCodNatureza') );
+        $obTPatrimonioGrupo->setDado('cod_grupo'    , $request->get('inCodGrupo') );
         $obTPatrimonioGrupo->exclusao();
 
-        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$_REQUEST['inCodGrupo'],"excluir","aviso", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Grupo - ".$request->get('inCodGrupo'),"excluir","aviso", Sessao::getId(), "../");
 
     break;
 
 }
 
 Sessao::encerraExcecao();
+
+?>

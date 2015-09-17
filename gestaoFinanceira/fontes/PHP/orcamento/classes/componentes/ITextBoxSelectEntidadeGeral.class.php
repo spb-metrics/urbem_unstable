@@ -41,30 +41,12 @@
     * Casos de uso: uc-02.01.02
 */
 
-/*
-$Log$
-Revision 1.9  2006/12/01 12:29:11  hboaventura
-correção do componente
-
-Revision 1.8  2006/12/01 10:48:34  hboaventura
-correção do componente
-
-Revision 1.7  2006/11/14 15:55:51  andre.almeida
-Corrigido um bug, trocado de cod_entidade para numcgm.
-
-Revision 1.6  2006/10/30 11:41:39  domluc
-O vinculo estava sendo passado errado, passava o numcgm da entidade , quando o correto seria passar o cod_entidade
-
-Revision 1.5  2006/07/05 20:41:48  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
-include_once ( CLA_TEXTBOX_SELECT );
+include_once CLA_TEXTBOX_SELECT;
 
 class ITextBoxSelectEntidadeGeral extends TextBoxSelect
 {
-function ITextBoxSelectEntidadeGeral()
+    
+public function __construct()
 {
     parent::TextBoxSelect();
 
@@ -88,17 +70,17 @@ function ITextBoxSelectEntidadeGeral()
     $this->obSelect->setNull          ( false                          );
 }
 
-function setExercicio($inValor)
+public function setExercicio($inValor)
 {
     $this->inExercicio = $inValor;
 }
 
-function setCodEntidade($inValor)
+public function setCodEntidade($inValor)
 {
     $this->inCodEntidade = $inValor;
 }
 
-function montaHTML()
+public function montaHTML()
 {
     $this->obTextBox->setValue        ( $this->inCodEntidade );
     $this->obSelect->setValue         ( $this->inCodEntidade );
@@ -122,4 +104,5 @@ function montaHTML()
     parent::montaHTML();
 }
 }
+
 ?>
