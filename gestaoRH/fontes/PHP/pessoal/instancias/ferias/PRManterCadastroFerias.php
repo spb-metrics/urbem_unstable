@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: PRManterCadastroFerias.php 63555 2015-09-10 17:00:04Z franver $
+    $Id: PRManterCadastroFerias.php 63647 2015-09-23 19:42:55Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -302,7 +302,7 @@ switch ($stAcao) {
                         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsUltimaMovimentacao);
                         $arDataFinal = explode("/",$rsUltimaMovimentacao->getCampo("dt_final"));
  
-                        if ( ($boPagar != '') && ($request->get('inCodTipo',null) != null) ) {
+                        if ($request->get('inCodTipo',null) != null) {
                             if ($inCodMes == $arDataFinal[1] and $_REQUEST['inAno'] == $arDataFinal[2]) {
                                 $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_contrato"            , $arContrato["cod_contrato"]);
                                 $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_periodo_movimentacao", $rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));

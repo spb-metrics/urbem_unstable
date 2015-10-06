@@ -32,7 +32,7 @@
     *
     * @ignore
     *
-    * $Id: FMManterPagamentoExtra.php 61422 2015-01-15 18:58:18Z evandro $
+    * $Id: FMManterPagamentoExtra.php 63740 2015-10-05 11:17:51Z franver $
     *
     * Casos de uso: uc-02.04.27
 */
@@ -362,6 +362,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addHidden    ($obHdnDtBoletim);
     $obFormulario->addComponente( $obICredor                    );
     //$obFormulario->addComponente( $obIRecurso                   );
+    if ( !(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true)))
     $obIMontaRecursoDestinacao->geraFormulario ( $obFormulario );
     $obFormulario->addComponente( $obBscHistorico               );
     $obFormulario->addSpan      ( $obSpanContas                 );

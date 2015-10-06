@@ -33,32 +33,19 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoNotaLiquidacao.class.php 61229 2014-12-18 17:10:10Z lisiane $
-
-    $Revision: 30805 $
-    $Name:  $
-    $Autor: $
-    $Date: 2008-02-12 09:01:05 -0200 (Ter, 12 Fev 2008) $
+    $Id: REmpenhoNotaLiquidacao.class.php 63657 2015-09-24 21:19:41Z michel $
 
     * Casos de uso: uc-02.03.18, uc-02.03.20, uc-02.03.03, uc-02.03.04, uc-02.03.14
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
 //INCLUDE DAS CLASSES PARA O TRATAMENTO DOS ATRIBUTOS DINAMICOS
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoAtributoLiquidacaoValor.class.php" );
-include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" );
-include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoContaAnalitica.class.php" );
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoIncorporacaoPatrimonio.class.php" );
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAtributoLiquidacaoValor.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
+include_once CAM_GF_CONT_NEGOCIO."RContabilidadePlanoContaAnalitica.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoIncorporacaoPatrimonio.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php";
 
-/**
-    * Classe de Regra de Nota de Liquidação
-
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Diego Barbosa Victoria
-
-    * @package URBEM
-    * @subpackage Regra
-*/
 class REmpenhoNotaLiquidacao
 {
 /**
@@ -86,6 +73,11 @@ var $obRContabilidadePlanoContaAnaliticaDebito;
     * @access Private
 */
 var $obRContabilidadePlanoContaAnaliticaCredito;
+/**
+    * @access Private
+    * @var Object
+*/
+var $obTEmpenhoNotaLiquidacao;
 /**
     * @access Private
     * @var Object
@@ -319,7 +311,11 @@ function setRContabilidadePlanoContaAnaliticaDebito($valor) { $this->obRContabil
     * @param Object $Valor
 */
 function setRContabilidadePlanoContaAnaliticaCredito($valor) { $this->obRContabilidadePlanoContaAnaliticaCredito = $valor; }
-
+/**
+    * @access Public
+    * @param Object $Valor
+*/
+function setTEmpenhoNotaLiquidacao($valor) { $this->obTEmpenhoNotaLiquidacao = $valor; }
 /**
     * @access Public
     * @return Object
@@ -442,7 +438,11 @@ function getRContabilidadePlanoContaAnaliticaDebito() { return $this->obRContabi
     * @return Object
 */
 function getRContabilidadePlanoContaAnaliticaCredito() { return $this->obRContabilidadePlanoContaAnaliticaCredito; }
-
+/**
+    * @access Public
+    * @return Object
+*/
+function getTEmpenhoNotaLiquidacao() { return $this->obTEmpenhoNotaLiquidacao; }
 /**
      * Método construtor
      * @access Public
@@ -457,6 +457,7 @@ function REmpenhoNotaLiquidacao(&$obREmpenhoEmpenho)
     $this->obRCadastroDinamico->obRModulo->setCodModulo( 10 );
     $this->obRContabilidadePlanoContaAnaliticaDebito = new RContabilidadePlanoContaAnalitica;
     $this->obRContabilidadePlanoContaAnaliticaCredito = new RContabilidadePlanoContaAnalitica;
+    $this->obTEmpenhoNotaLiquidacao = new TEmpenhoNotaLiquidacao;
 }
 
 /**
@@ -467,7 +468,6 @@ function REmpenhoNotaLiquidacao(&$obREmpenhoEmpenho)
 */
 function consultar($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
     $obTEmpenhoNotaLiquidacao->setDado( "cod_nota"    , $this->inCodNota  );
     $obTEmpenhoNotaLiquidacao->setDado( "exercicio"   , $this->stExercicio );
@@ -497,7 +497,6 @@ function consultar($boTransacao = "")
 */
 function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if($this->inCodNota)
@@ -529,7 +528,6 @@ function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 */
 function listarNotasAPagarDisponiveisImplantadas(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if($this->inCodNota)
@@ -567,7 +565,6 @@ function listarNotasAPagarDisponiveisImplantadas(&$rsRecordSet, $stOrder = "" , 
 function listarNotasDisponiveis(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
     global $request;
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     $stFiltro  = empty($stFiltro) ? "" : $stFiltro;
@@ -616,7 +613,6 @@ function listarNotasDisponiveis(&$rsRecordSet, $stOrder = "" , $boTransacao = ""
 */
 function listarNotasDisponiveisImplantadas(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if($this->inCodNota)
@@ -658,49 +654,47 @@ function listarNotasDisponiveisImplantadas(&$rsRecordSet, $stOrder = "" , $boTra
 */
 function incluir($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php" );
-    include_once ( CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacao.class.php" );
-    include_once ( CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacaoTCEMS.class.php" );
-    include_once ( CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacaoRestosAPagar.class.php" );
-    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLiquidacao.class.php" );
-    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoEmpenho.class.php" );
+    include_once CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacao.class.php";
+    include_once CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacaoTCEMS.class.php";
+    include_once CAM_GF_EMP_MAPEAMENTO."FEmpenhoEmpenhoLiquidacaoRestosAPagar.class.php";
+    include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeLiquidacao.class.php";
+    include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoEmpenho.class.php";
 
-    $obTContabilidadeLancamentoEmpenho  = new TContabilidadeLancamentoEmpenho;
-    $obTContabilidadeLiquidacao = new TContabilidadeLiquidacao;
-    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar = new FEmpenhoEmpenhoLiquidacaoRestosAPagar;
-    $obTEmpenhoNotaLiquidacao = new TEmpenhoNotaLiquidacao;
-    $obTEmpenhoIncorporacaoPatrimonio = new TEmpenhoIncorporacaoPatrimonio;
+    $obTContabilidadeLancamentoEmpenho          = new TContabilidadeLancamentoEmpenho;
+    $obTContabilidadeLiquidacao                 = new TContabilidadeLiquidacao;
+    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar    = new FEmpenhoEmpenhoLiquidacaoRestosAPagar;
+    $obTEmpenhoIncorporacaoPatrimonio           = new TEmpenhoIncorporacaoPatrimonio;
+    $this->obTEmpenhoNotaLiquidacao             = new TEmpenhoNotaLiquidacao;
 
     $boTCEMS = SistemaLegado::is_tcems($boTransacao);
 
-    if ($boTCEMS) {
+    if ($boTCEMS)
         $obFEmpenhoEmpenhoLiquidacao = new FEmpenhoEmpenhoLiquidacaoTCEMS;
-    } else {
+    else
         $obFEmpenhoEmpenhoLiquidacao = new FEmpenhoEmpenhoLiquidacao;
-    }
 
     $boFlagTransacao = false;
     $boFlagNovaClassificacao = true;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao);
     if ( !$obErro->ocorreu() ) {
-        $obTEmpenhoNotaLiquidacao->setDado("exercicio",$this->stExercicio );
+        $this->obTEmpenhoNotaLiquidacao->setDado("exercicio",$this->stExercicio );
         // Verifica numeração do empenho
         $obErro = $this->roREmpenhoEmpenho->obREmpenhoConfiguracao->consultar( $boTransacao );
         if ( !$obErro->ocorreu() ) {
             if ( $this->roREmpenhoEmpenho->obREmpenhoConfiguracao->getNumeracao() == 'P' ) {
-                $obTEmpenhoNotaLiquidacao->setComplementoChave( "cod_entidade,exercicio" );
-                $obTEmpenhoNotaLiquidacao->setDado("cod_entidade" ,$this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                $this->obTEmpenhoNotaLiquidacao->setComplementoChave( "cod_entidade,exercicio" );
+                $this->obTEmpenhoNotaLiquidacao->setDado("cod_entidade" , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()   );
             } else {
-                $obTEmpenhoNotaLiquidacao->setComplementoChave( "exercicio" );
-                $obTEmpenhoNotaLiquidacao->setDado("cod_entidade" ,null );
+                $this->obTEmpenhoNotaLiquidacao->setComplementoChave( "exercicio" );
+                $this->obTEmpenhoNotaLiquidacao->setDado("cod_entidade" , null                                                                  );
             }
+
+            $obErro = $this->obTEmpenhoNotaLiquidacao->proximoCod( $this->inCodNota, $boTransacao );
+            $this->obTEmpenhoNotaLiquidacao->setDado("cod_entidade"     , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()   );
         }
-        $obErro = $obTEmpenhoNotaLiquidacao->proximoCod( $this->inCodNota, $boTransacao );
-        $obTEmpenhoNotaLiquidacao->setDado("cod_entidade" ,$this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
         if ( !$obErro->ocorreu() ) {
             $obErro = $this->roREmpenhoEmpenho->consultar($boTransacao);
             if ( !$obErro->ocorreu() ) {
-
                 $obErro = $this->listarMaiorData( $rsMaiorData,'',$boTransacao );
                 if (!$obErro->ocorreu()) {
                     $maiorDataLiquidacao = $rsMaiorData->getCampo('data_liquidacao');
@@ -719,36 +713,36 @@ function incluir($boTransacao = "")
                     }
 
                     if ( !$obErro->ocorreu() ) {
-                        $obTEmpenhoNotaLiquidacao->setDado("cod_nota"     ,$this->inCodNota );
-                        $obTEmpenhoNotaLiquidacao->setDado("cod_empenho"  ,$this->roREmpenhoEmpenho->getCodEmpenho() );
-                        $obTEmpenhoNotaLiquidacao->setDado("exercicio_empenho", $this->roREmpenhoEmpenho->getExercicio() );
-                        $obTEmpenhoNotaLiquidacao->setDado("dt_vencimento",$this->stDtVencimento );
-                        $obTEmpenhoNotaLiquidacao->setDado("dt_liquidacao",$this->stDtLiquidacao );
-                        $obTEmpenhoNotaLiquidacao->setDado("observacao"   ,$this->stObservacao );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("cod_nota"         , $this->inCodNota                          );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("cod_empenho"      , $this->roREmpenhoEmpenho->getCodEmpenho() );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("exercicio_empenho", $this->roREmpenhoEmpenho->getExercicio()  );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("dt_vencimento"    , $this->stDtVencimento                     );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("dt_liquidacao"    , $this->stDtLiquidacao                     );
+                        $this->obTEmpenhoNotaLiquidacao->setDado("observacao"       , $this->stObservacao                       );
 
                         // Inclui o registro em nota_liquidacao
-                        $obErro = $obTEmpenhoNotaLiquidacao->inclusao( $boTransacao );
+                        $obErro = $this->obTEmpenhoNotaLiquidacao->inclusao( $boTransacao );
 
                         if ( !$obErro->ocorreu() ) {
                             $stTimestamp = substr($this->getDtLiquidacao(),6,4). "-" . substr($this->getDtLiquidacao(),3,2). "-" . substr($this->getDtLiquidacao(),0,2)  . date (" H:i:s.") . str_pad(1, 3, "0", STR_PAD_LEFT);
                             if ($stTimestamp) {
-                            $arChaveAtributoLiquidacao =  array( "cod_entidade" => $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
-                                                                 "cod_nota"     => $this->inCodNota,
-                                                                 "exercicio"    => $this->stExercicio,
-                                                                 "timestamp"    => $stTimestamp          );
+                                $arChaveAtributoLiquidacao =  array( "cod_entidade" => $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
+                                                                     "cod_nota"     => $this->inCodNota,
+                                                                     "exercicio"    => $this->stExercicio,
+                                                                     "timestamp"    => $stTimestamp );
                             } else {
-                            $arChaveAtributoLiquidacao =  array( "cod_entidade" => $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
-                                                                 "cod_nota"     => $this->inCodNota,
-                                                                 "exercicio"    => $this->stExercicio);
+                                $arChaveAtributoLiquidacao =  array( "cod_entidade" => $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
+                                                                     "cod_nota"     => $this->inCodNota,
+                                                                     "exercicio"    => $this->stExercicio );
                             }
                             $this->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoLiquidacao );
                             $obErro = $this->obRCadastroDinamico->salvarValores( $boTransacao );
                             if ( !$obErro->ocorreu() ) {
                                 $this->obRCadastroDinamico = new RCadastroDinamico();
-                                $this->obRCadastroDinamico->setPersistenteValores( new TEmpenhoAtributoLiquidacaoValor );
-                                $this->obRCadastroDinamico->setCodCadastro( 2 );
-                                $this->obRCadastroDinamico->obRModulo->setCodModulo( 10 );
-                                $this->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoLiquidacao );
+                                $this->obRCadastroDinamico->setPersistenteValores       ( new TEmpenhoAtributoLiquidacaoValor   );
+                                $this->obRCadastroDinamico->setCodCadastro              ( 2                                     );
+                                $this->obRCadastroDinamico->obRModulo->setCodModulo     ( 10                                    );
+                                $this->obRCadastroDinamico->setChavePersistenteValores  ( $arChaveAtributoLiquidacao            );
                                 $obErro = $this->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributosLiquidacao, '','', $boTransacao );
                                 if ( !$obErro->ocorreu() ) {
                                     while ( !$rsAtributosLiquidacao->eof() ) {
@@ -758,6 +752,9 @@ function incluir($boTransacao = "")
                                                     $obErro->setDescricao( 'Para realizar um lançamento patrimonial, é necessário selecionar um histórico!' );
                                             }
                                         }
+                                        if ( $obErro->ocorreu() )
+                                            break;
+
                                         $rsAtributosLiquidacao->proximo();
                                     }
                                 }
@@ -769,26 +766,26 @@ function incluir($boTransacao = "")
 
                             if ( !$obErro->ocorreu() ) {
                                 if ( $this->roREmpenhoEmpenho->getExercicio() == $this->stExercicio ) {
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "exercicio", $this->stExercicio );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "valor", $this->nuVlTotal );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "nom_lote", "Liquidação Empenho n° ".$this->roREmpenhoEmpenho->getCodEmpenho().'/'.$this->roREmpenhoEmpenho->getExercicio() );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "tipo_lote", "L" );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "complemento",  $this->roREmpenhoEmpenho->getCodEmpenho()."/".$this->stExercicio." ".$this->getComplemento());
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "dt_lote", $this->getDtLiquidacao() );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_entidade", $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_nota", $this->inCodNota );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_contabil_financ" , $this->inCodContaContabilFinanc );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "exercicio"              , $this->stExercicio                                                                                                );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "valor"                  , $this->nuVlTotal                                                                                                  );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "nom_lote"               , "Liquidação Empenho n° ".$this->roREmpenhoEmpenho->getCodEmpenho().'/'.$this->roREmpenhoEmpenho->getExercicio()   );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "tipo_lote"              , "L"                                                                                                               );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "complemento"            ,  $this->roREmpenhoEmpenho->getCodEmpenho()."/".$this->stExercicio." ".$this->getComplemento()                     );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "dt_lote"                , $this->getDtLiquidacao()                                                                                          );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_entidade"           , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()                                               );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_nota"               , $this->inCodNota                                                                                                  );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_contabil_financ"  , $this->inCodContaContabilFinanc                                                                                   );
 
                                     // Contas Débito e Crédito
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_debito", $this->obRContabilidadePlanoContaAnaliticaDebito->getCodEstrutural() );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_credito" , $this->obRContabilidadePlanoContaAnaliticaCredito->getCodEstrutural() );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_debito"           , $this->obRContabilidadePlanoContaAnaliticaDebito->getCodEstrutural()  );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "conta_credito"          , $this->obRContabilidadePlanoContaAnaliticaCredito->getCodEstrutural() );
 
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_historico_patrimon", $this->inCodHistorico );
-                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "num_orgao", $this->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao() );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_historico_patrimon" , $this->inCodHistorico                                                                                                             );
+                                    $obFEmpenhoEmpenhoLiquidacao->setDado( "num_orgao"              , $this->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao()   );
 
                                     if ($boTCEMS) {
-                                        $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_despesa", $this->roREmpenhoEmpenho->obROrcamentoDespesa->getCodDespesa() );
-                                        $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_classificacao", $this->inCodContaContabilFinanc);
+                                        $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_despesa"        , $this->roREmpenhoEmpenho->obROrcamentoDespesa->getCodDespesa()        );
+                                        $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_classificacao"  , $this->inCodContaContabilFinanc                                       );
                                     }
 
                                     // executaFuncao leva a montaInsereLote. Inclui o novo lote na base
@@ -796,18 +793,17 @@ function incluir($boTransacao = "")
 
                                     // Retorna sequencia e cod_lote para uso posterior
                                     $inSequencia = $obFEmpenhoEmpenhoLiquidacao->getDado( 'sequencia' );
-                                    $inCodLote = $obFEmpenhoEmpenhoLiquidacao->getDado( 'cod_lote'  );
-
+                                    $inCodLote   = $obFEmpenhoEmpenhoLiquidacao->getDado( 'cod_lote'  );
                                 } else {
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "exercicio", $this->stExercicio );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "valor", $this->nuVlTotal );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "complemento", $this->roREmpenhoEmpenho->getCodEmpenho()."/".$this->roREmpenhoEmpenho->getExercicio() );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "nom_lote", "Liquidação Empenho RP n° ".$this->roREmpenhoEmpenho->getCodEmpenho().'/'.$this->roREmpenhoEmpenho->getExercicio() );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "tipo_lote", "L" );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "dt_lote", $this->getDtLiquidacao() );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "cod_entidade", $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "cod_nota", $this->inCodNota );
-                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "exerc_rp", $this->roREmpenhoEmpenho->getExercicio() );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "exercicio"      , $this->stExercicio                                                                                                    );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "valor"          , $this->nuVlTotal                                                                                                      );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "complemento"    , $this->roREmpenhoEmpenho->getCodEmpenho()."/".$this->roREmpenhoEmpenho->getExercicio()                                );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "nom_lote"       , "Liquidação Empenho RP n° ".$this->roREmpenhoEmpenho->getCodEmpenho().'/'.$this->roREmpenhoEmpenho->getExercicio()    );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "tipo_lote"      , "L"                                                                                                                   );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "dt_lote"        , $this->getDtLiquidacao()                                                                                              );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "cod_entidade"   , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()                                                   );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "cod_nota"       , $this->inCodNota                                                                                                      );
+                                    $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->setDado( "exerc_rp"       , $this->roREmpenhoEmpenho->getExercicio()                                                                              );
 
                                     // executaFuncao leva a montaInsereLote
                                     // que inclui o novo lote na base
@@ -815,39 +811,39 @@ function incluir($boTransacao = "")
 
                                     // Retorna sequencia e cod_lote para uso posterior
                                     $inSequencia = $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->getDado( 'sequencia' );
-                                    $inCodLote = $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->getDado( 'cod_lote'  );
-
+                                    $inCodLote   = $obFEmpenhoEmpenhoLiquidacaoRestosAPagar->getDado( 'cod_lote'  );
                                 }
                             }
                             if ( !$obErro->ocorreu() ) {
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'cod_lote', $inCodLote );
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'tipo', 'L' );
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'sequencia', $inSequencia );
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'exercicio', $this->stExercicio );
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'cod_entidade', $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()        );
-                                $obTContabilidadeLancamentoEmpenho->setDado( 'estorno', false );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'cod_lote'     , $inCodLote                                                                    );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'tipo'         , 'L'                                                                           );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'sequencia'    , $inSequencia                                                                  );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'exercicio'    , $this->stExercicio                                                            );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'cod_entidade' , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()           );
+                                $obTContabilidadeLancamentoEmpenho->setDado( 'estorno'      , false                                                                         );
                                 $obErro = $obTContabilidadeLancamentoEmpenho->inclusao( $boTransacao );
                             }
                             if ( !$obErro->ocorreu() ) {
-                if ( $this->obRContabilidadePlanoContaAnaliticaCredito->getCodPlano() > 0
-                && $this->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano() > 0 ) {
-                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'exercicio' , $this->stExercicio );
-                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_entidade' , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_nota' , $this->inCodNota );
-                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_plano_credito' , $this->obRContabilidadePlanoContaAnaliticaCredito->getCodPlano() );
-                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_plano_debito' , $this->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano() );
+                                if (   $this->obRContabilidadePlanoContaAnaliticaCredito->getCodPlano() > 0
+                                    && $this->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano() > 0 )
+                                {
+                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'exercicio'         , $this->stExercicio                                                    );
+                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_entidade'      , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()   );
+                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_nota'          , $this->inCodNota                                                      );
+                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_plano_credito' , $this->obRContabilidadePlanoContaAnaliticaCredito->getCodPlano()      );
+                                    $obTEmpenhoIncorporacaoPatrimonio->setDado( 'cod_plano_debito'  , $this->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano()       );
                                     $obErro = $obTEmpenhoIncorporacaoPatrimonio->inclusao( $boTransacao );
-                }
+                                }
                             }
                             if ( !$obErro->ocorreu() ) {
-                                $obTContabilidadeLiquidacao->setDado( 'exercicio', $this->stExercicio );
-                $obTContabilidadeLiquidacao->setDado( 'exercicio_liquidacao', $this->stExercicio );
-                $obTContabilidadeLiquidacao->setDado( 'sequencia', $inSequencia );
-                $obTContabilidadeLiquidacao->setDado( 'tipo', 'L' );
-                $obTContabilidadeLiquidacao->setDado( 'cod_lote', $inCodLote );
-                $obTContabilidadeLiquidacao->setDado( 'cod_entidade', $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                $obTContabilidadeLiquidacao->setDado( 'cod_nota', $this->inCodNota );
-                $obErro = $obTContabilidadeLiquidacao->inclusao( $boTransacao );
+                                $obTContabilidadeLiquidacao->setDado( 'exercicio'           , $this->stExercicio                                                            );
+                                $obTContabilidadeLiquidacao->setDado( 'exercicio_liquidacao', $this->stExercicio                                                            );
+                                $obTContabilidadeLiquidacao->setDado( 'sequencia'           , $inSequencia                                                                  );
+                                $obTContabilidadeLiquidacao->setDado( 'tipo'                , 'L'                                                                           );
+                                $obTContabilidadeLiquidacao->setDado( 'cod_lote'            , $inCodLote                                                                    );
+                                $obTContabilidadeLiquidacao->setDado( 'cod_entidade'        , $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()           );
+                                $obTContabilidadeLiquidacao->setDado( 'cod_nota'            , $this->inCodNota                                                              );
+                                $obErro = $obTContabilidadeLiquidacao->inclusao( $boTransacao );
                             }
                         }
                     }
@@ -855,7 +851,7 @@ function incluir($boTransacao = "")
             }
         }
     }
-    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTEmpenhoNotaLiquidacao );
+    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTEmpenhoNotaLiquidacao );
 
     return $obErro;
 }
@@ -867,7 +863,6 @@ function incluir($boTransacao = "")
 */
 function alterar($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     $boFlagTransacao = false;
@@ -921,7 +916,6 @@ function recuperaTimestampAnuladoLiquidacao(&$rsRecordSet, $stFiltro, $boTransac
 */
 function excluir($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     $boFlagTransacao = false;
@@ -1206,7 +1200,6 @@ function anularItens($boTransacao = "")
 
 function listarItensAnulacao(&$rsRecordSet, $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if ($this->inCodNota) {
@@ -1238,7 +1231,6 @@ function listarItensAnulacao(&$rsRecordSet, $boTransacao = "")
 
 function listarNotaLiquidacaoEmpenho(&$rsRecordSet, $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if ($this->roREmpenhoEmpenho->inCodPreEmpenho) {
@@ -1261,7 +1253,6 @@ function listarNotaLiquidacaoEmpenho(&$rsRecordSet, $boTransacao = "")
 
 function listarNotaLiquidacaoEmpenhoRestos(&$rsRecordSet, $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if ($this->roREmpenhoEmpenho->inCodPreEmpenho) {
@@ -1295,7 +1286,6 @@ function listarNotaLiquidacaoEmpenhoRestos(&$rsRecordSet, $boTransacao = "")
 */
 function listarLiquidados(&$rsRecordSet, $stOrder = "nli.cod_nota, nli.exercicio", $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if( $this->roREmpenhoEmpenho->getExercicio() )
@@ -1331,7 +1321,6 @@ function listarLiquidados(&$rsRecordSet, $stOrder = "nli.cod_nota, nli.exercicio
 */
 function listarPagos(&$rsRecordSet, $stOrder = "op.exercicio, op.cod_ordem", $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php"                        );
     $obTEmpenhoNotaLiquidacao                        = new TEmpenhoNotaLiquidacao;
 
     if( $this->roREmpenhoEmpenho->getExercicio() )
@@ -1359,7 +1348,6 @@ function listarPagos(&$rsRecordSet, $stOrder = "op.exercicio, op.cod_ordem", $bo
 */
 function listarMaiorData(&$rsRecordSet, $stOrder = "", $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO     ."TEmpenhoNotaLiquidacao.class.php"                    );
     $obTEmpenhoNotaLiquidacao                   =  new TEmpenhoNotaLiquidacao;
 
     if( $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() )
@@ -1388,7 +1376,6 @@ function listarMaiorData(&$rsRecordSet, $stOrder = "", $boTransacao = "")
 */
 function listarMaiorDataAnulacao(&$rsRecordSet, $stOrder = "", $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO     ."TEmpenhoNotaLiquidacao.class.php"                    );
     $obTEmpenhoNotaLiquidacao                   =  new TEmpenhoNotaLiquidacao;
 
     if( $this->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() )
@@ -1417,7 +1404,6 @@ function listarMaiorDataAnulacao(&$rsRecordSet, $stOrder = "", $boTransacao = ""
 */
 function listarMaiorDataAnulacaoEmpenho(&$rsRecordSet, $stOrder = "", $boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO     ."TEmpenhoNotaLiquidacao.class.php"                    );
     $obTEmpenhoNotaLiquidacao                   =  new TEmpenhoNotaLiquidacao;
 
     $stFiltro = "";
@@ -1446,7 +1432,6 @@ function listarMaiorDataAnulacaoEmpenho(&$rsRecordSet, $stOrder = "", $boTransac
 */
 function buscaValorAPagar($boTransacao)
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO     ."TEmpenhoNotaLiquidacao.class.php"                    );
     $obTEmpenhoNotaLiquidacao                   =  new TEmpenhoNotaLiquidacao;
 
     $stFiltro = "";

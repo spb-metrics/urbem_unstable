@@ -35,7 +35,7 @@ $Name:  $
 $Author: lbbarreiro $
 $Date: 2007-10-31 15:55:22 -0200 (Qua, 31 Out 2007) $
 
- $Id: OCContaAnalitica.php 63583 2015-09-11 20:18:59Z arthur $
+ $Id: OCContaAnalitica.php 63740 2015-10-05 11:17:51Z franver $
 
 Casos de uso: uc-02.02.02,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -389,6 +389,53 @@ switch ( $request->get('stCtrl') ) {
                     $stDescricao = $rsRecordSet->getCampo( 'nom_conta' );
                 else
                     echo "alertaAviso('@Conta inválida para caixa/banco (".$_GET[$_GET['stNomCampoCod']].")','form','erro','".Sessao::getId()."');";
+            }
+
+        }
+    break;
+
+    case 'tes_pagamento_extra_caixa_banco_recurso_fixo':
+        if ($_GET[$_GET['stNomCampoCod']]) {
+            include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoAnalitica.class.php"        );
+            $obTContabilidadePlanoAnalitica        = new TContabilidadePlanoAnalitica;
+
+            $stSQLRelacionamentoRecurso = "
+                LEFT JOIN contabilidade.plano_recurso
+                       ON plano_recurso.exercicio = pa.exercicio
+                      AND plano_recurso.cod_plano = pa.cod_plano
+            ";
+            
+            $stFiltro .= "\n plano_recurso.cod_recurso = 100 AND ";
+            $stFiltro .= "\n pa.cod_plano is not null AND ";
+            $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
+            $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
+            if ( SistemaLegado::is_tcems($boTransacao) ) {
+                $stFiltro .= "\n( pb.cod_banco is not null AND ";
+                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%'  OR ";
+                $stFiltro .= "\n   pc.cod_estrutural like '1.1.4.%' )) AND ";
+            } else {
+                $stFiltro .= "\n(( pb.cod_banco is not null AND ";
+                $stFiltro .= "\n   pb.cod_entidade in (".$stCodEntidades.") AND ";
+                $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) OR ";
+                $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+            }
+
+            $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
+            $stOrder = ( $stOrder ) ?  $stOrder : 'cod_estrutural';
+            $obErro = $obTContabilidadePlanoAnalitica->recuperaRelacionamento( $rsRecordSet, $stSQLRelacionamentoRecurso.$stFiltro, $stOrder, $boTransacao );
+            
+            if (!$obErro->ocorreu()) {
+                if ($rsRecordSet->getCampo('cod_plano') <> "")
+                    $stDescricao = $rsRecordSet->getCampo( 'nom_conta' );
+                else {
+                    if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true)){
+                        $stJs .= "d.getElementById('inCodPlanoCredito').readOnly = false;\n";
+                        $stJs .= "d.getElementById('imgPlanoCredito').style.display = 'inline';\n";
+                    }
+                    $stJs .= "alertaAviso('@Conta inválida para caixa/banco (".$_GET[$_GET['stNomCampoCod']]."). Conta Bancária deve ser do Recurso 100.','form','erro','".Sessao::getId()."'); \n";
+                    echo $stJs;
+                }
             }
 
         }

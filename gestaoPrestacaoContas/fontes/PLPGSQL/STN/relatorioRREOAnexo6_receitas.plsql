@@ -31,7 +31,7 @@
     * $Author: eduardoschitz $
     * $Date: 2008-05-20 16:15:54 -0300 (Ter, 20 Mai 2008) $
     *
-    * $Id: relatorioRREOAnexo6_receitas.plsql 61311 2015-01-05 17:06:49Z lisiane $
+    * $Id: relatorioRREOAnexo6_receitas.plsql 63635 2015-09-22 20:27:07Z carlos.silva $
     *
     * Casos de uso:
     * 
@@ -43,7 +43,7 @@ DECLARE
     stCodEntidades                  ALIAS FOR $2;
     dtInicio                        ALIAS FOR $3;
     dtFim                           ALIAS FOR $4;
-    dtInicioExercicio               VARCHAR := '01/01/'||stExercicio;
+    dtInicioExercicio               VARCHAR;
     dtInicioExercicioAnterior       VARCHAR;
     dtInicioAnterior                VARCHAR;
     dtFinalAnterior                 VARCHAR;
@@ -78,6 +78,7 @@ BEGIN
     
     stExercicioAnterior := cast((cast(stExercicio as integer) - 1) as varchar);
     
+    dtInicioExercicio         := '01/01/'||stExercicio;
     dtInicioExercicioAnterior := '01/01/' || stExercicioAnterior;
     
     dtInicioAnterior := SUBSTRING(dtInicio,0,6) || stExercicioAnterior;
@@ -249,20 +250,9 @@ BEGIN
                                                       ,''' || dtInicioExercicioAnterior || '''
                                                       ,''' || dtFinalAnterior || '''
              ) as ate_bimestre_exercicio_anterior
-            --orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-            --                                             ,''' || dtInicioExercicioAnterior || '''
-            --                                             ,''' || dtFinalAnterior || '''
-            --                                             ,''' || stExercicioAnterior || '''
-            --) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita     
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                conta_receita.cod_estrutural = ''1.1.0.0.00.00.00.00.00''  
+        WHERE   conta_receita.cod_estrutural = ''1.1.0.0.00.00.00.00.00''  
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 2
             AND conta_receita.exercicio = ''' || stExercicio || '''
     
@@ -320,20 +310,9 @@ BEGIN
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-            --orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-            --                                             ,''' || dtInicioExercicioAnterior || '''
-            --                                             ,''' || dtFinalAnterior || '''
-            --                                             ,''' || stExercicioAnterior || '''
-            --) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   as plano_conta,
             orcamento.conta_receita     
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                (   conta_receita.cod_estrutural = ''1.2.1.0.01.00.00.00.00''
+        WHERE(      conta_receita.cod_estrutural = ''1.2.1.0.01.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''1.2.1.0.29.00.00.00.00''
             )
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 5
@@ -393,6 +372,7 @@ BEGIN
             -- Filtros
                 (   conta_receita.cod_estrutural = ''1.2.2.0.00.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''1.2.1.0.99.00.00.00.00''
+                OR  conta_receita.cod_estrutural = ''1.2.3.0.00.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''7.2.0.0.00.00.00.00.00''
             )
             AND publico.fn_nivel(conta_receita.cod_estrutural) <= 5
@@ -424,7 +404,7 @@ BEGIN
         1 as grupo,
         3 as subgrupo,
         1 as item,
-        cast(''1.3.1.0.00.00.00.00.00'' as varchar) as cod_estrutural,
+        cast(''1.3.0.0.00.00.00.00.00'' as varchar) as cod_estrutural,
         3 as nivel,
         cast(''Receita Patrimonial'' as varchar) as nom_conta,
         cast(sum(coalesce(previsao_inicial,0.00)) as numeric(14,2)) as previsao_atualizada,
@@ -452,24 +432,9 @@ BEGIN
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                (   conta_receita.cod_estrutural = ''1.3.1.0.00.00.00.00.00''
-                OR  conta_receita.cod_estrutural = ''1.3.2.0.00.00.00.00.00''
-                OR  conta_receita.cod_estrutural = ''1.3.3.0.00.00.00.00.00''
-                OR  conta_receita.cod_estrutural = ''7.3.0.0.00.00.00.00.00''
-            )
+        WHERE   conta_receita.cod_estrutural = ''1.3.0.0.00.00.00.00.00''
             AND publico.fn_nivel(conta_receita.cod_estrutural) <= 3
             AND conta_receita.exercicio = ''' || stExercicio || '''
     
@@ -512,22 +477,9 @@ BEGIN
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM 
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-            -- AND plano_conta.cod_estrutural = ''4.1.3.4.0.00.00.00.00.00''
-            -- 1.3.2.5.00.00.00.00.00
-                conta_receita.cod_estrutural = ''1.3.2.5.00.00.00.00.00''
+        WHERE   conta_receita.cod_estrutural = ''1.3.2.5.00.00.00.00.00''
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 4
             AND conta_receita.exercicio = ''' || stExercicio || '''
     
@@ -585,20 +537,9 @@ BEGIN
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                conta_receita.cod_estrutural = ''1.7.6.0.00.00.00.00.00''
+        WHERE   conta_receita.cod_estrutural = ''1.7.6.0.00.00.00.00.00''
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 3
             AND conta_receita.exercicio = ''' || stExercicio || '''
     
@@ -659,19 +600,11 @@ BEGIN
                --                                          ,''' || dtFinalAnterior || '''
                --                                          ,''' || stExercicioAnterior || '''
                -- ) as ate_bimestre_exercicio_anterior
-            FROM
---                contabilidade.plano_conta   ,
-                orcamento.conta_receita  
-            WHERE
-                -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-                --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND 
-                --plano_conta.exercicio        = conta_receita.exercicio             
-                -- Filtros
-                    (   conta_receita.cod_estrutural = ''1.7.2.0.00.00.00.00.00''
+            FROM orcamento.conta_receita  
+            WHERE   (   conta_receita.cod_estrutural = ''1.7.2.0.00.00.00.00.00''
                     OR  conta_receita.cod_estrutural = ''1.7.3.0.00.00.00.00.00''
                     OR  conta_receita.cod_estrutural = ''1.7.4.0.00.00.00.00.00''
                     OR  conta_receita.cod_estrutural = ''1.7.5.0.00.00.00.00.00''
-                --    OR  conta_receita.cod_estrutural = ''1.7.6.0.00.00.00.00.00''
                     ) 
                 AND publico.fn_nivel(conta_receita.cod_estrutural) = 3
                 AND conta_receita.exercicio = ''' || stExercicio || '''
@@ -815,20 +748,9 @@ UNION
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural AND 
-            --plano_conta.exercicio        = conta_receita.exercicio 
-            -- Filtros
-                conta_receita.cod_estrutural = ''1.9.3.0.00.00.00.00.00''
+        WHERE   conta_receita.cod_estrutural = ''1.9.3.0.00.00.00.00.00''
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 3 
             AND conta_receita.exercicio = ''' || stExercicio || ''' 
     
@@ -871,20 +793,9 @@ UNION
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
-        WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                (   conta_receita.cod_estrutural = ''1.9.1.0.00.00.00.00.00''
+        WHERE (     conta_receita.cod_estrutural = ''1.9.1.0.00.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''1.9.2.0.00.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''1.9.9.0.00.00.00.00.00''
                 OR  conta_receita.cod_estrutural = ''7.9.0.0.00.00.00.00.00''
@@ -931,20 +842,10 @@ UNION
                                                      ,''' || dtInicioExercicioAnterior || '''
                                                      ,''' || dtFinalAnterior || '''
             ) as ate_bimestre_exercicio_anterior
-           -- orcamento.fn_somatorio_balancete_receita_exercicio_menor_2012( conta_receita.cod_estrutural
-           --                                              ,''' || dtInicioExercicioAnterior || '''
-           --                                              ,''' || dtFinalAnterior || '''
-           --                                              ,''' || stExercicioAnterior || '''
-           -- ) as ate_bimestre_exercicio_anterior
         FROM
-            --contabilidade.plano_conta   ,
             orcamento.conta_receita  
         WHERE
-            -- Ligação entre contabilidade.plano_conta e orcamento.conta_receita
-            --plano_conta.cod_estrutural   = ''4.''||conta_receita.cod_estrutural  AND
-            --plano_conta.exercicio        = conta_receita.exercicio             
-            -- Filtros
-                conta_receita.cod_estrutural   like ''1.6%'' 
+                conta_receita.cod_estrutural = ''1.6.0.0.00.00.00.00.00''
             AND publico.fn_nivel(conta_receita.cod_estrutural) = 2
             AND conta_receita.exercicio = ''' || stExercicio || '''
     
@@ -1377,7 +1278,6 @@ UNION
             EXECUTE stSQLaux2;
 
         END LOOP;
-
         
         stSQLaux := '
         UPDATE tmp_valores_birt SET
@@ -1415,7 +1315,6 @@ UNION
     ';
     EXECUTE stSql;
 
-
     stSql := '
     SELECT
         ordem,
@@ -1431,32 +1330,7 @@ UNION
         tmp_valores_birt
     ORDER BY
         ordem';
-    
-    
-/*
-    stSql := ''
-    SELECT
-        ordem, 
-        grupo, 
-        cod_estrutural, 
-        nivel, 
-        nom_conta, 
-        COALESCE(SUM(previsao_atualizada), 0.00) AS previsao_atualizada, 
-        COALESCE(SUM(no_bimestre), 0.00) AS no_bimestre, 
-        COALESCE(SUM(ate_bimestre), 0.00) AS ate_bimestre, 
-        COALESCE(SUM(ate_bimestre_exercicio_anterior), 0.00) AS ate_bimestre_exercicio_anterior 
-    FROM 
-        tmp_valores_birt
-    GROUP BY
-        ordem, 
-        grupo, 
-        cod_estrutural, 
-        nivel, 
-        nom_conta 
-    ORDER BY
-        ordem'';
-*/    
-    
+        
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN next reRegistro;

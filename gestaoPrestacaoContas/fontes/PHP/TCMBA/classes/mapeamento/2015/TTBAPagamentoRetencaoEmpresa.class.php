@@ -177,7 +177,7 @@ class TTBAPagamentoRetencaoEmpresa extends Persistente
                        ON plano_conta.exercicio = plano_analitica.exercicio
                       AND plano_conta.cod_conta = plano_analitica.cod_conta
 
-               INNER JOIN tcmba.pagamento_tipo_documento_pagamento
+                LEFT JOIN tcmba.pagamento_tipo_documento_pagamento
                        ON pagamento_tipo_documento_pagamento.cod_entidade = pagamento.cod_entidade
                       AND pagamento_tipo_documento_pagamento.exercicio    = pagamento.exercicio
                       AND pagamento_tipo_documento_pagamento.timestamp    = pagamento.timestamp
@@ -209,7 +209,6 @@ class TTBAPagamentoRetencaoEmpresa extends Persistente
 
                  ORDER BY num_empenho
                         , dt_pagamento_retencao ";
-
         return $stSql;
     }
 

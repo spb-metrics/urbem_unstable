@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CVC.csv.inc.php 62397 2015-05-04 14:30:39Z franver $
-  * $Date: 2015-05-04 11:30:39 -0300 (Seg, 04 Mai 2015) $
+  * $Id: CVC.csv.inc.php 63670 2015-09-28 13:35:21Z franver $
+  * $Date: 2015-09-28 10:35:21 -0300 (Seg, 28 Set 2015) $
   * $Author: franver $
-  * $Rev: 62397 $
+  * $Rev: 63670 $
   *
 */
 /**
@@ -372,7 +372,7 @@ if (count($rsRecuperaVeiculosBaixadosCVC40->getElementos()) > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidadesub");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade_sub");
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NU  MERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(5);

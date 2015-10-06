@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObra.class.php 63589 2015-09-14 19:18:58Z michel $
+    * $Id: TTCMBAObra.class.php 63632 2015-09-22 17:42:03Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -42,7 +42,8 @@ class TTCMBAObra extends Persistente
     {
         parent::Persistente();
         $this->setTabela('tcmba.obra');
-        $this->setCampoCod('cod_obra, cod_tipo, cod_entidade, exercicio');
+        $this->setCampoCod('');
+        $this->setComplementoChave('cod_obra, cod_tipo, cod_entidade, exercicio');
 
         $this->AddCampo('cod_obra'              , 'integer' , true  , ''    , true , false);
         $this->AddCampo('cod_entidade'          , 'integer' , true  , ''    , true , true );
@@ -54,6 +55,7 @@ class TTCMBAObra extends Persistente
         $this->AddCampo('cod_uf'                , 'integer' , true  , ''    , false, true );
         $this->AddCampo('cod_municipio'         , 'integer' , true  , ''    , false, true );
         $this->AddCampo('cod_funcao'            , 'integer' , true  , ''    , false, true );
+        $this->AddCampo('nro_obra'              , 'varchar' , true  , '10'  , false, false);
         $this->AddCampo('descricao'             , 'varchar' , true  , '255' , false, false);
         $this->AddCampo('vl_obra'               , 'numeric' , true  , '16,2', false, false);
         $this->AddCampo('data_cadastro'         , 'date'    , true  , ''    , false, false);
@@ -64,5 +66,81 @@ class TTCMBAObra extends Persistente
         $this->AddCampo('cod_licitacao'         , 'integer' , false , ''    , false, true );
         $this->AddCampo('cod_modalidade'        , 'integer' , false , ''    , false, true );
         $this->AddCampo('exercicio_licitacao'   , 'varchar' , false , '4'   , false, true );
+    }
+
+    public function proximoCod(&$inCod, $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+
+        $stSql = $this->montaProximoCod().$stFiltro.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+        if ( !$obErro->ocorreu() ) {
+            $inCod = $rsRecordSet->getCampo("cod_obra") + 1;
+        }
+
+        return $obErro;
+    }
+    
+    public function montaProximoCod()
+    {
+        $stSql = "SELECT MAX(cod_obra) AS cod_obra
+                    FROM tcmba.obra
+                   WHERE obra.cod_tipo=".$this->getDado('cod_tipo')."
+                     AND obra.cod_entidade=".$this->getDado('cod_entidade')."
+                     AND obra.exercicio='".$this->getDado('exercicio')."'";
+
+        return $stSql;
+    }
+    
+    public function recuperaObra(&$rsRecordSet, $stFiltro = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        
+        if (trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false) ? " ORDER BY ".$stOrdem : $stOrdem;
+
+        $stSql = $this->montaRecuperaObra().$stFiltro.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+    
+    public function montaRecuperaObra()
+    {
+        $stSql = " SELECT obra.cod_obra
+                        , obra.cod_entidade
+                        , obra.exercicio
+                        , obra.cod_tipo
+                        , tipo_obra.descricao AS nom_tipo
+                        , obra.local
+                        , obra.cep
+                        , obra.cod_bairro
+                        , obra.cod_uf
+                        , obra.cod_municipio
+                        , obra.cod_funcao
+                        , LPAD(obra.nro_obra::VARCHAR, 10, '0') AS nro_obra
+                        , obra.descricao
+                        , obra.vl_obra
+                        , TO_CHAR(obra.data_cadastro,'dd/mm/yyyy') AS data_cadastro
+                        , TO_CHAR(obra.data_inicio,'dd/mm/yyyy') AS data_inicio
+                        , TO_CHAR(obra.data_aceite,'dd/mm/yyyy') AS data_aceite
+                        , obra.prazo
+                        , TO_CHAR((obra.data_inicio+obra.prazo),'dd/mm/yyyy') AS data_prazo
+                        , TO_CHAR(obra.data_recebimento,'dd/mm/yyyy') AS data_recebimento
+                        , obra.cod_licitacao
+                        , obra.cod_modalidade
+                        , obra.exercicio_licitacao
+                        , obra.cod_licitacao||'/'||obra.exercicio_licitacao AS st_licitacao
+
+                     FROM tcmba.obra
+               INNER JOIN tcmba.tipo_obra
+                       ON tipo_obra.cod_tipo=obra.cod_tipo";
+
+        return $stSql;
     }
 }

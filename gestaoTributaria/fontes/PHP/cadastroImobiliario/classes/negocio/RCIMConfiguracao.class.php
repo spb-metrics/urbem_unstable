@@ -33,26 +33,9 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMConfiguracao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMConfiguracao.class.php 63679 2015-09-29 14:38:48Z arthur $
 
      * Casos de uso: uc-05.01.01
-*/
-
-/*
-$Log$
-Revision 1.13  2007/03/08 18:14:44  cercato
-Bug #8640#
-
-Revision 1.12  2007/02/22 13:40:09  fabio
-comitado com o nro do bug errado.
-
-Revision 1.11  2007/02/08 11:36:29  rodrigo
-#8343#
-
-Revision 1.10  2006/09/18 09:12:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -84,6 +67,13 @@ var $stMascaraIM;
 var $inNumeroIM;
 var $inCodigoModulo;
 var $inAnoExercicio;
+/**#@-*/
+
+/**#@+
+    * @var Boolean
+    * @access Private
+*/
+var $boCodigoLocal;
 /**#@-*/
 
 /**#@+
@@ -119,6 +109,11 @@ function setTConfiguracao($valor) { $this->obTConfiguracao  = $valor; }
     * @param Object $valor
 */
 function setNavegacaoAutomatico($valor) { $this->stNavegacaoAutomatico    = $valor; }
+/**
+    * @access Public
+    * @param Object $valor
+*/
+function setCodigoLocal($valor) { $this->boCodigoLocal    = $valor; }
 /**
     * @access Public
     * @param Object $valor
@@ -167,6 +162,11 @@ function getNavegacaoAutomatico() { return $this->stNavegacaoAutomatico; }
 function getTConfiguracao() { return $this->obTConfiguracao;  }
 /**
     * @access Public
+    * @return Boolean
+*/
+function getCodigoLocal() { return $this->boCodigoLocal; }
+/**
+    * @access Public
     * @return String
 */
 function getMascaraLote() { return $this->stMascaraLote;    }
@@ -207,7 +207,7 @@ function getRSAliquota() { return $this->rsRSAliquota; }
     * Método Construtor
     * @access Private
 */
-function RCIMConfiguracao()
+function __construct()
 {
     $this->arOrdemEntrega   = array();
     $this->arOrdemMD = array();
@@ -262,6 +262,15 @@ function alterarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "cod_modulo", $this->inCodigoModulo );
     $this->obTConfiguracao->setDado( "exercicio" , $this->inAnoExercicio );
 
+    $this->obTConfiguracao->setDado( "parametro" , "codigo_localizacao" );
+    $this->obTConfiguracao->setDado( "valor"     , $this->boCodigoLocal );
+    $this->verificaParametro( $boExiste, $boTransacao );
+    if ($boExiste) {
+        $obErro = $this->obTConfiguracao->alteracao( $boTransacao );
+    } else {
+        $obErro = $this->obTConfiguracao->inclusao( $boTransacao );
+    }
+        
     $this->obTConfiguracao->setDado( "parametro" , "numero_inscricao" );
     $this->obTConfiguracao->setDado( "valor"     , $this->inNumeroIM );
     $this->verificaParametro( $boExiste, $boTransacao );
@@ -589,15 +598,21 @@ function consultarConfiguracao($boTransacao = "")
 {
     $obErro = $this->buscaModulo( $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
+    
     $this->obTConfiguracao->setDado( "cod_modulo", $this->inCodigoModulo );
-//  $this->obTConfiguracao->setDado( "exercicio" , $this->inAnoExercicio );
     $this->obTConfiguracao->setDado( "exercicio" , Sessao::getExercicio());
+    
+    $this->obTConfiguracao->setDado( "parametro" , "codigo_localizacao" );
+    $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
+    if( $obErro->ocorreu() )
+        return $obErro;
+
+    $this->boCodigoLocal = $rsConfiguracao->getCampo( "valor" );
+    
     $this->obTConfiguracao->setDado( "parametro" , "numero_inscricao" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->inNumeroIM = $rsConfiguracao->getCampo( "valor" );
@@ -605,7 +620,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "mascara_lote" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->stMascaraLote = $rsConfiguracao->getCampo( "valor" );
@@ -613,7 +627,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "atrib_edificacao" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->arAtbEdificacao = explode( ",", $rsConfiguracao->getCampo( "valor" ) );
@@ -621,7 +634,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "atrib_imovel" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->arAtbImovel = explode( ",", $rsConfiguracao->getCampo( "valor" ) );
@@ -629,7 +641,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "atrib_lote_rural" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->arAtbLoteRural = explode( ",", $rsConfiguracao->getCampo( "valor" ) );
@@ -637,7 +648,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "atrib_lote_urbano" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->arAtbLoteUrbano = explode( ",", $rsConfiguracao->getCampo( "valor" ) );
@@ -645,7 +655,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "mascara_inscricao" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->stMascaraIM = $rsConfiguracao->getCampo( "valor" );
@@ -653,7 +662,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "navegacao_automatica" );
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->stNavegacaoAutomatico = $rsConfiguracao->getCampo( "valor" );
@@ -661,7 +669,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "ordem_entrega");
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->montaRSOrdemEntrega( $rsConfiguracao->getCampo( "valor" ) );
@@ -669,7 +676,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "valor_md");
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->montaRSValorMD( $rsConfiguracao->getCampo( "valor" ) );
@@ -677,7 +683,6 @@ function consultarConfiguracao($boTransacao = "")
     $this->obTConfiguracao->setDado( "parametro" , "aliquotas");
     $obErro = $this->obTConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
     if( $obErro->ocorreu() )
-
         return $obErro;
 
     $this->montaRSAliquota( $rsConfiguracao->getCampo( "valor" ) );
@@ -773,4 +778,5 @@ function consultarMascaraLote(&$stMascaraProcesso , $boTransacao = "")
 }
 
 }
+
 ?>

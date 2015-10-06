@@ -29,7 +29,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
     * @ignore
-    $Id: FLManterExportacao.php 63603 2015-09-16 14:54:17Z evandro $
+    $Id: FLManterExportacao.php 63753 2015-10-05 20:51:52Z jean $
     * Casos de uso: uc-06.03.00
 */
 
@@ -157,6 +157,7 @@ if ($inCodUnidadeGestora != "") {
                                         ,"AdCont.txt"   
                                         ,"AdConv.txt"   
                                         ,"AltOrc.txt"   
+                                        ,"CadastroObra.txt"
                                         ,"CertCont.txt" 
                                         ,"Combustivel.txt"  
                                         ,"Contrato2.txt"    
@@ -177,11 +178,13 @@ if ($inCodUnidadeGestora != "") {
                                         ,"LiqEmp.txt"   
                                         ,"MovConta.txt" 
                                         ,"MovRestoPagar.txt" 
-                                        ,"NotaFisc.txt" 
+                                        ,"NotaFisc.txt"
+                                        ,"ObraFiscal.txt"
                                         ,"PagEmp2.txt"
                                         ,"PagRetencao.txt"
                                         ,"PartConv.txt" 
                                         ,"PartLic.txt"  
+                                        ,"ProrrogParc.txt"
                                         ,"PubLic.txt"
                                         ,"RecArrec.txt"   
                                         ,"ResCont.txt"
@@ -198,6 +201,12 @@ if ($inCodUnidadeGestora != "") {
                                         ,"EditalCadastro.txt"
                                         ,"EditalEndereco.txt"
                                         ,"PagRetEmpres.txt"
+                                        ,"ObraMedicao.txt"
+                                        ,"ObraContrato.txt"
+                                        ,"ContrataMdo.txt"
+                                        ,"FiscalCadastro.txt"
+                                        ,"DotTermoParc.txt"
+                                        ,"TermoParc.txt"
                                     );
         break;
     }

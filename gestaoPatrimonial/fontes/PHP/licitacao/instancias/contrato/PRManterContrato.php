@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Rodrigo
 
-    * $Id: PRManterContrato.php 63574 2015-09-11 15:53:11Z carlos.silva $
+    * $Id: PRManterContrato.php 63675 2015-09-28 21:31:00Z jean $
 
     * Casos de uso : uc-03.05.23
 */
@@ -135,7 +135,7 @@ switch ($stAcao) {
             if ($numDocumentosParticipante == 0 && $numDocumentosLicitacao == 0) {
                 $stMensagem = 'É necessário informar todos os documentos do participante!';
             }
-
+            
             // exige que seja ao menos lançado um documento para o participante
             if ($numDocumentosParticipante == 0 && $numDocumentosLicitacao > 0) {
                 $stMensagem = 'É necessário informar ao menos um documento do participante!';
@@ -267,8 +267,8 @@ switch ($stAcao) {
                     $i++;
                 }
                 /***************************************************************************************************************/
-
                 SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$obTContrato->getDado('numero_contrato')."/".$obTContrato->getDado('exercicio')." da entidade ".$obTContrato->getDado('cod_entidade')." - ".$rsEntidade->getCampo('nom_cgm'),"incluir", "aviso", Sessao::getId(),"");
+                Sessao::remove('arDocumentos');
 
                 if ($request->get('boImprimirContrato')) {
                 $arRelatorio = array();

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63436 $
+    $Revision: 63720 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -44,14 +44,15 @@
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBARetencao.class.php" );
 
     $obTTBARetencao = new TTBARetencao();
-    $obTTBARetencao->setDado('inMes'      , $inMes );
-    $obTTBARetencao->setDado('stEntidades', $stEntidades );
+    $obTTBARetencao->setDado('exercicio', Sessao::getExercicio() );
+    $obTTBARetencao->setDado('mes'      , $inMes );
+    $obTTBARetencao->setDado('entidades', $stEntidades );
     $obTTBARetencao->setDado('unidade_gestora', $inCodUnidadeGestora );
     $obTTBARetencao->setDado('dt_inicial', $stDataInicial );
     $obTTBARetencao->setDado('dt_final', $stDataFinal );
-    $obTTBARetencao->recuperaDadosTribunal($rsArquivo);
-
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+    $obTTBARetencao->recuperaDadosTribunal($rsRetencao);
+    
+    $obExportador->roUltimoArquivo->addBloco($rsRetencao);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
@@ -81,7 +82,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_retencao");
@@ -97,5 +98,9 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_subempenho");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
+
+    unset($obTTBARetencao);
+    unset($rsRetencao);
+?>

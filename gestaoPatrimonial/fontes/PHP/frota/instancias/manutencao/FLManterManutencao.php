@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FLManterManutencao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterManutencao.php 63735 2015-10-02 17:01:23Z evandro $
 
     * Casos de uso: uc-03.02.14
 */
@@ -135,7 +135,7 @@ $obFormulario->addComponente( $obTxtPrefixo );
 $obFormulario->addComponente( $obIPopUpItem );
 $obFormulario->addComponente( $obISelectMultiploEntidadeUsuario );
 
-$obFormulario->OK();
+$obFormulario->OK(true);
 
 $obFormulario->show();
 

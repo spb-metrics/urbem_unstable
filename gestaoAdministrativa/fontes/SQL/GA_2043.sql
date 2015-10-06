@@ -42,4 +42,5 @@ UPDATE      sw_nome_logradouro SET          cod_norma = 0;
 ALTER TABLE sw_nome_logradouro ALTER COLUMN cod_norma SET NOT NULL;
 ALTER TABLE sw_nome_logradouro ADD CONSTRAINT fk_nome_logradouro_3 FOREIGN KEY             (cod_norma)
                                                                    REFERENCES normas.norma (cod_norma);
-
+ALTER TABLE sw_nome_logradouro DROP CONSTRAINT pk_nome_logradouro;
+ALTER TABLE sw_nome_logradouro ADD  CONSTRAINT pk_nome_logradouro PRIMARY KEY (cod_logradouro, timestamp, nom_logradouro);

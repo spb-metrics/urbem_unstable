@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63436 $
+    $Revision: 63720 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -68,11 +68,10 @@ class TTBARetencao extends Persistente
     * Método Construtor
     * @access Private
 */
-function TTBARetencao()
+function __construct()
 {
     $this->setEstrutura( array() );
     $this->setEstruturaAuxiliar( array() );
-    $this->setDado('exercicio', Sessao::getExercicio() );
 }
 
 function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
@@ -90,73 +89,85 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
 function montaRecuperaDadosTribunal()
 {
-    $stSql = " SELECT   to_char(pag.timestamp,'yyyy') as ano    
-                         ,plc.exercicio as ano_criacao   
-                         ,des.num_orgao AS cod_orgao    
-                         ,des.num_unidade AS unidade_orcamentaria  
-                         ,emp.cod_empenho AS num_empenho   
-                         ,to_char(pag.timestamp,'dd/mm/yyyy') as dt_pagamento_empenho    
-                         ,REPLACE(plc.cod_estrutural,'.','') AS conta_contabil
-                         ,COALESCE(SUM(opr.vl_retencao),0.00) AS vl_retencao
-                         ,1 as tipo_registro
-                         ,".$this->getDado('unidade_gestora')." AS unidade_gestora
-                         ,".$this->getDado('exercicio')."::VARCHAR||".$this->getDado('inMes')."::VARCHAR AS competencia
+    $stSql = "   SELECT 1 AS tipo_registro
+                      , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+		      , despesa.num_unidade AS unidade_orcamentaria
+		      , empenho.cod_empenho AS num_empenho   
+                      , TO_CHAR(nota_liquidacao_paga.timestamp,'YYYY') AS ano    
+                      , plano_conta.exercicio AS ano_criacao   
+                      , TO_CHAR(nota_liquidacao_paga.timestamp,'DDMMYYYY') as dt_pagamento_empenho
+                      , REPLACE(plano_conta.cod_estrutural,'.','') AS conta_contabil
+                      , COALESCE(SUM(ordem_pagamento_retencao.vl_retencao),0.00) AS vl_retencao
+                      , ".$this->getDado('exercicio').$this->getDado('mes')."::VARCHAR AS competencia
+                      , despesa.num_orgao AS cod_orgao    
+                      , empenho.cod_empenho AS num_subempenho
+                      
+                 FROM empenho.empenho
 
-                 FROM empenho.empenho                  as emp    
-                     ,empenho.nota_liquidacao          as liq    
-                     ,empenho.pagamento_liquidacao     as pli    
-                     ,empenho.ordem_pagamento          as opa    
-                     ,empenho.ordem_pagamento_retencao as opr    
-                     ,empenho.nota_liquidacao_paga     as pag    
-                     ,contabilidade.plano_analitica    as pla    
-                     ,contabilidade.plano_conta        as plc    
-                     ,empenho.pre_empenho              as pre    
-                     ,empenho.pre_empenho_despesa      as ped    
-                     ,orcamento.despesa                as des    
+            INNER JOIN empenho.pre_empenho
+                    ON empenho.exercicio       = pre_empenho.exercicio    
+                   AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho    
+                    
+            INNER JOIN empenho.nota_liquidacao 
+                    ON empenho.exercicio    = nota_liquidacao.exercicio_empenho    
+                   AND empenho.cod_entidade = nota_liquidacao.cod_entidade    
+                   AND empenho.cod_empenho  = nota_liquidacao.cod_empenho    
+                     
+            INNER JOIN empenho.pagamento_liquidacao
+                    ON nota_liquidacao.exercicio    = pagamento_liquidacao.exercicio    
+                   AND nota_liquidacao.cod_entidade = pagamento_liquidacao.cod_entidade    
+                   AND nota_liquidacao.cod_nota     = pagamento_liquidacao.cod_nota    
+            
+            INNER JOIN empenho.ordem_pagamento
+                    ON pagamento_liquidacao.exercicio    = ordem_pagamento.exercicio    
+                   AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade    
+                   AND pagamento_liquidacao.cod_ordem    = ordem_pagamento.cod_ordem    
+            
+            INNER JOIN empenho.ordem_pagamento_retencao
+                    ON ordem_pagamento.exercicio    = ordem_pagamento_retencao.exercicio    
+                   AND ordem_pagamento.cod_entidade = ordem_pagamento_retencao.cod_entidade    
+                   AND ordem_pagamento.cod_ordem    = ordem_pagamento_retencao.cod_ordem    
+            
+            INNER JOIN contabilidade.plano_analitica
+                    ON ordem_pagamento_retencao.exercicio = plano_analitica.exercicio    
+                   AND ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano    
+            
+            INNER JOIN contabilidade.plano_conta
+                    ON plano_analitica.exercicio = plano_conta.exercicio    
+                   AND plano_analitica.cod_conta = plano_conta.cod_conta    
+            
+            INNER JOIN empenho.nota_liquidacao_paga
+                    ON nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio    
+                   AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade    
+                   AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota    
+            
+            INNER JOIN empenho.pre_empenho_despesa
+                    ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio    
+                   AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho    
+            
+            INNER JOIN orcamento.despesa
+                    ON pre_empenho_despesa.exercicio   = despesa.exercicio    
+                   AND pre_empenho_despesa.cod_despesa = despesa.cod_despesa    
+                     
+                 WHERE TO_CHAR(nota_liquidacao_paga.timestamp,'YYYY')  = '".$this->getDado('exercicio')."'
+                   AND TO_DATE(nota_liquidacao_paga.timestamp::VARCHAR, 'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY')
+                                                                                          AND TO_DATE('".$this->getDado('dt_final')."','DD/MM/YYYY')
+                   AND nota_liquidacao.cod_entidade IN (".$this->getDado('entidades').")
 
-                 WHERE emp.exercicio       = pre.exercicio    
-                   AND emp.cod_pre_empenho = pre.cod_pre_empenho    
-                     
-                   AND emp.exercicio       = liq.exercicio_empenho    
-                   AND emp.cod_entidade    = liq.cod_entidade    
-                   AND emp.cod_empenho     = liq.cod_empenho    
-                     
-                   AND liq.exercicio       = pli.exercicio    
-                   AND liq.cod_entidade    = pli.cod_entidade    
-                   AND liq.cod_nota        = pli.cod_nota    
-                     
-                   AND pli.exercicio       = opa.exercicio    
-                   AND pli.cod_entidade    = opa.cod_entidade    
-                   AND pli.cod_ordem       = opa.cod_ordem    
-                     
-                   AND opa.exercicio       = opr.exercicio    
-                   AND opa.cod_entidade    = opr.cod_entidade    
-                   AND opa.cod_ordem       = opr.cod_ordem    
-                     
-                   AND opr.exercicio       = pla.exercicio    
-                   AND opr.cod_plano       = pla.cod_plano    
-                     
-                   AND pla.exercicio       = plc.exercicio    
-                   AND pla.cod_conta       = plc.cod_conta    
-                     
-                   AND liq.exercicio       = pag.exercicio    
-                   AND liq.cod_entidade    = pag.cod_entidade    
-                   AND liq.cod_nota        = pag.cod_nota    
-                     
-                   AND pre.exercicio       = ped.exercicio    
-                   AND pre.cod_pre_empenho = ped.cod_pre_empenho    
-                   AND ped.exercicio       = des.exercicio    
-                   AND ped.cod_despesa     = des.cod_despesa    
-                     
-                   AND to_char(pag.timestamp,'yyyy')  = '".$this->getDado('exercicio')."'
-                   AND to_date(to_char(pag.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                   AND liq.cod_entidade IN (".$this->getDado('stEntidades').")
+              GROUP BY despesa.num_orgao
+                      , ano
+                      , ano_criacao
+                      , despesa.num_unidade
+                      , empenho.cod_empenho
+                      , dt_pagamento_empenho    
+                      , conta_contabil
 
-                   GROUP BY pag.timestamp,plc.exercicio,des.num_orgao,des.num_unidade,emp.cod_empenho,plc.cod_estrutural
-
-                   ORDER BY num_empenho,dt_pagamento_empenho
-            ";
+              ORDER BY num_empenho
+                     , dt_pagamento_empenho ";
+    
     return $stSql;
 }
 
 }
+
+?>

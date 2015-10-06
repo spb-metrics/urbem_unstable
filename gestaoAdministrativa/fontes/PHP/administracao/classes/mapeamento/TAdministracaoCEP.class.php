@@ -35,18 +35,73 @@ $Name$
 $Author: pablo $
 $Date: 2005-12-06 13:51:37 -0200 (Ter, 06 Dez 2005) $
 
+$Id: TAdministracaoCEP.class.php 63632 2015-09-22 17:42:03Z michel $
+
 Casos de uso: uc-01.03.98
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 class TCEP extends Persistente
 {
-function TCEP()
-{
-    parent::Persistente();
-    $this->setTabela('sw_cep');
-    $this->setCampoCod('cep');
+    function __construct()
+    {
+        parent::Persistente();
+        $this->setTabela('sw_cep');
+        $this->setCampoCod('cep');
+    
+        $this->AddCampo('cep',          'varchar', true,  8, true,  false);
+        $this->AddCampo('cep_anterior', 'varchar', true,  8, true,  false);
+    }
+    
+    function recuperaCepBairro(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stOrdem = ( $stOrdem != "" ) ? " ORDER BY ".$stOrdem : " ORDER BY sw_uf.nom_uf, sw_municipio.nom_municipio, sw_bairro.nom_bairro";
+        $stSql  = $this->montaCepBairro().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+    
+    function montaCepBairro()
+    {
+        $stSql = "     SELECT sw_cep.cep
+                            , sw_bairro_logradouro.cod_bairro
+                            , sw_bairro_logradouro.cod_municipio
+                            , sw_bairro_logradouro.cod_uf
+                            , sw_uf.nom_uf
+                            , sw_municipio.nom_municipio
+                            , sw_bairro.nom_bairro
+                         FROM sw_cep
+                   INNER JOIN sw_cep_logradouro
+                           ON sw_cep_logradouro.cep = sw_cep.cep
+                   INNER JOIN sw_bairro_logradouro
+                           ON sw_bairro_logradouro.cod_logradouro = sw_cep_logradouro.cod_logradouro
+                   INNER JOIN sw_bairro
+                           ON sw_bairro.cod_uf = sw_bairro_logradouro.cod_uf
+                          AND sw_bairro.cod_municipio = sw_bairro_logradouro.cod_municipio
+                          AND sw_bairro.cod_bairro = sw_bairro_logradouro.cod_bairro
+                   INNER JOIN sw_uf
+                           ON sw_uf.cod_uf = sw_bairro.cod_uf
+                   INNER JOIN sw_municipio
+                           ON sw_municipio.cod_municipio = sw_bairro.cod_municipio
+                          AND sw_municipio.cod_uf = sw_bairro.cod_uf
+        ";
 
-    $this->AddCampo('cep',          'varchar', true,  8, true,  false);
-    $this->AddCampo('cep_anterior', 'varchar', true,  8, true,  false);
-}
+        if($this->getDado('cep'))
+            $stSql .= " WHERE sw_cep.cep='".$this->getDado('cep')."' ";
+
+        $stSql .= "  GROUP BY sw_cep.cep
+                            , sw_bairro_logradouro.cod_bairro
+                            , sw_bairro_logradouro.cod_municipio
+                            , sw_bairro_logradouro.cod_uf
+                            , sw_bairro.nom_bairro
+                            , sw_uf.nom_uf
+                            , sw_municipio.nom_municipio
+        ";
+    
+        return $stSql;
+    }
 }

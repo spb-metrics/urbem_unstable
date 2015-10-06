@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63346 $
+    $Revision: 63694 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -42,15 +42,17 @@
 */
 
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBADotCont.class.php" );
-    $obTMapeamento = new TTBADotCont();
-    $obTMapeamento->setDado('mes'      , $inMes );
-    $obTMapeamento->setDado('entidades', $stEntidades );
-    $obTMapeamento->setDado('dt_inicial', $stDataInicial );
-    $obTMapeamento->setDado('dt_final', $stDataFinal );
-    $obTMapeamento->setDado('unidade_gestora', $stUnidadeGestora );
-    $obTMapeamento->recuperaDadosTribunal($rsArquivo);
+    
+    $obTTBADotCont = new TTBADotCont();
+    $obTTBADotCont->setDado('exercicio' , Sessao::getExercicio() );
+    $obTTBADotCont->setDado('mes'       , $inMes );
+    $obTTBADotCont->setDado('entidades' , $stEntidades );
+    $obTTBADotCont->setDado('dt_inicial'     , $stDataInicial );
+    $obTTBADotCont->setDado('dt_final'       , $stDataFinal );
+    $obTTBADotCont->setDado('unidade_gestora', $inCodUnidadeGestora );
+    $obTTBADotCont->recuperaDadosTribunal($rsDotacaoContrato);
 
-    $obExportador->roUltimoArquivo->addBloco($rsArquivo);
+    $obExportador->roUltimoArquivo->addBloco($rsDotacaoContrato);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
@@ -60,11 +62,11 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_contrato");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_despesa");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("estrutural");
@@ -110,3 +112,8 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+    
+    unset($obTTBADotCont);
+    unset($rsDotacaoContrato);
+
+?>

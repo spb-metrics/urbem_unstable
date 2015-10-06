@@ -50,9 +50,9 @@ adicionando ao repositório (rescisão de contrato e aditivos de contrato)
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once(TLIC."TLicitacaoRescisaoContrato.class.php");
+include_once(TLIC."TLicitacaoPublicacaoRescisaoContrato.class.php");
 include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 
 // padrão do programa
 $stPrograma = "ManterRescindirContrato";
@@ -62,6 +62,17 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
+
+//include_once $pgJs;
+
+
+$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+
+Sessao::remove('arValores');
+
+$inNumContrato = $request->get('inNumContrato');
+$inCodEntidade = $request->get('inCodEntidade');
+$stExercicio = $request->get('stExercicio');
 
 $obForm = new Form;
 $obForm->setAction( $pgProc );
@@ -74,7 +85,35 @@ $obHdnAcao->setValue( $stAcao );
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
+
+//Define o objeto de controle do id na listagem do veiculo de publicação
+$obHdnCodVeiculo= new Hidden;
+$obHdnCodVeiculo->setName  ( "HdnCodVeiculo" );
+$obHdnCodVeiculo->setId ( "HdnCodVeiculo" );
+$obHdnCodVeiculo->setValue ( ""           );
 //fim do padrão
+
+if ($inNumContrato) {
+//recupera os veiculos de publicacao, coloca na sessao e manda para o oculto
+  $obTLicitacaoPublicacaoRescisaoContrato = new TLicitacaoPublicacaoRescisaoContrato();
+  $obTLicitacaoPublicacaoRescisaoContrato->setDado('num_contrato', $inNumContrato);
+  $obTLicitacaoPublicacaoRescisaoContrato->setDado('exercicio_contrato', $stExercicio);
+  $obTLicitacaoPublicacaoRescisaoContrato->setDado('cod_entidade', $inCodEntidade);
+  $obTLicitacaoPublicacaoRescisaoContrato->recuperaVeiculosPublicacao( $rsVeiculosPublicacao );
+  $inCount = 0;
+  $arValores = array();
+  while ( !$rsVeiculosPublicacao->eof() ) {
+      $arValores[$inCount]['id'            ] = $inCount + 1;
+      $arValores[$inCount]['inVeiculo'     ] = $rsVeiculosPublicacao->getCampo( 'num_veiculo' );
+      $arValores[$inCount]['stVeiculo'     ] = $rsVeiculosPublicacao->getCampo( 'nom_veiculo');
+      $arValores[$inCount]['dtDataPublicacao'] = $rsVeiculosPublicacao->getCampo( 'dt_publicacao');
+      $arValores[$inCount]['inNumPublicacao'] = $rsVeiculosPublicacao->getCampo( 'num_publicacao');
+      $arValores[$inCount]['stObservacao'  ] = $rsVeiculosPublicacao->getCampo( 'observacao');
+      $inCount++;
+      $rsVeiculosPublicacao->proximo();
+  }
+  Sessao::write('arValores', $arValores);
+}
 
 // cria o objeto com os dados da licitacaoRescisaoContrato
 $obTLicitacaoRescisaoContrato = new TLicitacaoRescisaoContrato;
@@ -146,6 +185,64 @@ $obVlMotivo->setTitle('Informe o motivo.');
 $obVlMotivo->setName('stMotivo');
 $obVlMotivo->setNull(false);
 
+//Painel veiculos de publicidade
+$obVeiculoPublicidade = new IPopUpCGMVinculado( $obForm );
+$obVeiculoPublicidade->setTabelaVinculo       ( 'licitacao.veiculos_publicidade' );
+$obVeiculoPublicidade->setCampoVinculo        ( 'numcgm'                         );
+$obVeiculoPublicidade->setNomeVinculo         ( 'Veículo de Publicação'          );
+$obVeiculoPublicidade->setRotulo              ( '*Veículo de Publicação'         );
+$obVeiculoPublicidade->setTitle               ( 'Informe o Veículo de Publicidade.' );
+$obVeiculoPublicidade->setName                ( 'stNomCgmVeiculoPublicadade'     );
+$obVeiculoPublicidade->setId                  ( 'stNomCgmVeiculoPublicadade'     );
+$obVeiculoPublicidade->obCampoCod->setName    ( 'inVeiculo'                      );
+$obVeiculoPublicidade->obCampoCod->setId      ( 'inVeiculo'                      );
+$obVeiculoPublicidade->setNull( true );
+$obVeiculoPublicidade->obCampoCod->setNull( true );
+
+$obDataPublicacao = new Data();
+$obDataPublicacao->setId   ( "dtDataPublicacao" );
+$obDataPublicacao->setName ( "dtDataPublicacao" );
+$obDataPublicacao->setValue( date('d/m/Y') );
+$obDataPublicacao->setRotulo( "Data de Publicação" );
+$obDataPublicacao->setObrigatorioBarra( true );
+$obDataPublicacao->setTitle( "Informe a data de publicação." );
+
+$obNumeroPublicacao = new Inteiro();
+$obNumeroPublicacao->setId   ( "inNumPublicacao" );
+$obNumeroPublicacao->setName ( "inNumPublicacao" );
+$obNumeroPublicacao->setValue( "");
+$obNumeroPublicacao->setRotulo( "Número Publicação" );
+$obNumeroPublicacao->setObrigatorioBarra( false );
+$obNumeroPublicacao->setTitle( "Informe o Número da Publicação." );
+
+//Campo Observação da Publicação
+$obTxtObservacao = new TextArea;
+$obTxtObservacao->setId     ( "stObservacao"                               );
+$obTxtObservacao->setName   ( "stObservacao"                               );
+$obTxtObservacao->setValue  ( ""                                           );
+$obTxtObservacao->setRotulo ( "Observação"                                 );
+$obTxtObservacao->setTitle  ( "Informe uma breve observação da publicação.");
+$obTxtObservacao->setObrigatorioBarra( false                               );
+$obTxtObservacao->setRows   ( 2                                            );
+$obTxtObservacao->setCols   ( 100                                          );
+$obTxtObservacao->setMaxCaracteres( 80 );
+
+//Define Objeto Button para Incluir Veiculo da Publicação
+$obBtnIncluirVeiculo = new Button;
+$obBtnIncluirVeiculo->setValue             ( "Incluir"                                      );
+$obBtnIncluirVeiculo->setId                ( "incluiVeiculo"                                );
+$obBtnIncluirVeiculo->obEvento->setOnClick ( "montaParametrosGET('incluirListaVeiculos', 'id, inVeiculo, stVeiculo, dtDataPublicacao, inNumPublicacao, stNomCgmVeiculoPublicadade, stObservacao');" );
+
+//Define Objeto Button para Limpar Veiculo da Publicação
+$obBtnLimparVeiculo = new Button;
+$obBtnLimparVeiculo->setValue             ( "Limpar"          );
+$obBtnLimparVeiculo->obEvento->setOnClick ( "montaParametrosGET('limparVeiculo', 'id, inVeiculo, stVeiculo, dtDataPublicacao, inNumPublicacao, stNomCgmVeiculoPublicadade, stObservacao');" );
+
+//Span da Listagem de veículos de Publicação Utilizados
+$obSpnListaVeiculo = new Span;
+$obSpnListaVeiculo->setID("spnListaVeiculos");
+
+
 
 // objetos hidden das labels
 $obHdnInNumContrato = new Hidden;
@@ -173,6 +270,7 @@ $obFormulario->addHidden( $obHdnInCgmContratado );
 $obFormulario->addHidden( $obHdnInNumContrato );
 $obFormulario->addHidden( $obHdnStExercicio );
 $obFormulario->addHidden( $obHdnInCodEntidade );
+$obFormulario->addHidden        ( $obHdnCodVeiculo );
 $obFormulario->addTitulo        ( "Dados do Contrato"   );
 $obFormulario->addComponente( $obLblExercicioContrato );
 $obFormulario->addComponente( $obLblExercicioLicitacao );
@@ -184,7 +282,13 @@ $obFormulario->addComponente( $obTxtDataRescisao );
 $obFormulario->addComponente( $obVlMulta );
 $obFormulario->addComponente( $obVlIndenizacao );
 $obFormulario->addComponente( $obVlMotivo );
-
+$obFormulario->addTitulo        ( 'Veículo de Publicação' );
+$obFormulario->addComponente    ( $obVeiculoPublicidade );
+$obFormulario->addComponente    ( $obDataPublicacao );
+$obFormulario->addComponente    ( $obNumeroPublicacao );
+$obFormulario->addComponente    ( $obTxtObservacao );
+$obFormulario->defineBarra      ( array( $obBtnIncluirVeiculo, $obBtnLimparVeiculo ) );
+$obFormulario->addSpan          ( $obSpnListaVeiculo );
 $obFormulario->Ok();
 $obFormulario->show();
 

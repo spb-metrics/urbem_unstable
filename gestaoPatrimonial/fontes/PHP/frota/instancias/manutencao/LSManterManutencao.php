@@ -29,7 +29,7 @@
  * @author Analista: Gelson W. Gonçalves
  * @author Desenvolvedor: Henrique Boaventura
 
- * $Id: LSManterManutencao.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: LSManterManutencao.php 63735 2015-10-02 17:01:23Z evandro $
 
  * Casos de uso: uc-03.02.14
 
@@ -67,7 +67,7 @@ if ( !Sessao::read('paginando') ) {
 
 if ( Sessao::read('filtro') ) {
     foreach ( Sessao::read('filtro') as $key => $value ) {
-        $_REQUEST[$key] = $value;
+        $_REQUEST[$key]= $value;
     }
 }
 
@@ -106,8 +106,8 @@ $stFiltro .= "  NOT EXISTS (
                           ) AND ";
 
 //seta o cod_autorizacao
-if ($_REQUEST['inCodAutorizacao'] != '') {
-    $arAutorizacao = explode( '/', $_REQUEST['inCodAutorizacao'] );
+if ($request->get('inCodAutorizacao') != '') {
+    $arAutorizacao = explode( '/', $request->get('inCodAutorizacao') );
     $arAutorizacao[1] = ( $arAutorizacao[1] == '' ) ? Sessao::getExercicio() : $arAutorizacao[1];
     $stFiltro .= " EXISTS( SELECT 1
                              FROM frota.efetivacao
@@ -118,34 +118,38 @@ if ($_REQUEST['inCodAutorizacao'] != '') {
 }
 
 //seta o cod_manutencao
-if ($_REQUEST['inCodManutencao'] != '') {
-    $arManutencao = explode( '/', $_REQUEST['inCodManutencao'] );
+if ($request->get('inCodManutencao') != '') {
+    $arManutencao = explode( '/', $request->get('inCodManutencao') );
     $arManutencao[1] = ( $arManutencao[1] == '' ) ? Sessao::getExercicio() : $arManutencao[1];
     $stFiltro .= " manutencao.cod_manutencao = ".$arManutencao[0]." AND
                    manutencao.exercicio = '".$arManutencao[1]."' AND ";
 }
 
 //seta o prefixo
-if ($_REQUEST['stPrefixo'] != '') {
-    $stFiltro .= " veiculo.prefixo = '".$_REQUEST['stPrefixo']."' AND ";
+if ($request->get('stPrefixo') != '') {
+    $stFiltro .= " veiculo.prefixo = '".$request->get('stPrefixo')."' AND ";
 }
 
 //seta a placa
-if ($_REQUEST['stNumPlaca'] != '') {
-    $stFiltro .= " veiculo.placa = '".str_replace('-','',$_REQUEST['stNumPlaca'])."' AND ";
+if ($request->get('stNumPlaca') != '') {
+    $stFiltro .= " veiculo.placa = '".str_replace('-','',$request->get('stNumPlaca'))."' AND ";
+}
+
+if ($request->get('inCodVeiculo') != '') {
+    $stFiltro .= " veiculo.cod_veiculo = ".$request->get('inCodVeiculo')." AND ";
 }
 
 //seta o cod_item
-if ($_REQUEST['inCodItem'] != '') {
+if ($request->get('inCodItem') != '') {
     $stFiltro .= " EXISTS ( SELECT 1
                               FROM frota.manutencao_item
                              WHERE manutencao_item.cod_manutencao = manutencao.cod_manutencao
                                AND manutencao_item.exercicio = manutencao.exercicio
-                               AND manutencao_item.cod_item = ".$_REQUEST['inCodItem']."
+                               AND manutencao_item.cod_item = ".$request->get('inCodItem')."
                           ) AND ";
 }
 
-if ($_REQUEST['inCodEntidade'] != '') {
+if ($request->get('inCodEntidade') != '') {
     $stFiltro .= "  EXISTS ( SELECT veiculo_propriedade.cod_veiculo
                                  , MAX(veiculo_propriedade.timestamp) AS timestamp
                               FROM frota.veiculo_propriedade
@@ -155,7 +159,7 @@ if ($_REQUEST['inCodEntidade'] != '') {
                         INNER JOIN patrimonio.bem_comprado
                                 ON bem_comprado.cod_bem = proprio.cod_bem
                              WHERE veiculo_propriedade.cod_veiculo = veiculo.cod_veiculo
-                               AND bem_comprado.cod_entidade IN ( ".implode(',',$_REQUEST['inCodEntidade'])." )
+                               AND bem_comprado.cod_entidade IN ( ".implode(',',$request->get('inCodEntidade'))." )
                           GROUP BY veiculo_propriedade.cod_veiculo)       ";
 }
 
@@ -224,6 +228,8 @@ $obLista->ultimaAcao->addCampo( "&inCodVeiculo", "cod_veiculo" );
 $obLista->ultimaAcao->addCampo( "&stDescQuestao" , "[cod_manutencao]/[exercicio]" );
 
 $obLista->ultimaAcao->setLink( $stCaminho.$pgForm."?".Sessao::getId().$stLink );
+
+SistemaLegado::LiberaFrames(true, true);
 
 $obLista->commitAcao();
 $obLista->show();

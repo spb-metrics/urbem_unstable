@@ -34,7 +34,7 @@
 ?>
 <script type="text/javascript">
 
-function IniciaSessions(  ){
+function IniciaSessions(){
     var stTraget = document.frm.target;
     var stAction = document.frm.action;
     document.frm.stCtrl.value = 'IniciaSessions';
@@ -168,7 +168,6 @@ function limparListas(){
     document.frm.action = stAction;
 }
 
-
 function CancelarFormFL () {
 
 <?php
@@ -226,10 +225,7 @@ function incluirNovoBairro() {
     document.frm.submit();
     document.frm.target = stTraget;
     document.frm.action = stAction;
-}
-
-
-                        
+}                  
 
 function excluirBairro( inIndice ){
     var stTraget = document.frm.target;
@@ -388,6 +384,46 @@ function verificaCodigoLogradouro() {
     var stTraget = document.frm.target;
     var stAction = document.frm.action;
     document.frm.stCtrl.value = 'verificaCodigoLogradouro';
+    document.frm.target = "oculto";
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
+    document.frm.submit();
+    document.frm.target = stTraget;
+    document.frm.action = stAction;
+}
+
+function validaCamposLista()
+{
+    var inCodNorma      = jQuery("#inCodNorma").val();
+    var stDataInicial   = jQuery("#stDataInicial").val();
+    var stNomeLogradouroAnterior = jQuery("#stNomeLogradouroAnterior").val();
+    
+    if ( stDataInicial == '' || inCodNorma == '' || stNomeLogradouroAnterior == '') {
+        alertaAviso("Preencha todos os campos obrigatórios do histórico do logradouro.","erro","aviso","<?=Sessao::getId()?>");
+        return false;
+    }else{
+        jQuery('#stDescricaoNorma').val(jQuery('#stNorma').html());
+        return true;
+    };
+}
+
+function modificaDado(tipoBusca, inId)
+{
+    jQuery("#inId").val(inId);
+    var stTraget = document.frm.target;
+    var stAction = document.frm.action;
+    document.frm.stCtrl.value = tipoBusca;
+    document.frm.target = "oculto";
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&inId='+inId;
+    document.frm.submit();
+    document.frm.target = stTraget;
+    document.frm.action = stAction;
+}
+
+function manterHistorico(stControle)
+{
+    var stTraget = document.frm.target;
+    var stAction = document.frm.action;
+    document.frm.stCtrl.value = stControle;
     document.frm.target = "oculto";
     document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
     document.frm.submit();

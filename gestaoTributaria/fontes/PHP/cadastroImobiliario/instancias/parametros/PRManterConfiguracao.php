@@ -32,7 +32,7 @@
 
  * @ignore
 
- * $Id: PRManterConfiguracao.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: PRManterConfiguracao.php 63672 2015-09-28 19:24:31Z arthur $
 
  * Casos de uso: uc-05.01.01
 */
@@ -51,61 +51,62 @@ $pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 $pgProc = "PR".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
 $pgOcul = "OC".$stPrograma.".php";
 
-$obRCIMConfiguracao = new RCIMConfiguracao;
-$obErro  = new Erro;
-$boTransacao = new Transacao;
+$obRCIMConfiguracao = new RCIMConfiguracao();
+$obErro  = new Erro();
+$boTransacao = new Transacao();
 
 switch ($stAcao) {
     case "alterar":
-        if ( count($_REQUEST["inCodOrdemSelecionados"] ) < $_REQUEST["inNumeroOrdens"] ) {
+        if ( count($request->get("inCodOrdemSelecionados") ) < $request->get("inNumeroOrdens") ) {
             $obErro->setDescricao( "Campo Ordem de entrega inválido!(Todos os itens devem ser selecionados)");
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"unica","aviso");
             exit();
         } else {
-            $obRCIMConfiguracao->setNavegacaoAutomatico ( $_REQUEST["stNavegacaoAuto"] );
-            $obRCIMConfiguracao->setMascaraLote  ( $_REQUEST["stMascaraLote"] );
-            $obRCIMConfiguracao->setMascaraIM    ( $_REQUEST["stMascaraIM"]   );
-            $obRCIMConfiguracao->setNumeroIM     ( $_REQUEST["boNumeroIM"]    );
+            $obRCIMConfiguracao->setNavegacaoAutomatico ( $request->get("stNavegacaoAuto") );
+            $obRCIMConfiguracao->setCodigoLocal  ( $request->get("boCodigoLocal") );
+            $obRCIMConfiguracao->setMascaraLote  ( $request->get("stMascaraLote") );
+            $obRCIMConfiguracao->setMascaraIM    ( $request->get("stMascaraIM")   );
+            $obRCIMConfiguracao->setNumeroIM     ( $request->get("boNumeroIM")    );
             $obRCIMConfiguracao->setAnoExercicio ( Sessao::getExercicio()     );
 
-            if ($_REQUEST["inCodAtributosLoteUrbanoSelecionados"]) {
-                foreach ($_REQUEST["inCodAtributosLoteUrbanoSelecionados"] as $stValor) {
+            if ($request->get("inCodAtributosLoteUrbanoSelecionados")) {
+                foreach ($request->get("inCodAtributosLoteUrbanoSelecionados") as $stValor) {
                     $obRCIMConfiguracao->addAtbLotUrbano( $stValor );
                 }
             }
 
-            if ($_REQUEST["inCodAtributosLoteRuralSelecionados"]) {
-                foreach ($_REQUEST["inCodAtributosLoteRuralSelecionados"] as $stValor) {
+            if ($request->get("inCodAtributosLoteRuralSelecionados")) {
+                foreach ($request->get("inCodAtributosLoteRuralSelecionados") as $stValor) {
                     $obRCIMConfiguracao->addAtbLotRural( $stValor );
                 }
             }
 
-            if ($_REQUEST["inCodAtributosImovelSelecionados"]) {
-                foreach ($_REQUEST["inCodAtributosImovelSelecionados"] as $stValor) {
+            if ($request->get("inCodAtributosImovelSelecionados")) {
+                foreach ($request->get("inCodAtributosImovelSelecionados") as $stValor) {
                     $obRCIMConfiguracao->addAtbImovel( $stValor );
                 }
             }
 
-            if ($_REQUEST["inCodAtributosEdificacaoSelecionados"]) {
-                foreach ($_REQUEST["inCodAtributosEdificacaoSelecionados"] as $stValor) {
+            if ($request->get("inCodAtributosEdificacaoSelecionados")) {
+                foreach ($request->get("inCodAtributosEdificacaoSelecionados") as $stValor) {
                     $obRCIMConfiguracao->addAtbEdificacao( $stValor );
                 }
             }
 
-            if ($_REQUEST["inCodOrdemSelecionados"]) {
-                foreach ($_REQUEST["inCodOrdemSelecionados"] as $stOrdemEntrega) {
+            if ($request->get("inCodOrdemSelecionados")) {
+                foreach ($request->get("inCodOrdemSelecionados") as $stOrdemEntrega) {
                     $obRCIMConfiguracao->addOrdemEntrega( $stOrdemEntrega );
                 }
             }
 
-            if ($_REQUEST["inCodValorMDSelecionados"]) {
-                foreach ($_REQUEST["inCodValorMDSelecionados"] as $stValorMD) {
+            if ($request->get("inCodValorMDSelecionados")) {
+                foreach ($request->get("inCodValorMDSelecionados") as $stValorMD) {
                     $obRCIMConfiguracao->addValorMD( $stValorMD );
                 }
             }
 
-            if ($_REQUEST["inCodAliquotasSelecionados"]) {
-                foreach ($_REQUEST["inCodAliquotasSelecionados"] as $stValorMD) {
+            if ($request->get("inCodAliquotasSelecionados")) {
+                foreach ($request->get("inCodAliquotasSelecionados") as $stValorMD) {
                     $obRCIMConfiguracao->addAliquota( $stValorMD );
                 }
             }

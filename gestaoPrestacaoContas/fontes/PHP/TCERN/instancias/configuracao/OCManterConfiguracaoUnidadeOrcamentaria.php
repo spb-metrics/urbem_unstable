@@ -323,6 +323,10 @@ switch ($stCtrl) {
         }
     break;
 
+    case 'bloquear':
+        $stJs .= " jq('#Ok').prop('disabled',true);\n";
+        $stJs .= " jq('#limpar').prop('disabled',true);\n";
+    break;
 }
 
 echo $stJs;

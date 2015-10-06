@@ -34,6 +34,7 @@
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBADispensa.class.php" );
 
     $obTTBADispensa = new TTBADispensa();
+    $obTTBADispensa->setDado('exercicio'  , Sessao::getExercicio() );
     $obTTBADispensa->setDado('inMes'      , $inMes       );
     $obTTBADispensa->setDado('stEntidades', $stEntidades );
     $obTTBADispensa->setDado('unidade_gestora',$inCodUnidadeGestora);

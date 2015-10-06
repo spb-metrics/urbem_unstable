@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-02.08.05
 
-    $Id: LSProcurarCgm.php 62654 2015-05-29 12:59:20Z evandro $
+    $Id: LSProcurarCgm.php 63681 2015-09-29 17:48:28Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -217,9 +217,14 @@ if ( $request->get('stTabelaVinculo') ) {
             $obTCGM->recuperaRelacionamentoVinculadoComissaoLicitacao( $rsLista, $stFiltro, " ORDER BY lower(sw_cgm.nom_cgm)", $boTransacao , "" , "", $stFiltroVinculado);
         break;
 
+        case 'orgaoGestor':
+            $obTCGM->recuperaOrgaoGerenciador( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)", $boTransacao );
+        break;
+        
         default:
             $obTCGM->recuperaRelacionamentoVinculado( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)", $boTransacao , $_REQUEST['stTabelaVinculo'] , $_REQUEST['stCampoVinculo'], $stFiltroVinculado);
         break;
+
     }
 } else {
     $obTCGM->recuperaRelacionamentoSintetico( $rsLista, $stFiltro, " ORDER BY lower(CGM.nom_cgm)" );

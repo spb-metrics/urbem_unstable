@@ -32,23 +32,15 @@
 
     * @ignore
 
-    * $Id: FMManterConfiguracao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterConfiguracao.php 63672 2015-09-28 19:24:31Z arthur $
 
     * Casos de uso: uc-05.01.01
 */
 
-/*
-$Log$
-Revision 1.8  2006/09/18 10:31:08  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GT_CIM_NEGOCIO."RCIMConfiguracao.class.php" );
-include_once( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" );
+include_once CAM_GT_CIM_NEGOCIO."RCIMConfiguracao.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracao";
@@ -58,7 +50,7 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
-$obRCIMConfiguracao = new RCIMConfiguracao;
+$obRCIMConfiguracao = new RCIMConfiguracao();
 $obErro = $obRCIMConfiguracao->consultarConfiguracao();
 
 $stAcao = $request->get('stAcao');
@@ -71,6 +63,25 @@ $obForm->settarget      ( "oculto" );
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName     ( "stAcao" );
 $obHdnAcao->setValue    ( $stAcao );
+
+$obRdbCodLocalAutomatico = new Radio;
+$obRdbCodLocalAutomatico->setRotulo     ( "Código de Localização" );
+$obRdbCodLocalAutomatico->setName       ( "boCodigoLocal" );
+$obRdbCodLocalAutomatico->setId         ( "boCodigoLocal" );
+$obRdbCodLocalAutomatico->setLabel      ( "Automático" );
+$obRdbCodLocalAutomatico->setValue      ( "true" );
+$obRdbCodLocalAutomatico->setChecked    ( ( $obRCIMConfiguracao->getCodigoLocal() == 'true' ) );
+$obRdbCodLocalAutomatico->setTitle      ( "Define se o código de localização será informado ou gerado automaticamente." );
+$obRdbCodLocalAutomatico->setNull       ( false );
+
+$obRdbCodLocalManual = new Radio;
+$obRdbCodLocalManual->setRotulo      ( "Código de Localização" );
+$obRdbCodLocalManual->setName        ( "boCodigoLocal" );
+$obRdbCodLocalManual->setiD          ( "boCodigoLocal" );
+$obRdbCodLocalManual->setLabel       ( "Manual" );
+$obRdbCodLocalManual->setValue       ( "false" );
+$obRdbCodLocalManual->setChecked     ( ( empty($obRCIMConfiguracao->getCodigoLocal()) || $obRCIMConfiguracao->getCodigoLocal() == 'false') ? 'false' : "" );
+$obRdbCodLocalManual->setNull        ( false );
 
 $obTxtMascaraLote = new TextBox;
 $obTxtMascaraLote->setName      ( "stMascaraLote" );
@@ -95,19 +106,8 @@ $obRdbNumInscManual->setRotulo      ( "Número de Inscrição Imobiliária" );
 $obRdbNumInscManual->setName        ( "boNumeroIM" );
 $obRdbNumInscManual->setLabel       ( "Manual" );
 $obRdbNumInscManual->setValue       ( "false" );
-$obRdbNumInscManual->setChecked     ( ( $obRCIMConfiguracao->getNumeroIM() == 'false' ) );
+$obRdbNumInscManual->setChecked     ( ( empty($obRCIMConfiguracao->getNumeroIM()) || $obRCIMConfiguracao->getNumeroIM() == 'false') ? 'false' : "" );
 $obRdbNumInscManual->setNull        ( false );
-
-//$obCmbNumInscImob = new Select;
-//$obCmbNumInscImob->setName      ( "boNumeroIM" );
-//$obCmbNumInscImob->setValue     ( $obRCIMConfiguracao->getNumeroIM() );
-//$obCmbNumInscImob->setTitle     ( "Define se o número da inscrição imobiliária será informado ou gerado automaticamente" );
-//$obCmbNumInscImob->setRotulo    ( "Número Inscrição Imobiliária" );
-//$obCmbNumInscImob->setStyle     ( "width: 150px" );
-//$obCmbNumInscImob->addOption    ( "", "Selecione" );
-//$obCmbNumInscImob->addOption    ( "true", "Automático" );
-//$obCmbNumInscImob->addOption    ( "false", "Manual" );
-//$obCmbNumInscImob->setNull      ( false );
 
 $obTxtMascaraInscImob = new TextBox;
 $obTxtMascaraInscImob->setName      ( "stMascaraIM" );
@@ -576,13 +576,13 @@ $obHdnNumeroOrdens->setValue ( $rsRSOrdemEntrega->getNumLinhas() );
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
 $obFormulario->addForm       ( $obForm                   );
-$obFormulario->setAjuda ( "UC-05.01.01" );
+$obFormulario->setAjuda      ( "UC-05.01.01" );
 $obFormulario->addHidden     ( $obHdnAcao                );
 $obFormulario->addHidden     ( $obHdnNumeroOrdens        );
 $obFormulario->addTitulo     ( "Dados para Configuração" );
+$obFormulario->agrupaComponentes( array( $obRdbCodLocalAutomatico, $obRdbCodLocalManual ) );
 $obFormulario->addComponente ( $obTxtMascaraLote         );
 $obFormulario->agrupaComponentes( array( $obRdbNumInscAutomatico, $obRdbNumInscManual ) );
-//$obFormulario->addComponente ( $obCmbNumInscImob         );
 $obFormulario->addComponente ( $obTxtMascaraInscImob     );
 $obFormulario->addComponente ( $obCmbOrdemEntrega        );
 
@@ -598,4 +598,5 @@ $obFormulario->addComponente ( $obCmbAtributosEdificacao );
 $obFormulario->OK();
 $obFormulario->setFormFocus  ( $obTxtMascaraLote->getId() );
 $obFormulario->show();
+
 ?>

@@ -148,11 +148,15 @@ $obRdPessoaFisica->setName       ( "stTipoPessoa" );
 $obRdPessoaFisica->setValue      ( "F" );
 $obRdPessoaFisica->setLabel      ( "Pessoa Física" );
 $obRdPessoaFisica->obEvento->setOnClick( "habilitaCampos('F');" );
-if ( $request->get('tipoBusca') == 'fisica' ) {
-    $obRdPessoaFisica->setChecked( true );
-} elseif ( $request->get('tipoBusca') == 'juridica' ) {
-    $obRdPessoaFisica->setChecked( false );
-    $obRdPessoaFisica->setDisabled( true );
+switch ($request->get('tipoBusca')) {
+    case 'juridica':
+    case 'orgaoGerenciador':
+        $obRdPessoaFisica->setChecked( false );
+        $obRdPessoaFisica->setDisabled( true );
+    break;
+    case 'fisica':
+        $obRdPessoaFisica->setChecked( true );
+    break;
 }
 
 $obRdPessoaJuridica = new Radio;
@@ -161,11 +165,16 @@ $obRdPessoaJuridica->setName     ( "stTipoPessoa" );
 $obRdPessoaJuridica->setValue    ( "J" );
 $obRdPessoaJuridica->setLabel    ( "Pessoa Jurídica" );
 $obRdPessoaJuridica->obEvento->setOnClick( "habilitaCampos('J');" );
-if ( $request->get('tipoBusca') == 'juridica' ) {
-    $obRdPessoaJuridica->setChecked( true );
-} elseif ( $request->get('tipoBusca') == 'fisica' ) {
-    $obRdPessoaJuridica->setChecked( false );
-    $obRdPessoaJuridica->setDisabled( true );
+switch ($request->get('tipoBusca')) {
+    case 'juridica':
+    case 'orgaoGerenciador':
+        $obRdPessoaJuridica->setChecked( true );    
+        $jsOnload .= " habilitaCampos('J'); ";
+    break;
+    case 'fisica':
+        $obRdPessoaJuridica->setChecked( false );
+        $obRdPessoaJuridica->setDisabled( true );
+    break;
 }
 
 $obRdTodos = new Radio;

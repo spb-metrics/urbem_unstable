@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Mapeamento
 
-    * $Id: VCIMLocalizacaoAtiva.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: VCIMLocalizacaoAtiva.class.php 63688 2015-09-29 20:32:47Z arthur $
 
      * Casos de uso: uc-05.01.03
 */
@@ -49,23 +49,13 @@ adicionado trecho de log do CVS
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-/**
-  * Efetua conexão com a tabela  IMOBILIARIO.VW_LOCALIZACAO_ATIVO
-  * Data de Criação: 30/11/2004
-
-  * @author Analista: Ricardo Lopes de Alencar
-  * @author Desenvolvedor: Cassiano de Vasconcellos Ferrerira
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class VCIMLocalizacaoAtiva extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function VCIMLocalizacaoAtiva()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela('imobiliario.vw_localizacao_ativa');
@@ -84,4 +74,7 @@ function VCIMLocalizacaoAtiva()
     $this->AddCampo('nom_nivel',       'string', true,'' ,true, false);
 
 }
+
 }
+
+?>

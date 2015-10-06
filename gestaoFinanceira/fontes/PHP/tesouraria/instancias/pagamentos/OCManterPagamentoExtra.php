@@ -76,39 +76,42 @@ function limparCampos()
     Sessao::remove('stNomContaCredito');
 
     $stJs = "//document.getElementById('frm').reset();\n
-             document.getElementById('inCodEntidade').focus();\n
-             document.getElementById('stNomEntidade').readOnly = false;\n
-             document.getElementById('inCodEntidade').readOnly = false;\n
-             document.getElementById('imgCredor').style.display = 'inline';\n
-             document.getElementById('inCodCredor').readOnly = false;\n
-             document.getElementById('inCodCredor').value = '';\n
-             document.getElementById('inCodRecibo').value = '';\n
-             document.getElementById('stNomCredor').innerHTML = '&nbsp;';\n
-             if (document.getElementById('imgRecurso')) {
-                document.getElementById('imgRecurso').style.display = 'inline';\n
-                document.getElementById('inCodRecurso').readOnly = false;\n
-             } else {
-                document.getElementById('stDestinacaoRecurso').readOnly = false;
-                document.getElementById('inCodUso').disabled = false;
-                document.getElementById('inCodDestinacao').disabled = false;
-                document.getElementById('inCodEspecificacao').disabled = false;
-                document.getElementById('inCodDetalhamento').disabled = false;
-                document.getElementById('stDestinacaoRecurso').focus();
-                document.getElementById('stDestinacaoRecurso').value = '';
-                document.getElementById('inCodRecibo').focus();
-             }
-             document.getElementById('nuValor').readOnly = false;\n
-             document.getElementById('nuValor').value = '';\n
-             document.getElementById('inCodHistorico').value = '';\n
-             document.getElementById('stNomHistorico').innerHTML = '&nbsp';\n
-             document.getElementById('stNomHistorico').value = '';\n
-             if (document.getElementById('inCodEntidade').value == '') {
-                document.getElementById('spnBoletim').innerHTML = '';\n
-                document.getElementById('spnContas').innerHTML = '';\n
-             } else {
-                montaParametrosGET('montaSpanContas' , 'inCodEntidade');\n
-             }
-             jq('#spnCheques').html('');
+            document.getElementById('inCodEntidade').focus();\n
+            document.getElementById('stNomEntidade').readOnly = false;\n
+            document.getElementById('inCodEntidade').readOnly = false;\n
+            document.getElementById('imgCredor').style.display = 'inline';\n
+            document.getElementById('inCodCredor').readOnly = false;\n
+            document.getElementById('inCodCredor').value = '';\n
+            document.getElementById('inCodRecibo').value = '';\n
+            document.getElementById('stNomCredor').innerHTML = '&nbsp;';\n
+            
+            if(document.getElementById('inCodRecurso') != null) {
+                if (document.getElementById('imgRecurso')) {
+                    document.getElementById('imgRecurso').style.display = 'inline';\n
+                    document.getElementById('inCodRecurso').readOnly = false;\n
+                } else {
+                    document.getElementById('stDestinacaoRecurso').readOnly = false;
+                    document.getElementById('inCodUso').disabled = false;
+                    document.getElementById('inCodDestinacao').disabled = false;
+                    document.getElementById('inCodEspecificacao').disabled = false;
+                    document.getElementById('inCodDetalhamento').disabled = false;
+                    document.getElementById('stDestinacaoRecurso').focus();
+                    document.getElementById('stDestinacaoRecurso').value = '';
+                    document.getElementById('inCodRecibo').focus();
+                }
+            }
+            document.getElementById('nuValor').readOnly = false;\n
+            document.getElementById('nuValor').value = '';\n
+            document.getElementById('inCodHistorico').value = '';\n
+            document.getElementById('stNomHistorico').innerHTML = '&nbsp';\n
+            document.getElementById('stNomHistorico').value = '';\n
+            if (document.getElementById('inCodEntidade').value == '') {
+               document.getElementById('spnBoletim').innerHTML = '';\n
+               document.getElementById('spnContas').innerHTML = '';\n
+            } else {
+               montaParametrosGET('montaSpanContas' , 'inCodEntidade');\n
+            }
+            jq('#spnCheques').html('');
     ";
 
     return $stJs;
@@ -163,7 +166,9 @@ function buscaDadosRecibo($inCodEntidade, $inCodRecibo)
                                         d.getElementById('imgCredor').style.display = 'inline';\n
                                     } ";
                         if ($boDestinacao) {
-                            $stJs .= "  document.getElementById('stDestinacaoRecurso').focus();
+                            $stJs .= "
+                                    if(document.getElementById('inCodRecurso') != null) {
+                                        document.getElementById('stDestinacaoRecurso').focus();
                                         document.getElementById('stDestinacaoRecurso').value = '".$rsRecordSet->getCampo('masc_recurso')."';
                                         document.getElementById('inCodRecurso').value = '".$rsRecordSet->getCampo('cod_recurso')."';
                                         document.getElementById('stDestinacaoRecurso').readOnly = true;
@@ -171,9 +176,12 @@ function buscaDadosRecibo($inCodEntidade, $inCodRecibo)
                                         document.getElementById('inCodDestinacao').disabled = true;
                                         document.getElementById('inCodEspecificacao').disabled = true;
                                         document.getElementById('inCodDetalhamento').disabled = true;
+                                    }
                             ";
                         } else {
-                            $stJs .= "  d.getElementById('inCodRecurso').focus();\n
+                            $stJs .= "
+                                    if(document.getElementById('inCodRecurso') != null) {
+                                        d.getElementById('inCodRecurso').focus();\n
                                         d.getElementById('inCodRecurso').value = '".$rsRecordSet->getCampo("cod_recurso")."';\n
                                         if (d.getElementById('inCodRecurso').value) {
                                            d.getElementById('inCodRecurso').readOnly = true;\n
@@ -181,7 +189,8 @@ function buscaDadosRecibo($inCodEntidade, $inCodRecibo)
                                         } else {
                                            d.getElementById('inCodRecurso').readOnly = false;\n
                                            d.getElementById('imgRecurso').style.display = 'inline';\n
-                                        } ";
+                                        }
+                                    } ";
                         }
 
                         //Verifica se existem cheques vinculados a despesa extra
@@ -320,9 +329,13 @@ function montaSpanContas($obCmbEntidades)
     $obBscContaCredito->obCampoCod->setName            ( "inCodPlanoCredito" );
     $obBscContaCredito->obCampoCod->setId              ( "inCodPlanoCredito" );
     $obBscContaCredito->obImagem->setId                ( "imgPlanoCredito"   );
-    $obBscContaCredito->setTipoBusca                   ( "tes_pagamento_extra_caixa_banco"    );
+    if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true))
+        $obBscContaCredito->setTipoBusca               ( 'tes_pagamento_extra_caixa_banco_recurso_fixo'  );
+    else
+        $obBscContaCredito->setTipoBusca               ( 'tes_pagamento_extra_caixa_banco'  );
     $obBscContaCredito->obCampoCod->obEvento->setOnBlur( " montaParametrosGET( 'verificaContas','inCodPlanoCredito,inCodPlanoDebito,stDtBoletim');");
-
+    
+    
     $obFormulario = new Formulario;
     $obFormulario->addComponente ( $obBscContaDebito       );
     $obFormulario->addComponente ( $obBscContaCredito      );

@@ -84,20 +84,17 @@ function montaRecuperaDadosTribunal()
     $stSql = "
                 SELECT 1 AS tipo_registro
                      , ".$this->getDado('inCodUnidadeGestora')." AS unidade_gestora
-                     , contrato.num_contrato
-                     , contrato.num_contrato AS num_termo
-                     , CASE WHEN sw_cgm_pessoa_juridica IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj
-                            ELSE sw_cgm_pessoa_fisica.cpf
-                     END AS cnpj_cpf
-                     , CASE WHEN sw_cgm_pessoa_juridica IS NOT NULL THEN 2 ELSE 1
-                     END tipo_pessoa
+                     , contrato.numero_contrato
+                     , contrato.numero_contrato AS num_termo
+                     , pessoa_fisica_juridica.documento
+                     , pessoa_fisica_juridica.tipo_pessoa
                      , contrato.dt_assinatura AS dt_termo
                      , sw_cgm.nom_cgm AS nom_responsavel
                      , publicacao_contrato.dt_publicacao
                      , contrato.valor_contratado AS vl_termo
                      , TO_CHAR(contrato.dt_assinatura,'yyyymm') AS competencia
-                     , justificativa_razao.justificativa
-                     , justificativa_razao.fundamentacao_legal
+                     , contrato.justificativa
+                     , contrato.fundamentacao_legal
                      , contrato.objeto
                 FROM licitacao.contrato
                 INNER JOIN licitacao.contrato_licitacao
@@ -111,10 +108,19 @@ function montaRecuperaDadosTribunal()
                        AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao
                 INNER JOIN sw_cgm
                         ON sw_cgm.numcgm = contrato.cgm_contratado
-                LEFT JOIN sw_cgm_pessoa_juridica
-                       ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-                LEFT JOIN sw_cgm_pessoa_fisica
-                       ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                INNER JOIN ( SELECT numcgm
+                                  , cnpj as documento
+                                  , 2 AS tipo_pessoa
+                               FROM sw_cgm_pessoa_juridica
+
+                              UNION
+
+                               SELECT numcgm
+                                  , cpf as documento
+                                  , 1 AS tipo_pessoa
+                               FROM sw_cgm_pessoa_fisica 
+                     ) AS pessoa_fisica_juridica        
+                     ON pessoa_fisica_juridica.numcgm = contrato.cgm_contratado
                 INNER JOIN licitacao.publicacao_contrato
                         ON publicacao_contrato.num_contrato = contrato.num_contrato
                        AND publicacao_contrato.cod_entidade = contrato.cod_entidade

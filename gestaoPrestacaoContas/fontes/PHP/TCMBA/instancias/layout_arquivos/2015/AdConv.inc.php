@@ -63,7 +63,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(17);
 
@@ -71,7 +71,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(300);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
@@ -87,7 +87,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("[]");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tcm");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
@@ -95,11 +95,11 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_publicacao_convenio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_publicacao_aditivo");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_convenio");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 

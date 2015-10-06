@@ -128,7 +128,7 @@ function buscaPopup()
                             break;
                     }
 
-                    if ( $rsMapa->getNumLinhas()<=0 AND $inCodLicitacaoMapa !=$inHdnCodLicitacao) {
+                    if ( $rsMapa->getNumLinhas()<=0 OR $inCodLicitacaoMapa !=$inHdnCodLicitacao) {
 
                             $boMapa = sistemaLegado::pegaDado('cod_mapa','compras.mapa',' where cod_mapa = '.$arMapa[0].' and exercicio = \''.$arMapa[1].'\' ' );
 

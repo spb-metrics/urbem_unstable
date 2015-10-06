@@ -77,8 +77,10 @@ public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem
 
 public function montaRecuperaDadosTribunal()
 {
-    $stSql .= " SELECT convenio.exercicio
+    $stSql .= " SELECT 1 AS tipo_registro
+                     , convenio.exercicio
                      , convenio.num_convenio
+                     , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                      , CASE WHEN sw_cgm_pessoa_fisica.numcgm IS NOT NULL THEN 1
                             ELSE 2
                      END AS tipo_pessoa
@@ -86,9 +88,11 @@ public function montaRecuperaDadosTribunal()
                             WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN sw_cgm_pessoa_juridica.cnpj
                             ELSE ''            
                      END AS cpf_cnpj            
-                    , sw_cgm.nom_cgm
-                    , participante_convenio.valor_participacao            
-                    , '' AS nome_funcao
+                    , sem_acentos(sw_cgm.nom_cgm) as nom_cgm
+                    , participante_convenio.valor_participacao
+                    , '' AS reservado_tcm
+                    , TO_CHAR(convenio.dt_assinatura, 'yyyymm') AS competencia
+                    , participante_convenio.funcao AS nome_funcao
                     , TO_CHAR(convenio.dt_assinatura,'dd/mm/yyyy') AS data_assinatura
                     , TO_CHAR(convenio.dt_vigencia,'dd/mm/yyyy') AS data_vigencia
 
@@ -97,7 +101,7 @@ public function montaRecuperaDadosTribunal()
            INNER JOIN licitacao.participante_convenio
                    ON participante_convenio.exercicio = convenio.exercicio
                   AND participante_convenio.num_convenio = convenio.num_convenio
-
+           
            INNER JOIN sw_cgm
                    ON sw_cgm.numcgm = participante_convenio.cgm_fornecedor
 

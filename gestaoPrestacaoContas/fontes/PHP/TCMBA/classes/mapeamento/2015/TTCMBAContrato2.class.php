@@ -78,10 +78,10 @@ class TTCMBAContrato2 extends Persistente
     {
         $stSql = " SELECT 1 AS tipo_registro 
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                        , licitacao.cod_processo
+                        , licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo 
                         , contrato.num_contrato
                         , 1 as tipo_moeda
-                        , SUBSTR(TRIM(objeto.descricao), 1, 100) AS objeto_contrato
+                        , objeto.descricao AS objeto_contrato
                         , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN 1 
                                WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN 2
                                ELSE NULL
@@ -95,10 +95,7 @@ class TTCMBAContrato2 extends Persistente
                         , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS diario_oficial
                         , TO_CHAR(publicacao_contrato.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao
                         , contrato.valor_contratado AS vl_contrato
-                        , CASE WHEN tipo_item.cod_tipo = 3
-                               THEN (SUM(COALESCE(item_pre_empenho.vl_total,0.00)))::VARCHAR
-                               ELSE ''
-                        END AS custo_pessoal
+                        , patrimonio.fn_soma_valor_item_servico('2015', mapa_cotacao.cod_mapa) AS custo_pessoal -- PL para calcular custo dos itens de serviço
                         , TO_CHAR(contrato.dt_assinatura, 'yyyymm') AS competencia
                         , '' AS num_processo_dispensa
                         , TO_CHAR(contrato.inicio_execucao, 'dd/mm/yyyy') AS dt_inicio_execucao
@@ -231,7 +228,8 @@ class TTCMBAContrato2 extends Persistente
                       AND empenho_anulado_item.num_item IS NULL
                       AND licitacao.cod_entidade IN (".$this->getDado('entidades').")
                       AND licitacao.exercicio = '".$this->getDado('exercicio')."'
-                      AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                      AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                     AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
 
                  GROUP BY licitacao.cod_processo,
                           contrato.num_contrato,

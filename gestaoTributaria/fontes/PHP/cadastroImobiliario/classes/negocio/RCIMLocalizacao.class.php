@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLocalizacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMLocalizacao.class.php 63688 2015-09-29 20:32:47Z arthur $
 
      * Casos de uso: uc-05.01.03
 */
@@ -224,7 +224,7 @@ function getValorReduzido() { return $this->stValorReduzido;    }
      * Método construtor
      * @access Private
 */
-function RCIMLocalizacao()
+function __construct()
 {
     parent::RCIMNivel();
     $this->obTCIMLocalizacaoNivel = new TCIMLocalizacaoNivel;
@@ -265,8 +265,8 @@ function incluirLocalizacao($boTransacao = "")
                 $stCodigoComposto .= $rsMascaraNivel->getCampo("cod_nivel") == $this->getCodigoNivel() ? $stCodigoMascara."." : $stMascaraNivel.".";
                 $rsMascaraNivel->proximo();
             }
-            $stMascaraComposta = substr( $stMascaraComposta, 0,  1 - strlen( $this->stMascara ));
-            $stCodigoComposto = substr( $stCodigoComposto, 0,  1 - strlen( $this->stMascara ));
+            $stMascaraComposta = substr( $stMascaraComposta, 0, (-1*strlen($this->stMascara)) );
+            $stCodigoComposto = substr( $stCodigoComposto, 0,   (-1*strlen($this->stMascara)) );
 
             $corteMascara = strlen($stCodigoComposto) - strlen($stMascaraComposta);
             $stCodigoComposto = substr( $stCodigoComposto, $corteMascara);
@@ -698,23 +698,18 @@ function listarLocalizacao(&$rsRecordSet , $boTransacao = "")
 {
     $stFiltro = "";
     if ($this->inCodigoVigencia) {
-//        $stFiltro .= " AND LN.COD_VIGENCIA = ".$this->inCodigoVigencia." ";
         $stFiltro .= " COD_VIGENCIA = ".$this->inCodigoVigencia." AND";
     }
     if ($this->inCodigoNivel) {
-        //$stFiltro .= " AND LN.COD_NIVEL = ".$this->inCodigoNivel." ";
         $stFiltro .= " COD_NIVEL = ".$this->inCodigoNivel." AND";
     }
     if ($this->inCodigoLocalizacao) {
-        //$stFiltro .= " AND LN.COD_LOCALIZACAO = ".$this->inCodigoLocalizacao." ";
         $stFiltro .= " COD_LOCALIZACAO = ".$this->inCodigoLocalizacao." AND";
     }
     if ($this->stNomeLocalizacao) {
-        //$stFiltro .= " AND UPPER(LO.NOM_LOCALIZACAO) LIKE UPPER('%".$this->stNomeLocalizacao."%') ";
         $stFiltro .= " UPPER(NOM_LOCALIZACAO) LIKE UPPER('%".$this->stNomeLocalizacao."%') AND";
     }
     if ($this->stNomeNivel) {
-        //$stFiltro .= " AND UPPER(NI.NOM_NIVEL) LIKE UPPER('%".$this->stNomeNivel."%') ";
         $stFiltro .= " UPPER(NOM_NIVEL) LIKE UPPER('%".$this->stNomeNivel."%') AND";
     }
 
@@ -723,22 +718,18 @@ function listarLocalizacao(&$rsRecordSet , $boTransacao = "")
     }
 
     if ($this->stValorReduzido and  $this->stNomeNivel == 1) {
-        //$stFiltro .= " AND valor_reduzido like '".$this->stValorReduzido."%' ";
         $stFiltro .= " valor_reduzido like '".$this->stValorReduzido."%' AND";
     } elseif ($this->stValorReduzido) {
-        //$stFiltro .= " AND valor_reduzido like '".$this->stValorReduzido.".%' ";
-//        $stFiltro .= " valor_reduzido like '".$this->stValorReduzido.".%' AND";
         $stFiltro .= " valor_reduzido like '".$this->stValorReduzido."%' AND";
     }
     if ($this->stValorComposto) {
-        //$stFiltro .= " AND valor_composto like '".$this->stValorComposto."%' ";
         $stFiltro .= " valor_composto like '".$this->stValorComposto."%' AND";
     }
     if ($stFiltro) { $stFiltro = " WHERE ".SUBSTR( $stFiltro, 0, STRLEN( $stFiltro ) - 4 ); }
     $stOrdem = " ORDER BY valor_composto";
     //$obErro = $this->obTCIMLocalizacao->recuperaLocalizacaoAtiva( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
     $obErro = $this->obVCIMLocalizacaoAtiva->recuperaTodos( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
-
+    
     return $obErro;
 }
 

@@ -62,8 +62,6 @@ $pgJS   = "JS".$stPrograma.".js";
 
 Sessao::write("stOrigem","FL");
 
-//include_once ($pgJS);
-
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao = $request->get('stAcao');
 
@@ -92,32 +90,33 @@ $obTUnidade->recuperaTodos($rsUnidade," WHERE unidade.exercicio = '".Sessao::get
 $obTGestora = new TTCERNUnidadeGestora();
 $obTGestora->recuperaRelacionamento($rsGestora);
 
-if ($rsGestora->getCampo('cod_institucional') == '') {
-    SistemaLegado::alertaAviso("FMManterConfiguracaoUnidadeGestora.php", "Você deve primeiro configurar uma unidade gestora", "erro", "erro", Sessao::getId(), "../");
-}
+$obLblMensagem = new Label;
+$obLblMensagem->setName   ( "stMensagem" );
+$obLblMensagem->setRotulo ( "Mensagem" );
+$obLblMensagem->setValue  ( "Você deve primeiro configurar uma unidade gestora em Gestão Prestação de Contas :: TCE - RN :: Configuração :: Configurar Unidade Gestora" );
 
 $obLblGestora = new Label;
-$obLblGestora->setName ("stGestora");
-$obLblGestora->setId ("stGestora");
-$obLblGestora->setRotulo ("Entidade");
-$obLblGestora->setTitle ("Unidade Gestora");
-$obLblGestora->setValue ($rsGestora->getCampo('nom_cgm'));
+$obLblGestora->setName  ( "stGestora" );
+$obLblGestora->setId    ( "stGestora" );
+$obLblGestora->setRotulo( "Entidade" );
+$obLblGestora->setTitle ( "Unidade Gestora" );
+$obLblGestora->setValue ( $rsGestora->getCampo('nom_cgm') );
 
 $hdnIdGestora = new Hidden;
-$hdnIdGestora->setName ("hdnIdGestora");
-$hdnIdGestora->setId ("hdnIdGestora");
-$hdnIdGestora->setValue ($rsGestora->getCampo('id'));
+$hdnIdGestora->setName  ( "hdnIdGestora" );
+$hdnIdGestora->setId    ( "hdnIdGestora" );
+$hdnIdGestora->setValue ( $rsGestora->getCampo('id') );
 
 $obCmbUnidade = new Select;
-$obCmbUnidade->setName ("stUnidade");
-$obCmbUnidade->setId ("stUnidade");
-$obCmbUnidade->setRotulo ("Unidade");
-$obCmbUnidade->setTitle ("Selecione o nome da unidade");
-$obCmbUnidade->setCampoId ("[num_unidade]/[num_orgao]");
-$obCmbUnidade->setCampoDesc ("nom_unidade");
-$obCmbUnidade->addOption ("", "Selecione");
-$obCmbUnidade->setNull (false);
-$obCmbUnidade->preencheCombo ($rsUnidade);
+$obCmbUnidade->setName      ( "stUnidade" );
+$obCmbUnidade->setId        ( "stUnidade" );
+$obCmbUnidade->setRotulo    ( "Unidade" );
+$obCmbUnidade->setTitle     ( "Selecione o nome da unidade" );
+$obCmbUnidade->setCampoId   ( "[num_unidade]/[num_orgao]" );
+$obCmbUnidade->setCampoDesc ( "nom_unidade" );
+$obCmbUnidade->addOption    ( "", "Selecione" );
+$obCmbUnidade->setNull      ( false );
+$obCmbUnidade->preencheCombo( $rsUnidade );
 
 //****************************************//
 // Monta FORMULARIO
@@ -129,13 +128,18 @@ $obForm->setAction( $pgForm );
 $obFormulario = new Formulario;
 $obFormulario->addForm              ( $obForm );
 $obFormulario->addTitulo            ( "Filtro para Unidade Orçamentária" );
-$obFormulario->addHidden            ( $obHdnAcao );
-$obFormulario->addHidden            ( $obHdnCtrl );
-$obFormulario->addHidden            ( $hdnIdGestora );
-$obFormulario->addComponente        ( $obLblGestora );
-$obFormulario->addComponente        ( $obCmbUnidade );
 
-$obFormulario->ok();
+if ($rsGestora->getCampo('cod_institucional') == '') {
+    $obFormulario->addComponente( $obLblMensagem );
+}else{
+    $obFormulario->addHidden            ( $obHdnAcao );
+    $obFormulario->addHidden            ( $obHdnCtrl );
+    $obFormulario->addHidden            ( $hdnIdGestora );
+    $obFormulario->addComponente        ( $obLblGestora );
+    $obFormulario->addComponente        ( $obCmbUnidade );
+    $obFormulario->ok();
+}
+
 $obFormulario->show();
 
 include_once( $pgJS );

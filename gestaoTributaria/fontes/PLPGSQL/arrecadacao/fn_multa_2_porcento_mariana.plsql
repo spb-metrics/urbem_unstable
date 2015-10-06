@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION fn_multa_2_porcento_mariana(date,date,numeric,integer
         inDiffMes       INTEGER;
     BEGIN
 
-        flCorrecao:=fn_correcao_mariana(dtVencimento,dtDataCalculo,flCorrigido,1,1);
+        flCorrecao:=fn_correcao_mariana(dtVencimento,dtDataCalculo,flCorrigido,5,1);
         -- recupera diferença em dias das datas
         inDiffMes := diff_datas_em_meses(dtVencimento,dtDataCalculo);
         IF ( inDiffMes = 0 ) THEN

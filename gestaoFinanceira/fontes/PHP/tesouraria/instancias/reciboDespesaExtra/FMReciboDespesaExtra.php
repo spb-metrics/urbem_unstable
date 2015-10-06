@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMReciboDespesaExtra.php 63075 2015-07-21 19:15:24Z evandro $
+    $Id: FMReciboDespesaExtra.php 63736 2015-10-02 17:03:15Z franver $
 
     * Casos de uso: uc-02.04.30
 */
@@ -93,6 +93,9 @@ $obPopUpContaCaixaBanco->setID               ( 'innerContaBanco'                
 $obPopUpContaCaixaBanco->setName             ( 'innerContaBanco'                  );
 $obPopUpContaCaixaBanco->obCampoCod->setName ("inCodContaBanco"                   );
 $obPopUpContaCaixaBanco->setRotulo           ( 'Conta Caixa/Banco'                );
+if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true))
+$obPopUpContaCaixaBanco->setTipoBusca        ( 'tes_pagamento_extra_caixa_banco_recurso_fixo'  );
+else
 $obPopUpContaCaixaBanco->setTipoBusca        ( 'tes_pagamento_extra_caixa_banco'  );
 
 /// busca de conta Despesa
@@ -147,6 +150,15 @@ $obFormulario->addHidden     ( $obIApplet              );
 $obFormulario->addComponente ( $obEntidadeUsuario      );
 $obFormulario->addComponente ( $obTextData             );
 $obFormulario->addComponente ( $obPopUpCredor          );
+/*
+ * Verificando se o munícipio Bom Despacho e se a data é menor ou igual a 31/12/2015
+ * Se essas condições não forem verdadeiras será mostrado o campo de Recurso para os outros munícipios
+ * Após o dia 31/12/2015 será mostrado para Bom Despacho o Campo Recurso
+ *
+ **/
+$stDataFinalAno = '31/12/2015';
+$stDataAtual    = date('d/m/Y');
+if ( !(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true)))
 $obIMontaRecursoDestinacao->geraFormulario (  $obFormulario );
 $obFormulario->addComponente ( $obPopUpContaCaixaBanco );
 $obFormulario->addComponente ( $obPopUpContaDespesa    );

@@ -147,4 +147,38 @@ function listarFisicoJuridico(&$rsRecordSet, $inCNPJ = '', $inCPF = '', $inRG = 
     return $obErro;
 }
 
+function listarOrgaoGerenciador(&$rsCGM, $stOrder = "", $boTransacao = "")
+{
+    if ( $this->getNumCGM() ) {
+        $stFiltro  = "";
+        $stFiltro .= " CGM.numcgm <> 0 AND ";
+        $stFiltro .= " CGM.numcgm = ".$this->getNumCGM()." AND ";
+    }
+    if ( $this->getNomCGM() ) {
+        $stFiltro .= " UPPER (CGM.nom_cgm) like UPPER ('%".str_replace("'","\'",$this->getNomCGM())."%') AND ";
+    }
+
+    if (isset($_REQUEST["stTipoBusca"])) {
+       if ($_REQUEST["stTipoBusca"] == "usuario") {
+           $stFiltro .= " CGM.numcgm IN (select numcgm from administracao.usuario where status='A') AND ";
+               $stLink .= '&stTipoBusca='.$_REQUEST['stTipoBusca'];
+       } else {
+           if ( $this->getTipoPessoa()=="F" ) {
+               $stFiltro .= " CGM.numcgm IN (select numcgm from sw_cgm_pessoa_fisica ) AND ";
+           } else {
+               if ( $this->getTipoPessoa()=="J" ) {
+                   $stFiltro .= " CGM.numcgm IN (select numcgm from sw_cgm_pessoa_juridica ) AND ";
+               }
+           }
+       }
+    }
+    if ($stFiltro) {
+        $stFiltro = " AND ".SUBSTR( $stFiltro, 0, strlen( $stFiltro ) - 4 );
+    }
+    $obErro = $this->obTCGM->recuperaOrgaoGerenciador( $rsCGM, $stFiltro, $stOrder, $boTransacao);
+
+    return $obErro;
+}
+
+
 }

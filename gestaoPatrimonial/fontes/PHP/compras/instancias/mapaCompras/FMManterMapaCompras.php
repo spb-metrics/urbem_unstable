@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaCompras.php 63445 2015-08-28 13:44:54Z michel $
+ $Id: FMManterMapaCompras.php 63738 2015-10-02 17:54:55Z michel $
 
  */
 
@@ -46,6 +46,7 @@ include_once CAM_GP_LIC_COMPONENTES.'ISelectTipoLicitacao.class.php';
 include_once CAM_GP_COM_MAPEAMENTO.'TComprasObjeto.class.php';
 
 $link = Sessao::read('link');
+$link = (is_array($link)) ? $link : array();
 
 $stPrograma = "ManterMapaCompras";
 $pgFilt     = "FL".$stPrograma.".php";

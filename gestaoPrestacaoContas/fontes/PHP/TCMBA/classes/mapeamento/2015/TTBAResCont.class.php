@@ -88,7 +88,7 @@ class TTBAResCont extends Persistente
                         , rescisao_contrato.vlr_indenizacao
                         , TO_CHAR(contrato.dt_assinatura, 'yyyymm') AS competencia
                         , 'N' AS exame_previo
-                        , '' AS artigo
+                        , contrato.fundamentacao_legal AS artigo
                         , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial
 
                     FROM licitacao.contrato
@@ -103,12 +103,12 @@ class TTBAResCont extends Persistente
                      AND contrato.cod_entidade = rescisao_contrato.cod_entidade
                      AND contrato.num_contrato = rescisao_contrato.num_contrato
 
-              INNER JOIN licitacao.publicacao_rescisao_contrato
+               LEFT JOIN licitacao.publicacao_rescisao_contrato
                       ON rescisao_contrato.num_contrato = publicacao_rescisao_contrato.num_contrato
                      AND rescisao_contrato.exercicio_contrato = publicacao_rescisao_contrato.exercicio_contrato
                      AND rescisao_contrato.cod_entidade = publicacao_rescisao_contrato.cod_entidade
 
-              INNER JOIN sw_cgm AS cgm_imprensa
+               LEFT JOIN sw_cgm AS cgm_imprensa
                       ON publicacao_rescisao_contrato.cgm_imprensa = cgm_imprensa.numcgm
 
               INNER JOIN licitacao.licitacao
@@ -117,14 +117,13 @@ class TTBAResCont extends Persistente
                      AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
                      AND contrato_licitacao.exercicio = licitacao.exercicio
 
-                   WHERE NOT EXISTS (
-                                        SELECT 1
-                                        FROM licitacao.contrato_anulado
-                                        WHERE num_contrato = contrato_anulado.num_contrato
-                                        AND contrato.exercicio = contrato_anulado.exercicio
-                                        AND contrato.cod_entidade = contrato_anulado.cod_entidade
-                                    )
-                     AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+               LEFT JOIN licitacao.contrato_anulado
+                      ON contrato.num_contrato = contrato_anulado.num_contrato
+                     AND contrato.exercicio = contrato_anulado.exercicio
+                     AND contrato.cod_entidade = contrato_anulado.cod_entidade     
+                     
+                   WHERE contrato_anulado.num_contrato IS NULL 
+                     AND rescisao_contrato.dt_rescisao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
         ";
         return $stSql;
     }

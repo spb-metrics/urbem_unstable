@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_aplica_reducao_modalidade_acrescimo.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_aplica_reducao_modalidade_acrescimo.plsql 63615 2015-09-18 14:11:12Z evandro $
 *
 * Caso de uso: uc-05.04.00
 */
@@ -44,7 +44,7 @@ Revision 1.1  2007/04/24 15:25:59  cercato
 */
 
 
-CREATE OR REPLACE FUNCTION aplica_reducao_modalidade_acrescimo(integer,integer,numeric,integer,integer,date,integer) returns numeric as '
+CREATE OR REPLACE FUNCTION aplica_reducao_modalidade_acrescimo(integer,integer,numeric,integer,integer,date,integer) returns numeric as $$
 declare
     inCodModalidade     ALIAS FOR $1;
     inRegistro          ALIAS FOR $2;
@@ -61,7 +61,7 @@ declare
     boUtilizar          BOOLEAN;
 
 begin
-    stSqlFuncoes := ''                                       
+    stSqlFuncoes := '                                       
         SELECT
              (
                 SELECT
@@ -97,16 +97,16 @@ begin
 
 
         WHERE
-            divida.modalidade.cod_modalidade = ''||inCodModalidade||''
-            AND divida.modalidade_reducao_acrescimo.cod_acrescimo = ''||inCodAcrescimo||''
-            AND divida.modalidade_reducao_acrescimo.cod_tipo = ''||inCodTipo||''
-    '';
+            divida.modalidade.cod_modalidade = '||inCodModalidade||'
+            AND divida.modalidade_reducao_acrescimo.cod_acrescimo = '||inCodAcrescimo||'
+            AND divida.modalidade_reducao_acrescimo.cod_tipo = '||inCodTipo||'
+    ';
 
     nuRetorno := 0;
 
     -- executa
     FOR reRecordFuncoes IN EXECUTE stSqlFuncoes LOOP
-        stExecuta :=  ''SELECT ''||reRecordFuncoes.funcao_valida||''( ''||inRegistro||'', ''''''||dtDataVencimento||'''''', ''||inQtdParcelas||'' ) as utilizar '';
+        stExecuta :=  'SELECT '||reRecordFuncoes.funcao_valida||'( '||inRegistro|', '''||dtDataVencimento||''', '||inQtdParcelas||' ) as utilizar ';
         FOR reRecordExecuta IN EXECUTE stExecuta LOOP
             boUtilizar := reRecordExecuta.utilizar;
         END LOOP;
@@ -123,4 +123,4 @@ begin
 
    return nuRetorno::numeric(14,2);
 end;
-'language 'plpgsql';
+$$ language 'plpgsql';

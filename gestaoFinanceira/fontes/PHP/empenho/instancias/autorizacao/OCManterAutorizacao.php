@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacao.php 63604 2015-09-16 19:11:45Z jean $
+    $Id: OCManterAutorizacao.php 63630 2015-09-22 14:41:40Z jean $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -238,18 +238,17 @@ function montaCombo($stNomDespesa)
                 $js .= "jq('#stCodClassificacao').append(new Option(".$stOption.")); \n";
 
                 if ($stCodEstruturalOld == $_REQUEST['stCodEstrutural']) {
-                    $jq .= "jq('#stCodClassificacao').val('".$stCodEstruturalOld."');\n";
+                    $js .= "jq('#stCodClassificacao').val('".$stCodEstruturalOld."');\n";
                 }
             }
         } else {
             $js .= "jq('#stCodClassificacao').empty().append(new Option('Selecione','')); \n";
-            $jq .= "jq('#stCodClassificacao').val('0');\n";
+            $js .= "jq('#stCodClassificacao').val('0');\n";
         }
     } else {
         $js .= "jq('#stCodClassificacao').empty().append(new Option('Selecione','')); \n";
-        $jq .= "jq('#stCodClassificacao').val('0');\n";
+        $js .= "jq('#stCodClassificacao').val('0');\n";
     }
-
     return $js;
 }
 

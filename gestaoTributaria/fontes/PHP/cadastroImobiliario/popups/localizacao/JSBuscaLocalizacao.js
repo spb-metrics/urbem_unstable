@@ -33,17 +33,9 @@
 
     * @ignore
 
-    * $Id: JSBuscaLocalizacao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: JSBuscaLocalizacao.js 63688 2015-09-29 20:32:47Z arthur $
 
     * Casos de uso: uc-05.01.03
-*/
-
-/*
-$Log$
-Revision 1.4  2006/09/15 15:04:13  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 ?>
 

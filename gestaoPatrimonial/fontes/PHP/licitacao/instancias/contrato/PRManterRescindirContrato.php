@@ -55,6 +55,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once( TLIC."TLicitacaoContrato.class.php" );
 include_once( TLIC."TLicitacaoRescisaoContrato.class.php" );
 include_once( TLIC."TLicitacaoRescisaoContratoResponsavelJuridico.class.php" );
+include_once( TLIC."TLicitacaoPublicacaoRescisaoContrato.class.php");
 
 Sessao::getExercicio();
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
@@ -106,6 +107,20 @@ case "rescindir":
             $obTLicitacaoRescisContrRespJuridico->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
             $obTLicitacaoRescisContrRespJuridico->setDado('numcgm', $_REQUEST['inCodResponsavelJuridico']);
             $obTLicitacaoRescisContrRespJuridico->inclusao();
+        }
+        
+        //inclui os dados da publicacao do contrato
+        $arValores = Sessao::read('arValores');
+        foreach ($arValores as $arTemp) {
+            $obTPublicacaoRescisaoContrato = new TLicitacaoPublicacaoRescisaoContrato;
+            $obTPublicacaoRescisaoContrato->setDado( 'num_contrato', $request->get('inNumContrato') );
+            $obTPublicacaoRescisaoContrato->setDado( 'cgm_imprensa', $arTemp['inVeiculo'] );
+            $obTPublicacaoRescisaoContrato->setDado( 'dt_publicacao', $arTemp['dtDataPublicacao'] );
+            $obTPublicacaoRescisaoContrato->setDado( 'num_publicacao',$arTemp['inNumPublicacao'] );
+            $obTPublicacaoRescisaoContrato->setDado( 'exercicio_contrato', $request->get('stExercicio') );
+            $obTPublicacaoRescisaoContrato->setDado( 'cod_entidade', $request->get('inCodEntidade') );
+            $obTPublicacaoRescisaoContrato->setDado( 'observacao', $arTemp['stObservacao'] );
+            $obTPublicacaoRescisaoContrato->inclusao();
         }
 
         SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$_REQUEST['inNumContrato']."/".$_REQUEST['stExercicio'],"incluir", "aviso", Sessao::getId(),"");

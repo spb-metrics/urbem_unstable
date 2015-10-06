@@ -172,13 +172,12 @@ class RTGOConfiguracao
     {
         //Adiciona um filtro para nao trazer os combustiveis ja vinculados
         $stFiltro = "
-            WHERE NOT EXISTS( SELECT 1
+           WHERE NOT EXISTS( SELECT 1
                                 FROM tcmgo.combustivel_vinculo
                                WHERE combustivel_item.cod_item = combustivel_vinculo.cod_item
-                            )
-        ";
-
-        $stFiltro =
+                                 and combustivel_vinculo.cod_combustivel = " . $this->inCodCombustivel . "
+                                 and combustivel_vinculo.cod_tipo        = " . $this->inCodTipo . "
+                            )";
         $this->obTFrotaCombustivelItem->recuperaRelacionamento($rsCombustivel, $stFiltro);
     }
 
@@ -208,3 +207,5 @@ class RTGOConfiguracao
         $this->obTFrotaCombustivelItem->recuperaRelacionamento($rsCombustivel, $stFiltro);
     }
 }
+
+?>

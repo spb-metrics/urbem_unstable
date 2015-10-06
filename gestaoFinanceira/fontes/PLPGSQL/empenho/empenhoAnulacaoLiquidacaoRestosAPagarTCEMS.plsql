@@ -34,6 +34,8 @@ DECLARE
 
     SEQUENCIA INTEGER;
     inCodDespesa INTEGER;
+    inCodRecurso INTEGER;
+    stCodEstrutural VARCHAR;
     boImplantado BOOLEAN;
     INCONTCONFIGURACAO INTEGER := 0;
     SQLCONTA VARCHAR := '';
@@ -62,6 +64,47 @@ BEGIN
                                          WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
                                            AND nota_liquidacao.exercicio = '''||EXERCLIQUIDACAO||'''
                                            ');
+
+    inCodRecurso := selectIntoInteger('       SELECT despesa.cod_recurso
+                                                FROM empenho.nota_liquidacao
+                                          INNER JOIN empenho.empenho
+                                                  ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
+                                                 AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                                                 AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                                          INNER JOIN empenho.pre_empenho
+                                                  ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                                 AND pre_empenho.exercicio       = empenho.exercicio
+                                          INNER JOIN empenho.pre_empenho_despesa
+                                                  ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                                 AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                                          INNER JOIN orcamento.despesa
+                                                  ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                                                 AND despesa.exercicio   = pre_empenho_despesa.exercicio
+                                               WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
+                                                 AND nota_liquidacao.exercicio = '''||EXERCLIQUIDACAO||'''
+                                        ');                                           
+
+    stCodEstrutural := selectIntoVarchar('    SELECT conta_despesa.cod_estrutural
+                                                FROM empenho.nota_liquidacao
+                                          INNER JOIN empenho.empenho
+                                                  ON empenho.cod_empenho  = nota_liquidacao.cod_empenho
+                                                 AND empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                                                 AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                                          INNER JOIN empenho.pre_empenho
+                                                  ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                                                 AND pre_empenho.exercicio       = empenho.exercicio
+                                          INNER JOIN empenho.pre_empenho_despesa
+                                                  ON pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                                                 AND pre_empenho_despesa.exercicio       = pre_empenho.exercicio
+                                          INNER JOIN orcamento.despesa
+                                                  ON despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+                                                 AND despesa.exercicio   = pre_empenho_despesa.exercicio
+                                          INNER JOIN orcamento.conta_despesa
+                                                  ON conta_despesa.exercicio = despesa.exercicio
+                                                 AND conta_despesa.cod_conta = despesa.cod_conta
+                                               WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
+                                                 AND nota_liquidacao.exercicio = '''||EXERCLIQUIDACAO||'''
+                                        ');
 
     boImplantado := selectIntoBoolean(' SELECT pre_empenho.implantado
                                           FROM empenho.nota_liquidacao
@@ -98,14 +141,17 @@ BEGIN
                 INNER JOIN orcamento.conta_despesa
                         ON conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
                        AND conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                INNER JOIN orcamento.conta_despesa AS conta_despesa_exercicio
+                        ON conta_despesa_exercicio.cod_estrutural   = conta_despesa.cod_estrutural
+                       AND conta_despesa_exercicio.exercicio        = '''||EXERCICIO||'''
                 INNER JOIN contabilidade.configuracao_lancamento_credito
-                        ON configuracao_lancamento_credito.cod_conta_despesa = conta_despesa.cod_conta
-                       AND configuracao_lancamento_credito.exercicio         = '''||EXERCICIO||'''
+                        ON configuracao_lancamento_credito.cod_conta_despesa = conta_despesa_exercicio.cod_conta
+                       AND configuracao_lancamento_credito.exercicio         = conta_despesa_exercicio.exercicio
                 INNER JOIN contabilidade.configuracao_lancamento_debito
-                        ON configuracao_lancamento_credito.exercicio = configuracao_lancamento_debito.exercicio
-                       AND configuracao_lancamento_credito.cod_conta_despesa = configuracao_lancamento_debito.cod_conta_despesa
-                       AND configuracao_lancamento_credito.tipo = configuracao_lancamento_debito.tipo
-                       AND configuracao_lancamento_credito.estorno = configuracao_lancamento_debito.estorno
+                        ON configuracao_lancamento_credito.exercicio            = configuracao_lancamento_debito.exercicio
+                       AND configuracao_lancamento_credito.cod_conta_despesa    = configuracao_lancamento_debito.cod_conta_despesa
+                       AND configuracao_lancamento_credito.tipo                 = configuracao_lancamento_debito.tipo
+                       AND configuracao_lancamento_credito.estorno              = configuracao_lancamento_debito.estorno
                 INNER JOIN contabilidade.plano_conta plano_conta_credito
                         ON plano_conta_credito.cod_conta = configuracao_lancamento_credito.cod_conta
                        AND plano_conta_credito.exercicio = configuracao_lancamento_credito.exercicio
@@ -228,41 +274,45 @@ BEGIN
              , tabela_credito.plano_credito
              , tabela_credito.estrutural_credito
           FROM orcamento.despesa
-          JOIN orcamento.recurso
+    INNER JOIN orcamento.recurso
             ON recurso.cod_recurso = despesa.cod_recurso
            AND recurso.exercicio   = despesa.exercicio
-          JOIN ( SELECT plano_recurso.cod_recurso
+    INNER JOIN ( SELECT plano_recurso.cod_recurso
                       , plano_recurso.exercicio
                       , plano_analitica.cod_plano AS plano_debito
                       , plano_conta.cod_estrutural AS estrutural_debito
                    FROM contabilidade.plano_recurso
-                   JOIN contabilidade.plano_analitica
+             INNER JOIN contabilidade.plano_analitica
                      ON plano_analitica.cod_plano = plano_recurso.cod_plano
                     AND plano_analitica.exercicio = plano_recurso.exercicio
-                   JOIN contabilidade.plano_conta
+             INNER JOIN contabilidade.plano_conta
                      ON plano_conta.cod_conta = plano_analitica.cod_conta
                     AND plano_conta.exercicio = plano_analitica.exercicio
                   WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.3%''
                     AND plano_conta.exercicio = '''||EXERCICIO||'''
              ) AS tabela_debito
             ON tabela_debito.cod_recurso = recurso.cod_recurso
-          JOIN ( SELECT plano_recurso.cod_recurso
+    INNER JOIN ( SELECT plano_recurso.cod_recurso
                       , plano_recurso.exercicio
                       , plano_analitica.cod_plano AS plano_credito
                       , plano_conta.cod_estrutural AS estrutural_credito
                    FROM contabilidade.plano_recurso
-                   JOIN contabilidade.plano_analitica
+             INNER JOIN contabilidade.plano_analitica
                      ON plano_analitica.cod_plano = plano_recurso.cod_plano
                     AND plano_analitica.exercicio = plano_recurso.exercicio
-                   JOIN contabilidade.plano_conta
+             INNER JOIN contabilidade.plano_conta
                      ON plano_conta.cod_conta = plano_analitica.cod_conta
                     AND plano_conta.exercicio = plano_analitica.exercicio
                   WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.2%''
                     AND plano_conta.exercicio = '''||EXERCICIO||'''
              ) AS tabela_credito
             ON tabela_credito.cod_recurso = recurso.cod_recurso
-         WHERE despesa.cod_despesa = '||inCodDespesa||'
+    INNER JOIN orcamento.conta_despesa
+            ON conta_despesa.exercicio = despesa.exercicio
+           AND conta_despesa.cod_conta = despesa.cod_conta
+         WHERE conta_despesa.cod_estrutural = '''||stCodEstrutural||'''
            AND despesa.exercicio = '''||EXERCLIQUIDACAO||'''
+           AND recurso.cod_recurso = ' || inCodRecurso || '
             ';
         ELSE
             SQLCONTAFIXA := '
@@ -281,30 +331,30 @@ BEGIN
     INNER JOIN empenho.restos_pre_empenho
             ON restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
            AND restos_pre_empenho.exercicio       = pre_empenho.exercicio
-          JOIN ( SELECT plano_recurso.cod_recurso
+    INNER JOIN ( SELECT plano_recurso.cod_recurso
                       , plano_recurso.exercicio
                       , plano_analitica.cod_plano AS plano_debito
                       , plano_conta.cod_estrutural AS estrutural_debito
                    FROM contabilidade.plano_recurso
-                   JOIN contabilidade.plano_analitica
+             INNER JOIN contabilidade.plano_analitica
                      ON plano_analitica.cod_plano = plano_recurso.cod_plano
                     AND plano_analitica.exercicio = plano_recurso.exercicio
-                   JOIN contabilidade.plano_conta
+             INNER JOIN contabilidade.plano_conta
                      ON plano_conta.cod_conta = plano_analitica.cod_conta
                     AND plano_conta.exercicio = plano_analitica.exercicio
                   WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.3%''
                     AND plano_conta.exercicio = '''||EXERCICIO||'''
              ) AS tabela_debito
             ON tabela_debito.cod_recurso = restos_pre_empenho.recurso
-          JOIN ( SELECT plano_recurso.cod_recurso
+    INNER JOIN ( SELECT plano_recurso.cod_recurso
                       , plano_recurso.exercicio
                       , plano_analitica.cod_plano AS plano_credito
                       , plano_conta.cod_estrutural AS estrutural_credito
                    FROM contabilidade.plano_recurso
-                   JOIN contabilidade.plano_analitica
+             INNER JOIN contabilidade.plano_analitica
                      ON plano_analitica.cod_plano = plano_recurso.cod_plano
                     AND plano_analitica.exercicio = plano_recurso.exercicio
-                   JOIN contabilidade.plano_conta
+             INNER JOIN contabilidade.plano_conta
                      ON plano_conta.cod_conta = plano_analitica.cod_conta
                     AND plano_conta.exercicio = plano_analitica.exercicio
                   WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.2%''

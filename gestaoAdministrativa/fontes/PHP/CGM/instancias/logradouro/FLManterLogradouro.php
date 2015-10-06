@@ -131,6 +131,14 @@ $obHdnCampoNum = new Hidden;
 $obHdnCampoNum->setName( "campoNum" );
 $obHdnCampoNum->setValue( $_REQUEST['campoNum'] );
 
+$obTxtCodigoLogradouro = new TextBox;
+$obTxtCodigoLogradouro->setRotulo    ( "Código do Logradouro"  );
+$obTxtCodigoLogradouro->setName      ( "inCodLogradouro"       );
+$obTxtCodigoLogradouro->setId        ( "inCodLogradouro"       );
+$obTxtCodigoLogradouro->setSize      ( 8                       );
+$obTxtCodigoLogradouro->setMaxLength ( 8                       );
+$obTxtCodigoLogradouro->setInteiro   ( true                    );
+
 $obTxtNome = new TextBox;
 $obTxtNome->setRotulo         ( "Nome"             );
 $obTxtNome->setName           ( "stNomeLogradouro" );
@@ -142,14 +150,12 @@ $obTxtNome->setNull           ( true               );
 //Componente que define o tipo de busca
 $obTipoBuscaLogradouro = new TipoBusca( $obTxtNome );
 
-$obTxtCEP = new TextBox;
+$obTxtCEP = new CEP();
 $obTxtCEP->setRotulo    ( "CEP"  );
 $obTxtCEP->setName      ( "stCEP" );
 $obTxtCEP->setId        ( "stCEP" );
 $obTxtCEP->setValue     ( $_REQUEST['stCEP'] );
 $obTxtCEP->setSize      ( 8 );
-$obTxtCEP->setInteiro   ( true );
-$obTxtCEP->setMaxLength ( 8 );
 $obTxtCEP->setNull      ( true );
 $obTxtCEP->obEvento->setOnChange('desabilitaCampos();');
 
@@ -172,7 +178,6 @@ $obCmbUF->setCampoDesc          ( "nom_uf"                );
 $obCmbUF->preencheCombo         ( $rsUF                   );
 $obCmbUF->setValue              ( $_REQUEST['inCodigoUF'] );
 $obCmbUF->setNull               ( false                   );
-//$obCmbUF->setStyle              ( "width: 220px"          );
 $obCmbUF->obEvento->setOnChange ( "preencheMunicipio('')" );
 
 $obTxtCodMunicipio = new TextBox;
@@ -247,7 +252,7 @@ $obFormulario->addHidden     ( $obHdnCampoNom );
 $obFormulario->addHidden     ( $obHdnCampoNum );
 $obFormulario->addHidden     ( $obHdnCadastro );
 $obFormulario->addTitulo     ( "Dados para filtro" );
-
+$obFormulario->addComponente ( $obTxtCodigoLogradouro );
 $obFormulario->addComponente ( $obTxtCEP );
 $obFormulario->addComponente ( $obTipoBuscaLogradouro );
 $obFormulario->addComponenteComposto ( $obTxtCodUF, $obCmbUF );

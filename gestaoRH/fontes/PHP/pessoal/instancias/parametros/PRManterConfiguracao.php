@@ -62,7 +62,6 @@ $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 $obRConfiguracaoPessoal->setMascaraRegistro			( $_POST['stMascaraRegistro'] );
 $obRConfiguracaoPessoal->setGeracaoRegistro	        ( $_POST['boGeracaoRegistro'] );
 $obRConfiguracaoPessoal->setMascaraCBO				( $_POST['stMascaraCBO'] );
-$obRConfiguracaoPessoal->setGrupoPeriodo 		    ( $_POST['inCodGrupoPeriodoTxt'] );
 $obRConfiguracaoPessoal->setContagemInicial  	    ( $_POST['stContagemInicial'] );
 
 $obErro = $obRConfiguracaoPessoal->salvar();

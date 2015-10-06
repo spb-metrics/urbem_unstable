@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: ROrcamentoDespesa.class.php 60049 2014-09-26 13:59:27Z eduardoschitz $
+    $Id: ROrcamentoDespesa.class.php 63613 2015-09-17 19:40:48Z arthur $
 
     $Revision: 30824 $
     $Name$
@@ -567,8 +567,8 @@ function consultarContaDespesa(&$rsLista, $obTransacao = "")
 
 function listarDespesaCredEspecial(&$rsLista, $stOrder = "", $obTransacao = "")
 {
-    include_once( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoDespesa.class.php"             );
-    $obTOrcamentoDespesa         = new TOrcamentoDespesa;
+    include_once CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoDespesa.class.php";
+    $obTOrcamentoDespesa = new TOrcamentoDespesa;
 
     $obTOrcamentoDespesa->setDado( 'exercicio'  , $this->stExercicio      );
 

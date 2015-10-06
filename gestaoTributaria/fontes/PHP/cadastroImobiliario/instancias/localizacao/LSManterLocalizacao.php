@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterLocalizacao.php 63673 2015-09-28 19:31:03Z carlos.silva $
 
     * Casos de uso: uc-05.01.03
 */
@@ -49,12 +49,13 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php" );
 
 //Define o nome dos arquivos PHP
-$stPrograma = "ManterLocalizacao";
-$pgFilt      = "FL".$stPrograma.".php";
-$pgList      = "LS".$stPrograma.".php";
-$pgForm      = "FM".$stPrograma.".php";
-$pgFormNivel = "FM".$stPrograma."Nivel.php";
-$pgFormBaixa = "FM".$stPrograma."Baixa.php";
+$stPrograma      = "ManterLocalizacao";
+$pgFilt          = "FL".$stPrograma.".php";
+$pgList          = "LS".$stPrograma.".php";
+$pgForm          = "FM".$stPrograma.".php";
+$pgFormNivel     = "FM".$stPrograma."Nivel.php";
+$pgFormConsultar = "FM".$stPrograma."Consultar.php";
+$pgFormBaixa     = "FM".$stPrograma."Baixa.php";
 $pgFormiCaracteristica = "FM".$stPrograma."Caracteristica.php";
 $pgProc      = "PR".$stPrograma.".php";
 $pgOcul      = "OC".$stPrograma.".php";
@@ -72,6 +73,7 @@ if ( empty( $_REQUEST['stAcao'] ) ) {
 }
 //Define arquivos PHP para cada acao
 switch ($_REQUEST['stAcao']) {
+    case 'consultar': $pgProx = $pgFormConsultar; break;
     case 'alterar'  : $pgProx = $pgFormNivel; break;
     case 'reativar' :
     case 'baixar'   : $pgProx = $pgFormBaixa; break;
@@ -80,7 +82,7 @@ switch ($_REQUEST['stAcao']) {
     DEFAULT         : $pgProx = $pgForm;
 }
 //MANTEM FILTRO E PAGINACAO
-$stLink .= "&stAcao=".$_REQUEST['stAcao'];
+$stLink .= "&stAcao=".($_REQUEST['stAcao'] == 'consultar');
 if ($_GET["pg"] and  $_GET["pos"]) {
     $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
     $link["pg"]  = $_GET["pg"];
@@ -104,12 +106,6 @@ $obRCIMLocalizacao->setCodigoVigencia( $_REQUEST["inCodigoVigencia"] );
 //MONTA O FILTRO
 if ($_REQUEST["stValorComposto"]) {
     //RETIRA O PONTO FINAL DO VALOR COMPOSTO CASO EXISTA
-    /*
-    if ( strrpos( $_REQUEST["stValorComposto"], "." ) == strlen( $_REQUEST["stValorComposto"] ) - 1 ) {
-       $stValorComposto = $_REQUEST["stValorComposto"];
-       $_REQUEST["stValorComposto"] = substr( $stValorComposto, 0, strlen( $stValorComposto ) -1 );
-    }*/
-
     $obRCIMLocalizacao->setValorComposto( $_REQUEST["stValorComposto"] );
 }
 if ($_REQUEST["stNomeLocalizacao"]) {
@@ -173,6 +169,7 @@ $obLista->ultimaAcao->addCampo("&stValorComposto",     "valor_composto"   );
 $obLista->ultimaAcao->addCampo("&stValorReduzido",     "valor_reduzido"   );
 $obLista->ultimaAcao->addCampo("&stNomeLocalizacao",   "nom_localizacao"  );
 $obLista->ultimaAcao->addCampo("&stDescQuestao",       "[valor_composto]-[nom_localizacao]"  );
+
 if ($_REQUEST['stAcao'] == "reativar") {
     $obLista->ultimaAcao->addCampo("&stJustificativa", "justificativa" );
     $obLista->ultimaAcao->addCampo("&stTimeStamp", "timestamp" );

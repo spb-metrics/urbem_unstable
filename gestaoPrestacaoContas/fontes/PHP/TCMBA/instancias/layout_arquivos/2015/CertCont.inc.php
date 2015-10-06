@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63605 $
+    $Revision: 63687 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -44,7 +44,7 @@
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBACertidoesContratos.class.php" );
     
     $obTTBACertidoesContratos = new TTBACertidoesContratos();
-    $obTTBACertidoesContratos->setDado('inMes'        , $inMes );
+    $obTTBACertidoesContratos->setDado('competencia'  , Sessao::getExercicio().$inMes );
     $obTTBACertidoesContratos->setDado('stEntidades'  , $stEntidades );
     $obTTBACertidoesContratos->setDado('inCodGestora' , $inCodUnidadeGestora   );
     $obTTBACertidoesContratos->setDado('stExercicio'  , Sessao::getExercicio() );
@@ -54,6 +54,7 @@
     $obTTBACertidoesContratos->recuperaDadosTribunal($rsCertidoesContratos);    
 
     $obExportador->roUltimoArquivo->addBloco($rsCertidoesContratos);
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
@@ -90,4 +91,6 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
     
+    unset($obTTBACertidoesContratos);
+    unset($rsCertidoesContratos);
 ?>

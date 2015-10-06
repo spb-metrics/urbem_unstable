@@ -63,10 +63,9 @@ function alterar( inCodOrgao ){
 }
 
 function buscaDado( BuscaDado ){
-    document.frm.stCtrl.value = BuscaDado;
-    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
-    document.frm.submit();
-    document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
+    // Foi tentado de inúmeras maneiras e a única que funcionou foi sobrescrever o buscaDado desse JS para evitar de usar
+    // outro buscaDado que vem do LSDespesa do popup
+    montaParametrosGET(BuscaDado);
 }
 
 function incluirItem() {

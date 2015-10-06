@@ -161,10 +161,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $stDescricao           = $obREmpenhoAutorizacaoEmpenho->getDescricao();
         $inCodHistorico        = $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->getCodHistorico();
         $inCodCategoria        = $obREmpenhoAutorizacaoEmpenho->getCodCategoria();
-
-        //$obROrcamentoClassificacaoDespesaAlterar = new ROrcamentoClassificacaoDespesa;
-        //$obROrcamentoClassificacaoDespesaAlterar->setCodDespesa($inCodDespesa);
-        //$obROrcamentoClassificacaoDespesaAlterar->listar($rsClassificacao);
         
         if ($inCodCategoria == 2 || $inCodCategoria == 3) {
             include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoContrapartidaAutorizacao.class.php';

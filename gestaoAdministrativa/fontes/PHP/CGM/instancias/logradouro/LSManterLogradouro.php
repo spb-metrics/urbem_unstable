@@ -42,7 +42,7 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once(CAM_GT_CIM_NEGOCIO."RCIMTrecho.class.php");
+include_once CAM_GT_CIM_NEGOCIO."RCIMLogradouro.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLogradouro";
@@ -55,7 +55,7 @@ $pgJs   = "JS".$stPrograma.".js";
 
 include_once( $pgJs );
 
-$obRCIMTrecho = new RCIMTrecho();
+$obRCIMLogradouro = new RCIMLogradouro();
 $stErro = $request->get('stErro');
 
 if ($request->get('campoNom')) {
@@ -67,38 +67,48 @@ if ($request->get('nomForm')) {
 
 //MONTA OS FILTROS
 if ($request->get("inCodigoBairro")) {
-    $obRCIMTrecho->setBairro( $request->get("inCodigoBairro") );
+    $obRCIMLogradouro->setBairro( $request->get("inCodigoBairro") );
     $stLink .= "&inCodigoBairro=".$request->get("inCodigoBairro");
 }
 if ($request->get("stCEP")) {
-    $obRCIMTrecho->setCEP( $request->get("stCEP") );
+    $obRCIMLogradouro->setCEP( $request->get("stCEP") );
     $stLink .= "&stCEP=".$request->get("stCEP");
 }
 
-if ($request->get("inCodigoLogradouro")) {
-    $obRCIMTrecho->setCodigoLogradouro( $request->get("inCodigoLogradouro") );
+if ( $request->get("inCodigoLogradouro") ) {
+    $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodigoLogradouro") );
     $stLink .= "&inCodigoLogradouro=".$request->get("inCodigoLogradouro");
+}else if ( $request->get("inCodLogradouro") ) {
+    $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodLogradouro") );
+    $stLink .= "&inCodigoLogradouro=".$request->get("inCodLogradouro");
+    $stLink .= "&inCodLogradouro=".$request->get("inCodLogradouro");
 }
 if ($request->get("stNomeLogradouro")) {
-    $obRCIMTrecho->setNomeLogradouro( $request->get("stNomeLogradouro") );
+    $obRCIMLogradouro->setNomeLogradouro( $request->get("stNomeLogradouro") );
     $stLink .= "&stNomeLogradouro=".$request->get("stNomeLogradouro");
 }
 if ($request->get("inCodigoUF")) {
-    $obRCIMTrecho->setCodigoUF( $request->get("inCodigoUF") );
+    $obRCIMLogradouro->setCodigoUF( $request->get("inCodigoUF") );
     $stLink .= "&inCodigoUF=".$request->get("inCodigoUF");
 }
 if ($request->get("inCodigoMunicipio")) {
-    $obRCIMTrecho->setCodigoMunicipio( $request->get("inCodigoMunicipio") );
+    $obRCIMLogradouro->setCodigoMunicipio( $request->get("inCodigoMunicipio") );
     $stLink .= "&inCodigoMunicipio=".$request->get("inCodigoMunicipio");
 }
 if ($request->get("stCadastro")) {
     $stLink .= "&stCadastro=".$request->get("stCadastro");
 }
 
+if ( $request->get("stCEP") ) {
+    $stCEP = str_replace("-","",$request->get("stCEP"));
+    $obRCIMLogradouro->setCEP( $stCEP );    
+    $stLink .= "&stCEP=".$stCEP;
+}
+
 $stLink .= "&stAcao=".$request->get('stAcao');
 
 Sessao::write('stLink',$stLink);
-$obRCIMTrecho->listarLogradourosTrecho( $rsLista, "", $request->get("inCodPais") );
+$obRCIMLogradouro->listarLogradouros( $rsLista, $boTransacao );
 
 //DEFINICAO DA LISTA
 $obLista = new Lista;

@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObraMedicao.class.php 63589 2015-09-14 19:18:58Z michel $
+    * $Id: TTCMBAObraMedicao.class.php 63632 2015-09-22 17:42:03Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -42,7 +42,7 @@ class TTCMBAObraMedicao extends Persistente
     {
         parent::Persistente();
         $this->setTabela('tcmba.obra_medicao');
-        $this->setCampoCod('cod_obra, cod_tipo, cod_entidade, exercicio, cod_medicao');
+        $this->setComplementoChave('cod_obra, cod_tipo, cod_entidade, exercicio, cod_medicao');
 
         $this->AddCampo('cod_obra'              , 'integer' , true  , ''    , true , true );
         $this->AddCampo('cod_entidade'          , 'integer' , true  , ''    , true , true );

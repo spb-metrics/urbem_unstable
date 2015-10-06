@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63508 $
+    $Revision: 63751 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -84,8 +84,16 @@ public function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem
 public function montaRecuperaDadosTribunal()
 {   $stSql .= " SELECT 1 as tp_registro
                      , ".$this->getDado('inCodGestora')." AS unidade_gestora          
-                     , des.num_orgao                                                  
-                     , des.num_unidade                                                
+                     , CASE WHEN restos_pre_empenho.num_orgao IS NULL THEN
+                                des.num_orgao
+                            ELSE
+                                restos_pre_empenho.num_orgao
+                      END as cod_orgao --num_orgao
+                     , CASE WHEN restos_pre_empenho.num_unidade IS NULL THEN
+                                des.num_unidade
+                            ELSE
+                                restos_pre_empenho.num_unidade
+                      END as cod_unidade --num_unidade
                      , emp.cod_empenho                                                
                      , to_char(pag.timestamp,'dd/mm/yyyy') as data_pagamento     
                      , liq.exercicio_empenho as exercicio        
@@ -99,15 +107,44 @@ public function montaRecuperaDadosTribunal()
                         ELSE 1
                         END AS resto             
                   FROM empenho.empenho                AS emp                          
-                     , empenho.nota_liquidacao        AS liq                          
-                     , empenho.nota_liquidacao_paga   AS pag                          
+
+            INNER JOIN empenho.nota_liquidacao AS liq                          
+                    ON emp.exercicio    = liq.exercicio_empenho                     
+                   AND emp.cod_entidade = liq.cod_entidade                          
+                   AND emp.cod_empenho  = liq.cod_empenho                           
+
+            INNER JOIN empenho.nota_liquidacao_paga   AS pag                          
+                    ON liq.exercicio          = pag.exercicio                             
+                   AND liq.cod_entidade       = pag.cod_entidade                          
+                   AND liq.cod_nota           = pag.cod_nota                              
+
+            INNER JOIN empenho.pre_empenho AS pre  
+                    ON emp.exercicio       = pre.exercicio                             
+                   AND emp.cod_pre_empenho = pre.cod_pre_empenho                       
+
+             INNER JOIN tesouraria.pagamento
+                    ON pagamento.exercicio    = pag.exercicio                             
+                   AND pagamento.cod_entidade = pag.cod_entidade                          
+                   AND pagamento.cod_nota     = pag.cod_nota  
+                   AND pagamento.timestamp    = pag.timestamp
+
+            INNER JOIN empenho.nota_liquidacao_conta_pagadora as lcp                  
+                    ON pag.exercicio   = lcp.exercicio_liquidacao  
+                   AND pag.cod_entidade= lcp.cod_entidade          
+                   AND pag.cod_nota    = lcp.cod_nota              
+                   AND pag.timestamp   = lcp.timestamp
+
+            LEFT JOIN empenho.restos_pre_empenho
+                     ON restos_pre_empenho.cod_pre_empenho = pre.cod_pre_empenho 
+                    AND restos_pre_empenho.exercicio       = pre.exercicio
+
              LEFT JOIN ( SELECT exercicio                                          
                               , cod_entidade                                       
                               , cod_nota                                           
                               , timestamp                                          
                               , sum(vl_anulado) as vl_anulado                      
                            FROM empenho.nota_liquidacao_paga_anulada                
-                          WHERE to_char(timestamp_anulada,'yyyy') = '".$this->getDado('exercicio')."' 
+                          WHERE to_char(timestamp_anulada,'yyyy') = '".Sessao::getExercicio()."' 
                             AND cod_entidade in ( ".$this->getDado('stEntidades')." )   
                        GROUP BY exercicio, cod_entidade, cod_nota, timestamp       
                      ) as paa                                                        
@@ -116,12 +153,6 @@ public function montaRecuperaDadosTribunal()
                    AND pag.cod_nota    = paa.cod_nota                          
                    AND pag.timestamp   = paa.timestamp
                    
-             LEFT JOIN empenho.nota_liquidacao_conta_pagadora as lcp                  
-                    ON pag.exercicio   = lcp.exercicio_liquidacao  
-                   AND pag.cod_entidade= lcp.cod_entidade          
-                   AND pag.cod_nota    = lcp.cod_nota              
-                   AND pag.timestamp   = lcp.timestamp
-                   
              LEFT JOIN contabilidade.plano_analitica AS pla                           
                     ON lcp.exercicio   = pla.exercicio                           
                    AND lcp.cod_plano   = pla.cod_plano
@@ -129,41 +160,28 @@ public function montaRecuperaDadosTribunal()
              LEFT JOIN contabilidade.plano_conta as plc                               
                     ON pla.exercicio   = plc.exercicio                           
                    AND pla.cod_conta   = plc.cod_conta                           
-                     , empenho.pre_empenho            AS pre                          
-                     , empenho.pre_empenho_despesa    AS ped                          
-                     , orcamento.despesa              AS des 
-                     , tesouraria.pagamento
-               
+            
+             LEFT JOIN empenho.pre_empenho_despesa AS ped                          
+                    ON pre.exercicio       = ped.exercicio                             
+                   AND pre.cod_pre_empenho = ped.cod_pre_empenho                       
+
+             LEFT JOIN orcamento.despesa AS des 
+                    ON ped.exercicio   = des.exercicio                             
+                   AND ped.cod_despesa = des.cod_despesa
+            
              LEFT JOIN tcmba.pagamento_tipo_documento_pagamento as doc
                     ON pagamento.exercicio    = doc.exercicio                             
                    AND pagamento.cod_entidade = doc.cod_entidade                          
                    AND pagamento.cod_nota     = doc.cod_nota  
-                   AND pagamento.timestamp    = doc.timestamp 
-                   
-                 WHERE emp.exercicio          = pre.exercicio                             
-                   AND emp.cod_pre_empenho    = pre.cod_pre_empenho                       
-                   AND emp.exercicio          = liq.exercicio_empenho                     
-                   AND emp.cod_entidade       = liq.cod_entidade                          
-                   AND emp.cod_empenho        = liq.cod_empenho                           
-                   AND liq.exercicio          = pag.exercicio                             
-                   AND liq.cod_entidade       = pag.cod_entidade                          
-                   AND liq.cod_nota           = pag.cod_nota                              
-                   AND pre.exercicio          = ped.exercicio                             
-                   AND pre.cod_pre_empenho    = ped.cod_pre_empenho                       
-                   AND ped.exercicio          = des.exercicio                             
-                   AND ped.cod_despesa        = des.cod_despesa
-                   AND pagamento.exercicio    = pag.exercicio                             
-                   AND pagamento.cod_entidade = pag.cod_entidade                          
-                   AND pagamento.cod_nota     = pag.cod_nota  
-                   AND pagamento.timestamp    = pag.timestamp  
-                   AND TO_DATE(TO_CHAR(pag.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."' , 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')  
-                   AND des.cod_entidade in ( ".$this->getDado('stEntidades')." )   
+                   AND pagamento.timestamp    = doc.timestamp
+
+                 WHERE pag.timestamp BETWEEN TO_DATE('".$this->getDado('dt_inicial')."' , 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                   AND emp.cod_entidade in ( ".$this->getDado('stEntidades')." )
               
-              GROUP BY TO_CHAR(pag.timestamp,'yyyy')                                 
-                     , des.num_orgao                                                  
-                     , des.num_unidade                                                
-                     , emp.cod_empenho                                                
-                     , to_char(pag.timestamp,'dd/mm/yyyy')                            
+              GROUP BY pag.timestamp
+                     , cod_orgao                                                  
+                     , cod_unidade                                                
+                     , emp.cod_empenho                                                                     
                      , liq.exercicio_empenho
                      , plc.cod_estrutural
                      , doc.cod_tipo
@@ -172,7 +190,8 @@ public function montaRecuperaDadosTribunal()
                      , emp.exercicio
                      
               ORDER BY emp.cod_empenho 
-                     , to_char(pag.timestamp,'dd/mm/yyyy') ";
+                     , pag.timestamp
+    ";
     return $stSql;
 }
 

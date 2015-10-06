@@ -82,30 +82,33 @@ class TTBAAdConv extends Persistente
                          , convenio_aditivos.num_aditivo
                          , SUBSTR(TRIM(convenio_aditivos.objeto), 1, 300) AS objeto_convenio
                          , TO_CHAR(convenio_aditivos.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura_aditivo
-                         , TO_CHAR(convenio.dt_vigencia, 'dd/mm/yyyy') AS dt_vencimento_convenio
+                         , TO_CHAR(convenio_aditivos.dt_vigencia, 'dd/mm/yyyy') AS dt_vencimento_convenio
                          , norma.num_norma||'/'||norma.exercicio AS fundamentacao_legal
                          , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial
-                         , TO_CHAR(publicacao_convenio.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao_convenio
+                         , TO_CHAR(convenio_aditivos_publicacao.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao_aditivo
                          , convenio_aditivos.valor_convenio
                          , 1 AS tipo_moeda
                          , TO_CHAR(convenio.dt_assinatura, 'yyyymm') AS competencia
                          , TO_CHAR(convenio_aditivos.inicio_execucao,'dd/mm/yyyy') AS data_inicio
+                         , '' AS reservado_tcm
 
                      FROM licitacao.convenio
 
                INNER JOIN compras.objeto
                        ON convenio.cod_objeto = objeto.cod_objeto
 
-               INNER JOIN licitacao.publicacao_convenio
-                       ON publicacao_convenio.num_convenio = publicacao_convenio.num_convenio
-                      AND publicacao_convenio.exercicio = publicacao_convenio.exercicio
-
-               INNER JOIN sw_cgm AS cgm_imprensa
-                       ON publicacao_convenio.numcgm = cgm_imprensa.numcgm
-
                INNER JOIN licitacao.convenio_aditivos
                        ON convenio.exercicio = convenio_aditivos.exercicio_convenio
                       AND convenio.num_convenio = convenio_aditivos.num_convenio
+                      
+               INNER JOIN licitacao.convenio_aditivos_publicacao 
+                       ON convenio_aditivos_publicacao.num_convenio = convenio_aditivos.num_convenio
+                      AND convenio_aditivos_publicacao.exercicio = convenio_aditivos.exercicio_convenio
+                      AND convenio_aditivos_publicacao.num_aditivo = convenio_aditivos.num_aditivo
+
+               INNER JOIN sw_cgm AS cgm_imprensa
+                       ON convenio_aditivos_publicacao.numcgm = cgm_imprensa.numcgm
+
 
                INNER JOIN normas.norma
                        ON norma.cod_norma = convenio_aditivos.cod_norma_autorizativa

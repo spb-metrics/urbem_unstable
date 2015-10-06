@@ -45,12 +45,15 @@ function TNomeLogradouro()
     parent::Persistente();
     $this->setTabela('sw_nome_logradouro');
     $this->setCampoCod('cod_logradouro');
-    $this->setComplementoChave ('timestamp');
-
-    $this->AddCampo('cod_logradouro', 'integer'  , true , '', true , true);
-    $this->AddCampo('timestamp'     , 'timestamp', false, '', true , false);
-    $this->AddCampo('cod_tipo'      , 'integer'  , true , '', false, true);
-    $this->AddCampo('nom_logradouro', 'varchar'  , true , 60, false, false);
+    $this->setComplementoChave ('timestamp,nom_logradouro');
+    
+    $this->AddCampo('cod_logradouro', 'integer'  , true , '', true , true  );
+    $this->AddCampo('timestamp'     , 'timestamp', false, '', true , false );
+    $this->AddCampo('cod_tipo'      , 'integer'  , true , '', false, true  );
+    $this->AddCampo('nom_logradouro', 'varchar'  , true , 60, false, false );
+    $this->AddCampo('dt_inicio'     , 'date'     , false, '', false, false );
+    $this->AddCampo('dt_fim'        , 'date'     , false, '', false, false );
+    $this->AddCampo('cod_norma'     , 'integer'  , true , '', false, true  );
 }
 
 }

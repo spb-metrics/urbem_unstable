@@ -42,16 +42,18 @@ CREATE TYPE fn_demonstrativo_consolidado_receita
         arrecadado_mes              numeric,                                           
         arrecadado_ate_periodo      numeric,                                           
         anulado_mes                 numeric,
-        anulado_ate_periodo         numeric    
+        anulado_ate_periodo         numeric,
+        valor_diferenca             numeric
     );
 */
 
 CREATE OR REPLACE FUNCTION tcmba.fn_demonstrativo_consolidado_receita(varchar,varchar,varchar,varchar) RETURNS SETOF fn_demonstrativo_consolidado_receita AS $$
 DECLARE
-    stExercicio             ALIAS FOR $1;
-    dtInicial               ALIAS FOR $2;
-    dtFinal                 ALIAS FOR $3;
-    stCodEntidades          ALIAS FOR $4;
+    stExercicio         ALIAS FOR $1;
+    dtInicial           ALIAS FOR $2;
+    dtFinal             ALIAS FOR $3;
+    stCodEntidades      ALIAS FOR $4;
+    
     dtInicioAno         VARCHAR   := '';
     dtFimAno            VARCHAR   := '';
     stSql               VARCHAR   := '';
@@ -63,174 +65,170 @@ BEGIN
         dtInicioAno := '01/01/' || stExercicio;
 
         stSql := 'CREATE TEMPORARY TABLE tmp_valor AS (
-            SELECT
-                  ocr.cod_estrutural as cod_estrutural
-                , lote.dt_lote       as data
-                , CASE WHEN lr.estorno = ''t'' THEN vl.vl_lancamento
+             SELECT conta_receita.cod_estrutural  AS cod_estrutural
+                  , lote.dt_lote                  AS data
+                  , CASE WHEN lancamento_receita.estorno = TRUE
+                       THEN valor_lancamento.vl_lancamento
                        ELSE 0.00
-                  END AS valor_estorno
-                , CASE WHEN lr.estorno = ''f'' THEN vl.vl_lancamento
+                    END AS valor_estorno
+                  , CASE WHEN lancamento_receita.estorno = FALSE
+                       THEN valor_lancamento.vl_lancamento
                        ELSE 0.00
-                  END AS valor
-                , vl.oid             as primeira
-            FROM
-                contabilidade.valor_lancamento      as vl   ,
-                orcamento.conta_receita             as ocr  ,
-                orcamento.receita                   as ore  ,
-                contabilidade.lancamento_receita    as lr   ,
-                contabilidade.lancamento            as lan  ,
-                contabilidade.lote                  as lote
-            WHERE
-                    ore.cod_entidade    IN ('|| stCodEntidades ||')
-                AND ore.exercicio       = '|| quote_literal(stExercicio) ||'
+                    END AS valor
+                  , valor_lancamento.oid           AS primeira
+               
+               FROM orcamento.receita
 
-                AND ocr.cod_conta       = ore.cod_conta
-                AND ocr.exercicio       = ore.exercicio
+         INNER JOIN orcamento.conta_receita
+                 ON conta_receita.cod_conta = receita.cod_conta
+                AND conta_receita.exercicio = receita.exercicio
 
-                -- join lancamento receita
-                AND lr.cod_receita      = ore.cod_receita
-                AND lr.exercicio        = ore.exercicio
-                AND lr.estorno          = true
-                -- tipo de lancamento receita deve ser = A , de arrecadação
-                AND lr.tipo             = ''A''
+         INNER JOIN contabilidade.lancamento_receita
+                 ON lancamento_receita.cod_receita  = receita.cod_receita
+                AND lancamento_receita.exercicio    = receita.exercicio
+                AND lancamento_receita.estorno      = TRUE
+                AND lancamento_receita.tipo         = ''A''
 
-                -- join nas tabelas lancamento_receita e lancamento
-                AND lan.cod_lote        = lr.cod_lote
-                AND lan.sequencia       = lr.sequencia
-                AND lan.exercicio       = lr.exercicio
-                AND lan.cod_entidade    = lr.cod_entidade
-                AND lan.tipo            = lr.tipo
+         INNER JOIN contabilidade.lancamento
+                 ON lancamento.cod_lote        = lancamento_receita.cod_lote
+                AND lancamento.sequencia       = lancamento_receita.sequencia
+                AND lancamento.exercicio       = lancamento_receita.exercicio
+                AND lancamento.cod_entidade    = lancamento_receita.cod_entidade
+                AND lancamento.tipo            = lancamento_receita.tipo
 
-                -- join nas tabelas lancamento e valor_lancamento
-                AND vl.exercicio        = lan.exercicio
-                AND vl.sequencia        = lan.sequencia
-                AND vl.cod_entidade     = lan.cod_entidade
-                AND vl.cod_lote         = lan.cod_lote
-                AND vl.tipo             = lan.tipo
-                -- na tabela valor lancamento  tipo_valor deve ser credito
-                AND vl.tipo_valor       = ''D''
-
-                AND lote.cod_lote       = lan.cod_lote
-                AND lote.cod_entidade   = lan.cod_entidade
-                AND lote.exercicio      = lan.exercicio
-                AND lote.tipo           = lan.tipo
+         INNER JOIN contabilidade.valor_lancamento
+                 ON valor_lancamento.exercicio    = lancamento.exercicio
+                AND valor_lancamento.sequencia    = lancamento.sequencia
+                AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                AND valor_lancamento.cod_lote     = lancamento.cod_lote
+                AND valor_lancamento.tipo         = lancamento.tipo
+                AND valor_lancamento.tipo_valor   = ''D''
+                
+         INNER JOIN contabilidade.lote
+                 ON lote.cod_lote       = lancamento.cod_lote
+                AND lote.cod_entidade   = lancamento.cod_entidade
+                AND lote.exercicio      = lancamento.exercicio
+                AND lote.tipo           = lancamento.tipo
+                
+              WHERE receita.cod_entidade IN ('|| stCodEntidades ||')
+                AND receita.exercicio    = '|| quote_literal(stExercicio) ||'
 
             UNION
 
-            SELECT
-                  ocr.cod_estrutural as cod_estrutural
-                , lote.dt_lote       as data
-                , CASE WHEN lr.estorno = ''t'' THEN vl.vl_lancamento
+             SELECT conta_receita.cod_estrutural    AS cod_estrutural
+                  , lote.dt_lote                    AS data
+                  , CASE WHEN lancamento_receita.estorno = TRUE
+                       THEN valor_lancamento.vl_lancamento
                        ELSE 0.00
-                  END AS valor_estorno
-                , CASE WHEN lr.estorno = ''f'' THEN vl.vl_lancamento
+                    END AS valor_estorno
+                  , CASE WHEN lancamento_receita.estorno = FALSE
+                       THEN valor_lancamento.vl_lancamento
                        ELSE 0.00
-                  END AS valor
-                , vl.oid             as segunda
-            FROM
-                contabilidade.valor_lancamento      as vl   ,
-                orcamento.conta_receita             as ocr  ,
-                orcamento.receita                   as ore  ,
-                contabilidade.lancamento_receita    as lr   ,
-                contabilidade.lancamento            as lan  ,
-                contabilidade.lote                  as lote
+                    END AS valor
+                  , valor_lancamento.oid            AS segunda
+            
+               FROM orcamento.receita
 
-            WHERE
-                    ore.cod_entidade    IN('|| stCodEntidades ||')
-                AND ore.exercicio       = '|| quote_literal(stExercicio) ||'
-                AND ocr.cod_conta       = ore.cod_conta
-                AND ocr.exercicio       = ore.exercicio
+         INNER JOIN orcamento.conta_receita 
+                 ON conta_receita.cod_conta = receita.cod_conta
+                AND conta_receita.exercicio = receita.exercicio
 
-                -- join lancamento receita
-                AND lr.cod_receita      = ore.cod_receita
-                AND lr.exercicio        = ore.exercicio
-                AND lr.estorno          = false
-                -- tipo de lancamento receita deve ser = A , de arrecadação
-                AND lr.tipo             = ''A''
+         INNER JOIN contabilidade.lancamento_receita
+                 ON lancamento_receita.cod_receita = receita.cod_receita
+                AND lancamento_receita.exercicio   = receita.exercicio
+                AND lancamento_receita.estorno     = FALSE
+                AND lancamento_receita.tipo        = ''A''
 
-                -- join nas tabelas lancamento_receita e lancamento
-                AND lan.cod_lote        = lr.cod_lote
-                AND lan.sequencia       = lr.sequencia
-                AND lan.exercicio       = lr.exercicio
-                AND lan.cod_entidade    = lr.cod_entidade
-                AND lan.tipo            = lr.tipo
+         INNER JOIN contabilidade.lancamento
+                 ON lancamento.cod_lote      = lancamento_receita.cod_lote
+                AND lancamento.sequencia     = lancamento_receita.sequencia
+                AND lancamento.exercicio     = lancamento_receita.exercicio
+                AND lancamento.cod_entidade  = lancamento_receita.cod_entidade
+                AND lancamento.tipo          = lancamento_receita.tipo
 
-                -- join nas tabelas lancamento e valor_lancamento
-                AND vl.exercicio        = lan.exercicio
-                AND vl.sequencia        = lan.sequencia
-                AND vl.cod_entidade     = lan.cod_entidade
-                AND vl.cod_lote         = lan.cod_lote
-                AND vl.tipo             = lan.tipo
-                -- na tabela valor lancamento  tipo_valor deve ser credito
-                AND vl.tipo_valor       = ''C''
+         INNER JOIN contabilidade.valor_lancamento
+                 ON valor_lancamento.exercicio    = lancamento.exercicio
+                AND valor_lancamento.sequencia    = lancamento.sequencia
+                AND valor_lancamento.cod_entidade = lancamento.cod_entidade
+                AND valor_lancamento.cod_lote     = lancamento.cod_lote
+                AND valor_lancamento.tipo         = lancamento.tipo
+                AND valor_lancamento.tipo_valor   = ''C''
 
-                -- Data Inicial e Data Final, antes iguala codigo do lote
-                AND lote.cod_lote       = lan.cod_lote
-                AND lote.cod_entidade   = lan.cod_entidade
-                AND lote.exercicio      = lan.exercicio
-                AND lote.tipo           = lan.tipo )';
-        EXECUTE stSql;
-
-        stSql := '
-            SELECT tbl.cod_estrutural
-                 , tbl.receita
-                 , tbl.recurso
-                 , tbl.descricao
-                 , coalesce(sum(tbl.valor_previsto),0.00)
-                 , coalesce(sum(tbl.arrecadado_mes),0.00)
-                 , coalesce(sum(tbl.arrecadado_ate_periodo),0.00)
-                 , coalesce(sum(tbl.anulado_mes),0.00)
-                 , coalesce(sum(tbl.anulado_ate_periodo),0.00)
+         INNER JOIN contabilidade.lote
+                 ON lote.cod_lote     = lancamento.cod_lote
+                AND lote.cod_entidade = lancamento.cod_entidade
+                AND lote.exercicio    = lancamento.exercicio
+                AND lote.tipo         = lancamento.tipo
                 
+              WHERE receita.cod_entidade IN('|| stCodEntidades ||')
+                AND receita.exercicio    = '|| quote_literal(stExercicio) ||' )';
+        EXECUTE stSql;
+                       
+        stSql := '
+            SELECT tabela.cod_estrutural
+                 , tabela.receita
+                 , tabela.recurso
+                 , tabela.descricao
+                 , coalesce(sum(tabela.valor_previsto),0.00)
+                 , coalesce(sum(tabela.arrecadado_mes),0.00)
+                 , coalesce(sum(tabela.arrecadado_ate_periodo),0.00)
+                 , coalesce(sum(tabela.anulado_mes),0.00)
+                 , coalesce(sum(tabela.anulado_ate_periodo),0.00)
+                 , coalesce(sum(tabela.valor_previsto),0.00) + coalesce(sum(tabela.arrecadado_ate_periodo),0.00) AS valor_diferenca
               FROM ( 
-                    SELECT
-                            ocr.cod_estrutural as cod_estrutural,
-                            r.cod_receita  as receita,
-                            rec.masc_recurso_red as recurso,
-                            ocr.descricao AS descricao,
-                            orcamento.fn_receita_valor_previsto( '|| quote_literal(stExercicio) ||'
-                                                                ,publico.fn_mascarareduzida(ocr.cod_estrutural)
+                    SELECT conta_receita.cod_estrutural AS cod_estrutural
+                         , receita.cod_receita          AS receita
+                         , recurso.masc_recurso_red     AS recurso
+                         , conta_receita.descricao      AS descricao
+                         , orcamento.fn_receita_valor_previsto ( '|| quote_literal(stExercicio) ||'
+                                                                , publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                                 , '|| quote_literal(stCodEntidades) ||'
-                            ) as valor_previsto,
-                            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(ocr.cod_estrutural)
+                           ) AS valor_previsto
+                         , orcamento.fn_somatorio_balancete_receita ( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                                      ,'|| quote_literal(dtInicial) ||'
                                                                      ,'|| quote_literal(dtFinal)   ||'
-                            ) as arrecadado_mes,
-                            orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida(ocr.cod_estrutural)
+                           ) AS arrecadado_mes
+                         , orcamento.fn_somatorio_balancete_receita ( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                                      ,'|| quote_literal(dtInicioAno) ||'
                                                                      ,'|| quote_literal(dtFinal)     ||'
-                            ) as arrecadado_ate_periodo,
-                            tcmba.fn_somatorio_demonstrativo_consolidado_receita_estorno( publico.fn_mascarareduzida(ocr.cod_estrutural)
+                           ) AS arrecadado_ate_periodo
+                         , tcmba.fn_somatorio_demonstrativo_consolidado_receita_estorno ( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                                      ,'|| quote_literal(dtInicial) ||'
                                                                      ,'|| quote_literal(dtFinal)   ||'
-                            ) as anulado_mes,
-                            tcmba.fn_somatorio_demonstrativo_consolidado_receita_estorno( publico.fn_mascarareduzida(ocr.cod_estrutural)
+                           ) AS anulado_mes
+                         , tcmba.fn_somatorio_demonstrativo_consolidado_receita_estorno ( publico.fn_mascarareduzida(conta_receita.cod_estrutural)
                                                                      ,'|| quote_literal(dtInicioAno) ||'
                                                                      ,'|| quote_literal(dtFinal)     ||'
-                            ) as anulado_ate_periodo
-                      FROM orcamento.conta_receita ocr
-           LEFT OUTER JOIN orcamento.receita as r ON
-                           ocr.exercicio = r.exercicio AND
-                           ocr.cod_conta = r.cod_conta AND
-                           r.cod_entidade    IN ('|| stCodEntidades ||') AND
-                           r.exercicio       = '|| quote_literal(stExercicio) ||'
-                 LEFT JOIN orcamento.recurso('|| quote_literal(stExercicio) ||') as rec ON
-                           rec.cod_recurso = r.cod_recurso AND
-                           rec.exercicio   = r.exercicio
-                     WHERE ocr.cod_conta = ocr.cod_conta
-                       AND ocr.exercicio =  '|| quote_literal(stExercicio) ||'
-                   ) as tbl
-               WHERE orcamento.fn_movimento_balancete_receita( '|| quote_literal(stExercicio) ||'
-                                                                    ,publico.fn_mascarareduzida(tbl.cod_estrutural)
-                                                                    ,'|| quote_literal(stCodEntidades) ||'
-                                                                    ,'|| quote_literal(dtInicioAno) ||'
-                                                                    ,'|| quote_literal(dtFinal) ||'
-                                                                    ) = true
-            GROUP BY tbl.cod_estrutural, tbl.receita, tbl.recurso, tbl.descricao ';
+                           ) AS anulado_ate_periodo
+                           
+                      FROM orcamento.conta_receita
+           
+                INNER JOIN orcamento.receita
+                        ON conta_receita.exercicio = receita.exercicio
+                       AND conta_receita.cod_conta = receita.cod_conta
+                
+                 LEFT JOIN orcamento.recurso ('|| quote_literal(stExercicio) ||')
+                        ON recurso.cod_recurso = receita.cod_recurso
+                       AND recurso.exercicio   = receita.exercicio
+                     
+                     WHERE conta_receita.exercicio =  '|| quote_literal(stExercicio) ||'
+                       AND receita.cod_entidade    IN ('|| stCodEntidades ||')
 
+                   ) AS tabela
+                   
+               WHERE orcamento.fn_movimento_balancete_receita( '|| quote_literal(stExercicio) ||'
+                                                              , publico.fn_mascarareduzida(tabela.cod_estrutural)
+                                                              , '|| quote_literal(stCodEntidades) ||'
+                                                              , '|| quote_literal(dtInicioAno) ||'
+                                                              , '|| quote_literal(dtFinal) ||'
+                                                              ) = true
+            GROUP BY tabela.cod_estrutural
+                   , tabela.receita
+                   , tabela.recurso
+                   , tabela.descricao ';
+   
     FOR reRegistro IN EXECUTE stSql
     LOOP
-
         RETURN next reRegistro;
     END LOOP;
 
@@ -238,4 +236,5 @@ BEGIN
 
     RETURN;
 END;
+
 $$ language 'plpgsql';

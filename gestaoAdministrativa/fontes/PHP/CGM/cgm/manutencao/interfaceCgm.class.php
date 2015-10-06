@@ -35,7 +35,7 @@
 
 * Casos de uso: uc-01.02.92, uc-01.02.93
 
-  $Id: interfaceCgm.class.php 63580 2015-09-11 18:47:24Z franver $
+  $Id: interfaceCgm.class.php 63637 2015-09-23 17:04:21Z arthur $
 
 */
 
@@ -1479,53 +1479,53 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
 
             <?php if ($pessoa == 'fisica' or ( $pessoa == 'outros' and $tipo == 'fisica' )) { ?>
                 if (document.frm.dddRes.value != '' && document.frm.foneRes.value == '') {
-                    mensagem += "@@Campo DDD do Telefone residencial foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone residencial !";
+                    mensagem += "@@Campo DDD do Telefone residencial foi preenchido, por favor preencher o campo correspondente ao Número do Telefone residencial!";
                     erro = true;
                 }
                 
                 if (document.frm.dddRes.value == '' && document.frm.foneRes.value != '') {
-                    mensagem += "@Campo Número do Telefone residencial foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone residencial !";
+                    mensagem += "@Campo Número do Telefone residencial foi preenchido, por favor preencher o campo correspondente ao DDD do Telefone residencial!";
                     erro = true;
                 }
 
                 if (document.frm.dddCom.value != '' && document.frm.foneCom.value == '') {
-                    mensagem += "@@Campo DDD do Telefone comercial foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone comercial!";
+                    mensagem += "@@Campo DDD do Telefone comercial foi preenchido, por favor preencher o campo correspondente ao Número do Telefone comercial!";
                     erro = true;
                 }
                 
                 if (document.frm.dddCom.value == '' && document.frm.foneCom.value != '') {
-                    mensagem += "@Campo Número do Telefone comercial foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone comercial!";
+                    mensagem += "@Campo Número do Telefone comercial foi preenchido, por favor preencher o campo correspondente ao DDD do Telefone comercial!";
                     erro = true;
                 }
             <?php } else { ?>
                 if (document.frm.dddRes.value != '' && document.frm.foneRes.value == '') {
-                    mensagem += "@@Campo DDD do Telefone foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone!";
+                    mensagem += "@@Campo DDD do Telefone foi preenchido, por favor preencher o campo correspondente ao Número do Telefone!";
                     erro = true;
                 }
                 
                 if (document.frm.dddRes.value == '' && document.frm.foneRes.value != '') {
-                    mensagem += "@Campo Número do Telefone foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone!";
+                    mensagem += "@Campo Número do Telefone foi preenchido, por favor preencher o campo correspondente ao DDD do Telefone!";
                     erro = true;
                 }
 
                 if (document.frm.dddCom.value != '' && document.frm.foneCom.value == '') {
-                    mensagem += "@@Campo DDD do FAX foi preenchido, por favor preenchar o campo Correspondente ao Número do FAX!";
+                    mensagem += "@@Campo DDD do FAX foi preenchido, por favor preencher o campo correspondente ao Número do FAX!";
                     erro = true;
                 }
                 
                 if (document.frm.dddCom.value == '' && document.frm.foneCom.value != '') {
-                    mensagem += "@Campo Número do FAX foi preenchido, por favor preenchar o campo Correspondente ao DDD do FAX!";
+                    mensagem += "@Campo Número do FAX foi preenchido, por favor preencher o campo correspondente ao DDD do FAX!";
                     erro = true;
                 }
             <?php } ?>
 
                 if (document.frm.dddCel.value != '' && document.frm.foneCel.value == '') {
-                    mensagem += "@@Campo DDD do Telefone celular foi preenchido, por favor preenchar o campo Correspondente ao Número do Telefone celular!";
+                    mensagem += "@@Campo DDD do Telefone celular foi preenchido, por favor preencher o campo correspondente ao Número do Telefone celular!";
                     erro = true;
                 }
                 
                 if (document.frm.dddCel.value == '' && document.frm.foneCel.value != '') {
-                    mensagem += "@Campo Número do Telefone celular foi preenchido, por favor preenchar o campo Correspondente ao DDD do Telefone celular!";
+                    mensagem += "@Campo Número do Telefone celular foi preenchido, por favor preencher o campo correspondente ao DDD do Telefone celular!";
                     erro = true;
                 }
                 
@@ -2664,8 +2664,8 @@ if ($pessoa == 'juridica') {
             <td class="field">
             <input type="text" placeholder="DD" name="dddCel" maxlength="2" size="2" value="<?=$dddCel;?>"
         onKeyUp="return autoTab(this, 2, event);" onKeyPress="return(isValido(this,event,'0123456789'));">&nbsp;
-                <input type="text" placeholder="N° Telefone" name="foneCel" maxlength="8" size="8" value="<?=$foneCel;?>"
-                onKeyUp="return autoTab(this, 8, event);" onKeyPress="return(isValido(this,event,'0123456789'));">
+                <input type="text" placeholder="N° Telefone" name="foneCel" maxlength="9" size="8" value="<?=$foneCel;?>"
+                onKeyUp="return autoTab(this, 9, event);" onKeyPress="return(isValido(this,event,'0123456789'));">
             </td>
         </tr>
         <tr>

@@ -161,6 +161,15 @@ $obFormulario->addHidden     ( $obIApplet              );
 $obFormulario->addComponente ( $obEntidadeUsuario      );
 $obFormulario->addComponente ( $obTextData             );
 $obFormulario->addComponente ( $obPopUpCredor          );
+/*
+ * Verificando se o munícipio Bom Despacho e se a data é menor ou igual a 31/12/2015
+ * Se essas condições não forem verdadeiras será mostrado o campo de Recurso para os outros munícipios
+ * Após o dia 31/12/2015 será mostrado para Bom Despacho o Campo Recurso
+ *
+ **/
+$stDataFinalAno = '31/12/2015';
+$stDataAtual    = date('d/m/Y');
+if ( !(SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao ) == 11 && SistemaLegado::pegaConfiguracao('cod_municipio', 2, Sessao::getExercicio(), $boTransacao ) == 79 && SistemaLegado::comparaDatas($stDataFinalAno, $stDataAtual, true)))
 $obIMontaRecursoDestinacao->geraFormulario (  $obFormulario );
 $obFormulario->addComponente ( $obPopUpContaCaixaBanco );
 $obFormulario->addComponente ( $obPopUpContaReceita    );

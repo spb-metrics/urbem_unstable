@@ -35,12 +35,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoEmpenho.class.php 61103 2014-12-08 20:37:09Z diogo.zarpelon $
-
-    $Revision: 30805 $
-    $Name$
-    $Author: eduardoschitz $
-    $Date: 2008-02-27 07:17:08 -0300 (Qua, 27 Fev 2008) $
+    $Id: REmpenhoEmpenho.class.php 63657 2015-09-24 21:19:41Z michel $
 
     * Casos de uso: uc-02.01.23
                     uc-02.01.08
@@ -51,19 +46,14 @@
                     uc-02.03.31
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO        ."REmpenhoAutorizacaoEmpenho.class.php"         );
-include_once ( CAM_GF_ORC_NEGOCIO        ."ROrcamentoReserva.class.php"                  );
-include_once ( CAM_GF_ORC_NEGOCIO        ."ROrcamentoReservaSaldos.class.php"            );
-include_once ( CAM_GF_ORC_NEGOCIO        ."ROrcamentoEntidade.class.php"                 );
-include_once ( CAM_GF_EMP_NEGOCIO        ."REmpenhoPreEmpenho.class.php"                 );
-include_once ( CAM_GF_EMP_NEGOCIO        ."REmpenhoConfiguracao.class.php"               );
-include_once ( CAM_GRH_ENT_MAPEAMENTO    ."TEntidade.class.php"                          );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoReserva.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoReservaSaldos.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPreEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php";
 
-/**
-    * Classe de Regra de Empenho
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Eduardo Martins
-*/
 class REmpenhoEmpenho extends REmpenhoPreEmpenho
 {
 /*
@@ -2546,12 +2536,11 @@ function listarEmpenhoAnulado(&$rsRecordSet, $stOrder = "cod_empenho,timestamp,n
 */
 function consultar($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO     ."TEmpenhoEmpenho.class.php"                    );
-    $obTEmpenhoEmpenho                    =  new TEmpenhoEmpenho;
-
-    $obTEmpenhoEmpenho->setDado( "exercicio"       , $this->stExercicio  );
-    $obTEmpenhoEmpenho->setDado( "cod_empenho"     , $this->inCodEmpenho );
-    $obTEmpenhoEmpenho->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade () );
+    include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+    $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+    $obTEmpenhoEmpenho->setDado( "exercicio"       , $this->stExercicio                                 );
+    $obTEmpenhoEmpenho->setDado( "cod_empenho"     , $this->inCodEmpenho                                );
+    $obTEmpenhoEmpenho->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade()   );
     $obErro = $obTEmpenhoEmpenho->recuperaPorChave( $rsEmpenho, $boTransacao );
 
     if ( !$obErro->ocorreu() ) {
@@ -2563,7 +2552,7 @@ function consultar($boTransacao = "")
         $this->stHora            = $rsEmpenho->getCampo( "hora"              );
 
         if ($this->getCodCategoria()) {
-            include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoCategoriaEmpenho.class.php" );
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoCategoriaEmpenho.class.php";
             $obTEmpenhoCategoriaEmpenho = new TEmpenhoCategoriaEmpenho;
             $stFiltro = " WHERE cod_categoria = ".$this->getCodCategoria()."";
             $obErro = $obTEmpenhoCategoriaEmpenho->recuperaTodos($rsCategoria,$stFiltro,'',$boTransacao);
@@ -2572,38 +2561,41 @@ function consultar($boTransacao = "")
         }
 
         // Se o empenho for de adiantamentos então busca a contrapartida
-        if ( $this->getCodCategoria() == 2 || $this->getCodCategoria() == 3 ) {
-            include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaEmpenho.class.php" );
+        if ( ($this->getCodCategoria() == 2 || $this->getCodCategoria() == 3) && !$obErro->ocorreu()) {
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaEmpenho.class.php";
             $obTEmpenhoContrapartidaEmpenho = new TEmpenhoContrapartidaEmpenho;
-            $obTEmpenhoContrapartidaEmpenho->setDado( 'exercicio'   , $this->stExercicio );
-            $obTEmpenhoContrapartidaEmpenho->setDado( 'cod_empenho' , $this->inCodEmpenho );
-            $obTEmpenhoContrapartidaEmpenho->setDado( 'cod_entidade', $this->obROrcamentoEntidade->getCodigoEntidade() );
+            $obTEmpenhoContrapartidaEmpenho->setDado( 'exercicio'   , $this->stExercicio                                );
+            $obTEmpenhoContrapartidaEmpenho->setDado( 'cod_empenho' , $this->inCodEmpenho                               );
+            $obTEmpenhoContrapartidaEmpenho->setDado( 'cod_entidade', $this->obROrcamentoEntidade->getCodigoEntidade()  );
             $obErro = $obTEmpenhoContrapartidaEmpenho->recuperaContrapartidaLancamento( $rsContrapartida,'', $boTransacao );
             if (!$obErro->ocorreu()) {
-                $this->inCodContrapartida = $rsContrapartida->getCampo('conta_contrapartida');
-                $this->stNomContrapartida = $rsContrapartida->getCampo('nom_conta');
+                $this->inCodContrapartida = $rsContrapartida->getCampo( 'conta_contrapartida'   );
+                $this->stNomContrapartida = $rsContrapartida->getCampo( 'nom_conta'             );
             }
         }
 
-        // Se o empenho for complementar adiciona a linha EMPENHO COMPLEMENTAR ao relatorio
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoComplementar.class.php"                    );
-        $obTEmpenhoEmpenhoComplementar = new TEmpenhoEmpenhoComplementar();
-
-        $obTEmpenhoEmpenhoComplementar->setDado( "exercicio"       , $this->stExercicio  );
-        $obTEmpenhoEmpenhoComplementar->setDado( "cod_empenho"     , $this->inCodEmpenho );
-        $obTEmpenhoEmpenhoComplementar->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade () );
-        $obErro = $obTEmpenhoEmpenhoComplementar->recuperaPorChave( $rsEmpenhoComplementar, $boTransacao );
-
-        if ($rsEmpenhoComplementar->getNumLinhas() == 1 && !$obErro->ocorreu()) {
-            $this->boComplementar = true;
-            $this->inCodEmpenhoOriginal = $rsEmpenhoComplementar->getCampo('cod_empenho_original');
-            $this->stExercicioEmpenhoOriginal = $rsEmpenhoComplementar->getCampo('exercicio');
+        if (!$obErro->ocorreu()) {
+            // Se o empenho for complementar adiciona a linha EMPENHO COMPLEMENTAR ao relatorio
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoComplementar.class.php";
+            $obTEmpenhoEmpenhoComplementar = new TEmpenhoEmpenhoComplementar();
+            $obTEmpenhoEmpenhoComplementar->setDado( "exercicio"       , $this->stExercicio                                 );
+            $obTEmpenhoEmpenhoComplementar->setDado( "cod_empenho"     , $this->inCodEmpenho                                );
+            $obTEmpenhoEmpenhoComplementar->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade()   );
+            $obErro = $obTEmpenhoEmpenhoComplementar->recuperaPorChave( $rsEmpenhoComplementar, $boTransacao );
         }
 
-        $this->obROrcamentoEntidade->setExercicio( $this->stExercicio );
-        $obErro = $this->obROrcamentoEntidade->consultar( $rsEntidade , $boTransacao );
+        if ($rsEmpenhoComplementar->getNumLinhas() == 1 && !$obErro->ocorreu()) {
+            $this->boComplementar               = true;
+            $this->inCodEmpenhoOriginal         = $rsEmpenhoComplementar->getCampo( 'cod_empenho_original'  );
+            $this->stExercicioEmpenhoOriginal   = $rsEmpenhoComplementar->getCampo( 'exercicio'             );
+        }
+
         if ( !$obErro->ocorreu() ) {
-            $obErro = parent::consultar( $boTransacao );
+            $this->obROrcamentoEntidade->setExercicio( $this->stExercicio );
+            $obErro = $this->obROrcamentoEntidade->consultar( $rsEntidade , $boTransacao );
+            if ( !$obErro->ocorreu() ) {
+                $obErro = parent::consultar( $boTransacao );
+            }
         }
     }
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterLocalizacao.php 63673 2015-09-28 19:31:03Z carlos.silva $
 
     * Casos de uso: uc-05.01.03
 */
@@ -139,14 +139,6 @@ switch ($stAcao) {
         }
     break;
     case "alterar":
-        
-        // $arValidaLocalizacao['cod_localizacao']  = $_REQUEST['inCodigoLocalizacao'];
-        // $arValidaLocalizacao['cod_nivel']        = $_REQUEST['inCodigoNivel'];
-        // $arValidaLocalizacao['cod_vigencia']     = $_REQUEST['inCodigoVigencia'];
-        // $arValidaLocalizacao['valor']            = preg_replace( "/^0*/", "", trim( $_REQUEST["inValorLocalizacao"] ) );
-        // $arValidaLocalizacao['codigo_composto']  = $_REQUEST['stChaveLocalizacao'].".";
-        // $obErro = $obRCIMLocalizacao->validaCodigoLocalizacao( $arValidaLocalizacao );
-        
         $obErro = new Erro;
 
         if ( !$obErro->ocorreu() ) {

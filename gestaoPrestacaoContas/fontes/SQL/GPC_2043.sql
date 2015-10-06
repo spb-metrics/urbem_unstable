@@ -57,9 +57,9 @@ CREATE TABLE tcmba.pagamento_tipo_documento_pagamento(
     num_documento   varchar(8),
     CONSTRAINT pk_pagamento_tipo_documento_pagamento    PRIMARY KEY                               (exercicio, cod_entidade, cod_nota, timestamp, cod_tipo),
     CONSTRAINT fk_pagamento_tipo_documento_pagamento_1  FOREIGN KEY                               (exercicio, cod_entidade, cod_nota, timestamp)
-                                                        REFERENCES tesouraria.pagamento           (exercicio, cod_entidade, cod_nota, timestamp), 
+                                                        REFERENCES tesouraria.pagamento           (exercicio, cod_entidade, cod_nota, timestamp),
     CONSTRAINT fk_pagamento_tipo_documento_pagamento_2  FOREIGN KEY                               (cod_tipo)
-                                                        REFERENCES tcmba.tipo_documento_pagamento (cod_tipo) 
+                                                        REFERENCES tcmba.tipo_documento_pagamento (cod_tipo)
 );
 GRANT ALL ON tcmba.pagamento_tipo_documento_pagamento TO urbem;
 
@@ -246,7 +246,7 @@ CREATE TABLE tcmba.obra(
     exercicio_licitacao CHAR(4)                 ,
     CONSTRAINT pk_tcmba_obra            PRIMARY KEY                         (cod_obra, cod_entidade, exercicio, cod_tipo),
     CONSTRAINT fk_tcmba_obra_1          FOREIGN KEY                         (cod_tipo)
-                                        REFERENCES tcmba.tipo_obra          (cod_tipo), 
+                                        REFERENCES tcmba.tipo_obra          (cod_tipo),
     CONSTRAINT fk_tcmba_obra_2          FOREIGN KEY                         (cod_licitacao, cod_modalidade, cod_entidade, exercicio_licitacao)
                                         REFERENCES licitacao.licitacao      (cod_licitacao, cod_modalidade, cod_entidade, exercicio),
     CONSTRAINT fk_tcmba_obra_3          FOREIGN KEY                         (cod_funcao)
@@ -396,3 +396,218 @@ CREATE TABLE tcmba.obra_contratos(
 );
 GRANT ALL ON tcmba.obra_contratos TO urbem;
 
+
+----------------
+-- Ticket #23265
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+     VALUES
+     ( 3085
+     , 390
+     , 'FLRelacionarAtosPessoal.php'
+     , 'relacionar'
+     , 16
+     , ''
+     , 'Relacionar Atos de Pessoal'
+     , TRUE
+     );
+
+CREATE TABLE tcmba.tipo_ato_pessoal(
+    cod_tipo    INTEGER             NOT NULL,
+    descricao   VARCHAR(80)         NOT NULL,
+    CONSTRAINT pk_tipo_ato_pessoal  PRIMARY KEY (cod_tipo)
+);
+GRANT ALL ON tcmba.tipo_ato_pessoal TO urbem;
+
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES ( 9, 'Contratação por prazo determinado (Prorrogação)'                  );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (10, 'Contratação por prazo determinado (Renovação)'                    );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (11, 'Contratação p/ prazo determinado transf. em indet.(Antes CF/1988)');
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (16, 'Promoção de Nível'                                                );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (23, 'Exoneração de cargo em comissão'                                  );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (25, 'Disponibilidade'                                                  );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (29, 'Readmissão'                                                       );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (31, 'Readaptação'                                                      );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (32, 'Transferência do Município Mãe'                                   );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (34, 'Transferência para Município Emancipado'                          );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (40, 'Desistência de Aposentadoria / Reforma / Reserva'                 );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (42, 'Reavaliação de proventos de aposentadoria'                        );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (46, 'Reavaliação de proventos de pensão'                               );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (52, 'Licença sem vencimento'                                           );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (56, 'Afastamento por mandato eletivo'                                  );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (57, 'Auxílio Reclusão - Previdência Própria'                           );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (58, 'Licença para Atividade Política'                                  );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (59, 'Designação para Função Gratificada'                               );
+INSERT INTO tcmba.tipo_ato_pessoal (cod_tipo, descricao) VALUES (60, 'Dispensa de Função Gratificada'                                   );
+
+
+SELECT atualizarbanco('
+CREATE TABLE pessoal.tcmba_assentamento_ato_pessoal(
+    cod_assentamento    INTEGER     NOT NULL,
+    cod_tipo_ato_pessoal    INTEGER     NOT NULL,
+    exercicio               CHAR(4)     NOT NULL,
+    CONSTRAINT pk_tcmba_assentamento_ato_pessoal    PRIMARY KEY               (cod_assentamento, cod_tipo_ato_pessoal, exercicio),
+    CONSTRAINT fk_tcmba_assentamento_ato_pessoal_1  FOREIGN KEY                                 (cod_assentamento)
+                                                    REFERENCES pessoal.assentamento_assentamento(cod_assentamento),
+    CONSTRAINT fk_tcmba_assentamento_ato_pessoal_2  FOREIGN KEY                                 (cod_tipo_ato_pessoal)
+                                                    REFERENCES tcmba.tipo_ato_pessoal           (cod_tipo)
+);
+');
+SELECT atualizarbanco('
+GRANT ALL ON pessoal.tcmba_assentamento_ato_pessoal TO urbem;
+');
+
+
+----------------
+-- Ticket #22984
+----------------
+
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+
+BEGIN
+    PERFORM 1
+       FROM pg_proc
+      WHERE proname     = 'fn_demonstrativo_consolidado_receita'
+        AND pronargs    = 4
+        AND proargtypes = '1043 1043 1043 1043'
+          ;
+    IF FOUND THEN
+        DROP FUNCTION tcmba.fn_demonstrativo_consolidado_receita(varchar,varchar,varchar,varchar);
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+SELECT        manutencao();
+DROP FUNCTION manutencao();
+
+DROP TYPE fn_demonstrativo_consolidado_receita;
+
+CREATE TYPE fn_demonstrativo_consolidado_receita
+    AS (cod_estrutural              varchar,
+        receita                     integer,
+        recurso                     varchar,
+        descricao                   varchar,
+        valor_previsto              numeric,
+        arrecadado_mes              numeric,
+        arrecadado_ate_periodo      numeric,
+        anulado_mes                 numeric,
+        anulado_ate_periodo         numeric,
+        valor_diferenca             numeric
+    );
+
+
+----------------
+-- Ticket #23271
+----------------
+
+UPDATE administracao.acao SET ativo = FALSE WHERE cod_acao = 2007;
+DROP TABLE tcmgo.balanco_apbaaaa_tipo_combustivel;
+
+
+----------------
+-- Ticket #20472
+----------------
+
+CREATE TYPE tcemg.siace_despesa_total_pessoal AS (
+    cod_conta           VARCHAR,
+    descricao           VARCHAR,
+    cod_estrutural      VARCHAR,
+    valor               NUMERIC
+);
+
+
+----------------
+-- Ticket #23254
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+VALUES
+     ( 3089
+     , 390
+     , 'FMManterConfiguracaoParcSubvOSCIP.php'
+     , 'configurar'
+     , 17
+     , 'Parceria/Subvenção/OSCIP.'
+     , 'Configurar Termos de Parceria/Subvenção/OSCIP'
+     , TRUE
+     );
+
+
+CREATE TABLE tcmba.termo_parceria (
+    exercicio            VARCHAR(4)   NOT NULL,
+    cod_entidade         INTEGER      NOT NULL,
+    nro_processo         VARCHAR(16)  NOT NULL,
+    dt_assinatura        DATE         NOT NULL,
+    dt_publicacao        DATE         NOT NULL,
+    imprensa_oficial     VARCHAR(50)  NOT NULL,
+    dt_inicio            DATE         NOT NULL,
+    dt_termino           DATE         NOT NULL,
+    numcgm               INTEGER      NOT NULL,
+    processo_licitatorio VARCHAR(36),
+    processo_dispensa    VARCHAR(16),
+    objeto               VARCHAR(400) NOT NULL,
+    nro_processo_mj      VARCHAR(36),
+    dt_processo_mj       DATE,
+    dt_publicacao_mj     DATE,
+    CONSTRAINT pk_tcmba_termo_parceria   PRIMARY KEY          (exercicio,cod_entidade,nro_processo),
+    CONSTRAINT fk_tcmba_termo_parceria_1 FOREIGN KEY                      (exercicio, cod_entidade)
+                                         REFERENCES orcamento.entidade    (exercicio, cod_entidade),
+    CONSTRAINT fk_tcmba_termo_parceria_2 FOREIGN KEY                      (numcgm)
+                                         REFERENCES sw_cgm_pessoa_juridica(numcgm)
+    
+);
+GRANT ALL ON tcmba.termo_parceria TO urbem;
+
+CREATE TABLE tcmba.termo_parceria_dotacao (
+    exercicio              VARCHAR(4)    NOT NULL,
+    cod_entidade           INTEGER       NOT NULL,
+    nro_processo           VARCHAR(16)   NOT NULL,
+    exercicio_despesa      VARCHAR(4)    NOT NULL,
+    cod_despesa            INTEGER       NOT NULL,
+    CONSTRAINT pk_tcmba_termo_parceria_dotacao   PRIMARY KEY                     (exercicio, cod_entidade, nro_processo),
+    CONSTRAINT fk_tcmba_termo_parceria_dotacao_1 FOREIGN KEY                     (exercicio, cod_entidade, nro_processo)
+                                                 REFERENCES tcmba.termo_parceria (exercicio, cod_entidade, nro_processo),
+    CONSTRAINT fk_tcmba_termo_parceria_dotacao_2 FOREIGN KEY                     (exercicio_despesa, cod_despesa)
+                                                 REFERENCES orcamento.despesa    (exercicio, cod_despesa)
+
+);
+GRANT ALL ON tcmba.termo_parceria TO urbem;
+
+CREATE TABLE tcmba.termo_parceria_prorrogacao (
+    exercicio              VARCHAR(4)    NOT NULL,
+    cod_entidade           INTEGER       NOT NULL,
+    nro_processo           VARCHAR(16)   NOT NULL,
+    nro_termo_aditivo      VARCHAR(36)   NOT NULL,
+    exercicio_aditivo      VARCHAR(4)    NOT NULL,
+    dt_prorrogacao         DATE          NOT NULL,
+    dt_publicacao          DATE          NOT NULL,
+    imprensa_oficial       VARCHAR(50)   NOT NULL,
+    indicador_adimplemento BOOLEAN       NOT NULL DEFAULT FALSE,
+    dt_inicio              DATE          NOT NULL,
+    dt_termino             DATE          NOT NULL,
+    vl_prorrogacao         NUMERIC(14,2) NOT NULL,
+    CONSTRAINT pk_tcmba_termo_parceria_prorrogacao   PRIMARY KEY (exercicio, cod_entidade, nro_processo, nro_termo_aditivo, exercicio_aditivo),
+    CONSTRAINT fk_tcmba_termo_parceria_prorrogacao_1 FOREIGN KEY                     (exercicio, cod_entidade, nro_processo)
+                                                     REFERENCES tcmba.termo_parceria (exercicio, cod_entidade, nro_processo)
+);
+GRANT ALL ON tcmba.termo_parceria_prorrogacao TO urbem;

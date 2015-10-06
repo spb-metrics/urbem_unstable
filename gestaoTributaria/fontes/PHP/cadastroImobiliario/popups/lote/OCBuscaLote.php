@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCBuscaLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCBuscaLote.php 63638 2015-09-23 17:09:46Z jean $
 
     * Casos de uso: uc-05.01.08
 */
@@ -51,7 +51,7 @@ include_once( CAM_GT_CIM_NEGOCIO."RCIMImovel.class.php"  );
 include_once( CAM_GT_CIM_COMPONENTES."MontaLocalizacao.class.php" );
 
 //Define o nome dos arquivos PHP
-$stPrograma = "ProcurarImovel";
+$stPrograma = "BuscaLote";
 $pgFilt = "FL".$stPrograma.".php";
 $pgList = "LS".$stPrograma.".php";
 $pgForm = "FM".$stPrograma.".php";

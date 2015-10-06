@@ -33,7 +33,7 @@
 
     * @ignore
     
-    * $Id: JSManterLocalizacao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: JSManterLocalizacao.js 63673 2015-09-28 19:31:03Z carlos.silva $
 
     * Casos de uso: uc-05.01.03
 */
@@ -91,10 +91,14 @@ function buscaDado( BuscaDado ){
 }
 
 function submeteFiltro(){
-    stLocalizacao = document.frm.stValorComposto.value;
-    if ( stLocalizacao == "" ){
-        mensagem = "Campo Localização não foi preenchido!";
-        alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
+    if (document.frm.stAcao.value != 'consultar') {
+        stLocalizacao = document.frm.stValorComposto.value;
+        if ( stLocalizacao == "" ){
+            mensagem = "Campo Localização não foi preenchido!";
+            alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
+        } else {
+            document.frm.submit();
+        }
     } else {
         document.frm.submit();
     }

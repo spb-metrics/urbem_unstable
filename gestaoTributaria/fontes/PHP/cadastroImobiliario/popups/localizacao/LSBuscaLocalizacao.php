@@ -32,24 +32,11 @@
 
     * @ignore
 
-    * $Id: LSBuscaLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSBuscaLocalizacao.php 63688 2015-09-29 20:32:47Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
 
-/*
-$Log$
-Revision 1.12  2007/02/06 17:47:40  cercato
-Bug #8220#
-
-Revision 1.11  2006/12/11 14:54:31  cercato
-Bug #7780#
-
-Revision 1.10  2006/09/15 15:04:13  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php");
@@ -65,7 +52,7 @@ $pgCons = $pgFilt;
 
 include_once( $pgJS );
 
-$obRegra = new RCIMLocalizacao;
+$obRCIMLocalizacao = new RCIMLocalizacao();
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao = $request->get('stAcao');
@@ -84,15 +71,15 @@ switch ($stAcao) {
     DEFAULT         : $pgProx = $pgForm;
 }
 
-$stLink="";
+$stLink = "";
 
 if ( $request->get('stNome') ) {
-    $obRegra->setNomeLocalizacao( $_REQUEST['stNome'] );
-    $stLink .= '&stNome='.$_REQUEST['stNome'];
+    $obRCIMLocalizacao->setNomeLocalizacao( $request->get('stNome') );
+    $stLink .= '&stNome='.$request->get('stNome');
 }
 if ( $request->get('stChaveLocalizacao') ) {
-    $obRegra->setValorComposto( $_REQUEST['stChaveLocalizacao'] );
-    $stLink .= '&stChaveLocalizacao='.$_REQUEST['stChaveLocalizacao'];
+    $obRCIMLocalizacao->setValorComposto( $request->get('stChaveLocalizacao') );
+    $stLink .= '&stChaveLocalizacao='.$request->get('stChaveLocalizacao');
 }
 
 $stLink .= "&stAcao=".$stAcao;
@@ -104,18 +91,18 @@ $stLink .= "&tipoBusca=".$request->get('tipoBusca');
 Sessao::write('stLink', $stLink);
 
 if ( $request->get('inCodigoVigencia') ) {
-    $obRegra->setCodigoVigencia ( $_REQUEST['inCodigoVigencia'] );
+    $obRCIMLocalizacao->setCodigoVigencia ( $request->get('inCodigoVigencia') );
 }
 
 if ( Sessao::read('inCodigoNivel') > 0 ) {
-   $obRegra->setCodigoNivel ( Sessao::read('inCodigoNivel')-1 );
+   $obRCIMLocalizacao->setCodigoNivel ( Sessao::read('inCodigoNivel')-1 );
 } else {
-    $obRegra->recuperaUltimoNivel( $rsListaNivel );
-    $obRegra->setCodigoNivel ( $rsListaNivel->getCampo("cod_nivel") );
-    $obRegra->setValor(-$rsListaNivel->getCampo("mascara"));
+    $obRCIMLocalizacao->recuperaUltimoNivel( $rsListaNivel );
+    $obRCIMLocalizacao->setCodigoNivel ( $rsListaNivel->getCampo("cod_nivel") );
+    $obRCIMLocalizacao->setValor(-$rsListaNivel->getCampo("mascara"));
 }
 
-$obRegra->listarLocalizacao( $rsLista );
+$obRCIMLocalizacao->listarLocalizacao( $rsLista );
 
 $obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );

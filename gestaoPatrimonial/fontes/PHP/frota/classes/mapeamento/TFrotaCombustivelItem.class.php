@@ -29,7 +29,7 @@
   * @author Analista: Gelson W. Gonçalves
   * @author Programador: Henrique Boaventura
 
-  * $Id: TFrotaCombustivelItem.class.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: TFrotaCombustivelItem.class.php 63650 2015-09-23 21:21:08Z arthur $
 
     Caso de uso: uc-03.02.12
 **/
@@ -43,7 +43,7 @@ class TFrotaCombustivelItem extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TFrotaCombustivelItem()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('frota.combustivel_item');
@@ -62,15 +62,20 @@ class TFrotaCombustivelItem extends Persistente
         $stSql = "
             SELECT combustivel_item.cod_item
                  , combustivel_item.cod_combustivel
-                 , combustivel.nom_combustivel
+                 , INITCAP(combustivel.nom_combustivel) AS nom_combustivel
                  , catalogo_item.descricao_resumida
+              
               FROM frota.combustivel_item
+        
         INNER JOIN frota.combustivel
                 ON combustivel.cod_combustivel = combustivel_item.cod_combustivel
+        
         INNER JOIN frota.veiculo_combustivel
                 ON veiculo_combustivel.cod_combustivel = combustivel.cod_combustivel
+        
         INNER JOIN almoxarifado.catalogo_item
                 ON catalogo_item.cod_item = combustivel_item.cod_item
+             
              WHERE ";
         if ( $this->getDado( 'cod_veiculo' ) ) {
             $stSql .= " veiculo_combustivel.cod_veiculo = ".$this->getDado('cod_veiculo')." AND   ";
@@ -79,3 +84,5 @@ class TFrotaCombustivelItem extends Persistente
         return substr( $stSql,0,-6 );
     }
 }
+
+?>

@@ -36,7 +36,7 @@
  * Casos de uso: uc-03.04.05
                  uc-03.05.26
 
- $Id: TComprasMapaItemReserva.class.php 63445 2015-08-28 13:44:54Z michel $
+ $Id: TComprasMapaItemReserva.class.php 63738 2015-10-02 17:54:55Z michel $
 
  */
 
@@ -143,6 +143,16 @@ class TComprasMapaItemReserva extends Persistente
             SELECT  mapa_item.cod_solicitacao
                  ,  mapa_item.exercicio
               FROM  compras.mapa_item
+        INNER JOIN  compras.mapa_solicitacao
+                ON  mapa_solicitacao.exercicio = mapa_item.exercicio
+               AND  mapa_solicitacao.cod_entidade = mapa_item.cod_entidade
+               AND  mapa_solicitacao.cod_solicitacao = mapa_item.cod_solicitacao
+               AND  mapa_solicitacao.cod_mapa = mapa_item.cod_mapa
+               AND  mapa_solicitacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+        INNER JOIN  compras.solicitacao
+                ON  solicitacao.exercicio = mapa_solicitacao.exercicio_solicitacao
+               AND  solicitacao.cod_entidade = mapa_solicitacao.cod_entidade
+               AND  solicitacao.cod_solicitacao = mapa_solicitacao.cod_solicitacao  
              WHERE
         NOT EXISTS  (
                         SELECT  1
@@ -163,6 +173,7 @@ class TComprasMapaItemReserva extends Persistente
                AND  mapa_item.cod_entidade    = ".$this->getDado('cod_entidade')."
                AND  mapa_item.exercicio       = '".$this->getDado('exercicio')."'
                AND  mapa_item.cod_mapa        = ".$this->getDado('cod_mapa')."
+               AND  solicitacao.registro_precos = FALSE
             ";
 
         return $stSql;

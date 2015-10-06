@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalCVC.class.php 63551 2015-09-10 14:18:29Z franver $
+    $Id: TTCEMGArquivoMensalCVC.class.php 63670 2015-09-28 13:35:21Z franver $
 
 */
 
@@ -228,7 +228,7 @@ class TTCEMGArquivoMensalCVC extends Persistente
          LEFT JOIN tcemg.arquivo_cvc
                 ON registro10.num_unidade = arquivo_cvc.num_unidade
                AND registro10.num_orgao   = arquivo_cvc.num_orgao
-               AND registro10.exercicio   = arquivo_cvc.exercicio
+               --AND registro10.exercicio   = arquivo_cvc.exercicio
                AND registro10.cod_veiculo = arquivo_cvc.cod_veiculo
              WHERE arquivo_cvc.cod_veiculo IS NULL
                AND (registro10.num_unidade > 0 AND registro10.num_orgao > 0)
@@ -478,10 +478,10 @@ class TTCEMGArquivoMensalCVC extends Persistente
             LEFT JOIN tcemg.arquivo_cvc
                    ON registro10.num_unidade = arquivo_cvc.num_unidade
                   AND registro10.num_orgao   = arquivo_cvc.num_orgao
-                  --AND registro10.exercicio   = arquivo_cvc.exercicio
+                  AND registro10.exercicio   = arquivo_cvc.exercicio
                   AND registro10.cod_veiculo = arquivo_cvc.cod_veiculo
                 WHERE arquivo_cvc.mes = TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy'),'mm')
-                  AND arquivo_cvc.cod_veiculo IS NULL 
+                  AND arquivo_cvc.cod_veiculo IS NOT NULL 
                 
              ORDER BY registro10.cod_veiculo
         ";
@@ -1092,15 +1092,14 @@ class TTCEMGArquivoMensalCVC extends Persistente
                     ) AS descricao_veiculo_cessao
                  ON descricao_veiculo_cessao.cod_veiculo = veiculo_propriedade.cod_veiculo
                 AND descricao_veiculo_cessao.timestamp = veiculo_propriedade.timestamp
-
          INNER JOIN administracao.configuracao_entidade
                  ON configuracao_entidade.parametro    = 'tcemg_codigo_orgao_entidade_sicom'
                 AND configuracao_entidade.cod_modulo   = 55
                 AND configuracao_entidade.exercicio    = '".Sessao::getExercicio()."'
                 AND configuracao_entidade.cod_entidade = ".$this->getDado('entidades')."
-
-              WHERE veiculo_baixado.dt_baixa BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
-                                                 AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+              WHERE veiculo_baixado.dt_baixa BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                 OR descricao_veiculo_locado.dt_termino BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                 OR descricao_veiculo_cessao.dt_termino BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
            GROUP BY tipo_registro
                   , uniorcam_cod_orgao
                   , cod_unidade_sub

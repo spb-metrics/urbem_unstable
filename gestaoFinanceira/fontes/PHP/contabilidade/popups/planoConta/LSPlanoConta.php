@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 63547 2015-09-10 13:42:18Z carlos.silva $
+    * $Id: LSPlanoConta.php 63747 2015-10-05 17:04:20Z franver $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -217,7 +217,7 @@ if ($_REQUEST['tipoBusca'] == "banco" || $_REQUEST['tipoBusca'] == "codigoReduzi
 if ($_REQUEST['tipoBusca']) {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoAnalitica.class.php"        );
     $obTContabilidadePlanoAnalitica        = new TContabilidadePlanoAnalitica;
-
+    $stSQLRelacionamentoRecurso = "";
     switch ($_REQUEST['tipoBusca']) {
         case 'tes_deposito':
             $stFiltro  = "\n pa.cod_plano is not null AND ";
@@ -428,6 +428,35 @@ if ($_REQUEST['tipoBusca']) {
 
         case 'tes_pagamento_extra_caixa_banco':
                 $stFiltro  = "\n pa.cod_plano is not null AND ";
+                $stFiltro .= "\n pc.exercicio = '" . Sessao::getExercicio() . "' AND ";
+
+            if( $_REQUEST['stCodEstrutural'] )
+                $stFiltro .= "\n pc.cod_estrutural like publico.fn_mascarareduzida('".$_REQUEST['stCodEstrutural']."')||'%' AND ";
+            if( $_REQUEST['stDescricao'] )
+                $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
+            if ($_REQUEST['inCodEntidade']) {
+                if ( SistemaLegado::is_tcems() ) {
+                    $stFiltro .= "\n( pb.cod_banco is not null AND ";
+                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
+                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.4.%' )) AND ";
+                } else {
+                    $stFiltro .= "\n(( pb.cod_banco is not null AND ";
+                    $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
+                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) OR ";
+                    $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
+                }
+            }
+        break;
+
+        case 'tes_pagamento_extra_caixa_banco_recurso_fixo':
+            $stSQLRelacionamentoRecurso = "
+                LEFT JOIN contabilidade.plano_recurso
+                       ON plano_recurso.exercicio = pa.exercicio
+                      AND plano_recurso.cod_plano = pa.cod_plano
+            ";
+                $stFiltro .= "\n plano_recurso.cod_recurso = 100 AND ";
+                $stFiltro .= "\n pa.cod_plano is not null AND ";
                 $stFiltro .= "\n pc.exercicio = '" . Sessao::getExercicio() . "' AND ";
 
             if( $_REQUEST['stCodEstrutural'] )
@@ -761,7 +790,7 @@ if ($_REQUEST['tipoBusca']) {
         $stOrder = isset($stOrder) ?  $stOrder : 'cod_estrutural';
         $boTransacao = "";
 
-        $obErro = $obTContabilidadePlanoAnalitica->recuperaRelacionamento( $rsLista, $stFiltro, $stOrder, $boTransacao );
+        $obErro = $obTContabilidadePlanoAnalitica->recuperaRelacionamento( $rsLista, $stSQLRelacionamentoRecurso.$stFiltro, $stOrder, $boTransacao );
     }
 
 }

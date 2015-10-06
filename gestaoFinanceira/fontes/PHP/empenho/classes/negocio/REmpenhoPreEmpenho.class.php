@@ -33,10 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Revision: 32121 $
-    $Name$
-    $Author: cako $
-    $Date: 2007-12-04 12:08:26 -0200 (Ter, 04 Dez 2007) $
+    $Id: REmpenhoPreEmpenho.class.php 63657 2015-09-24 21:19:41Z michel $
 
     *Casos de uso: uc-02.01.23
                    uc-02.03.15
@@ -47,322 +44,316 @@
                    uc-02.03.30
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoTipoEmpenho.class.php"               );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoHistorico.class.php"                 );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoItemPreEmpenho.class.php"            );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoAtributoEmpenhoValor.class.php"      );
-include_once ( CAM_GA_CGM_NEGOCIO."RCGM.class.php"                              );
-include_once ( CAM_GA_ADM_NEGOCIO."RUsuario.class.php"                          );
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php"                          );
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoClassificacaoDespesa.class.php"             );
-include_once ( CAM_GA_ADM_NEGOCIO."RUnidadeMedida.class.php"                    );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoPermissaoAutorizacao.class.php"      );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoTipoEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoHistorico.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoItemPreEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAtributoEmpenhoValor.class.php";
+include_once CAM_GA_CGM_NEGOCIO."RCGM.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RUsuario.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoClassificacaoDespesa.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RUnidadeMedida.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPermissaoAutorizacao.class.php";
 //INCLUDE DAS CLASSES PARA O TRATAMENTO DOS ATRIBUTOS DINAMICOS
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoAtributoEmpenhoValor.class.php" );
-include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php"                 );
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAtributoEmpenhoValor.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
 
-/**
-    * Classe de Regra de Pre Empenho
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Anderson R. M. Buzo
-*/
 class REmpenhoPreEmpenho
 {
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obRCadastroDinamico;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obREmpenhoTipoEmpenho;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obREmpenhoPermissaoAutorizacao;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obREmpenhoHistorico;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obRCGM;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obRUsuario;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obROrcamentoDespesa;
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obROrcamentoClassificacaoDespesa;
 
-         var $obErro;
+    var $obErro;
     /**
     * @access Private
     * @var Reference Object
-*/
+    **/
     public $roUltimoItemPreEmpenho;
     /**
     * @access Private
     * @var Reference Object
-*/
+    **/
     public $roUltimoAtributoEmpenhoValor;
     /**
     * @access Private
     * @var Integer
-*/
+    **/
     public $inCodPreEmpenho;
     /**
     * @access Private
     * @var Integer
-*/
+    **/
     public $inCodMaterial;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stDescricao;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stNomMaterial;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stExercicio;
     /**
     * @access Private
     * @var Array
-*/
+    **/
     public $arItemPreEmpenho;
     /**
     * @access Private
     * @var Array
-*/
+    **/
     public $arAtributoEmpenhoValor;
     /**
     * @access Private
     * @var Boolean
-*/
+    **/
     public $boImplantado;
     /**
     * @access Public;
     * @var Integer
-*/
+    **/
     public $inCountDespesaExercicio;
     /**
     * @access Public;
     * @var String
-*/
+    **/
     public $stTimestampAtributo;
     /**
     * @access Public;
     * @var Integer
-*/
+    **/
     public $inCodDespesaFixa;
 
     public $inCodEntidade;
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setREmpenhoTipoEmpenho($valor) { $this->obREmpenhoTipoEmpenho = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setRCadastroDinamico($valor) { $this->obRCadastroDinamico   = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setREmpenhoHistorico($valor) { $this->obREmpenhoHistorico = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setREmpenhoPermissaoAutorizacao($valor) { $this->obREmpenhoPermissaoAutorizacao = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setRCGM($valor) { $this->obRCGM = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setRUsuario($valor) { $this->obRUsuario = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setROrcamentoDespesa($valor) { $this->obROrcamentoDespesa = $valor; }
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setROrcamentoClassificacaoDespesa($valor) { $this->obROrcamentoClassificacaoDespesa = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setCodPreEmpenho($valor) { $this->inCodPreEmpenho = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setCodMaterial($valor) { $this->inCodMaterial = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setDescricao($valor) { $this->stDescricao = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setNomMaterial($valor) { $this->stNomMaterial = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setExercicio($valor) { $this->stExercicio = $valor; }
     /**
     * @access Public
     * @param Array $Valor
-*/
+    **/
     public function setItemPreEmpenho($valor) { $this->arItemPreEmpenho        = $valor; }
     /**
     * @access Public
     * @param Boolean $Valor
-*/
+    **/
     public function setImplantado($valor) { $this->boImplantado = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setCountDespesaExercicio($valor) { $this->inCountDespesaExercicio = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setTimestampAtributo($valor) { $this->stTimestampAtributo = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setCodDespesaFixa($valor) { $this->inCodDespesaFixa = $valor; }
 
-function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
+    function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
 
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getREmpenhoTipoEmpenho() { return $this->obREmpenhoTipoEmpenho; }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getRCadastroDinamico() { return $this->obRCadastroDinamico;   }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getREmpenhoHistorico() { return $this->obREmpenhoHistorico; }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getREmpenhoPermissaoAutorizacao() { return $this->obREmpenhoPermissaoAutorizacao; }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getRCGM() { return $this->obRCGM; }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getRUsuario() { return $this->obRUsuario; }
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getROrcamentoClassificacaoDespesa() { return $this->obROrcamentoClassificacaoDespesa; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getCodPreEmpenho() { return $this->inCodPreEmpenho; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getCodMaterial() { return $this->inCodMaterial; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getDescricao() { return $this->stDescricao; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getNomMaterial() { return $this->stNomMaterial; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getExercicio() { return $this->stExercicio;        }
     /**
     * @access Public
     * @return Array
-*/
+    **/
     public function getItemPreEmpenho() { return $this->arItemPreEmpenho; }
     /**
     * @access Public
     * @return Boolean
-*/
+    **/
     public function getImplantado() { return $this->boImplantado; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getCountDespesaExercicio() { return $this->inCountDespesaExercicio; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getTimestampAtributo() { return $this->stTimestampAtributo; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getCodDespesaFixa() { return $this->inCodDespesaFixa; }
 
     public function getCodEntidade() { return $this->inCodEntidade; }
 
     /**
-
-     * Método construtor
-     * @access Public
-*/
+    * Método construtor
+    * @access Public
+    **/
     public function REmpenhoPreEmpenho()
     {
         $this->obRCadastroDinamico               = new RCadastroDinamico;
@@ -382,7 +373,7 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     /**
     * Método Para adicionar Itens Pre Empenho
     * @access Public
-*/
+    **/
     public function addItemPreEmpenho()
     {
         $this->arItemPreEmpenho[] = new REmpenhoItemPreEmpenho( $this );
@@ -394,7 +385,7 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     * @access Public
     * @param Object $boTransacao
     * @return Object $obErro
-*/
+    **/
     public function consultaSaldoAnterior(&$nuSaldoAnterior, $stOrder = "" , $boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
@@ -420,7 +411,7 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     * @access public
     * @param Object $obTransacao
     * @return Object $obErro
-*/
+    **/
     public function checarFormaExecucaoOrcamento(&$stFormaExecucao,  $boTransacao = "")
     {
         $obROrcamentoConfiguracao = new ROrcamentoConfiguracao;
@@ -443,11 +434,11 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     * @param Object $rsRecordSet
     * @param Object $boTransacao
     * @return Object $obErro
-*/
+    **/
     public function listarUnidadeMedida(&$rsRecordSet, $boTransacao = "")
     {
-                $obErro = "";
-                $stOrdem = "";
+        $obErro = "";
+        $stOrdem = "";
         $obUnidadeMedida = new RUnidadeMedida;
         $obUnidadeMedida->listar( $rsRecordSet, $stOrdem, $boTransacao );
 
@@ -460,7 +451,7 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     * @param Object $rsRecordSet
     * @param Object $boTransacao
     * @return Object $obErro
-*/
+    **/
     public function listarMaterial(&$rsRecordSet, $boTransacao = "")
     {
         include_once ( CAM_GP_COM_MAPEAMENTO."VComprasSamlinkSiamMater.class.php"            );
@@ -480,33 +471,32 @@ function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
     * Executa um listar para contar quantos despesas existem na empenho.pre_empenho_despesa no exercicio atual
     * @access public
     * @return Object $obErro
-*/
+    **/
+    function consultarExistenciaDespesa($boTransacao = "")
+    {
+        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
+        $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
 
-function consultarExistenciaDespesa($boTransacao = "")
-{
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
-    $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
+        $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio", $this->stExercicio );
+        $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_despesa", $this->obROrcamentoDespesa->getCodDespesa() );
 
-    $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio", $this->stExercicio );
-    $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_despesa", $this->obROrcamentoDespesa->getCodDespesa() );
+        if($this->getCodEntidade())
+            $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_entidade", $this->getCodEntidade() );
+        $obErro = $obTEmpenhoPreEmpenhoDespesa->recuperaExistenciaDespesa( $rsRecordSet, $boTransacao );
 
-    if($this->getCodEntidade())
-        $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_entidade", $this->getCodEntidade() );
-    $obErro = $obTEmpenhoPreEmpenhoDespesa->recuperaExistenciaDespesa( $rsRecordSet, $boTransacao );
+        if ( !$obErro->ocorreu() ) {
+            $this->inCountDespesaExercicio = $rsRecordSet->getCampo( "total" );
+        }
 
-   if ( !$obErro->ocorreu() ) {
-        $this->inCountDespesaExercicio = $rsRecordSet->getCampo( "total" );
+        return $obErro;
     }
-
-    return $obErro;
-}
 
     /**
     * Executa listar para achar os Itens de Pre Empenho e Seta seus dados
     * @access public
     * @param Object  $boTransacao Parâmetro de Transação
     * @return Object $obErro
-*/
+    **/
     public function consultarItemPreEmpenho($boTransacao = "")
     {
         $obREmpenhoItemPreEmpenho = new REmpenhoItemPreEmpenho( $this );
@@ -540,11 +530,11 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @param  String $stOrder Parâmetro de Ordenação
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function consultar($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
+        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php";
+        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php";
         $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
         $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
         
@@ -554,23 +544,23 @@ function consultarExistenciaDespesa($boTransacao = "")
         if ( !$obErro->ocorreu() ) {
             $this->stDescricao  = $rsRecordSet->getCampo( "descricao" );
             $this->boImplantado = $rsRecordSet->getCampo( "implantado" );
-            $this->obREmpenhoTipoEmpenho->setCodTipo( $rsRecordSet->getCampo( "cod_tipo" ) );
-            $this->obREmpenhoHistorico->setCodHistorico( $rsRecordSet->getCampo( "cod_historico" ) );
-            $this->obRCGM->setNumCGM( $rsRecordSet->getCampo( "cgm_beneficiario" ) );
+            $this->obREmpenhoTipoEmpenho->setCodTipo    ( $rsRecordSet->getCampo( "cod_tipo" )          );
+            $this->obREmpenhoHistorico->setCodHistorico ( $rsRecordSet->getCampo( "cod_historico" )     );
+            $this->obRCGM->setNumCGM                    ( $rsRecordSet->getCampo( "cgm_beneficiario" )  );
             $obErro = $this->obRCGM->listar( $rsBeneficiario, '', $boTransacao );
             if ( !$obErro->ocorreu() ) {
-                $this->obRCGM->setNomCGM( $rsBeneficiario->getCampo('nom_cgm') );
-                $this->obRUsuario->obRCGM->setNumCGM( $rsRecordSet->getCampo( "cgm_usuario" ) );
-                $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_pre_empenho", $this->inCodPreEmpenho );
-                $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio", $this->stExercicio );
+                $this->obRCGM->setNomCGM            ( $rsBeneficiario->getCampo('nom_cgm')      );
+                $this->obRUsuario->obRCGM->setNumCGM( $rsRecordSet->getCampo( "cgm_usuario" )   );
+                $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_pre_empenho", $this->inCodPreEmpenho    );
+                $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio"      , $this->stExercicio        );
                 $obErro = $obTEmpenhoPreEmpenhoDespesa->recuperaPorChave( $rsRecordSet, $boTransacao );
                 if ( !$obErro->ocorreu() ) {
-                    $this->obROrcamentoDespesa->setCodDespesa( $rsRecordSet->getCampo( "cod_despesa" ) );
-                    $this->obROrcamentoDespesa->setExercicio ( $this->stExercicio );
-                    $this->obROrcamentoClassificacaoDespesa->setCodConta( $rsRecordSet->getCampo( "cod_conta" ) );
+                    $this->obROrcamentoDespesa->setCodDespesa           ( $rsRecordSet->getCampo( "cod_despesa" )   );
+                    $this->obROrcamentoDespesa->setExercicio            ( $this->stExercicio                        );
+                    $this->obROrcamentoClassificacaoDespesa->setCodConta( $rsRecordSet->getCampo( "cod_conta" )     );
                     $obErro = $this->obREmpenhoTipoEmpenho->consultar( $boTransacao );
                     if ( !$obErro->ocorreu() ) {
-                        $this->obREmpenhoHistorico->setExercicio( $this->stExercicio );
+                        $this->obREmpenhoHistorico->setExercicio        ( $this->stExercicio                        );
                         $obErro = $this->obREmpenhoHistorico->consultar( $boTransacao );
                         if ( !$obErro->ocorreu() ) {
                             $obErro = $this->obRCGM->consultar( $rsCGM, $boTransacao );
@@ -580,69 +570,65 @@ function consultarExistenciaDespesa($boTransacao = "")
                                     if ( !$obErro->ocorreu() and $this->boImplantado == 'f' ) {
                                         if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
                                             $obErro = $this->obROrcamentoDespesa->listar( $rsDespesa, '' ,$boTransacao );
-                                            $this->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setDescricao( $rsDespesa->getCampo("descricao") );
-                                            $this->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso( $rsDespesa->getCampo("cod_recurso") );
-                                            $this->obROrcamentoDespesa->obROrcamentoRecurso->setMascRecurso($rsDespesa->getCampo("masc_recurso") );
-                                            $this->obROrcamentoDespesa->obROrcamentoRecurso->setNome      ( $rsDespesa->getCampo("nom_recurso") );
-                                            $this->obROrcamentoDespesa->setValorOriginal         ( $rsDespesa->getCampo("vl_original") );
-                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($rsDespesa->getCampo("num_orgao"));
-                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setNumeroUnidade( $rsDespesa->getCampo("num_unidade") );
-                                            $this->obROrcamentoDespesa->setValorOriginal         ( $rsDespesa->getCampo("vl_original") );
-                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNumeroProjeto( $rsDespesa->getCampo( 'num_acao' ) );
-                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setExercicio( $this->stExercicio );
-                                            $obErro = $this->obROrcamentoClassificacaoDespesa->listar( $rsClassificacao, '', $boTransacao );
                                             if ( !$obErro->ocorreu() ) {
-                                                $this->obROrcamentoClassificacaoDespesa->setMascClassificacao( $rsClassificacao->getCampo("mascara_classificacao") );
-                                                $this->obROrcamentoClassificacaoDespesa->setDescricao( $rsClassificacao->getCampo("descricao") );
+                                                $this->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setDescricao  ( $rsDespesa->getCampo("descricao")                                 );
+                                                $this->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso              ( $rsDespesa->getCampo("cod_recurso")                               );
+                                                $this->obROrcamentoDespesa->obROrcamentoRecurso->setMascRecurso             ( $rsDespesa->getCampo("masc_recurso")                              );
+                                                $this->obROrcamentoDespesa->obROrcamentoRecurso->setNome                    ( $rsDespesa->getCampo("nom_recurso")                               );
+                                                $this->obROrcamentoDespesa->setValorOriginal                                ( $rsDespesa->getCampo("vl_original")                               );
+                                                $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $rsDespesa->getCampo("num_orgao")    );
+                                                $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setNumeroUnidade( $rsDespesa->getCampo("num_unidade")                               );
+                                                $this->obROrcamentoDespesa->setValorOriginal                                ( $rsDespesa->getCampo("vl_original")                               );
+                                                $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNumeroProjeto  ( $rsDespesa->getCampo('num_acao')                                  );
+                                                $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setExercicio      ( $this->stExercicio                                                );
+                                                $obErro = $this->obROrcamentoClassificacaoDespesa->listar( $rsClassificacao, '', $boTransacao );
                                                 if ( !$obErro->ocorreu() ) {
-                                                    $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->consultarPorNumAcao( $rsPAO, $boTransacao );
+                                                    $this->obROrcamentoClassificacaoDespesa->setMascClassificacao   ( $rsClassificacao->getCampo("mascara_classificacao")   );
+                                                    $this->obROrcamentoClassificacaoDespesa->setDescricao           ( $rsClassificacao->getCampo("descricao")               );
                                                     if ( !$obErro->ocorreu() ) {
-                                                        $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNome( $rsPAO->getCampo('nom_pao') );
-                                                        
-                                                        $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma($rsDespesa->getCampo( 'cod_programa' ));
-                                                        $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio($rsDespesa->getCampo( 'exercicio' ));
-                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $boTransacao);
+                                                        $obErro = $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->consultarPorNumAcao( $rsPAO, $boTransacao );
                                                         if ( !$obErro->ocorreu() ) {
-                                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao($rsPrograma->getCampo( 'descricao' ));   
+                                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNome   ( $rsPAO->getCampo('nom_pao')               );
+                                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma    ( $rsDespesa->getCampo( 'cod_programa' )    );
+                                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio      ( $rsDespesa->getCampo( 'exercicio' )       );
+                                                            $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $boTransacao);
+                                                            if ( !$obErro->ocorreu() ) {
+                                                                $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao  ( $rsPrograma->getCampo( 'descricao' )      );
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     } elseif ( !$obErro->ocorreu() ) {
-                                        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoRestosPreEmpenho.class.php"     );
+                                        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoRestosPreEmpenho.class.php";
                                         $obTEmpenhoRestosPreEmpenho        = new TEmpenhoRestosPreEmpenho;
-
                                         //Restos
                                         $obTEmpenhoRestosPreEmpenho->setDado( "cod_pre_empenho", $this->inCodPreEmpenho );
                                         $obTEmpenhoRestosPreEmpenho->setDado( "exercicio"      , $this->stExercicio     );
                                         $obErro = $obTEmpenhoRestosPreEmpenho->recuperaPorChave( $rsRestosPreEmpenho, $boTransacao );
                                         if ( !$obErro->ocorreu() ) {
-                                            $this->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso( $rsRestosPreEmpenho->getCampo("recurso") );
-                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($rsRestosPreEmpenho->getCampo("num_orgao"));
-                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setNumeroUnidade( $rsRestosPreEmpenho->getCampo("num_unidade") );
-                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNumeroProjeto( $rsRestosPreEmpenho->getCampo( 'num_pao' ) );
-                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setExercicio( $rsRestosPreEmpenho->getCampo( 'exercicio' ));
-                                            $this->obROrcamentoClassificacaoDespesa->setCodEstrutural( $rsRestosPreEmpenho->getCampo( 'cod_estrutural' ) );
-                                            $this->obROrcamentoClassificacaoDespesa->setExercicio( $rsRestosPreEmpenho->getCampo( 'exercicio' ));
-
-                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma($rsRestosPreEmpenho->getCampo( 'cod_programa' ));
-                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio($rsRestosPreEmpenho->getCampo( 'exercicio' ));
-                                            
+                                            $this->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso              ( $rsRestosPreEmpenho->getCampo("recurso")                                  );
+                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $rsRestosPreEmpenho->getCampo("num_orgao")   );
+                                            $this->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setNumeroUnidade( $rsRestosPreEmpenho->getCampo( 'num_unidade')                             );
+                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNumeroProjeto  ( $rsRestosPreEmpenho->getCampo( 'num_pao' )                                );
+                                            $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setExercicio      ( $rsRestosPreEmpenho->getCampo( 'exercicio' )                              );
+                                            $this->obROrcamentoClassificacaoDespesa->setCodEstrutural                   ( $rsRestosPreEmpenho->getCampo( 'cod_estrutural' )                         );
+                                            $this->obROrcamentoClassificacaoDespesa->setExercicio                       ( $rsRestosPreEmpenho->getCampo( 'exercicio' )                              );
+                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setCodPrograma            ( $rsRestosPreEmpenho->getCampo( 'cod_programa' )                           );
+                                            $this->obROrcamentoDespesa->obROrcamentoPrograma->setExercicio              ( $rsRestosPreEmpenho->getCampo( 'exercicio' )                              );
                                             $obErro = $this->obROrcamentoClassificacaoDespesa->listar( $rsClassificacao, '', $boTransacao );
                                             if ( !$obErro->ocorreu() ) {
                                                 $stMascaraClassificacao = $rsClassificacao->getCampo("mascara_classificacao");
                                                 $stMascaraClassificacao = ($stMascaraClassificacao!='') ? $stMascaraClassificacao : $rsRestosPreEmpenho->getCampo( 'cod_estrutural' );
-                                                $this->obROrcamentoClassificacaoDespesa->setMascClassificacao( $stMascaraClassificacao );
-                                                $this->obROrcamentoClassificacaoDespesa->setDescricao( $rsClassificacao->getCampo("descricao") );
-                                                
-                                                $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->consultar( $rsPAO, $boTransacao );
+                                                $this->obROrcamentoClassificacaoDespesa->setMascClassificacao   ( $stMascaraClassificacao                       );
+                                                $this->obROrcamentoClassificacaoDespesa->setDescricao           ( $rsClassificacao->getCampo("descricao")       );
+                                                $obErro = $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->consultar( $rsPAO, $boTransacao );
                                                 if ( !$obErro->ocorreu() ) {
-                                                    $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNome( $rsPAO->getCampo('nom_pao') );
-                                                    
+                                                    $this->obROrcamentoDespesa->obROrcamentoProjetoAtividade->setNome   ( $rsPAO->getCampo('nom_pao')           );
                                                     $obErro = $this->obROrcamentoDespesa->obROrcamentoPrograma->consultar($rsPrograma, $boTransacao);
                                                     if ( !$obErro->ocorreu() ) {
-                                                        $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao($rsPrograma->getCampo( 'descricao' ));   
+                                                        $this->obROrcamentoDespesa->obROrcamentoPrograma->setDescricao  ( $rsPrograma->getCampo( 'descricao' )  );   
                                                     }
                                                 }
                                             }
@@ -673,7 +659,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @param  String $stOrder Parâmetro de Ordenação
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
@@ -707,7 +693,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @access private
     * @param Object $obErro
     * @return Object obErro
-*/
+    **/
     public function salvarDespesa($boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
@@ -746,7 +732,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @access private
     * @param Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function getCodConta(&$inCodConta, $boTransacao = "")
     {
         $inCodDespesa = $this->obROrcamentoDespesa->getCodDespesa();
@@ -767,7 +753,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @access Public
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function incluir($boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
@@ -840,7 +826,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @access Public
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function alterar($boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
@@ -932,7 +918,7 @@ function consultarExistenciaDespesa($boTransacao = "")
     * @access Public
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function incluirItemEmpenhoDespesaFixa($boTransacao = "")
     {
         include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
@@ -952,12 +938,10 @@ function consultarExistenciaDespesa($boTransacao = "")
             $this->obREmpenhoHistorico->setCodHistorico( 0 );
             $obTEmpenhoPreEmpenho->setDado( "cod_pre_empenho" , $this->inCodPreEmpenho );
             $obTEmpenhoPreEmpenho->setDado( "cod_historico"   , $this->obREmpenhoHistorico->getCodHistorico() );
-            //      $obTEmpenhoPreEmpenho->setDado( "cod_despesa"     , $this->obROrcamentoDespesa->getCodDespesa() );
             $obTEmpenhoPreEmpenho->setDado( "cgm_beneficiario", $this->obRCGM->getNumCGM() );
             $obTEmpenhoPreEmpenho->setDado( "descricao"       , $this->stDescricao );
             $obTEmpenhoPreEmpenho->setDado( "cod_tipo"        , $this->obREmpenhoTipoEmpenho->getCodTipo() );
             $obTEmpenhoPreEmpenho->setDado( "cgm_usuario"     , $this->obRUsuario->obRCGM->getNumCGM() );
-            //      $obTEmpenhoPreEmpenho->setDado( "cod_conta"       , $this->obROrcamentoClassificacaoDespesa->getCodConta() );
 
             $obErro = $obTEmpenhoPreEmpenho->inclusao( $boTransacao );
             if ( !$obErro->ocorreu() ) {

@@ -75,9 +75,9 @@ class TTCMBAEmpreSubven extends Persistente
                          , TO_CHAR(subvencao_empenho.dt_termino,'dd/mm/yyyy') as dt_enceramento
                          , subvencao_empenho.prazo_aplicacao
                          , subvencao_empenho.prazo_comprovacao
-                         , subvencao_empenho.cod_norma_utilidade
+                         , norma_utilidade.num_norma AS cod_norma_utilidade
                          , TO_CHAR(norma_utilidade.dt_publicacao,'dd/mm/yyyy') as dt_publicacao_utilidade
-                         , subvencao_empenho.cod_norma_valor
+                         , norma_valor.num_norma AS cod_norma_valor
                          , TO_CHAR(norma_valor.dt_publicacao,'dd/mm/yyyy') as dt_publicacao_valor
                          , '".$this->getDado('competencia')."' as competencia
                          , banco.num_banco AS cod_banco

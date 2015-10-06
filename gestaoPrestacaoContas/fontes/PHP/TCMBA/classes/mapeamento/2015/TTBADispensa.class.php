@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Revision: 63456 $
+    * $Revision: 63677 $
     * $Name$
     * $Author: diego $
     * $Date: 2007-10-16 01:38:47 +0000 (Ter, 16 Out 2007) $
@@ -55,7 +55,6 @@ class TTBADispensa extends Persistente
         parent::Persistente();
         $this->setEstrutura         ( array() );
         $this->setEstruturaAuxiliar ( array() );
-        $this->setDado('exercicio', Sessao::getExercicio() );
     }
 
     public function montaRecuperaTodos()
@@ -118,7 +117,7 @@ class TTBADispensa extends Persistente
                        , TO_DATE(licitacao.timestamp::varchar,'yyyy-mm-dd') AS dt_dispensa
                        , documento_pessoa.tipo_documento
                    
-                   FROM licitacao.licitacao as licitacao
+                   FROM licitacao.licitacao
              
              INNER JOIN compras.modalidade
                      ON modalidade.cod_modalidade = licitacao.cod_modalidade
@@ -229,8 +228,8 @@ class TTBADispensa extends Persistente
                       ON ordenador.numcgm = configuracao_ordenador.cgm_ordenador 
                    
                    WHERE licitacao.cod_entidade in (".$this->getDado('stEntidades').")
-                     AND TO_CHAR(homologacao.timestamp, 'dd/mm/yyyy') BETWEEN TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy'), 'dd/mm/yyyy')
-                                                                          AND TO_CHAR(TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy'), 'dd/mm/yyyy')
+                     AND TO_DATE(homologacao.timestamp::VARCHAR, 'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY')
+                                                                                   AND TO_DATE('".$this->getDado('dt_final')."', 'DD/MM/YYYY')
                      AND ( licitacao.cod_modalidade = 8 OR licitacao.cod_modalidade = 9 )
                      AND NOT EXISTS( SELECT 1
                                         FROM licitacao.licitacao_anulada
@@ -402,9 +401,8 @@ class TTBADispensa extends Persistente
                        ON ordenador.numcgm = configuracao_ordenador.cgm_ordenador 
                     
                     WHERE compra_direta.cod_entidade IN (".$this->getDado('stEntidades').")
-                      AND compra_direta.exercicio_mapa = '".$this->getDado('exercicio')."'
-                      AND TO_CHAR(homologacao.timestamp, 'dd/mm/yyyy') BETWEEN TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy'), 'dd/mm/yyyy')
-                                                                           AND TO_CHAR(TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy'), 'dd/mm/yyyy')
+                      AND TO_DATE(homologacao.timestamp::VARCHAR, 'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','DD/MM/YYYY')
+                                                                                    AND TO_DATE('".$this->getDado('dt_final')."', 'DD/MM/YYYY')
                  AND NOT EXISTS( SELECT 1
                                    FROM compras.compra_direta_anulacao 
                                   WHERE compra_direta_anulacao.cod_compra_direta  = compra_direta.cod_compra_direta

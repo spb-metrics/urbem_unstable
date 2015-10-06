@@ -73,7 +73,15 @@ class TFrotaManutencao extends Persistente
 
     public function recuperaManutencaoSintetico(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
-         return $this->executaRecupera("montaRecuperaManutencaoSintetico",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaRecuperaManutencaoSintetico().$stFiltro.$stOrder;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
     }
     public function montaRecuperaManutencaoSintetico()
     {

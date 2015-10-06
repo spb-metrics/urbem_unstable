@@ -188,20 +188,18 @@ function montaListagemReceita()
     $obValorReceita->setLabel(true);
     $obValorReceita->setClass('valor');
     $obValorReceita->setValue("");
-    $obValorReceita->setMaxLength(11);
-    $obValorReceita->setSize(14);
+    $obValorReceita->setMaxLength(14);
+    $obValorReceita->setSize(15);
 
     $obAno1 = new Numerico;
     $obAno1->setName('flAno1_[cod_receita]_[tipo]');
     $obAno1->setClass('porcentagem');
     $obAno1->setLabel(true);
-    $obAno1->setMaxLength(7);
 
     $obAno2 = new Numerico;
     $obAno2->setName('flAno2_[cod_receita]_[tipo]');
     $obAno2->setClass('porcentagem');
     $obAno2->setLabel(true);
-    $obAno2->setMaxLength(7);
 
     $obAno3 = new Numerico;
     $obAno3->setName('flAno3_[cod_receita]_[tipo]');
@@ -216,7 +214,6 @@ function montaListagemReceita()
     $obTableReceitas = new Table;
     $obTableReceitas->setId('tableReceita');
     $obTableReceitas->setRecordset($rsListagem);
-    //$obTableReceitas->setConditional(true, "#efefef");
 
     $obTableReceitas->Head->addCabecalho('Receitas' , 50);
     $obTableReceitas->Head->addCabecalho('Valor'    , 10);
@@ -245,7 +242,7 @@ function montaFormularioSintetico()
     $obPorcentagemAno1->setRotulo('Porcentagem Ano 1');
     $obPorcentagemAno1->setTitle ('Informe a porcentagem do Ano 1.');
     $obPorcentagemAno1->setObrigatorio(true);
-    $obPorcentagemAno1->setMaxLength(7);
+    $obPorcentagemAno1->setMaxLength(8);
 
     $obPorcentagemAno2 = new Numerico;
     $obPorcentagemAno2->setId    ('flPorcentagemAno2');
@@ -253,7 +250,7 @@ function montaFormularioSintetico()
     $obPorcentagemAno2->setRotulo('Porcentagem Ano 2');
     $obPorcentagemAno2->setTitle ('Informe a porcentagem do Ano 2.');
     $obPorcentagemAno2->setObrigatorio(true);
-    $obPorcentagemAno2->setMaxLength(7);
+    $obPorcentagemAno2->setMaxLength(8);
 
     $obPorcentagemAno3 = new Numerico;
     $obPorcentagemAno3->setId    ('flPorcentagemAno3');
@@ -261,7 +258,7 @@ function montaFormularioSintetico()
     $obPorcentagemAno3->setRotulo('Porcentagem Ano 3');
     $obPorcentagemAno3->setTitle ('Informe a porcentagem do Ano 3.');
     $obPorcentagemAno3->setObrigatorio(true);
-    $obPorcentagemAno3->setMaxLength(7);
+    $obPorcentagemAno3->setMaxLength(8);
 
     $obPorcentagemAno4 = new Numerico;
     $obPorcentagemAno4->setId    ('flPorcentagemAno4');
@@ -269,7 +266,7 @@ function montaFormularioSintetico()
     $obPorcentagemAno4->setRotulo('Porcentagem Ano 4');
     $obPorcentagemAno4->setTitle ('Informe a porcentagem do Ano 4.');
     $obPorcentagemAno4->setObrigatorio(true);
-    $obPorcentagemAno4->setMaxLength(7);
+    $obPorcentagemAno4->setMaxLength(8);
 
     $obFormulario = new Formulario;
     $obFormulario->addComponente($obPorcentagemAno1);

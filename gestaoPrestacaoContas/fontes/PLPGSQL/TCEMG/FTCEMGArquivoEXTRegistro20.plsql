@@ -25,11 +25,11 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-* $Id: FTCEMGArquivoEXTRegistro20.plsql 63539 2015-09-09 19:36:23Z jean $
-* $Revision: 63539 $
+* $Id: FTCEMGArquivoEXTRegistro20.plsql 63691 2015-09-30 13:12:31Z franver $
+* $Revision: 63691 $
 * $Name$
-* $Author: jean $
-* $Date: 2015-09-09 16:36:23 -0300 (Qua, 09 Set 2015) $
+* $Author: franver $
+* $Date: 2015-09-30 10:12:31 -0300 (Qua, 30 Set 2015) $
 *
 */
 
@@ -245,12 +245,12 @@ BEGIN
                      , sub_tipo
                      , cod_plano AS cod_ext 
                      , cod_recurso
-                     , SUM(0.00) as vl_saldo_anterior
-                     , SUM(0.00) as vl_saldo_debitos
-                     , SUM(0.00) as vl_saldo_creditos
-                     , SUM(0.00) as vl_saldo_atual
-                     , nat_saldo_anterior_fonte
-                     , nat_saldo_atual_fonte
+                     , 0.00::NUMERIC as vl_saldo_anterior
+                     , 0.00::NUMERIC as vl_saldo_debitos
+                     , 0.00::NUMERIC as vl_saldo_creditos
+                     , 0.00::NUMERIC as vl_saldo_atual
+                     , '' ''::CHAR AS nat_saldo_anterior_fonte
+                     , '' ''::CHAR AS nat_saldo_atual_fonte
                   FROM ( SELECT pc.cod_estrutural
                               , 20 AS tipo_registro
                               , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
@@ -302,17 +302,7 @@ BEGIN
                               , 0.00 as vl_saldo_debitos
                               , 0.00 as vl_saldo_creditos
                               , 0.00 as vl_saldo_atual
-                              , (SELECT plano_analitica.natureza_saldo 
-                                   FROM contabilidade.plano_analitica
-                                  WHERE plano_analitica.exercicio = (' || quote_literal( stExercicio ) ||'::INTEGER - 1)::VARCHAR
-                                    AND plano_analitica.cod_plano = pa.cod_plano
-                              ) AS nat_saldo_anterior_fonte
-                              , (SELECT plano_analitica.natureza_saldo 
-                                   FROM contabilidade.plano_analitica
-                                  WHERE plano_analitica.exercicio = '|| quote_literal( stExercicio ) ||'
-                                    AND plano_analitica.cod_plano = pa.cod_plano
-                              ) AS nat_saldo_atual_fonte
-                
+                            
                            FROM contabilidade.plano_analitica as pa
                 
                            LEFT JOIN tesouraria.transferencia 
@@ -369,7 +359,7 @@ BEGIN
                 
                           WHERE t_be.exercicio   = '''||stExercicio||'''
                           
-                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento, nat_saldo_anterior_fonte, nat_saldo_atual_fonte
+                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento
                        
                        UNION
                        
@@ -424,16 +414,6 @@ BEGIN
                               , 0.00 as vl_saldo_debitos
                               , 0.00 as vl_saldo_creditos
                               , 0.00 as vl_saldo_atual
-                              , (SELECT plano_analitica.natureza_saldo 
-                                   FROM contabilidade.plano_analitica
-                                  WHERE plano_analitica.exercicio = (' || quote_literal( stExercicio ) ||'::INTEGER - 1)::VARCHAR
-                                    AND plano_analitica.cod_plano = pa.cod_plano
-                              ) AS nat_saldo_anterior_fonte
-                              , (SELECT plano_analitica.natureza_saldo 
-                                   FROM contabilidade.plano_analitica
-                                  WHERE plano_analitica.exercicio = '|| quote_literal( stExercicio ) ||'
-                                    AND plano_analitica.cod_plano = pa.cod_plano
-                              ) AS nat_saldo_atual_fonte
                 
                            FROM contabilidade.plano_analitica as pa
                 
@@ -491,7 +471,7 @@ BEGIN
                 
                           WHERE t_be.exercicio   = '''||stExercicio||'''
 
-                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento, nat_saldo_anterior_fonte, nat_saldo_atual_fonte
+                       GROUP BY cod_estrutural, pa.cod_plano, cod_recurso, cod_orgao, cod_unidade, tipo_lancamento, sub_tipo, desdobra_sub_tipo , t_be.sub_tipo_lancamento
                        
                 ) AS registros
           
@@ -510,9 +490,7 @@ BEGIN
         IF reRegistro.vl_saldo_anterior <> 0.00
           THEN
              IF (substr(reRegistro.cod_estrutural,1,1) = '2')
-                  THEN reRegistro.vl_saldo_anterior := (reRegistro.vl_saldo_anterior * -1);
-                       reRegistro.nat_saldo_anterior_fonte := 'C';
-                  ELSE reRegistro.nat_saldo_anterior_fonte := 'D';
+                THEN reRegistro.vl_saldo_anterior := (reRegistro.vl_saldo_anterior * -1);
               END IF;
         END IF;
 
@@ -520,8 +498,6 @@ BEGIN
           THEN
             IF (substr(reRegistro.cod_estrutural,1,1) = '2')
               THEN reRegistro.vl_saldo_atual := (reRegistro.vl_saldo_atual * -1);
-                   reRegistro.nat_saldo_atual_fonte := 'C';
-              ELSE reRegistro.nat_saldo_atual_fonte := 'D';
             END IF;
         END IF;
 

@@ -67,65 +67,72 @@ function recuperaDadosTribunal(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
     return $obErro;
 }
 
+
+
+
 function montaRecuperaDadosTribunal()
 {
     $stSql  = "
         SELECT 1  AS tipo_registro
              , '".$this->getDado('unidade_gestora')."' AS unidade_gestora
              , '".$this->getDado('exercicio').$this->getDado('mes')."' AS competencia
-             , t.item_receita
-             , SUM(t.valor_previsto) AS valor_previsto
-             , SUM(t.arrecadado_mes)AS arrecadado_mes
-             , SUM(t.arrecadado_ate_periodo) AS arrecadado_ate_periodo
-             , SUM(t.anulado_mes) AS anulado_mes
-             , SUM(t.anulado_ate_periodo) AS anulado_ate_periodo
-             , 0.00 AS vl_diferenca_mais
-             , 0.00 AS vl_diferenca_menos
-         FROM( SELECT SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,8) AS item_receita
-                    , CASE WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) = '9' THEN
-                               CASE WHEN (tbl.valor_previsto > 0) THEN tbl.valor_previsto * -1
-                                    ELSE tbl.valor_previsto
+             , tabela.item_receita
+             , SUM(tabela.valor_previsto) AS valor_previsto
+             , SUM(tabela.arrecadado_mes)AS arrecadado_mes
+             , SUM(tabela.arrecadado_ate_periodo) AS arrecadado_ate_periodo
+             , SUM(tabela.anulado_mes) AS anulado_mes
+             , SUM(tabela.anulado_ate_periodo) AS anulado_ate_periodo
+             , SUM(tabela.vl_diferenca_mais) AS vl_diferenca_mais
+             , SUM(tabela.vl_diferenca_menos) AS vl_diferenca_menos
+         FROM ( SELECT SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,8) AS item_receita
+                    , CASE WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) = '9' THEN
+                               CASE WHEN (retorno.valor_previsto > 0) THEN retorno.valor_previsto * -1
+                                    ELSE retorno.valor_previsto
                                END
-                           WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) != '9' THEN
-                               CASE WHEN (tbl.valor_previsto < 0) THEN tbl.valor_previsto * -1
-                                    ELSE tbl.valor_previsto
+                           WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) != '9' THEN
+                               CASE WHEN (retorno.valor_previsto < 0) THEN retorno.valor_previsto * -1
+                                    ELSE retorno.valor_previsto
                                END
                        END AS valor_previsto
-                    , CASE WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) = '9' THEN
-                               CASE WHEN (tbl.arrecadado_mes > 0) THEN tbl.arrecadado_mes * -1
-                                    ELSE tbl.arrecadado_mes
+                    , CASE WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) = '9' THEN
+                               CASE WHEN (retorno.arrecadado_mes > 0) THEN retorno.arrecadado_mes * -1
+                                    ELSE retorno.arrecadado_mes
                                END
-                           WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) != '9' THEN
-                               CASE WHEN (tbl.arrecadado_mes < 0) THEN tbl.arrecadado_mes * -1
-                                   ELSE tbl.arrecadado_mes
+                           WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) != '9' THEN
+                               CASE WHEN (retorno.arrecadado_mes < 0) THEN retorno.arrecadado_mes * -1
+                                   ELSE retorno.arrecadado_mes
                                END
                       END AS arrecadado_mes
-                    , CASE WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) = '9' THEN
-                               CASE WHEN (tbl.arrecadado_ate_periodo > 0) THEN tbl.arrecadado_ate_periodo * -1
-                                    ELSE tbl.arrecadado_ate_periodo
+                    , CASE WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) = '9' THEN
+                               CASE WHEN (retorno.arrecadado_ate_periodo > 0) THEN retorno.arrecadado_ate_periodo * -1
+                                    ELSE retorno.arrecadado_ate_periodo
                                END
-                           WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) != '9' THEN
-                               CASE WHEN (tbl.arrecadado_ate_periodo < 0) THEN tbl.arrecadado_ate_periodo * -1
-                                    ELSE tbl.arrecadado_ate_periodo
+                           WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) != '9' THEN
+                               CASE WHEN (retorno.arrecadado_ate_periodo < 0) THEN retorno.arrecadado_ate_periodo * -1
+                                    ELSE retorno.arrecadado_ate_periodo
                                END
                        END AS arrecadado_ate_periodo
-                     , CASE WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) != '9' THEN tbl.anulado_mes * -1
-                            ELSE tbl.anulado_mes
+                     , CASE WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) != '9' THEN retorno.anulado_mes * -1
+                            ELSE retorno.anulado_mes
                        END AS anulado_mes
-                    , CASE WHEN SUBSTR(REPLACE(tbl.cod_estrutural,'.',''),1,1) != '9' THEN tbl.anulado_ate_periodo * -1
-		                   ELSE tbl.anulado_ate_periodo
+                    , CASE WHEN SUBSTR(REPLACE(retorno.cod_estrutural,'.',''),1,1) != '9' THEN retorno.anulado_ate_periodo * -1
+		                   ELSE retorno.anulado_ate_periodo
                        END AS anulado_ate_periodo
+                    , retorno.valor_diferenca AS vl_diferenca_mais
+                    , ( retorno.valor_previsto - retorno.valor_diferenca ) AS vl_diferenca_menos
                    
                  FROM ".$this->getTabela()." ( '".$this->getDado("exercicio")."'
-                                             ,'".$this->getDado("data_inicio")."'
-                                             ,'".$this->getDado("data_fim")."'
-                                             ,'".$this->getDado("entidades")." ') AS tbl
-             ORDER BY item_receita ) AS t
+                                              ,'".$this->getDado("data_inicio")."'
+                                              ,'".$this->getDado("data_fim")."'
+                                              ,'".$this->getDado("entidades")." ') AS retorno
+             ORDER BY item_receita
+            ) AS tabela
              
-     GROUP BY t.item_receita
-             ";
+     GROUP BY tabela.item_receita ";
+    
     return $stSql;
 }
 
 }
+
 ?>

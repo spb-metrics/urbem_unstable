@@ -28,7 +28,7 @@
  *
  * @package URBEM
  * @subpackage Mapeamento
- * @version $Id: TTBAPagamentoRetencao.class.php 63484 2015-09-01 17:16:10Z michel $
+ * @version $Id: TTBAPagamentoRetencao.class.php 63710 2015-10-01 17:30:49Z carlos.silva $
  * @author Michel Teixeira
  */
 
@@ -171,7 +171,7 @@ class TTBAPagamentoRetencao extends Persistente
                        ON plano_conta.exercicio = plano_analitica.exercicio
                       AND plano_conta.cod_conta = plano_analitica.cod_conta
 
-               INNER JOIN tcmba.pagamento_tipo_documento_pagamento AS ptdp
+                LEFT JOIN tcmba.pagamento_tipo_documento_pagamento AS ptdp
                        ON ptdp.cod_entidade = pagamento.cod_entidade
                       AND ptdp.exercicio    = pagamento.exercicio
                       AND ptdp.timestamp    = pagamento.timestamp

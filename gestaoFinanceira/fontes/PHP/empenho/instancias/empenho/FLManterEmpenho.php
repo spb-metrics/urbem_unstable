@@ -172,7 +172,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscFornecedor->obCampoCod->setSize ( 10 );
     $obBscFornecedor->obCampoCod->setMaxLength( 8 );
     $obBscFornecedor->obCampoCod->setAlign ("left");
-    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("buscaDado('buscaFornecedorDiverso');");
+    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("montaParametrosGET('buscaFornecedorDiverso','');");
     $obBscFornecedor->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodFornecedor','stNomFornecedor','','".Sessao::getId()."','800','550');");
 
     // Define objeto Data para Periodo

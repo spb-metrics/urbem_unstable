@@ -120,29 +120,6 @@ $obTxtMascaraCBO->obEvento->setOnKeyPress("return validaMascaraRegistro(this,eve
 $obTxtMascaraCBO->obEvento->setOnKeyUp("return retiraCaracteresEspeciais(this);");
 $obTxtMascaraCBO->obEvento->setOnChange("validaMascara(this);");
 
-$obTxtGrupoPeriodo = new TextBox;
-$obTxtGrupoPeriodo->setRotulo              ( "Grupo com Período para Rescisão"               );
-$obTxtGrupoPeriodo->setTitle               ( "Informe o grupo com o período a ser utilizado no cadastro da causa de rescisão."     );
-$obTxtGrupoPeriodo->setName                ( "inCodGrupoPeriodoTxt"                          );
-$obTxtGrupoPeriodo->setValue               ( $inCodGrupoPeriodoTxt                           );
-$obTxtGrupoPeriodo->setSize                ( 6                                               );
-$obTxtGrupoPeriodo->setMaxLength           ( 3                                               );
-$obTxtGrupoPeriodo->setInteiro             ( true                                            );
-$obTxtGrupoPeriodo->setNull                ( false                                           );
-
-$obRConfiguracaoPessoal->listarGruposPeriodo( $rsGruposPeriodo     ) ;
-
-$obCmbGrupoPeriodo= new Select;
-$obCmbGrupoPeriodo->setRotulo              ( "Grupo com Período para Rescisão");
-$obCmbGrupoPeriodo->setName                ( "inCodGrupoPeriodo"              );
-$obCmbGrupoPeriodo->setValue               ( $inCodGrupoPeriodo               );
-$obCmbGrupoPeriodo->setStyle               ( "width: 200px"                   );
-$obCmbGrupoPeriodo->setCampoID             ( "cod_grupo_periodo"              );
-$obCmbGrupoPeriodo->setCampoDesc           ( "descricao"                      );
-$obCmbGrupoPeriodo->addOption              ( "", "Selecione"                  );
-$obCmbGrupoPeriodo->setNull                ( false                            );
-$obCmbGrupoPeriodo->preencheCombo          ( $rsGruposPeriodo                 );
-
 $obRdbDtPosse = new Radio;
 $obRdbDtPosse->setRotulo ( "Contagem de Tempo" );
 $obRdbDtPosse->setName   ( "stContagemInicial" );
@@ -191,7 +168,6 @@ $obFormulario->addTitulo            ( "Dados para Configuração" );
 $obFormulario->addComponente        ( $obTxtMascaraRegistro );
 $obFormulario->addComponenteComposto( $obRdbAutomatica, $obRdbManual);
 $obFormulario->addComponente        ( $obTxtMascaraCBO );
-$obFormulario->addComponenteComposto( $obTxtGrupoPeriodo, $obCmbGrupoPeriodo);
 $obFormulario->agrupaComponentes( array($obRdbDtPosse, $obRdbDtNomeacao, $obRdbDtAdmissao ));
 $obFormulario->defineBarra          ( array($obBtnOk,$obBtnLimpar) );
 $obFormulario->show                 ();

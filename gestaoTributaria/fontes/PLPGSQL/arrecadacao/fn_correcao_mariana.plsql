@@ -31,7 +31,7 @@
 * Calculo Valor de Juros Especial (Mata)
 */
 
-CREATE OR REPLACE FUNCTION fn_correcao_mariana (date,date,numeric,integer,integer) RETURNS numeric as '
+CREATE OR REPLACE FUNCTION fn_correcao_mariana (date,date,numeric,integer,integer) RETURNS numeric as $$
 
     DECLARE
         dtVencimento    ALIAS FOR $1;
@@ -39,63 +39,39 @@ CREATE OR REPLACE FUNCTION fn_correcao_mariana (date,date,numeric,integer,intege
         nuValor         ALIAS FOR $3;
         inCodAcrescimo  ALIAS FOR $4;
         inCodTipo       ALIAS FOR $5;
-        nuJuros         NUMERIC = 0.00;
+        nuPercent       NUMERIC = 0.00;
+        nuCorrecao      NUMERIC = 0.00;
         nuRetorno       NUMERIC = 0.00;
         inDiff          INTEGER;
-        nuValorVenc     numeric = 0.0;
-        nuValorPag      numeric = 0.0;
-        nuJuroTotal     numeric = 0.0;
-        inMesInicio     integer;
-        inMesFim        integer;
-        inAno           integer;
-        inTeste         integer;
-        inTotalMes      INTEGER;
+        dtMinVigencia   DATE;
+        dtMaxVigencia   DATE;
 
     BEGIN
-       -- Calculo de Juros simples                                                                            
-        nuJuroTotal := 0.00;
+       -- Calculo de Juros simples
         inDiff := diff_datas_em_meses(dtVencimento,dtDataCalculo);
 
-        inMesInicio := date_part(''month'' , dtVencimento )::integer + 1;
-        inMesFim := date_part(''month'' , dtVencimento )::integer + ( inDiff );
+        SELECT MAX(inicio_vigencia)
+          INTO dtMinVigencia
+          FROM monetario.valor_acrescimo
+         WHERE cod_acrescimo = inCodAcrescimo
+           AND cod_tipo      = inCodTipo
+           AND inicio_vigencia <= dtVencimento
+             ;
 
-        inAno := date_part(''year'' , dtVencimento )::integer;
+        SELECT SUM(valor)
+          INTO nuPercent
+          FROM monetario.valor_acrescimo
+         WHERE cod_acrescimo = inCodAcrescimo
+           AND cod_tipo      = inCodTipo
+           AND inicio_vigencia >= dtMinVigencia
+           AND inicio_vigencia <= dtDataCalculo - interval '1 month'
+             ;
 
-        inTotalMes := inMesInicio;
+        nuCorrecao := nuValor * (nuPercent / 100);
 
-        IF ( inDiff > 0 ) THEN
-
-            SELECT valor
-              INTO nuValorVenc
-              FROM monetario.valor_acrescimo
-             WHERE valor_acrescimo.cod_acrescimo = inCodAcrescimo
-               AND valor_acrescimo.cod_tipo = inCodTipo
-               AND inicio_vigencia = (
-                                       SELECT MAX(inicio_vigencia)
-                                         FROM monetario.valor_acrescimo 
-                                        WHERE cod_acrescimo    = inCodAcrescimo
-                                          AND cod_tipo         = inCodTipo
-                                          AND inicio_vigencia <= dtVencimento
-                                     );
-
-            SELECT valor
-              INTO nuValorPag
-              FROM monetario.valor_acrescimo
-             WHERE valor_acrescimo.cod_acrescimo = inCodAcrescimo
-               AND valor_acrescimo.cod_tipo = inCodTipo
-               AND inicio_vigencia = (
-                                       SELECT MAX(inicio_vigencia)
-                                         FROM monetario.valor_acrescimo 
-                                        WHERE cod_acrescimo    = inCodAcrescimo
-                                          AND cod_tipo         = inCodTipo
-                                          AND inicio_vigencia <= dtDataCalculo
-                                     );
-
-            nuRetorno      := nuValor / nuValorVenc * nuValorPag - nuValor ; 
-
-        END IF;
+        nuRetorno  := nuCorrecao::NUMERIC(14,2);
 
         RETURN nuRetorno::numeric(14,2);
     END;
-'language 'plpgsql';
-           
+$$ language 'plpgsql';
+

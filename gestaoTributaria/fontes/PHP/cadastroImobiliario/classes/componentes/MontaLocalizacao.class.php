@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Interface
 
-    * $Id: MontaLocalizacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: MontaLocalizacao.class.php 63638 2015-09-23 17:09:46Z jean $
 
     * Casos de uso: uc-05.01.03
 */
@@ -556,48 +556,54 @@ function preencheCombos()
     $inCont = 1;//CONTADOR DOS COMBOS DOS NIVEIS DE LOCALIZACAO
     $js = "";
     while ( !$rsListaNivel->eof() and key( $arValorReduzido ) < count( $arValorReduzido ) ) {
-         if ($inCont == 1) {
-             $stValorReduzido .= current( $arValorReduzido );
-             $boMontaCombos = true;
-         } else {
-             if ( $this->obRCIMLocalizacao->getValorReduzido() ) {
-                 $boMontaCombos = true;
-             } else {
-                 $boMontaCombos = false;
-             }
-             $stValorReduzido .= ".".current( $arValorReduzido );
-         }
-         next( $arValorReduzido );
-         $stNomeCombo = "inCodLocalizacao_".$inCont++;
-         $stSelecione = $rsListaNivel->getCampo("nom_nivel");
-         $js .= "limpaSelect(f.".$stNomeCombo.",0); \n";
-         $js .= "f.".$stNomeCombo.".options[0] = new Option('Selecione $stSelecione','', 'selected');\n";
-         if ($boMontaCombos) {
-             $this->obRCIMLocalizacao->setCodigoNivel       ( $rsListaNivel->getCampo("cod_nivel") );
-             if (substr_count($stValorReduzido,".") == 0)
-                 $stValorReduzidoSemPonto = str_replace(".","",$stValorReduzido);
-             $this->obRCIMLocalizacao->setValorReduzido     ( $stValorReduzidoSemPonto);
-             $obErro = $this->obRCIMLocalizacao->listarLocalizacao( $rsListaLocalizacao );
-             $this->obRCIMLocalizacao->setValorReduzido     ( $stValorReduzido );
-             $inContador = 1;
-             while ( !$rsListaLocalizacao->eof() ) {
-                 $stChaveLocalizacao  = $rsListaLocalizacao->getCampo( "cod_nivel" )."-";
-                 $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "cod_localizacao")."-";
-                 $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor")."-";
-                 $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor_reduzido");
-                 $stNomeLocalizacao   = $rsListaLocalizacao->getCampo( "nom_localizacao" );
-                 if ( $rsListaLocalizacao->getCampo( "valor_reduzido") == $stValorReduzido ) {
-                     $stSelected = "selected";
-                 } else {
-                     $stSelected = "";
-                 }
-                 $js .= "f.".$stNomeCombo.".options[$inContador] = ";
-                 $js .= "new Option('".$stNomeLocalizacao."','".$stChaveLocalizacao."','".$stSelected."'); \n";
-                 $inContador++;
-                 $rsListaLocalizacao->proximo();
-             }
-         }
-         $rsListaNivel->proximo();
+        
+        if ($inCont == 1) {
+            $stValorReduzido .= current( $arValorReduzido );
+            $boMontaCombos = true;
+        } else {
+            if ($this->obRCIMLocalizacao->getValorReduzido() ) {
+                $boMontaCombos = true;
+            } else {
+                $boMontaCombos = false;
+            }
+            $stValorReduzido .= ".".current( $arValorReduzido );
+        }
+        next( $arValorReduzido );
+        $stNomeCombo = "inCodLocalizacao_".$inCont++;
+        $stSelecione = $rsListaNivel->getCampo("nom_nivel");
+        $js .= "limpaSelect(f.".$stNomeCombo.",0); \n";
+        $js .= "f.".$stNomeCombo.".options[0] = new Option('Selecione $stSelecione','');\n";
+
+        if ($boMontaCombos) {
+            $this->obRCIMLocalizacao->setCodigoNivel       ( $rsListaNivel->getCampo("cod_nivel") );
+            
+            if (substr_count($stValorReduzido,".") == 0)
+                $stValorReduzidoSemPonto = str_replace(".","",$stValorReduzido);
+            $this->obRCIMLocalizacao->setValorReduzido     ( $stValorReduzidoSemPonto);
+            $obErro = $this->obRCIMLocalizacao->listarLocalizacao( $rsListaLocalizacao );
+            $this->obRCIMLocalizacao->setValorReduzido     ( $stValorReduzido );
+            $inContador = 1;
+
+            while ( !$rsListaLocalizacao->eof() ) {
+                $stChaveLocalizacao  = $rsListaLocalizacao->getCampo( "cod_nivel" )."-";
+                $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "cod_localizacao")."-";
+                $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor")."-";
+                $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor_reduzido");
+                $stNomeLocalizacao   = $rsListaLocalizacao->getCampo( "nom_localizacao" );
+
+                if ( $rsListaLocalizacao->getCampo( "valor_reduzido") == $stValorReduzido ) {
+                     $stValorSelecionado = $stChaveLocalizacao;
+                } 
+
+                $js .= "f.".$stNomeCombo.".options[$inContador] = ";
+                $js .= "new Option('".$stNomeLocalizacao."','".$stChaveLocalizacao."'); \n";
+                $inContador++;
+                $rsListaLocalizacao->proximo();
+            }
+
+            $js .= "f.".$stNomeCombo.".value = '".$stValorSelecionado."';\n";  
+        }
+        $rsListaNivel->proximo();
     }
     if ($this->boPopUp) {
         SistemaLegado::executaIFrameOculto ( $js );

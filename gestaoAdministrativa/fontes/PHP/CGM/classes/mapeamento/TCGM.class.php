@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: TCGM.class.php 62654 2015-05-29 12:59:20Z evandro $
+$Id: TCGM.class.php 63681 2015-09-29 17:48:28Z evandro $
 
 $Revision: 28411 $
 $Name$
@@ -432,6 +432,54 @@ function montaRecuperaRelacionamentoVinculadoComissaoLicitacao($stTabelaVinculo 
     return $stSql;
 
 }
+
+function recuperaOrgaoGerenciador(&$rsrecordset, $stcondicao = "" , $stordem = "" , $botransacao = "")
+{
+    $oberro      = new erro;
+    $obconexao   = new conexao;
+    $rsrecordset = new recordset;
+
+    if (trim($stordem)) {
+        $stordem = strtolower( $stordem );
+        $stordem = (strpos( $stordem,"order by") ===false)?" order by $stordem":$stordem;
+    }
+    $stsql = $this->montaRecuperaOrgaoGerenciador().$stcondicao.$stordem;
+    $this->setdebug( $stsql );
+    $oberro = $obconexao->executasql( $rsrecordset, $stsql, $botransacao );
+
+    return $oberro;
+}
+
+function montaRecuperaOrgaoGerenciador()
+{
+    $stSql  = " SELECT                                                             
+                        CGM.numcgm as numcgm,                                         
+                        CGM.nom_cgm
+                FROM                                                               
+                    (                                                              
+                        SELECT                                                     
+                            CGM.*,                                                 
+                            MU.nom_municipio,                                      
+                            UF.nom_uf,                                             
+                            CGM.tipo_logradouro||' '||CGM.logradouro||', '||CGM.numero   
+                            ||' '||CGM.complemento AS endereco,                          
+                            MU.nom_municipio||' - '||UF.nom_uf as municipio_uf           
+                        FROM                                                       
+                            sw_cgm       AS CGM,                                  
+                            sw_municipio AS MU,                                   
+                            sw_uf        AS UF                                    
+                        WHERE                                                      
+                            CGM.cod_municipio = MU.cod_municipio AND               
+                            CGM.cod_uf = MU.cod_uf               AND               
+                            MU.cod_uf = UF.cod_uf                AND               
+                            CGM.numcgm <> 0                                        
+                    ) as CGM                                                       
+        INNER JOIN sw_cgm_pessoa_juridica AS PJ                                  
+                ON CGM.numcgm = PJ.numcgm                                         
+    ";
+    return $stSql;
+}
+
 
 
 

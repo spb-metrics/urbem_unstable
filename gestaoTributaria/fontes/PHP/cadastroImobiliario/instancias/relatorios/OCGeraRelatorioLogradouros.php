@@ -28,7 +28,7 @@
  * Data de Criação   : 15/07/2015
  * @author Analista: Gelson Wolowski Gonçalves
  * @author Desenvolvedor: Evandro Melos
- * $Id: OCGeraRelatorioLogradouros.php 63009 2015-07-16 14:36:54Z evandro $
+ * $Id: OCGeraRelatorioLogradouros.php 63656 2015-09-24 19:44:19Z evandro $
  */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -43,8 +43,15 @@ if ($boMostrarHisorico == 'true'){
     $arDados['boMostrarHistorico'] = 'false';
 }
 
+if ($boMostrarHisorico == 'true'){
+    $arDados['boNorma'] = 'true';
+}else{
+    $arDados['boNorma'] = 'false';
+}
+
 $arDados['arDadosLogradouro'] = $rsDadosRelatorio->getElementos();
 
+//gestaoTributaria/fontes/RPT/cadastroImobiliario/MPDF/LHLogradouros.php
 $obMPDF = new FrameWorkMPDF(5,12,2);
 $obMPDF->setFormatoFolha("A4-L");
 

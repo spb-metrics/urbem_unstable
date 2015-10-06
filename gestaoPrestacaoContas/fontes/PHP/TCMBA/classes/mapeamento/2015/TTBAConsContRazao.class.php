@@ -55,7 +55,7 @@ class TTBAConsContRazao extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TTBAConsContRazao()
+    public function __construct()
     {
         parent::Persistente();
         $this->setDado('exercicio', Sessao::getExercicio() );
@@ -123,10 +123,8 @@ class TTBAConsContRazao extends Persistente
                           )
                         ) AS retorno_mes
                        ON plano_conta.cod_estrutural = retorno_mes.cod_estrutural
-                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
                       AND plano_conta.indicador_superavit = retorno_mes.indicador_superavit
-                      AND plano_conta.cod_sistema = retorno_mes.cod_sistema
-                      AND plano_conta.nom_conta = retorno_mes.nom_conta
                       
                       GROUP BY plano_conta.cod_estrutural
                       
@@ -165,10 +163,8 @@ class TTBAConsContRazao extends Persistente
                           )
                         ) AS retorno_mes_ant
                        ON plano_conta.cod_estrutural = retorno_mes_ant.cod_estrutural
-                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
                       AND plano_conta.indicador_superavit = retorno_mes_ant.indicador_superavit
-                      AND plano_conta.cod_sistema = retorno_mes_ant.cod_sistema
-                      AND plano_conta.nom_conta = retorno_mes_ant.nom_conta
                       
                       GROUP BY plano_conta.cod_estrutural
                       
@@ -207,10 +203,8 @@ class TTBAConsContRazao extends Persistente
                           )
                         ) AS retorno_anterior
                        ON plano_conta.cod_estrutural = retorno_anterior.cod_estrutural
-                      AND plano_conta.exercicio = '2015'
+                      AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
                       AND plano_conta.indicador_superavit = retorno_anterior.indicador_superavit
-                      AND plano_conta.cod_sistema = retorno_anterior.cod_sistema
-                      AND plano_conta.nom_conta = retorno_anterior.nom_conta
                       
                       GROUP BY plano_conta.cod_estrutural
                       

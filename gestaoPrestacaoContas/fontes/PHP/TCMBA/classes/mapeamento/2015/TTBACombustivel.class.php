@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63490 $
+    $Revision: 63646 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -164,6 +164,9 @@ function montaRecuperaDadosTribunal()
                            , manutencao_item.valor
                            , manutencao.dt_manutencao
                   ) AS retorno
+
+          WHERE custo_mensal > 0.00
+
           GROUP BY placa
                  , tipo_registro
                  , tipo_combustivel

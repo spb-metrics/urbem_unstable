@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TOrcamentoDespesa.class.php 61964 2015-03-18 20:04:41Z evandro $
+    $Id: TOrcamentoDespesa.class.php 63613 2015-09-17 19:40:48Z arthur $
 
     $Revision: 30668 $
     $Name$
@@ -47,23 +47,15 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  ORCAMENTO.DESPESA
-  * Data de Criação: 13/07/2004
-
-  * @author Analista: Jorge B. Ribarr
-  * @author Desenvolvedor: Marcelo B. Paulino
-
-*/
 class TOrcamentoDespesa extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TOrcamentoDespesa()
+public function __construct()
 {
     parent::Persistente();
     $this->setTabela('orcamento.despesa');
@@ -85,7 +77,8 @@ function TOrcamentoDespesa()
     $this->AddCampo('vl_original','numeric',true,'14,02',false,false);
     $this->AddCampo('dt_criacao','date',false,'',false,false);
 }
-function montaRecuperaRelacionamento()
+
+public function montaRecuperaRelacionamento()
 {
     $stSql = "  SELECT
      CD.mascara_classificacao,
@@ -134,7 +127,7 @@ function montaRecuperaRelacionamento()
     return $stSql;
 }
 
-function recuperaDespesa(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesa(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -146,7 +139,7 @@ function recuperaDespesa(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTr
     return $obErro;
 }
 
-function montaRecuperaDespesa()
+public function montaRecuperaDespesa()
 {
     $stQuebra = "\n";
     $stSql  = "  SELECT                                                             \n";
@@ -196,7 +189,7 @@ function montaRecuperaDespesa()
     return $stSql;
 }
 
-function verificaDuplicidade(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function verificaDuplicidade(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -208,7 +201,7 @@ function verificaDuplicidade(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $
     return $obErro;
 }
 
-function montaVerificaDuplicidade()
+public function montaVerificaDuplicidade()
 {
     $stQuebra = "\n";
     $stSql  = "SELECT                                                   \n";
@@ -219,7 +212,7 @@ function montaVerificaDuplicidade()
     return $stSql;
 }
 
-function recuperaListaDespesaCredEspecial(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
+public function recuperaListaDespesaCredEspecial(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
 {
     $obErro    = new Erro;
     $obConexao = new Conexao;
@@ -231,20 +224,31 @@ function recuperaListaDespesaCredEspecial(&$rsRecordSet, $stOrdem = "", $boTrans
     return $obErro;
 }
 
-function montaListaDespesaCredEspecial()
+public function montaListaDespesaCredEspecial()
 {
-    $stSql  = " SELECT *                                                    \n";
-    $stSql .= " FROM orcamento.despesa                                      \n";
-    $stSql .= " LEFT JOIN orcamento.conta_despesa                           \n";
-    $stSql .= "   USING( cod_conta,exercicio)                               \n";
-    $stSql .= " LEFT JOIN empenho.pre_empenho_despesa                       \n";
-    $stSql .= "   USING( cod_despesa,exercicio)                             \n";
-    $stSql .= " LEFT JOIN orcamento.suplementacao_suplementada              \n";
-    $stSql .= "   USING( cod_despesa, exercicio)                            \n";
-    $stSql .= " LEFT JOIN orcamento.suplementacao_reducao                   \n";
-    $stSql .= "  USING( cod_despesa, exercicio)                             \n";
-    $stSql .= " WHERE despesa.vl_original = 0                               \n";
-    $stSql .= "  AND exercicio ='".$this->getDado('exercicio')."'           \n";
+    
+    $stSql  = " SELECT *                                                    
+                  FROM orcamento.despesa                                      
+             
+             LEFT JOIN orcamento.conta_despesa                           
+                    ON conta_despesa.cod_conta = despesa.cod_conta
+                   AND conta_despesa.exercicio = despesa.exercicio
+             
+             LEFT JOIN empenho.pre_empenho_despesa                       
+                    ON pre_empenho_despesa.cod_despesa = despesa.cod_despesa
+                   AND pre_empenho_despesa.exercicio   = despesa.exercicio   
+             
+             LEFT JOIN orcamento.suplementacao_suplementada              
+                    ON suplementacao_suplementada.cod_despesa = despesa.cod_despesa
+                   AND suplementacao_suplementada.exercicio   = despesa.exercicio   
+             
+             LEFT JOIN orcamento.suplementacao_reducao                   
+                    ON suplementacao_reducao.cod_despesa = despesa.cod_despesa
+                   AND suplementacao_reducao.exercicio   = despesa.exercicio  
+                 
+                 WHERE despesa.vl_original = 0.00                               
+                   AND despesa.exercicio   = '".$this->getDado('exercicio')."' \n";
+    
     if ($this->getDado('cod_despesa')) {
         $stSql .= "  AND despesa.cod_despesa = ".$this->getDado('cod_despesa')." \n";
     }
@@ -252,14 +256,14 @@ function montaListaDespesaCredEspecial()
     if ($this->getDado('cod_entidade')) {
         $stSql .= "  AND despesa.cod_entidade = ".$this->getDado('cod_entidade')." \n";
     }
-    $stSql .= "  AND pre_empenho_despesa.cod_pre_empenho is null            \n";
-    $stSql .= "  AND suplementacao_suplementada.cod_suplementacao is null   \n";
-    $stSql .= "  AND suplementacao_reducao.cod_suplementacao is null        \n";
+    
+    $stSql .= " AND pre_empenho_despesa.cod_pre_empenho     IS NULL
+                AND suplementacao_reducao.cod_suplementacao IS NULL ";
 
     return $stSql;
 }
 
-function recuperaListaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaListaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -271,7 +275,7 @@ function recuperaListaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , 
     return $obErro;
 }
 
-function montaRecuperaListaDotacao()
+public function montaRecuperaListaDotacao()
 {
     $stQuebra = "\n";
 
@@ -294,7 +298,7 @@ function montaRecuperaListaDotacao()
     return $stSql;
 }
 
-function recuperaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -306,7 +310,7 @@ function recuperaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTr
     return $obErro;
 }
 
-function montaRecuperaDotacao()
+public function montaRecuperaDotacao()
 {
     $stQuebra = "\n";
     $stSql  = " SELECT *, \n";
@@ -670,7 +674,7 @@ function montaRecuperaDotacao()
     return $stSql;
 }
 
-function recuperaAnexo01(&$rsRecordSet, $stFiltroEntidade = "", $stFiltro = "", $stOrdem = "", $boTransacao = "")
+public function recuperaAnexo01(&$rsRecordSet, $stFiltroEntidade = "", $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -681,7 +685,7 @@ function recuperaAnexo01(&$rsRecordSet, $stFiltroEntidade = "", $stFiltro = "", 
     return $obErro;
 }
 
-function montaRecuperaAnexo01($stFiltroEntidade = "")
+public function montaRecuperaAnexo01($stFiltroEntidade = "")
 {
     $stQuebra = "\n";
     $stSql  = " SELECT                                                             ".$stQuebra;
@@ -701,8 +705,7 @@ function montaRecuperaAnexo01($stFiltroEntidade = "")
 }
 
 // Funcao para buscar nomes das funcoes de despesa
-
-function buscaNomesFuncao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "ORDER BY f.cod_funcao" , $boTransacao = "")
+public function buscaNomesFuncao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "ORDER BY f.cod_funcao" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -715,7 +718,7 @@ function buscaNomesFuncao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "ORDER BY
     return $obErro;
 }
 
-function montaBuscaNomesFuncao()
+public function montaBuscaNomesFuncao()
 {
     $stSql  = " SELECT                                                        \n";
     $stSql .= "     f.*,                                                      \n";
@@ -737,7 +740,7 @@ function montaBuscaNomesFuncao()
 
 }
 
-function buscaGrupos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function buscaGrupos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -750,14 +753,14 @@ function buscaGrupos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransa
     return $obErro;
 }
 
-function montaBuscaGrupos()
+public function montaBuscaGrupos()
 {
     $stSql  = " select *,substr(classificacao_reduzida,3,2) as cod_grupo from orcamento.fn_somatorio_despesa('".$this->getDado('exercicio')."','".$this->getDado('stFiltro')."') as retorno(cod_conta integer, nivel integer, descricao varchar, classificacao varchar, classificacao_reduzida varchar, valor numeric) where nivel = 2 AND substr(classificacao,1,1)::integer = ".$this->getDado("categoria_economica");
 
     return $stSql;
 }
 
-function montaRecuperaDespesaUsuario()
+public function montaRecuperaDespesaUsuario()
 {
     $stSql  = "  SELECT                                                                   \n";
     $stSql .= "      CD.cod_estrutural as mascara_classificacao                           \n";
@@ -796,7 +799,7 @@ function montaRecuperaDespesaUsuario()
     return $stSql;
 }
 
-function montaRecuperaDespesaUsuarioPermissao()
+public function montaRecuperaDespesaUsuarioPermissao()
 {
     $stSql  = "  SELECT                                                                   \n";
     $stSql .= "      CD.cod_estrutural as mascara_classificacao                           \n";
@@ -853,7 +856,7 @@ function montaRecuperaDespesaUsuarioPermissao()
     return $stSql;
 }
 
-function recuperaDespesaUsuarioOrcamento(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesaUsuarioOrcamento(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -868,7 +871,7 @@ function recuperaDespesaUsuarioOrcamento(&$rsRecordSet, $stCondicao = "" , $stOr
 }
 
 // metedo duplicado para o bug 9112
-function montaRecuperaDespesaUsuarioOrcamento()
+public function montaRecuperaDespesaUsuarioOrcamento()
 {
     $stSql  = "  SELECT                                                                   \n";
     $stSql .= "      CD.cod_estrutural as mascara_classificacao                           \n";
@@ -926,7 +929,7 @@ function montaRecuperaDespesaUsuarioOrcamento()
     return $stSql;
 }
 
-function montaRecuperaDespesaCentroCusto()
+public function montaRecuperaDespesaCentroCusto()
 {
     $stSql  = "  SELECT                                                                   \n";
     $stSql .= "       cod_despesa,                                                                     \n";
@@ -966,7 +969,7 @@ function montaRecuperaDespesaCentroCusto()
     * @return Object  Objeto Erro
 */
 
-function recuperaDespesaUsuario(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesaUsuario(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -980,7 +983,7 @@ function recuperaDespesaUsuario(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
     return $obErro;
 }
 
-function recuperaDespesaUsuarioPermissao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesaUsuarioPermissao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -994,7 +997,7 @@ function recuperaDespesaUsuarioPermissao(&$rsRecordSet, $stCondicao = "" , $stOr
     return $obErro;
 }
 
-function recuperaDespesaCentroCusto(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesaCentroCusto(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -1006,7 +1009,7 @@ function recuperaDespesaCentroCusto(&$rsRecordSet, $stCondicao = "" , $stOrdem =
     return $obErro;
 }
 
-function recuperaDespesaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaDespesaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -1018,7 +1021,7 @@ function recuperaDespesaDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
     return $obErro;
 }
 
-function montaRecuperaDespesaDotacao()
+public function montaRecuperaDespesaDotacao()
 {
     $stSql  = "  SELECT                                                              \n";
     $stSql .= "     publico.fn_mascara_dinamica( ( SELECT valor FROM administracao.configuracao \n";
@@ -1053,7 +1056,8 @@ function montaRecuperaDespesaDotacao()
 
     return $stSql;
 }
-function recuperaSaldoDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+
+public function recuperaSaldoDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -1065,7 +1069,7 @@ function recuperaSaldoDotacao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , 
     return $obErro;
 }
 
-function montaRecuperaSaldoDotacao()
+public function montaRecuperaSaldoDotacao()
 {
     $stSql  = "SELECT                                                              \n";
     $stSql .= "  empenho.fn_saldo_dotacao (                                    \n";
@@ -1076,7 +1080,7 @@ function montaRecuperaSaldoDotacao()
     return $stSql;
 }
 
-function recuperaExportacaoBrubAnt(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaExportacaoBrubAnt(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -1088,7 +1092,7 @@ function recuperaExportacaoBrubAnt(&$rsRecordSet, $stCondicao = "" , $stOrdem = 
     return $obErro;
 }
 
-function montaRecuperaExportacaoBrubAnt()
+public function montaRecuperaExportacaoBrubAnt()
 {
     $stSql  = " SELECT * FROM (                                                                                                                         \n";
     $stSql .= "   SELECT                                                                                                                                \n";
@@ -2168,7 +2172,7 @@ function montaRecuperaExportacaoBrubAnt()
     return $stSql;
 }
 
-function recuperaCodDespesa(&$rsRecordSet, $boTransacao = "")
+public function recuperaCodDespesa(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2179,7 +2183,7 @@ function recuperaCodDespesa(&$rsRecordSet, $boTransacao = "")
     return $obErro;
 }
 
-function montaRecuperaCodDespesa()
+public function montaRecuperaCodDespesa()
 {
     $stSql  =  "select rec.cod_despesa\n";
     $stSql .=  "from orcamento.conta_despesa    as ocr,\n";
@@ -2193,7 +2197,7 @@ function montaRecuperaCodDespesa()
 }
 
 /* Utilizado no e-Sfinge (TCE-SC) */
-function recuperaProjetoAtividade(&$rsRecordSet, $boTransacao = "")
+public function recuperaProjetoAtividade(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2205,7 +2209,7 @@ function recuperaProjetoAtividade(&$rsRecordSet, $boTransacao = "")
 }
 
 /* Usado pelo e-Sfinge (TCE-SC) */
-function montaRecuperaProjetoAtividade()
+public function montaRecuperaProjetoAtividade()
 {
     $stSql = "
                 select despesa.exercicio
@@ -2230,7 +2234,7 @@ function montaRecuperaProjetoAtividade()
 }
 
 /* Utilizado no e-Sfinge (TCE-SC) */
-function recuperaFonteRecursosDotacao(&$rsRecordSet, $boTransacao = "")
+public function recuperaFonteRecursosDotacao(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2242,7 +2246,7 @@ function recuperaFonteRecursosDotacao(&$rsRecordSet, $boTransacao = "")
 }
 
 /* Usado pelo e-Sfinge (TCE-SC) */
-function montaRecuperaFonteRecursosDotacao()
+public function montaRecuperaFonteRecursosDotacao()
 {
     $stSql = "
               select despesa.exercicio
@@ -2274,12 +2278,12 @@ function montaRecuperaFonteRecursosDotacao()
 
 }
 
-function listaDespesa(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+public function listaDespesa(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
 {
     return $this->executaRecupera("montaListaDespesa",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
 }
 
-function montaListaDespesa()
+public function montaListaDespesa()
 {
     $stSql = "select despesa.cod_despesa
                    , trim(conta_despesa.descricao) as descricao
@@ -2302,12 +2306,12 @@ function montaListaDespesa()
     return $stSql;
 }
 
-function listaDespesaAcao(&$rsRecordSet, $stFiltro = '', $stOrder = '', $boTransacao = '')
+public function listaDespesaAcao(&$rsRecordSet, $stFiltro = '', $stOrder = '', $boTransacao = '')
 {
     return $this->executaRecupera('montaListaDespesaAcao', $rsRecordSet, $stFiltro, $stOrder, $boTransacao);
 }
 
-function montaListaDespesaAcao()
+public function montaListaDespesaAcao()
 {
     $stSql = "
         SELECT despesa.cod_despesa
@@ -2347,7 +2351,7 @@ function montaListaDespesaAcao()
     return $stSql;
 }
 
-function recuperaConfiguracaoLancamentoDespesa(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaConfiguracaoLancamentoDespesa(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2363,7 +2367,7 @@ function recuperaConfiguracaoLancamentoDespesa(&$rsRecordSet, $stCondicao = "" ,
     return $obErro;
 }
 
-function montaRecuperaConfiguracaoLancamentoDespesa()
+public function montaRecuperaConfiguracaoLancamentoDespesa()
 {
     $stQuebra = "\n";
     $stSql  = "  SELECT                                                             \n";
@@ -2382,7 +2386,7 @@ function montaRecuperaConfiguracaoLancamentoDespesa()
     return $stSql;
 }
 
-function recuperaConfiguracaoLancamentoDespesaDetalhado(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaConfiguracaoLancamentoDespesaDetalhado(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2394,7 +2398,7 @@ function recuperaConfiguracaoLancamentoDespesaDetalhado(&$rsRecordSet, $stCondic
     return $obErro;
 }
 
-function montaRecuperaConfiguracaoLancamentoDespesaDetalhado($stFiltro)
+public function montaRecuperaConfiguracaoLancamentoDespesaDetalhado($stFiltro)
 {
     $stSql = "     SELECT orcamento.fn_consulta_class_despesa( tabela.cod_conta
                                                   , tabela.exercicio::character varying
@@ -2430,7 +2434,7 @@ function montaRecuperaConfiguracaoLancamentoDespesaDetalhado($stFiltro)
     return $stSql;
 }
 
-function recuperaConfiguracaoLancamentoDespesaNovo(&$rsRecordSet, $boTransacao = "")
+public function recuperaConfiguracaoLancamentoDespesaNovo(&$rsRecordSet, $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2442,7 +2446,7 @@ function recuperaConfiguracaoLancamentoDespesaNovo(&$rsRecordSet, $boTransacao =
     return $obErro;
 }
 
-function montaRecuperaConfiguracaoLancamentoDespesaNovo()
+public function montaRecuperaConfiguracaoLancamentoDespesaNovo()
 {
     $stSql ="  SELECT tabela.mascara_classificacao
 		      ,tabela.descricao
@@ -2499,7 +2503,7 @@ function montaRecuperaConfiguracaoLancamentoDespesaNovo()
 }
 
 
-function recuperaConfiguracaoLancamentoDespesaDetalhadoNovo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaConfiguracaoLancamentoDespesaDetalhadoNovo(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -2511,7 +2515,7 @@ function recuperaConfiguracaoLancamentoDespesaDetalhadoNovo(&$rsRecordSet, $stCo
     return $obErro;
 }
 
-function montaRecuperaConfiguracaoLancamentoDespesaDetalhadoNovo($stFiltro)
+public function montaRecuperaConfiguracaoLancamentoDespesaDetalhadoNovo($stFiltro)
 {
     $stSql = "  SELECT orcamento.fn_consulta_class_despesa( tabela.cod_conta
                                                   , max(tabela.exercicio)::character varying
@@ -2560,3 +2564,5 @@ function montaRecuperaConfiguracaoLancamentoDespesaDetalhadoNovo($stFiltro)
 }
 
 }
+
+?>

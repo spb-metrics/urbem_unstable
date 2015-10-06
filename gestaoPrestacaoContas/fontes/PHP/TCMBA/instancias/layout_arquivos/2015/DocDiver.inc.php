@@ -44,11 +44,11 @@
 include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTCMBADocDiver.class.php";
 
 $obTTCMBADocDiver = new TTCMBADocDiver();
-$obTTCMBADocDiver->setDado('entidade'   ,$stEntidades  );
-$obTTCMBADocDiver->setDado('unidade_gestora', $inCodUnidadeGestora );
-$obTTCMBADocDiver->setDado('dt_inicial' ,$stDataInicial);
-$obTTCMBADocDiver->setDado('dt_final'   ,$stDataFinal  );
-$obTTCMBADocDiver->setDado('exercicio'  ,Sessao::getExercicio());
+$obTTCMBADocDiver->setDado('entidade'       ,$stEntidades          );
+$obTTCMBADocDiver->setDado('unidade_gestora',$inCodUnidadeGestora  );
+$obTTCMBADocDiver->setDado('dt_inicial'     ,$stDataInicial        );
+$obTTCMBADocDiver->setDado('dt_final'       ,$stDataFinal          );
+$obTTCMBADocDiver->setDado('exercicio'      ,Sessao::getExercicio());
 $obTTCMBADocDiver->recuperaDados($rsDocDiver);
 
 $obExportador->roUltimoArquivo->addBloco($rsDocDiver);

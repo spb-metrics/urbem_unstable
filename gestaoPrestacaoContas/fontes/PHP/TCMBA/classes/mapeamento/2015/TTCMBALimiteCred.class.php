@@ -64,7 +64,7 @@ function montaRecuperaDadosTribunal()
                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                        , tcmba.limite_alteracao_credito.exercicio AS ano_alteracao
                        , norma.nom_norma AS descricao_lei
-                       , tcmba.limite_alteracao_credito.cod_norma AS numero_lei
+                       , norma.num_norma AS numero_lei
                        , norma.dt_publicacao AS data_lei
                        , limite_alteracao_credito.cod_tipo_alteracao AS tipo_alteracao
                        , limite_alteracao_credito.valor_alteracao AS valor_alteracao

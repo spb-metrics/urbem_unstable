@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63605 $
+    $Revision: 63687 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -78,11 +78,11 @@ public function montaRecuperaDadosTribunal()
                     , ".$this->getDado('inCodGestora')." AS unidade_gestora
                     , contrato_documento.exercicio        
                     , documento_de_para.cod_tipo_tcm   
-                    , contrato_documento.num_contrato   
+                    , contrato.numero_contrato   
                     , contrato_documento.num_documento  
                     , TO_CHAR(contrato_documento.dt_emissao ,'DDMMYYYY') AS dt_emissao 
                     , TO_CHAR(contrato_documento.dt_validade,'DDMMYYYY') AS dt_validade
-                    , TO_CHAR(participante_documentos.dt_emissao,'yyyymm') AS competencia
+                    , '".$this->getDado('competencia')."' AS competencia
 
                  FROM licitacao.documento
 
@@ -99,6 +99,11 @@ public function montaRecuperaDadosTribunal()
            INNER JOIN licitacao.contrato_documento
                    ON documento.cod_documento  = contrato_documento.cod_documento
 
+           INNER JOIN licitacao.contrato
+                   ON contrato.exercicio           = contrato_documento.exercicio
+                  AND contrato.cod_entidade       = contrato_documento.cod_entidade
+                  AND contrato.num_contrato       = contrato_documento.num_contrato
+
             LEFT JOIN ( SELECT documento_de_para.cod_documento_tcm AS cod_tipo_tcm
                              , documento_de_para.cod_documento
                           FROM tcmba.documento_de_para 
@@ -107,24 +112,23 @@ public function montaRecuperaDadosTribunal()
                       ) AS documento_de_para
                    ON documento_de_para.cod_documento = contrato_documento.cod_documento
 
-                WHERE participante_documentos.dt_emissao BETWEEN TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy')
-                                                             AND TO_DATE('".$this->getDado('dtFinal')."', 'dd/mm/yyyy') 
-                  AND contrato_documento.cod_entidade IN (".$this->getDado('stEntidades').") 
+              WHERE contrato.vencimento >= TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy')
+                AND contrato_documento.dt_validade >= TO_DATE('".$this->getDado('dtInicial')."', 'dd/mm/yyyy')
+                AND contrato_documento.cod_entidade IN (".$this->getDado('stEntidades').") 
  
-             GROUP BY contrato_documento.exercicio
+           GROUP BY contrato_documento.exercicio
                     , documento_de_para.cod_tipo_tcm  
-                    , contrato_documento.num_contrato  
+                    , contrato.numero_contrato  
                     , contrato_documento.num_documento 
                     , contrato_documento.dt_emissao    
                     , contrato_documento.dt_validade
-                    , participante_documentos.dt_emissao
-                       
-             ORDER BY contrato_documento.exercicio     
-                    , documento_de_para.cod_tipo_tcm  
-                    , contrato_documento.num_contrato  
-                    , contrato_documento.num_documento 
-                    , contrato_documento.dt_emissao    
+                      
+           ORDER BY contrato_documento.exercicio     
                     , contrato_documento.dt_validade
+                    , contrato_documento.dt_emissao    
+                    , contrato.numero_contrato
+                    , contrato_documento.num_documento
+                    , documento_de_para.cod_tipo_tcm
     ";
     
     return $stSql;

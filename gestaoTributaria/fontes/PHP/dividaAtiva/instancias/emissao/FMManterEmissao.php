@@ -32,7 +32,7 @@
  * @author Desenvolvedor: Fernando Piccini Cercato
  * @ignore
 
- * $Id: FMManterEmissao.php 61643 2015-02-20 10:45:39Z evandro $
+ * $Id: FMManterEmissao.php 63615 2015-09-18 14:11:12Z evandro $
 
  * Casos de uso: uc-05.04.03
 
@@ -197,7 +197,7 @@ foreach ($arLista as $valor => $arKey) {
             $arDtOrigem = explode( "-", $stDtOrigem);
             $arDtAtual = explode( "/", $stDtAtual);
             $arValorOrigem = array();
-
+            
             while ($arDtOrigem[0].$arDtOrigem[1].$arDtOrigem[2] < $arDtAtual[2].$arDtAtual[1].$arDtAtual[0]) {
                 unset( $rsListaDA );
 
@@ -265,9 +265,17 @@ foreach ($arLista as $valor => $arKey) {
                     $dtDiaVencimento = 1;
                 }
 
+                if ( $arDtOrigem[1] != $arDtAtual[1]) {
+                    //incrementa para realizar o calculo certo dos juros
+                    $stDataCalculojuros = $arDtOrigem[1]+1;
+                }else{
+                    $dtDiaVencimento = $arDtAtual[0];
+                }
+
                 $stNovaData = sprintf("%04d-%02d-%02d", $arDtOrigem[0], $arDtOrigem[1], $dtDiaVencimento );
                 $stNovaDataBR = sprintf("%02d/%02d/%04d", $dtDiaVencimento, $arDtOrigem[1], $arDtOrigem[0] );
-                $obTDATDividaAtiva->recuperaConsultaMemoriaCalculoGenerico( $rsListaDA, $rsDadosValorCreditos->getCampo( "cod_inscricao" ), $rsDadosValorCreditos->getCampo( "exercicio" ), $rsDadosValorCreditos->getCampo( "cod_modalidade" ), $rsDadosValorCreditos->getCampo( "inscricao" ), $rsDadosValorCreditos->getCampo( "valor_origem" ), $rsDadosValorCreditos->getCampo( "dt_vencimento_origem" ), $stNovaData );
+                                    
+                $obTDATDividaAtiva->recuperaConsultaMemoriaCalculoGenerico( $rsListaDA, $rsDadosValorCreditos->getCampo( "cod_inscricao" ), $rsDadosValorCreditos->getCampo( "exercicio" ), $rsDadosValorCreditos->getCampo( "cod_modalidade" ), $rsDadosValorCreditos->getCampo( "num_parcelamento" ), $rsDadosValorCreditos->getCampo( "valor_origem" ), $rsDadosValorCreditos->getCampo( "dt_vencimento_origem" ), $stNovaData );
 
                 if ( $boAvancaData )
                     $arDtOrigem[1]++;
@@ -298,7 +306,7 @@ foreach ($arLista as $valor => $arKey) {
                     $flValorOrigem = $rsDadosValorCreditos->getCampo( "valor_origem" );
                     $arValorOrigem[] = array (
                         "dt_calc" => $stNovaDataBR,
-                        "origem" => $rsDadosValorCreditos->getCampo("imposto"),
+                        "origem" => $rsDadosValorCreditos->getCampo("credito_origem"),
                         "valor_origem" => number_format( $flValorOrigem, 2, ',', '.' ),
                         "correcao" => number_format( $flCorrecao, 2, ',', '.' ),
                         "juros" => number_format( $flJuros, 2, ',', '.' ),
@@ -545,7 +553,7 @@ foreach ($arLista as $valor => $arKey) {
             $arHeader[0]['cep'] = $arDados[0]['cep_notificado'];
             $arHeader[0]['cid_est'] = $arDados[0]['cidade_estado_notificado'];
             $x=-1;
-
+            
             for ( $i = 0; $i < count($arDados); $i++ ) {
                 $parcial = 0;
                 if ( ( $arDados[$i]['exercicio_origem'] == $arDados[$i-1]['exercicio_origem'] ) && ( $arDados[$i]['descricao_credito'] == $arDados[$i-1]['descricao_credito'] ) && ( $i > 0 ) ) {
@@ -553,51 +561,54 @@ foreach ($arLista as $valor => $arKey) {
                     $arArquivo[$x]['endereco']     = $arDados[$i]['endereco_notificado'];
                     $arArquivo[$x]['exercicio']    = $arDados[$i]['exercicio_origem'];
                     $arArquivo[$x]['tributo']      = $arDados[$i]['descricao_credito'];
-                    $arArquivo[$x]['valor_atual'] += number_format($arDados[$i]['valor_origem'] + $arDados[$i]['correcao'] + $arDados[$i]['multa_infracao'],2,'.','');
-                    $arArquivo[$x]['multa']       += number_format($arDados[$i]['multa'],2,'.','');
-                    $arArquivo[$x]['juros']       += number_format($arDados[$i]['juros'],2,'.','');
-                    $arArquivo[$x]['total']       += number_format($arDados[$i]['multa'] + $arDados[$i]['juros'],2,'.','');
-                    $arArquivo[$x]['desconto']    += number_format($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa'],2,'.','');
-                    $parcial = (($arDados[$i]['multa'] + $arDados[$i]['juros'])-($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa']));
-                    $arArquivo[$x]['parcial']     += number_format($parcial,2,'.','');
-                    $arArquivo[$x]['geral']       = number_format($arArquivo[$x]['valor_atual'] + $arArquivo[$x]['parcial'],2,'.','');
+                    $arArquivo[$x]['valor_atual']  += number_format($arDados[$i]['valor_origem'] + $arDados[$i]['correcao'] + $arDados[$i]['multa_infracao'],2,',','.');
+                    $arArquivo[$x]['multa']        += number_format($arDados[$i]['multa'],2,',','.');
+                    $arArquivo[$x]['juros']        += number_format($arDados[$i]['juros'],2,',','.');
+                    $arArquivo[$x]['total']        += number_format($arDados[$i]['multa'] + $arDados[$i]['juros'],2,',','.');
+                    $arArquivo[$x]['desconto']     += number_format($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa'],2,',','.');
+                    $parcial                       = (($arDados[$i]['multa'] + $arDados[$i]['juros'])-($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa']));
+                    $arArquivo[$x]['parcial']      += number_format($parcial,2,',','.');
+                    $arArquivo[$x]['geral']        = number_format(($arArquivo[$x]['valor_atual'] + $arArquivo[$x]['parcial']),2,',','.');
                 } else {
                     $x++;
                     $arArquivo[$x]['contribuinte'] = $arDados[$i]['nome_notificado'];
                     $arArquivo[$x]['endereco']     = $arDados[$i]['endereco_notificado'];
-                    $arArquivo[$x]['exercicio']   = $arDados[$i]['exercicio_origem'];
-                    $arArquivo[$x]['tributo']     = $arDados[$i]['descricao_credito'];
-                    $arArquivo[$x]['valor_atual'] = number_format($arDados[$i]['valor_origem'] + $arDados[$i]['correcao'] + $arDados[$i]['multa_infracao'],2,'.','') ;
-                    $arArquivo[$x]['multa']       = number_format($arDados[$i]['multa'],2,'.','');
-                    $arArquivo[$x]['juros']       = number_format($arDados[$i]['juros'],2,'.','');
-                    $arArquivo[$x]['total']       = number_format($arDados[$i]['multa'] + $arDados[$i]['juros'],2,'.','');
-                    $arArquivo[$x]['desconto']    = number_format($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa'],2,'.','');
-                    $parcial = (($arDados[$i]['multa'] + $arDados[$i]['juros'])-($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa']));
-                    $arArquivo[$x]['parcial']     = number_format($parcial,2,'.','');
-                    $arArquivo[$x]['geral']       = number_format($arArquivo[$x]['valor_atual'] + $arArquivo[$x]['parcial'],2,'.','');
+                    $arArquivo[$x]['exercicio']    = $arDados[$i]['exercicio_origem'];
+                    $arArquivo[$x]['tributo']      = $arDados[$i]['descricao_credito'];
+                    $arArquivo[$x]['valor_atual']  = number_format($arDados[$i]['valor_origem'] + $arDados[$i]['correcao'] + $arDados[$i]['multa_infracao'],2,',','.');
+                    $nuValorAtual                  = $arDados[$i]['valor_origem'] + $arDados[$i]['correcao'] + $arDados[$i]['multa_infracao'];
+                    $arArquivo[$x]['multa']        = number_format($arDados[$i]['multa'],2,',','.');
+                    $arArquivo[$x]['juros']        = number_format($arDados[$i]['juros'],2,',','.');
+                    $arArquivo[$x]['total']        = number_format($arDados[$i]['multa'] + $arDados[$i]['juros'],2,',','.');
+                    $arArquivo[$x]['desconto']     = number_format($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa'],2,',','.');
+                    $parcial                       = ($arDados[$i]['multa'] + $arDados[$i]['juros'])-($arDados[$i]['reducao_juros'] + $arDados[$i]['reducao_multa']);
+                    $arArquivo[$x]['parcial']      = number_format($parcial,2,',','.');
+                    $arArquivo[$x]['geral']        = number_format($nuValorAtual + $parcial,2,',','.');
+                    $arArquivo[$x]['geral_total']  = $nuValorAtual + $parcial;
                 }
             }
 
             for ( $i=0; $i<=count($arArquivo); $i++ ) {
-                $arFooter[0]['total_geral'] += $arArquivo[$i]['geral'];
+                $arFooter[0]['total_geral'] += $arArquivo[$i]['geral_total'];
             }
-
-            $arFooter[0]['total_geral'] = number_format($arFooter[0]['total_geral'],2,'.','');
+            $arFooter[0]['total_geral'] = number_format($arFooter[0]['total_geral'],2,',','.');
 
             $obTDATDividaParcela = new TDATDividaParcela;
             $obTDATDividaParcela->recuperaTodos( $rsDados3, " WHERE num_parcelamento in ( ".$arKey[6]." ) ORDER BY dt_vencimento_parcela " );
 
             $arParcela = $rsDados3->arElementos;
             $arArquivoParcela = array();
+            $arArquivoParcela[0]['parcela_um'] = number_format(0.00,2,',','.');
+            $arArquivoParcela[0]['vlr_parcela'] = number_format(0.00,2,',','.');
             for ( $x = 0; $x < count($arParcela); $x++ ) {
                 if (( $arParcela[$x]['num_parcela'] == 1 ) || ( count($arParcela) == 1 )) {
-                    $arArquivoParcela[0]['parcela_um'] = number_format($arParcela[$x]['vlr_parcela'],2,'.','');
+                    $arArquivoParcela[0]['parcela_um'] = number_format($arParcela[$x]['vlr_parcela'],2,',','.');
                 }
-                $arArquivoParcela[0]['vlr_parcela'] = number_format($arParcela[$x]['vlr_parcela'],2,'.','');
+                $arArquivoParcela[0]['vlr_parcela'] = number_format($arParcela[$x]['vlr_parcela'],2,',','.');
             }
             $arArquivoParcela[0]['nro_parcela'] = count($arParcela);
 
-            $arFooter[0]['saldo'] = number_format(bcsub($arFooter[0]['total_geral'],$arArquivoParcela[0]['parcela_um'], 2),2,'.','');
+            $arFooter[0]['saldo'] = number_format(bcsub($arFooter[0]['total_geral'],$arArquivoParcela[0]['parcela_um'], 2),2,',','.');
 
             $arFooter[0]['dia'] = date('d');
             switch (date('m')) {

@@ -65,12 +65,9 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                 ,'".$this->getDado('exercicio')."' as exercicio
                                 ,'".$this->getDado('mes')."' as mes
                         FROM tcemg.balancete_extmmaa
-                        LEFT JOIN tcemg.arquivo_ext
-                            ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
-                            AND balancete_extmmaa.exercicio = arquivo_ext.exercicio
-                        WHERE arquivo_ext.cod_plano IS NULL
-                          AND balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
-                ";
+                   LEFT JOIN tcemg.arquivo_ext
+                          ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
+                       WHERE arquivo_ext.cod_plano IS NULL ";
         return $stSql;
     }
 
@@ -207,61 +204,66 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao20()
     {
-        $stSql = "  SELECT tipo_registro
-                        , cod_orgao
-                        , cod_unidade
-                        , tipo_lancamento
-                        , sub_tipo
-                        , cod_ext
-                        , cod_font_recurso
-                        , SUM(vl_saldo_anterior) as vl_saldo_ant
-                        , SUM(vl_saldo_atual)AS vl_saldo_atual
-                        , nat_saldo_anterior_fonte
-                        , nat_saldo_atual_fonte
-                    FROM (
-                            SELECT  tipo_registro
-                                    , cod_orgao
-                                    , cod_ext
-				                    , cod_unidade
-                                    , tipo_lancamento
-                                    , sub_tipo
-                                    , cod_recurso AS cod_font_recurso
-                                    , vl_saldo_anterior
-                                    , vl_saldo_atual
-                                    , nat_saldo_anterior_fonte
-                                    , nat_saldo_atual_fonte
-                            
-                                  FROM tcemg.fn_arquivo_ext_registro20( '".$this->getDado('exercicio')."'
-                                                                       , 'cod_entidade IN (".$this->getDado('entidades').")'
-                                                                       , '".$this->getDado('dt_inicial')."'
-                                                                       , '".$this->getDado('dt_final')."'
-                                                                       , 'A'::CHAR )
-                            AS retorno(   cod_estrutural             VARCHAR
-                                        , tipo_registro              INTEGER
-                                        , cod_orgao                  VARCHAR
-					, cod_unidade                TEXT
-                                        , tipo_lancamento            TEXT
-                                        , sub_tipo                   TEXT
-                                        , cod_ext                    VARCHAR
-                                        , cod_recurso                INTEGER
-                                        , vl_saldo_anterior          NUMERIC
-                                        , vl_saldo_debitos           NUMERIC
-                                        , vl_saldo_creditos          NUMERIC
-                                        , vl_saldo_atual             NUMERIC
-                                        , nat_saldo_anterior_fonte   CHAR
-                                        , nat_saldo_atual_fonte      CHAR
-                            )
-                            
-                    ) AS registro20
-                GROUP BY tipo_registro
-                        , cod_orgao
-                        , cod_unidade
-                        , tipo_lancamento
-                        , sub_tipo
-                        , cod_ext
-                        , cod_font_recurso
-                        , nat_saldo_anterior_fonte
-                        , nat_saldo_atual_fonte
+        $stSql = "
+              SELECT tipo_registro
+                   , cod_orgao
+                   , cod_unidade
+                   , tipo_lancamento
+                   , sub_tipo
+                   , cod_ext
+                   , cod_font_recurso
+                   , ABS(vl_saldo_ant) AS vl_saldo_ant
+                   , ABS(vl_saldo_atual) AS vl_saldo_atual
+                   , CASE WHEN vl_saldo_ant < 0.00
+                          THEN 'D'
+                          ELSE 'C'
+                      END AS nat_saldo_anterior_fonte
+                   , CASE WHEN vl_saldo_atual < 0.00
+                          THEN 'D'
+                          ELSE 'C'
+                      END AS nat_saldo_atual_fonte
+                FROM (
+                      SELECT tipo_registro
+                           , cod_orgao
+                           , cod_ext
+                           , cod_unidade
+                           , tipo_lancamento
+                           , sub_tipo
+                           , cod_recurso AS cod_font_recurso
+                           , SUM(vl_saldo_anterior) as vl_saldo_ant
+                           , SUM(vl_saldo_atual)AS vl_saldo_atual
+                           , nat_saldo_anterior_fonte AS natureza_anterior
+                           , nat_saldo_atual_fonte AS natureza_atual
+                        FROM tcemg.fn_arquivo_ext_registro20( '".$this->getDado('exercicio')."'
+                                                            , 'cod_entidade IN (".$this->getDado('entidades').")'
+                                                            , '".$this->getDado('dt_inicial')."'
+                                                            , '".$this->getDado('dt_final')."'
+                                                            , 'A'::CHAR )
+                          AS retorno( cod_estrutural             VARCHAR
+                                    , tipo_registro              INTEGER
+                                    , cod_orgao                  VARCHAR
+					                , cod_unidade                TEXT
+                                    , tipo_lancamento            TEXT
+                                    , sub_tipo                   TEXT
+                                    , cod_ext                    VARCHAR
+                                    , cod_recurso                INTEGER
+                                    , vl_saldo_anterior          NUMERIC
+                                    , vl_saldo_debitos           NUMERIC
+                                    , vl_saldo_creditos          NUMERIC
+                                    , vl_saldo_atual             NUMERIC
+                                    , nat_saldo_anterior_fonte   CHAR
+                                    , nat_saldo_atual_fonte      CHAR
+                                    )
+                    GROUP BY tipo_registro
+                           , cod_orgao
+                           , cod_unidade
+                           , tipo_lancamento
+                           , sub_tipo
+                           , cod_ext
+                           , cod_font_recurso
+                           , nat_saldo_anterior_fonte
+                           , nat_saldo_atual_fonte
+                     ) AS registro20
         ";     
         
         return $stSql;
@@ -784,8 +786,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         AND plano_analitica.cod_plano = conta_debito.cod_plano 
 
 					LEFT JOIN contabilidade.plano_recurso
-						   ON plano_recurso.exercicio = balancete_extmmaa.exercicio
-                          AND plano_recurso.cod_plano = balancete_extmmaa.cod_plano
+						   ON plano_recurso.exercicio = plano_analitica.exercicio
+                          AND plano_recurso.cod_plano = plano_analitica.cod_plano
 						
                     LEFT JOIN (
                                 SELECT conta_debito.cod_lote

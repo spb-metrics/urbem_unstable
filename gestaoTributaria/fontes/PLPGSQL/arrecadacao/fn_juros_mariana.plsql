@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_juros_mariana.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_juros_mariana.plsql 63702 2015-09-30 19:20:45Z evandro $
 *
 * Caso de uso: uc-05.03.00
 * Calculo Valor de Juros para Mariana
@@ -121,7 +121,7 @@ inMesLoop := inMesInicio;
         	    --adciona 1% pelo ultimo mes
         	    nuJuroTotal := nuJuroTotal + 1.00;
 
-        nuCorrecao := fn_correcao_mariana(dtVencimento,dtDataCalculo,nuValor, 1 , 1);
+        nuCorrecao := fn_correcao_mariana(dtVencimento,dtDataCalculo,nuValor, 5 , 1);
         nuRetorno  := (nuValor + nuMulta + nuCorrecao ) * ( nuJuroTotal / 100 ); 
 	ELSE 	
 		nuRetorno := nuValor * (1.00 /100);

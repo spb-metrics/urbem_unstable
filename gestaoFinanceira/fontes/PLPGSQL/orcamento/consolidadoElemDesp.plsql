@@ -485,7 +485,6 @@ stSql := '
             if (inCodSubFuncao is not null and inCodSubFuncao <> 0) then
                stSql := stSql || ' AND od.cod_subfuncao = ' || inCodSubFuncao || '';
             end if;
-            stSql := stSql || stFiltro;
 
 EXECUTE stSql;
 
@@ -527,75 +526,6 @@ stSql := '
 EXECUTE stSql;
 
 
-
-/*
-    --CRIA TABELA TEMPORÁRIA COM TODOS AS DESPESAS DA DESPESA, SETA ELAS COMO MÃE
-    CREATE TEMPORARY TABLE tmp_pre_empenho_despesa AS
-        SELECT
-                  exercicio
-                 ,cod_conta
-                 ,cod_despesa
-                 ,cast(''M'' as varchar) as tipo_conta
-                 ,cast(''D'' as varchar) as tipo_soma
-        FROM
-                 orcamento.despesa as d;
-
-     --INSERE NA TABELA TEMPORARIA OS REGISTROS RESUTADOS DE UM SELECT
-     --ESTE SELECT PREVEM DA TABELA PRE_EMPENHO_DESPESA ONDE TODOS OS REGISTROS SÃO SETADOS COMO FILHAS
-        INSERT INTO tmp_pre_empenho_despesa
-            SELECT
-                    exercicio
-                    ,cod_conta
-                    ,cod_despesa
-                    ,cast(''F'' as varchar) as tipo_conta
-                    ,cast(''D'' as varchar) as tipo_soma
-            FROM    empenho.pre_empenho_despesa e_ped
-            WHERE NOT EXISTS ( SELECT 1
-                                 FROM tmp_pre_empenho_despesa tmp_ped
-                                WHERE tmp_ped.exercicio   = e_ped.exercicio
-                                  AND tmp_ped.cod_conta   = e_ped.cod_conta
-                                  AND tmp_ped.cod_despesa = e_ped.cod_despesa
-                             )
-
-     --ATUALIZA O TOPO DA SOMA PARA TODOS OS REGISTRO QUE ESTIVEREM NA TABELA PRE_EMPENHO
-        UPDATE tmp_pre_empenho_despesa SET tipo_soma=''P''
-            WHERE   exercicio||\'-\'||cod_conta||\'-\'||cod_despesa IN (
-                        SELECT  exercicio||\'-\'||cod_conta||\'-\'||cod_despesa
-                        FROM    empenho.pre_empenho_despesa
-                    );
-*/
-
-
-/*
-    --CRIA TABELA TEMPORÁRIA COM TODOS AS DESPESAS DA TABELA PRE_EMPENHO_DESPESA, SETA ELAS COMO FILHAS
-    CREATE TEMPORARY TABLE tmp_pre_empenho_despesa AS
-        SELECT   cod_pre_empenho
-                 ,exercicio
-                 ,cod_conta
-                 ,cod_despesa
-                 ,cast(''F'' as varchar) as tipo_conta
-        FROM
-                 empenho.pre_empenho_despesa as ped;
-
-     --INSERE NA TABELA TEMPORARIA OS REGISTROS RESUTADOS DE UM SELECT
-     --ESTE SELECT PREVEM DA TABELA DESPESA ONDE TODOS OS REGISTROS SÃO SETADOS COMO MÃE
-        INSERT INTO tmp_pre_empenho_despesa
-            SELECT  0
-                    ,exercicio
-                    ,cod_conta
-                    ,cod_despesa
-                    ,cast(''M'' as varchar) as tipo_conta
-            FROM    orcamento.despesa o_d
-            
-            WHERE NOT EXISTS ( SELECT 1
-                                FROM tmp_pre_empenho_despesa tmp_ped
-                               WHERE tmp_ped.exercicio   = o_d.exercicio
-                                 AND tmp_ped.cod_conta   = o_d.cod_conta
-                                 AND tmp_ped.cod_despesa = o_d.cod_despesa
-            )
-
-*/
-
 SELECT valor INTO stNomePrefeitura FROM administracao.configuracao WHERE exercicio = '' || stExercicio || '' AND parametro = 'nom_prefeitura';
 
 stSql := '
@@ -608,7 +538,6 @@ stSql := '
 
             --SELECIONA EMPENHO.PRE_EMPENHO_DESPESA
             eped.tipo_conta     as tipo_conta,
---            eped.tipo_soma      as tipo_soma,
 
             --SELECIONA ORCAMENT.CONTA_DESPESA
             ocd.cod_estrutural  as classificacao,
@@ -669,7 +598,6 @@ stSql := stSql || '
                     
                         stSql := stSql || '
                                 os.exercicio         = oss1.exercicio AND
-                            --  os.dt_suplementacao between  to_date('|| quote_literal(stDataInicial) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'') AND
                                 os.dt_suplementacao between  to_date('|| quote_literal(dataInicio) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'')    AND
                                 os.cod_suplementacao || ''-'' || os.exercicio IN (
                                 SELECT
@@ -682,7 +610,6 @@ stSql := stSql || '
                                     ctd.cod_lote  = cl.cod_lote AND
                                     ctd.tipo      = cl.tipo AND
                                     ctd.cod_entidade = cl.cod_entidade AND
-                                --  cl.dt_lote between  to_date('|| quote_literal(stDataInicial) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'')
                                     cl.dt_lote between  to_date('|| quote_literal(dataInicio) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'')
                                 )
                             ';
@@ -717,8 +644,6 @@ stSql := stSql || '
                     WHERE
                         os.cod_suplementacao = osr1.cod_suplementacao AND
                         os.exercicio         = osr1.exercicio --AND
-                    --  os.dt_suplementacao between  to_date('|| quote_literal(stDataInicial) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'') AND
-                    --  os.dt_suplementacao between  to_date('|| quote_literal(dataInicio) ||'::varchar,''dd/mm/yyyy'') And to_date('|| quote_literal(stDataFinal) ||'::varchar,''dd/mm/yyyy'')
                     ';
 
                         stSql := stSql || '
@@ -852,7 +777,6 @@ stSql := stSql || ' ' || stFiltro || '
             oss.valor,
             osr.valor,
             eped.tipo_conta
---            eped.tipo_soma
 ';
 
     if ((stCodOrgaoInicial is not null and stCodOrgaoInicial <> '') or (stCodOrgaoFinal is not null and stCodOrgaoFinal <> '')) then
@@ -906,7 +830,7 @@ stSql := '
         (coalesce(orcamento.fn_consolidado_liquidado(''' || dataInicio || ''', ''' || stDataFinal || ''',publico.fn_mascarareduzida(tbl.classificacao),tbl.num_orgao,tbl.num_unidade),0.00) - coalesce(orcamento.fn_consolidado_liquidado_estornado(''' || dataInicio || ''', ''' || stDataFinal || ''', publico.fn_mascarareduzida(tbl.classificacao),tbl.num_orgao,tbl.num_unidade),0.00)) as liquidado_ano,
         tbl.tipo_conta
         ,publico.fn_nivel(classificacao) AS nivel
---        tbl.tipo_soma
+
     FROM (
         SELECT
             CASE WHEN tr.classificacao IS NOT NULL THEN
@@ -1103,8 +1027,6 @@ stSql := stSql || '
         tbl.num_unidade,
         tbl.descricao
 ';
-
-
 
     FOR reRegistro IN EXECUTE stSql
     LOOP

@@ -53,47 +53,51 @@ function TLogradouro()
 
 function montaRecuperaRelacionamento()
 {
-    $stSql  = " SELECT                                                \n";
-    $stSql .= "     TL.cod_tipo,                                      \n";
-    $stSql .= "     TL.nom_tipo||' '||NL.nom_logradouro as tipo_nome, \n";
-    $stSql .= "     TL.nom_tipo,                                      \n";
-    $stSql .= "     NL.nom_logradouro,                                \n";
-    $stSql .= "     L.*,                                              \n";
-    $stSql .= "     B.nom_bairro,                                     \n";
-    $stSql .= "     M.nom_municipio,                                  \n";
-    $stSql .= "     U.nom_uf,                                         \n";
-    $stSql .= "     U.sigla_uf,                                       \n";
-    $stSql .= "     imobiliario.fn_consulta_cep(L.cod_logradouro) AS cep \n";
-    $stSql .= " FROM                                                  \n";
-    $stSql .= "    sw_tipo_logradouro   AS TL,                       \n";
-    $stSql .= "    sw_nome_logradouro   AS NL,                       \n";
-    $stSql .= "    sw_municipio         AS M,                        \n";
-    $stSql .= "    sw_uf                AS U,                        \n";
-    $stSql .= "     ( SELECT                                          \n";
-    $stSql .= "           MAX(timestamp) AS timestamp,                \n";
-    $stSql .= "           cod_logradouro                              \n";
-    $stSql .= "       FROM                                            \n";
-    $stSql .= "           sw_nome_logradouro                         \n";
-    $stSql .= "       GROUP BY cod_logradouro                         \n";
-    $stSql .= "       ORDER BY cod_logradouro                         \n";
-    $stSql .= "     ) AS MNL,                                         \n";
-    $stSql .= "    sw_logradouro        AS L                         \n";
-    $stSql .= " LEFT OUTER JOIN sw_bairro_logradouro    AS BL ON     \n";
-    $stSql .= "     BL.cod_logradouro = L.cod_logradouro   AND        \n";
-    $stSql .= "     BL.cod_uf         = L.cod_uf           AND        \n";
-    $stSql .= "     BL.cod_municipio  = L.cod_municipio               \n";
-    $stSql .= " LEFT OUTER JOIN sw_bairro               AS B ON      \n";
-    $stSql .= "     B.cod_bairro      = BL.cod_bairro      AND        \n";
-    $stSql .= "     B.cod_uf          = BL.cod_uf          AND        \n";
-    $stSql .= "     B.cod_municipio   = BL.cod_municipio              \n";
-    $stSql .= " WHERE                                                 \n";
-    $stSql .= "     L.cod_logradouro  = NL.cod_logradouro  AND        \n";
-    $stSql .= "     NL.cod_logradouro = MNL.cod_logradouro AND        \n";
-    $stSql .= "     NL.timestamp      = MNL.timestamp      AND        \n";
-    $stSql .= "     L.cod_municipio   = M.cod_municipio    AND        \n";
-    $stSql .= "     L.cod_uf          = M.cod_uf           AND        \n";
-    $stSql .= "     M.cod_uf          = U.cod_uf           AND        \n";
-    $stSql .= "     NL.cod_tipo       = TL.cod_tipo                   \n";
+    $stSql  = " SELECT 
+                       TL.cod_tipo,                                      
+                       TL.nom_tipo||' '||NL.nom_logradouro as tipo_nome, 
+                       TL.nom_tipo,                                      
+                       NL.nom_logradouro,                                
+                       L.*,                                              
+                       B.nom_bairro,                                     
+                       M.nom_municipio,                                  
+                       U.nom_uf,                                         
+                       U.sigla_uf,                                       
+                       imobiliario.fn_consulta_cep(L.cod_logradouro) AS cep 
+                  FROM sw_tipo_logradouro AS TL,                       
+                       ( SELECT DISTINCT ON (cod_logradouro)
+                                  cod_logradouro
+                                , timestamp
+                                , cod_tipo
+                                , nom_logradouro
+                                , dt_inicio
+                                , MAX(dt_fim) as dt_fim
+                                , cod_norma
+                           FROM sw_nome_logradouro as snl 
+                       GROUP BY cod_logradouro
+                                , timestamp
+                                , cod_tipo
+                                , nom_logradouro
+                                , dt_inicio
+                       ORDER BY cod_logradouro DESC
+                       )AS NL,                       
+                       sw_municipio  AS M,                        
+                       sw_uf         AS U,                        
+                       sw_logradouro AS L                         
+       LEFT OUTER JOIN sw_bairro_logradouro AS BL 
+                    ON BL.cod_logradouro = L.cod_logradouro   
+                   AND BL.cod_uf         = L.cod_uf           
+                   AND BL.cod_municipio  = L.cod_municipio               
+       LEFT OUTER JOIN sw_bairro               AS B 
+                    ON B.cod_bairro      = BL.cod_bairro      
+                   AND B.cod_uf          = BL.cod_uf          
+                   AND B.cod_municipio   = BL.cod_municipio              
+                 WHERE L.cod_logradouro  = NL.cod_logradouro 
+                   AND L.cod_municipio   = M.cod_municipio    
+                   AND L.cod_uf          = M.cod_uf           
+                   AND M.cod_uf          = U.cod_uf           
+                   AND NL.cod_tipo       = TL.cod_tipo  
+    ";                 
 
     return $stSql;
 }
@@ -127,6 +131,9 @@ function montaRecuperaRelacionamentoRelatorio()
                     ,sw_uf.sigla_uf
                     ,imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) AS cep
                     ,TO_CHAR(sw_nome_logradouro.timestamp,'dd/mm/yyyy hh24:mm') as data_logradouro   
+                    ,norma.num_norma||'/'||norma.exercicio||' - '||tipo_norma.nom_tipo_norma||' - '||norma.nom_norma as descricao_norma_relatorio
+                    ,TO_CHAR(sw_nome_logradouro.dt_inicio,'dd/mm/yyyy') as dt_inicio
+                    ,TO_CHAR(sw_nome_logradouro.dt_fim,'dd/mm/yyyy') as dt_fim
                 FROM sw_logradouro
                 
                 INNER JOIN sw_nome_logradouro
@@ -151,7 +158,13 @@ function montaRecuperaRelacionamentoRelatorio()
                 
                 INNER JOIN sw_uf
                     ON sw_municipio.cod_uf          = sw_uf.cod_uf
-                    
+                
+                INNER JOIN normas.norma
+                    ON norma.cod_norma = sw_nome_logradouro.cod_norma    
+            
+                INNER JOIN normas.tipo_norma
+                    ON tipo_norma.cod_tipo_norma = norma.cod_tipo_norma
+
                 LEFT JOIN sw_bairro_logradouro
                      ON sw_bairro_logradouro.cod_logradouro = sw_logradouro.cod_logradouro   
                     AND sw_bairro_logradouro.cod_uf         = sw_logradouro.cod_uf           
@@ -174,7 +187,7 @@ function recuperaHistoricoLogradouro(&$rsRecordSet, $stCondicao = "" , $stOrdem 
     $rsRecordSet = new RecordSet;
     if(trim($stOrdem))
         $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-    $stSql = $this->montaRecuperaHistoricoLogradouro().$stCondicao.$stOrdem;
+    $stSql = $this->montaRecuperaHistoricoLogradouro().$stCondicao.$stOrdem;    
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -185,42 +198,61 @@ function recuperaHistoricoLogradouro(&$rsRecordSet, $stCondicao = "" , $stOrdem 
 private function montaRecuperaHistoricoLogradouro()
 {
     $stSql  = " SELECT
-                    '3' as grupo
-                    ,sw_tipo_logradouro.cod_tipo
-                    ,sw_tipo_logradouro.nom_tipo||' '||sw_nome_logradouro.nom_logradouro as tipo_nome
-                    ,sw_tipo_logradouro.nom_tipo
-                    ,sw_nome_logradouro.nom_logradouro
-                    ,sw_logradouro.*
-                    ,initcap(sw_bairro.nom_bairro) as nom_bairro
-                    ,sw_municipio.nom_municipio
-                    ,sw_uf.nom_uf
-                    ,sw_uf.sigla_uf
-                    ,imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) AS cep
-                    ,TO_CHAR(sw_nome_logradouro.timestamp,'dd/mm/yyyy hh24:mm') as data_logradouro
-                FROM sw_logradouro
-
-                INNER JOIN sw_nome_logradouro
+                        CASE WHEN sw_nome_logradouro.timestamp < (SELECT max(timestamp) FROM sw_nome_logradouro as max 
+                                                                  WHERE max.cod_logradouro = sw_nome_logradouro.cod_logradouro) 
+                               THEN
+                                        '3'
+                               else
+                                        '1'
+                        END as grupo
+                       ,sw_tipo_logradouro.cod_tipo
+                       ,sw_tipo_logradouro.nom_tipo||' '||sw_nome_logradouro.nom_logradouro as tipo_nome
+                       ,sw_tipo_logradouro.nom_tipo
+                       ,sw_nome_logradouro.nom_logradouro as nome_anterior
+                       ,sw_nome_logradouro.nom_logradouro
+                       ,TO_CHAR(sw_nome_logradouro.dt_inicio,'dd/mm/yyyy') as dt_inicio
+                       ,TO_CHAR(sw_nome_logradouro.dt_fim,'dd/mm/yyyy') as dt_fim   
+                       ,sw_nome_logradouro.cod_norma
+                       ,norma.cod_tipo_norma||' - '||norma.nom_norma as descricao_norma
+                       ,norma.num_norma||'/'||norma.exercicio||' - '||tipo_norma.nom_tipo_norma||' - '||norma.nom_norma as descricao_norma_relatorio
+                       ,sw_logradouro.*
+                       ,initcap(sw_bairro.nom_bairro) as nom_bairro
+                       ,sw_municipio.nom_municipio
+                       ,sw_uf.nom_uf
+                       ,sw_uf.sigla_uf
+                       ,imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) AS cep
+                       ,TO_CHAR(sw_nome_logradouro.timestamp,'dd/mm/yyyy hh24:mm') as data_logradouro
+                       ,TO_CHAR(sw_nome_logradouro.timestamp,'yyyy') as exercicio
+                       ,row_number() OVER (ORDER BY sw_nome_logradouro.dt_inicio) as sequencial
+                  FROM sw_logradouro
+            INNER JOIN sw_nome_logradouro
                     ON sw_logradouro.cod_logradouro = sw_nome_logradouro.cod_logradouro
 
-                INNER JOIN sw_tipo_logradouro
+            INNER JOIN sw_tipo_logradouro
                     ON sw_nome_logradouro.cod_tipo = sw_tipo_logradouro.cod_tipo
                        
-                INNER JOIN sw_municipio
-                     ON sw_logradouro.cod_municipio   = sw_municipio.cod_municipio    
-                    AND sw_logradouro.cod_uf          = sw_municipio.cod_uf           
+            INNER JOIN sw_municipio
+                    ON sw_logradouro.cod_municipio   = sw_municipio.cod_municipio    
+                   AND sw_logradouro.cod_uf          = sw_municipio.cod_uf           
                 
-                INNER JOIN sw_uf
+            INNER JOIN sw_uf
                     ON sw_municipio.cod_uf          = sw_uf.cod_uf
-                    
-                LEFT JOIN sw_bairro_logradouro
-                     ON sw_bairro_logradouro.cod_logradouro = sw_logradouro.cod_logradouro   
-                    AND sw_bairro_logradouro.cod_uf         = sw_logradouro.cod_uf           
-                    AND sw_bairro_logradouro.cod_municipio  = sw_logradouro.cod_municipio               
                 
-                LEFT JOIN sw_bairro
-                     ON sw_bairro.cod_bairro      = sw_bairro_logradouro.cod_bairro      
-                    AND sw_bairro.cod_uf          = sw_bairro_logradouro.cod_uf          
-                    AND sw_bairro.cod_municipio   = sw_bairro_logradouro.cod_municipio
+            INNER JOIN normas.norma
+                    ON norma.cod_norma = sw_nome_logradouro.cod_norma    
+            
+            INNER JOIN normas.tipo_norma
+                    ON tipo_norma.cod_tipo_norma = norma.cod_tipo_norma    
+            
+            LEFT JOIN sw_bairro_logradouro
+                   ON sw_bairro_logradouro.cod_logradouro = sw_logradouro.cod_logradouro   
+                  AND sw_bairro_logradouro.cod_uf         = sw_logradouro.cod_uf           
+                  AND sw_bairro_logradouro.cod_municipio  = sw_logradouro.cod_municipio               
+                
+            LEFT JOIN sw_bairro
+                   ON sw_bairro.cod_bairro      = sw_bairro_logradouro.cod_bairro      
+                  AND sw_bairro.cod_uf          = sw_bairro_logradouro.cod_uf          
+                  AND sw_bairro.cod_municipio   = sw_bairro_logradouro.cod_municipio
         ";
 
    return $stSql;

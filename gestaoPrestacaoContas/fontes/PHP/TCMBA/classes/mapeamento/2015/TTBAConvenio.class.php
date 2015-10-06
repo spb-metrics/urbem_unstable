@@ -98,7 +98,7 @@ class TTBAConvenio extends Persistente
                         , convenio.exercicio AS ano
                         , 0 AS cod_funcao
                         , 0 AS cod_subfuncao
-                        , '1'::VARCHAR AS contrato_anterior_siga
+                        , 'S'::VARCHAR AS contrato_anterior_siga
 
                     FROM licitacao.convenio
 

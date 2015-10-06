@@ -131,7 +131,7 @@ case "elaborar":
 
 function getMensagemValidaCampos($arValidacao)
 {
-    $arReturn = SistemaLegado::validaMascaraDinamica('999999999999.99', $arValidacao['flValorReceita']['valor']);
+    $arReturn = SistemaLegado::validaMascaraDinamica('9.999.999.999,99', $arValidacao['flValorReceita']['valor']);
     if ($arReturn[0] == 0) {
         $arChave = explode('_', $arValidacao['flValorReceita']['chave']);
         $stMensagem = 'O valor do campo Valor na linha '.$arChave[1].' está fora dos padrões, digite-o corretamente.';

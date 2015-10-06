@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLLogradouros.php 63009 2015-07-16 14:36:54Z evandro $
+    * $Id: FLLogradouros.php 63656 2015-09-24 19:44:19Z evandro $
 
     * Casos de uso: uc-05.01.20
 */
@@ -230,6 +230,24 @@ $obRadMostrarHistoricoNao->setChecked (true);
 
 $arMostrarHistorico = array($obRadMostrarHistoricoSim, $obRadMostrarHistoricoNao);
 
+// Mostrar Norma do Logradouro
+$obRadMostrarNormaSim = new Radio();
+$obRadMostrarNormaSim->setId     ('boNorma');
+$obRadMostrarNormaSim->setName   ('boNorma');
+$obRadMostrarNormaSim->setValue  ('S');
+$obRadMostrarNormaSim->setRotulo ('Demonstrar Norma do Logradouro');
+$obRadMostrarNormaSim->setLabel  ('Sim');
+
+$obRadMostrarNormaNao = new Radio();
+$obRadMostrarNormaNao->setId      ('boNorma');
+$obRadMostrarNormaNao->setName    ('boNorma');
+$obRadMostrarNormaNao->setValue   ('N');
+$obRadMostrarNormaNao->setRotulo  ('Demonstrar Norma do Logradouro');
+$obRadMostrarNormaNao->setLabel   ('Não');
+$obRadMostrarNormaNao->setChecked (true);
+
+$arMostrarNorma = array($obRadMostrarNormaSim, $obRadMostrarNormaNao);
+
 $obFormulario = new Formulario;
 $obFormulario->addForm               ( $obForm );
 $obFormulario->setAjuda              ( "UC-05.01.20" );
@@ -246,7 +264,9 @@ $obFormulario->agrupaComponentes     ( array( $obCEPInicio, $obLblCEP ,$obCEPTer
 $obFormulario->addComponenteComposto ( $obTxtCodUF, $obCmbUF               );
 $obFormulario->addComponenteComposto ( $obTxtCodMunicipio, $obCmbMunicipio );
 $obFormulario->addComponente         ( $obCmbOrder );
-$obFormulario->agrupaComponentes     ($arMostrarHistorico     );
+$obFormulario->agrupaComponentes     ( $arMostrarHistorico );
+$obFormulario->agrupaComponentes     ( $arMostrarNorma );
+
 $obFormulario->OK();
 $obFormulario->setFormFocus          ( $obCmbTipoLogradouro->getid() );
 $obFormulario->show();

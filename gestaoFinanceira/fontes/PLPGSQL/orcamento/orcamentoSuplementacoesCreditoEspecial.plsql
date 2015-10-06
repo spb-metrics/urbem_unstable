@@ -34,14 +34,13 @@ DECLARE
     inSequencia           INTEGER;
     stTipoCredSuplementar VARCHAR := '';
 BEGIN
-    
-    SELECT INTO
-          inUF
-          configuracao.valor
+   
+    SELECT INTO inUF
+                configuracao.valor
      FROM administracao.configuracao
     WHERE configuracao.cod_modulo = 2
       AND configuracao.parametro = 'cod_uf'
-      AND configuracao.exercicio = quote_literal(stExercicio);
+      AND configuracao.exercicio = stExercicio;
     
     stTipoCredSuplementar := stCredSuplementar;
     

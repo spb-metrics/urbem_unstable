@@ -29,7 +29,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBARetencaoEmpresa.class.php 63571 2015-09-11 14:04:58Z michel $
+    * $Id: TTCMBARetencaoEmpresa.class.php 63716 2015-10-01 19:03:03Z carlos.silva $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -61,20 +61,16 @@ class TTCMBARetencaoEmpresa extends Persistente {
     public function montaRecuperaRetencaoEmpresa()
     {
         $stSql = "                       
-                SELECT to_char(nota_liquidacao_paga.timestamp,'yyyy') AS ano    
-                     , empenho.exercicio AS ano_criacao
-                     , pagamento_liquidacao.cod_ordem AS num_pagamento
-                     , empenho.cod_empenho AS num_empenho   
-                     , to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy') AS dt_pagamento_empenho    
-                     , REPLACE(plano_conta.cod_estrutural,'.','') AS conta_contabil
-                     , conta_despesa.cod_estrutural AS desdobramento
-                     , COALESCE(SUM(ordem_pagamento_retencao.vl_retencao),0.00) AS vl_retencao
-                     , 1 AS tipo_registro
-                     , '".$this->getDado('unidade_gestora')."' AS unidade_gestora
-                     , '".$this->getDado('competencia')."' AS competencia
-                     , '0000' AS reservado
-                     , '0000' AS reservado2
-                     , '0000000000' AS reservado3
+                SELECT  1 AS tipo_registro
+                       , '".$this->getDado('unidade_gestora')."' AS unidade_gestora
+                       , pagamento_liquidacao.cod_ordem AS num_pagamento
+                       , to_char(nota_liquidacao_paga.timestamp,'yyyy') AS ano    
+                       , empenho.exercicio AS ano_criacao
+                       , to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy') AS dt_pagamento_empenho    
+                       , REPLACE(plano_conta.cod_estrutural,'.','') AS conta_contabil
+                       , COALESCE(SUM(ordem_pagamento_retencao.vl_retencao),0.00) AS vl_retencao
+                       , '".$this->getDado('competencia')."' AS competencia
+                       , '' AS reservado_tcm
 
                  FROM empenho.empenho 
 
@@ -142,10 +138,10 @@ class TTCMBARetencaoEmpresa extends Persistente {
                      , conta_despesa.cod_estrutural
                      , pagamento_liquidacao.cod_ordem
 
-              ORDER BY pagamento_liquidacao.cod_ordem, num_empenho
-                     , dt_pagamento_empenho
-
-        ";
+              ORDER BY pagamento_liquidacao.cod_ordem
+                     , empenho.cod_empenho
+                     , dt_pagamento_empenho ";
+                     
         return $stSql;
     }
     

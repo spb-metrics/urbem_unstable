@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Leandro André Zis
 
-    * $Id: OCManterContrato.php 63565 2015-09-11 11:25:25Z carlos.silva $
+    * $Id: OCManterContrato.php 63675 2015-09-28 21:31:00Z jean $
 
     * Casos de uso : uc-03.05.22
 */
@@ -272,7 +272,6 @@ switch ($_REQUEST['stCtrl']) {
     } else {
        echo "alertaAviso('Este documento já consta nesse contrato.','form','erro','".Sessao::getId()."');";
     }
-
     echo 'limpaFormularioDocumentos();';
     echo 'document.getElementById("inNumDiasValido").value = "";';
     Sessao::write('arDocumentos', $arDocumentos);
@@ -339,7 +338,6 @@ switch ($_REQUEST['stCtrl']) {
         }
         $inCount++;
     }
-
     Sessao::write('arDocumentos', $arDocumentos);
     echo 'limpaFormularioDocumentos();';
     echo 'document.getElementById("inNumDiasValido").value = "";';
@@ -372,7 +370,6 @@ switch ($_REQUEST['stCtrl']) {
             $inCount++;
         }
     }
-
     Sessao::write('arDocumentos', $arTEMP);
     echo montaListaDocumentos($arTEMP);
     break;
@@ -801,7 +798,6 @@ function montaListaDocumentos($arRecordSet , $boExecuta = true)
     if (is_array($arRecordSet) ) {
         $rsDocumentos = new RecordSet;
         $rsDocumentos->preenche( $arRecordSet );
-
     $obLista = new Lista;
 
     $obLista->setTitulo('Documentos Exigidos');

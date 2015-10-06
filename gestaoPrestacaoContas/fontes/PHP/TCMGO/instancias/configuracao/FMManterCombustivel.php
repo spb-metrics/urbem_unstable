@@ -40,12 +40,12 @@ include_once CAM_GPC_TGO_NEGOCIO .'RTGOConfiguracao.class.php';
 $pgProc = "PRManterCombustivel.php";
 $pgOcul = "OCManterCombustivel.php";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 //Instancia um form
 $obForm = new Form;
-$obForm->setAction                  ( $pgProc  );
-$obForm->setTarget                  ( "oculto" );
+$obForm->setAction ( $pgProc  );
+$obForm->setTarget ( "oculto" );
 
 //Instancia o hidden para a acao
 $obHdnAcao = new Hidden;
@@ -87,8 +87,8 @@ $obSlCombustivelTCM->obEvento->setOnChange("montaParametrosGET('preencheCombusti
 //Instancia um select multiplo para os combustiveis do SW
 $obSlMultiploCombustivel = new SelectMultiplo();
 $obSlMultiploCombustivel->setName            ('arCodCombustivelSW');
-$obSlMultiploCombustivel->setRotulo          ('Combustível do SW');
-$obSlMultiploCombustivel->setTitle           ('Selecione os combustiveis do SW');
+$obSlMultiploCombustivel->setRotulo          ('Combustível do Urbem');
+$obSlMultiploCombustivel->setTitle           ('Selecione os combustiveis do Urbem');
 $obSlMultiploCombustivel->setNull            (true);
 
 $rsCombustivelDisponivel  = new RecordSet();
@@ -120,4 +120,5 @@ $obFormulario->Ok();
 $obFormulario->show();
 include 'JSManterCombustivel.js';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

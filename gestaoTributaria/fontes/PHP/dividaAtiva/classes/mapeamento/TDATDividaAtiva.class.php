@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TDATDividaAtiva.class.php 61352 2015-01-09 18:14:18Z evandro $
+    * $Id: TDATDividaAtiva.class.php 63615 2015-09-18 14:11:12Z evandro $
 
 * Casos de uso: uc-05.04.02
 */
@@ -4186,7 +4186,7 @@ ON
                                     , 1 ) AS juros
 
 
-                        , split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
+                        ,COALESCE(NULLIF(split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
                                                                  , dda.cod_inscricao
                                                                  , dda.exercicio::integer
                                                                  , dpar.cod_modalidade
@@ -4213,11 +4213,10 @@ ON
                                                                  , COALESCE(dparc.dt_vencimento_parcela,NOW()::DATE)
                                                                  , 'false' )
                                     , ';'
-                                    , 5
-                                    ) AS multa_infracao
+                                    , 5),''),'0.00')::numeric AS multa_infracao
 
 
-                        , split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
+                        ,COALESCE(NULLIF(split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
                                                                  , dda.cod_inscricao
                                                                  , dda.exercicio::integer
                                                                  , dpar.cod_modalidade
@@ -4243,12 +4242,12 @@ ON
                                                                  , COALESCE(dparc.dt_vencimento_parcela,NOW()::DATE)
                                                                  , 'false' )
                                     , ';'
-                                    , 2 ) AS multa
+                                    , 2 ),''),'0.00')::numeric AS multa
 
                                     ,aplica_reducao_modalidade_acrescimo(
                                                                   dpar.cod_modalidade
                                                                  , dpar.num_parcelamento
-                                                                 , split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
+                                                                 , COALESCE(NULLIF(split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
                                                                  , dda.cod_inscricao
                                                                  , dda.exercicio::integer
                                                                  , dpar.cod_modalidade
@@ -4275,7 +4274,7 @@ ON
                                                                  , COALESCE(dparc.dt_vencimento_parcela,NOW()::DATE)
                                                                  , 'false' )
                                     , ';'
-                                    , 1 )::numeric
+                                    , 1 ),''),'0.00')::numeric
                                                                 , 2
                                                                 , 2
                                                                 , dda.dt_vencimento_origem
@@ -4285,7 +4284,7 @@ ON
                                         ,aplica_reducao_modalidade_acrescimo(
                                                                   dpar.cod_modalidade
                                                                  , dpar.num_parcelamento
-                                                                 , split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
+                                                                 , COALESCE(NULLIF(split_part( aplica_acrescimo_modalidade( CASE WHEN dpar.judicial = FALSE THEN 0 ELSE 1 END
                                                                  , dda.cod_inscricao
                                                                  , dda.exercicio::integer
                                                                  , dpar.cod_modalidade
@@ -4312,8 +4311,7 @@ ON
                                                                  , COALESCE(dparc.dt_vencimento_parcela,NOW()::DATE)
                                                                  , 'false' )
                                     , ';'
-                                    ,2
-                                    )::numeric
+                                    ,2),''),'0.00')::numeric
                                                                 , 3
                                                                 , 3
                                                                 , dda.dt_vencimento_origem
@@ -9098,7 +9096,7 @@ ON
                     ".$inCodInscricao.",
                     ".$inExercicio.",
                     ".$inCodModalidade.",
-                    3,
+                    0,
                     ".$inInscricao.",
                     ".$flValorOrigem.",
                     '".$stDtOrigem."',

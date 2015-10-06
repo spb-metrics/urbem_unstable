@@ -42,8 +42,10 @@ $Date: 2007-12-13 11:24:00 -0200 (Qui, 13 Dez 2007) $
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GRH_PES_NEGOCIO."RConfiguracaoPessoal.class.php"                                     );
-include_once ( CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php"                           );
+include_once CAM_GRH_PES_NEGOCIO."RConfiguracaoPessoal.class.php";
+include_once CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php";
+
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterServidor";
@@ -53,6 +55,7 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
+
 
 Sessao::write("stOrigem","FL");
 
@@ -90,16 +93,22 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName     ( "stCtrl" );
 $obHdnCtrl->setValue    ( ""       );
 
+//Para caso ainda não tenha periodo movimentação cadastrado
+$obLblMensagem = new Label;
+$obLblMensagem->setName   ( "stMensagem" );
+$obLblMensagem->setRotulo ( "Mensagem" );
+$obLblMensagem->setValue  ( "Necessário criar o primeiro período de movimentação em <b>Gestão Recursos Humanos :: Folha de Pagamento :: Rotina Mensal :: Abrir Período de Movimentação</b>" );
+
 $obBscCGM = new BuscaInner;
-$obBscCGM->setRotulo           ( "CGM"                      );
+$obBscCGM->setRotulo           ( "CGM" );
 $obBscCGM->setTitle            ( "Informe o CGM do servidor.");
 if( $stAcao == 'incluir' )
-$obBscCGM->setNull             ( false                      );
-$obBscCGM->setId               ( "inNomCGM"                 );
-$obBscCGM->obCampoCod->setName ( "inNumCGM"                 );
-$obBscCGM->obCampoCod->setId   ( "inNumCGM"                 );
-$obBscCGM->obCampoCod->setValue( isset($inNumCGM) ? $inNumCGM : ""      );
-$obBscCGM->obCampoCod->obEvento->setOnChange("buscaValor('buscaCGM')"   );
+$obBscCGM->setNull             ( false );
+$obBscCGM->setId               ( "inNomCGM" );
+$obBscCGM->obCampoCod->setName ( "inNumCGM" );
+$obBscCGM->obCampoCod->setId   ( "inNumCGM" );
+$obBscCGM->obCampoCod->setValue( isset($inNumCGM) ? $inNumCGM : "" );
+$obBscCGM->obCampoCod->obEvento->setOnChange("buscaValor('buscaCGM')" );
 
 $obBscCGM->setFuncaoBusca( "abrePopUp('".CAM_GRH_PES_POPUPS."servidor/FLProcurarCgm.php','frm','inNumCGM','inNomCGM','fisica','".Sessao::getId()."','800','550')" );
 
@@ -121,20 +130,29 @@ if ($stAcao == "incluir") {
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addForm              ( $obForm                           );
-$obFormulario->addTitulo            ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
-$obFormulario->addTitulo            ( "Filtro para Servidor"            );
-$obFormulario->addHidden            ( $obHdnAcao                        );
-$obFormulario->addHidden            ( $obHdnAba                         );
-$obFormulario->addHidden            ( $obHdnCtrl                        );
-$obFormulario->addComponente        ( $obBscCGM                         );
-if ($stAcao != 'incluir') {
-    $obIContratoDigitoVerificador->geraFormulario( $obFormulario        );
-}
-$obFormulario->ok();
+$obFormulario->addForm  ( $obForm );
+$obFormulario->addTitulo( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
+$obFormulario->addTitulo( "Filtro para Servidor" );
 
-$obFormulario->setFormFocus( $obBscCGM->obCampoCod->getId() );
+$obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao;
+$obTFolhaPagamentoPeriodoMovimentacao->recuperaTodos($rsFolhaPagamentoPeriodoMovimentacao);
+
+if ($rsFolhaPagamentoPeriodoMovimentacao->getNumLinhas() < 1) {
+    $obFormulario->addComponente( $obLblMensagem );
+    
+} else {
+    $obFormulario->addHidden    ( $obHdnAcao );
+    $obFormulario->addHidden    ( $obHdnAba  );
+    $obFormulario->addHidden    ( $obHdnCtrl );
+    $obFormulario->addComponente( $obBscCGM  );
+    if ($stAcao != 'incluir') {
+        $obIContratoDigitoVerificador->geraFormulario( $obFormulario );
+    }
+    
+    $obFormulario->ok();
+    $obFormulario->setFormFocus( $obBscCGM->obCampoCod->getId() );
+}
+
 $obFormulario->show();
 
 include_once( $pgJS );
-?>

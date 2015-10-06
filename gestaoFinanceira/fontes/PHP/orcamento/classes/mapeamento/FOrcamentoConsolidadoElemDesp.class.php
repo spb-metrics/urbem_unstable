@@ -88,31 +88,134 @@ function FOrcamentoConsolidadoElemDesp()
 
 }
 
+function recuperaTodos(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stOrdem = $stOrdem ? " ORDER BY ".$stOrdem : " ORDER BY descricao ";
+    
+    $idCodUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao);
+    if ($idCodUf == 11) {
+        $stSql  = $this->montaRecuperaTodosTCEMG().$stFiltro.$stOrdem;    
+    } else {
+        $stSql  = $this->montaRecuperaTodos().$stFiltro.$stOrdem;
+    }
+    
+    $this->setDebug( $stSql );
+
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
 function montaRecuperaTodos()
 {
-    $stSql  = " SELECT *                                                                                                    \n";
-    $stSql .= " FROM ".$this->getTabela()."('".$this->getDado("exercicio")."','".$this->getDado("stFiltro")."','".$this->getDado("stDataInicial")."','".$this->getDado("stDataFinal")."','".$this->getDado("stEntidade")."','".$this->getDado("stCodOrgaoInicial")."','".$this->getDado("stCodOrgaoFinal")."','".$this->getDado("stCodUnidadeInicial")."','".$this->getDado("stCodUnidadeFinal")."','".$this->getDado('stDestinacaoRecurso')."','".$this->getDado('inCodDetalhamento')."', ".$this->getDado('inCodFuncao').", ".$this->getDado('inCodSubFuncao').") as retorno( \n";
-    $stSql .= "     classificacao   varchar,        \n";
-    $stSql .= "     cod_reduzido    varchar,        \n";
-    $stSql .= "     descricao       varchar,        \n";
-    $stSql .= "     num_orgao       integer,        \n";
-    $stSql .= "     nom_orgao       varchar,        \n";
-    $stSql .= "     num_unidade     integer,        \n";
-    $stSql .= "     nom_unidade     varchar,        \n";
-    $stSql .= "     saldo_inicial   numeric,        \n";
-    $stSql .= "     suplementacoes  numeric,        \n";
-    $stSql .= "     reducoes        numeric,        \n";
-    $stSql .= "     empenhado_mes   numeric,        \n";
-    $stSql .= "     empenhado_ano   numeric,        \n";
-    $stSql .= "     anulado_mes     numeric,        \n";
-    $stSql .= "     anulado_ano     numeric,        \n";
-    $stSql .= "     pago_mes        numeric,        \n";
-    $stSql .= "     pago_ano        numeric,        \n";
-    $stSql .= "     liquidado_mes   numeric,        \n";
-    $stSql .= "     liquidado_ano   numeric,        \n";
-    $stSql .= "     tipo_conta      varchar,        \n";
-    $stSql .= "     nivel           integer         \n";
-   $stSql .= "     )                                                                                                       \n";
+    $stSql  = " SELECT *
+                    FROM ".$this->getTabela()."('".$this->getDado("exercicio")."','".$this->getDado("stFiltro")."','".$this->getDado("stDataInicial")."','".$this->getDado("stDataFinal")."','".$this->getDado("stEntidade")."','".$this->getDado("stCodOrgaoInicial")."','".$this->getDado("stCodOrgaoFinal")."','".$this->getDado("stCodUnidadeInicial")."','".$this->getDado("stCodUnidadeFinal")."','".$this->getDado('stDestinacaoRecurso')."','".$this->getDado('inCodDetalhamento')."', ".$this->getDado('inCodFuncao').", ".$this->getDado('inCodSubFuncao').") as retorno( \n
+                        classificacao   varchar,
+                        cod_reduzido    varchar,
+                        descricao       varchar,
+                        num_orgao       integer,
+                        nom_orgao       varchar,
+                        num_unidade     integer,
+                        nom_unidade     varchar,
+                        saldo_inicial   numeric,
+                        suplementacoes  numeric,
+                        reducoes        numeric,
+                        empenhado_mes   numeric,
+                        empenhado_ano   numeric,
+                        anulado_mes     numeric,
+                        anulado_ano     numeric,
+                        pago_mes        numeric,
+                        pago_ano        numeric,
+                        liquidado_mes   numeric,
+                        liquidado_ano   numeric,
+                        tipo_conta      varchar,
+                        nivel           integer ) ";
+                        
+    return $stSql;
+}
+
+function recuperaTodosSinteticos(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $this->setTabela('orcamento.fn_consolidado_elem_despesa_sintetica');
+
+    $stOrdem = $stOrdem ? " ORDER BY ".$stOrdem : " ORDER BY descricao ";
+    
+    $idCodUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao);
+    if ($idCodUf == 11) {
+        $stSql  = $this->montaRecuperaTodosTCEMG().$stFiltro.$stOrdem;    
+    } else {
+        $stSql  = $this->montaRecuperaTodos().$stFiltro.$stOrdem;
+    }
+    
+    $this->setDebug( $stSql );
+
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaTodosTCEMG()
+{
+    $stSql  = "SELECT *
+                 FROM (
+                    SELECT *                                                                                                    
+                      FROM ".$this->getTabela()."('".$this->getDado("exercicio")."',' AND (cod_estrutural NOT ILIKE ''3.1.7.1%'' AND cod_estrutural NOT ILIKE ''3.3.7.1%'' AND cod_estrutural NOT ILIKE ''4.4.7.1%'') ','".$this->getDado("stDataInicial")."','".$this->getDado("stDataFinal")."','".$this->getDado("stEntidade")."','".$this->getDado("stCodOrgaoInicial")."','".$this->getDado("stCodOrgaoFinal")."','".$this->getDado("stCodUnidadeInicial")."','".$this->getDado("stCodUnidadeFinal")."','".$this->getDado('stDestinacaoRecurso')."','".$this->getDado('inCodDetalhamento')."', ".$this->getDado('inCodFuncao').", ".$this->getDado('inCodSubFuncao').") AS retorno (
+                             classificacao   varchar,
+                             cod_reduzido    varchar,
+                             descricao       varchar,
+                             num_orgao       integer,
+                             nom_orgao       varchar,
+                             num_unidade     integer,
+                             nom_unidade     varchar,
+                             saldo_inicial   numeric,
+                             suplementacoes  numeric,
+                             reducoes        numeric,
+                             empenhado_mes   numeric,
+                             empenhado_ano   numeric,
+                             anulado_mes     numeric,
+                             anulado_ano     numeric,
+                             pago_mes        numeric,
+                             pago_ano        numeric,
+                             liquidado_mes   numeric,
+                             liquidado_ano   numeric,
+                             tipo_conta      varchar,
+                             nivel           integer )
+                        WHERE ( cod_reduzido NOT ILIKE '3.1.7.1%' AND cod_reduzido NOT ILIKE '3.3.7.1%' AND cod_reduzido NOT ILIKE '4.4.7.1%' )
+                         
+                        UNION
+                         
+                    SELECT *
+                      FROM ".$this->getTabela()."('".$this->getDado("exercicio")."',' AND (cod_estrutural ILIKE ''3.1.7.1%'' OR cod_estrutural ILIKE ''3.3.7.1%'' OR cod_estrutural ILIKE ''4.4.7.1%'') ','".$this->getDado("stDataInicial")."','".$this->getDado("stDataFinal")."','".$this->getDado("stEntidade")."','".$this->getDado("stCodOrgaoInicial")."','".$this->getDado("stCodOrgaoFinal")."','".$this->getDado("stCodUnidadeInicial")."','".$this->getDado("stCodUnidadeFinal")."','".$this->getDado('stDestinacaoRecurso')."','".$this->getDado('inCodDetalhamento')."', ".$this->getDado('inCodFuncao').", ".$this->getDado('inCodSubFuncao').") AS retorno (
+                             classificacao   varchar,
+                             cod_reduzido    varchar,
+                             descricao       varchar,
+                             num_orgao       integer,
+                             nom_orgao       varchar,
+                             num_unidade     integer,
+                             nom_unidade     varchar,
+                             saldo_inicial   numeric,
+                             suplementacoes  numeric,
+                             reducoes        numeric,
+                             empenhado_mes   numeric,
+                             empenhado_ano   numeric,
+                             anulado_mes     numeric,
+                             anulado_ano     numeric,
+                             pago_mes        numeric,
+                             pago_ano        numeric,
+                             liquidado_mes   numeric,
+                             liquidado_ano   numeric,
+                             tipo_conta      varchar,
+                             nivel           integer )                  
+                        WHERE ( cod_reduzido ILIKE '3.1.7.1%' OR cod_reduzido ILIKE '3.3.7.1%' OR cod_reduzido ILIKE '4.4.7.1%' )
+                    ) AS tbl ";
 
     return $stSql;
 }
@@ -137,24 +240,6 @@ function montaConsultaValorConta()
     $stSql .= "     cod_despesa IS NOT NULL                                 ".$stQuebra;
 
     return $stSql;
-}
-
-function recuperaTodosSinteticos(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    $this->setTabela('orcamento.fn_consolidado_elem_despesa_sintetica');
-
-    $stOrdem = $stOrdem ? " ORDER BY ".$stOrdem : " ORDER BY descricao ";
-    $stSql  = $this->montaRecuperaTodos().$stFiltro.$stOrdem;
-
-    $this->setDebug( $stSql );
-
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
 }
 
 function recuperaAnexoDCAID(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")

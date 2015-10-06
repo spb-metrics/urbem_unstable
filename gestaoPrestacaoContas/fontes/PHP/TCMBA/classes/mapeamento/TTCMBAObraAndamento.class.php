@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObraAndamento.class.php 63589 2015-09-14 19:18:58Z michel $
+    * $Id: TTCMBAObraAndamento.class.php 63632 2015-09-22 17:42:03Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -42,7 +42,7 @@ class TTCMBAObraAndamento extends Persistente
     {
         parent::Persistente();
         $this->setTabela('tcmba.obra_andamento');
-        $this->setCampoCod('cod_obra, cod_tipo, cod_entidade, exercicio, cod_situacao, data_situacao');
+        $this->setComplementoChave('cod_obra, cod_tipo, cod_entidade, exercicio, cod_situacao, data_situacao');
 
         $this->AddCampo('cod_obra'              , 'integer' , true  , ''    , true , true );
         $this->AddCampo('cod_entidade'          , 'integer' , true  , ''    , true , true );

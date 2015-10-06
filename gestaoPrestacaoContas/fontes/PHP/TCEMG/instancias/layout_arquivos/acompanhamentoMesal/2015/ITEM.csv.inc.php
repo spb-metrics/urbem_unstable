@@ -30,10 +30,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ITEM.csv.inc.php 63085 2015-07-22 20:32:35Z evandro $
-  * $Date: 2015-07-22 17:32:35 -0300 (Qua, 22 Jul 2015) $
-  * $Author: evandro $
-  * $Rev: 63085 $
+  * $Id: ITEM.csv.inc.php 63614 2015-09-17 19:57:47Z franver $
+  * $Date: 2015-09-17 16:57:47 -0300 (Qui, 17 Set 2015) $
+  * $Author: franver $
+  * $Rev: 63614 $
   *
 */
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TExportacaoTCEMGItem.class.php";
@@ -59,11 +59,6 @@ $rsRecordSetITEM99->preenche($arRecordSetITEM99);
 
 $arRecordSetITEM10 = $rsRecordSetITEM10->getElementos();
 if (count($arRecordSetITEM10) > 0) {
-    SistemaLegado::removeAcentosSimbolos($arRecordSetITEM10['dscitem']);
-    $inCount = count($arRecordSetITEM10);
-    for($i = 0; $i < $inCount; $i++){   
-        $arRecordSetITEM10[$i]['unidademedida']=utf8_encode($arRecordSetITEM10[$i]['unidademedida']);
-    }
 
     $rsRecordSetITEM10->preenche($arRecordSetITEM10);
     $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
@@ -99,7 +94,7 @@ if (count($arRecordSetITEM10) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(100);
 
-}else {
+} else {
     $obExportador->roUltimoArquivo->addBloco($rsRecordSetITEM99);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');

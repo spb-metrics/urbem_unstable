@@ -33,7 +33,7 @@
  * @package URBEM
  * @subpackage Regra
 
- * $Id: RCIMRelatorioLogradouros.class.php 63009 2015-07-16 14:36:54Z evandro $
+ * $Id: RCIMRelatorioLogradouros.class.php 63656 2015-09-24 19:44:19Z evandro $
 
  * Casos de uso: uc-05.01.20
  */
@@ -66,6 +66,8 @@ var $obRCIMLogradouro;
     * @access Private
 */
 var $boMostrarHistorico;
+
+var $boMostrarNorma;
 
 /**
     * @access Public
@@ -108,6 +110,8 @@ function setOrder($valor) { $this->stOrder            = $valor;  }
 */
 function setMostrarHistorico($valor) { $this->boMostrarHistorico   = $valor;  }
 
+function setMostrarNorma($valor) { $this->boMostrarNorma   = $valor;  }
+
 /**
     * @access Public
     * @return Integer
@@ -149,6 +153,8 @@ function getOrder() { return $this->stOrder;            }
     * @return Boolean
 */
 function getMostrarHistorico() { return $this->boMostrarHistorico; }
+
+function getMostrarNorma() { return $this->boMostrarNorma; }
 
 /**
     * Método Construtor
@@ -211,15 +217,15 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
    }
 // cod cep
     if ( $this->getCodInicioCEP() && $this->getCodTerminoCEP() ) {
-        $stFiltro .= " cep BETWEEN  '".$this->getCodInicioCEP()."'";
+        $stFiltro .= " imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) BETWEEN  '".$this->getCodInicioCEP()."'";
         $stFiltro .= " AND '".$this->getCodTerminoCEP()."' \r\nAND";
     }
     if ( $this->getCodInicioCEP() && !$this->getCodTerminoCEP() ) {
-        $stFiltro .= " cep BETWEEN  '".$this->getCodInicioCEP()."'";
+        $stFiltro .= " imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) BETWEEN  '".$this->getCodInicioCEP()."'";
         $stFiltro .= " AND '99999999' AND\r\n";
     }
     if ( !$this->getCodInicioCEP() && $this->getCodTerminoCEP() ) {
-        $stFiltro .= " cep BETWEEN  '0'";
+        $stFiltro .= " imobiliario.fn_consulta_cep(sw_logradouro.cod_logradouro) BETWEEN  '0'";
         $stFiltro .= " AND '".$this->getCodTerminoCEP()."' \r\nAND";
    }
 
@@ -229,9 +235,9 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
 
     if ($this->getMostrarHistorico() == 'S') {
         Sessao::write('mostra_historico','true');
-        if ($this->stOrder == "codlogradouro") {
-            $stOrder = " ORDER BY sw_logradouro.cod_logradouro , sw_nome_logradouro.timestamp DESC";
-            $obErro = $this->obTLogradouro->recuperaHistoricoLogradouro( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+        if ($this->getOrder() == "codlogradouro") {
+            $stOrder = " \n ORDER BY sw_logradouro.cod_logradouro , sw_nome_logradouro.dt_inicio DESC";
+            $obErro = $this->obTLogradouro->recuperaHistoricoLogradouro( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );            
         } else { //Se for ordenado por NOME DE LOGRADOURO
             //Buscar todos os dados com o maxtimestamp
             $stOrder = " ORDER BY sw_nome_logradouro.nom_logradouro ASC";
@@ -252,39 +258,43 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             $rsRecordSet = new RecordSet();
             $inChave = 0;
             foreach ($rsMaxLogradouro->getElementos() as $valorMax) {
-                    $arLogradouros[$inChave]['grupo']           = $valorMax['grupo'];
-                    $arLogradouros[$inChave]['cod_tipo']        = $valorMax['cod_tipo'];
-                    $arLogradouros[$inChave]['tipo_nome']       = $valorMax['tipo_nome'];
-                    $arLogradouros[$inChave]['nom_tipo']        = $valorMax['nom_tipo'];
-                    $arLogradouros[$inChave]['nom_logradouro']  = $valorMax['nom_logradouro'];
-                    $arLogradouros[$inChave]['cod_logradouro']  = $valorMax['cod_logradouro'];
-                    $arLogradouros[$inChave]['cod_uf']          = $valorMax['cod_uf'];
-                    $arLogradouros[$inChave]['cod_municipio']   = $valorMax['cod_municipio'];
-                    $arLogradouros[$inChave]['cod_bairro']      = $valorMax['cod_bairro'];
-                    $arLogradouros[$inChave]['nom_bairro']      = $valorMax['nom_bairro'];
-                    $arLogradouros[$inChave]['nom_municipio']   = $valorMax['nom_municipio'];
-                    $arLogradouros[$inChave]['nom_uf']          = $valorMax['nom_uf'];
-                    $arLogradouros[$inChave]['sigla_uf']        = $valorMax['sigla_uf'];
-                    $arLogradouros[$inChave]['cep']             = $valorMax['cep'];
-                    $arLogradouros[$inChave]['data_logradouro'] = $valorMax['data_logradouro'];
+                    $arLogradouros[$inChave]['grupo']                     = $valorMax['grupo'];
+                    $arLogradouros[$inChave]['cod_tipo']                  = $valorMax['cod_tipo'];
+                    $arLogradouros[$inChave]['tipo_nome']                 = $valorMax['tipo_nome'];
+                    $arLogradouros[$inChave]['nom_tipo']                  = $valorMax['nom_tipo'];
+                    $arLogradouros[$inChave]['nom_logradouro']            = $valorMax['nom_logradouro'];
+                    $arLogradouros[$inChave]['cod_logradouro']            = $valorMax['cod_logradouro'];
+                    $arLogradouros[$inChave]['cod_uf']                    = $valorMax['cod_uf'];
+                    $arLogradouros[$inChave]['cod_municipio']             = $valorMax['cod_municipio'];
+                    $arLogradouros[$inChave]['cod_bairro']                = $valorMax['cod_bairro'];
+                    $arLogradouros[$inChave]['nom_bairro']                = $valorMax['nom_bairro'];
+                    $arLogradouros[$inChave]['nom_municipio']             = $valorMax['nom_municipio'];
+                    $arLogradouros[$inChave]['nom_uf']                    = $valorMax['nom_uf'];
+                    $arLogradouros[$inChave]['sigla_uf']                  = $valorMax['sigla_uf'];
+                    $arLogradouros[$inChave]['cep']                       = $valorMax['cep'];
+                    $arLogradouros[$inChave]['dt_inicio']                 = $valorMax['dt_inicio'];
+                    $arLogradouros[$inChave]['dt_fim']                    = $valorMax['dt_fim'];
+                    $arLogradouros[$inChave]['descricao_norma_relatorio'] = $valorMax['descricao_norma_relatorio'];
                 foreach ($rsHistorico->getElementos() as $valorHistorico) {
                     if ($valorMax['cod_logradouro'] == $valorHistorico['cod_logradouro']) {                        
                         $inChave++;
-                        $arLogradouros[$inChave]['grupo']           = $valorHistorico['grupo'];
-                        $arLogradouros[$inChave]['cod_tipo']        = $valorHistorico['cod_tipo'];
-                        $arLogradouros[$inChave]['tipo_nome']       = $valorHistorico['tipo_nome'];
-                        $arLogradouros[$inChave]['nom_tipo']        = $valorHistorico['nom_tipo'];
-                        $arLogradouros[$inChave]['nom_logradouro']  = $valorHistorico['nom_logradouro'];
-                        $arLogradouros[$inChave]['cod_logradouro']  = $valorHistorico['cod_logradouro'];
-                        $arLogradouros[$inChave]['cod_uf']          = $valorHistorico['cod_uf'];
-                        $arLogradouros[$inChave]['cod_municipio']   = $valorHistorico['cod_municipio'];
-                        $arLogradouros[$inChave]['cod_bairro']      = $valorHistorico['cod_bairro'];
-                        $arLogradouros[$inChave]['nom_bairro']      = $valorHistorico['nom_bairro'];
-                        $arLogradouros[$inChave]['nom_municipio']   = $valorHistorico['nom_municipio'];
-                        $arLogradouros[$inChave]['nom_uf']          = $valorHistorico['nom_uf'];
-                        $arLogradouros[$inChave]['sigla_uf']        = $valorHistorico['sigla_uf'];
-                        $arLogradouros[$inChave]['cep']             = $valorHistorico['cep'];
-                        $arLogradouros[$inChave]['data_logradouro'] = $valorHistorico['data_logradouro'];
+                        $arLogradouros[$inChave]['grupo']                     = $valorHistorico['grupo'];
+                        $arLogradouros[$inChave]['cod_tipo']                  = $valorHistorico['cod_tipo'];
+                        $arLogradouros[$inChave]['tipo_nome']                 = $valorHistorico['tipo_nome'];
+                        $arLogradouros[$inChave]['nom_tipo']                  = $valorHistorico['nom_tipo'];
+                        $arLogradouros[$inChave]['nom_logradouro']            = $valorHistorico['nom_logradouro'];
+                        $arLogradouros[$inChave]['cod_logradouro']            = $valorHistorico['cod_logradouro'];
+                        $arLogradouros[$inChave]['cod_uf']                    = $valorHistorico['cod_uf'];
+                        $arLogradouros[$inChave]['cod_municipio']             = $valorHistorico['cod_municipio'];
+                        $arLogradouros[$inChave]['cod_bairro']                = $valorHistorico['cod_bairro'];
+                        $arLogradouros[$inChave]['nom_bairro']                = $valorHistorico['nom_bairro'];
+                        $arLogradouros[$inChave]['nom_municipio']             = $valorHistorico['nom_municipio'];
+                        $arLogradouros[$inChave]['nom_uf']                    = $valorHistorico['nom_uf'];
+                        $arLogradouros[$inChave]['sigla_uf']                  = $valorHistorico['sigla_uf'];
+                        $arLogradouros[$inChave]['cep']                       = $valorHistorico['cep'];
+                        $arLogradouros[$inChave]['dt_inicio']                 = $valorHistorico['dt_inicio'];
+                        $arLogradouros[$inChave]['dt_fim']                    = $valorHistorico['dt_fim'];
+                        $arLogradouros[$inChave]['descricao_norma_relatorio'] = $valorHistorico['descricao_norma_relatorio'];
                     }
                 }
                 $inChave++;
@@ -295,9 +305,9 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     }else{//Se for sem o historico dos logradouros
         Sessao::write('mostra_historico','false');
         if ($this->stOrder == "codlogradouro") {
-            $stOrder = " ORDER BY sw_logradouro.cod_logradouro , sw_nome_logradouro.timestamp DESC";
+            $stOrder = " ORDER BY sw_logradouro.cod_logradouro , sw_nome_logradouro.dt_inicio DESC";
         } else {
-            $stOrder = " ORDER BY sw_nome_logradouro.nom_logradouro, sw_logradouro.cod_logradouro, sw_nome_logradouro.timestamp";
+            $stOrder = " ORDER BY sw_nome_logradouro.nom_logradouro, sw_logradouro.cod_logradouro, sw_nome_logradouro.dt_inicio";
         }        
         $obErro = $this->obTLogradouro->recuperaRelacionamentoRelatorio( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
     }

@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_aplica_acrescimo_modalidade.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_aplica_acrescimo_modalidade.plsql 63615 2015-09-18 14:11:12Z evandro $
 *
 * Caso de uso: uc-05.04.00
 */
@@ -96,7 +96,12 @@ if nuValor2 IS NULL THEN nuValor := 0; ELSE nuValor = nuValor2;END IF;
         ON
             divida.modalidade_acrescimo.timestamp = divida.modalidade.ultimo_timestamp
             AND divida.modalidade_acrescimo.cod_modalidade = divida.modalidade.cod_modalidade
-            AND divida.modalidade_acrescimo.cod_tipo = '|| inCodTipo ||'
+        ';
+        IF inCodTipo != 0 THEN
+            stSqlFuncoes := stSqlFuncoes || ' AND divida.modalidade_acrescimo.cod_tipo = '|| inCodTipo ||' ';
+        END IF;
+        
+        stSqlFuncoes := stSqlFuncoes || ' 
             AND divida.modalidade_acrescimo.pagamento = '|| boIncidencia ||'
         
         INNER JOIN
@@ -163,7 +168,7 @@ if nuValor2 IS NULL THEN nuValor := 0; ELSE nuValor = nuValor2;END IF;
         WHERE
             divida.modalidade.cod_modalidade = '|| inCodModalidade ||'
     ';
-    IF ( dtDataVencimento < dtDataBase ) THEN
+    IF ( dtDataVencimento <= dtDataBase ) THEN
         -- executa
         FOR reRecordFuncoes IN EXECUTE stSqlFuncoes LOOP
             stExecuta :=  'SELECT '||reRecordFuncoes.funcao_valida||'( '||inRegistro||' ) as utilizar ';

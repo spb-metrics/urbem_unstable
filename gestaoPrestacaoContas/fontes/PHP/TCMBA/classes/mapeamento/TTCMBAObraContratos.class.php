@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObraContratos.class.php 63589 2015-09-14 19:18:58Z michel $
+    * $Id: TTCMBAObraContratos.class.php 63727 2015-10-02 11:55:01Z evandro $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -42,7 +42,7 @@ class TTCMBAObraContratos extends Persistente
     {
         parent::Persistente();
         $this->setTabela('tcmba.obra_contratos');
-        $this->setCampoCod('cod_obra, cod_tipo, cod_entidade, exercicio, cod_contratacao, numcgm');
+        $this->setComplementoChave('cod_obra, cod_tipo, cod_entidade, exercicio, cod_contratacao, numcgm');
 
         $this->AddCampo('cod_obra'              , 'integer' , true  , ''    , true , true );
         $this->AddCampo('cod_entidade'          , 'integer' , true  , ''    , true , true );
@@ -58,5 +58,35 @@ class TTCMBAObraContratos extends Persistente
         $this->AddCampo('data_inicio'           , 'date'    , true  , ''    , false, false);
         $this->AddCampo('data_final'            , 'date'    , true  , ''    , false, false);
         $this->AddCampo('lotacao'               , 'varchar' , false , '50'  , false, false);
+    }
+
+    public function recuperaObraContrato(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql = $this->montaRecuperaObraContrato().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaObraContrato()
+    {
+        $stSql ="   SELECT  1 AS tipo_registro
+                            , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                            ,obra_contratos.cod_obra
+                            ,obra_contratos.nro_contrato
+                            ,'".$this->getDado('competencia')."' as competencia
+                       FROM tcmba.obra_contratos
+                      WHERE obra_contratos.cod_entidade IN (".$this->getDado('entidades').")  
+                        AND obra_contratos.data_inicio <= TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+                        AND obra_contratos.data_final >= TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')
+                        AND obra_contratos.nro_contrato <> ''
+        ";
+        
+        return $stSql;
     }
 }

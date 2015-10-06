@@ -106,7 +106,7 @@ class TTCMBADocDiver extends Persistente {
                                  , nlp.exercicio as exercicio_liquidacao                                                                      
                                  , sum(coalesce(nlp.vl_pago ,0.00)) as vl_pago      
                                  , sum(coalesce(nlpa.vl_anulado ,0.00)) as vl_anulado                                                          
-                                 , TO_DATE(TO_CHAR(nlpa.timestamp, 'dd/mm/yyyy'),'dd/mm/yyyy') AS data_pagamento      
+                                 , TO_DATE(TO_CHAR(nlp.timestamp, 'dd/mm/yyyy'),'dd/mm/yyyy') AS data_pagamento      
                                  , ptdp.num_documento
                                  , tipo_documento_pagamento.descricao AS nm_documento
                                  , TO_DATE(TO_CHAR(ptdp.timestamp, 'dd/mm/yyyy'),'dd/mm/yyyy') AS data_emissao    
@@ -136,7 +136,7 @@ class TTCMBADocDiver extends Persistente {
                                 AND nlp.cod_nota     = plnlp.cod_nota                                                                        
                                 AND nlp.exercicio    = plnlp.exercicio_liquidacao                                                            
                                 AND nlp.timestamp    = plnlp.timestamp                    
-                                AND plnlp.exercicio = '2015'
+                                AND plnlp.exercicio = '".$this->getDado('exercicio')."'   
                                 AND nlp.cod_entidade = tp.cod_entidade                                                                    
                                 AND nlp.cod_nota     = tp.cod_nota                                                                        
                                 AND nlp.exercicio    = tp.exercicio                                                            
@@ -148,7 +148,7 @@ class TTCMBADocDiver extends Persistente {
                                   , nlpa.vl_anulado                                       
                                   , plnlp.cod_ordem                                       
                                   , plnlp.exercicio                                       
-                                  , nlpa.timestamp     
+                                  , nlp.timestamp     
                                   , num_documento
                                   , tipo_documento_pagamento.descricao
                                   , ptdp.timestamp                                                   

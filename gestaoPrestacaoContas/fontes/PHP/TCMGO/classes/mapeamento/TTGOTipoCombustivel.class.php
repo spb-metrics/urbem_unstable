@@ -30,7 +30,7 @@
     * @author Analista: Tonismar Bernardo
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: TTGOTipoCombustivel.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTGOTipoCombustivel.class.php 63650 2015-09-23 21:21:08Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -42,7 +42,7 @@ class TTGOTipoCombustivel extends Persistente
      * Método Construtor
      * @access Private
      */
-    public function TTGOTipoCombustivel()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("tcmgo.tipo_combustivel");
@@ -53,5 +53,6 @@ class TTGOTipoCombustivel extends Persistente
         $this->AddCampo('cod_tipo' , 'integer' ,true, ''  , true , false);
         $this->AddCampo('descricao', 'varchar' ,true, '20', false, false);
     }
-
 }
+
+?>

@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterRegistroPreco.php 63501 2015-09-03 17:22:53Z michel $
-  * $Date: 2015-09-03 14:22:53 -0300 (Qui, 03 Set 2015) $
-  * $Author: michel $
-  * $Rev: 63501 $
+  * $Id: OCManterRegistroPreco.php 63756 2015-10-06 16:58:53Z franver $
+  * $Date: 2015-10-06 13:58:53 -0300 (Ter, 06 Out 2015) $
+  * $Author: franver $
+  * $Rev: 63756 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -49,6 +49,63 @@ $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
+
+function validaNumItemLote()
+{
+    $arItens = Sessao::read('arItens');
+    if(!is_array($arItens)){
+        $arItens = array();
+    }
+    
+    $arItensTeste = array();
+    $arItensErro  = array();
+
+    foreach ($arItens AS $arItem) {
+        $stCodLoteItem = ($arItem['stCodigoLote'] != 0) ? $arItem['stCodigoLote'] : '0';
+        if(array_key_exists($arItem['inNumItemLote'],$arItensTeste)){
+            if($arItensTeste[$arItem['inNumItemLote']]['stCodigoLote'] == $stCodLoteItem){
+                if($arItensTeste[$arItem['inNumItemLote']]['inCodItem']==$arItem['inCodItem']){
+                    if($arItensTeste[$arItem['inNumItemLote']]['inNumCGMVencedor']==$arItem['inNumCGMVencedor']){
+                        $arItensErro[$stCodLoteItem][] = $arItem['inNumItemLote'];
+                    }
+                } else {
+                    $arItensErro[$stCodLoteItem][] = $arItem['inNumItemLote'];
+                }
+            }
+        }else{
+            foreach($arItensTeste as $num_item => $campoItem){
+                if($num_item!=$arItem['inNumItemLote'] && $campoItem['stCodigoLote']==$stCodLoteItem){
+                    if($campoItem['inCodItem']==$arItem['inCodItem']){
+                        if($campoItem['inNumCGMVencedor']==$arItem['inNumCGMVencedor']){
+                            $arItensErro[$stCodLoteItem][] = $arItem['inNumItemLote'];
+                        }
+                    }                    
+                }
+            }
+
+            $arItensTeste[$arItem['inNumItemLote']]['stCodigoLote']     = $stCodLoteItem;
+            $arItensTeste[$arItem['inNumItemLote']]['inCodItem']        = $arItem['inCodItem'];
+            $arItensTeste[$arItem['inNumItemLote']]['inNumCGMVencedor'] = $arItem['inNumCGMVencedor'];
+        }
+    }
+    
+    
+    if (count($arItensErro) > 0) {
+        $stJs .= "jQuery('#Ok').prop('disabled', true); \n";
+        foreach($arItensErro AS $stLote => $arErroLote){
+            $stJs .= "alertaAviso('Verificar na Aba Itens, o Lote (".$stLote.") os seguintes Número de Item no Lote (".implode(', ',$arErroLote).").','form','erro','".Sessao::getId()."'); \n";
+        }
+    } else {
+        $stJs .= "if(jQuery('#Ok').is('[disabled]') && jQuery('#stAcao').val() == 'alterar'){ \n";
+        $stJs .= "    alertaAviso('Verificação na Aba Itens Concluída!.','form','aviso','".Sessao::getId()."'); \n";
+        $stJs .= " } \n";
+        $stJs .= "jQuery('#Ok').removeProp('disabled'); \n";
+    }
+    
+    return $stJs;
+
+}
+
 
 function validaNroProcesso($stCodProcesso, $stExercicioRegistroPrecos, $inCodEntidade)
 {
@@ -207,7 +264,7 @@ function incluirListaItens()
                         break;
                     }
                     if ($arrItem['inNumItemLote'] == $arItensCotacao['inNumItemLote'] && $arrItem['stCodigoLote'] == $arItensCotacao['stCodigoLote'] && $arrItem['inCodItem'] != $arItensCotacao['inCodItem'] ) {
-                        $obErro->setDescricao("Este Número de Item já está na lista!");
+                        $obErro->setDescricao("O campo *Número do Item no Lote informado (".$_REQUEST['inNumItemLote']."), já está na lista!");
                         break;
                     }
                     if ($arrItem['inCodItem'] == $arItensCotacao['inCodItem'] && $arrItem['inNumCGMVencedor'] == $arItensCotacao['inNumCGMVencedor']) {
@@ -226,7 +283,6 @@ function incluirListaItens()
     } else {
         $arItens[] = $arItensCotacao;
         Sessao::write('arItens', $arItens);
-        $stJs .= montaListaItens();
         $stJs .= limparFormItem();
         
         $boLote = ($_REQUEST['stCodigoLote']>0) ? true : false;
@@ -259,14 +315,15 @@ function alterarListaItens()
     }
     
     if (!$obErro->ocorreu()) {
+        $stCodLote = isset($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0;
         foreach ($arItens as $key => $arItem) {
             if($arItem['inId'] != $_REQUEST['inIdItem']){
-                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$_REQUEST['stCodigoLote'] && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
-                    $obErro->setDescricao("Este Número de Item já está na lista!");
+                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$stCodLote && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
+                    $obErro->setDescricao("Este Item já está na lista, para esse CGM de Fornecedor(".$_REQUEST['inNumCGMVencedor'].")!");
                     break;
                 }
-                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$_REQUEST['stCodigoLote'] && $arItem['inCodItem']!=$_REQUEST['inCodItem']){
-                    $obErro->setDescricao("Este Número de Item já está na lista!");
+                if ($arItem['inNumItemLote']==$_REQUEST['inNumItemLote'] && $arItem['stCodigoLote']==$stCodLote && $arItem['inCodItem']!=$_REQUEST['inCodItem']){
+                    $obErro->setDescricao("O campo *Número do Item no Lote informado (".$_REQUEST['inNumItemLote']."), já está na lista!");
                     break;
                 }
                 if ($arItem['inCodItem']==$_REQUEST['inCodItem'] && $arItem['inNumCGMVencedor']==$_REQUEST['inNumCGMVencedor']){
@@ -307,6 +364,8 @@ function alterarListaItens()
         foreach ($arItens as $key => $arItem) {
             if ($arItem['inId'] == $_REQUEST['inIdItem']) {
                 $inNumItemLote = $arItem['inNumItemLote'];
+                $inCodItem     = $arItem['inCodItem'];
+                $inCodLoteItem = (!empty($_REQUEST['stCodigoLote']) ? $_REQUEST['stCodigoLote'] : 0);
 
                 $arItens[$key]['nuVlReferencia']            = $_REQUEST['nuVlReferencia'];
                 $arItens[$key]['inNumItemLote']             = $_REQUEST['inNumItemLote'];
@@ -332,9 +391,8 @@ function alterarListaItens()
 
         if($inNumItemLote>-1){
             $arOrgaoItemQuantitativos = Sessao::read('arOrgaoItemQuantitativos');
-
             foreach ($arOrgaoItemQuantitativos as $key => $value) {
-                if ($value['inNumItemQ'] == $inNumItemLote) {
+                if ($value['inNumItemQ'] == $inNumItemLote && $inCodItem == $value['inCodItemQ'] && $inCodLoteItem == $value['inCodLoteQ'] ) {
                     $arOrgaoItemQuantitativos[$key]['inNumItemQ']       = $_REQUEST['inNumItemLote'];
                     $arOrgaoItemQuantitativos[$key]['inCodFornecedorQ'] = $_REQUEST['inNumCGMVencedor'];
                     $arOrgaoItemQuantitativos[$key]['stNomFornecedorQ'] = SistemaLegado::pegaDado("nom_cgm", "sw_cgm", "where numcgm = ".$_REQUEST['inNumCGMVencedor']);
@@ -534,7 +592,9 @@ function montaListaItens()
     $stHtml = str_replace("\n","",$stHtml);
     $stHtml = str_replace("  ","",$stHtml);
     $stHtml = str_replace("'","\\'",$stHtml);
+    
     $stJs .= "d.getElementById('spnListaItens').innerHTML = '".$stHtml."';\n";
+    $stJs .= validaNumItemLote();
 
     return $stJs;
 }
@@ -565,11 +625,11 @@ function alterarItem()
             $stChaveItem = $arItem['stCodigoLote'].$arItem['inNumItemLote'].$arItem['inCodItem'].$arItem['inNumCGMVencedor'];
 
             if ($obErro->ocorreu()) {
-                $stJs  = limparFormItem();
+                $stJs .= limparFormItem();
                 $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');       \n";
                 $stJs .= "jQuery('#Ok').focus();                                                                \n";
             }else{
-                $stJs  = "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                            \n";
+                $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                            \n";
                 $stJs .= "jQuery('#btnSalvar').val('Alterar Item');                                             \n";
                 $stJs .= "jQuery('#btnSalvar').attr('onclick', 'montaParametrosGET(\'alterarListaItens\');');   \n";
     
@@ -733,7 +793,7 @@ function excluirItem()
 
 function limparFormItem()
 {
-    $stJs  = "var jQuery = window.parent.frames['telaPrincipal'].jQuery;    \n";
+    $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;    \n";
     $stJs .= "if(jQuery('#stCodigoLote')){                                  \n";
     $stJs .= "      jQuery('#stCodigoLote').val('');                        \n";
     $stJs .= "      jQuery('#txtDescricaoLote').val('');                    \n";
@@ -801,13 +861,13 @@ function buscaOrgaoGerenciador()
     
     if ($_REQUEST[ $stText ] != "" AND $_REQUEST[ $stText ] != "0") {
         $obRegra->setNumCGM ($_REQUEST[$stText]);
-        $obRegra->listar ($rsCGM);
+        $obRegra->listarOrgaoGerenciador($rsCGM,"",$boTransacao);
         
         if ( $rsCGM->getNumLinhas() <= 0) {
             $stJs .= "f.".$stText.".value = '';                                                                                                 \n";
             $stJs .= "f.".$stText.".focus();                                                                                                    \n";
             $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                \n";
-            $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                           \n";
+            $stJs .= "alertaAviso('@CGM inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                           \n";
         } else {
             $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".($rsCGM->getCampo('nom_cgm')?$rsCGM->getCampo('nom_cgm'):$stNull)."';      \n";
         }
@@ -815,7 +875,7 @@ function buscaOrgaoGerenciador()
         $stJs .= "f.".$stText.".value = '';                                                                                                     \n";
         $stJs .= "f.".$stText.".focus();                                                                                                        \n";
         $stJs .= "d.getElementById('".$stSpan."').innerHTML = '".$stNull."';                                                                    \n";
-        $stJs .= "alertaAviso('@Valor inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                               \n";
+        $stJs .= "alertaAviso('@CGM inválido. (".$_REQUEST[ $stText ].")','form','erro','".Sessao::getId()."');                               \n";
     }
     
     return $stJs;

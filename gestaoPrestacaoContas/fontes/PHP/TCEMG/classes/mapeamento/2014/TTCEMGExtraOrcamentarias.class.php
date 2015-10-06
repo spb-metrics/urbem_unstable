@@ -65,11 +65,9 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                 ,'".$this->getDado('exercicio')."' as exercicio
                                 ,'".$this->getDado('mes')."' as mes
                         FROM tcemg.balancete_extmmaa
-                        LEFT JOIN tcemg.arquivo_ext
-                            ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
-                            AND balancete_extmmaa.exercicio = arquivo_ext.exercicio
-                        WHERE arquivo_ext.cod_plano IS NULL
-                ";
+                   LEFT JOIN tcemg.arquivo_ext
+                          ON balancete_extmmaa.cod_plano = arquivo_ext.cod_plano
+                       WHERE arquivo_ext.cod_plano IS NULL ";
         return $stSql;
     }
 
@@ -170,8 +168,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                 AND plano_analitica.cod_conta = plano_conta.cod_conta
                             
                             JOIN administracao.configuracao_entidade
-                              ON configuracao_entidade.cod_entidade IN (2)
-                             AND configuracao_entidade.exercicio = '2014'
+                              ON configuracao_entidade.cod_entidade IN (".$this->getDado('entidades').")
+                             AND configuracao_entidade.exercicio = '".$this->getDado('exercicio')."'
                              AND configuracao_entidade.cod_modulo = 55
                              AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
                 
@@ -213,8 +211,6 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         , cod_font_recurso
                         , SUM(vl_saldo_ant) as vl_saldo_ant
                         , SUM(vl_saldo_atual)AS vl_saldo_atual
-                        , nat_saldo_anterior_fonte
-                        , nat_saldo_atual_fonte
                     FROM (
                             SELECT  tipo_registro
                                     , cod_orgao
@@ -223,16 +219,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                     , tipo_lancamento
                                     , sub_tipo
                                     , cod_recurso AS cod_font_recurso
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
-                                           THEN(vl_saldo_anterior * -1)
-                                           ELSE vl_saldo_anterior
-                                      END AS vl_saldo_ant
-                                    , CASE WHEN (substr(cod_estrutural,1,1) = '2')
-                                           THEN (vl_saldo_atual * -1)
-			                    ELSE vl_saldo_atual
-		                      END AS vl_saldo_atual
-                                    , nat_saldo_anterior_fonte
-                                    , nat_saldo_atual_fonte
+                                    , vl_saldo_anterior AS vl_saldo_ant
+                                    , vl_saldo_atual
                             
                                   FROM tcemg.fn_arquivo_ext_registro20( '".$this->getDado('exercicio')."'
                                                                        , 'cod_entidade IN (".$this->getDado('entidades').")'
@@ -263,10 +251,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                         , sub_tipo
                         , cod_ext
                         , cod_font_recurso
-                        , nat_saldo_anterior_fonte
-                        , nat_saldo_atual_fonte
         ";     
-        
         return $stSql;
     }
 
@@ -368,12 +353,12 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
 			         JOIN(
                            SELECT lote.cod_lote
-				 , lote.dt_lote
-				 , lote.exercicio
-				 , conta_credito.cod_plano
-				 , lote.tipo
-				 , lote.cod_entidade
-				 , valor_lancamento.vl_lancamento
+				                , lote.dt_lote
+				                , lote.exercicio
+				                , conta_credito.cod_plano
+				                , lote.tipo
+				                , lote.cod_entidade
+				                , valor_lancamento.vl_lancamento
                           FROM  contabilidade.lote
                           JOIN contabilidade.valor_lancamento
                             ON valor_lancamento.exercicio = lote.exercicio
@@ -495,12 +480,12 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
                      JOIN(
                            SELECT lote.cod_lote
-				 , lote.dt_lote
-				 , lote.exercicio
-				 , conta_debito.cod_plano
-				 , lote.tipo
-				 , lote.cod_entidade
-				 , valor_lancamento.vl_lancamento
+				                , lote.dt_lote
+				                , lote.exercicio
+				                , conta_debito.cod_plano
+				                , lote.tipo
+				                , lote.cod_entidade
+				                , valor_lancamento.vl_lancamento
                           FROM  contabilidade.lote
                           JOIN contabilidade.valor_lancamento
                             ON valor_lancamento.exercicio = lote.exercicio
@@ -536,6 +521,244 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                      AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
                      AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
                     AND transferencia.cod_tipo = 1
+            
+            UNION ALL
+                --Busca Lancamento Manuais credito
+                SELECT distinct
+                          21 AS tipo_registro
+                         , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
+                        , LPAD((LPAD(''||configuracao_entidade.valor,2, '0')||LPAD(''||configuracao_entidade.cod_entidade,2, '0')), 5, '0') AS cod_unidade 
+                        , LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0') as tipo_lancamento
+                        , LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0') AS sub_tipo
+                         , balancete_extmmaa.sub_tipo_lancamento::VARCHAR AS sub_tipo_mov
+                        , COALESCE(plano_recurso.cod_recurso,'100') as cod_font_recurso
+                        , tcemg.seq_num_op_extra(lote.exercicio,lote.cod_entidade,1,lote.cod_lote)::varchar||balancete_extmmaa.cod_plano||TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS num_op
+                        , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                  THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  ELSE ''
+                                END
+                                WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  ELSE ''
+                             END
+                            ELSE ''
+                        END AS desdobra_sub_tipo                                                            
+                        , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          ELSE plano_analitica.cod_plano::VARCHAR
+                                     END
+                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          ELSE plano_analitica.cod_plano::VARCHAR
+                                     END
+                                ELSE plano_analitica.cod_plano::VARCHAR
+                        END AS cod_plano
+                        , 1 AS categoria
+                        , TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS dt_lancamento
+                        , lote.vl_lancamento
+                        , lote.cod_lote
+                        
+                    FROM (
+                           SELECT lote.cod_lote
+                                , lote.dt_lote
+                                , lote.exercicio
+                                , conta_credito.cod_plano
+                                , lote.tipo
+                                , lote.cod_entidade
+                                , valor_lancamento.vl_lancamento
+                          FROM  contabilidade.lote
+                          JOIN contabilidade.valor_lancamento
+                            ON valor_lancamento.exercicio = lote.exercicio
+                           AND valor_lancamento.cod_entidade = lote.cod_entidade
+                           AND valor_lancamento.tipo = lote.tipo
+                           AND valor_lancamento.cod_lote = lote.cod_lote
+                           AND valor_lancamento.tipo_valor = 'C'
+                           AND valor_lancamento.tipo = 'M'
+
+                          JOIN contabilidade.conta_credito
+                            ON conta_credito.exercicio = valor_lancamento.exercicio
+                           AND conta_credito.cod_entidade = valor_lancamento.cod_entidade
+                           AND conta_credito.tipo = valor_lancamento.tipo
+                           AND conta_credito.cod_lote = valor_lancamento.cod_lote
+                           AND conta_credito.sequencia = valor_lancamento.sequencia
+                           
+                           WHERE lote.exercicio = '".$this->getDado('exercicio')."'
+                           AND lote.cod_entidade IN (".$this->getDado('entidades').")
+                           AND lote.tipo = 'M'
+                           AND lote.dt_lote = TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                           Group by 1,2,3,4,5,6,7
+                           Order By lote.cod_lote
+
+                        )as lote
+
+                INNER JOIN contabilidade.plano_analitica
+                        ON lote.exercicio = plano_analitica.exercicio
+                       AND lote.cod_plano = plano_analitica.cod_plano
+             
+                    JOIN tcemg.balancete_extmmaa
+                      ON balancete_extmmaa.cod_plano = plano_analitica.cod_plano
+                     AND balancete_extmmaa.exercicio = plano_analitica.exercicio
+                     
+                    JOIN contabilidade.plano_conta
+                      ON plano_analitica.exercicio = plano_conta.exercicio
+                     AND plano_analitica.cod_conta = plano_conta.cod_conta
+                     
+                    JOIN contabilidade.conta_credito
+                      ON plano_analitica.exercicio = conta_credito.exercicio
+                     AND plano_analitica.cod_plano = conta_credito.cod_plano
+                     
+                    JOIN administracao.configuracao_entidade
+                      ON configuracao_entidade.cod_entidade IN (".$this->getDado('entidades').")
+                     AND configuracao_entidade.exercicio = '".$this->getDado('exercicio')."'
+                     AND configuracao_entidade.cod_modulo = 55
+                     AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+                           
+                    LEFT JOIN contabilidade.plano_recurso
+                         ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                        AND plano_recurso.exercicio = plano_analitica.exercicio 
+
+                   WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+                     AND lote.dt_lote = TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                    
+            UNION ALL
+                
+                --Busca Lancamento Manuais debito
+                SELECT distinct
+                          21 AS tipo_registro
+                         , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
+                        , LPAD((LPAD(''||configuracao_entidade.valor,2, '0')||LPAD(''||configuracao_entidade.cod_entidade,2, '0')), 5, '0') AS cod_unidade 
+                        , LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0') as tipo_lancamento
+                        , LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0') AS sub_tipo
+                         , balancete_extmmaa.sub_tipo_lancamento::VARCHAR AS sub_tipo_mov
+                        , COALESCE(plano_recurso.cod_recurso,'100') as cod_font_recurso
+                        , tcemg.seq_num_op_extra(lote.exercicio,lote.cod_entidade,1,lote.cod_lote)::varchar||balancete_extmmaa.cod_plano||TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS num_op
+                        , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                  THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  ELSE ''
+                                END
+                                WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                  THEN LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                  ELSE ''
+                             END
+                            ELSE ''
+                        END AS desdobra_sub_tipo                                                            
+                        , CASE  WHEN (balancete_extmmaa.tipo_lancamento = 1)
+                                          THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 3
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 4
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          ELSE plano_analitica.cod_plano::VARCHAR
+                                     END
+                                        WHEN (balancete_extmmaa.tipo_lancamento = 4)
+                                        THEN CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 1
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          WHEN balancete_extmmaa.sub_tipo_lancamento = 2
+                                          THEN LPAD(balancete_extmmaa.tipo_lancamento::VARCHAR,2,'0')||LPAD(balancete_extmmaa.sub_tipo_lancamento::VARCHAR,4,'0')
+                                          ELSE plano_analitica.cod_plano::VARCHAR
+                                     END
+                                ELSE plano_analitica.cod_plano::VARCHAR
+                        END AS cod_plano
+                        , 2 AS categoria
+                        , TO_CHAR(lote.dt_lote, 'ddmmyyyy') AS dt_lancamento
+                        , lote.vl_lancamento
+                        , lote.cod_lote
+                        
+                    FROM (
+                           SELECT lote.cod_lote
+                                , lote.dt_lote
+                                , lote.exercicio
+                                , conta_debito.cod_plano
+                                , lote.tipo
+                                , lote.cod_entidade
+                                , valor_lancamento.vl_lancamento
+                          FROM  contabilidade.lote
+                          JOIN contabilidade.valor_lancamento
+                            ON valor_lancamento.exercicio = lote.exercicio
+                           AND valor_lancamento.cod_entidade = lote.cod_entidade
+                           AND valor_lancamento.tipo = lote.tipo
+                           AND valor_lancamento.cod_lote = lote.cod_lote
+                           AND valor_lancamento.tipo_valor = 'D'
+                           AND valor_lancamento.tipo = 'M'
+
+                          JOIN contabilidade.conta_debito
+                            ON conta_debito.exercicio = valor_lancamento.exercicio
+                           AND conta_debito.cod_entidade = valor_lancamento.cod_entidade
+                           AND conta_debito.tipo = valor_lancamento.tipo
+                           AND conta_debito.cod_lote = valor_lancamento.cod_lote
+                           AND conta_debito.sequencia = valor_lancamento.sequencia
+                           
+                           Where lote.exercicio = '".$this->getDado('exercicio')."'
+                           AND lote.cod_entidade IN (".$this->getDado('entidades').")
+                           AND lote.tipo = 'M'
+                           AND lote.dt_lote = TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                           Group by 1,2,3,4,5,6,7
+                           Order By lote.cod_lote
+
+                        )as lote
+
+                INNER JOIN contabilidade.plano_analitica
+                        ON lote.exercicio = plano_analitica.exercicio
+                       AND lote.cod_plano = plano_analitica.cod_plano
+             
+                    JOIN tcemg.balancete_extmmaa
+                      ON balancete_extmmaa.cod_plano = plano_analitica.cod_plano
+                     AND balancete_extmmaa.exercicio = plano_analitica.exercicio
+                     
+                    JOIN contabilidade.plano_conta
+                      ON plano_analitica.exercicio = plano_conta.exercicio
+                     AND plano_analitica.cod_conta = plano_conta.cod_conta
+                     
+                    JOIN contabilidade.conta_debito
+                      ON plano_analitica.exercicio = conta_debito.exercicio
+                     AND plano_analitica.cod_plano = conta_debito.cod_plano
+                     
+                    JOIN administracao.configuracao_entidade
+                      ON configuracao_entidade.cod_entidade IN (2)
+                     AND configuracao_entidade.exercicio = '".$this->getDado('exercicio')."'
+                     AND configuracao_entidade.cod_modulo = 55
+                     AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+                           
+                    LEFT JOIN contabilidade.plano_recurso
+                         ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                        AND plano_recurso.exercicio = plano_analitica.exercicio 
+
+                   WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
+                     AND lote.dt_lote = TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+
             ) AS resultado
             
                 GROUP BY tipo_registro, cod_font_recurso, categoria, dt_lancamento,  cod_reduzido_mov, cod_plano   
@@ -552,7 +775,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 
     public function montaRecuperaExportacao22()
     {
-        $stSql = "SELECT
+        $stSql = "SELECT DISTINCT
                     22 AS tipo_registro
                     , 2 || LPAD( (REPLACE(configuracao_entidade.valor::VARCHAR,'0','') ||configuracao_entidade.cod_entidade::VARCHAR||REPLACE(balancete_extmmaa.tipo_lancamento::VARCHAR,'0','')||balancete_extmmaa.sub_tipo_lancamento::VARCHAR|| TO_CHAR(lote.dt_lote, 'ddmmyyyy') ) ,14,'0') AS cod_reduzido_mov
                     , COALESCE(lote.vl_lancamento,0.00) AS vl_op
@@ -827,7 +1050,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 		                            AND conta_bancaria.exercicio = plano_analitica.exercicio
                      
                                 WHERE conta_debito.exercicio = '".$this->getDado('exercicio')."'
-                                AND conta_debito.cod_entidade IN (2)
+                                AND conta_debito.cod_entidade IN (".$this->getDado('entidades').")
                                 AND  lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
                                 AND  lo.exercicio = '".$this->getDado('exercicio')."'
 		                        AND conta_debito.tipo = 'T'
@@ -841,7 +1064,8 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                     WHERE balancete_extmmaa.exercicio = '".$this->getDado('exercicio')."'
                     AND transferencia.cod_entidade IN (".$this->getDado('entidades').")
                     AND transferencia.cod_tipo = 1
-                
+                    AND cod_ctb_transferencia.cod_ctb_anterior is not null
+
                     GROUP BY tipo_registro
                             , tipo_documento_op
                             , num_documento
@@ -853,7 +1077,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                             , vl_documento
         
                     ORDER BY cod_reduzido_op
-        ";        
+        ";     
         return $stSql;
     }
     
@@ -910,7 +1134,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                      AND conta_debito.sequencia = valor_lancamento.sequencia
                      AND valor_lancamento.tipo = 'T'
                      
-                    WHERE lote.exercicio = '2014' AND lote.tipo = 'T'
+                    WHERE lote.exercicio = '".$this->getDado('exercicio')."' AND lote.tipo = 'T'
                       AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') and TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
                     GROUP BY 1,2,3,4,5,6,7
                     ORDER BY lote.cod_lote
@@ -964,7 +1188,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                            , transferencia.cod_entidade
                            , tcemg.seq_num_op_extra(exercicio,cod_entidade,cod_tipo,cod_lote) AS codigo
                         FROM tesouraria.transferencia 
-                       WHERE exercicio='2014' 
+                       WHERE exercicio='".$this->getDado('exercicio')."' 
                          AND cod_entidade=transferencia.cod_entidade
                          AND cod_tipo=2 
                          AND cod_lote = transferencia.cod_lote

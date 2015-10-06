@@ -96,10 +96,10 @@ INSERT
      ( 3084
      , 390
      , 'FLManterLimiteAlteracaoCreditoAdicional.php'
-     , 'configurar'
+     , 'manter'
      , 15
      , ''
-     , 'Limites para Alteração de Créditos'
+     , 'Limites para Alteração de Créditos Adicionais'
      , TRUE
      );
 

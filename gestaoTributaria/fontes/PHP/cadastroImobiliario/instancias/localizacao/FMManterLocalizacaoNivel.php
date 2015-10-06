@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterLocalizacaoNivel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterLocalizacaoNivel.php 63673 2015-09-28 19:31:03Z carlos.silva $
 
     * Casos de uso: uc-05.01.03
 */
@@ -301,9 +301,6 @@ $obTxtCodigoLocalizacao->setSize      ( strlen( $stMascara)  );
 $obTxtCodigoLocalizacao->setValue     ( $inValorLocalizacao  );
 $obTxtCodigoLocalizacao->setMascara   ( $stMascara           );
 $obTxtCodigoLocalizacao->setValidaCaracteres( true           );
-//if ( preg_match( "/^[a-zA-Z]/",$stMascara) ) {
-//    $obTxtCodigoLocalizacao->setMinLength ( strlen( $stMascara ) );
-//}
 
 $obTxtNomeLocalizacao = new TextBox;
 $obTxtNomeLocalizacao->setName      ( "stNomeLocalizacao" );

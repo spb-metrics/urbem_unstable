@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: PRManterMapaCompras.php 63445 2015-08-28 13:44:54Z michel $
+ $Id: PRManterMapaCompras.php 63738 2015-10-02 17:54:55Z michel $
 
  */
 
@@ -57,6 +57,7 @@ include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoReservaSaldos.class.php';
 include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoReservaSaldosAnulada.class.php';
 
 $link = Sessao::read('link');
+$link = (is_array($link)) ? $link : array();
 $stLink = "&pg=".$link['pg']."&pos=".$link['pos'];
 
 $stPrograma = "ManterMapaCompras";
