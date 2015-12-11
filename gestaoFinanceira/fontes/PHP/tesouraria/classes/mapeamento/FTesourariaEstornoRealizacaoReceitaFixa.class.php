@@ -100,10 +100,10 @@ function montaExecutaFuncao($boTransacao = "")
     $stSql .= "                         ".$this->getDado("cod_lote")               ." , \n";
     $stSql .= "                        '".$this->getDado("tipo_lote")              ."', \n";
     $stSql .= "                         ".$this->getDado("cod_entidade")           ." , \n";
-    if ( !SistemaLegado::is_tcems($boTransacao) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $stSql .= "                         ".$this->getDado('valor_despesa')          ." , \n";
     }
-    if ( !SistemaLegado::is_tcems($boTransacao) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $stSql .= "                         ".$this->getDado('valor_disponibilidades') ." , \n";
     }
     if($this->getDado('cod_historico'))

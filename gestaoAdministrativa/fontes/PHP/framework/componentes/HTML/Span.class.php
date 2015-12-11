@@ -138,6 +138,12 @@ function setDestaque($Valor) {$this->boDestaque     = $Valor;  }
 */
 function setStyle($valor) { $this->stStyle      = $valor; }
 
+/**
+  * @access Public
+  * @param String $valor
+*/
+function setClass($valor) { $this->stClass      = $valor; }
+
 //GETTERS
 /**
     * @access Public
@@ -182,6 +188,12 @@ function getDestaque() {return $this->boDestaque;   }
 function getStyle() { return $this->stStyle;      }
 
 /**
+  * @access Public
+  * @return String
+  */
+function getClass() { return $this->stClass;      }
+
+/**
     * Método construtor
     * @access Public
 */
@@ -205,6 +217,10 @@ function montaHTML()
 
     if ($this->getDestaque()) {
         $stHTML .= ' class="spanDestaque" ';
+    }
+    
+    if ($this->getClass()) {
+        $stHTML .= " class=\"".$this->getClass()."\" ";
     }
 
     if ($this->getStyle()) {

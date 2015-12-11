@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: encaminhaProcessoLote.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: encaminhaProcessoLote.php 63829 2015-10-22 12:06:07Z franver $
 
     */
 
@@ -323,7 +323,6 @@ if (Sessao::read('ordem') =='') {
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);
-        //mostravar($dbEmp);
         $dbEmp->vaiPrimeiro();
 
         //DIEGO - VERIFICANDO...

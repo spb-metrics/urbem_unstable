@@ -107,11 +107,9 @@ $arTempDados[0]["nom_usuario"] = Sessao::read( "numCgm" )." - ".Sessao::read( "n
 //$arTempDados[0]["iss"] = number_format( $flValorISS, 2, ',', '.' );
 $arTempDados[0]["iss"] = number_format( $rsINSS->getCampo('valor'), 2, ',', '.' );
 $arTempDados[0]["total_nf"] = number_format( $flTotalNF, 2, ',', '.' );
-//sistemaLegado::mostravar( $arTempDados );exit;
 
 /*
 $obRCEMInscricaoEconomica = new RCEMInscricaoEconomica;
-sistemaLegado::mostravar($obRCEMInscricaoEconomica); die;
 $arChaveAtributoInscricao =  array( "inscricao_economica" => $_REQUEST["inscricao_economica"] );
 $obRCEMInscricaoEconomica->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoInscricao );
 $obRCEMInscricaoEconomica->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );

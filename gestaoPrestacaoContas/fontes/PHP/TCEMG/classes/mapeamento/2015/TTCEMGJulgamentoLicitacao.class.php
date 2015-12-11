@@ -28,30 +28,20 @@
     * Data de Criação: 15/09/2006
 
     * @author Analista: Gelson W. Gonçalves
-    * @author Desenvolvedor: Nome do Programador
+    * @author Desenvolvedor: Jean da Silva
 
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoParticipante.class.php 57380 2014-02-28 17:45:35Z diogo.zarpelon $
+    $Id: TTCEMGJulgamentoLicitacao.class.php 64106 2015-12-02 19:13:45Z michel $
 
     * Casos de uso: uc-03.05.18
             uc-03.05.19
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.participante
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Thiago La Delfa Cabelleira
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TTCEMGJulgamentoLicitacao extends Persistente
 {
 /**
@@ -63,123 +53,129 @@ class TTCEMGJulgamentoLicitacao extends Persistente
     {
         return $this->executaRecupera("montaRecuperaExportacao10", $rsRecordSet, $stFiltro, $stOrder, $boTransacao);
     }
-    
+
     public function montaRecuperaExportacao10()
     {
-        $stSql = "SELECT
-                          10 AS tipo_registro
-                        , LPAD(configuracao_entidade.valor,2,'0') AS cod_orgao
-                        , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0') || LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade
-                        , config_licitacao.exercicio_licitacao
-                        , config_licitacao.num_licitacao AS num_processo_licitatorio
-                        , documento_pessoa.tipo_documento AS tipo_documento
-                        , documento_pessoa.num_documento AS num_documento
-                        , CASE WHEN mapa.cod_tipo_licitacao = 2
-                               THEN homologacao.lote::VARCHAR
-                               ELSE ' '
-                           END AS num_lote
-                        , mapa_item.cod_item AS cod_item
-                        , (mapa_item.vl_total / mapa_item.quantidade  )::numeric(14,4) AS vl_unitario
-                        , mapa_item.quantidade::numeric(14,4) AS quantidade
-                     --   , mapa_item.lote::varchar || mapa_item.cod_item::varchar AS sequencial
-                          
+        $stSql = "SELECT 10 AS tipo_registro
+                       , LPAD(configuracao_entidade.valor,2,'0') AS cod_orgao
+                       , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0') || LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade
+                       , ( SELECT exercicio_licitacao
+                             FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+                                                               VALUES (cod_licitacao       INTEGER
+                                                                      ,cod_modalidade      INTEGER
+                                                                      ,cod_entidade        INTEGER
+                                                                      ,exercicio           CHAR(4)
+                                                                      ,exercicio_licitacao VARCHAR
+                                                                      ,num_licitacao       TEXT )
+                            WHERE cod_entidade = licitacao.cod_entidade
+                              AND cod_licitacao = licitacao.cod_licitacao
+                              AND cod_modalidade = licitacao.cod_modalidade
+                              AND exercicio = licitacao.exercicio 
+                         ) AS exercicio_licitacao
+                       , ( SELECT num_licitacao
+                             FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+                                                               VALUES (cod_licitacao       INTEGER
+                                                                      ,cod_modalidade      INTEGER
+                                                                      ,cod_entidade        INTEGER
+                                                                      ,exercicio           CHAR(4)
+                                                                      ,exercicio_licitacao VARCHAR
+                                                                      ,num_licitacao       TEXT ) 	    
+                            WHERE cod_entidade = licitacao.cod_entidade
+                              AND cod_licitacao = licitacao.cod_licitacao
+                              AND cod_modalidade = licitacao.cod_modalidade
+                              AND exercicio = licitacao.exercicio 
+                         ) AS num_processo_licitatorio
+                       , documento_pessoa.tipo_documento AS tipo_documento
+                       , documento_pessoa.num_documento AS num_documento
+                       , CASE WHEN mapa.cod_tipo_licitacao = 2
+                                   THEN homologacao.lote::VARCHAR
+                              ELSE ' '
+                         END AS num_lote
+                       , mapa_item.cod_item AS cod_item
+                       , (mapa_item.vl_total / mapa_item.quantidade  )::numeric(14,4) AS vl_unitario
+                       , mapa_item.quantidade::numeric(14,4) AS quantidade
+
                     FROM licitacao.licitacao
-                    
-                    JOIN licitacao.participante
+
+              INNER JOIN licitacao.participante
                       ON participante.cod_licitacao = licitacao.cod_licitacao
                      AND participante.cod_modalidade = licitacao.cod_modalidade
                      AND participante.cod_entidade = licitacao.cod_entidade
                      AND participante.exercicio = licitacao.exercicio
-                    
-                    JOIN compras.mapa
+
+              INNER JOIN compras.mapa
                       ON mapa.exercicio = licitacao.exercicio_mapa
                      AND mapa.cod_mapa = licitacao.cod_mapa
-                     
-                    JOIN compras.mapa_solicitacao
+
+              INNER JOIN compras.mapa_solicitacao
                       ON mapa_solicitacao.exercicio = mapa.exercicio
                      AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
-                     
-                    JOIN compras.mapa_item
+
+              INNER JOIN compras.mapa_item
                       ON mapa_item.exercicio = mapa_solicitacao.exercicio
                      AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
                      AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
                      AND mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
                      AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-                    
-                    JOIN compras.mapa_cotacao
+
+              INNER JOIN compras.mapa_cotacao
                       ON mapa_cotacao.exercicio_mapa = mapa.exercicio
                      AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-                     
-                    JOIN compras.cotacao
+
+              INNER JOIN compras.cotacao
                       ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
                      AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-                    
-                    JOIN compras.julgamento
+
+              INNER JOIN compras.julgamento
                       ON julgamento.exercicio = cotacao.exercicio
                      AND julgamento.cod_cotacao = cotacao.cod_cotacao
-                     
-                    JOIN compras.julgamento_item
+
+              INNER JOIN compras.julgamento_item
                       ON julgamento_item.exercicio = julgamento.exercicio
                      AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
                      AND julgamento_item.cod_item = mapa_item.cod_item 
 
-                    JOIN licitacao.homologacao
+              INNER JOIN licitacao.homologacao
                       ON homologacao.cod_licitacao=licitacao.cod_licitacao
                      AND homologacao.cod_modalidade=licitacao.cod_modalidade
                      AND homologacao.cod_entidade=licitacao.cod_entidade
                      AND homologacao.exercicio_licitacao=licitacao.exercicio
                      AND homologacao.cod_item=julgamento_item.cod_item
                      AND homologacao.lote=julgamento_item.lote
-                     AND (
-                             SELECT homologacao_anulada.num_homologacao FROM licitacao.homologacao_anulada
-                             WHERE homologacao_anulada.cod_licitacao=licitacao.cod_licitacao
-                             AND homologacao_anulada.cod_modalidade=licitacao.cod_modalidade
-                             AND homologacao_anulada.cod_entidade=licitacao.cod_entidade
-                             AND homologacao_anulada.exercicio_licitacao=licitacao.exercicio
-                             AND homologacao.num_homologacao=homologacao_anulada.num_homologacao
-                             AND homologacao.cod_item=homologacao_anulada.cod_item
-                             AND homologacao.lote=homologacao_anulada.lote
-                         ) IS NULL
-                     
-                    JOIN administracao.configuracao_entidade
+
+               LEFT JOIN licitacao.homologacao_anulada
+                      ON homologacao_anulada.cod_licitacao=homologacao.cod_licitacao
+                     AND homologacao_anulada.cod_modalidade=homologacao.cod_modalidade
+                     AND homologacao_anulada.cod_entidade=homologacao.cod_entidade
+                     AND homologacao_anulada.exercicio_licitacao=homologacao.exercicio_licitacao
+                     AND homologacao_anulada.num_homologacao=homologacao.num_homologacao
+                     AND homologacao_anulada.cod_item=homologacao.cod_item
+                     AND homologacao_anulada.lote=homologacao.lote
+
+              INNER JOIN administracao.configuracao_entidade
                       ON configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
                      AND configuracao_entidade.cod_modulo = 55
                      AND configuracao_entidade.exercicio = licitacao.exercicio
                      AND configuracao_entidade.cod_entidade = licitacao.cod_entidade
-                     
-                    JOIN sw_cgm AS responsavel
+
+              INNER JOIN sw_cgm AS responsavel
                       ON responsavel.numcgm = participante.numcgm_representante
-                      
-                    JOIN ( SELECT num_documento, numcgm, tipo_documento
+
+              INNER JOIN ( SELECT num_documento, numcgm, tipo_documento
                              FROM (
                                     SELECT cpf AS num_documento, numcgm, 1 AS tipo_documento
                                       FROM sw_cgm_pessoa_fisica
-                                      
                                      UNION
-                                     
                                     SELECT cnpj AS num_documento, numcgm, 2 AS tipo_documento
                                       FROM sw_cgm_pessoa_juridica
-                                ) AS tabela
-                            GROUP BY numcgm, num_documento, tipo_documento
-                        ) AS documento_pessoa
+                                  ) AS tabela
+                         GROUP BY numcgm, num_documento, tipo_documento
+                         ) AS documento_pessoa
                       ON documento_pessoa.numcgm = julgamento_item.cgm_fornecedor
-                      
-            JOIN (
-                     SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
-																VALUES (cod_licitacao		INTEGER
-																	   ,cod_modalidade		INTEGER
-																	   ,cod_entidade		INTEGER
-																	   ,exercicio			CHAR(4)
-																	   ,exercicio_licitacao	VARCHAR
-																	   ,num_licitacao		TEXT ) 
-                 ) AS config_licitacao
-              ON config_licitacao.cod_entidade = licitacao.cod_entidade
-             AND config_licitacao.cod_licitacao = licitacao.cod_licitacao
-             AND config_licitacao.cod_modalidade = licitacao.cod_modalidade
-             AND config_licitacao.exercicio = licitacao.exercicio                        
-                      
+
                    WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
                      AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
+                     AND homologacao_anulada.cod_licitacao IS NULL
                      AND licitacao.cod_entidade IN (" . $this->getDado('entidades') . ")
                      AND licitacao.cod_modalidade NOT IN (8,9)
                      AND NOT EXISTS ( SELECT 1
@@ -189,25 +185,26 @@ class TTCEMGJulgamentoLicitacao extends Persistente
                                          AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
                                          AND licitacao_anulada.exercicio = licitacao.exercicio
                                     )
-                      
-                 GROUP BY tipo_registro
-                        , cod_orgao
-                        , cod_unidade
-                        , num_processo_licitatorio
-                        , tipo_documento
-                        , num_documento
-                        , num_lote
-                        , mapa_item.cod_item
-                        , mapa_item.vl_total
-                        , mapa_item.quantidade
-                        , licitacao.exercicio
-                        , config_licitacao.exercicio_licitacao
-                        , config_licitacao.num_licitacao
-                 ORDER BY num_processo_licitatorio
-        ";
+
+                GROUP BY tipo_registro
+                       , cod_orgao
+                       , cod_unidade
+                       , tipo_documento
+                       , num_documento
+                       , num_lote
+                       , mapa_item.cod_item
+                       , mapa_item.vl_total
+                       , mapa_item.quantidade
+                       , licitacao.cod_entidade
+                       , licitacao.cod_licitacao
+                       , licitacao.cod_modalidade
+                       , licitacao.exercicio 
+
+                ORDER BY num_processo_licitatorio ";
+
         return $stSql;
     }
-    
+
     // detalhamento 20 foi removido porque não tem os filtros necessários ainda.
     /*
     public function recuperaDetalhamento20(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
@@ -321,7 +318,7 @@ class TTCEMGJulgamentoLicitacao extends Persistente
         ";
     }
     */
-    
+
     public function recuperaExportacao30(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
         return $this->executaRecupera("montaRecuperaExportacao30",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
@@ -330,141 +327,148 @@ class TTCEMGJulgamentoLicitacao extends Persistente
     public function montaRecuperaExportacao30()
     {
         $stSql = "
-            SELECT
-                    30 AS tipo_registro
-                  , LPAD(configuracao_entidade.valor,2,'0') AS cod_orgao
-                  , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0') || LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade
-                  , config_licitacao.exercicio_licitacao
-                  , config_licitacao.num_licitacao AS num_processo_licitatorio
-                  , TO_CHAR(julgamento.timestamp,'ddmmyyyy') AS dt_julgamento
-                  , 1 AS presenca_licitantes
-                  , CASE WHEN participante.renuncia_recurso = true THEN
+          SELECT 30 AS tipo_registro
+               , LPAD(configuracao_entidade.valor,2,'0') AS cod_orgao
+               , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0') || LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade
+               , (SELECT exercicio_licitacao
+                    FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+                                                      VALUES (cod_licitacao       INTEGER
+                                                             ,cod_modalidade      INTEGER
+                                                             ,cod_entidade        INTEGER
+                                                             ,exercicio           CHAR(4)
+                                                             ,exercicio_licitacao VARCHAR
+                                                             ,num_licitacao       TEXT ) 	    
+                   WHERE cod_entidade = licitacao.cod_entidade
+                     AND cod_licitacao = licitacao.cod_licitacao
+                     AND cod_modalidade = licitacao.cod_modalidade
+                     AND exercicio = licitacao.exercicio 
+                 ) AS exercicio_licitacao
+               , (SELECT num_licitacao
+                    FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
+                                                      VALUES (cod_licitacao       INTEGER
+                                                             ,cod_modalidade      INTEGER
+                                                             ,cod_entidade        INTEGER
+                                                             ,exercicio           CHAR(4)
+                                                             ,exercicio_licitacao VARCHAR
+                                                             ,num_licitacao       TEXT ) 	    
+                   WHERE cod_entidade = licitacao.cod_entidade
+                     AND cod_licitacao = licitacao.cod_licitacao
+                     AND cod_modalidade = licitacao.cod_modalidade
+                     AND exercicio = licitacao.exercicio 
+                 ) AS num_processo_licitatorio
+               , TO_CHAR(julgamento.timestamp,'ddmmyyyy') AS dt_julgamento
+               , 1 AS presenca_licitantes
+               , CASE WHEN participante.renuncia_recurso = true THEN
                                     1
                          ELSE
                                     2
                     END AS renuncia_recurso 
-                 
+
             FROM licitacao.licitacao
-                    
-            JOIN licitacao.participante
+
+      INNER JOIN licitacao.participante
               ON participante.cod_licitacao = licitacao.cod_licitacao
              AND participante.cod_modalidade = licitacao.cod_modalidade
              AND participante.cod_entidade = licitacao.cod_entidade
              AND participante.exercicio = licitacao.exercicio
-            
-            JOIN compras.mapa
+
+      INNER JOIN compras.mapa
               ON mapa.exercicio = licitacao.exercicio_mapa
              AND mapa.cod_mapa = licitacao.cod_mapa
-             
-            JOIN compras.mapa_solicitacao
+
+      INNER JOIN compras.mapa_solicitacao
               ON mapa_solicitacao.exercicio = mapa.exercicio
              AND mapa_solicitacao.cod_mapa = mapa.cod_mapa
-             
-            JOIN compras.mapa_item
+
+      INNER JOIN compras.mapa_item
               ON mapa_item.exercicio = mapa_solicitacao.exercicio
              AND mapa_item.cod_entidade = mapa_solicitacao.cod_entidade
              AND mapa_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
              AND mapa_item.cod_mapa = mapa_solicitacao.cod_mapa
              AND mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
-            
-            JOIN compras.mapa_cotacao
+
+      INNER JOIN compras.mapa_cotacao
               ON mapa_cotacao.exercicio_mapa = mapa.exercicio
              AND mapa_cotacao.cod_mapa = mapa.cod_mapa
-             
-            JOIN compras.cotacao
+
+      INNER JOIN compras.cotacao
               ON cotacao.exercicio = mapa_cotacao.exercicio_cotacao
              AND cotacao.cod_cotacao = mapa_cotacao.cod_cotacao
-            
-            JOIN compras.julgamento
+
+      INNER JOIN compras.julgamento
               ON julgamento.exercicio = cotacao.exercicio
              AND julgamento.cod_cotacao = cotacao.cod_cotacao
-            
-            JOIN compras.julgamento_item
+
+      INNER JOIN compras.julgamento_item
               ON julgamento_item.exercicio = julgamento.exercicio
              AND julgamento_item.cod_cotacao = julgamento.cod_cotacao
              AND julgamento_item.cod_item = mapa_item.cod_item                      
-             
-            JOIN licitacao.homologacao
+
+      INNER JOIN licitacao.homologacao
               ON homologacao.cod_licitacao=licitacao.cod_licitacao
              AND homologacao.cod_modalidade=licitacao.cod_modalidade
              AND homologacao.cod_entidade=licitacao.cod_entidade
              AND homologacao.exercicio_licitacao=licitacao.exercicio
              AND homologacao.cod_item=julgamento_item.cod_item
              AND homologacao.lote=julgamento_item.lote
-             AND (
-                     SELECT homologacao_anulada.num_homologacao FROM licitacao.homologacao_anulada
-                     WHERE homologacao_anulada.cod_licitacao=licitacao.cod_licitacao
-                     AND homologacao_anulada.cod_modalidade=licitacao.cod_modalidade
-                     AND homologacao_anulada.cod_entidade=licitacao.cod_entidade
-                     AND homologacao_anulada.exercicio_licitacao=licitacao.exercicio
-                     AND homologacao.num_homologacao=homologacao_anulada.num_homologacao
-                     AND homologacao.cod_item=homologacao_anulada.cod_item
-                     AND homologacao.lote=homologacao_anulada.lote
-                 ) IS NULL
-             
-            JOIN administracao.configuracao_entidade
+
+       LEFT JOIN licitacao.homologacao_anulada
+              ON homologacao_anulada.cod_licitacao=homologacao.cod_licitacao
+             AND homologacao_anulada.cod_modalidade=homologacao.cod_modalidade
+             AND homologacao_anulada.cod_entidade=homologacao.cod_entidade
+             AND homologacao_anulada.exercicio_licitacao=homologacao.exercicio_licitacao
+             AND homologacao_anulada.num_homologacao=homologacao.num_homologacao
+             AND homologacao_anulada.cod_item=homologacao.cod_item
+             AND homologacao_anulada.lote=homologacao.lote
+
+      INNER JOIN administracao.configuracao_entidade
               ON configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
              AND configuracao_entidade.cod_modulo = 55
              AND configuracao_entidade.exercicio = licitacao.exercicio
              AND configuracao_entidade.cod_entidade = licitacao.cod_entidade
-             
-            JOIN sw_cgm AS responsavel
+
+      INNER JOIN sw_cgm AS responsavel
               ON responsavel.numcgm = participante.numcgm_representante
-              
-            JOIN ( SELECT num_documento, numcgm, tipo_documento
+
+      INNER JOIN ( SELECT num_documento, numcgm, tipo_documento
                      FROM (
                             SELECT cpf AS num_documento, numcgm, 1 AS tipo_documento
                               FROM sw_cgm_pessoa_fisica
-                              
                              UNION
-                             
                             SELECT cnpj AS num_documento, numcgm, 2 AS tipo_documento
                               FROM sw_cgm_pessoa_juridica
                         ) AS tabela
                     GROUP BY numcgm, num_documento, tipo_documento
-                ) AS documento_pessoa
+                 ) AS documento_pessoa
               ON documento_pessoa.numcgm = responsavel.numcgm
-              
-            JOIN (
-                     SELECT * FROM tcemg.fn_exercicio_numero_licitacao ('".$this->getDado('exercicio')."', '".$this->getDado('entidades')."')
-																VALUES (cod_licitacao		INTEGER
-																	   ,cod_modalidade		INTEGER
-																	   ,cod_entidade		INTEGER
-																	   ,exercicio			CHAR(4)
-																	   ,exercicio_licitacao	VARCHAR
-																	   ,num_licitacao		TEXT ) 
-                 ) AS config_licitacao
-              ON config_licitacao.cod_entidade = licitacao.cod_entidade
-             AND config_licitacao.cod_licitacao = licitacao.cod_licitacao   
-             AND config_licitacao.cod_modalidade = licitacao.cod_modalidade
-             AND config_licitacao.exercicio = licitacao.exercicio               
-              
-            WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
-              AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
-              AND licitacao.cod_entidade IN (" . $this->getDado('entidades'). ")
-              AND licitacao.cod_modalidade NOT IN (8,9)
-              AND NOT EXISTS( SELECT 1
-			        FROM licitacao.licitacao_anulada
-			       WHERE licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
-				 AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
-                                 AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
-                                 AND licitacao_anulada.exercicio = licitacao.exercicio
-                            ) 
-            GROUP BY tipo_registro
-                   , cod_orgao
-                   , cod_unidade
-                   , num_processo_licitatorio
-                   , dt_julgamento, presenca_licitantes
-                   , renuncia_recurso
-                   , licitacao.exercicio
-                   , config_licitacao.exercicio_licitacao
-                   , config_licitacao.num_licitacao
-                   
-            ORDER BY num_processo_licitatorio
-        ";
+
+           WHERE TO_DATE(TO_CHAR(homologacao.timestamp,'dd/mm/yyyy'), 'dd/mm/yyyy') BETWEEN TO_DATE('01/" . $this->getDado('mes') . "/" . $this->getDado('exercicio') . "', 'dd/mm/yyyy')
+             AND last_day(TO_DATE('" . $this->getDado('exercicio') . "' || '-' || '".$this->getDado('mes') . "' || '-' || '01','yyyy-mm-dd'))
+             AND homologacao_anulada.cod_licitacao IS NULL
+             AND licitacao.cod_entidade IN (" . $this->getDado('entidades'). ")
+             AND licitacao.cod_modalidade NOT IN (8,9)
+             AND NOT EXISTS( SELECT 1
+                               FROM licitacao.licitacao_anulada
+                              WHERE licitacao_anulada.cod_licitacao = licitacao.cod_licitacao
+                                AND licitacao_anulada.cod_modalidade = licitacao.cod_modalidade
+                                AND licitacao_anulada.cod_entidade = licitacao.cod_entidade
+                                AND licitacao_anulada.exercicio = licitacao.exercicio
+                           )
+
+        GROUP BY tipo_registro
+               , cod_orgao
+               , cod_unidade
+               , dt_julgamento, presenca_licitantes
+               , renuncia_recurso
+               , licitacao.cod_entidade
+               , licitacao.cod_licitacao
+               , licitacao.cod_modalidade
+               , licitacao.exercicio
+
+        ORDER BY num_processo_licitatorio ";
+
         return $stSql;
     }
-    
+
     public function __destruct(){}
-    
 }

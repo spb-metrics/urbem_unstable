@@ -333,7 +333,6 @@ function exclusao($boTransacao = "")
             $stChave = $this->montaChave();
             if ($stChave) {
                 $stSql .= " WHERE ".$stChave;
-                //mostravar($stSql);
                 $obErro = $obConexao->executaDML( $stSql, $boTransacao );
             } else {
                 $obErro->setDescricao( "Na classe persistente deve ser setada a chave!<br>\n" );
@@ -366,7 +365,6 @@ function alteracao($boTransacao = "")
             $stChave = $this->montaChave();
             if ($stChave) {
                 $stSql .= " WHERE ".$stChave;
-                //mostravar($stSql);
                 $obErro = $obConexao->executaDML( $stSql, $boTransacao );
                 //if ( !$obErro->ocorreu() ) {
                     //

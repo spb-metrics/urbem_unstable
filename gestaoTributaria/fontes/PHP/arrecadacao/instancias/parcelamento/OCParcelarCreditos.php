@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Diego Bueno Coelho
 
-    * $Id: OCParcelarCreditos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCParcelarCreditos.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.20
 */
@@ -80,7 +80,6 @@ function montaParcelas($numParcelas, $primeiroVencimento, $valorParcelas)
         $rsListaParcelas = new RecordSet;
         $rsListaParcelas->preenche ( $arrParcelas);
         $rsListaParcelas->addFormatacao( "valor"   , "NUMERIC_BR" );
-//        sistemaLegado::mostravar ( $rsListaParcelas );
 
         $obLista = new Lista;
         $obLista->setRecordSet            (   $rsListaParcelas   );
@@ -220,7 +219,7 @@ switch ($_REQUEST ["stCtrl"]) {
         if ($_REQUEST["inInscricaoImobiliaria"]) {
             $obRCIMUnidadeAutonoma->roRCIMImovel->setNumeroInscricao( $_REQUEST["inInscricaoImobiliaria"] );
             $obRCIMUnidadeAutonoma->roRCIMImovel->listarImoveisConsulta( $rsImoveis );
-            sistemaLegado::mostravar ( $rsImoveis );
+
             if ( $rsImoveis->eof() ) {
                 //nao encontrada
                 $stJs .= 'f.inInscricaoImobiliaria.value = "";';

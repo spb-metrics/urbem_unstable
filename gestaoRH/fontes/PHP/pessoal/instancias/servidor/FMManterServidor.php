@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.07
 
-    $Id: FMManterServidor.php 61695 2015-02-26 12:13:37Z franver $
+    $Id: FMManterServidor.php 63792 2015-10-13 19:59:22Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -68,7 +68,7 @@ $inPaginacaoPos = $request->get('pos');
 unset($_GET['pg']);
 unset($_GET['pos']);
 
-//SistemaLegado::executaFramePrincipal("BloqueiaFrames(true,false);");
+SistemaLegado::executaFramePrincipal("BloqueiaFrames(true,false);");
 SistemaLegado::BloqueiaFrames();
 
 $obRPessoalServidor = new RPessoalServidor;
@@ -181,6 +181,9 @@ if ($stAcao == "incluir" or $stAcao == "alterar_servidor") {
                 $arExcluirTotal[] = $inIndexExcluir;
             }
         }
+
+        $stValorPadrao = "";
+        $stValorDescPadrao = "";
     }
     $arTemp = array ();
     foreach ($arAtributos as $inIndex=>$arAtributo) {

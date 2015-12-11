@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_honorarios_mata.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_honorarios_mata.plsql 63888 2015-10-30 15:35:08Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
@@ -44,7 +44,7 @@ funcao para calculo de honorarios advocaticios para cobrancas de divida ativa
 
 */
 
-CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURNS numeric as '
+CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURNS numeric as $$
 
     DECLARE
         dtVencimento    ALIAS FOR $1;
@@ -89,28 +89,11 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
 
     BEGIN
 
---        -- RECUPERACAO DAS REDUCOES QUE INCIDEM EM CADA ACRESCIMO
---        stSQL := '' SELECT cod_acrescimo
---                         , cod_tipo
---                      FROM divida.modalidade_reducao_acrescimo
---                     WHERE cod_modalidade = '' || inCodModalidade || ''
---                       AND timestamp = (
---                                         SELECT ultimo_timestamp
---                                           FROM divida.modalidade
---                                          WHERE cod_modalidade = '' || inCodModalidade || ''
---                                       )
---                       AND pagamento = false '';
---
---        FOR reRECORD IN EXECUTE stSQL LOOP
---            nuReducao   := aplica_reducao_modalidade_acrescimo( inCodModalidade, inRegistro, );
---        END LOOP;
-
-        inCodInscricao  := recuperarbufferinteiro( ''inCodInscricao''  );
-        inExercicio     := recuperarbufferinteiro( ''inExercicio''     );
-        inCodModalidade := recuperarbufferinteiro( ''inCodModalidade'' );
-        inRegistro      := recuperarbufferinteiro( ''inRegistro''      );
---        inQtdParcelas   := recuperarbufferinteiro( ''inQtdParcelas''   );
-        boIncidencia    := recuperarbuffertexto  ( ''boIncidencia''    );
+        inCodInscricao  := recuperarbufferinteiro( 'inCodInscricao'  );
+        inExercicio     := recuperarbufferinteiro( 'inExercicio'     );
+        inCodModalidade := recuperarbufferinteiro( 'inCodModalidade' );
+        inRegistro      := recuperarbufferinteiro( 'inRegistro'      );
+        boIncidencia    := recuperarbuffertexto  ( 'boIncidencia'    );
 
         SELECT qtd_parcela
           INTO inQtdParcelas
@@ -122,29 +105,25 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
                                WHERE cod_modalidade = inCodModalidade
                             );
         
-        inJudicial := recuperarBufferInteiro(''judicial'');
+        inJudicial := recuperarBufferInteiro( 'judicial' );
         -- RECUPERACAO DO VALOR DOS ACRESCIMOS QUE INCIDEM SOBRE O VALOR ORIGINAL
         stSplit1        := aplica_acrescimo_modalidade_honorarios_mata( inJudicial, inCodInscricao, inExercicio, inCodModalidade, 1, inRegistro, flCorrigido::numeric, dtVencimento, dtDataCalculo, boIncidencia ); 
         stSplit2        := aplica_acrescimo_modalidade_honorarios_mata( inJudicial, inCodInscricao, inExercicio, inCodModalidade, 2, inRegistro, flCorrigido::numeric, dtVencimento, dtDataCalculo, boIncidencia ); 
         stSplit3        := aplica_acrescimo_modalidade_honorarios_mata( inJudicial, inCodInscricao, inExercicio, inCodModalidade, 3, inRegistro, flCorrigido::numeric, dtVencimento, dtDataCalculo, boIncidencia ); 
 
---        nuSplit1 := split_part(stSplit1,'';'',1)::float;
---        nuSplit2 := split_part(stSplit2,'';'',1)::float;
---        nuSplit3 := split_part(stSplit3,'';'',1)::float;
-
         -- RECUPERACAO DOS VALORES DO ACRESCIMO TIPO 1
         lnSplit         := length(stSplit1);
-        btSplit         := replace(stSplit1,'';'','''');
+        btSplit         := replace(stSplit1,';','');
         lnSplitRep      := length(btSplit);
 
         wCount := ( lnSplit::integer - lnSplitRep::integer ) / 3;
 
         WHILE ( iLimite < wCount ) LOOP
 
-            nuAcrescimo := split_part(stSplit1,'';'',iCount);
+            nuAcrescimo := split_part(stSplit1,';',iCount);
 
-            inTmpAcrescimo := split_part(stSplit1,'';'',iCount+1)::integer;
-            inTmpTipo      := split_part(stSplit1,'';'',iCount+2)::integer;
+            inTmpAcrescimo := split_part(stSplit1,';',iCount+1)::integer;
+            inTmpTipo      := split_part(stSplit1,';',iCount+2)::integer;
 
             nuReducao := aplica_reducao_modalidade_acrescimo( inCodModalidade, inRegistro, nuAcrescimo::numeric, inTmpAcrescimo, inTmpTipo, dtVencimento, inQtdParcelas );
             nuSplit1  := nuSplit1 + ( nuAcrescimo - nuReducao );
@@ -157,20 +136,19 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
         iCount := 2;
         iLimite := 0;
 
-
         -- RECUPERACAO DOS VALORES DO ACRESCIMO TIPO 2
         lnSplit         := length(stSplit2);
-        btSplit         := replace(stSplit2,'';'','''');
+        btSplit         := replace(stSplit2,';','');
         lnSplitRep      := length(btSplit);
 
         wCount := ( lnSplit::integer - lnSplitRep::integer ) / 3;
 
         WHILE ( iLimite < wCount ) LOOP
 
-            nuAcrescimo := split_part(stSplit2,'';'',iCount);
+            nuAcrescimo := split_part(stSplit2,';',iCount);
 
-            inTmpAcrescimo := split_part(stSplit2,'';'',iCount+1)::integer;
-            inTmpTipo      := split_part(stSplit2,'';'',iCount+2)::integer;
+            inTmpAcrescimo := split_part(stSplit2,';',iCount+1)::integer;
+            inTmpTipo      := split_part(stSplit2,';',iCount+2)::integer;
 
             nuReducao := aplica_reducao_modalidade_acrescimo( inCodModalidade, inRegistro, nuAcrescimo::numeric, inTmpAcrescimo, inTmpTipo, dtVencimento, inQtdParcelas );
             nuSplit2  := nuSplit2 + ( nuAcrescimo - nuReducao );
@@ -186,17 +164,17 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
 
         -- RECUPERACAO DOS VALORES DO ACRESCIMO TIPO 3
         lnSplit         := length(stSplit3);
-        btSplit         := replace(stSplit3,'';'','''');
+        btSplit         := replace(stSplit3,';','');
         lnSplitRep      := length(btSplit);
 
         wCount := ( lnSplit::integer - lnSplitRep::integer ) / 3;
 
         WHILE ( iLimite < wCount ) LOOP
 
-            nuAcrescimo := split_part(stSplit3,'';'',iCount);
+            nuAcrescimo := split_part(stSplit3,';',iCount);
 
-            inTmpAcrescimo := split_part(stSplit3,'';'',iCount+1)::integer;
-            inTmpTipo      := split_part(stSplit3,'';'',iCount+2)::integer;
+            inTmpAcrescimo := split_part(stSplit3,';',iCount+1)::integer;
+            inTmpTipo      := split_part(stSplit3,';',iCount+2)::integer;
 
             nuReducao := aplica_reducao_modalidade_acrescimo( inCodModalidade, inRegistro, nuAcrescimo::numeric, inTmpAcrescimo, inTmpTipo, dtVencimento, inQtdParcelas );
             nuSplit3  := nuSplit3 + ( nuAcrescimo - nuReducao );
@@ -211,7 +189,7 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
         flValorTotal := flCorrigido + nuSplit1 + nuSplit2 + nuSplit3;
 
         -- CALCULO DO VALOR DOS HONORARIOS - 10% OU 20%
-        inJudicial := recuperarBufferInteiro(''judicial'');
+        inJudicial := recuperarBufferInteiro( 'judicial' );
         IF ( inJudicial = 1 ) THEN
             flHonorario := ( flValorTotal * 20) / 100 ;
         ELSE
@@ -232,5 +210,5 @@ CREATE OR REPLACE FUNCTION fn_honorarios(date,date,float,integer,integer) RETURN
 
         RETURN flHonorario::numeric(14,2);
     END;
-'language 'plpgsql';
+$$ language 'plpgsql';
            

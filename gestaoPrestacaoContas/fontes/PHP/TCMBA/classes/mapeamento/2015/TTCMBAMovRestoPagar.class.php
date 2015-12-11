@@ -28,7 +28,7 @@
     * Data de Criação   : 03/09/2015
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Evandro Melos
-    * $Id: TTCMBAMovRestoPagar.class.php 63510 2015-09-04 15:12:29Z evandro $
+    * $Id: TTCMBAMovRestoPagar.class.php 63787 2015-10-13 18:41:08Z lisiane $
     * $Rev:$
     * $Author:$
     * $Date:$
@@ -94,7 +94,7 @@ class TTCMBAMovRestoPagar extends Persistente {
                       ON pre_empenho.exercicio = empenho.exercicio
                      AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
               
-              INNER JOIN (  SELECT nota_liquidacao_paga.exercicio
+               LEFT JOIN (  SELECT nota_liquidacao_paga.exercicio
                                  , nota_liquidacao_paga.cod_entidade
                                  , nota_liquidacao_paga.cod_nota
                                  , ( SUM(COALESCE(nota_liquidacao_paga.vl_total,0.00)) - SUM(COALESCE(nota_liquidacao_paga_anulada.vl_anulado,0.00)) ) AS vl_total
@@ -153,13 +153,18 @@ class TTCMBAMovRestoPagar extends Persistente {
                       ON despesa.exercicio = pre_empenho_despesa.exercicio
                      AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
             
-               LEFT JOIN empenho.restos_pre_empenho
+              INNER JOIN empenho.restos_pre_empenho
                       ON restos_pre_empenho.exercicio = pre_empenho.exercicio
                      AND restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+              
+              INNER join empenho.empenho_anulado
+                      ON empenho.exercicio = empenho_anulado.exercicio
+                     AND empenho.cod_entidade = empenho_anulado.cod_entidade
+                     AND empenho.cod_empenho = empenho_anulado.cod_empenho
             
                    WHERE empenho.exercicio <= '".$this->getDado('exercicio_anterior')."'
-                     AND empenho.dt_empenho <= TO_DATE('31/12/".$this->getDado('exercicio_anterior')."','dd/mm/yyyy')
-                     AND nota_liquidacao.dt_liquidacao <= TO_DATE('31/12/".$this->getDado('exercicio_anterior')."','dd/mm/yyyy')
+                     AND TO_DATE(empenho_anulado.timestamp::TEXT,'yyyy-mm-dd') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') 
+                                         AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')                     
                      AND empenho.cod_entidade IN (".$this->getDado('cod_entidade').")
         ";
         return $stSql;

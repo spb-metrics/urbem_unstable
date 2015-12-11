@@ -57,15 +57,15 @@ TEXTAREA.lista {
   
 }
 BODY {
-   /*background: url("../imagens/bg_fundo_home.png") 0 0 repeat-x;*/
    background: #EDF4FA;
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
-   /*background-color : #E4EAE4;*/
 }
+
 BODY.tela_erro{
    background-color : #85A5CC!important;
 }
+
 TD.userTopo {
    color : White; 
    font-family : Futura, Arial, Helvetica, sans-serif;
@@ -139,9 +139,11 @@ INPUT {
    font-stretch : condensed;
    
 }
+
 INPUT:focus{
    background-color : #fff5dd;
 }
+
 INPUT.aviso {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -155,18 +157,22 @@ A:link {
   font-weight : bold;
   outline:none;
 }
+
 A:visited {
    color: black;
    font-weight : bold;
 }
+
 A:active {
    color: Blue;
    font-weight : bold;
 }
+
 A:hover {
    color: Blue;
    font-weight : bold;
 }
+
 TD.status_cel_up {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -178,6 +184,7 @@ TD.status_cel_up {
    border-left : 1px solid #f4f4ff;
    border-top : 1px solid #f4f4ff;
 }
+
 TD.status_cel_up_center {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -189,6 +196,7 @@ TD.status_cel_up_center {
    border-left : 1px solid #f4f4ff;
    border-top : 1px solid #f4f4ff;
 }
+
 TD.status_cel_down{
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -223,6 +231,7 @@ TD.status_cel_up_center {
    border-left : 1px solid #f4f4ff;
    border-top : 1px solid #f4f4ff;
 }
+
 TD.status_cel_down{
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -241,12 +250,14 @@ H1{
    font-weight: bold;
    color : #174A81;
 }
+
 H2{
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 16px;
    font-weight: bold;
    color : #FF0000;
 }
+
 H3{
    font-family : Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -261,20 +272,35 @@ H3{
    text-align : center;
    color : #ff0000;
 }
+
+.observacao{
+   background-color : #85A5CC;
+   color: #000000;
+   font-family : Futura, Arial, Helvetica, sans-serif;
+   font-size : 13px;
+   font-weight: bold;
+   padding:  5px;
+   text-align: center;
+   display: block !important;
+}
+
 table{
     background-color: #ffffff;
 }
+
 table#processos{
     background-color: #ffffff;
 }
+
 table#impressoras{
     background-color: #ffffff;
 }
+
 table#paginacao{
     background-color:#EDF4FA;
 }
 
-TD.label{
+TD.label, p.label{
    background-color : #85A5CC;
    color: #000000;
    font-family : Futura, Arial, Helvetica, sans-serif;
@@ -282,13 +308,8 @@ TD.label{
    font-weight: bold;
    text-align : right;
    vertical-align : top;
-   
- /*  border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB;*/
 }
+
 TD.labelleft{
    background-color : #85A5CC;
    color: #FFFFFF;
@@ -298,15 +319,10 @@ TD.labelleft{
    height: 45px;
    text-align : left;
    vertical-align : middle;
-   /*border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB;*/
 }
+
 TD.labelleftcabecalho{
    background-color : #85a5cc!important;
-   /*border-bottom : 1px solid #929292;*/
    color: #ffffff;
    font-family: Verdana, Arial, Helvetica, sans-serif; ;
    font-size : 12px;
@@ -315,8 +331,8 @@ TD.labelleftcabecalho{
    text-align : left;
    vertical-align : middle;
 }
+
 TD.labelcenter{
-   /*border-bottom : 1px solid #929292;*/
    background-color : #edf4fa;
    font-family: Verdana, Arial, Helvetica, sans-serif; ;
    font-size : 12px;
@@ -324,12 +340,8 @@ TD.labelcenter{
    height: 45px;
    text-align : center;
    vertical-align : middle;
-  /* border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB; */
 }
+
 TD.labelcenterTable{
    background-color : #edf4fa;
    font-family: Verdana, Arial, Helvetica, sans-serif; ;
@@ -338,15 +350,10 @@ TD.labelcenterTable{
    height: 45px;
    text-align : center;
    vertical-align : middle;
-  /* border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB; */
 }
+
 TD.labelcentercabecalho{
    background-color : #85a5cc!important;
-   /*border-bottom : 1px solid #929292;*/
    color: #ffffff;
    font-family: Verdana, Arial, Helvetica, sans-serif; ;
    font-size : 12px;
@@ -355,6 +362,7 @@ TD.labelcentercabecalho{
    text-align : center;
    vertical-align : middle;
 }
+
 TD.labelcenterCalendario{
    border-bottom : 1px solid #929292;
    background-color : #4A6491;
@@ -364,16 +372,10 @@ TD.labelcenterCalendario{
    height: 45px;
    text-align : center;
    vertical-align : middle;
-  /* border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB; */
 }
 
 TD.contadorClaro{
    background-color : #edf4fa;
-   /*border-bottom : 1px solid #929292;*/
    font-family: Futura, Arial, Helvetica, sans-serif;
    font-size : 13px;
    font-weight: bold;
@@ -384,7 +386,6 @@ TD.contadorClaro{
 
 TD.contadorEscuro{
    background-color : #d0e4f2;
-   /*border-bottom : 1px solid #929292;*/
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 13px;
    font-weight: bold;
@@ -400,12 +401,6 @@ TD.titulocabecalho {
     font-weight : bold;
     font-style : normal;
     text-align : left;
- /* background-color : #323232;
-    border: 1px outset #000000;
-    border-bottom : 1px solid #000000;
-    border-right : 1px solid #000000;
-    border-left : 1px solid #FFFFFF;
-    border-top : 1px solid #FFFFFF;*/
 }
 
 TD.field {
@@ -414,13 +409,6 @@ TD.field {
    font-size : 13px;
    vertical-align : top;
    height: 30px;
-   
- /*border: 1px outset #808080;
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;
-*/
 }
 
 TD.fieldfinanceiro {
@@ -429,28 +417,15 @@ TD.fieldfinanceiro {
    font-size : 13px;
    vertical-align :middle;
    height: 30px;
-   
- /*border: 1px outset #808080;
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;
-*/
 }
+
 TD.fieldcalendario {
    background-color : #edf4fa;
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 13px;
    vertical-align : top;
-   
-   
- /*border: 1px outset #808080;
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;
-*/
 }
+
 TD.fieldMensagem {
    background-color : #4A6491;
    color: #ffffff;
@@ -459,8 +434,8 @@ TD.fieldMensagem {
    font-weight: bold;
    height: 23px;
    vertical-align : middle;
- 
 }
+
 TD.field TD{
     background: #EDF4FA;
 }
@@ -470,18 +445,15 @@ TD.fieldlabel {
    font-size : 12px;
    background-color : #EDF4FA;
 }
+
 TD.fieldright {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
    text-align : right;
    vertical-align : top;
    background-color : #EDF4FA;
-/* border: 1px outset #808080;
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;*/
 }
+
 TD.fieldright_noborder {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -489,30 +461,29 @@ TD.fieldright_noborder {
    vertical-align : top;
    background-color : #dcdcdc;
 }
+
 TD.fieldcenter {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
    text-align : center;
    vertical-align : top;
    background-color : #dcdcdc;
-/* border: 1px outset #808080;
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;*/
 }
+
 TD.fakefield {
    background : #FFFFFF!important;
    border: 1px solid #85A5CC; 
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
 }
+
 TD.botao {
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
    font-weight: bold;
    text-align : center;
 }
+
 TH.contec {
    font-family : Futura, Arial, Helvetica, sans-serif;
   font-weight:  bold;
@@ -520,10 +491,6 @@ TH.contec {
   color: #000000;
   background: #ffcc00;
   text-align: left;
- /*  border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-left : 1px solid #f5f5f5;
-   border-top : 1px solid #f5f5f5;*/
 }
 
 TH.diasemana  {
@@ -539,6 +506,7 @@ TH.diasemana  {
    border-left : 1px solid #ccccff;
    border-top : 1px solid #ccccff;
 }
+
 TD.domingo  {
    text-align : center;
   font-size : 12px;
@@ -552,8 +520,8 @@ TD.domingo  {
    border-right : 1px solid #000080;
    border-left : 1px solid #f4f4ff;
    border-top : 1px solid #f4f4ff;
-/*   background-image : url(../icones/label.jpg); */
 }
+
 TD.feriado  {
    text-align : center;
   font-size : 12px;
@@ -568,8 +536,8 @@ TD.feriado  {
    border-right : 1px solid #000080;
    border-left : 1px solid #ffffff;
    border-top : 1px solid #ffffff;
-/*   background-image : url(../icones/label.jpg); */
 }
+
 TD.feriadofixo  {
    text-align : center;
   font-size : 12px;
@@ -584,6 +552,7 @@ TD.feriadofixo  {
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/F.png);
 }
+
 TD.feriadovariavel {
    text-align : center;
   font-size : 12px;
@@ -598,6 +567,7 @@ TD.feriadovariavel {
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/V.png); 
 }
+
 TD.feriadopontofacultativo {
    text-align : center;
   font-size : 12px;
@@ -612,6 +582,7 @@ TD.feriadopontofacultativo {
   border-top : 1px solid #ffffff;
   background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/P.png); 
 }
+
 TD.feriadodiacompensado {
    text-align : center;
   font-size : 12px;
@@ -641,6 +612,7 @@ TD.feriadodf{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DF.png); 
 }
+
 TD.feriadodp{
    text-align : center;
   font-size : 12px;
@@ -670,6 +642,7 @@ TD.feriadodv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DV.png); 
 }
+
 TD.feriadofp{
    text-align : center;
   font-size : 12px;
@@ -684,6 +657,7 @@ TD.feriadofp{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/FP.png); 
 }
+
 TD.feriadofv{
    text-align : center;
   font-size : 12px;
@@ -698,6 +672,7 @@ TD.feriadofv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/FV.png); 
 }
+
 TD.feriadopv{
    text-align : center;
   font-size : 12px;
@@ -712,6 +687,7 @@ TD.feriadopv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/PV.png); 
 }
+
 TD.feriadodfp{
    text-align : center;
   font-size : 12px;
@@ -726,6 +702,7 @@ TD.feriadodfp{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DFP.png); 
 }
+
 TD.feriadodfv{
    text-align : center;
   font-size : 12px;
@@ -740,6 +717,7 @@ TD.feriadodfv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DFV.png); 
 }
+
 TD.feriadodpv{
    text-align : center;
   font-size : 12px;
@@ -754,6 +732,7 @@ TD.feriadodpv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DPV.png); 
 }
+
 TD.feriadofpv{
    text-align : center;
   font-size : 12px;
@@ -768,6 +747,7 @@ TD.feriadofpv{
    border-top : 1px solid #ffffff;
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/FPV.png); 
 }
+
 TD.feriadodfpv{
    text-align : center;
   font-size : 12px;
@@ -783,7 +763,6 @@ TD.feriadodfpv{
    background-image : url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/DFPV.png); 
 }
 
-
 TD.hoje  {
    text-align : center;
   font-size : 12px;
@@ -797,8 +776,8 @@ TD.hoje  {
    border-right : 1px solid #808080;
    border-left : 1px solid #f5f5f5;
    border-top : 1px solid #f5f5f5;
-/*   background-image : url(../icones/fundocopy.jpg); */
 }
+
 TD.labelDia{
    background-color : #4A6491;
    color: #000000;
@@ -807,13 +786,8 @@ TD.labelDia{
    font-weight: bold;
    text-align : right;
    vertical-align : top;
-   
- /*  border: 1px outset #5F625F;
-   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB;*/
 }
+
 TD.dia  {
    text-align : center;
   font-size : 12px;
@@ -827,8 +801,8 @@ TD.dia  {
    border-right : 1px solid #808080;
    border-left : 1px solid #f5f5f5;
    border-top : 1px solid #f5f5f5;
-
 }
+
 TD.alt_dados  {
   background-color : #30395C!important;
   color : #FFFFFF;
@@ -839,12 +813,8 @@ TD.alt_dados  {
   height: 45px;
   padding:0 0 0 10px;
   text-align : left;
-  /*  border: 1px outset #000000;
-   border-bottom : 1px solid #000000;
-   border-right : 1px solid #000000;
-   border-left : 1px solid #FFFFFF;
-   border-top : 1px solid #FFFFFF;*/
 }
+
 TD.alt_dados_dir  {
    text-align : right;
   font-size : 12px;
@@ -853,12 +823,9 @@ TD.alt_dados_dir  {
   font-style : normal;
   background-color : #85A5CC;
   color : #000000;
-  /*border: 1px outset #929292;*/
    border-bottom : 1px solid #929292;
-   /*border-right : 1px solid #000000;
-   border-left : 1px solid #FFFFFF;
-   border-top : 1px solid #FFFFFF;*/
 }
+
 TD.alt_dados_center  {
    text-align : center;
   font-size : 12px;
@@ -867,12 +834,8 @@ TD.alt_dados_center  {
   font-style : normal;
   background-color : #30395C!important;
   color : #FFFFFF;
-/*   border: 1px outset #000000;
-   border-bottom : 1px solid #000000;
-   border-right : 1px solid #000000;
-   border-left : 1px solid #FFFFFF;
-   border-top : 1px solid #FFFFFF; */
 }
+
 TD.show_dados  {
   text-align : left;
   font-size : 13px;
@@ -882,12 +845,8 @@ TD.show_dados  {
   background-color : #EDF4FA;
   color : #000000;
   height: 45px;
-  /*border-bottom : 1px solid #929292;*/
-  /*border: 1px outset #929292;
-   border-right : 1px solid #000000;
-   border-left : 1px solid #CCCCCC;
-   border-top : 1px solid #CCCCCC;*/
 }
+
 TD.show_dados_center  {
   background-color : #EDF4FA;
   color : #000000;
@@ -897,21 +856,10 @@ TD.show_dados_center  {
   font-family : Futura, Arial, Helvetica, sans-serif;
   font-weight : normal;
   font-style : normal;
- /* border-bottom : 1px solid #929292;
-   border: 1px outset #000000;
-   border-bottom : 1px solid #000000;/
-   border-right : 2px outset #000000;
-   border-left : 2px outset #000000;
-   border-top : 2px outset #000000; */
 }
 
 TD.show_dados_center_bold  {
    background-color : #EDF4FA;
-   /* border: 1px outset #000000;
-   border-bottom : 1px solid #000000;
-   border-right : 1px solid #000000;
-   border-left : 1px solid #CCCCCC;
-   border-top : 1px solid #CCCCCC; */
    color : #000000;
    font-size : 13px;
    font-family : Futura, Arial, Helvetica, sans-serif;
@@ -920,26 +868,22 @@ TD.show_dados_center_bold  {
    text-align : center;
     height: 45px;
 }
+
 tr.zb td { 
     background:#D0E4F2; 
 }
+
 TD.show_dados_right  {
    background-color : #EDF4FA;
-   /*border-bottom : 1px solid #929292;*/
    color : #000000;
-   /*border: 1px outset #000000;
-   border-bottom : 1px solid #000000;
-   border-right : 1px solid #000000;
-   border-left : 1px solid #CCCCCC;
-   border-top : 1px solid #CCCCCC;*/
    text-align : right;
    font-size : 12px;
    font-family: Verdana, Arial, Helvetica, sans-serif; 
-   /*font-family : Futura, Arial, Helvetica, sans-serif;*/
    font-weight : normal;
    font-style : normal;
   
 }
+
 TD.status{
    font-family : Futura, Arial, Helvetica, sans-serif;
    font-size : 12px;
@@ -947,20 +891,20 @@ TD.status{
    text-align : left;
    background-image : url("../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/bg_barra_azul_baixo.png");
    height: 27px;
-/*   border-bottom : 1px solid #5F625F;
-   border-right : 1px solid #5F625F;
-   border-left : 1px solid #EBF2EB;
-   border-top : 1px solid #EBF2EB;*/
 }
+
 .toUpperCase{
     text-transform: uppercase;
 }
+
 .toLowerCase{
     text-transform: lowercase;
 }
+
 .toCapitalize{
     text-transform: capitalize;
 }
+
 TD.botao {
     text-align : center;
     font-size : 12px;
@@ -968,13 +912,7 @@ TD.botao {
     font-weight : normal;
     font-style : normal;
     background-color : #edf4fa;
-   /* border-bottom : 1px solid #929292;*/
     color : #000000;
-   /* border: 1px outset #000000;
-    border-bottom : 1px solid #000000;
-    border-right : 1px solid #000000;
-    border-left : 1px solid #CCCCCC;
-    border-top : 1px solid #CCCCCC;*/
 }
 
 TD.botaoEscuro{
@@ -983,7 +921,6 @@ TD.botaoEscuro{
     font-family : Futura, Arial, Helvetica, sans-serif;
     font-weight : normal;
     font-style : normal;
-    /*border-bottom : 1px solid #929292;*/
     color : #000000;
     background-color : #d0e4f2;
 }
@@ -993,14 +930,8 @@ TD.intervalo {
    font-size : 12px;
    background-color : #dcdcdc;
    vertical-align : top;
-  
-/*
-   border-bottom : 1px solid #808080;
-   border-right : 1px solid #808080;
-   border-top : 1px solid #e4e4e4;
-   border-left : 1px solid #e4e4e4;
-*/
 }
+
 TD.fonte_programa {
     text-align : left;
     font-size : 12px;
@@ -1011,6 +942,7 @@ TD.fonte_programa {
     color : #000000;
     border: 0px outset #000000;
 }
+
 .t0i {
     font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 10px;
@@ -1018,28 +950,30 @@ TD.fonte_programa {
     background-color: #ffffcc;
     text-decoration: none;
 }
+
 .t0im {
     border: 0px;
     width: 19px;
     height: 16px;
 }
+
 SPAN.TreeviewSpanArea A {
      font-size: 10pt; 
      font-family: verdana,helvetica; 
      text-decoration: none;
      color: black
 }
+
 SPAN.TreeviewSpanArea A:hover {
      color: #820082;
 }
+
 /********** bloqueia frames *********************/
 #fundo_carregando{
-    /* background-color:#E6EAE6;*/
     background: url("../imagens/botao_menu_claro.png") 0 0 repeat-x;
     position:absolute;
     width:100%;
     height:100%;    
-/*    padding: auto ;*/
     margin: auto ;
     z-index:999;
 }
@@ -1074,19 +1008,19 @@ TD.label a.dcontexto:hover span.contexto{
     left:50px;
     top:10px;
 }
+
 /* somente  pra versao */
 TD.versao  a{    
     color:#FF9900;
     float:left;
     padding:3px 0 0 35px!important;
     text-decoration:none;
-    /*top:25px;
-    right:10px;
-    text-align:left;*/
 }
+
 .versao div#qTip{
     right:10px;
 }
+
 div.versaoFundo{
     background: url("../imagens/bg_version.png") 0 0 no-repeat;
     color:#ff9900;
@@ -1101,6 +1035,7 @@ a.versaoFundo{
     margin: 0 30px 0 0;
     padding:0 6px!important;
 }
+
 td.caminho{
     padding: 0px 0px 0px 15px;
     
@@ -1128,6 +1063,7 @@ TD.show_dados_center_aba{
    -webkit-border-top-left-radius : 30px;
    -webkit-border-top-right-radius : 30px;
 }
+
 TD.labelcenter_aba{
    background-color : #85A5CC;
    border: 1px outset #30395C;
@@ -1148,24 +1084,29 @@ TD.labelcenter_aba{
    -webkit-border-top-left-radius : 30px;
    -webkit-border-top-right-radius : 30px;
 }
+
 TD.show_dados_center a{
     cursor: default;    
     text-decoration:none;
     display:block;
 }
+
 TD.labelcenter_aba a{
     text-decoration:none;
     display:block;
 }
+
 TD.labelcenter_aba:hover{
    text-decoration:none;
    background-color: #EDF4FA;
 }
+
 TD.show_dados_center_aba a{
     display:block;
     text-decoration:none;
     color:#85A5CC;
 }
+
 TD.labelcenter_aba a{
     display:block;
     text-decoration:none;
@@ -1180,7 +1121,6 @@ TD.labelcenter_aba a{
     font-family : Futura, Arial, Helvetica, sans-serif;
     font-weight : bold;
     font-style : normal;
-    /* background-color : #323232; */
     background: url("../imagens/bg_barra_azul.png") 0 0 repeat-x;
     height: 33px;
     color : #FFFFFF;
@@ -1203,21 +1143,24 @@ TD.labelcenter_aba a{
   text-align: left;
   visibility: hidden;
   z-index : 99999;
+}
 
-}   
 a#link_ajuda {
     width: 25px;
     height:25px;
     background: transparent url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens//btnHelpOff.png) top left no-repeat;
     position: fixed; bottom: 1px; right: 1px;
 }
+
 a#link_ajuda:hover{
     background: transparent url(../../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens//btnHelpOn.png) top left no-repeat;
 }
+
 #link_ajuda span{
     display:none;
     visibility:hidden;
 }
+
 .titleBar {
   background-color: #323232;
   cursor: default;
@@ -1244,6 +1187,7 @@ a#link_ajuda:hover{
   width: 50px;
   height: 14px;
 }
+
 .clientArea {
   background-color: #ffffff;
   border-color: #404040 #e0e0e0 #f0f0f0 #505050;
@@ -1267,10 +1211,12 @@ a#link_ajuda:hover{
       margin-left: 0px;
       margin-top: 0px;
       text-align: left;
-  }
+}
+
 #LSResult ul {
     list-style-type:none;
 }
+
 #LSResult a {
     text-decoration:none;
     font-weight : normal;
@@ -1280,13 +1226,13 @@ a#link_ajuda:hover{
     padding:0px;
     margin:0px;
 }
+
 #LSShadow {
       position: relative;
       color: inherit;
-/*      border:  2px inset #ccc;*/
       top:1px;
       left:1px;
-  }
+}
   
 #LSResult div {
      margin-left: 0px;
@@ -1313,13 +1259,6 @@ a#link_ajuda:hover{
     color: #fff;
 }
 
-/*#livesearch {
-    width: 160px;
-    display: block;
-    padding:2px;
-    margin:2px;
-}*/
-    
 .searchHighlight {
     background-color: #ffffff;
 }
@@ -1337,7 +1276,6 @@ a#link_volta {
     visibility:hidden;
 }
 
-
  /**
  * 
  * 
@@ -1352,8 +1290,6 @@ a#link_volta {
         width: 100%;
     }
     table.tabela{ 
-        /*border: 1px solid #000; 
-        border-top:none; */
         margin:0px auto 3px auto;
         padding: 1px; 
     }
@@ -1369,10 +1305,8 @@ a#link_volta {
         width:99.5%;
     }
     table.tabela tr { background-color:#EDF4FA;}
-    /*table.tabela td { border: 1px outset #000;}*/
     table.tabela th , table.tabela td.numeracao{
         background-color:#85A5CC; 
-        /*border: 1px outset #000; */
         color: #fff; 
         font-weight:bold; 
         text-align:center;
@@ -1390,8 +1324,6 @@ a#link_volta {
 
     /* link  */
     table.tabela th .link { text-decoration:underline;}
-
-
 
 /**************************
  *
@@ -1546,13 +1478,17 @@ div#swTools{
     right:50%;
     top:5px;
 }
+
 div#swTools a{
     border:none;
     color: #fff; 
     text-decoration:none;
 }
+
 div#swTools a#menu-abrir, div#swTools a#menu-fechar-oculto{display:none;}
+
 div#swTools img{border:none;}
+
 a#btnHelp{
     bottom:5px;
     display:block;

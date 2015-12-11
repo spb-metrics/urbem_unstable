@@ -68,7 +68,6 @@ if ( is_array($arFiltro) ) {
 //if ( !isset($filtro) ) {
 
     $arLocal = preg_split( "/[^a-zA-Z0-9]/", $_POST['codMasSetor'] );
-    //sistemaLegado::mostravar($_POST) ;
     if ($_POST['inCodBemInicial']) {
         $codBemInicial = $_POST['inCodBemInicial'];
     }
@@ -173,7 +172,6 @@ $ordenar = "B.cod_bem";
 
 //Mostra a opção de imprimir ou salvar o relatório
 $sqlPDF     = $sql." ORDER BY ".$ordenar." ASC ";
-//sistemaLegado::mostravar($sqlPDF) ;
 $sXML       = '../../../../../../gestaoPatrimonial/fontes/PHP/patrimonio/patrimonio/relatorios/relatorioPatrimonialResumido.xml';
 $botoesPDF  = new botoesPdfLegado;
 $botoesPDF->imprimeBotoes($sXML,$sqlPDF,'','');

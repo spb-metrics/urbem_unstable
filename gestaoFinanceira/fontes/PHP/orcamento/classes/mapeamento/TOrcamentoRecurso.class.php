@@ -298,4 +298,43 @@ function montaRecuperaRecursoExercicio()
     return $stSql;
 }
 
+public function verificaContaRecurso(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    
+    $stSql = $this->montaVerificaContaRecurso();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+public function montaVerificaContaRecurso()
+{
+    $stSql="SELECT  plano_conta.*
+                    ,plano_recurso.*
+            FROM contabilidade.plano_analitica
+            
+            INNER JOIN contabilidade.plano_recurso
+               ON plano_recurso.cod_plano = plano_analitica.cod_plano
+              AND plano_recurso.exercicio = plano_analitica.exercicio
+            
+            INNER JOIN contabilidade.plano_conta 
+               ON plano_conta.cod_conta = plano_analitica.cod_conta
+              AND plano_conta.exercicio = plano_analitica.exercicio
+        
+            WHERE plano_analitica.exercicio = '".$this->getDado('exercicio')."'         
+              AND plano_conta.escrituracao = 'analitica'
+              AND plano_conta.cod_estrutural SIMILAR TO ('7.2.1.1.1%|7.2.1.1.2%|8.2.1.1.1%|8.2.1.1.2%|8.2.1.1.3%|8.2.1.1.4%')
+              AND plano_conta.cod_estrutural LIKE (SELECT fn_conta_mae('".$this->getDado('cod_estrutural')."'))||'%'
+              AND plano_recurso.cod_recurso = '".$this->getDado('cod_recurso')."'   
+            ORDER BY cod_estrutural
+        ";
+    return $stSql;
+}
+
+
+
 }

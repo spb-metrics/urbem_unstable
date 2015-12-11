@@ -378,7 +378,7 @@ class VLDODespesaReceita
         $obValorAno1->setLabel           (true);
         $obValorAno1->setClass           ('valor');
         $obValorAno1->setValue           ('[valor_1]');
-        $obValorAno1->setMaxLength       (11);
+        $obValorAno1->setMaxLength       (12);
         $obValorAno1->setSize            (10);
         $obValorAno1->setNegativo        (false);
         $obValorAno1->obEvento->setOnBlur('recalcularValores(1,this.name);');
@@ -389,7 +389,7 @@ class VLDODespesaReceita
         $obValorAno2->setLabel           (true);
         $obValorAno2->setClass           ('valor');
         $obValorAno2->setValue           ('[valor_2]');
-        $obValorAno2->setMaxLength       (11);
+        $obValorAno2->setMaxLength       (12);
         $obValorAno2->setSize            (10);
         $obValorAno2->setNegativo        (false);
         $obValorAno2->obEvento->setOnBlur('recalcularValores(2,this.name);');
@@ -400,7 +400,7 @@ class VLDODespesaReceita
         $obValorAno3->setLabel           (true);
         $obValorAno3->setClass           ('valor');
         $obValorAno3->setValue           ('[valor_3]');
-        $obValorAno3->setMaxLength       (11);
+        $obValorAno3->setMaxLength       (12);
         $obValorAno3->setSize            (10);
         $obValorAno3->setNegativo        (false);
         $obValorAno3->obEvento->setOnBlur('recalcularValores(3,this.name);');
@@ -411,7 +411,7 @@ class VLDODespesaReceita
         $obValorAno4->setLabel           (true);
         $obValorAno4->setClass           ('valor');
         $obValorAno4->setValue           ('[valor_4]');
-        $obValorAno4->setMaxLength       (11);
+        $obValorAno4->setMaxLength       (12);
         $obValorAno4->setSize            (10);
         $obValorAno4->setNegativo        (false);
         $obValorAno4->obEvento->setOnBlur('recalcularValores(4,this.name);');

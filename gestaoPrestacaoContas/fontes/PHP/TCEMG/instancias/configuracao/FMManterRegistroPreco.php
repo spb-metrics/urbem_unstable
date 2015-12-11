@@ -404,8 +404,8 @@ $obBscOrgaoGerenciador->setValue($stNomGerenciador);
 $obBscOrgaoGerenciador->obCampoCod->setName("inNumOrgaoGerenciador");
 $obBscOrgaoGerenciador->obCampoCod->setId("inNumOrgaoGerenciador");
 $obBscOrgaoGerenciador->obCampoCod->setValue( $inNumGerenciador );
-$stParametrosAbrePopUp = Sessao::getId()."&stCtrl=buscaOrgaoGerenciador&stTabelaVinculo=sw_cgm_pessoa_fisica&stCampoVinculo=numcgm";
-$stParametrosOnBlur = "&stTabelaVinculo=sw_cgm_pessoa_fisica&stCampoVinculo=numcgm&inNumOrgaoGerenciador='+this.value";
+$stParametrosAbrePopUp = Sessao::getId()."&stCtrl=buscaOrgaoGerenciador&stTabelaVinculo=sw_cgm_pessoa_juridica&stCampoVinculo=numcgm";
+$stParametrosOnBlur = "&stTabelaVinculo=sw_cgm_pessoa_juridica&stCampoVinculo=numcgm&inNumOrgaoGerenciador='+this.value";
 $obBscOrgaoGerenciador->obCampoCod->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId().$stParametrosOnBlur.",'buscaOrgaoGerenciador');");
 $obBscOrgaoGerenciador->setFuncaoBusca( "abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumOrgaoGerenciador','inNomOrgaoGerenciador','orgaoGerenciador','".$stParametrosAbrePopUp."','800','550');" );
 

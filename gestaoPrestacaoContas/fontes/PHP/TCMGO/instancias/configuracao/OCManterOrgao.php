@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCManterOrgao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterOrgao.php 63835 2015-10-22 13:53:31Z franver $
 
     * Casos de uso : uc-06.04.00
 */
@@ -99,7 +99,6 @@ function retornaData($stData)
 
 $arGestor = Sessao::read('arGestor');
 
-//sistemaLegado::mostraVar($_REQUEST);
 switch ($stCtrl) {
     case 'incluiGestor' :
                 if ($_REQUEST['inCGMGestor'] == '') {

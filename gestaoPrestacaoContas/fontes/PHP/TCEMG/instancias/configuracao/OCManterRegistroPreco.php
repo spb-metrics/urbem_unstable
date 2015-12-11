@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: OCManterRegistroPreco.php 63756 2015-10-06 16:58:53Z franver $
-  * $Date: 2015-10-06 13:58:53 -0300 (Ter, 06 Out 2015) $
-  * $Author: franver $
-  * $Rev: 63756 $
+  * $Id: OCManterRegistroPreco.php 63773 2015-10-08 17:59:44Z michel $
+  * $Date: 2015-10-08 14:59:44 -0300 (Qui, 08 Out 2015) $
+  * $Author: michel $
+  * $Rev: 63773 $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -1620,7 +1620,7 @@ function preencheComboOrgaoAbaQuantitativo()
         }
     }
     foreach( $arOrgaosTMP as $key => $arOrgao) {
-        $stJs .= "f.inCodOrgaoQ.options[".$inContador++."] = new Option('".$arOrgao."','".$key."'); \n";    
+        $stJs .= "f.inCodOrgaoQ.options[".$inContador++."] = new Option('".addslashes($arOrgao)."','".$key."'); \n"; 
     }
     
     $stJs .= "if(f.inCodUnidadeQ){                                                                  \n";
@@ -1681,7 +1681,7 @@ function preencheLoteOuNumItemAbaQuantitativo($boLote = false)
         $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('Selecione','');             \n";
         
         foreach( $arLote as $key => $value) {
-            $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('".$value."','".$key."');\n";
+            $stJs .= "f.inCodLoteQ.options[".$inContador++."] = new Option('".addslashes($value)."','".$key."');\n";
         }
         
         $_REQUEST['inCodLoteQ'] = NULL;
@@ -1713,7 +1713,7 @@ function preencheNumItemAbaQuantitativo($boValidaCodLote = false)
     }
 
     foreach( $arItensTMP as $key => $arItem) {
-        $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('".$arItem."',".$key.");     \n"; 
+        $stJs .= "f.inNumItemQ.options[".$inContador++."] = new Option('".addslashes($arItem)."','".$key."'); \n"; 
     }
 
     $stJs .= "f.nuHdnQtdeFornecida.value = '0,0000';                                                \n";
@@ -1764,7 +1764,8 @@ function preencheComboFornecedorAbaQuantitativo()
     foreach( $arItens as $arItem) {
         if ( $arItem["inNumItemLote"] == $_REQUEST['inNumItemQ'] && $arItem["stCodigoLote"] == $inCloLoteV) {
             $stJs .= "f.inHdnCodItemQ.value = ".$arItem["inCodItem"].";\n";
-            $stJs .= "f.inCodFornecedorQ.options[".$inContador++."] = new Option('".$arItem["inNumCGMVencedor"]." - ".$arItem['stNomCGMVencedor']."','".$arItem["inNumCGMVencedor"]."'); \n"; 
+            $stCgmVencedor = addslashes($arItem["inNumCGMVencedor"]." - ".$arItem['stNomCGMVencedor']);
+            $stJs .= "f.inCodFornecedorQ.options[".$inContador++."] = new Option('".$stCgmVencedor."','".$arItem["inNumCGMVencedor"]."'); \n"; 
         }
     }
 
@@ -2175,7 +2176,8 @@ function carregaLicitacao()
 
     while (!($rsModalidade->eof())) {
         $inCount++;
-        $stJs .= "f.inCodModalidade.options[".$inCount."] = new Option('".$rsModalidade->getCampo('cod_modalidade')." - ".$rsModalidade->getCampo('descricao')."','".$rsModalidade->getCampo('cod_modalidade')."'); \n";
+        $stModalidade = addslashes($rsModalidade->getCampo('cod_modalidade')." - ".$rsModalidade->getCampo('descricao'));
+        $stJs .= "f.inCodModalidade.options[".$inCount."] = new Option('".$stModalidade."','".$rsModalidade->getCampo('cod_modalidade')."'); \n";
         if($rsModalidade->getCampo('cod_modalidade')==$inCodModalidade){
             $stJs .= "d.getElementById('inCodModalidade').selectedIndex = ".$inCount.";         \n";
             $stJs .= "jQuery('#inCodModalidade').val('".$inCodModalidade."');                   \n";

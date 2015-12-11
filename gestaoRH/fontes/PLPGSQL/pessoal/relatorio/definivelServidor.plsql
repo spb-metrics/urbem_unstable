@@ -43,7 +43,7 @@ CREATE TYPE colunasDefinivelServidor AS (
     uf                                          VARCHAR,
     fone                                        VARCHAR,
     escolaridade                                VARCHAR,
-    data_nascimento                             VARCHAR,
+    data_nascimento                             DATE,
     cpf                                         VARCHAR,
     rg                                          VARCHAR,
     processo                                    VARCHAR,
@@ -281,7 +281,7 @@ BEGIN
                         , CAST((SELECT sigla_uf FROM sw_uf WHERE sw_uf.cod_uf = sw_cgm.cod_uf) AS VARCHAR) as uf   
                         , CAST(sw_cgm.fone_residencial AS VARCHAR) as fone   
                         , CAST((SELECT descricao FROM sw_escolaridade WHERE cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade) AS VARCHAR) as escolaridade   
-                        , CAST(sw_cgm_pessoa_fisica.dt_nascimento AS VARCHAR) as data_nascimento
+                        , sw_cgm_pessoa_fisica.dt_nascimento as data_nascimento
                         , CAST(sw_cgm_pessoa_fisica.cpf AS VARCHAR) AS cpf
                         , CAST(sw_cgm_pessoa_fisica.rg AS VARCHAR) AS rg
                         , CAST(sw_processo.cod_processo AS VARCHAR) as processo 
@@ -467,7 +467,7 @@ BEGIN
                        , CAST((SELECT sigla_uf FROM sw_uf WHERE sw_uf.cod_uf = sw_cgm.cod_uf) AS VARCHAR) as uf 
                        , CAST(sw_cgm.fone_residencial AS VARCHAR) as fone 
                        , CAST((SELECT descricao FROM sw_escolaridade WHERE cod_escolaridade = sw_cgm_pessoa_fisica.cod_escolaridade) AS VARCHAR) as escolaridade 
-                       , CAST(sw_cgm_pessoa_fisica.dt_nascimento AS VARCHAR) as data_nascimento
+                       , sw_cgm_pessoa_fisica.dt_nascimento as data_nascimento
                        , CAST(sw_cgm_pessoa_fisica.cpf AS VARCHAR) AS cpf
                        , CAST(sw_cgm_pessoa_fisica.rg AS VARCHAR) AS rg
                        , CAST(sw_cgm_pessoa_fisica.servidor_pis_pasep AS VARCHAR) as PIS_PASEP 

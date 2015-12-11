@@ -32,7 +32,7 @@
 
 * @ignore
 
-* $Id: LSManterContrato.php 63565 2015-09-11 11:25:25Z carlos.silva $
+* $Id: LSManterContrato.php 63995 2015-11-16 18:35:10Z jean $
 
 * Casos de uso: uc-03.05.22
 */
@@ -59,6 +59,7 @@ if ( empty( $stAcao ) ) {
 }
 
 switch ($stAcao) {
+    case 'consultar': $pgProx = 'FMConsultarContrato.php'; break;
     case 'alterar': $pgProx = $pgForm; break;
     case 'anular': $pgProx = $pgAnular; break;
     case 'rescindir':  $pgProx = 'FMManterRescindirContrato.php'; break;
@@ -79,7 +80,11 @@ if ($_REQUEST['inCodLicitacao'] || $_REQUEST['stDataInicial'] || $_REQUEST['inCo
     }
     Sessao::write('paginando', true);
 }
+
 Sessao::write('filtro', $filtro);
+Sessao::write('pos', $request->get('pos'));
+Sessao::write('pg', $request->get('pg'));
+Sessao::write('paginando', $request->get('paginando'));
 
 $obTLicitacaoContrato = new TLicitacaoContrato;
 $rsLista = new RecordSet;
@@ -98,7 +103,7 @@ if ($_REQUEST['stMapaCompras']) {
     $stFiltro .= " licitacao.exercicio_mapa = ".$exercicio." \nand ";
 }
 if ($_REQUEST['inNumContrato']) {
-   $stFiltro .= " contrato.num_contrato = ". $_REQUEST['inNumContrato']." \nand ";
+   $stFiltro .= " contrato.numero_contrato = ". $_REQUEST['inNumContrato']." \nand ";
 }
 if ($_REQUEST['stDataInicial']) {
    $stFiltro .= " contrato.dt_assinatura between to_date('". $_REQUEST['stDataInicial']."','dd/mm/yyyy') and to_date('". $_REQUEST['stDataFinal']."', 'dd/mm/yyyy') \nand ";
@@ -185,4 +190,3 @@ $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
 $obLista->commitAcao();
 
 $obLista->show();
-?>

@@ -163,7 +163,7 @@ var $obTAlmoxarifadoPermissaoCentroCusto;
   $obTAlmoxarifadoPermissaoCentroCusto->setDado("cod_centro",$this->roUltimoCentro->getCodigo());
 
   $this->listar($rsRelacionados,'',$boTransacao);
-//sistemaLegado::mostraVar($rsRelacionados);
+
   while (!($rsRelacionados->eof())) {
    $permissao = $rsRelacionados->getCampo("responsavel");
     if ($permissao == "t") {

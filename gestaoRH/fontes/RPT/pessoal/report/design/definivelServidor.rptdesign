@@ -587,23 +587,100 @@ function visibilidadeEspacamento()
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_250.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135"
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="principal" id="1362">
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">stNomeTabela</property>
-                    <property name="paramName">stNomeTabela</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[var q = "";
+            <method name="beforeOpen"><![CDATA[this.queryText = "select *                                                         					 \n";
+this.queryText += "from relatorioDefinivelServidor('"+params["stNomeTabela"]+"') as (				 \n";
+this.queryText += "	cod_contrato                               INTEGER,          \n";
+this.queryText += "   nome                                        VARCHAR,          \n";
+this.queryText += "   endereco                                    VARCHAR,          \n";
+this.queryText += "   bairro                                      VARCHAR,          \n";
+this.queryText += "   cep                                         VARCHAR,          \n";
+this.queryText += "   municipio                                   VARCHAR,          \n";
+this.queryText += "   uf                                          VARCHAR,          \n";
+this.queryText += "   fone                                        VARCHAR,          \n";
+this.queryText += "   escolaridade                                VARCHAR,          \n";
+this.queryText += "   data_nascimento                             DATE,             \n";
+this.queryText += "   cpf                                         VARCHAR,          \n";    
+this.queryText += "   rg                                          VARCHAR,          \n";
+this.queryText += "   processo                                    VARCHAR,          \n";
+this.queryText += "   data_inclusao_processo                      DATE,             \n";
+this.queryText += "   matricula                                   VARCHAR,          \n";
+this.queryText += "   grau_parentesco                             VARCHAR,          \n";
+this.queryText += "   ocupacao                                    VARCHAR,          \n";
+this.queryText += "   data_inicio_beneficio                       DATE,             \n";
+this.queryText += "   data_encerramento_beneficio                 DATE,             \n";
+this.queryText += "   motivo_encerramento                         VARCHAR,          \n";
+this.queryText += "   numero_beneficio                            VARCHAR,          \n";
+this.queryText += "   percentual_pagamento_pensao                 VARCHAR,          \n";
+this.queryText += "   tipo_dependencia                            VARCHAR,          \n";
+this.queryText += "   cid                                         VARCHAR,          \n";
+this.queryText += "   banco                                       VARCHAR,          \n";
+this.queryText += "   agencia                                     VARCHAR,          \n"; 
+this.queryText += "   conta                                       VARCHAR,          \n";
+this.queryText += "   lotacao                                     VARCHAR,          \n";  
+this.queryText += "   previdencia                                 VARCHAR,          \n";
+this.queryText += "   matricula_gerador_beneficio                 VARCHAR,          \n";
+this.queryText += "   nome_gerador_beneficio                      VARCHAR,          \n";
+this.queryText += "   cgm_gerador_beneficio                       VARCHAR,          \n";    
+this.queryText += "   pis_pasep                                   VARCHAR,          \n";
+this.queryText += "   titulo_de_eleitor                           VARCHAR,          \n";    
+this.queryText += "   secao_do_titulo                             VARCHAR,          \n";
+this.queryText += "   zona_titulo                                 VARCHAR,          \n";        
+this.queryText += "   ctps                                        VARCHAR,          \n"; 
+this.queryText += "   serie_ctps                                  VARCHAR,          \n"; 
+this.queryText += "   data_nomeacao                               DATE,             \n"; 
+this.queryText += "   data_posse                                  DATE,             \n"; 
+this.queryText += "   data_admissao                               DATE,             \n"; 
+this.queryText += "   data_rescisao                               DATE,             \n"; 
+this.queryText += "   causa_rescisao                              VARCHAR,          \n"; 
+this.queryText += "   regime_subdivisao_cargo                     VARCHAR,          \n";    
+this.queryText += "   cargo_especialidade                         VARCHAR,          \n";    
+this.queryText += "   regime_subdivisao_funcao                    VARCHAR,          \n";    
+this.queryText += "   funcao                                      VARCHAR,          \n";
+this.queryText += "   categoria                                   VARCHAR,          \n"; 
+this.queryText += "   tipo_admissao                               VARCHAR,          \n"; 
+this.queryText += "   vinculo_empregaticio                        VARCHAR,          \n"; 
+this.queryText += "   classif_agentes_nocivos                     VARCHAR,          \n";
+this.queryText += "   horas_mensais                               VARCHAR,          \n";
+this.queryText += "   horas_semanais                              VARCHAR,          \n";
+this.queryText += "   padrao                                      VARCHAR,          \n";
+this.queryText += "   valor_padrao                                VARCHAR,          \n";
+this.queryText += "   salario                                     VARCHAR,          \n";
+this.queryText += "   forma_pagamento                             VARCHAR,          \n";
+this.queryText += "   local                                       VARCHAR,          \n";
+this.queryText += "   data_opcao_fgts                             DATE,             \n";
+this.queryText += "   agrupamento                                 VARCHAR,          \n";       
+this.queryText += "   atributo1                                   VARCHAR,          \n";
+this.queryText += "   atributo2                                   VARCHAR,          \n";
+this.queryText += "   atributo3                                   VARCHAR,          \n";
+this.queryText += "   atributo4                                   VARCHAR,          \n";
+this.queryText += "   atributo5                                   VARCHAR,          \n";
+this.queryText += "   atributo6                                   VARCHAR,          \n";
+this.queryText += "   atributo7                                   VARCHAR,          \n";
+this.queryText += "   atributo8                                   VARCHAR,          \n";
+this.queryText += "   atributo9                                   VARCHAR,          \n";
+this.queryText += "   atributo10                                  VARCHAR,          \n";
+this.queryText += "   salario_bruto                               VARCHAR,          \n";
+this.queryText += "   salario_liquido                             VARCHAR,          \n";
+this.queryText += "   descontos_da_folha_salario                  VARCHAR,          \n";
+this.queryText += "   evento1_qte                                 NUMERIC,          \n";
+this.queryText += "   evento1_valor                               NUMERIC,          \n";
+this.queryText += "   evento2_qte                                 NUMERIC,          \n";
+this.queryText += "   evento2_valor                               NUMERIC,          \n";
+this.queryText += "   evento3_qte                                 NUMERIC,          \n";
+this.queryText += "   evento3_valor                               NUMERIC,          \n";
+this.queryText += "   evento4_qte                                 NUMERIC,          \n";
+this.queryText += "   evento4_valor                               NUMERIC           \n";
+this.queryText += ")                                                                \n";
+
+var q = "";
 
 if (params["colunasVisiveis"].indexOf("evento1") !=-1) {
 	q += "(evento1_valor > 0 OR evento1_qte > 0) OR ";
@@ -634,90 +711,8 @@ this.queryText += ";";
 
 params['query'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[select * 
-from relatorioDefinivelServidor(?) as (
-	cod_contrato                                INTEGER,
-    nome                                        VARCHAR,
-    endereco                                    VARCHAR,
-    bairro                                      VARCHAR,
-    cep                                         VARCHAR,
-    municipio                                   VARCHAR,
-    uf                                          VARCHAR,
-    fone                                        VARCHAR,
-    escolaridade                                VARCHAR,
-    data_nascimento                             VARCHAR,
-    cpf                                         VARCHAR,
-    rg                                          VARCHAR,
-    processo                                    VARCHAR,
-    data_inclusao_processo                      DATE,
-    matricula                                   VARCHAR,
-    grau_parentesco                             VARCHAR,
-    ocupacao                                    VARCHAR,
-    data_inicio_beneficio                       DATE,
-    data_encerramento_beneficio                 DATE,
-    motivo_encerramento                         VARCHAR,
-    numero_beneficio                            VARCHAR,
-    percentual_pagamento_pensao                 VARCHAR,
-    tipo_dependencia                            VARCHAR,
-    cid                                         VARCHAR,
-    banco                                       VARCHAR,
-    agencia                                     VARCHAR,
-    conta                                       VARCHAR,
-    lotacao                                     VARCHAR,
-    previdencia                                 VARCHAR,
-    matricula_gerador_beneficio                 VARCHAR,
-    nome_gerador_beneficio                      VARCHAR,
-    cgm_gerador_beneficio                       VARCHAR,
-    pis_pasep                                   VARCHAR,
-    titulo_de_eleitor                           VARCHAR,
-    secao_do_titulo                             VARCHAR,
-    zona_titulo                                 VARCHAR,
-    ctps                                        VARCHAR,
-    serie_ctps                                  VARCHAR,
-    data_nomeacao                               DATE,
-    data_posse                                  DATE,
-    data_admissao                               DATE,
-    data_rescisao                               DATE,
-    causa_rescisao                              VARCHAR,
-    regime_subdivisao_cargo                     VARCHAR,
-    cargo_especialidade                         VARCHAR,
-    regime_subdivisao_funcao                    VARCHAR,
-    funcao                                      VARCHAR,
-    categoria                                   VARCHAR,
-    tipo_admissao                               VARCHAR,
-    vinculo_empregaticio                        VARCHAR,
-    classif_agentes_nocivos                     VARCHAR,
-    horas_mensais                               VARCHAR,
-    horas_semanais                              VARCHAR,
-    padrao                                      VARCHAR,
-    valor_padrao                                VARCHAR,
-    salario                                     VARCHAR,
-    forma_pagamento                             VARCHAR,
-    local                                       VARCHAR,
-    data_opcao_fgts                             DATE,
-    agrupamento                                 VARCHAR,
-    atributo1                                   VARCHAR,
-    atributo2                                   VARCHAR,
-    atributo3                                   VARCHAR,
-    atributo4                                   VARCHAR,
-    atributo5                                   VARCHAR,
-    atributo6                                   VARCHAR,
-    atributo7                                   VARCHAR,
-    atributo8                                   VARCHAR,
-    atributo9                                   VARCHAR,
-    atributo10                                  VARCHAR,
-    salario_bruto                               VARCHAR,
-    salario_liquido                             VARCHAR,
-    descontos_da_folha_salario                  VARCHAR,
-    evento1_qte                                 NUMERIC,
-    evento1_valor                               NUMERIC,
-    evento2_qte                                 NUMERIC,
-    evento2_valor                               NUMERIC,
-    evento3_qte                                 NUMERIC,
-    evento3_valor                               NUMERIC,
-    evento4_qte                                 NUMERIC,
-    evento4_valor                               NUMERIC 
-)]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="entidade" id="3588"
  extends="urbem_250.entidade">

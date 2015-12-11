@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: LSManterCarteira.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCarteira.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.05
 
@@ -158,7 +158,6 @@ $obLista->ultimaAcao->addCampo("&flVariacao",    "variacao"     );
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[num_carteira]");
 if ($_REQUEST['stAcao'] == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
-    //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

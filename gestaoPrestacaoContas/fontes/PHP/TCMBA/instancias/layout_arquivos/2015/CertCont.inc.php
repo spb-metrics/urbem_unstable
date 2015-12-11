@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 63687 $
+    $Revision: 63763 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
@@ -51,7 +51,7 @@
     $obTTBACertidoesContratos->setDado('dtInicial'    , $stDataInicial         );
     $obTTBACertidoesContratos->setDado('dtFinal'      , $stDataFinal           );
 
-    $obTTBACertidoesContratos->recuperaDadosTribunal($rsCertidoesContratos);    
+    $obTTBACertidoesContratos->recuperaDadosTribunal($rsCertidoesContratos);
 
     $obExportador->roUltimoArquivo->addBloco($rsCertidoesContratos);
     
@@ -63,7 +63,7 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
     
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_contrato");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_contrato");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
     

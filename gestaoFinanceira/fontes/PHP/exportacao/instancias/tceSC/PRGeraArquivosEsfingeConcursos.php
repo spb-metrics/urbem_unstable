@@ -58,7 +58,6 @@ function geraArquivosConcursos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTConcursoConcurso->setDado( 'dt_inicial'  , $stDataInicial );
     $obTConcursoConcurso->setDado( 'dt_final'  , $stDataFinal );
     $obTConcursoConcurso->recuperaConcursoEsfinge( $rsConcurso );
-//    sistemaLegado::mostravar( $rsConcurso );
 
     $obExportador->addArquivo("concurso.txt");
     $obExportador->roUltimoArquivo->addBloco($rsConcurso);
@@ -94,7 +93,6 @@ function geraArquivosConcursos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTConcursoConcurso->setDado( 'dt_inicial'  , $stDataInicial );
     $obTConcursoConcurso->setDado( 'dt_final'  , $stDataFinal );
     $obTConcursoConcurso->recuperaResultadoConcursoEsfinge( $rsResultadoConcurso );
-    sistemaLegado::mostravar( $rsResultadoConcurso );
 
     $obExportador->addArquivo("resultadoconcurso.txt");
     $obExportador->roUltimoArquivo->addBloco($rsResultadoConcurso);

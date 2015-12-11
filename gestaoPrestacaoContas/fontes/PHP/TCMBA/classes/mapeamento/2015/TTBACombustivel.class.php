@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63646 $
+    $Revision: 64003 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -100,6 +100,7 @@ function montaRecuperaDadosTribunal()
                   , SUM(custo_mensal) AS custo_mensal
                   , competencia
                   , unidade_gestora
+                  , cod_tipo
 
                FROM
                   (
@@ -110,10 +111,11 @@ function montaRecuperaDadosTribunal()
                                 WHEN combustivel.cod_combustivel = 2 THEN 1
                                 WHEN combustivel.cod_combustivel = 3 THEN 2
                             END AS tipo_combustivel
-                         , SUM(COALESCE(manutencao_item.quantidade,0.00)) AS km_ltr
+                         , COALESCE(manutencao_item.quantidade,0.00) AS km_ltr
                          , COALESCE(manutencao_item.valor,0.00) AS custo_mensal
                          , TO_CHAR(manutencao.dt_manutencao, 'yyyymm') AS competencia
-                  
+                         , item.cod_tipo
+                         
                      FROM frota.manutencao
 
                INNER JOIN frota.manutencao_item
@@ -126,8 +128,11 @@ function montaRecuperaDadosTribunal()
                INNER JOIN frota.tipo_item
                        ON tipo_item.cod_tipo = item.cod_tipo
 
-               INNER JOIN almoxarifado.catalogo_item 
-                       ON catalogo_item.cod_item = item.cod_item
+               INNER JOIN frota.combustivel_item
+		               ON item.cod_item = combustivel_item.cod_item
+              
+               INNER JOIN frota.combustivel
+                       ON combustivel.cod_combustivel = combustivel_item.cod_combustivel
 
                INNER JOIN frota.veiculo
                        ON veiculo.cod_veiculo = manutencao.cod_veiculo
@@ -140,9 +145,6 @@ function montaRecuperaDadosTribunal()
 
                 LEFT JOIN frota.veiculo_combustivel
                        ON veiculo_combustivel.cod_veiculo = veiculo.cod_veiculo
-
-                LEFT JOIN frota.combustivel
-                       ON combustivel.cod_combustivel = veiculo_combustivel.cod_combustivel
 
                     WHERE manutencao.exercicio = '".$this->getDado('exercicio')."'
                       AND manutencao.dt_manutencao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
@@ -159,19 +161,23 @@ function montaRecuperaDadosTribunal()
                                     AND bem_comprado.cod_entidade IN (2)
                                GROUP BY veiculo_propriedade.cod_veiculo
                                 )
+                     AND item.cod_tipo = 1        
+                        
                     GROUP BY veiculo.placa
                            , tipo_combustivel
                            , manutencao_item.valor
                            , manutencao.dt_manutencao
+                           , item.cod_tipo
+                           , manutencao_item.quantidade
                   ) AS retorno
 
           WHERE custo_mensal > 0.00
-
           GROUP BY placa
                  , tipo_registro
                  , tipo_combustivel
                  , competencia
-                 , unidade_gestora ";
+                 , unidade_gestora
+                 , cod_tipo ";
 
     return $stSql;
 }

@@ -160,8 +160,6 @@ switch ($_REQUEST['stAcao']) {
             $stFiltro .= "   AND nro_contrato  =  ".$_REQUEST['inNumContrato'];
             $stFiltro .= "   AND cod_contrato <>  ".$_REQUEST['inCodContrato'];
 
-            //sistemaLegado::mostraVar($_REQUEST);
-
             $obTTCMGOContrato->recuperaTodos($rsRecordSet, $stFiltro);
             if ($rsRecordSet->getNumLinhas() == -1) {
                 $obTTCMGOContrato->setDado('cod_contrato'     , $_REQUEST['inCodContrato']              );

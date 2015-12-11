@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.41
 
-    $Id: OCConsultarFichaFinanceira.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCConsultarFichaFinanceira.php 63871 2015-10-27 20:24:26Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -742,7 +742,7 @@ function montaListaContratosxEvento()
     $obLista->Foot->addSoma ( 'quantidade', 'D' );
     $obLista->Foot->addSoma ( 'valor', 'D' );
 
-    $obLista->Body->addAcao("consultar","executaFuncaoAjax('%s','&inCodContrato=%s&inMatricula=%s&stNomeCGM=%s&inNumCGM=%s&inCodPeriodoMovimentacao=%s&inCodComplementar=".$_REQUEST["inCodComplementar"]."&inCodConfiguracao=".$_REQUEST["inCodConfiguracao"]."')",array('processarPopUp','cod_contrato','matricula','nom_cgm','numcgm','cod_periodo_movimentacao','inCodComplementar','inCodConfiguracao'));
+    $obLista->Body->addAcao("consultar","executaFuncaoAjax('%s','&inCodContrato=%s&inMatricula=%s&stNomeCGM=%s&inNumCGM=%s&inCodPeriodoMovimentacao=%s&inCodComplementar=".$_REQUEST["inCodComplementar"]."&inCodConfiguracao=".$_REQUEST["inCodConfiguracao"]."&inCodMes=".$_REQUEST["inCodMes"]."&inAno=".$_REQUEST["inAno"]."')",array('processarPopUp','cod_contrato','matricula','nom_cgm','numcgm','cod_periodo_movimentacao','inCodComplementar','inCodConfiguracao','inCodMes','inAno'));
 
     $obLista->montaHTML(true);
     $stJs = "d.getElementById('spnSpan5').innerHTML = '".$obLista->getHtml()."';  \n";
@@ -752,10 +752,9 @@ function montaListaContratosxEvento()
 
 function processarPopUp()
 {
-    $stFiltros = "&inCodContrato=".$_GET["inCodContrato"]."&inRegistro=".$_GET["inMatricula"]."&inCodConfiguracao=".$_GET['inCodConfiguracao']."&nom_cgm=".$_GET["stNomeCGM"]."&numcgm=".$_GET["inNumCGM"]."&inCodPeriodoMovimentacao=".$_GET["inCodPeriodoMovimentacao"]."&inCodComplementar=".$_REQUEST["inCodComplementar"];
+    $stFiltros = "&inCodContrato=".$_GET["inCodContrato"]."&inRegistro=".$_GET["inMatricula"]."&inCodConfiguracao=".$_GET['inCodConfiguracao']."&nom_cgm=".$_GET["stNomeCGM"]."&numcgm=".$_GET["inNumCGM"]."&inCodPeriodoMovimentacao=".$_GET["inCodPeriodoMovimentacao"]."&inCodComplementar=".$_REQUEST["inCodComplementar"]."&inCodMes=".$_REQUEST["inCodMes"]."&inAno=".$_REQUEST["inAno"]."";
     $stUrlFrame = CAM_GRH_FOL_POPUPS."movimentacaoFinanceira/FRConsultarFichaFinanceira.php?sUrlConsulta=FMConsultarFichaFinanceira.php?".Sessao::getId().$stFiltros;
     $stJs .=  "window.open('".$stUrlFrame."', 'popUpConsultaFichaFinanceira', 'width=800,height=550,resizable=1,scrollbars=1,left=0,top=0');";
-
     return $stJs;
 }
 

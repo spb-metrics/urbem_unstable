@@ -70,7 +70,6 @@ class FDATInscricaoDivida extends Persistente
         $obConexao   = new Conexao;
         $stSql  = $this->montaInscricaoDivida($stFiltro).$stOrdem;
         $this->setDebug($stSql);
-        //SistemaLegado::mostravar ( $stSql );
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;

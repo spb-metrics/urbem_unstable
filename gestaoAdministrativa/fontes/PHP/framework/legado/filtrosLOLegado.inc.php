@@ -53,13 +53,12 @@ $mascaraSetor = pegaConfiguracao('mascara_local',2);
     <?php
     //Faz o combo de Órgãos
     $sSQL = "SELECT cod_orgao, nom_orgao, ano_exercicio FROM administracao.orgao ORDER by nom_orgao";
-    //mostravar($sSQL);
     $dbEmp = new dataBaseLegado;
     $dbEmp->abreBD();
     $dbEmp->abreSelecao($sSQL);
     $dbEmp->vaiPrimeiro();
     $comboCodOrgao = "";
-    //mostravar($sSQL);
+
     while (!$dbEmp->eof()) {
     $codOrgaof  = trim($dbEmp->pegaCampo("cod_orgao"));
     $nomOrgaof  = trim($dbEmp->pegaCampo("nom_orgao"));

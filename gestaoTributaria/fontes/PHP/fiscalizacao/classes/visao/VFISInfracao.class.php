@@ -33,7 +33,7 @@
  * @package URBEM
  * @subpackage Visao
 
- $Id: VFISInfracao.class.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: VFISInfracao.class.php 63839 2015-10-22 18:08:07Z franver $
 
  * Casos de uso:
  */
@@ -118,8 +118,6 @@ class VFISInfracao
 
     public function montaPenalidade(array $arParametros)
     {
-        //sistemaLegado::mostravar( $arParametros );
-        //echo "comanxinho!!";exit;
         if ($_REQUEST["cmbTipoFiscalizacao"]) {
             # Define dados das Penalidades
             $obFormulario = new Formulario();

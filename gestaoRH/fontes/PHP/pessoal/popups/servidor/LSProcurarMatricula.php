@@ -89,7 +89,6 @@ if(Sessao::read('stTipoListagem') == 'geral' and
 
 //Filtros da sessão
 $arFiltro = Sessao::read('filtroRelatorio');
-
 //Define qual listagem deverá ser feita
 switch ($_REQUEST["stTipo"]) {
     case "pensionista":
@@ -197,6 +196,21 @@ switch ($_REQUEST["stTipo"]) {
         $stFiltro .= "	  ) 						   																	\n";
         $obTPessoalContrato->recuperaCgmDoRegistro($rsLista,$stFiltro,$stiOrdem,"");
         break;
+    case 'contrato_ativos':
+        if ( !empty($stFiltro) ) {
+           Sessao::write('filtroRelatorio', $stFiltro);
+        } else {
+           $stFiltro = Sessao::read('filtroRelatorio');
+        }
+        if ($_REQUEST['stSituacao'] == "ativos") {
+            $stFiltro .= " AND NOT EXISTS (SELECT 1 
+                                            FROM pessoal.contrato_servidor_caso_causa 
+                                            WHERE contrato.cod_contrato = contrato_servidor_caso_causa.cod_contrato 
+                            )     
+                         AND situacao = 'Ativo' \n";
+        }
+        $obTPessoalContrato->recuperaCgmDoRegistro($rsLista,$stFiltro,$stOrdem,"");
+        break;
     default:
         if ( !empty($stFiltro) ) {
            Sessao::write('filtroRelatorio', $stFiltro);
@@ -209,11 +223,6 @@ switch ($_REQUEST["stTipo"]) {
             $stFiltro .= "              WHERE contrato.cod_contrato = contrato_servidor_caso_causa.cod_contrato )   \n";
 
         }
-        /*if ($_REQUEST['stSituacao'] == "ativos") {
-            $stFiltro .= " AND NOT EXISTS (SELECT 1                                                                     \n";
-            $stFiltro .= "                   FROM pessoal.contrato_servidor_caso_causa        \n";
-            $stFiltro .= "                  WHERE contrato.cod_contrato = contrato_servidor_caso_causa.cod_contrato )   \n";
-        }*/
 
         $obTPessoalContrato->recuperaCgmDoRegistro($rsLista,$stFiltro,$stOrdem,"");
         break;

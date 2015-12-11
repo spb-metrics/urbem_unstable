@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    * $Id: ITextLicenca.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: ITextLicenca.class.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -97,7 +97,6 @@ class ITextLicenca extends Objeto
         $obTConfiguracao->setDado ( 'exercicio', Sessao::getExercicio() );
         $obTConfiguracao->recuperaPorChave ( $rsNumeroLicenca );
         $inNumeroLicenca = $rsNumeroLicenca->getCampo('valor');
-        #sistemaLEgado::mostravar ( $rsNumeroLicenca );
 #		while ( !$rsNumeroLicenca->eof() ) {
 #			if ( (int) $rsNumeroLicenca->getCampo('exercicio') == $this->obTxtLicenca->inExercicio ) {
 //				$inNumeroLicenca 	= $rsNumeroLicenca->getCampo('valor');

@@ -278,7 +278,6 @@ case 2:
     $js = "";
     $js .= 'window.parent.frames["telaMensagem"].document.location = "'.CAM_FW_INSTANCIAS.'index/menu.html";';
     $arCodSetor = preg_split( "/[^a-zA-Z0-9]/",$stCodSetor);
-    //mostraVar($arCodSetor);
     $stExercicio = $arCodSetor[4];
     $inCodOrgao = (int) $arCodSetor[0];
     $inCodUnidade = (int) $arCodSetor[1];

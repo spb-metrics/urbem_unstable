@@ -92,12 +92,12 @@ if (trim($stAcao)=="excluir") {
 }
 
 //MANTEM FILTRO E PAGINACAO
-$stLink .= "&stAcao=".$stAcao."&inAba=".$_REQUEST['inAba']."&inNumCGM=".$_REQUEST["inNumCGM"];
+$stLink .= "&stAcao=".$stAcao."&inAba=".$request->get('inAba')."&inNumCGM=".$request->get('inNumCGM');
 $link = Sessao::read("link");
-if ($_GET["pg"] and  $_GET["pos"]) {
-    $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
-    $link["pg"]  = $_GET["pg"];
-    $link["pos"] = $_GET["pos"];
+if ($request->get('pg') and  $request->get('pos')) {
+    $stLink.= "&pg=".$request->get('pg')."&pos=".$request->get('pos');
+    $link["pg"]  = $request->get('pg');
+    $link["pos"] = $request->get('pos');
     Sessao::write("link",$link);
 }
 
@@ -106,12 +106,12 @@ if ($_GET["pg"] and  $_GET["pos"]) {
 if ( is_array($link) ) {
     $_REQUEST = $link;
 } else {
-    foreach ($_REQUEST as $key => $valor) {
+    foreach ($request->getAll() as $key => $valor) {
         $link[$key] = $valor;
     }
     Sessao::write("link",$link);
 }
-foreach ($_REQUEST as $key => $valor) {
+foreach ($request->getAll() as $key => $valor) {
     Sessao::write($key,$valor);
 }
 
@@ -225,4 +225,5 @@ if (trim($stAcao)=="incluir") {
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

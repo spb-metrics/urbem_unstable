@@ -54,7 +54,6 @@ function geraArquivosContratos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTLicitacaoContrato->setDado( 'dt_inicial', $stDataInicial );
     $obTLicitacaoContrato->setDado( 'dt_final', $stDataFinal );
     $obTLicitacaoContrato->recuperaContratoEsfinge( $rsContrato );
-//    sistemaLegado::mostravar( $rsContrato );
 
     $obExportador->addArquivo("contrato.txt");
     $obExportador->roUltimoArquivo->addBloco($rsContrato);

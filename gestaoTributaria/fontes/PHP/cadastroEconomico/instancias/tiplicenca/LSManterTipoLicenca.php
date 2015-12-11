@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterTipoLicenca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterTipoLicenca.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.11
 */
@@ -65,7 +65,6 @@ switch ($stAcao) {
     case 'excluir'  : $pgProx = $pgProc; break;
     DEFAULT         : $pgProx = $pgForm;
 }
-//mostravar($stAcao);
 //MANTEM FILTRO E PAGINACAO
 $stLink .= "&stAcao=".$stAcao;
 $link = Sessao::read( "link" );

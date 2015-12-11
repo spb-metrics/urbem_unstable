@@ -27,7 +27,7 @@
   * Página de Mapemanto Relatorio Divida Flutuante
   * Data de Criação: 31/07/2014
   * @author Desenvolvedor: Evandro Melos  
-  *$Id: TTCEMGRelatorioDividaFlutuante.class.php 59719 2014-09-08 15:00:53Z franver $
+  *$Id: TTCEMGRelatorioDividaFlutuante.class.php 64143 2015-12-08 17:05:11Z jean $
   *$Date: $
   *$Author: $
   *$Rev: $
@@ -427,6 +427,7 @@ class TTCEMGRelatorioDividaFlutuante extends Persistente
         $rsRecordSet = new RecordSet;
         $stSql = $this->montaRecuperaDepositosDividaFlutuante();
         $this->stDebug = $stSql;
+        //stemaLegado::mostraVar($stSql);die;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
     }
 
@@ -435,7 +436,7 @@ class TTCEMGRelatorioDividaFlutuante extends Persistente
         $stSql = " 
                     SELECT   
                              cod_entidade
-                            ,nom_conta    
+                            ,cod_plano::VARCHAR || ' - ' || nom_conta AS nom_conta
                             ,nom_entidade
                             ,ABS(SUM(vl_saldo_anterior)) as vl_saldo_anterior
                             ,ABS(SUM(vl_saldo_debitos))  as inscricao
@@ -449,6 +450,7 @@ class TTCEMGRelatorioDividaFlutuante extends Persistente
                                                                     ,'A')
                     AS(
                          cod_estrutural     VARCHAR
+                        ,cod_plano          INTEGER
                         ,nivel              INTEGER
                         ,nom_conta          VARCHAR
                         ,nom_entidade       VARCHAR
@@ -458,7 +460,7 @@ class TTCEMGRelatorioDividaFlutuante extends Persistente
                         ,vl_saldo_creditos  NUMERIC
                         ,vl_saldo_atual     NUMERIC                
                     )
-                    GROUP BY cod_entidade, nom_entidade, nom_conta
+                    GROUP BY cod_entidade, nom_entidade, nom_conta, cod_plano
                 ";
         return $stSql;
     }

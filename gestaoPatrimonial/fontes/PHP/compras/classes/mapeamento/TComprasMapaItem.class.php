@@ -36,7 +36,7 @@
   * Casos de uso: uc-03.04.05
                   uc-03.05.26
 
-  $Id: TComprasMapaItem.class.php 63032 2015-07-17 18:04:12Z michel $
+  $Id: TComprasMapaItem.class.php 63865 2015-10-27 13:55:57Z franver $
 
   */
 
@@ -191,8 +191,8 @@ class TComprasMapaItem extends Persistente
                      , '' as data_validade
                      , '' as cod_marca
                      , '' as desc_marca
-                     , translate(to_char(mapa_itens.quantidade - coalesce ( mapa_item_anulacao.quantidade, 0 ),'999,999.9999'),'.,',',.') as quantidade
-                     , mapa_itens.vl_total   - coalesce ( mapa_item_anulacao.vl_total  , 0 ) as vl_total
+                     , mapa_itens.quantidade - coalesce ( mapa_item_anulacao.quantidade, 0.0000 ) as quantidade
+                     , mapa_itens.vl_total   - coalesce ( mapa_item_anulacao.vl_total  , 0.00 ) as vl_total
 
                   from (
                        select mapa.cod_mapa
@@ -201,8 +201,8 @@ class TComprasMapaItem extends Persistente
                              , mapa_item.lote
                              , catalogo_item.descricao_resumida
                              , catalogo_item.descricao
-                             , sum(mapa_item.quantidade) as quantidade
-                             , sum(mapa_item.vl_total) as vl_total
+                             , sum( coalesce( mapa_item.quantidade, 0.0000) ) as quantidade
+                             , sum( coalesce( mapa_item.vl_total, 0.00) )as vl_total
 
                           from compras.mapa
 
@@ -777,17 +777,12 @@ class TComprasMapaItem extends Persistente
                        ,  complemento
                        ,  cod_centro
                        ,  centro_custo
-
-
                        ,  CASE WHEN vl_total IS NOT NULL THEN vl_total
                           ELSE vl_total_item
                           END as vl_total
-
                        ,  valor_unitario
                        ,  valor_anulado
-
                        ,  COALESCE(valor_unitario, 0.00) * (COALESCE(quantidade_mapa, 0.0000) - COALESCE(quantidade_mapa_anulada, 0.0000)) as valor_total_mapa
-
                        ,  quantidade
                        ,  quantidade_anulada
                        ,  quantidade_estoque
@@ -798,12 +793,9 @@ class TComprasMapaItem extends Persistente
                        ,  ((quantidade - quantidade_anulada) - (quantidade_mapa - quantidade_mapa_anulada)) as quantidade_disponivel
                        ,  (quantidade_mapa - quantidade_mapa_anulada) as quantidade_maxima
                        ,  (quantidade - quantidade_anulada) as quantidade_solicitada
-
                        --,  (quantidade_mapa - quantidade_mapa_anulada) as quantidade_atendida
                        --,  ((quantidade - quantidade_anulada) - (quantidade_mapa - quantidade_mapa_anulada)) as quantidade_mapa
-
                        ,  vl_total_mapa_item
-
                        ,  dotacao
                        ,  dotacao_nom_conta
                        ,  conta_despesa
@@ -1119,29 +1111,31 @@ class TComprasMapaItem extends Persistente
                         AND  mapa_item.cod_mapa              = mapa_solicitacao.cod_mapa
                         AND  mapa_item.exercicio_solicitacao = mapa_solicitacao.exercicio_solicitacao
 
-                  LEFT JOIN  compras.mapa_item_dotacao
-                         ON  mapa_item_dotacao.exercicio             = mapa_item.exercicio
-                        AND  mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
-                        AND  mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
-                        AND  mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
-                        AND  mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
-                        AND  mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
-                        AND  mapa_item_dotacao.cod_item              = mapa_item.cod_item
-                        AND  mapa_item_dotacao.lote                  = mapa_item.lote
+                   LEFT JOIN compras.mapa_item_dotacao
+                          ON mapa_item.exercicio             = mapa_item_dotacao.exercicio
+                         AND mapa_item.cod_mapa              = mapa_item_dotacao.cod_mapa
+                         AND mapa_item.exercicio_solicitacao = mapa_item_dotacao.exercicio_solicitacao
+                         AND mapa_item.cod_entidade          = mapa_item_dotacao.cod_entidade
+                         AND mapa_item.cod_solicitacao       = mapa_item_dotacao.cod_solicitacao
+                         AND mapa_item.cod_centro            = mapa_item_dotacao.cod_centro
+                         AND mapa_item.cod_item              = mapa_item_dotacao.cod_item
+                         AND mapa_item.lote                  = mapa_item_dotacao.lote
 
-                 INNER JOIN  compras.solicitacao_item
-                         ON  solicitacao_item.exercicio       =  mapa_item.exercicio
-                        AND  solicitacao_item.cod_entidade    =  mapa_item.cod_entidade
-                        AND  solicitacao_item.cod_solicitacao =  mapa_item.cod_solicitacao
-                        AND  solicitacao_item.cod_centro      =  mapa_item.cod_centro
-                        AND  solicitacao_item.cod_item        =  mapa_item.cod_item
+                 INNER JOIN compras.solicitacao_item
+                         ON solicitacao_item.exercicio       =  mapa_item.exercicio
+                        AND solicitacao_item.cod_entidade    =  mapa_item.cod_entidade
+                        AND solicitacao_item.cod_solicitacao =  mapa_item.cod_solicitacao
+                        AND solicitacao_item.cod_centro      =  mapa_item.cod_centro
+                        AND solicitacao_item.cod_item        =  mapa_item.cod_item
 
-                  LEFT JOIN  compras.solicitacao_item_dotacao
-                         ON  solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
-                        AND  solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
-                        AND  solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
-                        AND  solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
-                        AND  solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
+                   LEFT JOIN compras.solicitacao_item_dotacao
+                          ON solicitacao_item.exercicio       = solicitacao_item_dotacao.exercicio
+                         AND solicitacao_item.cod_entidade    = solicitacao_item_dotacao.cod_entidade
+                         AND solicitacao_item.cod_solicitacao = solicitacao_item_dotacao.cod_solicitacao
+                         AND solicitacao_item.cod_centro      = solicitacao_item_dotacao.cod_centro
+                         AND solicitacao_item.cod_item        = solicitacao_item_dotacao.cod_item
+                         AND mapa_item_dotacao.cod_conta      = solicitacao_item_dotacao.cod_conta
+                         AND mapa_item_dotacao.cod_despesa    = solicitacao_item_dotacao.cod_despesa
 
                  INNER JOIN  compras.solicitacao
                          ON  solicitacao.exercicio       = solicitacao_item.exercicio

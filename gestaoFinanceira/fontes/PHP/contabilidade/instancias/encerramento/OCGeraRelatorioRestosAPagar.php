@@ -44,7 +44,7 @@ include_once( CAM_FW_PDF."RRelatorio.class.php" );
 $obRRelatorio = new RRelatorio;
 $obPDF        = new ListaPDF("L");
 $arDados      = Sessao::Read('argeral');
-//SistemaLegado::mostravar($arDados);exit;
+
 $rsRecordSet  = new RecordSet;
 
 $obRRelatorio->setCodigoEntidade( $arDados['entidade'][0] );

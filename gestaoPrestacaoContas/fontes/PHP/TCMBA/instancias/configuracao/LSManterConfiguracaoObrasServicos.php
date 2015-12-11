@@ -29,7 +29,7 @@
     * @author Analista      Dagiane Vieira
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: LSManterConfiguracaoObrasServicos.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: LSManterConfiguracaoObrasServicos.php 63771 2015-10-08 13:39:13Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -58,7 +58,8 @@ $inCodLicitacao         = $arLicitacao[0];
 $stCaminho = CAM_GPC_TCMBA_INSTANCIAS."configuracao/";
 
 if ($stAcao == 'alterar') {
-    $stCaminho .= $pgForm;
+    Sessao::write('arLink',$_REQUEST);
+    $stCaminho = $pgForm;
 } else {
     $stCaminho .= $pgProc;
 }
@@ -89,6 +90,7 @@ if ($stFiltro != '')
     $stFiltro = ' WHERE '.substr($stFiltro,0,strlen($stFiltro)-4);
 
 $stOrder = " ORDER BY obra.exercicio, obra.cod_entidade, LPAD(obra.nro_obra::VARCHAR, 10, '0') ";
+
 $obTTCMBAObra->recuperaObra($rsObra, $stFiltro, $stOrder);
 
 $obLista = new Lista;
@@ -153,6 +155,9 @@ $obLista->ultimoDado->setAlinhamento("CENTRO");
 $obLista->ultimoDado->setCampo( "[st_licitacao]" );
 $obLista->commitDado();
 
+$stLink = "&inCodEntidade=".$inCodEntidade."&stExercicio=".$stExercicio."&inCodTipoObra=".$inCodTipoObra."&stNroObra".$stNroObra;
+$stLink .= "&stExercicioLicitacao=".$stExercicioLicitacao."&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$request->get('inCodLicitacao');
+
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->addCampo("&inCodEntidade"     , "cod_entidade");
@@ -161,7 +166,8 @@ $obLista->ultimaAcao->addCampo("&stExercicio"       , "exercicio");
 $obLista->ultimaAcao->addCampo("&inCodTipo"         , "cod_tipo");
 $obLista->ultimaAcao->addCampo("stNroObra"          , "nro_obra");
 $obLista->ultimaAcao->addCampo("&stDescQuestao"     , "[nro_obra]/[exercicio]");
-$obLista->ultimaAcao->setLink ($stCaminho."?".Sessao::getId()."&stAcao=".$stAcao."&inCodEntidade=".$inCodEntidade."&stExercicio=".$stExercicio."&inCodTipoObra=".$inCodTipoObra."&stNroObra=".$stNroObra."&stExercicioLicitacao=".$stExercicioLicitacao."&inCodModalidade=".$inCodModalidade."&inCodLicitacao=".$request->get('inCodLicitacao'));
+//$obLista->ultimaAcao->setLink ($stCaminho."?".Sessao::getId()."&stAcao=".$stAcao.$stLink);
+$obLista->ultimaAcao->setLink ($stCaminho."?stAcao=".$stAcao."&".Sessao::getId().$stLink);
 $obLista->commitAcao();
 $obLista->show();
 

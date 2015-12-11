@@ -75,7 +75,7 @@ function montaRecuperaDadosTribunal()
     $stSql = "
             SELECT 1 AS tipo_registro
                  , ".$this->getDado('inCodGestora')." AS unidade_gestora
-                 , TO_CHAR(bem.dt_aquisicao,'yyyy') AS exercicio
+                 , TO_CHAR(bem.".$this->getDado('tipoPeriodo').",'yyyy') AS exercicio
                  , bem.num_placa AS tombo_bem
                  , tipo_bem.cod_tipo_tcm AS tipo_bem
                  , TRANSLATE(bem.descricao, ';,!?', '') AS descricao
@@ -84,7 +84,7 @@ function montaRecuperaDadosTribunal()
                  , bem.vl_bem AS valor_bem
                  , sw_cgm.nom_cgm AS funcionario_responsavel
                  , sw_cgm_pessoa_fisica.cpf
-                 , TO_CHAR(bem.dt_aquisicao,'dd/mm/yyyy') AS data_aquisicao
+                 , TO_CHAR(bem.".$this->getDado('tipoPeriodo').",'dd/mm/yyyy') AS data_aquisicao
                  , TO_CHAR(bem_baixado.dt_baixa,'dd/mm/yyyy') AS data_baixa
                  , 000 as num_orgao
                  , 000 as num_unidade
@@ -157,7 +157,7 @@ function montaRecuperaDadosTribunal()
                    ) AS historico_bem
                 ON historico_bem.cod_bem = bem.cod_bem
              
-             WHERE bem.dt_aquisicao BETWEEN TO_DATE('".$this->getDado('dt_inicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_fim')."','dd/mm/yyyy')
+             WHERE bem.".$this->getDado('tipoPeriodo')." BETWEEN TO_DATE('".$this->getDado('dt_inicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_fim')."','dd/mm/yyyy')
                 OR (
                     ((bem_baixado.cod_bem IS NOT NULL) AND (bem_baixado.dt_baixa BETWEEN TO_DATE('".$this->getDado('dt_inicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_fim')."','dd/mm/yyyy')))
                    ) \n ";

@@ -145,6 +145,7 @@ function recuperaMovimentoBanco(&$rsRecordSet, $stCondicao = "", $boTransacao = 
 
 function montaRecuperaMovimentoBanco($obTransacao = "")
 {
+    $boNovoPlanoConta = (Sessao::getExercicio() > '2012')?true:false;
     $stSql  = "SELECT '".$this->getDado("stExercicio")."' as exercicio, *                                            \n";
     $stSql .= "FROM tesouraria.fn_recupera_movimento_banco('".$this->getDado("stFiltroTransferenciaBanco")."',       \n";
     $stSql .= "                                               '".$this->getDado("stFiltroTransferenciaEstornadaBanco")."',\n";
@@ -155,7 +156,7 @@ function montaRecuperaMovimentoBanco($obTransacao = "")
     $stSql .= "                                               '".$this->getDado("stEntidade")  ."',                 \n";
     $stSql .= "                                               '".$this->getDado("stExercicio")  ."',                \n";
     $stSql .= "                                               '".$this->getDado("stDtBoletim")  ."',                \n";
-    $stSql .= "                                               '".SistemaLegado::is_tcems($obTransacao)."'           \n";
+    $stSql .= "                                               '".$boNovoPlanoConta."'           \n";
     $stSql .= ") as retorno( cod_estrutural    VARCHAR                                                              \n";
     $stSql .= "             ,cod_plano         INTEGER                                                              \n";
     $stSql .= "             ,nom_conta         VARCHAR                                                              \n";
@@ -600,7 +601,7 @@ function recuperaArrecadacao(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $b
 function montaRecuperaArrecadacao($boTransacao = "")
 {
     $stSql .= "SELECT *                                                             \n";
-    if (SistemaLegado::is_tcems($boTransacao)) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "FROM tesouraria.fn_listar_arrecadacao_tce('".$this->getDado("stFiltroArrecadacao")."', '".$this->getDado("stFiltroArrecadacao")."') ;  \n";
     } else {
         $stSql .= "FROM tesouraria.fn_listar_arrecadacao_tce('".$this->getDado("stFiltroArrecadacao")."', '".$this->getDado("stFiltroArrecadacao")."') ;  \n";

@@ -68,9 +68,9 @@ class TTBAObrasFiscais extends Persistente
 
     function montaRecuperaObrasFiscais()
     {
-        $stSql .= " SELECT 1 AS tp_registro
+        $stSql .= " SELECT 1 AS tipo_registro
                          , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                         , cod_obra AS num_obra
+                         , obra.nro_obra AS num_obra
                          , responsavel.documento AS nu_cpfcnpjfiscal
                          , obra_fiscal.matricula
                          , obra_fiscal.registro_profissional
@@ -78,6 +78,11 @@ class TTBAObrasFiscais extends Persistente
                          , obra_fiscal.data_final
                          , TO_CHAR(TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy'), 'mmyyyy') AS competencia
                       FROM tcmba.obra_fiscal
+                INNER JOIN tcmba.obra
+                        ON obra.cod_obra = obra_fiscal.cod_obra
+                       AND obra.cod_entidade = obra_fiscal.cod_entidade
+                       AND obra.exercicio = obra_fiscal.exercicio
+                       AND obra.cod_tipo = obra_fiscal.cod_tipo
                 INNER JOIN ( SELECT numcgm 
                                   , cnpj AS documento
                                FROM public.sw_cgm_pessoa_juridica 
@@ -88,7 +93,7 @@ class TTBAObrasFiscais extends Persistente
                             ) AS responsavel
                         ON responsavel.numcgm = obra_fiscal.numcgm
                      WHERE obra_fiscal.data_inicio BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
-                       AND cod_entidade in (".$this->getDado('entidades').")";
+                       AND obra_fiscal.cod_entidade in (".$this->getDado('entidades').")";
         return $stSql;
     }
 }

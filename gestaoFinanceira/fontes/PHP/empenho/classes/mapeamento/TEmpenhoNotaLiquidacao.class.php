@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoNotaLiquidacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TEmpenhoNotaLiquidacao.class.php 63889 2015-10-30 16:13:06Z franver $
 
     $Revision: 30668 $
     $Name$
@@ -1086,7 +1086,7 @@ function montaRecuperaRelacionamentoPagos()
     $stSql .= "                --Ligação CONTA_CREDITO : PLANO ANALITICA        \n";
     $stSql .= "                AND cc.cod_plano        = pa.cod_plano           \n";
     $stSql .= "                AND cc.exercicio        = pa.exercicio           \n";
-    if ($this->getDado('exercicio') > $this->getDado('exercicio_empenho')) {
+    if ($this->getDado('exercicio') == $this->getDado('exercicio_empenho')) {
         $stSql .= "                AND cc.sequencia        = 3                  \n";
     } else {
         $stSql .= "                AND cc.sequencia        = 2                  \n";

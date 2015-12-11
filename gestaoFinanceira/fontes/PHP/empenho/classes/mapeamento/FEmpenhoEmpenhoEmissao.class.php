@@ -114,7 +114,6 @@ function executaFuncao(&$rsRecordSet, $boTransacao = "")
     if ( !$this->getDado("cod_lote") ) {
         $stSql = $this->montaInsereLote();
         $this->setDebug( $stSql );
-        sistemalegado::mostravar($stSql);
         $obErro = $obConexao->executaSQL( $rsRecordSetLote, $stSql, $boTransacao );
         if ( !$obErro->ocorreu() ) {
             $this->setDado("cod_lote", $rsRecordSetLote->getCampo("cod_lote"));
@@ -124,10 +123,8 @@ function executaFuncao(&$rsRecordSet, $boTransacao = "")
     if ( !$obErro->ocorreu() ) {
         $stSql = $this->montaExecutaFuncao();
         $this->setDebug( $stSql );
-        //sistemalegado::mostravar($stSql);exit;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
-//sistemalegado::mostravar($rsRecordSet);exit;
         if ( !$obErro->ocorreu() ) {
             $this->setDado("sequencia", $rsRecordSet->getCampo("sequencia"));
         }

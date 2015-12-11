@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: LSManterVinculoEmpenhoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterVinculoEmpenhoContrato.php 64100 2015-12-02 17:15:03Z jean $
 
 */
 
@@ -50,34 +50,53 @@ $pgOcul = "OC".$stPrograma.".php";
 $stAcao = $request->get('stAcao');
 
 //Prepara o filtro para pesquisa
-$stFiltro .= " AND contrato.exercicio = '".$_REQUEST['inExercicio']."'\n";
+$stFiltro .= " AND contrato.exercicio = '".$request->get('inExercicio')."'\n";
 $stFiltro .= " AND contrato.cod_entidade IN (";
 if(is_array($_REQUEST['inCodEntidade'])){
     foreach ($_REQUEST['inCodEntidade'] as $value) {
         $stEntidades .= $value.", ";
     }
 }else{
-    $inCodEntidade = explode(",", $_REQUEST['inCodEntidade']);
+    $inCodEntidade = explode(",", $request->get('inCodEntidade'));
     for($i=0;$i<count($inCodEntidade);$i++){
         $stEntidades .= $inCodEntidade[$i].", ";    
     }
 }
 $stFiltro .= substr($stEntidades,0,strlen($stEntidades)-2).") \n";
 
-if ($_REQUEST['inNumContrato']) {
-    $stFiltro .= " AND contrato.num_contrato = '".$_REQUEST['inNumContrato']."'"."\n";
+if ($request->get('inNumeroContrato') != "") {
+    switch ($request->get('stTipoBusca')) {
+        case 'inicio':
+            $stTipoBusca = "'".$request->get('inNumeroContrato')."%'";
+        break;
+
+        case 'final':
+            $stTipoBusca = "'%".$request->get('inNumeroContrato')."'";
+        break;
+
+        case 'contem':
+            $stTipoBusca = "'%".$request->get('inNumeroContrato')."%'";
+        break;
+
+        case 'exata':
+            $stTipoBusca = "'".$request->get('inNumeroContrato')."'";
+        break;
+    }
+    $stFiltro .= " AND contrato.numero_contrato::VARCHAR ILIKE ".$stTipoBusca." \n";
 }
-$stOrdem = "ORDER BY nom_credor";
+
+$stOrdem = " ORDER BY nom_credor";
 
 //Efetua pesquisa para a lista
 $obTLicitacaoContrato = new TLicitacaoContrato;
 $obTLicitacaoContrato->recuperaDadosContrato($rsRecordset, $stFiltro, $stOrdem);
+
 //********************************************************************//
 
 //Define a paginacao
 if ( !Sessao::read('paginando') ) {
     $arFiltro = array();
-    foreach ($_REQUEST as $stCampo => $stValor) {
+    foreach ($request->getAll() as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;
     }
     Sessao::write('filtro', $arFiltro);
@@ -127,7 +146,7 @@ $obLista->ultimoDado->setCampo( "nom_entidade" );
 $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
 $obLista->commitDado();
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "[num_contrato]/[exercicio]" );
+$obLista->ultimoDado->setCampo( "[numero_contrato]/[exercicio]" );
 $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
 $obLista->commitDado();
 $obLista->addDado();
@@ -137,13 +156,14 @@ $obLista->commitDado();
 
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
-$obLista->ultimaAcao->addCampo( "&inNumContrato" , "num_contrato"  );
-$obLista->ultimaAcao->addCampo( "&inCodEntidade" , "cod_entidade"  );
-$obLista->ultimaAcao->addCampo( "&inExercicio"   , "exercicio"     );
-$obLista->ultimaAcao->addCampo( "&stNomEntidade" , "nom_entidade"  );
-$obLista->ultimaAcao->addCampo( "&stNomCredor"   , "nom_credor"    );
-$obLista->ultimaAcao->addCampo( "&dtAssinatura"	 , "dt_assinatura" );
-$obLista->ultimaAcao->addCampo( "&cgm_contratado", "cgm_contratado");
+$obLista->ultimaAcao->addCampo( "&inNumeroContrato" , "numero_contrato" );
+$obLista->ultimaAcao->addCampo( "&inNumContrato"    , "num_contrato"    );
+$obLista->ultimaAcao->addCampo( "&inCodEntidade"    , "cod_entidade"    );
+$obLista->ultimaAcao->addCampo( "&inExercicio"      , "exercicio"       );
+$obLista->ultimaAcao->addCampo( "&stNomEntidade"    , "nom_entidade"    );
+$obLista->ultimaAcao->addCampo( "&stNomCredor"      , "nom_credor"      );
+$obLista->ultimaAcao->addCampo( "&dtAssinatura"	    , "dt_assinatura"   );
+$obLista->ultimaAcao->addCampo( "&cgm_contratado"   , "cgm_contratado"  );
 
 if ($stAcao == "selecionar") {
     $pgProx = CAM_GF_EMP_INSTANCIAS."empenho/FMManterVinculoEmpenhoContrato.php";

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: EMP.inc.php 62759 2015-06-16 18:00:15Z jean $
+    $Id: EMP.inc.php 63835 2015-10-22 13:53:31Z franver $
 
     * Casos de uso: uc-06.04.00
 */
@@ -415,8 +415,6 @@
         foreach ($rsEmpenhoContrato->arElementos as $arEmpenhoContrato) {
             // deixar comentado a linha abaixo caso seja necessário usar a string abaixo para apresentar os registros
             $stKeyContrato = $arEmpenhoContrato['num_programa'].$arEmpenhoContrato['num_orgao'].$arEmpenhoContrato['num_unidade'].$arEmpenhoContrato['cod_funcao'].$arEmpenhoContrato['cod_subfuncao'].$arEmpenhoContrato['cod_natureza'].$arEmpenhoContrato['numero_pao'].$arEmpenhoContrato['elemento_despesa'].$arEmpenhoContrato['subelemento_despesa'].$arEmpenhoContrato['cod_empenho'];
-            //sistemaLegado::mostravar(" kei: ".$stKey);
-            //sistemaLegado::mostravar(" contrato: ".$stKeyContrato);
 
             if ($stKeyContrato === $stKey) {
                 $arEmpenhoContrato['numero_sequencial'] = ++$inCount;

@@ -116,7 +116,6 @@ function RecuperaAtributosSelecionadosValoresHistorico(&$rsRecordSet, $stFiltro 
 
     $stSql = $this->montaRecuperaAtributosSelecionadosValoresHistorico().$stFiltro.$stOrdem;
     $this->setDebug( $stSql );
-    //mostravar( $stSql );
     if( $this->getPersistenteAtributo() )
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
     else

@@ -197,6 +197,7 @@ BEGIN
                     SELECT * FROM (
                         SELECT
                              tmp_totaliza.cod_estrutural
+                            ,tmp_totaliza.cod_plano
                             ,publico.fn_nivel(tmp_totaliza.cod_estrutural) as nivel                                                        
                             ,tmp_totaliza.nom_conta
                             ,sw_cgm.nom_cgm
@@ -214,7 +215,7 @@ BEGIN
                         WHERE   tmp_totaliza.exercicio   = ' || quote_literal(stExercicio) || '
                     )as retorno
                     WHERE nivel >= 5
-                    AND cod_estrutural BETWEEN ''2.1.8.9.2%''  AND ''2.1.8.9.5%''
+                    AND cod_estrutural ILIKE ''2.1.8.8%''
                     ORDER BY cod_estrutural ';
 
 

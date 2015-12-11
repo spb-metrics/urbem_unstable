@@ -112,16 +112,34 @@ if ($_REQUEST["inAno"] != "" and $_REQUEST["inCodMes"] != "") {
     $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
 }
 
+// Necessário carregar da sessão e testar se existe no request, pois quando vai Conceder Férias não usa o request
+if ($_REQUEST["stCodigos"] == "") {
+    $arContratos = Sessao::read("arContratos");
+    $stFiltroAux = "";
+    foreach ($arContratos as $campo) {
+        if ($campo['cod_contrato'] != "") {
+            $stFiltroAux .= $campo['cod_contrato'].",";
+        }
+    }
+}
+
+if ($stFiltroAux != "") {
+    $stValoresFiltro = substr($stFiltroAux,0,-1);
+} else {
+    $stValoresFiltro = $_REQUEST["stCodigos"];
+}
+
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php");
 $obTPessoalFerias = new TPessoalFerias();
 $obTPessoalFerias->setDado("stAcao"                     ,$_REQUEST["stAcao"]);
 $obTPessoalFerias->setDado("stTipoFiltro"               ,$_REQUEST["stTipoFiltro"]);
-$obTPessoalFerias->setDado("stValoresFiltro"            ,$_REQUEST["stCodigos"]);
+$obTPessoalFerias->setDado("stValoresFiltro"            ,$stValoresFiltro);
 $obTPessoalFerias->setDado("inCodPeriodoMovimentacao"   ,$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao"));
 $obTPessoalFerias->setDado("boFeriasVencidas"           ,(trim($_REQUEST['boApresentarSomenteFerias']) != "") ? 'true' : 'false');
 $obTPessoalFerias->setDado("inCodLote"                  ,(trim($_REQUEST["inCodLote"]) != "") ? $_REQUEST["inCodLote"] : 0);
 $obTPessoalFerias->setDado("inCodRegime"                ,$_REQUEST["inCodRegime"]);
 $obTPessoalFerias->concederFerias($rsLista,$stFiltro," ORDER BY nom_cgm, dt_inicial_aquisitivo, dt_final_aquisitivo");
+
 
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoContratoServidor.class.php");
 $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGeradoContratoServidor();

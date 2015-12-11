@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSBuscaLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSBuscaLote.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.08
 */
@@ -107,7 +107,6 @@ if ( is_array($link) ) {
 }
 
 Sessao::write('link', $link);
-//sistemalegado::mostravar($_REQUEST);exit;
 //MASCARA PROCESSO
 $obRCIMConfiguracao = new RCIMConfiguracao;
 $obRCIMConfiguracao->setCodigoModulo( 12 );

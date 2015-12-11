@@ -62,12 +62,12 @@ function TPessoalAtributoContratoServidorValor()
     $this->setCampoCod('');
     $this->setComplementoChave('cod_contrato,cod_modulo,cod_atributo,cod_cadastro,timestamp');
 
-    $this->AddCampo('cod_contrato','integer'   ,true  ,''    ,true  ,true  );
-    $this->AddCampo('cod_atributo','integer'   ,true  ,''    ,true  ,true  );
-    $this->AddCampo('cod_cadastro','integer'   ,true  ,''    ,true  ,true  );
-    $this->AddCampo('valor'       ,'text'      ,true  ,'' ,false ,true  );
-    $this->AddCampo('timestamp'   ,'timestamp' ,false ,''    ,false ,false );
-    $this->AddCampo('cod_modulo'  ,'integer'   ,true  ,''    ,true  ,true  );
+    $this->AddCampo('cod_contrato','integer'       ,true, '', true,true  );
+    $this->AddCampo('cod_atributo','integer'       ,true, '', true,true  );
+    $this->AddCampo('cod_cadastro','integer'       ,true, '', true,true  );
+    $this->AddCampo('valor'       ,'text'          ,true, '',false,false  );
+    $this->AddCampo('timestamp'   ,'timestamp_now' ,true, '', true,false );
+    $this->AddCampo('cod_modulo'  ,'integer'       ,true, '', true,true  );
 }
 
 function montaRecuperaRelacionamento()

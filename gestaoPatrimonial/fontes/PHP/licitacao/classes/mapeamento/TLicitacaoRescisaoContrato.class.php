@@ -148,6 +148,9 @@ class TLicitacaoRescisaoContrato extends Persistente
         if ($this->getDado("num_contrato")) {
             $stSQL .= "licitacao.contrato.num_contrato = ".$this->getDado("num_contrato")." AND  ";
         }
+        if ($this->getDado("exercicio")) {
+            $stSQL .= "contrato.exercicio = '".$this->getDado("exercicio")."' AND  ";
+        }
 
         $stSQL = substr($stSQL, 0, strlen($stFiltro)-6);
 

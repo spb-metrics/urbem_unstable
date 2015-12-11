@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.04.03
 
-    $Id: OCManterFornecedor.php 62068 2015-03-27 19:55:45Z jean $
+    $Id: OCManterFornecedor.php 63833 2015-10-22 13:05:17Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -548,7 +548,6 @@ switch ($stCtrl) {
     case 'excluirSocio':
         $inCount=0;
         $arSocioSessao = Sessao::read('arSocio');
-//SistemaLegado::mostravar($arSocioSessao);die;
         foreach ( $arSocioSessao as $arSocio ) {
             if ($arSocio['id'] != $_REQUEST['id']) {
                 $arSocioSessaoAtualizado[$inCount]['id']              = $inCount;

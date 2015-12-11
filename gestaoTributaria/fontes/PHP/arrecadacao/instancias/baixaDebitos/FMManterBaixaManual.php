@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterBaixaManual.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterBaixaManual.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.11
 */
@@ -69,7 +69,6 @@ include_once ( CAM_GT_ARR_NEGOCIO."RARRTipoPagamento.class.php" );
 include_once ( CAM_GT_ARR_NEGOCIO."RARRConfiguracao.class.php"  );
 include_once ( CAM_GT_MON_NEGOCIO."RMONAgencia.class.php" );
 
-#SistemaLegado::mostravar( $_REQUEST );
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterBaixaManual";
 $pgFilt = "FL".$stPrograma.".php";

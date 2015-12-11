@@ -70,6 +70,7 @@ class ILabelEntidade extends Label
         $this->obForm = $obForm;
         $this->obHdnCodEntidade = new Hidden;
         $this->obHdnCodEntidade->setName ( 'inCodEntidade' );
+        $this->obHdnCodEntidade->setId   ( 'inCodEntidade' );
         $this->setRotulo ("Entidade" );
         $this->setName   ("stEntidade" );
         $this->setId     ("stEntidade" );

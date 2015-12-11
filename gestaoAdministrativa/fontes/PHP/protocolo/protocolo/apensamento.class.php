@@ -64,7 +64,7 @@ class apensamento
             $dbApensar->comBegin = false;
             $dbApensar->abreBd();
             $dbApensar->executaSql("BEGIN");
-            //mostravar($aPensamentos);
+
             while (list($vKey,$vValor) = each($aPensamentos)) {
                 $aCod = explode("_",$vValor);
                 $sInsert = " insert into sw_processo_apensado
@@ -98,7 +98,7 @@ class apensamento
             $dbDesapensar->comBegin = false;
             $dbDesapensar->abreBd();
             $dbDesapensar->executaSql("BEGIN");
-            //mostravar($aDesapensamentos);
+
             while (list($vKey,$vValor) = each($aDesapensamentos)) {
 
                 $aCod = explode("_",$vValor);

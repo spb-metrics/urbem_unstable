@@ -51,8 +51,11 @@ $Date: 2008-01-28 12:57:53 -0200 (Seg, 28 Jan 2008) $
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <frameset rows="*,0" border="0" noresize >
-    <?php include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php"     ); ?>
-    <frame name="telaPrincipal" src="./<?=$request->get("sUrlConsulta")."&iURLRandomica=".$request->get("iURLRandomica")."&inCodContrato=".$request->get("inCodContrato")."&inRegistro=".$request->get("inRegistro")."&inCodConfiguracao=".$request->get('inCodConfiguracao')."&nom_cgm=".$request->get("nom_cgm")."&numcgm=".$request->get("numcgm")."&inCodComplementar=".$request->get("inCodComplementar")."&inCodPeriodoMovimentacao=".$request->get("inCodPeriodoMovimentacao")?>" marginwidth="0" marginheight="0" scrolling="yes" frameborder="0" noresize >
+    <?php include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php"     ); 
+    // Foram colocados as variaveis CodMes e InAno para poder ser usadas como a competência na tela seguinte, pois antes possuía uma
+    // referência para uma Sessão inexistente e não há necessidade de criar uma sessão para ambas variavéis, apenas passar por request
+    ?>
+    <frame name="telaPrincipal" src="./<?=$request->get("sUrlConsulta")."&iURLRandomica=".$request->get("iURLRandomica")."&inCodContrato=".$request->get("inCodContrato")."&inRegistro=".$request->get("inRegistro")."&inCodConfiguracao=".$request->get('inCodConfiguracao')."&nom_cgm=".$request->get("nom_cgm")."&numcgm=".$request->get("numcgm")."&inCodComplementar=".$request->get("inCodComplementar")."&inCodPeriodoMovimentacao=".$request->get("inCodPeriodoMovimentacao")."&inCodMes=".$request->get("inCodMes")."&inAno=".$request->get("inAno")?>" marginwidth="0" marginheight="0" scrolling="yes" frameborder="0" noresize >
     <frame name="oculto" id="oculto" src="" marginwidth="100%" marginheight="100%" scrolling="yes" frameborder="1" noresize >
 </frameset>
 </html>

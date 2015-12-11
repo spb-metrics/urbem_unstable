@@ -306,8 +306,5 @@ function geraRecordSet(&$arRecordSet , $stOrder = "")
     $rsNewRecord = new RecordSet;
     $rsNewRecord->preenche($arBloco7);
     $arRecordSet[4] = $rsNewRecord;
-
-    //SistemaLegado::mostravar( $arRecordSet );
-    //die();
 }
 }

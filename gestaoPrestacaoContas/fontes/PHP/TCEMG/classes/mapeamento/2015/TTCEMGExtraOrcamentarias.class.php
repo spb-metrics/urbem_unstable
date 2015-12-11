@@ -214,13 +214,19 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                    , cod_font_recurso
                    , ABS(vl_saldo_ant) AS vl_saldo_ant
                    , ABS(vl_saldo_atual) AS vl_saldo_atual
-                   , CASE WHEN vl_saldo_ant < 0.00
-                          THEN 'D'
-                          ELSE 'C'
+                                      , CASE WHEN natureza_anterior != ' '
+                          THEN natureza_anterior
+                          ELSE CASE WHEN vl_saldo_ant < 0.00
+                                    THEN 'D'
+                                    ELSE 'C'
+                                END
                       END AS nat_saldo_anterior_fonte
-                   , CASE WHEN vl_saldo_atual < 0.00
-                          THEN 'D'
-                          ELSE 'C'
+                   , CASE WHEN natureza_atual != ' '
+                          THEN natureza_atual
+                          ELSE CASE WHEN vl_saldo_atual < 0.00
+                                    THEN 'D'
+                                    ELSE 'C'
+                                END
                       END AS nat_saldo_atual_fonte
                 FROM (
                       SELECT tipo_registro
@@ -704,14 +710,18 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
         $stSql = "  SELECT
                             23 AS tipo_registro
                             , tcemg.seq_num_op_extra(transferencia.exercicio,transferencia.cod_entidade,1,transferencia.cod_lote)::varchar AS cod_reduzido_op
-                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN '99'
-                                   ELSE pagamento_tipo_documento.cod_tipo_documento
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL AND SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) <> '1111101' THEN '99'
+                                   WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101' THEN '05'
+                                   ELSE pagamento_tipo_documento.cod_tipo_documento::VARCHAR
                               END AS tipo_documento_op                            
                             , pagamento_tipo_documento.num_documento AS num_documento
-                            , cod_ctb_transferencia.cod_ctb_anterior as cod_ctb
+                            , CASE WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101' THEN ''
+                                   ELSE cod_ctb_transferencia.cod_ctb_anterior::varchar
+                              END AS cod_ctb   
                             , COALESCE(plano_recurso.cod_recurso,'100') AS cod_fonte_ctb
-                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 THEN 'Outros'
-                                   WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL THEN 'Outros'
+                            , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 AND SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) <> '1111101' THEN 'Outros'
+                                   WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL AND SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) <> '1111101' THEN 'Outros'
+                                   WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101' THEN ''
                                    ELSE tipo_documento.descricao
                               END AS desctipodocumentoop
                             , TO_CHAR(transferencia.dt_autenticacao, 'ddmmyyyy') AS dt_emissao
@@ -798,6 +808,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 			                         , transferencia.cod_plano_credito
 			                         , transferencia.cod_plano_debito
 			                         , conta_debito.sequencia
+                                     , REPLACE(plano_conta.cod_estrutural , '.', '') as cod_estrutural 
                                 FROM contabilidade.conta_debito
                                 
                                 INNER JOIN contabilidade.lote AS lo 
@@ -817,7 +828,11 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                     ON plano_analitica.cod_plano = transferencia.cod_plano_credito
                                     AND plano_analitica.natureza_saldo = 'D'
                                     AND plano_analitica.exercicio = conta_debito.exercicio
-                                
+                                    
+                                INNER JOIN contabilidade.plano_conta
+                                    ON plano_analitica.exercicio = plano_conta.exercicio
+                                    AND plano_analitica.cod_conta = plano_conta.cod_conta
+                        
                                 LEFT JOIN tcemg.conta_bancaria
 			                        ON conta_bancaria.cod_conta = plano_analitica.cod_conta
 		                            AND conta_bancaria.exercicio = plano_analitica.exercicio

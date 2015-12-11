@@ -62,7 +62,7 @@ $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
-if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerramentoMes == 'true') {
+if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual && $boUtilizarEncerramentoMes == 'true') {
     $obSpan = new Span;
     $obSpan->setValue('<b>Não é possível utilizar esta rotina pois o mês atual está encerrado!</b>');
     $obSpan->setStyle('align: center;');
@@ -80,9 +80,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRegra->obRNorma->setExercicio( Sessao::getExercicio() );
     $obRegra->obRNorma->listarDecreto( $rsNorma );
 
-    $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+    $stAcao = $request->get("stAcao");
+    
     Sessao::remove('arDespesaSuplementar');
-    //sessao->transf3 = array();
 
     if ($stAcao == 'Especial') {
         $inCodTipo = 9;
@@ -140,7 +140,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtDtLancamento->setId        ( "stData"      );
     $obTxtDtLancamento->setName      ( "stData"      );
     $obTxtDtLancamento->setValue     ( ''            );
-    //$obTxtDtLancamento->setValue     ( date('d/m/Y') );
     $obTxtDtLancamento->setNull      ( false         );
 
     // Define Objeto TextArea para Motivo
@@ -229,6 +228,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     } else {
         $obFormulario->addTitulo            ( "Dados para Crédito Especial por Excesso de Arrecadação" );
     }
+    
     $obFormulario->addComponente        ( $obCmbCodEntidade         );
     $obFormulario->addComponente        ( $obBscNorma               );
     $obFormulario->addComponente        ( $obTxtDtLancamento        );

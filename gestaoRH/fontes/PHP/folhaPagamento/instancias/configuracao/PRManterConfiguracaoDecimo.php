@@ -38,10 +38,11 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
-include_once ( CAM_GRH_FOL_MAPEAMENTO .'TFolhaPagamentoTipoEventoDecimo.class.php'                     );
-include_once ( CAM_GRH_FOL_MAPEAMENTO .'TFolhaPagamentoDecimoEvento.class.php'                     );
-include_once ( CAM_GRH_FOL_MAPEAMENTO .'TFolhaPagamentoEvento.class.php'                     );
+include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracao.class.php';
+include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php';
+include_once CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoTipoEventoDecimo.class.php';
+include_once CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoDecimoEvento.class.php';
+include_once CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEvento.class.php';
 
 $stPrograma = 'ManterConfiguracaoDecimo';
 $pgFilt = "FL".$stPrograma.".php";
@@ -53,39 +54,53 @@ $pgJs   = "JS".$stPrograma.".js";
 
 Sessao::setTrataExcecao( true );
 
-$obTAdministracaoConfiguracao       = new TAdministracaoConfiguracao;
-$obTFolhaPagamentoDecimoEvento      = new TFolhaPagamentoDecimoEvento;
-$obTFolhaPagamentoTipoEventoDecimo  = new TFolhaPagamentoTipoEventoDecimo;
-$obTFolhaPagamentoEvento            = new TFolhaPagamentoEvento;
+$obTAdministracaoConfiguracao         = new TAdministracaoConfiguracao();
+$obTFolhaPagamentoDecimoEvento        = new TFolhaPagamentoDecimoEvento();
+$obTFolhaPagamentoTipoEventoDecimo    = new TFolhaPagamentoTipoEventoDecimo();
+$obTFolhaPagamentoEvento              = new TFolhaPagamentoEvento();
 
 Sessao::getTransacao()->setMapeamento( $obTFolhaPagamentoDecimoEvento );
 
 $rsTipoEventoDecimo = new RecordSet;
-$obTFolhaPagamentoTipoEventoDecimo->recuperaTodos( $rsTipoEventoDecimo );
+$obTFolhaPagamentoTipoEventoDecimo->recuperaTodos( $rsTipoEventoDecimo, $boTransacao );
 
 $obTAdministracaoConfiguracao->setDado( "cod_modulo", "27");
 $obTAdministracaoConfiguracao->setDado( "exercicio" , Sessao::getExercicio());
 $obTAdministracaoConfiguracao->setDado( "parametro" , "mes_calculo_decimo".Sessao::getEntidade());
-$obTAdministracaoConfiguracao->setDado( "valor"     , $_POST["inMesCalculoDecimo"] );
-$obTAdministracaoConfiguracao->recuperaPorChave( $rsConfiguracao );
+$obTAdministracaoConfiguracao->setDado( "valor"     , $request->get("inMesCalculoDecimo") );
+$obTAdministracaoConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
+$obTAdministracaoConfiguracao->alteracao($boTransacao);
 
-if ($rsConfiguracao->getNumLinhas() == -1) {
-    $obTAdministracaoConfiguracao->inclusao();
-} else {
-    $obTAdministracaoConfiguracao->alteracao();
+//Inclusao do radio box Gera Adiant. de 13º Salário no mês de aniversário
+$obTAdministracaoConfiguracao->setDado( "cod_modulo", "27");
+$obTAdministracaoConfiguracao->setDado( "exercicio" , Sessao::getExercicio());
+$obTAdministracaoConfiguracao->setDado( "parametro" , "adiantamento_13_salario".Sessao::getEntidade());
+$obTAdministracaoConfiguracao->setDado( "valor"     , $request->get('boRdGerarAdiantamento13') );
+$obTAdministracaoConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
+$obTAdministracaoConfiguracao->alteracao($boTransacao);
+
+//Caso entidade seja diferente de PREFEITURA
+if ( Sessao::getEntidade() != '' ) {
+    $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade();
+    $obTAdministracaoConfiguracaoEntidade->setDado( 'exercicio'    , Sessao::getExercicio() );
+    $obTAdministracaoConfiguracaoEntidade->setDado( 'cod_entidade' , Sessao::getCodEntidade() );
+    $obTAdministracaoConfiguracaoEntidade->setDado( 'cod_modulo'   , '27');
+    $obTAdministracaoConfiguracaoEntidade->setDado( 'parametro'    , 'adiantamento_13_salario'.Sessao::getEntidade());
+    $obTAdministracaoConfiguracaoEntidade->setDado( 'valor'        , $request->get('boRdGerarAdiantamento13') );
+    $obTAdministracaoConfiguracaoEntidade->recuperaPorChave( $rsConfiguracaoEntidade, $boTransacao );
+    $obTAdministracaoConfiguracaoEntidade->alteracao($boTransacao);
 }
 
 while ( !$rsTipoEventoDecimo->eof() ) {
-    $stFiltro = " WHERE codigo = '".$_POST['stInner_Cod_'.$rsTipoEventoDecimo->getCampo('cod_tipo')]."'";
-    $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro);
-
+    $stFiltro = " WHERE codigo = '".$request->get('stInner_Cod_'.$rsTipoEventoDecimo->getCampo('cod_tipo'))."'";
+    $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro,"",$boTransacao);
     $obTFolhaPagamentoDecimoEvento->setDado( 'cod_tipo'   , $rsTipoEventoDecimo->getCampo('cod_tipo') );
     $obTFolhaPagamentoDecimoEvento->setDado( 'cod_evento' , $rsEvento->getCampo('cod_evento')   );
-    $obTFolhaPagamentoDecimoEvento->inclusao();
+    $obTFolhaPagamentoDecimoEvento->inclusao($boTransacao);
     $rsTipoEventoDecimo->proximo();
 }
 $stMensagem = "Configuração atualizada.";
-sistemaLegado::alertaAviso($pgForm,$stMensagem,"incluir","aviso", Sessao::getId(), "../");
+SistemaLegado::alertaAviso($pgForm,$stMensagem,"incluir","aviso", Sessao::getId(), "../");
 Sessao::encerraExcecao();
 
 ?>

@@ -35,7 +35,7 @@
 
   * Casos de uso: uc-03.04.02
 
-  $Id: TComprasSolicitacaoHomologadaReserva.class.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: TComprasSolicitacaoHomologadaReserva.class.php 63833 2015-10-22 13:05:17Z franver $
 
   */
 
@@ -172,8 +172,7 @@ class TComprasSolicitacaoHomologadaReserva extends Persistente
         $stFiltro .= "       AND solicitacao_homologada_reserva.cod_entidade     =  ".$this->getDado('cod_entidade')."      \n";
         $stFiltro .= "       AND solicitacao_homologada_reserva.cod_centro       =  ".$this->getDado('cod_centro')."        \n";
         $stFiltro .= "       AND solicitacao_homologada_reserva.cod_item         =  ".$this->getDado('cod_item')."          \n";
-//sistemaLegado::mostravar($stFiltro);
-//die('Fim');
+
         return $stFiltro;
     }
 

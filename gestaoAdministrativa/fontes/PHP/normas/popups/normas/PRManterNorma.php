@@ -70,7 +70,7 @@ switch ($stAcao) {
                 $value = implode(",",$value);
             $obRegra->obRTipoNorma->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
         }
-        SistemaLegado::mostraVar($_POST);
+
         $obRegra->setNumNorma                  ( $_POST['inNumNorma']        );
         $obRegra->setExercicio                 ( $_POST['stExercicio']       );
         $obRegra->setDataPublicacao            ( $_POST['stDataPublicacao']  );

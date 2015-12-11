@@ -28,10 +28,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: CAIXA.csv.inc.php 63511 2015-09-04 17:49:49Z michel $
-  * $Date: 2015-09-04 14:49:49 -0300 (Sex, 04 Set 2015) $
-  * $Author: michel $
-  * $Rev: 63511 $
+  * $Id: CAIXA.csv.inc.php 63912 2015-11-05 18:10:02Z lisiane $
+  * $Date: 2015-11-05 16:10:02 -0200 (Qui, 05 Nov 2015) $
+  * $Author: lisiane $
+  * $Rev: 63912 $
   *
 */
 /**
@@ -171,7 +171,7 @@ foreach ($rsRecordSetCAIXA10->getElementos() as $arCAIXA10) {
                             $stChave12 = '';
                             $stChaveComp12 = '';
                             foreach ($rsRecordSetCAIXA12->getElementos() as $arCAIXA12) {
-                                $stChaveComp12 = $arCAIXA12['cod_reduzido'];
+                                $stChaveComp12 = trim($arCAIXA12['cod_reduzido']);
 
                                     if ($stChave12 <> $arCAIXA12['tipo_registro'].$arCAIXA12['tipo_movimentacao'].$arCAIXA12['tipo_entr_saida'].$arCAIXA12['cod_ctb_transf'].$arCAIXA12['cod_fonte_ctb_transf']) {
 
@@ -236,7 +236,7 @@ foreach ($rsRecordSetCAIXA10->getElementos() as $arCAIXA10) {
                                             $stChave13 = '';
                                             $stChaveComp13 = '';
                                             foreach ($rsRecordSetCAIXA13->getElementos() as $arCAIXA13) {
-                                                $stChaveComp13 = $arCAIXA13['cod_reduzido'];
+                                                $stChaveComp13 = trim($arCAIXA13['cod_reduzido']);
 
                                                 if($stChaveComp12 == $stChaveComp13){
                                                     if (!($stChave13 === $arCAIXA13['tipo_registro'].$arCAIXA13['cod_reduzido'].$arCAIXA13['e_deducao_de_receita'].$arCAIXA13['identificador_deducao'].$arCAIXA13['cod_fonte_ctb_transf'].$arCAIXA13['natureza_receita'])) {

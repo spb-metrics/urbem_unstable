@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMDefinirAtividades.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMDefinirAtividades.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -107,7 +107,6 @@ $obRCEMInscricaoAtividade->roRCEMInscricaoEconomica->setInscricaoEconomica( $_RE
 
 //MONTAGEM DA LISTA DE HORÁRIOS JÁ CADASTRADOS
 $obRCEMInscricaoAtividade->roRCEMInscricaoEconomica->listarInscricaoHorarios( $rsHorarios );
-//sistemaLegado::mostravar ( $rsHorarios );
 $inCount=0;
 $arHorariosSessao = array();
 while ( !$rsHorarios->eof() ) {

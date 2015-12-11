@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRDefinirContasRP.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRDefinirContasRP.php 63831 2015-10-22 12:51:00Z franver $
 
     * Casos de uso: uc-02.02.31
 */
@@ -58,8 +58,6 @@ $obTContabilidadeContaLancamentoRp->excluiTudo( " WHERE exercicio = '".Sessao::g
 
 $arContasDebito = Sessao::read('arContasDebito');
 $arContasCreditos = Sessao::read('arContasCredito');
-//sistemaLegado::mostravar($arContasDebito);
-//sistemaLegado::mostravar($arContasCreditos);exit;
 
 if (is_array($arContasDebito)) {
     foreach ($arContasDebito as $arConta) {

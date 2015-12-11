@@ -60,7 +60,7 @@ class TTCMBAProrrogParc extends Persistente
         $stSql = "  SELECT  1 AS tipo_registro
                             ,  ".$this->getDado('unidade_gestora')." AS unidade_gestora
                             , nro_processo
-                            , '1111111' as competencia
+                            , '".$this->getDado('competencia')."' AS competencia
                             , dt_prorrogacao
                             , '' as reservado_tcm
                             , CASE WHEN indicador_adimplemento IS TRUE THEN

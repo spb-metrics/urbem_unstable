@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: LSReceita.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSReceita.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.06
 */
@@ -134,7 +134,7 @@ switch ($_REQUEST['tipoBusca']) {
                                           FROM contabilidade.desdobramento_receita as dr
                                          WHERE   receita.cod_receita = dr.cod_receita_secundaria
                                              AND receita.exercicio   = dr.exercicio ) ";
-        if ( SistemaLegado::is_tcems() ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $stFiltro .= " AND CLR.estorno = 'false' ";
             $obMapeamento->recuperaReceitaAnaliticaTCE($rsLista, $stFiltro, " ORDER BY mascara_classificacao");
         } else {

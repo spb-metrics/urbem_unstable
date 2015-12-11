@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMManterInscricaoConvFD.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterInscricaoConvFD.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -372,8 +372,6 @@ $onBtnLimpar->obEvento->setOnClick( "busca('limparSpan');" );
 $arChaveAtributoInscricao =  array( "inscricao_economica" => $_REQUEST["inInscricaoEconomica"] );
 $obRCEMInscricaoEconomica->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoInscricao );
 $obRCEMInscricaoEconomica->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
-
-//sistemaLegado::mostravar ( $rsAtributos );
 
 $obMontaAtributos = new MontaAtributos;
 $obMontaAtributos->setTitulo     ( "Atributos"  );

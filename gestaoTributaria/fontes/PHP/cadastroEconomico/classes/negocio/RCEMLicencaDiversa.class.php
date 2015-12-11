@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCEMLicencaDiversa.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCEMLicencaDiversa.class.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 */
@@ -192,8 +192,6 @@ function concederLicenca($boTransacao = "")
 
                 if (!$obErro->ocorreu() ) {
                     $arElementos = $this->arElementos;
-                    #echo '<h3>ARRAY DE ELEMENTOS</h2>';
-                    #sistemaLegado::mostravar ( $arElementos ); #exit;
 
                     for ($inCount=0;$inCount < count($arElementos);$inCount++) {
                         $inCodElemento = $arElementos[$inCount]["inCodigoElemento"];

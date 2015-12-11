@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCConcederLicencaGeralTipo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: OCConcederLicencaGeralTipo.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -115,8 +115,6 @@ function excluirElemento($inLinha)
 
 function montaListaElementos(&$rsListaElementos)
 {
-    #sistemaLegado::mostravar ( $rsListaElementos );
-
     $stAcao = $request->get('stAcao');
     $rsListaElementos->setPrimeiroElemento();
      if ( !$rsListaElementos->eof() ) {
@@ -188,14 +186,12 @@ function montaListaElementos(&$rsListaElementos)
      return $stJs;
 }
 
-//sistemaLegado::mostravar($stCtrl);die();
 switch ($stCtrl) {
     case "LimparSessao":
          Sessao::write( "lsElementos", array() );
     break;
 
     case "montaAtributosElementos":
-//sistemaLegado::mostravar($_sessao);
         $obRCEMLicencaDiversa   = new RCEMLicencaDiversa;
         /* Atributos Dinamicos */
         $obRCEMLicencaDiversa->obRCadastroDinamicoElemento->setChavePersistenteValores( array("cod_elemento"=>$_REQUEST["stCodigoElemento"]) );
@@ -256,7 +252,6 @@ switch ($stCtrl) {
         $stHTML = str_replace("\"","'",$stHTML);
         $stHTML = str_replace("'","\\'",$stHTML);
 
-//sistemaLegado::mostravar($obMontaAtributosElemento->arNomeInput);
         $stJs .= 'd.getElementById("inNumAtributos").value = "'.$inNumeroAtributos.'"; ';
 //        $stJs .= 'colocaValoresAtributos('.implode(",",$obMontaAtributosElemento->arNomeInput).'); ';
 //        $stJs .= 'colocaValoresAtributos('.$obMontaAtributosElemento->arNomeInput.');';
@@ -313,8 +308,6 @@ echo $stJs;
         $arAtribElem        = explode(",",$stNomAtribElem)          ;
 
         $arAtribElemValor[$stCodElemento] = array()                 ;
-        #sistemaLegado::mostravar( $arAtribElemValor );
-        #echo '<hr>';
         // array de indice =  a cod_elemento criado com valores dos atributos.
         for ( $inCount =0; $inCount < count($arAtribElem); $inCount++) {
             #$arAtribElemValor[$stCodElemento][substr( $arAtribElem[$inCount],-3,1)] = $_REQUEST[$arAtribElem[$inCount]] ;
@@ -344,7 +337,7 @@ echo $stJs;
                 break;
             }
         }
-//sistemaLegado::mostravar($_REQUEST);die();
+
         if ($boErro) {
             $stJs .= "f.boElemento.value = '0';\n";
             $stJs .= "alertaAviso('Elemento já informado!(".$_REQUEST["stCodigoElemento"].")','form','erro','".Sessao::getId()."', '../');";

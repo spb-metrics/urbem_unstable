@@ -126,7 +126,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_bairro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_funcao");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_funcao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 

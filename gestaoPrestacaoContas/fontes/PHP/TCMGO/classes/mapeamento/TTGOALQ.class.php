@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 62658 $
+    $Revision: 63835 $
     $Name$
-    $Author: evandro $
-    $Date: 2015-05-29 15:52:16 -0300 (Sex, 29 Mai 2015) $
+    $Author: franver $
+    $Date: 2015-10-22 11:53:31 -0200 (Qui, 22 Out 2015) $
 
     * Casos de uso: uc-06.04.00
 */
@@ -232,8 +232,7 @@ class TTGOALQ extends Persistente
         --ORDER BY  nota_liquidacao_item_anulado.timestamp
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
-        //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
         return $stSql;
     }
 
@@ -397,8 +396,7 @@ class TTGOALQ extends Persistente
         --ORDER BY  nota_liquidacao_item_anulado.timestamp
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
-        //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
         return $stSql;
     }
 
@@ -610,8 +608,7 @@ class TTGOALQ extends Persistente
         --ORDER BY  nota_liquidacao_item_anulado.timestamp
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
-        //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
         return $stSql;
     }
 }

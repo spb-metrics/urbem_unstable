@@ -32,7 +32,7 @@
 
   * @package URBEM
 
-    * $Id: RCarneDiversosMarianaPimentel.class.php 61620 2015-02-18 12:14:10Z franver $
+    * $Id: RCarneDiversosMarianaPimentel.class.php 64141 2015-12-08 16:23:59Z evandro $
 
   Caso de uso: uc-05.03.11
 */
@@ -1665,7 +1665,14 @@ function imprimirCarne($diffBaixa = FALSE)
                 $stParametro1 = $stParametro.$dtVencimento."'";
 
                 // valor atualizado
-                $obErro = $obCalculaParcelas->executaCalculaValoresParcelasReemissao($rsTmp,$stParametro1);
+                $rsTmp = new RecordSet();
+                if ( $parcela['boApenasReemitir'] == false){
+                    $obErro = $obCalculaParcelas->executaCalculaValoresParcelasReemissao($rsTmp,$stParametro1);
+                }else{
+                    $stValorParcela = $rsParcela->getCampo('valor').'§'.$rsParcela->getCampo('valor');
+                    $stValorParcela .= '§'.'0.00'.'§'.'0.00'.'§'.'0.00'.'§'.'0.00';
+                    $rsTmp->setCampo('valor',$stValorParcela);
+                }
 
                 unset( $obTARRCarne );
                 $obTARRCarne = new TARRCarne;
@@ -1677,6 +1684,7 @@ function imprimirCarne($diffBaixa = FALSE)
                 $nuValorNormal = $arValorNormal[1];
                 $stJuroNormal = $arValorNormal[3];
                 $stMultaNormal = $arValorNormal[2];
+                $nuValorCorrecaoMonetaria = $arValorNormal[5];
 
                 $flTotal = 0;
                 while ( !$rsListaCreditos->Eof() ) {
@@ -1843,7 +1851,7 @@ function imprimirCarne($diffBaixa = FALSE)
                             //-----------------------------------------------------------------------
 
                             // valor, % de juro, % de multa para valor vencimento 3 do carne --------------
-                            // valor
+                            // valor                            
                             if ($boVenc3 == true) {
                                 $obErro = $obCalculaParcelas->executaFuncao($rsTmp1,$stParametro4);
                                 $nuValor3 = $rsTmp1->getCampo('valor');
@@ -1865,13 +1873,17 @@ function imprimirCarne($diffBaixa = FALSE)
 
                             // repassa valores para pdf
                             $this->obRCarneMarianaPimentel->setValor       (number_format(round($nuValorNormal,2),2,',','.'));
-                            if ($boVenc1 == true) {
+                            if ($boVenc1 == true) {                                
                                 $this->obRCarneMarianaPimentel->setValor1      (number_format(round($nuValor1,2),2,',','.')) ;
-                                if ($boVenc2 == true) {
+                                if ($boVenc2 == true) {                                    
                                     $this->obRCarneMarianaPimentel->setValor2      (number_format(round($nuValor2,2),2,',','.')) ;
                                     if ($boVenc3 == true) {
-                                        $this->obRCarneMarianaPimentel->setValor3      (number_format(round($nuValor3,2),2,',','.')) ;
+                                        $this->obRCarneMarianaPimentel->setValor3      (number_format(round($nuValor3,2),2,',','.'));
                                     }
+                                //Corrigindo correcao monetaria quando for a 1º emissao do carne quando não houver vencimento 3 do carne
+                                }else if($nuValor3 == ''){ 
+                                    $this->obRCarneMarianaPimentel->setValor3 (number_format($nuValorCorrecaoMonetaria,2,',','.'));
+                                    $this->obRCarneMarianaPimentel->setValorOutros(number_format($nuValorCorrecaoMonetaria,2,',','.'));
                                 }
                             }
                         } else {

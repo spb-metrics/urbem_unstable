@@ -32,10 +32,10 @@
   * 
   * @ignore
   * 
-  * $Id: PRManterRegistroPreco.php 63322 2015-08-18 13:58:14Z michel $
-  * $Date: 2015-08-18 10:58:14 -0300 (Ter, 18 Ago 2015) $
+  * $Id: PRManterRegistroPreco.php 63765 2015-10-07 18:51:47Z michel $
+  * $Date: 2015-10-07 15:51:47 -0300 (Qua, 07 Out 2015) $
   * $Author: michel $
-  * $Rev: 63322 $
+  * $Rev: 63765 $
   **/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -61,10 +61,9 @@ $stAcao = $request->get('stAcao', 'incluir');
 
 $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
 
-Sessao::setTrataExcecao(true);
-Sessao::getTransacao()->setMapeamento( $obTTCEMGRegistroPrecos );
-
 $obErro = new Erro;
+$obTransacao = new Transacao();
+$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
 switch ($stAcao) {
 
@@ -75,57 +74,72 @@ switch ($stAcao) {
         $obTTCEMGRegistroPrecosOrgaoItem->setDado('cod_entidade'              , $request->get('inCodEntidade'));
         $obTTCEMGRegistroPrecosOrgaoItem->setDado('interno'                   , $request->get('boInterno'));
         $obTTCEMGRegistroPrecosOrgaoItem->setDado('numcgm_gerenciador'        , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGRegistroPrecosOrgaoItem->exclusao();
+        $obErro = $obTTCEMGRegistroPrecosOrgaoItem->exclusao($boTransacao);
         
-        $obTTCEMGItemRegistroPrecos = new TTCEMGItemRegistroPrecos();
-        $obTTCEMGItemRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGItemRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGItemRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
-        $obTTCEMGItemRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
-        $obTTCEMGItemRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGItemRegistroPrecos->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGItemRegistroPrecos = new TTCEMGItemRegistroPrecos();
+            $obTTCEMGItemRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGItemRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGItemRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
+            $obTTCEMGItemRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
+            $obTTCEMGItemRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGItemRegistroPrecos->exclusao($boTransacao);
+        }
         
-        $obTTCEMGRegistroPrecosOrgao = new TTCEMGRegistroPrecosOrgao();
-        $obTTCEMGRegistroPrecosOrgao->setDado('numero_registro_precos'   , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_registro_precos', $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGRegistroPrecosOrgao->setDado('cod_entidade'             , $request->get('inCodEntidade'));
-        $obTTCEMGRegistroPrecosOrgao->setDado('interno'                  , $request->get('boInterno'));
-        $obTTCEMGRegistroPrecosOrgao->setDado('numcgm_gerenciador'       , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGRegistroPrecosOrgao->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGRegistroPrecosOrgao = new TTCEMGRegistroPrecosOrgao();
+            $obTTCEMGRegistroPrecosOrgao->setDado('numero_registro_precos'   , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGRegistroPrecosOrgao->setDado('exercicio_registro_precos', $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGRegistroPrecosOrgao->setDado('cod_entidade'             , $request->get('inCodEntidade'));
+            $obTTCEMGRegistroPrecosOrgao->setDado('interno'                  , $request->get('boInterno'));
+            $obTTCEMGRegistroPrecosOrgao->setDado('numcgm_gerenciador'       , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGRegistroPrecosOrgao->exclusao($boTransacao);
+        }
         
-        $obTTCEMGLoteRegistroPrecos = new TTCEMGLoteRegistroPrecos();
-        $obTTCEMGLoteRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGLoteRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGLoteRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
-        $obTTCEMGLoteRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
-        $obTTCEMGLoteRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGLoteRegistroPrecos->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGLoteRegistroPrecos = new TTCEMGLoteRegistroPrecos();
+            $obTTCEMGLoteRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGLoteRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGLoteRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
+            $obTTCEMGLoteRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
+            $obTTCEMGLoteRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGLoteRegistroPrecos->exclusao($boTransacao);
+        }
 
-        $obTTCEMGEmpenhoRegistroPrecos = new TTCEMGEmpenhoRegistroPrecos();
-        $obTTCEMGEmpenhoRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGEmpenhoRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGEmpenhoRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
-        $obTTCEMGEmpenhoRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
-        $obTTCEMGEmpenhoRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGEmpenhoRegistroPrecos->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGEmpenhoRegistroPrecos = new TTCEMGEmpenhoRegistroPrecos();
+            $obTTCEMGEmpenhoRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGEmpenhoRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGEmpenhoRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
+            $obTTCEMGEmpenhoRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
+            $obTTCEMGEmpenhoRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGEmpenhoRegistroPrecos->exclusao($boTransacao);
+        }
         
-        $obTTCEMGRegistroPrecosLicitacao = new TTCEMGRegistroPrecosLicitacao();
-        $obTTCEMGRegistroPrecosLicitacao->setDado('cod_entidade'            , $request->get('inCodEntidade'));
-        $obTTCEMGRegistroPrecosLicitacao->setDado('numero_registro_precos'  , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGRegistroPrecosLicitacao->setDado('exercicio'               , $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGRegistroPrecosLicitacao->setDado('interno'                 , $request->get('boInterno'));
-        $obTTCEMGRegistroPrecosLicitacao->setDado('numcgm_gerenciador'      , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGRegistroPrecosLicitacao->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGRegistroPrecosLicitacao = new TTCEMGRegistroPrecosLicitacao();
+            $obTTCEMGRegistroPrecosLicitacao->setDado('cod_entidade'            , $request->get('inCodEntidade'));
+            $obTTCEMGRegistroPrecosLicitacao->setDado('numero_registro_precos'  , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGRegistroPrecosLicitacao->setDado('exercicio'               , $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGRegistroPrecosLicitacao->setDado('interno'                 , $request->get('boInterno'));
+            $obTTCEMGRegistroPrecosLicitacao->setDado('numcgm_gerenciador'      , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGRegistroPrecosLicitacao->exclusao($boTransacao);
+        }
         
-        $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
-        $obTTCEMGRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
-        $obTTCEMGRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
-        $obTTCEMGRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
-        $obTTCEMGRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
-        $obTTCEMGRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
-        $obErro = $obTTCEMGRegistroPrecos->exclusao();
+        if (!$obErro->ocorreu()) {
+            $obTTCEMGRegistroPrecos = new TTCEMGRegistroPrecos();
+            $obTTCEMGRegistroPrecos->setDado('numero_registro_precos' , $request->get('inNroRegistroPrecos'));
+            $obTTCEMGRegistroPrecos->setDado('exercicio'              , $request->get('stExercicioRegistroPrecos'));
+            $obTTCEMGRegistroPrecos->setDado('cod_entidade'           , $request->get('inCodEntidade'));
+            $obTTCEMGRegistroPrecos->setDado('interno'                , $request->get('boInterno'));
+            $obTTCEMGRegistroPrecos->setDado('numcgm_gerenciador'     , $request->get('numcgmGerenciador'));
+            $obErro = $obTTCEMGRegistroPrecos->exclusao($boTransacao);
+        }
 
-        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&inCodEntidade=".$request->get('inCodEntidade')."&stAcao=".$stAcao,'Registro de Preço - '.$request->get('inNroProcessoAdesao')."/".$request->get('stExercicioProcessoAdesao'),"excluir","excluir", Sessao::getId(), "../");
+        if (!$obErro->ocorreu()) {
+            $stMsg = 'Registro de Preço - '.$request->get('inNroRegistroPrecos')."/".$request->get('stExercicioRegistroPrecos');
+            SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&inCodEntidade=".$request->get('inCodEntidade')."&stAcao=".$stAcao,$stMsg,"excluir","excluir", Sessao::getId(), "../");
+        }
     break;
 
     default:
@@ -171,7 +185,7 @@ switch ($stAcao) {
                 $obTTCEMGRegistroPrecosLicitacao->setDado('exercicio'               , $request->get('stExercicioRegistroPreco'));
                 $obTTCEMGRegistroPrecosLicitacao->setDado('interno'                 , $request->get('boTipoRegPreco'));
                 $obTTCEMGRegistroPrecosLicitacao->setDado('numcgm_gerenciador'      , $request->get('inNumOrgaoGerenciador'));
-                
+
                 $obErro = $obTTCEMGRegistroPrecosLicitacao->exclusao($boTransacao);
 
                 if (!$obErro->ocorreu()) {
@@ -181,7 +195,7 @@ switch ($stAcao) {
                         $obTTCEMGRegistroPrecosLicitacao->setDado('cod_modalidade'          , $request->get('inCodModalidade'));
                         $obTTCEMGRegistroPrecosLicitacao->setDado('cod_entidade_licitacao'  , $request->get('inCodEntidade'));
                         $obTTCEMGRegistroPrecosLicitacao->setDado('exercicio_licitacao'     , $request->get('stExercicioLicitacao'));
-                        
+
                         $obErro = $obTTCEMGRegistroPrecosLicitacao->inclusao($boTransacao);
                     }
                 }
@@ -197,7 +211,7 @@ switch ($stAcao) {
                 $obTTCEMGRegistroPrecosOrgaoItem->setDado('interno'                  , $request->get('boTipoRegPreco'));
                 $obTTCEMGRegistroPrecosOrgaoItem->setDado('numcgm_gerenciador'       , $request->get('inNumOrgaoGerenciador'));
                 $obErro = $obTTCEMGRegistroPrecosOrgaoItem->exclusao($boTransacao);
-                
+
                 if (!$obErro->ocorreu()) {
                     # Exclui todos os Orgãos e as Unidades para o tipo de registro de preço.
                     $obTTCEMGRegistroPrecosOrgao = new TTCEMGRegistroPrecosOrgao();
@@ -208,7 +222,7 @@ switch ($stAcao) {
                     $obTTCEMGRegistroPrecosOrgao->setDado('numcgm_gerenciador'       , $request->get('inNumOrgaoGerenciador'));
                     $obErro = $obTTCEMGRegistroPrecosOrgao->exclusao($boTransacao);
                 }
-                
+
                 if (!$obErro->ocorreu()) {
                     # Exclui todos os Itens para o tipo de registro de preço.
                     $obTTCEMGItemRegistroPrecos = new TTCEMGItemRegistroPrecos();
@@ -219,7 +233,7 @@ switch ($stAcao) {
                     $obTTCEMGItemRegistroPrecos->setDado('numcgm_gerenciador'       , $request->get('inNumOrgaoGerenciador'));
                     $obErro = $obTTCEMGItemRegistroPrecos->exclusao($boTransacao);
                 }
-                
+
                 if (!$obErro->ocorreu()) {
                     # Exclui todos os Empenhos para o tipo de registro de preço.
                     $obTTCEMGEmpenhoRegistroPrecos = new TTCEMGEmpenhoRegistroPrecos();
@@ -262,44 +276,46 @@ switch ($stAcao) {
                                 $obErro = $obTTCEMGRegistroPrecosOrgao->inclusao($boTransacao);
                             }else{
                                 $obErro->setDescricao('Informe o CGM do Responsável pela Aprovação do Orgão: '.$arOrgao['stMontaCodOrgaoM'].' - '.$arOrgao['stMontaCodUnidadeM']);
-                                break;
                             }
+
+                            if ($obErro->ocorreu())
+                                break;
                         }
                     }
                 }
-                
+
                 if (!$obErro->ocorreu()) {
                     if (is_array($arItens) && count($arItens) > 0) {
                         $boProcessoPorLote = $request->get('inProcessoPorLote');
                         $inDescontoTabela  = $request->get('inDescontoTabela');
-                        
+
                         foreach ($arItens as $item) {
                             # Cadastro de Lote quando necessário
                             $inCodLote = ((!empty($item['stCodigoLote']) && $item['stCodigoLote'] != 0) ? $item['stCodigoLote'] : 0);
                             $txtDescricaoLote = (!empty($item['txtDescricaoLote']) ? $item['txtDescricaoLote'] : '');
-    
+
                             $obTTCEMGLoteRegistroPrecos->setDado('cod_lote' , $inCodLote);
                             $obErro =  $obTTCEMGLoteRegistroPrecos->recuperaPorChave( $rsLote, $boTransacao );
                             
                             if (!$obErro->ocorreu()) {
                                 $obTTCEMGLoteRegistroPrecos->setDado('descricao_lote' , $txtDescricaoLote);
-        
+
                                 $nuPercentualLote = ($boProcessoPorLote == true) ? $item['nuPercentualLote'] : 0;
                                 $obTTCEMGLoteRegistroPrecos->setDado('percentual_desconto_lote' , $nuPercentualLote);
-            
+
                                 if ($rsLote->getNumLinhas() > 0) {
                                     $obErro = $obTTCEMGLoteRegistroPrecos->alteracao($boTransacao);
                                 } else {
                                     $obErro = $obTTCEMGLoteRegistroPrecos->inclusao($boTransacao);
                                 }
-        
+
                                 if (!$obErro->ocorreu()) {
                                     if ($inDescontoTabela == 2 || ($inDescontoTabela == 1 && $boProcessoPorLote == 1)) {
                                         $nuPercentualItem = 0;
                                     } else {
                                         $nuPercentualItem = $item['nuPercentualItem'];
                                     }
-                    
+
                                     # Cadastro dos Itens do Registro de Preço, vinculação ao lote
                                     $obTTCEMGItemRegistroPrecos->setDado('cod_lote'                       , $inCodLote);
                                     $obTTCEMGItemRegistroPrecos->setDado('cod_item'                       , $item['inCodItem']);
@@ -320,7 +336,11 @@ switch ($stAcao) {
                                         $boItemAderidaSuperior = true;
                                     }
                                 }
+
                             }
+
+                            if ($obErro->ocorreu())
+                                break;
                         }
                     }
                 }
@@ -336,10 +356,13 @@ switch ($stAcao) {
                             $obTTCEMGRegistroPrecosOrgaoItem->setDado('cgm_fornecedor'   ,$arOrgaoItemQuantitativo['inCodFornecedorQ']);
                             $obTTCEMGRegistroPrecosOrgaoItem->setDado('quantidade'       ,$arOrgaoItemQuantitativo['nuQtdeOrgao']);
                             $obErro = $obTTCEMGRegistroPrecosOrgaoItem->inclusao($boTransacao);
+
+                            if ($obErro->ocorreu())
+                                break;
                         }
                     }
                 }
-                
+
                 if (!$obErro->ocorreu()) {
                     if (is_array($arEmpenhos) && count($arEmpenhos) > 0) {
                         foreach ($arEmpenhos as $empenho) {
@@ -348,6 +371,9 @@ switch ($stAcao) {
                             $obTTCEMGEmpenhoRegistroPrecos->setDado('exercicio_empenho'    , $empenho['exercicio']);
                             $obTTCEMGEmpenhoRegistroPrecos->setDado('cod_entidade_empenho' , $empenho['cod_entidade']);
                             $obErro = $obTTCEMGEmpenhoRegistroPrecos->inclusao($boTransacao);
+
+                            if ($obErro->ocorreu())
+                                break;
                         }
                     }
                 }
@@ -360,12 +386,13 @@ switch ($stAcao) {
                 Sessao::remove('arOrgaos');
                 Sessao::remove('arOrgaoItemQuantitativos');
 
-                $stMsg = "Adesão a Registro de Preço";
-
+                $stMsg = "";
                 if($boItemAderidaSuperior)
-                    $stMsg = "Itens foram incluidos/alterados com Quantidade Aderida superior a Quantidade Licitada";
+                    $stMsg = ". Itens foram incluidos/alterados com Quantidade Aderida superior a Quantidade Licitada.";
 
-                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=alterar",$stMsg,"incluir","aviso", Sessao::getId(), "../");
+                $stMsg = 'Registro de Preço - '.$request->get('stCodigoProcesso').'/'.$request->get('stExercicioRegistroPreco').$stMsg;
+
+                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId()."&stAcao=".$stAcao,$stMsg,"incluir","aviso", Sessao::getId(), "../");
             }
         }
 
@@ -373,6 +400,10 @@ switch ($stAcao) {
 
 }
 
-Sessao::encerraExcecao();
+if ($obErro->ocorreu())
+    SistemaLegado::exibeAviso($obErro->getDescricao(),"n_".$stAcao,"erro");
+
+SistemaLegado::liberaFrames(true,true);
+$obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTTCEMGRegistroPrecos );
 
 ?>

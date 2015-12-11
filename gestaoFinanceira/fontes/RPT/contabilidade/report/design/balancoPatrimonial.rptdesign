@@ -321,11 +321,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_atual_ativo_financeiro" id="6908">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -336,11 +333,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_atual_ativo_permanente" id="6909">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -351,11 +345,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_anterior_ativo_permanente" id="6910">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -366,11 +357,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_anterior_ativo_financeiro" id="6911">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -381,11 +369,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_atual_passivo_financeiro" id="6912">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -396,11 +381,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_atual_passivo_permanente" id="6913">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -411,11 +393,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_anterior_passivo_permanente" id="6914">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -426,11 +405,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         <scalar-parameter name="total_anterior_passivo_financeiro" id="6915">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">string</property>
+            <property name="dataType">float</property>
             <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant"></value>
-            </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
@@ -449,40 +425,57 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <structure>
                     <property name="name">exercicio</property>
                     <property name="paramName">exercicio</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">1</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_inicial</property>
                     <property name="paramName">dt_inicial</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">2</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_final</property>
                     <property name="paramName">dt_final</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">3</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">entidades</property>
                     <property name="paramName">cod_entidades</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">4</property>
                     <expression name="defaultValue" type="javascript">1</expression>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[  SELECT * 
+            <xml-property name="queryText"><![CDATA[
+
+
+
+
+  SELECT * 
     FROM contabilidade.balanco_patrimonial_ativo( ?
        , ?
        , ?
@@ -493,47 +486,62 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
          , vl_saldo_anterior NUMERIC
          , vl_saldo_debitos NUMERIC
          , vl_saldo_creditos NUMERIC
-         , vl_saldo_atual NUMERIC )
+         , vl_saldo_atual NUMERIC
+         , tipo_conta VARCHAR )
 ORDER BY cod_estrutural;
 ]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsPassivo" id="1745">
+            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">exercicio</property>
                     <property name="paramName">exercicio</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">1</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_inicial</property>
                     <property name="paramName">dt_inicial</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">2</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_final</property>
                     <property name="paramName">dt_final</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">3</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">entidades</property>
                     <property name="paramName">cod_entidades</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">4</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
             <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[  SELECT * 
     FROM contabilidade.balanco_patrimonial_passivo( ?
        , ?
@@ -545,41 +553,191 @@ ORDER BY cod_estrutural;
          , vl_saldo_anterior NUMERIC
          , vl_saldo_debitos NUMERIC
          , vl_saldo_creditos NUMERIC
-         , vl_saldo_atual NUMERIC )
+         , vl_saldo_atual NUMERIC
+          )
 ORDER BY cod_estrutural;
 ]]></xml-property>
         </oda-data-set>
-        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsPatrimonioLiquido" id="1804">
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsTotalAtivo" id="6960">
+            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">exercicio</property>
                     <property name="paramName">exercicio</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">1</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_inicial</property>
                     <property name="paramName">dt_inicial</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">2</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">dt_final</property>
                     <property name="paramName">dt_final</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">3</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
                     <property name="name">entidades</property>
                     <property name="paramName">cod_entidades</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">4</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[  SELECT vl_saldo_anterior
+		, vl_saldo_debitos
+		, vl_saldo_creditos
+		, vl_saldo_atual
+		, CASE WHEN tipo_conta = 'permanente' THEN 'ATIVO PERMANTENTE' ELSE 'ATIVO FINANCEIRO' END AS tipo_conta 
+        , tipo_conta as conta
+    FROM contabilidade.calculo_ativo_patrimonial( ?
+       , ?
+       , ?
+       , ?) 
+      AS ( vl_saldo_anterior NUMERIC
+         , vl_saldo_debitos NUMERIC
+         , vl_saldo_creditos NUMERIC
+         , vl_saldo_atual NUMERIC
+         , tipo_conta VARCHAR )
+  order by tipo_conta;
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsTotalPassivo" id="6961">
+            <list-property name="columnHints"/>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">exercicio</property>
+                    <property name="paramName">exercicio</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_inicial</property>
+                    <property name="paramName">dt_inicial</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">2</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_final</property>
+                    <property name="paramName">dt_final</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">3</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">entidades</property>
+                    <property name="paramName">cod_entidades</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">4</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">postgres</property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[  SELECT vl_saldo_anterior
+		, vl_saldo_debitos
+		, vl_saldo_creditos
+		, vl_saldo_atual
+		, CASE WHEN tipo_conta = 'permanente' THEN 'PASSIVO PERMANTENTE' ELSE 'PASSIVO FINANCEIRO' END AS tipo_conta 
+        , tipo_conta as conta
+    FROM contabilidade.calculo_passivo_patrimonial( ?
+       , ?
+       , ?
+       , ?) 
+      AS ( vl_saldo_anterior NUMERIC
+         , vl_saldo_debitos NUMERIC
+         , vl_saldo_creditos NUMERIC
+         , vl_saldo_atual NUMERIC
+         , tipo_conta VARCHAR )
+  order by tipo_conta;]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsPatrimonioLiquido" id="1804">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">exercicio</property>
+                    <property name="paramName">exercicio</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_inicial</property>
+                    <property name="paramName">dt_inicial</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">2</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dt_final</property>
+                    <property name="paramName">dt_final</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">3</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">entidades</property>
+                    <property name="paramName">cod_entidades</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">4</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -597,7 +755,8 @@ ORDER BY cod_estrutural;
          , vl_saldo_anterior NUMERIC
          , vl_saldo_debitos NUMERIC
          , vl_saldo_creditos NUMERIC
-         , vl_saldo_atual NUMERIC )
+         , vl_saldo_atual NUMERIC
+         , tipo_conta VARCHAR )
 ORDER BY cod_estrutural;]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsCompensacaoAtivo" id="2044">
@@ -961,12 +1120,28 @@ ORDER BY cod_estrutural;]]></xml-property>
                             </structure>
                             <structure>
                                 <property name="name">saldo_atual</property>
-                                <expression name="expression">dataSetRow['vl_saldo_atual']</expression>
+                                <expression name="expression" type="javascript">if (dataSetRow["tipo_conta"] == 'Financeiro') {
+	params["total_atual_ativo_financeiro"].value = dataSetRow["vl_saldo_atual"] + params["total_atual_ativo_financeiro"].value;
+}
+
+if (dataSetRow["tipo_conta"] == 'Patrimonial') {
+	params["total_atual_ativo_permanente"].value = dataSetRow["vl_saldo_atual"] + params["total_atual_ativo_permanente"].value;
+}
+
+dataSetRow['vl_saldo_atual']</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                             <structure>
                                 <property name="name">saldo_anterior</property>
-                                <expression name="expression">dataSetRow['vl_saldo_anterior']</expression>
+                                <expression name="expression" type="javascript">if (dataSetRow["tipo_conta"] == 'Financeiro') {
+	params["total_anterior_ativo_financeiro"].value = params["total_anterior_ativo_financeiro"].value + dataSetRow["vl_saldo_anterior"] ;
+}
+
+if (dataSetRow["tipo_conta"] == 'Patrimonial') {
+	params["total_anterior_ativo_permanente"].value = params["total_anterior_ativo_permanente"].value + dataSetRow["vl_saldo_anterior"];
+}
+
+dataSetRow['vl_saldo_anterior']</expression>
                                 <property name="dataType">decimal</property>
                             </structure>
                             <structure>
@@ -983,18 +1158,11 @@ ORDER BY cod_estrutural;]]></xml-property>
 if (row["cod_estrutural"] == '1.2.0.0.0.00.00') {
 	params["total_atual_ativo_nao_circulante"].value = row["saldo_atual"];
 }
-if (row["cod_estrutural"] == '1.0.0.0.0.00.00') {
-	params["total_atual_ativo_financeiro"].value = row["saldo_atual"];
-}
 
-if (row["cod_estrutural"] == '1.0.0.0.0.00.01') {
-	params["total_atual_ativo_permanente"].value = row["saldo_atual"];
-}
 row["saldo_atual"]</expression>
                                     </structure>
                                 </list-property>
                                 <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
-                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_anterior_ativo</property>
@@ -1011,18 +1179,10 @@ if (row["cod_estrutural"] == '1.2.0.0.0.00.00') {
 	params["total_anterior_ativo_nao_circulante"].value = row["saldo_anterior"];
 }
 
-if (row["cod_estrutural"] == '1.0.0.0.0.00.00') {
-	params["total_anterior_ativo_financeiro"].value = row["saldo_anterior"];
-}
-
-if (row["cod_estrutural"] == '1.0.0.0.0.00.01') {
-	params["total_anterior_ativo_permanente"].value = row["saldo_anterior"];
-}
 row["saldo_anterior"]</expression>
                                     </structure>
                                 </list-property>
                                 <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
-                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="repeatHeader">false</property>
@@ -1042,6 +1202,7 @@ row["saldo_anterior"]</expression>
                                 <cell id="1493">
                                     <property name="colSpan">3</property>
                                     <property name="rowSpan">1</property>
+                                    <property name="fontFamily">sans-serif</property>
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
                                     <property name="borderBottomWidth">thin</property>
@@ -1058,6 +1219,7 @@ row["saldo_anterior"]</expression>
                                         <property name="fontSize">7pt</property>
                                         <property name="fontWeight">bold</property>
                                         <property name="textAlign">center</property>
+                                        <structure name="toc"/>
                                         <property name="contentType">auto</property>
                                         <text-property name="content"><![CDATA[ATIVO]]></text-property>
                                     </text>
@@ -1129,6 +1291,7 @@ row["saldo_anterior"]</expression>
                                     <property name="borderRightStyle">solid</property>
                                     <property name="borderRightWidth">thin</property>
                                     <data id="1501">
+                                        <property name="style">padrão_urbem</property>
                                         <property name="fontSize">7.5px</property>
                                         <property name="textAlign">left</property>
                                         <method name="onCreate"><![CDATA[if (this.getRowData().getColumnValue('cod_estrutural') == '1.2.1.0.0.00.00' 
@@ -1276,13 +1439,15 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                             </structure>
                             <structure>
                                 <property name="name">saldo_atual</property>
-                                <expression name="expression">dataSetRow['vl_saldo_atual']</expression>
+                                <expression name="expression" type="javascript">dataSetRow['vl_saldo_atual']</expression>
                                 <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">saldo_anterior</property>
-                                <expression name="expression">dataSetRow['vl_saldo_anterior']</expression>
+                                <expression name="expression" type="javascript">dataSetRow['vl_saldo_anterior']</expression>
                                 <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_passivo_atual</property>
@@ -1291,21 +1456,12 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '2.0.0.0.0.00.00') {
-	params["total_atual_passivo_financeiro"].value = row["saldo_atual"];
-}
-
-if (row["cod_estrutural"] == '2.0.0.0.0.00.01') {
-	params["total_atual_passivo_permanente"].value = row["saldo_atual"];
-}
-
-params["total_passivo_exercicio_atual"].value += row["saldo_atual"];
+                                        <expression name="value" type="javascript">params["total_passivo_exercicio_atual"].value += row["saldo_atual"];
 
 row["saldo_atual"]</expression>
                                     </structure>
                                 </list-property>
                                 <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
-                                <property name="allowExport">true</property>
                             </structure>
                             <structure>
                                 <property name="name">total_passivo_anterior</property>
@@ -1314,21 +1470,12 @@ row["saldo_atual"]</expression>
                                 <list-property name="arguments">
                                     <structure>
                                         <property name="name">Expression</property>
-                                        <expression name="value" type="javascript">if (row["cod_estrutural"] == '2.0.0.0.0.00.00') {
-	params["total_anterior_passivo_financeiro"].value = row["saldo_anterior"];
-}
-
-if (row["cod_estrutural"] == '2.0.0.0.0.00.01') {
-	params["total_anterior_passivo_permanente"].value = row["saldo_anterior"];
-}
-
-params["total_passivo_exercicio_anterior"].value += row["saldo_anterior"];
+                                        <expression name="value" type="javascript">params["total_passivo_exercicio_anterior"].value += row["saldo_anterior"];
 
 row["saldo_anterior"]</expression>
                                     </structure>
                                 </list-property>
                                 <expression name="filterExpr" type="javascript">row["nivel"] == 2</expression>
-                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="repeatHeader">false</property>
@@ -1372,7 +1519,6 @@ row["saldo_anterior"]</expression>
                             <row id="1720">
                                 <property name="backgroundColor">#E5E5E5</property>
                                 <property name="verticalAlign">middle</property>
-                                <property name="height">0.3333333333333333in</property>
                                 <cell id="1721">
                                     <property name="borderBottomColor">#000000</property>
                                     <property name="borderBottomStyle">solid</property>
@@ -1670,6 +1816,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                             <row id="1777">
                                 <property name="backgroundColor">#E5E5E5</property>
                                 <property name="fontSize">5px</property>
+                                <property name="height">0.2604166666666667in</property>
                                 <cell id="1778">
                                     <property name="colSpan">3</property>
                                     <property name="rowSpan">1</property>
@@ -1974,42 +2121,45 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                     <property name="paddingBottom">0pt</property>
                     <property name="paddingRight">0pt</property>
                     <property name="textAlign">center</property>
-                    <grid id="1909">
-                        <property name="marginLeft">0pt</property>
+                    <grid id="6916">
+                        <property name="marginTop">1pt</property>
+                        <property name="marginLeft">1pt</property>
+                        <property name="marginBottom">1pt</property>
+                        <property name="marginRight">1pt</property>
                         <property name="textAlign">right</property>
-                        <property name="height">0.6831683168316832in</property>
-                        <property name="width">7.247524752475248in</property>
-                        <column id="1910">
+                        <property name="width">7.635416666666667in</property>
+                        <column id="6917">
+                            <property name="suppressDuplicates">true</property>
+                            <property name="width">77px</property>
+                        </column>
+                        <column id="6918">
                             <property name="width">76px</property>
                         </column>
-                        <column id="1911">
-                            <property name="width">76px</property>
-                        </column>
-                        <column id="1912">
+                        <column id="6919">
                             <property name="width">77px</property>
                         </column>
-                        <column id="1913">
+                        <column id="6920">
                             <property name="width">68px</property>
                         </column>
-                        <column id="1914">
-                            <property name="width">68px</property>
+                        <column id="6921">
+                            <property name="width">0.7083333333333334in</property>
                         </column>
-                        <column id="1915">
+                        <column id="6922">
+                            <property name="width">0.8020833333333334in</property>
+                        </column>
+                        <column id="6923">
                             <property name="width">77px</property>
                         </column>
-                        <column id="1916">
-                            <property name="width">77px</property>
+                        <column id="6924">
+                            <property name="width">0.78125in</property>
                         </column>
-                        <column id="1917">
-                            <property name="width">77px</property>
+                        <column id="6925">
+                            <property name="width">0.71875in</property>
                         </column>
-                        <column id="1918">
-                            <property name="width">68px</property>
+                        <column id="6926">
+                            <property name="width">0.713in</property>
                         </column>
-                        <column id="1919">
-                            <property name="width">68px</property>
-                        </column>
-                        <row id="1920">
+                        <row id="6927">
                             <property name="borderBottomColor">#000000</property>
                             <property name="borderBottomStyle">solid</property>
                             <property name="borderBottomWidth">thin</property>
@@ -2022,260 +2172,211 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                             <property name="borderTopColor">#000000</property>
                             <property name="borderTopStyle">solid</property>
                             <property name="borderTopWidth">thin</property>
-                            <cell id="1921">
-                                <property name="colSpan">3</property>
+                            <cell id="6928">
+                                <property name="colSpan">5</property>
                                 <property name="rowSpan">1</property>
                                 <property name="borderRightColor">#000000</property>
                                 <property name="borderRightStyle">solid</property>
                                 <property name="borderRightWidth">thin</property>
+                                <property name="paddingTop">0pt</property>
+                                <property name="paddingLeft">0pt</property>
+                                <property name="paddingBottom">0pt</property>
+                                <property name="paddingRight">0pt</property>
                                 <property name="textAlign">left</property>
-                                <property name="verticalAlign">bottom</property>
-                                <text id="1953">
-                                    <property name="fontSize">7pt</property>
-                                    <property name="fontWeight">bold</property>
-                                    <property name="contentType">auto</property>
-                                    <text-property name="content"><![CDATA[ATIVO FINANCEIRO]]></text-property>
-                                </text>
-                            </cell>
-                            <cell id="1924">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1959">
-                                    <property name="fontSize">7.5px</property>
-                                    <property name="textAlign">right</property>
+                                <table id="6962">
+                                    <property name="dataSet">dsTotalAtivo</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
-                                            <property name="name">total_atual_ativo_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_atual_ativo_financeiro"].value</expression>
-                                            <property name="dataType">decimal</property>
+                                            <property name="name">tipo_conta</property>
+                                            <text-property name="displayName">tipo_conta</text-property>
+                                            <expression name="expression" type="javascript">dataSetRow['tipo_conta']</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">vl_saldo_atual</property>
+                                            <text-property name="displayName">vl_saldo_atual</text-property>
+                                            <expression name="expression" type="javascript">if (dataSetRow['conta'] == 'financeiro'){
+	params['total_atual_ativo_financeiro'].value += dataSetRow['vl_saldo_atual']
+}
+
+if (dataSetRow['conta'] == 'permanente'){
+	params['total_atual_ativo_permanente'].value += dataSetRow['vl_saldo_atual']
+}
+
+
+dataSetRow['vl_saldo_atual']</expression>
+                                            <property name="dataType">float</property>
+                                            <property name="allowExport">true</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">vl_saldo_anterior</property>
+                                            <text-property name="displayName">vl_saldo_anterior</text-property>
+                                            <expression name="expression" type="javascript">if (dataSetRow['conta'] == 'financeiro'){
+	params['total_anterior_ativo_financeiro'].value += dataSetRow['vl_saldo_anterior'];
+}
+
+if (dataSetRow['conta'] == 'permanente'){
+	params['total_anterior_ativo_permanente'].value += dataSetRow['vl_saldo_anterior'];
+}
+
+
+dataSetRow['vl_saldo_anterior']</expression>
+                                            <property name="dataType">float</property>
                                             <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
-                                    <property name="resultSetColumn">total_atual_ativo_circulante</property>
-                                </data>
+                                    <column id="6975">
+                                        <property name="width">2.3541666666666665in</property>
+                                    </column>
+                                    <column id="6976">
+                                        <property name="width">0.7083333333333334in</property>
+                                    </column>
+                                    <column id="6977">
+                                        <property name="width">0.6770833333333334in</property>
+                                    </column>
+                                    <detail>
+                                        <row id="6967">
+                                            <cell id="6968">
+                                                <property name="fontSize">8pt</property>
+                                                <property name="borderRightColor">#000000</property>
+                                                <property name="borderRightStyle">solid</property>
+                                                <property name="borderRightWidth">thin</property>
+                                                <data id="6994">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <property name="resultSetColumn">tipo_conta</property>
+                                                </data>
+                                            </cell>
+                                            <cell id="6969">
+                                                <property name="fontSize">8pt</property>
+                                                <property name="borderRightColor">#000000</property>
+                                                <property name="borderRightStyle">solid</property>
+                                                <property name="borderRightWidth">thin</property>
+                                                <data id="6996">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <structure name="numberFormat">
+                                                        <property name="category">Currency</property>
+                                                        <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                                    </structure>
+                                                    <property name="textAlign">right</property>
+                                                    <property name="resultSetColumn">vl_saldo_atual</property>
+                                                </data>
+                                            </cell>
+                                            <cell id="6970">
+                                                <property name="fontSize">8pt</property>
+                                                <data id="6997">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <structure name="numberFormat">
+                                                        <property name="category">Currency</property>
+                                                        <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                                    </structure>
+                                                    <property name="textAlign">right</property>
+                                                    <property name="resultSetColumn">vl_saldo_anterior</property>
+                                                </data>
+                                            </cell>
+                                        </row>
+                                    </detail>
+                                </table>
                             </cell>
-                            <cell id="1925">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1976">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_anterior_ativo_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_anterior_ativo_financeiro"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_anterior_ativo_circulante</property>
-                                </data>
-                            </cell>
-                            <cell id="1926">
-                                <property name="colSpan">3</property>
+                            <cell id="6934">
+                                <property name="colSpan">5</property>
                                 <property name="rowSpan">1</property>
                                 <property name="borderRightColor">#000000</property>
                                 <property name="borderRightStyle">solid</property>
                                 <property name="borderRightWidth">thin</property>
+                                <property name="paddingTop">0pt</property>
+                                <property name="paddingLeft">0pt</property>
+                                <property name="paddingBottom">0pt</property>
+                                <property name="paddingRight">0pt</property>
                                 <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <text id="1955">
-                                    <property name="fontSize">7pt</property>
-                                    <property name="fontWeight">bold</property>
-                                    <property name="contentType">auto</property>
-                                    <text-property name="content"><![CDATA[PASSIVO FINANCEIRO]]></text-property>
-                                </text>
-                            </cell>
-                            <cell id="1929">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1968">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
+                                <table id="6998">
+                                    <property name="dataSet">dsTotalPassivo</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
-                                            <property name="name">total_atual_passivo_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_atual_passivo_financeiro"].value</expression>
-                                            <property name="dataType">decimal</property>
+                                            <property name="name">tipo_conta</property>
+                                            <expression name="expression">dataSetRow['tipo_conta']</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">vl_saldo_atual</property>
+                                            <expression name="expression" type="javascript">if (dataSetRow['conta'] == 'financeiro'){
+	params['total_atual_passivo_financeiro'].value = dataSetRow['vl_saldo_atual'];
+}
+
+if (dataSetRow['conta'] == 'permanente'){
+	params['total_atual_passivo_permanente'].value = dataSetRow['vl_saldo_atual'];
+}
+
+
+dataSetRow['vl_saldo_atual']</expression>
+                                            <property name="dataType">float</property>
+                                            <property name="allowExport">true</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">vl_saldo_anterior</property>
+                                            <expression name="expression" type="javascript">if (dataSetRow['conta'] == 'financeiro'){
+	params['total_anterior_passivo_financeiro'].value += dataSetRow['vl_saldo_anterior'];
+}
+
+if (dataSetRow['conta'] == 'permanente'){
+	params['total_anterior_passivo_permanente'].value += dataSetRow['vl_saldo_anterior'];
+}
+
+dataSetRow['vl_saldo_anterior']</expression>
+                                            <property name="dataType">float</property>
                                             <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
-                                    <property name="resultSetColumn">total_atual_passivo_circulante</property>
-                                </data>
-                            </cell>
-                            <cell id="1930">
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1970">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_anterior_passivo_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_anterior_passivo_financeiro"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_anterior_passivo_circulante</property>
-                                </data>
+                                    <column id="7006">
+                                        <property name="width">2.375in</property>
+                                    </column>
+                                    <column id="7007">
+                                        <property name="width">0.7083333333333334in</property>
+                                    </column>
+                                    <column id="7008">
+                                        <property name="width">0.6770833333333334in</property>
+                                    </column>
+                                    <detail>
+                                        <row id="6999">
+                                            <cell id="7000">
+                                                <property name="borderRightColor">#000000</property>
+                                                <property name="borderRightStyle">solid</property>
+                                                <property name="borderRightWidth">thin</property>
+                                                <data id="7010">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <property name="resultSetColumn">tipo_conta</property>
+                                                </data>
+                                            </cell>
+                                            <cell id="7002">
+                                                <property name="borderRightColor">#000000</property>
+                                                <property name="borderRightStyle">solid</property>
+                                                <property name="borderRightWidth">thin</property>
+                                                <data id="7003">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <structure name="numberFormat">
+                                                        <property name="category">Currency</property>
+                                                        <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                                    </structure>
+                                                    <property name="textAlign">right</property>
+                                                    <property name="resultSetColumn">vl_saldo_atual</property>
+                                                </data>
+                                            </cell>
+                                            <cell id="7004">
+                                                <data id="7005">
+                                                    <property name="fontSize">7.5px</property>
+                                                    <structure name="numberFormat">
+                                                        <property name="category">Currency</property>
+                                                        <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                                    </structure>
+                                                    <property name="textAlign">right</property>
+                                                    <property name="resultSetColumn">vl_saldo_anterior</property>
+                                                </data>
+                                            </cell>
+                                        </row>
+                                    </detail>
+                                </table>
                             </cell>
                         </row>
-                        <row id="1931">
-                            <property name="borderBottomColor">#000000</property>
-                            <property name="borderBottomStyle">solid</property>
-                            <property name="borderBottomWidth">thin</property>
-                            <property name="borderLeftColor">#000000</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightColor">#000000</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
-                            <cell id="1932">
-                                <property name="colSpan">3</property>
-                                <property name="rowSpan">1</property>
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <text id="1954">
-                                    <property name="fontSize">7pt</property>
-                                    <property name="fontWeight">bold</property>
-                                    <property name="contentType">auto</property>
-                                    <text-property name="content"><![CDATA[ATIVO PERMANENTE]]></text-property>
-                                </text>
-                            </cell>
-                            <cell id="1935">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1961">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_atual_ativo_nao_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_atual_ativo_permanente"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_atual_ativo_nao_circulante</property>
-                                </data>
-                            </cell>
-                            <cell id="1936">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1977">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_anterior_ativo_nao_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_anterior_ativo_permanente"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_anterior_ativo_nao_circulante</property>
-                                </data>
-                            </cell>
-                            <cell id="1937">
-                                <property name="colSpan">3</property>
-                                <property name="rowSpan">1</property>
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <text id="1956">
-                                    <property name="fontSize">7pt</property>
-                                    <property name="fontWeight">bold</property>
-                                    <property name="contentType">auto</property>
-                                    <text-property name="content"><![CDATA[PASSIVO PERMANENTE]]></text-property>
-                                </text>
-                            </cell>
-                            <cell id="1940">
-                                <property name="borderRightColor">#000000</property>
-                                <property name="borderRightStyle">solid</property>
-                                <property name="borderRightWidth">thin</property>
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1969">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_atual_passivo_nao_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_atual_passivo_permanente"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_atual_passivo_nao_circulante</property>
-                                </data>
-                            </cell>
-                            <cell id="1941">
-                                <property name="textAlign">left</property>
-                                <property name="verticalAlign">middle</property>
-                                <data id="1971">
-                                    <property name="fontSize">7.5px</property>
-                                    <structure name="numberFormat">
-                                        <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00</property>
-                                    </structure>
-                                    <property name="textAlign">right</property>
-                                    <list-property name="boundDataColumns">
-                                        <structure>
-                                            <property name="name">total_anterior_passivo_nao_circulante</property>
-                                            <expression name="expression" type="javascript">params["total_anterior_passivo_permanente"].value</expression>
-                                            <property name="dataType">decimal</property>
-                                            <property name="allowExport">true</property>
-                                        </structure>
-                                    </list-property>
-                                    <property name="resultSetColumn">total_anterior_passivo_nao_circulante</property>
-                                </data>
-                            </cell>
-                        </row>
-                        <row id="1942">
+                        <row id="6953">
                             <property name="backgroundColor">#E5E5E5</property>
                             <property name="borderBottomColor">#000000</property>
                             <property name="borderBottomStyle">solid</property>
@@ -2287,7 +2388,7 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                             <property name="borderRightStyle">solid</property>
                             <property name="borderRightWidth">thin</property>
                             <property name="height">0.22772277227722773in</property>
-                            <cell id="1943">
+                            <cell id="6954">
                                 <property name="colSpan">8</property>
                                 <property name="rowSpan">1</property>
                                 <property name="borderRightColor">#000000</property>
@@ -2295,14 +2396,14 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                 <property name="borderRightWidth">thin</property>
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">middle</property>
-                                <text id="1957">
+                                <text id="6955">
                                     <property name="fontSize">7pt</property>
                                     <property name="fontWeight">bold</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[SALDO PATRIMONIAL]]></text-property>
                                 </text>
                             </cell>
-                            <cell id="1951">
+                            <cell id="6956">
                                 <property name="borderRightColor">#000000</property>
                                 <property name="borderRightStyle">solid</property>
                                 <property name="borderRightWidth">thin</property>
@@ -2318,16 +2419,17 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_atual_patrimonio_liquido</property>
-                                            <expression name="expression">((params["total_atual_ativo_circulante"]) + (params["total_atual_ativo_nao_circulante"]))
+                                            <expression name="expression" type="javascript">(( params["total_atual_ativo_financeiro"].value) +( params["total_atual_ativo_permanente"].value) )
 -
-((params["total_atual_passivo_circulante"]) + (params["total_atual_passivo_nao_circulante"]))</expression>
+((params["total_atual_passivo_financeiro"].value) + (params["total_atual_passivo_permanente"].value));</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">true</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_atual_patrimonio_liquido</property>
                                 </data>
                             </cell>
-                            <cell id="1952">
+                            <cell id="6958">
                                 <property name="textAlign">left</property>
                                 <property name="verticalAlign">middle</property>
                                 <data id="1975">
@@ -2340,8 +2442,11 @@ this.getStyle().marginLeft = (this.getRowData().getColumnValue('nivel')-2)*2 + '
                                     <list-property name="boundDataColumns">
                                         <structure>
                                             <property name="name">total_anterior_patrimonio_liquido</property>
-                                            <expression name="expression">params["total_anterior_patrimonio_liquido"].value</expression>
+                                            <expression name="expression" type="javascript">(( params["total_anterior_ativo_financeiro"].value ) + ( params["total_anterior_ativo_permanente"].value ))
+-
+(( params["total_anterior_passivo_financeiro"].value ) + ( params["total_anterior_passivo_permanente"].value ));</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">false</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">total_anterior_patrimonio_liquido</property>

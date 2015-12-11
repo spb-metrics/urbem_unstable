@@ -30,12 +30,14 @@
     * @author Analista: Valtair
     * @author Desenvolvedor: Carlos Adriano
 
+    $Id: TTCEMGOPS.class.php 64106 2015-12-02 19:13:45Z michel $
+
     * @package URBEM
     * @subpackage Mapeamento
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TTCEMGOPS extends Persistente
 {
@@ -74,147 +76,153 @@ class TTCEMGOPS extends Persistente
 
     public function montaRecuperaDadosOPS10()
     {
-        $stSql  = " SELECT    '10' AS tiporegistro
-                             , LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')::VARCHAR AS codorgao
-                             , CASE WHEN  (pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho and pre_empenho.implantado = 't') THEN
-					                           CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL) THEN
-						                              LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')::VARCHAR
-					                           ELSE LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')::VARCHAR
-					                           END
-				                        ELSE LPAD((lpad(despesa.num_orgao::VARCHAR, 3, '0')||LPAD(despesa.num_unidade::VARCHAR, 2, '0')),5,'0')::VARCHAR
-				                      END AS codunidadesub
-                             , TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'yyyymmddhh24mm')||LPAD(ordem_pagamento.cod_ordem::VARCHAR,10,'0') AS nroop
-                             , TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'ddmmyyyy') AS dtpagamento
-                             , sum(nota_liquidacao_paga.vl_pago) AS vlop
-                             , CASE WHEN ordem_pagamento.observacao <> ''
-                                    THEN trim(regexp_replace(sem_acentos(ordem_pagamento.observacao), '[º|°]', '', 'gi'))
-                                    ELSE 'pagamento OP' || ordem_pagamento.cod_ordem::varchar
-                             END AS especificacaoop
-                             , (SELECT cpf
-                                  FROM sw_cgm_pessoa_fisica
-                                     WHERE sw_cgm_pessoa_fisica.numcgm = (SELECT numcgm
-																		    FROM administracao.auditoria
-																		   WHERE auditoria.objeto = (SELECT objeto
-																									   FROM administracao.auditoria
-																									  WHERE objeto = (SELECT '".chr(34)."cod_ordem".chr(34)." => ".chr(34)."'||op2.cod_ordem||'".chr(34).",".chr(34)."cod_entidade".chr(34)." => ".chr(34)."'||op2.cod_entidade||'".chr(34).",".chr(34)."exercicio".chr(34)." => ".chr(34)."'||op2.exercicio||'".chr(34)."'
-																										                FROM empenho.ordem_pagamento AS op2
-																													   WHERE op2.exercicio = ordem_pagamento.exercicio
-																														 AND op2.cod_entidade   = ordem_pagamento.cod_entidade
-																														 AND op2.cod_ordem      = ordem_pagamento.cod_ordem limit 1
-																													  )
-																									)
-																		   --AND auditoria.cod_acao = 816
-                                                                             AND substr(timestamp::varchar,1,4) = '".$this->getDado('exercicio')."'
-																		  )
-                            ) AS cpfresppgto
+        $stSql  = " SELECT '10' AS tiporegistro
+                         , LPAD((SELECT valor FROM administracao.configuracao_entidade WHERE exercicio = '".$this->getDado('exercicio')."' AND cod_entidade = empenho.cod_entidade AND parametro = 'tcemg_codigo_orgao_entidade_sicom'), 2, '0')::VARCHAR AS codorgao
+                         , CASE WHEN pre_empenho.cod_pre_empenho = restos_pre_empenho.cod_pre_empenho AND pre_empenho.implantado = 't' THEN
+                                     CASE WHEN uniorcam_restos_atual.num_orgao IS NOT NULL THEN
+                                               LPAD(LPAD(uniorcam_restos_atual.num_orgao::VARCHAR,2,'0')||LPAD(uniorcam_restos_atual.num_unidade::VARCHAR,2,'0'),5,'0')::VARCHAR
+                                          ELSE
+                                               LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')::VARCHAR
+                                          END
+                                ELSE
+                                     LPAD((lpad(despesa.num_orgao::VARCHAR, 3, '0')||LPAD(despesa.num_unidade::VARCHAR, 2, '0')),5,'0')::VARCHAR
+                           END AS codunidadesub
+                         , TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'yyyymmddhh24mm')||LPAD(ordem_pagamento.cod_ordem::VARCHAR,10,'0') AS nroop
+                         , TO_CHAR(pagamento_liquidacao_nota_liquidacao_paga.timestamp,'ddmmyyyy') AS dtpagamento
+                         , sum(nota_liquidacao_paga.vl_pago) AS vlop
+                         , CASE WHEN ordem_pagamento.observacao <> '' THEN
+                                     trim(regexp_replace(sem_acentos(ordem_pagamento.observacao), '[º|°]', '', 'gi'))
+                                ELSE
+                                     'pagamento OP' || ordem_pagamento.cod_ordem::varchar
+                           END AS especificacaoop
+                         , cgm_ordenador.cpf AS cpfresppgto
 
-                    FROM  empenho.nota_liquidacao as nl
+                      FROM empenho.nota_liquidacao as nl
 
-                    JOIN empenho.nota_liquidacao_paga
-                         ON nota_liquidacao_paga.exercicio    = nl.exercicio
-                        AND nota_liquidacao_paga.cod_entidade = nl.cod_entidade
-                        AND nota_liquidacao_paga.cod_nota     = nl.cod_nota
+                INNER JOIN empenho.nota_liquidacao_paga
+                        ON nota_liquidacao_paga.exercicio    = nl.exercicio
+                       AND nota_liquidacao_paga.cod_entidade = nl.cod_entidade
+                       AND nota_liquidacao_paga.cod_nota     = nl.cod_nota
 
-                    LEFT JOIN empenho.nota_liquidacao_paga_anulada
-                         ON nota_liquidacao_paga_anulada.exercicio       = nota_liquidacao_paga.exercicio
-                        AND nota_liquidacao_paga_anulada.cod_nota       = nota_liquidacao_paga.cod_nota
-                        AND nota_liquidacao_paga_anulada.cod_entidade   = nota_liquidacao_paga.cod_entidade
-                        AND nota_liquidacao_paga_anulada.timestamp      = nota_liquidacao_paga.timestamp
-                    
+                 LEFT JOIN empenho.nota_liquidacao_paga_anulada
+                        ON nota_liquidacao_paga_anulada.exercicio       = nota_liquidacao_paga.exercicio
+                       AND nota_liquidacao_paga_anulada.cod_nota       = nota_liquidacao_paga.cod_nota
+                       AND nota_liquidacao_paga_anulada.cod_entidade   = nota_liquidacao_paga.cod_entidade
+                       AND nota_liquidacao_paga_anulada.timestamp      = nota_liquidacao_paga.timestamp
 
-                    JOIN empenho.nota_liquidacao_conta_pagadora
-                         ON nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
-                        AND nota_liquidacao_conta_pagadora.cod_entidade         = nota_liquidacao_paga.cod_entidade
-                        AND nota_liquidacao_conta_pagadora.cod_nota             = nota_liquidacao_paga.cod_nota
-                        AND nota_liquidacao_conta_pagadora.timestamp            = nota_liquidacao_paga.timestamp
+                INNER JOIN empenho.nota_liquidacao_conta_pagadora
+                        ON nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                       AND nota_liquidacao_conta_pagadora.cod_entidade         = nota_liquidacao_paga.cod_entidade
+                       AND nota_liquidacao_conta_pagadora.cod_nota             = nota_liquidacao_paga.cod_nota
+                       AND nota_liquidacao_conta_pagadora.timestamp            = nota_liquidacao_paga.timestamp
 
-                    JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
-                         ON nota_liquidacao_paga.cod_entidade = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
-                        AND nota_liquidacao_paga.cod_nota     = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
-                        AND nota_liquidacao_paga.exercicio    = pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao
-                        AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
+                INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
+                        ON nota_liquidacao_paga.cod_entidade = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
+                       AND nota_liquidacao_paga.cod_nota     = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
+                       AND nota_liquidacao_paga.exercicio    = pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao
+                       AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
 
-                    JOIN empenho.pagamento_liquidacao
-                         ON pagamento_liquidacao.exercicio              = pagamento_liquidacao_nota_liquidacao_paga.exercicio
-                        AND pagamento_liquidacao.cod_entidade           = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
-                        AND pagamento_liquidacao.cod_ordem              = pagamento_liquidacao_nota_liquidacao_paga.cod_ordem
-                        AND pagamento_liquidacao.exercicio_liquidacao   = pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao
-                        AND pagamento_liquidacao.cod_nota               = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
+                INNER JOIN empenho.pagamento_liquidacao
+                        ON pagamento_liquidacao.exercicio              = pagamento_liquidacao_nota_liquidacao_paga.exercicio
+                       AND pagamento_liquidacao.cod_entidade           = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
+                       AND pagamento_liquidacao.cod_ordem              = pagamento_liquidacao_nota_liquidacao_paga.cod_ordem
+                       AND pagamento_liquidacao.exercicio_liquidacao   = pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao
+                       AND pagamento_liquidacao.cod_nota               = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
 
-                    JOIN empenho.empenho
-                         ON empenho.exercicio    = nl.exercicio_empenho
-                        AND empenho.cod_entidade = nl.cod_entidade
-                        AND empenho.cod_empenho  = nl.cod_empenho
+                INNER JOIN empenho.empenho
+                        ON empenho.exercicio    = nl.exercicio_empenho
+                       AND empenho.cod_entidade = nl.cod_entidade
+                       AND empenho.cod_empenho  = nl.cod_empenho
 
-                    JOIN empenho.pre_empenho
-                         ON pre_empenho.exercicio       = empenho.exercicio
-                        AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                                   
-                    LEFT JOIN empenho.restos_pre_empenho
-                         ON restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                        AND restos_pre_empenho.exercicio = pre_empenho.exercicio
-                          
-                    LEFT JOIN sw_cgm
-                         ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
+                INNER JOIN empenho.pre_empenho
+                        ON pre_empenho.exercicio       = empenho.exercicio
+                       AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
 
-                    LEFT JOIN sw_cgm_pessoa_fisica
+                 LEFT JOIN empenho.restos_pre_empenho
+                        ON restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                       AND restos_pre_empenho.exercicio = pre_empenho.exercicio
+
+                 LEFT JOIN tcemg.uniorcam AS uniorcam_restos
+                        ON uniorcam_restos.num_unidade = restos_pre_empenho.num_unidade
+                       AND uniorcam_restos.num_orgao   = restos_pre_empenho.num_orgao
+                       AND uniorcam_restos.exercicio   = restos_pre_empenho.exercicio    
+                       AND uniorcam_restos.num_orgao_atual IS NOT NULL
+
+                 LEFT JOIN tcemg.uniorcam AS uniorcam_restos_atual
+                        ON uniorcam_restos_atual.num_unidade = uniorcam_restos.num_unidade_atual
+                       AND uniorcam_restos_atual.num_orgao   = uniorcam_restos.num_orgao_atual
+                       AND uniorcam_restos_atual.exercicio   = '".$this->getDado('exercicio')."' 
+
+                 LEFT JOIN sw_cgm
+                        ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
+
+                 LEFT JOIN sw_cgm_pessoa_fisica
                         ON sw_cgm_pessoa_fisica.numcgm = pre_empenho.cgm_beneficiario
 
-                    LEFT JOIN sw_cgm_pessoa_juridica
+                 LEFT JOIN sw_cgm_pessoa_juridica
                         ON sw_cgm_pessoa_juridica.numcgm = pre_empenho.cgm_beneficiario
 
-                    LEFT JOIN empenho.pre_empenho_despesa
-                         ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio
-                        AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
-                                   
-                    LEFT JOIN orcamento.despesa
-                         ON despesa.exercicio   = pre_empenho_despesa.exercicio
-                        AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                            
-                    LEFT JOIN tcemg.uniorcam
-                         ON uniorcam.num_unidade = restos_pre_empenho.num_unidade
-                        AND uniorcam.num_orgao   = restos_pre_empenho.num_orgao
-                        AND uniorcam.exercicio   = restos_pre_empenho.exercicio    
-                        AND uniorcam.num_orgao_atual IS NOT NULL                            
-                            
-                    JOIN empenho.ordem_pagamento
-                         ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
-                        AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
-                        AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
-                             
-                    LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
-                                        , ordem_pagamento_retencao.cod_entidade
-                                        , ordem_pagamento_retencao.exercicio
-                                        , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
-                                FROM empenho.ordem_pagamento_retencao
-                                JOIN contabilidade.plano_analitica
-                                     ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
-                                    AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
-                                JOIN contabilidade.plano_conta
-                                     ON plano_conta.cod_conta = plano_analitica.cod_conta
-                                    AND plano_conta.exercicio = plano_analitica.exercicio
-                                WHERE SUBSTR(plano_conta.cod_estrutural, 1, 1) <> '4'
-                                GROUP BY ordem_pagamento_retencao.cod_ordem
-                                        , ordem_pagamento_retencao.cod_entidade
-                                        , ordem_pagamento_retencao.exercicio
-                    ) AS vl_retencao_orcamentaria
-                         ON vl_retencao_orcamentaria.cod_ordem    = ordem_pagamento.cod_ordem
-                        AND vl_retencao_orcamentaria.cod_entidade = ordem_pagamento.cod_entidade
-                        AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio
-                                
-                    WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
-                    AND TO_DATE(nota_liquidacao_paga.timestamp::varchar, 'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                    AND ordem_pagamento.cod_entidade IN (".$this->getDado('entidade').")
-                    --AND nota_liquidacao_paga_anulada.timestamp_anulada IS NULL
-                    GROUP BY tiporegistro
-                            , codorgao
-                            , codunidadesub
-                            , nroop
-                            , dtpagamento
-                            , especificacaoop
-                            , cpfresppgto
-                            
-                    ORDER BY   nroop";
+                 LEFT JOIN empenho.pre_empenho_despesa
+                        ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio
+                       AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+
+                 LEFT JOIN orcamento.despesa
+                        ON despesa.exercicio   = pre_empenho_despesa.exercicio
+                       AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+
+                 LEFT JOIN tcemg.uniorcam AS uniorcam_despesa
+                        ON uniorcam_despesa.num_unidade = despesa.num_unidade
+                       AND uniorcam_despesa.num_orgao   = despesa.num_orgao
+                       AND uniorcam_despesa.exercicio   = despesa.exercicio
+
+                INNER JOIN empenho.ordem_pagamento
+                        ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
+                       AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
+                       AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+
+                 LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
+                                  , ordem_pagamento_retencao.cod_entidade
+                                  , ordem_pagamento_retencao.exercicio
+                                  , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
+                              FROM empenho.ordem_pagamento_retencao
+                        INNER JOIN contabilidade.plano_analitica
+                                ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
+                               AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
+                        INNER JOIN contabilidade.plano_conta
+                                ON plano_conta.cod_conta = plano_analitica.cod_conta
+                               AND plano_conta.exercicio = plano_analitica.exercicio
+                             WHERE SUBSTR(plano_conta.cod_estrutural, 1, 1) <> '4'
+                          GROUP BY ordem_pagamento_retencao.cod_ordem
+                                 , ordem_pagamento_retencao.cod_entidade
+                                 , ordem_pagamento_retencao.exercicio
+                           ) AS vl_retencao_orcamentaria
+                        ON vl_retencao_orcamentaria.cod_ordem    = ordem_pagamento.cod_ordem
+                       AND vl_retencao_orcamentaria.cod_entidade = ordem_pagamento.cod_entidade
+                       AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio
+
+                 LEFT JOIN sw_cgm_pessoa_fisica AS cgm_ordenador
+                        ON (     restos_pre_empenho.cod_pre_empenho IS NOT NULL
+                             AND pre_empenho.implantado = 't' 
+                             AND cgm_ordenador.numcgm = uniorcam_restos_atual.cgm_ordenador
+                           )
+                        OR ( (   restos_pre_empenho.cod_pre_empenho IS NULL
+                              OR pre_empenho.implantado <> 't' )
+                             AND cgm_ordenador.numcgm = uniorcam_despesa.cgm_ordenador
+                           )
+
+                     WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
+                       AND TO_DATE(nota_liquidacao_paga.timestamp::varchar, 'YYYY-MM-DD') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                       AND ordem_pagamento.cod_entidade IN (".$this->getDado('entidade').")
+
+                  GROUP BY tiporegistro
+                         , codorgao
+                         , codunidadesub
+                         , nroop
+                         , dtpagamento
+                         , especificacaoop
+                         , cpfresppgto
+
+                  ORDER BY nroop ";
         return $stSql;
     }
 

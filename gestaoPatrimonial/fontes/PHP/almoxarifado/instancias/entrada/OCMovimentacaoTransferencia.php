@@ -834,9 +834,6 @@ switch ($stCtrl) {
         if ($stRet != null) {
             $stJs = $stRet;
         } else {
-            //SistemaLegado::mostravar( $sessao->transf['Valores'] );
-            //return 0;
-
             if ($arValoresSessao) {
                 foreach ($arValoresSessao as $campo => $valor) {
                     if ($arValoresSessao[$campo]["inId"] == $id) {

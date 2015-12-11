@@ -32,17 +32,9 @@
 
     * @ignore
 
-    * $Id: LSManterLocalizacao.php 63673 2015-09-28 19:31:03Z carlos.silva $
+    * $Id: LSManterLocalizacao.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
-*/
-
-/*
-$Log$
-Revision 1.11  2006/09/18 10:30:48  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -62,17 +54,19 @@ $pgOcul      = "OC".$stPrograma.".php";
 $pgJS        = "JS".$stPrograma.".js";
 
 $stCaminho = CAM_GT_CIM_INSTANCIAS."localizacao/";
-//$stCaminho = CAM_GT_CIM_INSTANCIAS."lote/";
 
 $obRCIMLocalizacao = new RCIMLocalizacao;
 $link = Sessao::read('link');
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if ( empty( $_REQUEST['stAcao'] ) ) {
-    $_REQUEST['stAcao'] = "alterar";
+$stAcao = $request->get('stAcao');
+
+if ( empty( $stAcao ) ) {
+    $stAcao = "alterar";
 }
+
 //Define arquivos PHP para cada acao
-switch ($_REQUEST['stAcao']) {
+switch ($stAcao) {
     case 'consultar': $pgProx = $pgFormConsultar; break;
     case 'alterar'  : $pgProx = $pgFormNivel; break;
     case 'reativar' :
@@ -82,11 +76,12 @@ switch ($_REQUEST['stAcao']) {
     DEFAULT         : $pgProx = $pgForm;
 }
 //MANTEM FILTRO E PAGINACAO
-$stLink .= "&stAcao=".($_REQUEST['stAcao'] == 'consultar');
-if ($_GET["pg"] and  $_GET["pos"]) {
-    $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
-    $link["pg"]  = $_GET["pg"];
-    $link["pos"] = $_GET["pos"];
+$stLink .= "&stAcao=".$stAcao;
+
+if ($request->get('pg') && $request->get('pos')) {
+    $stLink.= "&pg=".$request->get('pg')."&pos=".$request->get('pos');
+    $link["pg"]  = $request->get('pg');
+    $link["pos"] = $request->get('pos');
 }
 
 //USADO QUANDO EXISTIR FILTRO
@@ -94,7 +89,7 @@ if ($_GET["pg"] and  $_GET["pos"]) {
 if ( is_array($link) ) {
     $_REQUEST = $link;
 } else {
-    foreach ($_REQUEST as $key => $valor) {
+    foreach ($request->getAll() as $key => $valor) {
         $link[$key] = $valor;
     }
 }
@@ -102,24 +97,24 @@ if ( is_array($link) ) {
 Sessao::write('link', $link);
 Sessao::write('stLink', $stLink);
 
-$obRCIMLocalizacao->setCodigoVigencia( $_REQUEST["inCodigoVigencia"] );
+$obRCIMLocalizacao->setCodigoVigencia( $request->get('inCodigoVigencia') );
 //MONTA O FILTRO
-if ($_REQUEST["stValorComposto"]) {
+if ($request->get('stValorComposto')) {
     //RETIRA O PONTO FINAL DO VALOR COMPOSTO CASO EXISTA
-    $obRCIMLocalizacao->setValorComposto( $_REQUEST["stValorComposto"] );
+    $obRCIMLocalizacao->setValorComposto( $request->get('stValorComposto') );
 }
-if ($_REQUEST["stNomeLocalizacao"]) {
-    $obRCIMLocalizacao->setNomeLocalizacao( $_REQUEST["stNomeLocalizacao"] );
+if ($request->get('stNomeLocalizacao')) {
+    $obRCIMLocalizacao->setNomeLocalizacao( $request->get('stNomeLocalizacao') );
 }
 
-if ($_REQUEST['stAcao'] == 'reativar') {
+if ($stAcao == 'reativar') {
     $obRCIMLocalizacao->verificaBaixaLocalizacao( $rsListaLocalizacao );
 } else {
     $obRCIMLocalizacao->listarLocalizacao( $rsListaLocalizacao );
-    if ( $rsListaLocalizacao->eof() && $_REQUEST["stValorComposto"] ) { //nao encontrou nada, verificar se esta baixado
+    if ( $rsListaLocalizacao->eof() && $request->get('stValorComposto') ) { //nao encontrou nada, verificar se esta baixado
         $obRCIMLocalizacao->verificaBaixaLocalizacao( $rsListaLocalizacaoBaixa );
         if ( !$rsListaLocalizacaoBaixa->eof()) {
-            $stJs = "alertaAviso('@Localização baixada. (".$_REQUEST["stValorComposto"].")','form','erro','".Sessao::getId()."');";
+            $stJs = "alertaAviso('@Localização baixada. (".$request->get('stValorComposto').")','form','erro','".Sessao::getId()."');";
 
             SistemaLegado::executaFrameOculto($stJs);
         }
@@ -160,7 +155,7 @@ $obLista->addDado();
 $obLista->ultimoDado->setCampo( "nom_localizacao" );
 $obLista->commitDado();
 $obLista->addAcao();
-$obLista->ultimaAcao->setAcao( $_REQUEST['stAcao'] );
+$obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->addCampo("&inCodigoVigencia",    "cod_vigencia"     );
 $obLista->ultimaAcao->addCampo("&inCodigoNivel",       "cod_nivel"        );
 $obLista->ultimaAcao->addCampo("&stNomeNivel",         "nom_nivel"        );
@@ -170,13 +165,13 @@ $obLista->ultimaAcao->addCampo("&stValorReduzido",     "valor_reduzido"   );
 $obLista->ultimaAcao->addCampo("&stNomeLocalizacao",   "nom_localizacao"  );
 $obLista->ultimaAcao->addCampo("&stDescQuestao",       "[valor_composto]-[nom_localizacao]"  );
 
-if ($_REQUEST['stAcao'] == "reativar") {
+if ($stAcao == "reativar") {
     $obLista->ultimaAcao->addCampo("&stJustificativa", "justificativa" );
     $obLista->ultimaAcao->addCampo("&stTimeStamp", "timestamp" );
     $obLista->ultimaAcao->addCampo("&stDTInicio", "dt_inicio" );
 }
 
-if ($_REQUEST['stAcao'] == "excluir") {
+if ($stAcao == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );

@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCEMTipoLicencaUsoSolo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCEMTipoLicencaUsoSolo.class.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 */
@@ -185,14 +185,12 @@ $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
                     }
 
                     //CADASTRA OS REGISTROS NA TABELA ECONOMICO.TIPO_LICENCA_MODELO_DOCUMENTO
-//                    sistemalegado::mostravar($sessao);die();
                     $arDocumentosSessao = Sessao::read( "documentos" );
                     $inRegistros = count ( $arDocumentosSessao );
 
                     if ( !$obErro->ocorreu() ) {
                         $inX = 0;
                         while ( $inX < $inRegistros && !$obErro->ocorreu() ) {
-//                            sistemalegado::mostravar("entroiu no while");die();
                             $inCodTipoDocumentoAtual = $arDocumentosSessao[$inX]['cod_tipo_documento'];
                             $inCodDocumentoAtual = $arDocumentosSessao[$inX]['cod_documento'];
 
@@ -230,10 +228,8 @@ function alterarTipoLicencaDiversa($boTransacao = "")
     if ( !$obErro->ocorreu() ) {
         $this->obTCEMTipoLicencaDiversa->setDado( "cod_tipo" , $this->inCodigoTipoLicencaDiversa );
         $this->obTCEMTipoLicencaDiversa->setDado( "nom_tipo" , $this->stNomeTipoLicencaDiversa );
-//        sistemalegado::mostravar($sessao);die();
         $this->inTipoUtilizacao = Sessao::read( 'inTipoUtilizacao' );
         $this->obTCEMTipoLicencaDiversa->setDado( "cod_utilizacao", $this->inTipoUtilizacao);
-//        sistemalegado::mostravar("aqui".$this->inTipoUtilizacao);die();
 //        $this->obTCEMTipoLicencaDiversa->setDado( "cod_utilizacao", $this->inTipoUtilizacao );
         $obErro = $this->validaNomeTipoLicencaDiversa ($boTransacao);
 
@@ -250,7 +246,6 @@ function alterarTipoLicencaDiversa($boTransacao = "")
 
                 if ( !$obErro->ocorreu() ) {
                     if ( count( $this->arRCEMElemento ) ) {
-  //                      sistemalegado::mostravar($boTransacao);
                         $obErro = $this->alterarTipoLicencaDiversaElemento( $boTransacao );
                     } else {
                         $this->addTipoLicencaDiversaElemento();
@@ -355,7 +350,6 @@ function alterarTipoLicencaDiversaElemento($boFlagTransacao, $boTransacao = "")
                 if ( !isset( $arElementoTipoLicencaDiversa[$obRCEMElemento->getCodigoElemento()] ) ) {
                     $this->roUltimoElemento->obTCEMElementoTipoLicencaDiversa->setDado( "cod_tipo",$this->inCodigoTipoLicencaDiversa );
                     $this->roUltimoElemento->obTCEMElementoTipoLicencaDiversa->setDado( "cod_utilizacao", $this->inCodUtilizacao );
-                  //  sistemalegado::mostravar($this->roUltimoElemento->obTCEMElementoTipoLicencaDiversa);
                     $obRCEMElemento->referenciaTipoLicencaDiversa($this);
                     $this->roUltimoElemento->obTCEMElementoTipoLicencaDiversa->setDado("cod_elemento",  $obRCEMElemento->getCodigoElemento());
                     $this->roUltimoElemento->obTCEMElementoTipoLicencaDiversa->setDado("ativo",  true );
@@ -417,7 +411,7 @@ function listarTipoLicencaDiversa(&$rsRecordSet, $boTransacao = "")
 
     $stOrdem = " ORDER BY etld.cod_tipo";
     $obErro = $this->obTCEMTipoLicencaDiversa->recuperaTipoLicencaDiversa( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
-///	$this->obTCEMTipoLicencaDiversa->debug();   #exit;
+
     return $obErro;
 }
 
@@ -440,7 +434,6 @@ function consultar(&$rsRecordSet, $boTransacao = "")
     if ( !$obErro->ocorreu() ) {
         $this->setNomeTipoLicencaDiversa( $rsRecordSet->getCampo("nom_tipo") );
         $this->setTipoUtilizacao( $rsRecordSet->getCampo("cod_utilizacao") );
-//        sistemalegado::mostravar( $rsRecordSet->getCampo("cod_utilizacao") );
     }
 
     return $obErro;

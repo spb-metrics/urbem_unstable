@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Programador: Diego Bueno Coelho
 
-    * $Id: OCManterAcrescimo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterAcrescimo.php 63839 2015-10-22 18:08:07Z franver $
 
     Caso de uso: uc-05.05.11
 **/
@@ -328,8 +328,6 @@ switch ($_REQUEST ["stCtrl"]) {
         $obRFuncao->obRBiblioteca->setCodigoBiblioteca     ( $arCodFuncao[1] );
         $obRFuncao->obRBiblioteca->roRModulo->setCodModulo ( $arCodFuncao[0] );
         $obRFuncao->consultar();
-
-        //sistemaLegado::mostravar ( $obRFuncao );
 
         $inCodFuncao = $obRFuncao->getCodFuncao () ;
         $stDescricao = "&nbsp;";

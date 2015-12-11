@@ -154,8 +154,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/URBEM/
 $dbCriaTabela->limpaSelecao();
 $dbCriaTabela->fechaBd();
 
-//SistemaLegado::mostravar($stNomeTabela);
-
 //$preview->addParametro( "stSituacao"      , $_POST["stSituacao"]);
 $preview->addParametro( "codLocal"        , $stLocalSelecionados);
 $preview->addParametro( "codLotacao"      , $stLotacaoSelecionados);

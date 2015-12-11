@@ -66,32 +66,9 @@ $obTxtDescricaoSal->setMaxLength           ( 80                                 
 $obTxtDescricaoSal->setCaracteresAceitos   ( "[0-9a-zA-Z áàãââÁÀÃÂéêÉÊíÍóõôÓÔÕúüÚÜçÇ%--/*+%]"                              );
 $obTxtDescricaoSal->setEspacosExtras       ( false                                                                         );
 
-//$obCmbRegimeSubDivisaoSal = new SelectMultiplo();
-//$obCmbRegimeSubDivisaoSal->setName         ( 'inCodSubDivisaoSal'                                                          );
-//$obCmbRegimeSubDivisaoSal->setRotulo       ( "*Regime/subdivisões"                                                          );
-//$obCmbRegimeSubDivisaoSal->setTitle        ( "Selecione os regimes/subdivisões associados ao evento de salário"            );
-//$obCmbRegimeSubDivisaoSal->SetNomeLista1   ( 'inCodSubDivisaoDisponiveisSal'                                               );
-//$obCmbRegimeSubDivisaoSal->setCampoId1     ( '[cod_sub_divisao]/[nom_regime]/[nom_sub_divisao]'                            );
-//$obCmbRegimeSubDivisaoSal->setCampoDesc1   ( '[nom_regime]/[nom_sub_divisao]'                                              );
-//$obCmbRegimeSubDivisaoSal->setStyle1       ( "width: 300px"                                                                );
-//$obCmbRegimeSubDivisaoSal->SetRecord1      ( $rsSubDivisaoDisponiveisSal                                                   );
-//$obCmbRegimeSubDivisaoSal->SetNomeLista2   ( 'inCodSubDivisaoSelecionadosSal'                                              );
-//$obCmbRegimeSubDivisaoSal->setCampoId2     ( '[cod_sub_divisao]/[nom_regime]/[nom_sub_divisao]'                            );
-//$obCmbRegimeSubDivisaoSal->setCampoDesc2   ( '[nom_regime]/[nom_sub_divisao]'                                              );
-//$obCmbRegimeSubDivisaoSal->setStyle2       ( "width: 300px"                                                                );
-//$obCmbRegimeSubDivisaoSal->SetRecord2      ( $rsSubDivisaoSelecionadosSal                                                  );
-//$stOnClick = "selecionaSubDivisao('Sal',true);buscaValor('preencheCargoEspecialidadeSal');selecionaSubDivisao('Sal',false);";
-//$obCmbRegimeSubDivisaoSal->obGerenciaSelects->obBotao1->obEvento->setOnClick( $stOnClick );
-//$obCmbRegimeSubDivisaoSal->obGerenciaSelects->obBotao2->obEvento->setOnClick( $stOnClick );
-//$obCmbRegimeSubDivisaoSal->obGerenciaSelects->obBotao3->obEvento->setOnClick( $stOnClick );
-//$obCmbRegimeSubDivisaoSal->obGerenciaSelects->obBotao4->obEvento->setOnClick( $stOnClick );
-//$obCmbRegimeSubDivisaoSal->obSelect1->obEvento->setOnDblClick( $stOnClick );
-//$obCmbRegimeSubDivisaoSal->obSelect2->obEvento->setOnDblClick( $stOnClick );
-
 $obCmbCargoSal = new SelectMultiplo();
 $obCmbCargoSal->setName                    ( 'inCodCargoSal'                                                            );
 $obCmbCargoSal->setRotulo                  ( "*Cargos vinculados"                                                        );
-//$obCmbCargoSal->setTitle                   ( "Selecione os cargos/especialidades associados ao evento de salário"       );
 $obCmbCargoSal->SetNomeLista1              ( 'inCodCargoDisponiveisSal'                                                 );
 $obCmbCargoSal->setCampoId1                ( '[cod_cargo]'                                                              );
 $obCmbCargoSal->setCampoDesc1              ( '[descr_cargo]/[descr_espec]'                                              );

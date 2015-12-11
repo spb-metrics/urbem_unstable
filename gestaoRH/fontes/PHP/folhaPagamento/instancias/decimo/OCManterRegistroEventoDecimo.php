@@ -335,6 +335,7 @@ function montaListaEventos($arEventos)
     $obLista->ultimaAcao->setLink( "JavaScript:executaFuncaoAjax('montaAlterarEvento');");
     $obLista->ultimaAcao->addCampo("1","inId");
     $obLista->ultimaAcao->addCampo("2","inCodigoEvento");
+    
     $obLista->commitAcao();
 
     $obLista->addAcao();
@@ -453,9 +454,9 @@ function montaListaEventosBase($arEventos)
         $stHtml = str_replace("  ","",$stHtml);
         $stHtml = str_replace("'","\\'",$stHtml);
 
-        $stJs .= "d.getElementById('spnEventosBase').innerHTML = '".$stHtml."';   \n";
+        $stJs .= "jq('#spnEventosBase').html('".$stHtml."'); \n";
     } else {
-        $stJs .= "d.getElementById('spnEventosBase').innerHTML = '';   \n";
+        $stJs .= "jq('#spnEventosBase').html(''); \n";
     }
 
     return $stJs;
@@ -513,25 +514,25 @@ function incluirEvento()
     return $stJs;
 }
 
-function alterarEvento()
+function alterarEvento(Request $request)
 {
     include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoRegistroEvento.class.php");
     $obErro = new erro;
     $arEventos = ( is_array(Sessao::read('arEventos')) ? Sessao::read('arEventos') : array());
     $obTFolhaPagamentoRegistroEvento = new TFolhaPagamentoRegistroEvento;
-    $stFiltro  = " AND evento.codigo = '".$_GET['inCodigoEvento']."'";
-    $stFiltro .= " AND sub_divisao.cod_sub_divisao = ".$_GET['inCodSubDivisao'];
-    $stFiltro .= " AND cargo.cod_cargo = ".$_GET['inCodCargo'];
-    $stFiltro .= ( $_GET['inCodEspecialidade'] ) ? " AND especialidade.cod_especialidade = ".$_GET['inCodEspecialidade'] : "";
+    $stFiltro  = " AND evento.codigo = '".$request->get('inCodigoEvento')."'";
+    $stFiltro .= " AND sub_divisao.cod_sub_divisao = ".$request->get('inCodSubDivisao');
+    $stFiltro .= " AND cargo.cod_cargo = ".$request->get('inCodCargo');
+    $stFiltro .= ( $request->get('inCodEspecialidade') ) ? " AND especialidade.cod_especialidade = ".$request->get('inCodEspecialidade') : "";
     $obTFolhaPagamentoRegistroEvento->recuperaRelacionamentoConfiguracao($rsConfiguracao,$stFiltro);
     if ( $rsConfiguracao->getNumLinhas() < 0 ) {
         $obErro->setDescricao("O evento informado não possui configuração para a subdivisão/cargo e/ou especialidade do contrato em manutenção.");
     }
     if ( !$obErro->ocorreu() ) {
         foreach ($arEventos as $arEvento) {
-            if($arEvento['inCodigoEvento'] == $_GET['inCodigoEvento'] and $arEvento['stDesdobramento'] == $_GET['stDesdobramento']
+            if($arEvento['inCodigoEvento'] == $request->get('inCodigoEvento') and $arEvento['stDesdobramento'] == $request->get('stDesdobramento')
                and $arEvento['inId'] != Sessao::read('inIdEditar')){
-                switch ($_GET['stDesdobramento']) {
+                switch ($request->get('stDesdobramento')) {
                     case 'A':
                         $stDesd = "Abono";
                     break;
@@ -542,27 +543,27 @@ function alterarEvento()
                         $stDesd = "Adiantamento";
                     break;
                 }
-                $obErro->setDescricao("O Evento ".$_GET['inCodigoEvento']."-".$_GET['hdnDescEvento']."(".$stDesd.") já está incluído na lista.");
+                $obErro->setDescricao("O Evento ".$request->get('inCodigoEvento')."-".$request->get('hdnDescEvento')."(".$stDesd.") já está incluído na lista.");
             }
         }
     }
     if ( !$obErro->ocorreu() ) {
         $arEventos = Sessao::read("arEventos");
         $arEvento['inId']                                               = Sessao::read('inIdEditar');
-        $arEvento['inCodigoEvento']                                     = $_GET['inCodigoEvento'];
-        $arEvento['stDescricao']                                        = $_GET['hdnDescEvento'];
-        $arEvento['nuValorEvento']                                      = ($_GET['nuValorEvento'] != "")?$_GET['nuValorEvento']:'0,00';
-        $arEvento['nuQuantidadeEvento']                                 = ($_GET['nuQuantidadeEvento'] != "")?$_GET['nuQuantidadeEvento']:'0,00';
-        $arEvento['nuQuantidadeParcelasEvento']                         = $_GET['nuQuantidadeParcelasEvento'];
-        $arEvento['stDesdobramento']                                    = $_GET['stDesdobramento'];
+        $arEvento['inCodigoEvento']                                     = $request->get('inCodigoEvento');
+        $arEvento['stDescricao']                                        = $request->get('hdnDescEvento');
+        $arEvento['nuValorEvento']                                      = ($request->get('nuValorEvento') != "")?$request->get('nuValorEvento'):'0,00';
+        $arEvento['nuQuantidadeEvento']                                 = ($request->get('nuQuantidadeEvento') != "")?$request->get('nuQuantidadeEvento'):'0,00';
+        $arEvento['nuQuantidadeParcelasEvento']                         = $request->get('nuQuantidadeParcelasEvento');
+        $arEvento['stDesdobramento']                                    = $request->get('stDesdobramento');
         $arEvento['inCodRegistro']                                      = Sessao::read('inCodRegistro');
-        $arEventos[Sessao::read('inIdEditar')]     = $arEvento;
+        $arEventos[Sessao::read('inIdEditar')] = $arEvento;
         Sessao::write("arEventos",$arEventos);
         $stJs .= montaListaEventos($arEventos);
         Sessao::write('inIdEditar',"");
         Sessao::write('inCodRegistro',"");
-        $stJs .= "f.btAlterarEvento.disabled = true;     \n";
-        $stJs .= "f.btIncluirEvento.disabled = false;    \n";
+        $stJs .= "jq('#btAlterarEvento').prop('disabled',true); \n";
+        $stJs .= "jq('#btIncluirEvento').removeProp('disabled'); \n";
     } else {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     }
@@ -586,38 +587,99 @@ function excluirEvento()
     return $stJs;
 }
 
-function montaAlterarEvento()
+function preencheAlterarEvento(Request $request)
 {
-    include_once(CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php");
+    include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php" );
+    include_once( CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php" );
+    include_once( CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php" );
+    
+    $obIBscEvento                = Sessao::read('IBscEvento');
+    $inCodigoEvento              = $request->get('inCodigoEvento');
+    $boInformaValorQuantidade    = $obIBscEvento->getInformarValorQuantidade();
+    $boInformaQuantidadeParcelas = $obIBscEvento->getInformarQuantidadeParcelas();
+    $stNaturezasAceitas          = $obIBscEvento->getNaturezasAceitas();
+    $stEventoSistema             = "";
+    if ( $obIBscEvento->getEventoSistema() ) {
+        $stEventoSistema = "true";
+    }
+    if ( $obIBscEvento->getEventoSistema() === false ) {
+        $stEventoSistema = "false";
+    }
+    if ($request->get('boPopUp')) {
+        $stJs = "d = window.opener.parent.frames['telaPrincipal'].document; \n";
+    }
+
+    $stJs .= "jq('#stEvento').html('&nbsp;');\n";
+    if ($inCodigoEvento) {
+        $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento;
+        $obRFolhaPagamentoEvento->setCodigo( $inCodigoEvento );
+        $arNaturezasAceitas = explode( "-", $stNaturezasAceitas );
+        for ( $i=0; $i<count($arNaturezasAceitas); $i++ ) {
+            $obRFolhaPagamentoEvento->setNaturezas( $arNaturezasAceitas[$i] );
+        }
+        $obRFolhaPagamentoEvento->setEventoSistema( $stEventoSistema );
+        $obRFolhaPagamentoEvento->listarEvento( $rsEvento );
+        $rsEvento->addFormatacao('valor_quantidade','NUMERIC_BR');
+
+        if ( $rsEvento->getNumLinhas() > 0 ) {
+            $stJs .= "jq('#stEvento').html('".$rsEvento->getCampo('descricao')."');\n";
+            $stJs .= "jq('#hdnDescEvento').val('".$rsEvento->getCampo('descricao')."');\n";
+            $stJs .= "jq('#HdninCodigoEvento').val('".$rsEvento->getCampo('cod_evento')."');\n";
+            $stJs .= "jq('#stHdnFixado').val('".$rsEvento->getCampo('fixado')."');\n";
+            $stJs .= "jq('#stHdnApresentaParcela').val('".$rsEvento->getCampo('apresenta_parcela')."');\n";
+            $stJs .= "jq('#stTextoComplementar').html('".$rsEvento->getCampo('observacao')."');\n";
+            
+            if ($boInformaValorQuantidade || $boInformaQuantidadeParcelas) {
+                $stJs .= preencheValorQuantidade( $rsEvento->getCampo("fixado"), $rsEvento->getCampo("valor_quantidade"), $rsEvento->getCampo("limite_calculo") );
+            }
+        } else {
+            $stJs .= "jq('#inCodigoEvento').val('');\n";
+            $stJs .= "jq('#inCodigoEvento').focus();\n";            
+            $stJs .= "jq('#spnDadosEvento').html('');\n";
+            $stJs .= "jq('#hdnDescEvento').val('');\n";
+            $stJs .= "jq('#stTextoComplementar').html('&nbsp;');\n";
+            $stJs .= "alertaAviso('Código de evento inválido. (".$inCodigoEvento.") ','form','erro','".Sessao::getId()."');\n";
+        }
+    } else {
+        $stJs .= "jq('#spnDadosEvento').html('');\n";
+    }
+
+    return $stJs;
+}
+
+function montaAlterarEvento(Request $request)
+{
+    //include_once( CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php" );
     include_once(CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php");
     $arEventos = ( is_array(Sessao::read("arEventos")) ? Sessao::read("arEventos") : array());
-    $arEvento  = $arEventos[$_GET['inId']];
+    $arEvento  = $arEventos[$request->get('inId')];
     $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento;
     $obRFolhaPagamentoEvento->setCodigo( $arEvento['inCodigoEvento'] );
-    $obRFolhaPagamentoEvento->listarEvento( $rsEvento );
-    $stJs .= preencheDescEvento();
-    $stJs .= "f.inCodigoEvento.value = '".$arEvento['inCodigoEvento']."';                                   \n";
-    $stJs .= "f.hdnDescEvento.value = '".$arEvento['stDescricao']."';                                       \n";
-    $stJs .= "d.getElementById('stEvento').innerHTML = '".$arEvento['stDescricao']."';                      \n";
+    $obRFolhaPagamentoEvento->listarEvento( $rsEvento );        
+    $stJs .= preencheAlterarEvento($request);        
+    $stJs .= "jq('#inCodigoEvento').val('".$arEvento['inCodigoEvento']."'); \n";
+    $stJs .= "jq('#hdnDescEvento').val('".$arEvento['stDescricao']."'); \n";
+    $stJs .= "jq('#stEvento').html('".$arEvento['stDescricao']."'); \n";
     if ($rsEvento->getCampo('fixado') == 'V') {
-        $stJs .= "f.nuValorEvento.value = '".$arEvento['nuValorEvento']."';                                 \n";
-        $stJs .= "f.nuQuantidadeEvento.value = '".$arEvento['nuQuantidadeEvento']."';                       \n";
+        $stJs .= "jq('#nuValorEvento').val('".$arEvento['nuValorEvento']."'); \n";
+        $stJs .= "jq('#nuQuantidadeEvento').val('".$arEvento['nuQuantidadeEvento']."'); \n";
         if ($rsEvento->getCampo('apresenta_parcela') != 'f') {
-            $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$arEvento['nuQuantidadeParcelasEvento']."';   \n";
+            $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$arEvento['nuQuantidadeParcelasEvento']."'); \n";
         }
     }
     if ($rsEvento->getCampo('fixado') == 'Q') {
-        $stJs .= "f.nuQuantidadeEvento.value = '".$arEvento['nuQuantidadeEvento']."';                       \n";
+        $stJs .= "jq('#nuQuantidadeEvento').val('".$arEvento['nuQuantidadeEvento']."'); \n";
         if ($rsEvento->getCampo('apresenta_parcela') != 'f') {
-            $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$arEvento['nuQuantidadeParcelasEvento']."';   \n";
+            $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$arEvento['nuQuantidadeParcelasEvento']."'); \n";
         }
     }
-    Sessao::write('inIdEditar',$_GET['inId']);
+    Sessao::write('inIdEditar',$request->get('inId'));
     Sessao::write('inCodRegistro',$arEvento['inCodRegistro']);
-    $stJs .= "f.stDesdobramento.value = '".$arEvento['stDesdobramento']."';                                 \n";
-    $stJs .= "f.stCmbDesdobramento.value = '".$arEvento['stDesdobramento']."';                              \n";
-    $stJs .= "f.btAlterarEvento.disabled = false;                                                           \n";
-    $stJs .= "f.btIncluirEvento.disabled = true;                                                            \n";
+    $stJs .= "jq('#stDesdobramento').val('".$arEvento['stDesdobramento']."'); \n";
+    $stJs .= "jq('#stCmbDesdobramento').val('".$arEvento['stDesdobramento']."');\n";
+    $stJs .= "jq('#stDesdobramento').focus();\n";
+    $stJs .= "jq('#btAlterarEvento').removeProp('disabled'); \n";
+    $stJs .= "jq('#btIncluirEvento').prop('disabled',true); \n";
 
     return $stJs;
 }
@@ -646,14 +708,14 @@ switch ($_GET['stCtrl']) {
     case "incluirEvento":
         $stJs .= incluirEvento();
     break;
-    case "alterarEvento":
-        $stJs .= alterarEvento();
+    case "alterarEvento":    
+        $stJs .= alterarEvento($request);
     break;
     case "excluirEvento":
         $stJs .= excluirEvento();
     break;
     case "montaAlterarEvento":
-        $stJs .= montaAlterarEvento();
+        $stJs .= montaAlterarEvento($request);
     break;
     case "mostraMensagem":
         $stJs .= mostraMensagem();

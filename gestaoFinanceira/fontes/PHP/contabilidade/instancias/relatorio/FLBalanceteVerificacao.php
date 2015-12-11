@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLBalanceteVerificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLBalanceteVerificacao.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.22
 */
@@ -82,7 +82,7 @@ $obHdnValidacao = new HiddenEval;
 $obHdnValidacao->setName("boValidacao");
 $obHdnValidacao->setValue( " " ); //Preenchido a partir do JS
 
-if ( SistemaLegado::is_tcems() ) {
+if ( Sessao::getExercicio() > '2012' ) {
     $stEval = "
     if ( !document.getElementById('stEstiloContaAnalitica').checked && !document.getElementById('stEstiloContaSintetica').checked ) {
         erro = true;
@@ -118,7 +118,7 @@ $obHdnEval = new HiddenEval;
 $obHdnEval->setName  ( "stEval" );
 $obHdnEval->setValue ( $stEval  );
 
-if ( !SistemaLegado::is_tcems() ) {
+if ( !Sessao::getExercicio() > '2012' ) {
     while (!$rsGrupos->EOF()) {
         if($rsGrupos->getCampo('nom_conta') == "(R) DEDUCOES DA RECEITA")
             $stNomConta = "(R) Deduções da Receita";
@@ -191,7 +191,7 @@ $radioEstruturalNao->setId   ( "stEstrutural" );
 $radioEstruturalNao->setValue( "N" );
 $radioEstruturalNao->setLabel( "Não" );
 
-if ( SistemaLegado::is_tcems() ) {
+if ( Sessao::getExercicio() > '2012' ) {
     $radioEstruturalSim->setChecked( true );
     $radioEstruturalNao->setChecked( false );
 } else {
@@ -211,7 +211,7 @@ $obFormulario->addHidden( $obHdnEval, true );
 $obFormulario->addTitulo( "Dados para Filtro" );
 
 $rsGrupos->setPrimeiroElemento();
-if ( !SistemaLegado::is_tcems() ) {
+if ( !Sessao::getExercicio() > '2012' ) {
     while ( !$rsGrupos->EOF() ) {
         $objeto = 'obChkGrupo_'.$rsGrupos->getCampo('cod_grupo');
         $obFormulario->addComponente( $$objeto );

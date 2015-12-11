@@ -84,7 +84,6 @@ function consultarConfiguracaoGeral(&$rsConfiguracao, $boTransacao = "")
 {
     $this->obTAdministracaoConfiguracao->setDado( "cod_modulo", $this->getCodModulo() );
     $obErro = $this->obTAdministracaoConfiguracao->recuperaPorChave( $rsConfiguracao, $boTransacao );
-//    mostraVar($rsConfiguracao);
 //    if ( !$obErro->ocorreu() ) {
 //        $this->setCodUF             ( $rsConfiguracao->getCampo('cod_uf') );
 //        $this->setCodMunicipio      ( $rsConfiguracao->getCampo('cod_municipio') );

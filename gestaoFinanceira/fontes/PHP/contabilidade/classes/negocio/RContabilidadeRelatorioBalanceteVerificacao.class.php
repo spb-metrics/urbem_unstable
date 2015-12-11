@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: RContabilidadeRelatorioBalanceteVerificacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RContabilidadeRelatorioBalanceteVerificacao.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.22
 */
@@ -186,7 +186,7 @@ class RContabilidadeRelatorioBalanceteVerificacao extends PersistenteRelatorio
 
        $inCount = 0;
        while (!$rsRecordSet->eof()) {
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 switch ($rsRecordSet->getCampo('cod_sistema')) {
                 case 1:
                     $stCodSistema = 'P';

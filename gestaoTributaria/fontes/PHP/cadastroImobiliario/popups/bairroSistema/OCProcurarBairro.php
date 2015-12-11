@@ -34,7 +34,7 @@
 
     * @ignore
 
-    * $Id: OCProcurarBairro.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCProcurarBairro.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.05
 
@@ -56,8 +56,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 // Instancia Objeto
 $obRCIMBairro = new RCIMBairro;
 $rsMunicipios = new RecordSet;
-
-mostravar($_REQUEST);
 
 switch ($_REQUEST ["stCtrl"]) {
     case "preencheMunicipio":

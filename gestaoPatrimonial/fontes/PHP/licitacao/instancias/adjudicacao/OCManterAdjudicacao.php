@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterAdjudicacao.php 62309 2015-04-20 19:43:33Z arthur $
+    * $Id: OCManterAdjudicacao.php 63865 2015-10-27 13:55:57Z franver $
 
     * Casos de uso: uc-03.05.20
 */
@@ -183,12 +183,12 @@ function montaSpnItens()
     $table->setSummary     ( 'Itens'  );
     //$table->setConditional ( true , "#E4E4E4" );
 
-    $table->Head->addCabecalho( 'Item'             , 50 );
+    $table->Head->addCabecalho( 'Item'             , 35 );
     $table->Head->addCabecalho( 'Lote'             ,  5 );
     $table->Head->addCabecalho( 'Qtde.'            , 10 );
     $table->Head->addCabecalho( 'Valor Ref.'       , 10 );
     $table->Head->addCabecalho( 'Valor'            , 10 );
-    $table->Head->addCabecalho( 'Status'           , 10 );
+    $table->Head->addCabecalho( 'Status'           , 25 );
     //$table->Head->addCabecalho( 'Selecione'        ,  5 );
 
     $table->Body->addCampo( '[codItem] - [descricaoItem]<br>[complemento]' );

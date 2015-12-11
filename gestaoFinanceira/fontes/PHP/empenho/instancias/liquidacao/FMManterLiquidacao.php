@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterLiquidacao.php 63351 2015-08-20 13:42:42Z evandro $
+    $Id: FMManterLiquidacao.php 64153 2015-12-09 19:16:02Z evandro $
 
     $Revision: 32093 $
     $Name:  $
@@ -135,7 +135,7 @@ $arItemPreEmpenho = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getItemPre
 $stConfiguracaoUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
 
 $stCodClassIncorporacao = substr(str_replace(".", "", $stCodClassificacao), 0, 6); // XXXXXX
-if (!SistemaLegado::is_tcems()) {
+if (!Sessao::getExercicio() > '2012') {
     $arIncorpPatrimonial = array("449051", "449052", "449061", "449092", "459061", "459161");
     $arAmortizacao = array("4690");
 } else {

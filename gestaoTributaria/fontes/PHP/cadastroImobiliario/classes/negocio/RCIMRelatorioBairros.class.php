@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMRelatorioBairros.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMRelatorioBairros.class.php 63839 2015-10-22 18:08:07Z franver $
 
      * Casos de uso: uc-05.01.19
 */
@@ -180,7 +180,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     }
 
     $obErro = $this->obTBairro->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder );
-//        $this->obTBairro->debug();die();
     return $obErro;
 }
 
@@ -191,7 +190,6 @@ function getRecordSetValor(&$rsRecordSet)
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaRecordSetValor( $this->stOrder );
 //    $this->setDebug( $stSql );
-//SistemaLegado::mostravar($stSql);die();
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;

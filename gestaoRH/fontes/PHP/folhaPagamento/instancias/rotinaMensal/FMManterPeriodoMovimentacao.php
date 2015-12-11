@@ -52,14 +52,14 @@ $obHdnCtrl->setName                             ( "stCtrl"                      
 $obHdnCtrl->setValue                            ( $stStrl                                               );
 
 //Define o nome dos arquivos PHP
-$stAcao     = $_REQUEST['stAcao'];
+$stAcao     = $request->get('stAcao');
 $stPrograma = "ManterPeriodoMovimentacao";
 $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js";
 $pgJS       = "OC".$stPrograma.".php";
 
-$obErro = new Erro();;
+$obErro = new Erro();
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 
 if ($stAcao != "mensagemincluir") {
@@ -67,24 +67,24 @@ if ($stAcao != "mensagemincluir") {
     $obRFolhaPagamentoPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao);
     $obRFolhaPagamentoPeriodoMovimentacao->setCodPeriodoMovimentacao( $rsUltimaMovimentacao->getCampo('cod_periodo_movimentacao') );
     $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao( $obRFolhaPagamentoPeriodoMovimentacao );
-    $obRFolhaPagamentoFolhaSituacao->consultarFolha();
-    if ($obRFolhaPagamentoFolhaSituacao->getSituacao() == 'Aberto' and $stAcao != "mensagemincluir") {
+    $obRFolhaPagamentoFolhaSituacao->consultarFolha();    
+    if (($obRFolhaPagamentoFolhaSituacao->getSituacao() == 'Aberto') and ($stAcao != "mensagemincluir") ) {
         $obErro->setDescricao("&nbsp;&nbsp;- Folha salário aberta. Feche a folha salário para abrir um novo período de movimentação;<br>");
     }
     $obRFolhaPagamentoFolhaComplementar = new RFolhaPagamentoFolhaComplementar( $obRFolhaPagamentoPeriodoMovimentacao );
     $obRFolhaPagamentoFolhaComplementar->listarFolhaComplementar($rsFolhaComplementar);
-    if ($rsFolhaComplementar->getCampo('situacao') == "a" and $stAcao != "mensagemincluir") {
+    if (($rsFolhaComplementar->getCampo('situacao') == "a") and ($stAcao != "mensagemincluir")) {
         $obErro->setDescricao($obErro->getDescricao()."&nbsp;&nbsp;- Folha complementar aberta. Feche a folha complementar para abrir um novo período de movimentação;<br>");
     }
     include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculo.class.php");
     $obTFolhaPagamentoLogErroCalculo = new TFolhaPagamentoLogErroCalculo();
-    $obTFolhaPagamentoLogErroCalculo->recuperaTodos($rsErroCalculo);
+    $obTFolhaPagamentoLogErroCalculo->recuperaTodos($rsErroCalculo);    
     if ($rsErroCalculo->getNumLinhas() > 0) {
         $obErro->setDescricao($obErro->getDescricao()."&nbsp;&nbsp;- Folha salário com erros, resolva os erros ocorridos para poder abrir um novo período de movimentação;<br>");
     }
     include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculoComplementar.class.php");
     $obTFolhaPagamentoLogErroCalculoComplementar = new TFolhaPagamentoLogErroCalculoComplementar();
-    $obTFolhaPagamentoLogErroCalculoComplementar->recuperaTodos($rsErroCalculoComplementar);
+    $obTFolhaPagamentoLogErroCalculoComplementar->recuperaTodos($rsErroCalculoComplementar);    
     if ($rsErroCalculoComplementar->getNumLinhas() > 0) {
         $obErro->setDescricao($obErro->getDescricao()."&nbsp;&nbsp;- Folha complementar com erros, resolva os erros ocorridos para poder abrir um novo período de movimentação;<br>");
     }
@@ -96,7 +96,7 @@ if ($stAcao != "mensagemincluir") {
     }
     include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculoDecimo.class.php");
     $obTFolhaPagamentoLogErroCalculoDecimo = new TFolhaPagamentoLogErroCalculoDecimo();
-    $obTFolhaPagamentoLogErroCalculoDecimo->recuperaTodos($rsErroCalculoDecimo);
+    $obTFolhaPagamentoLogErroCalculoDecimo->recuperaTodos($rsErroCalculoDecimo);    
     if ($rsErroCalculoDecimo->getNumLinhas() > 0) {
         $obErro->setDescricao($obErro->getDescricao()."&nbsp;&nbsp;- Folha décimo com erros, resolva os erros ocorridos para poder abrir um novo período de movimentação;<br>");
     }
@@ -113,7 +113,6 @@ if ($obErro->ocorreu()) {
     $obLblObs = new Label;
     $obLblObs->setRotulo        ( "Observação"          );
     $obLblObs->setValue         ( "Não é possível abrir um novo período de movimentação pois existe(m) o(s) seguinte(s) problema(s):<br>".$obErro->getDescricao() );
-    //$obLblObs->setValue         ( "Não é possível abrir um novo período de movimentação pois existe uma folha salário e/ou uma folha complementar aberta(s). Feche a folha salário e/ou a folha complementar para abrir um novo período de movimentação." );
 
     $obFormulario = new Formulario;
     $obFormulario->addComponente( $obLblObs );
@@ -121,7 +120,7 @@ if ($obErro->ocorreu()) {
 } else {
     include_once ($pgJS);
 
-    $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+    $stAcao = $request->get("stAcao");
 
     $obRPeriodoMovimentacao = new RFolhaPagamentoPeriodoMovimentacao;
     $obRPeriodoMovimentacao->listarUltimaMovimentacao($rsLista);

@@ -56,13 +56,15 @@ $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->exclusao();
 
 $arOcorrenciasSessao = Sessao::read('arOcorrencias');
 
-foreach ($arOcorrenciasSessao as $arOcorrenciasSessaoTmp) {
-    foreach ($arOcorrenciasSessaoTmp["assentamentos"] as $arAssentamentoSelecionado) {
-        $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('exercicio',Sessao::getExercicio());
-        $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_entidade', Sessao::read('cod_entidade'));
-        $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_ocorrencia', $arOcorrenciasSessaoTmp["cod_ocorrencia"]);
-        $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_assentamento', $arAssentamentoSelecionado["cod_assentamento"]);
-        $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->inclusao();
+if ( is_array($arOcorrenciasSessao) ){
+    foreach ($arOcorrenciasSessao as $arOcorrenciasSessaoTmp) {
+        foreach ($arOcorrenciasSessaoTmp["assentamentos"] as $arAssentamentoSelecionado) {
+            $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('exercicio',Sessao::getExercicio());
+            $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_entidade', Sessao::read('cod_entidade'));
+            $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_ocorrencia', $arOcorrenciasSessaoTmp["cod_ocorrencia"]);
+            $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->setDado('cod_assentamento', $arAssentamentoSelecionado["cod_assentamento"]);
+            $obTTCEALConfiguracaoOcorrenciaFuncionalAssentamento->inclusao();
+        }
     }
 }
 

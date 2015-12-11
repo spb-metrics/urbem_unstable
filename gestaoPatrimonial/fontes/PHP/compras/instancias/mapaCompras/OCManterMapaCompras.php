@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.04.05
 
-  $Id: OCManterMapaCompras.php 63445 2015-08-28 13:44:54Z michel $
+  $Id: OCManterMapaCompras.php 64118 2015-12-04 12:33:31Z franver $
 
   */
 
@@ -1036,30 +1036,30 @@ function montaListaItens($rsRecordSet, $stTipoCotacao, $stAcao = '')
     $rsRecordSet->addFormatacao('valor_unitario'        , 'NUMERIC_BR');
     $rsRecordSet->addFormatacao('valor_total_mapa'      , 'NUMERIC_BR');
     $rsRecordSet->addFormatacao('valorAnular'           , 'NUMERIC_BR');
-    $rsRecordSet->addFormatacao('quantidade_solicitada' , 'NUMERIC_BR');
-    $rsRecordSet->addFormatacao('quantidadeAnular'      , 'NUMERIC_BR');
-    $rsRecordSet->addFormatacao('quantidade_mapa'       , 'NUMERIC_BR');
-    $rsRecordSet->addFormatacao('quantidade_anulada'    , 'NUMERIC_BR');
+    $rsRecordSet->addFormatacao('quantidade_solicitada' , 'NUMERIC_BR_4');
+    $rsRecordSet->addFormatacao('quantidadeAnular'      , 'NUMERIC_BR_4');
+    $rsRecordSet->addFormatacao('quantidade_mapa'       , 'NUMERIC_BR_4');
+    $rsRecordSet->addFormatacao('quantidade_anulada'    , 'NUMERIC_BR_4');
 
     $table = new Table;
     $table->setRecordset( $rsRecordSet );
     $table->setSummary('Itens do Mapa');
 
-    $table->Head->addCabecalho('Solicitação'           ,  8);
-    $table->Head->addCabecalho('Item'                  , 30);
-    $table->Head->addCabecalho('Quantidade Solicitada' ,  8);
-    $table->Head->addCabecalho('Quantidade no Mapa'    ,  8);
+    $table->Head->addCabecalho('Solicitação'           ,  6);
+    $table->Head->addCabecalho('Item'                  , 25);
+    $table->Head->addCabecalho('Quantidade Solicitada' ,  9);
+    $table->Head->addCabecalho('Quantidade no Mapa'    ,  9);
 
     if ($stAcao == 'consultar') {
-        $table->Head->addCabecalho('Quantidade Anulada', 8);
+        $table->Head->addCabecalho('Quantidade Anulada', 9);
     }
 
-    $table->Head->addCabecalho('Valor de Referência' , 8);
-    $table->Head->addCabecalho('Valor Total'         , 8);
+    $table->Head->addCabecalho('Valor de Referência' , 9);
+    $table->Head->addCabecalho('Valor Total'         , 9);
 
     if ($stAcao == 'anular') {
-        $table->Head->addCabecalho('Valor a Anular'      , 8);
-        $table->Head->addCabecalho('Quantidade a Anular' , 8);
+        $table->Head->addCabecalho('Valor a Anular'      , 9);
+        $table->Head->addCabecalho('Quantidade a Anular' , 9);
     }
 
     $stTitle = "[stTitle]";
@@ -1150,7 +1150,7 @@ function montaAnulacaoItem($inId)
     $obLblQuantidadeSolicitada = new Label;
     $obLblQuantidadeSolicitada->setId ( 'lblQuantidadeSolicitada' );
     $obLblQuantidadeSolicitada->setRotulo ( 'Quantidade Solicitada' );
-    $obLblQuantidadeSolicitada->setValue  ( $arItem['quantidade_solicitada'] );
+    $obLblQuantidadeSolicitada->setValue  (number_format( $arItem['quantidade_solicitada'], 4,',','.') );
 
     # Valor unitário
     $obLblValorUnitario = new Label;
@@ -1198,6 +1198,9 @@ function montaAnulacaoItem($inId)
     $obNumQuantidadeAnular->setId       ('flQuantidadeAnular');
     $obNumQuantidadeAnular->setname     ('flQuantidadeAnular');
     $obNumQuantidadeAnular->setRotulo   ('Quantidade a Anular');
+    $obNumQuantidadeAnular->setDefinicao('NUMERIC');
+    $obNumQuantidadeAnular->setSize(14);
+    $obNumQuantidadeAnular->setMaxLength(13);
     $obNumQuantidadeAnular->setDecimais (4);
     $obNumQuantidadeAnular->obEvento->setOnChange("montaParametrosGET('calculaTotalAnulacao');");
 
@@ -1309,6 +1312,7 @@ function anularItem($inId, $flValorAnular, $flQuantidadeAnular, $hdnValorUnitari
         $rsRecordSet->preenche( $itens );
 
         $stJs .= "jQuery('#spnItem').html('&nbsp;');  \n";
+        $stJs .= "jQuery('#flQuantidadeAnular').focus(); \n ";
         $stJs .= "jQuery('#Ok').removeAttr('disabled'); \n";
         $stJs .=  montaListaItens($rsRecordSet, ' ', 'anular');
         $stJs .=  montaListaSolicitacoes('', 'anular');
@@ -1600,7 +1604,7 @@ function montaListaTotais($rsTotais)
 
     $rsTotais->addFormatacao ( 'valor'               , 'NUMERIC_BR' );
     $rsTotais->addFormatacao ( 'valor_ultima_compra' , 'NUMERIC_BR' );
-    $rsTotais->addFormatacao ( 'quantidade'          , 'NUMERIC_BR' );
+    $rsTotais->addFormatacao ( 'quantidade'          , 'NUMERIC_BR_4' );
 
     $table = new TableTree();
 
@@ -1613,10 +1617,10 @@ function montaListaTotais($rsTotais)
     $table->setParametros( array( "cod_item") );
     $table->setComplementoParametros ( "stCtrl=detalhaItem" );
 
-    $table->Head->addCabecalho( 'Item'            , 60 );
-    $table->Head->addCabecalho( 'Quantidade Total', 10 );
-    $table->Head->addCabecalho( 'Valor da Última Compra', 10 );
-    $table->Head->addCabecalho( 'Valor Total'     , 10 );
+    $table->Head->addCabecalho( 'Item'            , 50 );
+    $table->Head->addCabecalho( 'Quantidade Total', 12 );
+    $table->Head->addCabecalho( 'Valor da Última Compra', 13 );
+    $table->Head->addCabecalho( 'Valor Total'     , 15 );
 
     $table->Body->addCampo( '[cod_item] - [nom_item]' , 'E' );
     $table->Body->addCampo( 'quantidade', 'D' );
@@ -1666,8 +1670,8 @@ function detalhaItem($inCodItem)
 
 function montaSpamDetalheItem($rsDados)
 {
-   $rsDados->addFormatacao ( 'quantidade_solicitada' ,'NUMERIC_BR' ) ;
-   $rsDados->addFormatacao ( 'quantidade_mapa'       ,'NUMERIC_BR' ) ;
+   $rsDados->addFormatacao ( 'quantidade_solicitada' ,'NUMERIC_BR_4' ) ;
+   $rsDados->addFormatacao ( 'quantidade_mapa'       ,'NUMERIC_BR_4' ) ;
    $rsDados->addFormatacao ( 'valor_unitario'        ,'NUMERIC_BR' ) ;
    $rsDados->addFormatacao ( 'valor_total_mapa'      ,'NUMERIC_BR' ) ;
    $rsDados->addFormatacao ( 'vl_reserva'            ,'NUMERIC_BR' ) ;
@@ -1679,11 +1683,11 @@ function montaSpamDetalheItem($rsDados)
    $table->setSummary('Itens');
 
    $table->Head->addCabecalho( 'Solicitação'           , 5 );
-   $table->Head->addCabecalho( 'Quantidade Solicitada' , 5 );
-   $table->Head->addCabecalho( 'Quantidade no Mapa'    , 5 );
-   $table->Head->addCabecalho( 'Valor de Referência'   , 5 );
-   $table->Head->addCabecalho( 'Valor Total'           , 5 );
-   $table->Head->addCabecalho( 'Valor Reservado'       , 5 );
+   $table->Head->addCabecalho( 'Quantidade Solicitada' , 10 );
+   $table->Head->addCabecalho( 'Quantidade no Mapa'    , 10 );
+   $table->Head->addCabecalho( 'Valor de Referência'   , 12 );
+   $table->Head->addCabecalho( 'Valor Total'           , 12 );
+   $table->Head->addCabecalho( 'Valor Reservado'       , 12 );
    $table->Head->addCabecalho( 'Dotação Orçamentária'  , 10 );
 
    $table->Body->addCampo( 'cod_solicitacao'      , 'C' );

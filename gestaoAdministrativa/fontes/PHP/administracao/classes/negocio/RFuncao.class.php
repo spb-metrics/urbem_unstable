@@ -30,7 +30,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    $Id: RFuncao.class.php 61012 2014-11-28 16:32:54Z evandro $
+    $Id: RFuncao.class.php 63893 2015-11-03 16:32:58Z evandro $
 
     Casos de uso: uc-01.03.95
 */
@@ -895,7 +895,7 @@ function montaCorpoFuncao($inChaveChecked='')
             $stPagina      = 0;
             $stComplemento = '';
 
-            if (substr($stConteudo,0,2)=='SE' && substr($stConteudo,0,3)!='SEN') {
+            if (substr(ltrim($stConteudo),0,2)=='SE' && substr($stConteudo,0,3)!='SEN') {
                 $stPagina      = "FMPopupCondicao";
                 $inNivelFuncao = $inNivel - 1;
                 $stComplemento = '&nbsp;';
@@ -945,7 +945,7 @@ function montaCorpoFuncao($inChaveChecked='')
             }
 
             //Verifica se não é estrutura condicional ou laço
-            if (substr($stConteudo,0,2)=='SE' || substr($stConteudo,0,2)=='EN') {
+            if (substr(ltrim($stConteudo),0,2)=='SE' || substr($stConteudo,0,2)=='EN') {
                 $inCountNivel--;
             }
             for ($inCount=0; $inCount<($inCountNivel); $inCount++) {

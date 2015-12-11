@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: FLManterVinculoEmpenhoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterVinculoEmpenhoContrato.php 64087 2015-12-01 16:10:15Z jean $
 
 */
 
@@ -112,28 +112,38 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbExercicio->setNull                ( false                         );
 
     $obCmbEntidades = new SelectMultiplo();
-    $obCmbEntidades->setName   ('inCodEntidade');
-    $obCmbEntidades->setRotulo ( "Entidades" );
+    $obCmbEntidades->setName   ('inCodEntidade'            );
+    $obCmbEntidades->setRotulo ( "Entidades"               );
     $obCmbEntidades->setTitle  ( "Selecione as entidades." );
-    $obCmbEntidades->setNull   ( false );
+    $obCmbEntidades->setNull   ( false                     );
 
-    $obCmbEntidades->SetNomeLista1 ('inCodEntidadeDisponivel');
-    $obCmbEntidades->setCampoId1   ( 'cod_entidade' );
-    $obCmbEntidades->setCampoDesc1 ( 'nom_cgm' );
-    $obCmbEntidades->SetRecord1    ( $rsEntidades );
+    $obCmbEntidades->SetNomeLista1 ( 'inCodEntidadeDisponivel');
+    $obCmbEntidades->setCampoId1   ( 'cod_entidade'           );
+    $obCmbEntidades->setCampoDesc1 ( 'nom_cgm'                );
+    $obCmbEntidades->SetRecord1    ( $rsEntidades             );
 
-    $obCmbEntidades->SetNomeLista2 ('inCodEntidade');
-    $obCmbEntidades->setCampoId2   ('cod_entidade');
-    $obCmbEntidades->setCampoDesc2 ('nom_cgm');
-    $obCmbEntidades->SetRecord2    ( $rsRecordset );
+    $obCmbEntidades->SetNomeLista2 ( 'inCodEntidade' );
+    $obCmbEntidades->setCampoId2   ( 'cod_entidade'  );
+    $obCmbEntidades->setCampoDesc2 ( 'nom_cgm'       );
+    $obCmbEntidades->SetRecord2    ( $rsRecordset    );
 
     $obTxtContrato = new TextBox;
-    $obTxtContrato->setName   ( "inNumContrato" );
-    $obTxtContrato->setId     ( "inNumContrato" );
-    $obTxtContrato->setValue  ( $inNumContrato  );
-    $obTxtContrato->setRotulo ( "Contrato"      );
+    $obTxtContrato->setName   ( "inNumeroContrato"    );
+    $obTxtContrato->setId     ( "inNumeroContrato"    );
+    $obTxtContrato->setValue  ( $inNumeroContrato     );
+    $obTxtContrato->setRotulo ( "Contrato"            );
     $obTxtContrato->setTitle  ( "Informe o contrato." );
     $obTxtContrato->setInteiro( true );
+
+    $obCmbTipoBusca = new Select;
+    $obCmbTipoBusca->setName    ( "stTipoBusca"             );
+    $obCmbTipoBusca->setId      ( "stTipoBusca"             );
+    $obCmbTipoBusca->setRotulo  ( "Tipo de Busca"           );
+    $obCmbTipoBusca->addOPtion  ( "inicio", "Início", true  );
+    $obCmbTipoBusca->addOPtion  ( "final", "Final", false   );
+    $obCmbTipoBusca->addOPtion  ( "contem", "Contém", false );
+    $obCmbTipoBusca->addOPtion  ( "exata", "Exata", false   );
+
 
     $obHdnAcao = new Hidden;
     $obHdnAcao->setName( "stAcao" );
@@ -142,11 +152,11 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     //Monta o formulario
     $obFormulario = new Formulario;
     $obFormulario->addForm( $obForm );
-    $obFormulario->addTitulo( "Dados para Filtro"  );
-    $obFormulario->addHidden( $obHdnAcao 		   );
-    $obFormulario->addComponente( $obCmbExercicio  );
-    $obFormulario->addComponente( $obCmbEntidades  );
-    $obFormulario->addComponente( $obTxtContrato   );
+    $obFormulario->addTitulo( "Dados para Filtro"                            );
+    $obFormulario->addHidden( $obHdnAcao 		                             );
+    $obFormulario->addComponente( $obCmbExercicio                            );
+    $obFormulario->addComponente( $obCmbEntidades                            );
+    $obFormulario->agrupaComponentes( array($obTxtContrato, $obCmbTipoBusca) );
 
     $obFormulario->OK();
     $obFormulario->show();

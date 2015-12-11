@@ -1258,7 +1258,7 @@ $stComposicao =
 
         /* imposto/taxa */
         $arTMP = explode( ";", $this->stImpostoTaxa ); //teste aqui
-//sistemaLegado::mostravar( $arTMP );exit;
+
         if (  count($arTMP)-1 >= 0 ) {
             $this->Text( $x+156, $y+(92*$inTamY) , $arTMP[count($arTMP)-1] );
             for ( $inX=count($arTMP)-2; $inX>=0; $inX-- )
@@ -1473,7 +1473,6 @@ function imprimirCarne($diffBaixa = FALSE)
     foreach ($this->arEmissao as $valor => $chave) {
         /* imprimir duas folhas com dados cadastrais */
         /* buscar informações para dados cadastrais*/
-        //sistemaLegado::mostravar( $chave );exit;
         $stFiltro = " ddc.numcgm = ".$chave[0]['numcgm']." AND ap.cod_parcela = ".$chave[0]['cod_parcela']." \n";
         $obTDATDividaAtiva = new TDATDividaAtiva;
 
@@ -1484,8 +1483,6 @@ function imprimirCarne($diffBaixa = FALSE)
             $obTDATDividaAtiva->RecuperaCapaCarneDividaMataSaoJoao( $rsListaCarne, $stFiltro );
 
     //$rsListaCarne = new RecordSet;
-    //$obTDATDividaAtiva->debug();exit;
-    //sistemaLegado::mostravar( $rsListaCarne );exit;
     //        $rsListaCarne->addFormatacao ('total_reducao','NUMERIC_BR');
             $rsListaCarne->ordena( "exercicio_original" );
 
@@ -1574,11 +1571,6 @@ function imprimirCarne($diffBaixa = FALSE)
             }
         } //comentei aqui
 
-//echo "total de parcelas = ".$inTotalParcelas."<br>";
-//echo "total de inscricoes = ".$inTotalInscricoes."<br>";
-//  sistemaLegado::mostravar( $this->obRCarnePetropolis->arDemonstrativoParcelas );
-//sistemaLegado::mostravar( $this->obRCarnePetropolis->arVencimentosDemonstrativos );
-//exit;
         $rsListaCarne->setPrimeiroElemento();
 
         /* setar todos os dados necessarios */
@@ -1601,7 +1593,6 @@ function imprimirCarne($diffBaixa = FALSE)
         $this->obRCarnePetropolis->stCondominio = (string) $rsListaCarne2->getCampo("condominio");
         $this->obRCarnePetropolis->stInscricaoImobiliaria = (string) $rsListaCarne->getCampo("inscricao_municipal");
         $this->obRCarnePetropolis->stInscricaoEconomica = (string) $rsListaCarne->getCampo("inscricao_economica");
-//sistemaLegado::mostravar( $rsListaCarne2->getCampo("imposto_taxa") );exit;
         //$arTMP = explode( "/", $rsListaCarne2->getCampo("imposto_taxa") );
         $this->obRCarnePetropolis->stImpostoTaxa = $stImpostos;//(string) $arTMP[0];
         $this->obRCarnePetropolis->stNroCobrancaDA = (string) $rsListaCarne->getCampo("numero_parcelamento")."/".$rsListaCarne->getCampo("exercicio_cobranca");
@@ -1624,7 +1615,7 @@ function imprimirCarne($diffBaixa = FALSE)
         }
         $this->obRCarnePetropolis->setObservacaoL1 ('Créditos: ');
         $arEndereco = explode( "§", $rsGeraCarneCabecalho->getCampo( 'nom_logradouro' ) );
-//sistemaLegado::mostravar( $rsGeraCarneCabecalho );exit;
+
         while ( !$rsGeraCarneCabecalho->eof() ) {
             /* montagem cabecalho (protocolo) */
             $this->obRCarnePetropolis->setCt                ( $rsGeraCarneCabecalho->getCampo( 'ano_aquisicao' )          );

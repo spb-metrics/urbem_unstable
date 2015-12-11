@@ -209,7 +209,7 @@ BEGIN
                                     ON atributo_valor_padrao.cod_modulo = atributo_contrato_servidor_valor.cod_modulo
                                    AND atributo_valor_padrao.cod_cadastro = atributo_contrato_servidor_valor.cod_cadastro
                                    AND atributo_valor_padrao.cod_atributo = atributo_contrato_servidor_valor.cod_atributo
-                                   AND atributo_valor_padrao.cod_valor = atributo_contrato_servidor_valor.valor';
+                                   AND atributo_valor_padrao.cod_valor::INTEGER = atributo_contrato_servidor_valor.valor::INTEGER ';
         END IF;
         
         stSql := stSql || '

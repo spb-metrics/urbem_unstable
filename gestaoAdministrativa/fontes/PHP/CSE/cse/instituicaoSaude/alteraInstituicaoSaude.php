@@ -217,7 +217,6 @@ $nomInstituicao = pegaDado("nom_instituicao","cse.instituicao_saude","Where cod_
 
 //Inclusão, alteração ou exclusão de dados
 case 2:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     //Verifica se já existe o registro a ser incluido

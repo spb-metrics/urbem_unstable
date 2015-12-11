@@ -46,7 +46,6 @@ $obTTCMBAContrato2->setDado('dt_final',$stDataFinal);
 $obTTCMBAContrato2->setDado('exercicio',Sessao::getExercicio());
 $obTTCMBAContrato2->recuperaDadosTribunal($rsArquivo);
 
-
 $obExportador->roUltimoArquivo->addBloco($rsArquivo);
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -60,7 +59,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(36);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_contrato");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_contrato");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 

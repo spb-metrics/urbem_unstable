@@ -245,8 +245,7 @@ class TTCEAMRecibos extends Persistente
            , descricao_objeto
            , tipo_recibo
     ORDER BY cod_empenho";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
         return $stSql;
     }
 }

@@ -67,8 +67,6 @@ if ( !$rsPermissaoIncluirInterno->eof() ) {
     $boPermissao = true;
 }
 
-//SistemaLegado::mostravar( $_REQUEST );
-
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );

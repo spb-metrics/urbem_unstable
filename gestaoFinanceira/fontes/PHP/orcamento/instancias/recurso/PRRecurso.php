@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    * $Id: PRRecurso.php 60248 2014-10-08 17:43:58Z arthur $
+    * $Id: PRRecurso.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.05
 */
@@ -109,7 +109,7 @@ switch ($stAcao) {
         if (Sessao::getExercicio() > '2008' && Sessao::getExercicio() <= '2013') {
             if (!$obErro->ocorreu()) {
                 
-                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     $obRContabilidadePlanoBanco->setCodEstrutural('7.2.1.1.1.');
                 } else {
                     $obRContabilidadePlanoBanco->setCodEstrutural('1.9.3.2.0.00.00.');
@@ -122,7 +122,7 @@ switch ($stAcao) {
                     $obRContabilidadePlanoBanco->obRContabilidadeClassificacaoContabil->setCodClassificacao(1);
                     $inProximoCodEstruturalD++;
                     $inProximoCodEstruturalD = str_pad($inProximoCodEstruturalD, 2, "0", STR_PAD_LEFT);
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         $stCodEstruturalD = '7.2.1.1.1.'.$inProximoCodEstruturalD.'.00';
                     } else {
                         $stCodEstruturalD = '1.9.3.2.0.00.00.'.$inProximoCodEstruturalD.'.00.00';
@@ -145,7 +145,7 @@ switch ($stAcao) {
             if (!$obErro->ocorreu()) {
                 $obRContabilidadePlanoBanco = new RContabilidadePlanoBanco;
                 
-                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     $obRContabilidadePlanoBanco->setCodEstrutural('8.2.1.1.1.');
                 } else {
                     $obRContabilidadePlanoBanco->setCodEstrutural('2.9.3.2.0.00.00.');
@@ -158,7 +158,7 @@ switch ($stAcao) {
                     $obRContabilidadePlanoBanco->obRContabilidadeClassificacaoContabil->setCodClassificacao(1);
                     $inProximoCodEstruturalC++;
                     $inProximoCodEstruturalC = str_pad($inProximoCodEstruturalC, 2, "0", STR_PAD_LEFT);
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         $stCodEstruturalC = '8.2.1.1.1.'.$inProximoCodEstruturalC.'.00';
                     } else {
                         $stCodEstruturalC = '2.9.3.2.0.00.00.'.$inProximoCodEstruturalC.'.00.00';
@@ -173,7 +173,7 @@ switch ($stAcao) {
                     
                     $obErro = $obRContabilidadePlanoBanco->salvar($boTransacao);
                     
-                    if (!$obErro->ocorreu() && SistemaLegado::is_tcems($boTransacao)) {
+                    if (!$obErro->ocorreu() && Sessao::getExercicio() > '2012') {
                         $obRContabilidadePlanoBanco->setCodEstrutural('8.2.1.1.2.');
                         
                         $obRContabilidadePlanoBanco->getProximoEstruturalRecurso($rsProxCod);

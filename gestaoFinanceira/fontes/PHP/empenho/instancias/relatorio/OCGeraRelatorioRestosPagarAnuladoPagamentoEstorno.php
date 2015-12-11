@@ -35,7 +35,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioRestosPagarAnuladoPagamentoEstorno.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+    * $Id: OCGeraRelatorioRestosPagarAnuladoPagamentoEstorno.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso : uc-02.03.08
 */
@@ -213,7 +213,7 @@ if ($_REQUEST['inCodDetalhamento'] != "") {
     $preview->addParametro('cod_detalhamento', '');
 }
 
-if (SistemaLegado::is_tcems($boTransacao)) {
+if (Sessao::getExercicio() > '2012') {
     $preview->addParametro('boTCEMS', 'true');
 } else {
     $preview->addParametro('boTCEMS', 'false');

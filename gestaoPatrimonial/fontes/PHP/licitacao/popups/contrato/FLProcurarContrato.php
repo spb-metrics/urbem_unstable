@@ -30,35 +30,14 @@
 * @author Analista: Lucas Teixeira Stephanou
 * @author Desenvolvedor: Lucas Teixeira Stephanou
 
+  $Id: FLProcurarContrato.php 64081 2015-11-30 15:36:50Z michel $
+
 * Casos de uso :uc-03.04.07, uc-03.04.05,
 */
 
-/*
-$Log$
-Revision 1.1  2006/10/11 17:21:12  domluc
-p/ Diegon:
-   O componente de Contrato gera no formulario que o chama um buscainner e um span, o buscainner somente aceita preenchimento via PopUp, ou seja, não é possivel digitar diretamente o numero do contrato.
-   Chamando a popup do buscainner, ele devera poder filtrar por ( em ordem)
-1) Número do Contrato ( inteiro)
-2) Exercicio ( ref a Contrato) ( componente exercicio)
-3) Modalidade ( combo)
-4) Codigo da Licitação  ( inteiro )
-5) Entidade ( componente)
-
-entao o usuario clica em Ok, e o sistema exibe uma lista correspondente ao filtro informado.
-o usuario seleciona um dos contratos na listageme o sistema fecha a popup, retornando ao formulario, onde o sistema preenche o numero do convenio e no span criado pelo componente , exibe as informações recorrentes, que sao:
-- exercicio
-- modalidade
-- licitação
-- entidade
-- cgm contratado
-
-era isso
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeGeral.class.php' );
+include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeGeral.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ProcurarContrato";
@@ -70,12 +49,10 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if ( empty( $stAcao ) ) {
-    $stAcao = "excluir";
-}
+$stAcao = $request->get('stAcao', 'excluir');
 
 Sessao::write('link', '');
+Sessao::remove('filtro');
 
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao = new Hidden;
@@ -84,20 +61,57 @@ $obHdnAcao->setValue  ( $stAcao  );
 
 $obHdnForm = new Hidden;
 $obHdnForm->setName( "nomForm" );
-$obHdnForm->setValue( $_REQUEST['nomForm']);
+$obHdnForm->setValue( $request->get('nomForm'));
 
 $obHdnCampoNum = new Hidden;
 $obHdnCampoNum->setName( "campoNum" );
-$obHdnCampoNum->setValue( $_REQUEST['campoNum']);
+$obHdnCampoNum->setValue( $request->get('campoNum'));
 
 //Define HIDDEN com o o nome do campo texto
 $obHdnCampoNom = new Hidden;
 $obHdnCampoNom->setName( "campoNom" );
-$obHdnCampoNom->setValue( $_REQUEST['campoNom'] );
+$obHdnCampoNom->setValue( $request->get('campoNom') );
 
 $obITextBoxSelectEntidadeGeral = new ITextBoxSelectEntidadeGeral;
 $obPeriodicidade               = new Periodicidade;
 $obPeriodicidade->setExercicio ( Sessao::getExercicio());
+
+$obHdnBoFornecedor = new Hidden;
+$obHdnBoFornecedor->setName( "boFornecedor" );
+$obHdnBoFornecedor->setValue( $request->get('boFornecedor') );
+
+if($request->get('boFornecedor')){
+    $arFiltroBuscaContrato = Sessao::read('arFiltroBuscaContrato');
+    $arFiltroBuscaContrato = (is_array($arFiltroBuscaContrato)) ? $arFiltroBuscaContrato : array();
+
+    $inCodEntidade = $arFiltroBuscaContrato['inCodEntidade'];
+    $inCodFornecedor = $arFiltroBuscaContrato['inCodFornecedor'];
+    $stNomFornecedor = '';
+    if(!empty($inCodFornecedor))
+        $stNomFornecedor = sistemalegado::pegaDado("nom_cgm","sw_cgm","WHERE numcgm = '".$inCodFornecedor."' ");
+
+    if(!empty($stNomFornecedor))
+        $stNomFornecedor = $inCodFornecedor.' - '.$stNomFornecedor;
+
+    $obITextBoxSelectEntidadeGeral->setCodEntidade($inCodEntidade);
+    $obITextBoxSelectEntidadeGeral->setLabel(true);
+
+    $obHdnCodFornecedor = new Hidden;
+    $obHdnCodFornecedor->setName( "inCodFornecedor" );
+    $obHdnCodFornecedor->setValue( $inCodFornecedor );
+
+    $obLblFornecedor = new Label;
+    $obLblFornecedor->setId    ('inCodFornecedor');
+    $obLblFornecedor->setRotulo('Fornecedor');
+    $obLblFornecedor->setValue ($stNomFornecedor);
+
+    $obTxtExercicio = new TextBox;
+    $obTxtExercicio->setName   ('stExercicio');
+    $obTxtExercicio->setId     ('stExercicio');
+    $obTxtExercicio->setValue  (Sessao::getExercicio());
+    $obTxtExercicio->setRotulo ('Exercício');
+    $obTxtExercicio->setReadOnly(true);
+}
 
 $obHdnTipoBusca = new Hidden;
 $obHdnTipoBusca->setName( "stTipoBusca" );
@@ -113,10 +127,16 @@ $obFormulario->addHidden     ( $obHdnForm                     );
 $obFormulario->addHidden     ( $obHdnCampoNum                 );
 $obFormulario->addHidden     ( $obHdnCampoNom                 );
 $obFormulario->addHidden     ( $obHdnTipoBusca 	              );
+$obFormulario->addHidden     ( $obHdnBoFornecedor             );
 $obFormulario->addTitulo     ( "Dados para filtro"            );
 $obFormulario->addHidden     ( $obHdnAcao                     );
 $obFormulario->addComponente ( $obITextBoxSelectEntidadeGeral );
-$obFormulario->addComponente ( $obPeriodicidade               );
+if($request->get('boFornecedor')){
+    $obFormulario->addHidden     ( $obHdnCodFornecedor        );
+    $obFormulario->addComponente ( $obLblFornecedor           );
+    $obFormulario->addComponente ( $obTxtExercicio            );
+}else
+    $obFormulario->addComponente ( $obPeriodicidade           );
 
 $obFormulario->OK();
 $obFormulario->show();

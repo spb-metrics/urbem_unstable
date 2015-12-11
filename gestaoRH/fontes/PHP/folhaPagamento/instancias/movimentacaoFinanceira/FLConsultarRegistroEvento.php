@@ -59,12 +59,12 @@ $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPag
 
 //DEFINICAO DO FORM
 $obForm = new Form;
-$obForm->setAction                              ( $pgProc             );
-$obForm->setTarget                              ( "telaPrincipal"     );
+$obForm->setAction( $pgProc );
+$obForm->setTarget( "telaPrincipal" );
 
 $obHdnCtrl =  new Hidden;
-$obHdnCtrl->setName                             ( "stCtrl"            );
-$obHdnCtrl->setValue                            ( $stCtrl             );
+$obHdnCtrl->setName ( "stCtrl" );
+$obHdnCtrl->setValue( $stCtrl );
 
 $obIFiltroCompetencia = new IFiltroCompetencia;
 
@@ -78,13 +78,13 @@ $obIFiltroComponentes->setEvento();
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addForm                          ( $obForm                                               );
-$obFormulario->addTitulo                        ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
-$obFormulario->addTitulo                        ( "Parâmetros para Emissão do Relatório"                );
-$obFormulario->addHidden                        ( $obHdnCtrl                                            );
-$obIFiltroCompetencia->geraFormulario           ( $obFormulario                                         );
-$obIFiltroComponentes->geraFormulario		( $obFormulario						);
-//$obIFiltroTipoFolha->geraFormulario		( $obFormulario						);
+$obFormulario->addForm               ( $obForm );
+$obFormulario->addTitulo             ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
+$obFormulario->addTitulo             ( "Parâmetros para Emissão do Relatório" );
+$obFormulario->addHidden             ( $obHdnCtrl );
+$obIFiltroCompetencia->geraFormulario( $obFormulario );
+$obIFiltroComponentes->geraFormulario( $obFormulario );
+
 $obFormulario->ok();
 $obFormulario->show();
 

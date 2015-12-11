@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FLExportarRemessaCaixaEconomicaFederal.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLExportarRemessaCaixaEconomicaFederal.php 64088 2015-12-01 17:45:02Z evandro $
 
     * Casos de uso: uc-04.08.11
 */
@@ -55,16 +55,16 @@ $jsOnload   = "montaParametrosGET('gerarSpan','stSituacao');";
 $obRFolhaPagamentoPeriodoMovimentacao = new RFolhaPagamentoPeriodoMovimentacao;
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao($obRFolhaPagamentoPeriodoMovimentacao);
 
-$stAcao      = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
-$obHdnAcao->setName                             ( "stAcao"                                                              );
-$obHdnAcao->setValue                            ( $stAcao                                                               );
+$obHdnAcao->setName  ( "stAcao" );
+$obHdnAcao->setValue ( $stAcao  );
 
 $obHdnCtrl =  new Hidden;
-$obHdnCtrl->setName                             ( "stCtrl"                                                              );
-$obHdnCtrl->setValue                            ( $stCtrl                                                               );
+$obHdnCtrl->setName ( "stCtrl" );
+$obHdnCtrl->setValue( $stCtrl  );
 
 $obHdnTipoFiltroExtra = new hiddenEval();
 $obHdnTipoFiltroExtra->setName("hdnTipoFiltroExtra");
@@ -72,8 +72,8 @@ $obHdnTipoFiltroExtra->setValue("eval(document.frm.hdnTipoFiltro.value);");
 
 //DEFINICAO DO FORM
 $obForm = new Form;
-$obForm->setAction                              ( $pgProc                                                               );
-$obForm->setTarget                              ( "oculto"                                                              );
+$obForm->setAction( $pgProc  );
+$obForm->setTarget( "oculto" );
 
 $obBtnOk = new Ok();
 $obBtnOk->obEvento->setOnClick("montaParametrosGET('submeter','',true);");
@@ -82,20 +82,20 @@ $obBtnLimpar = new Limpar();
 $obBtnLimpar->obEvento->setOnClick("executaFuncaoAjax('limparForm');");
 
 $obComboCadastro = new Select;
-$obComboCadastro->setRotulo                         ( "Cadastro"                                      );
-$obComboCadastro->setTitle                          ( "Selecione o cadastro para filtro."             );
-$obComboCadastro->setName                           ( "stSituacao"                                    );
-$obComboCadastro->setValue                          ( "ativos"                                        );
-$obComboCadastro->setStyle                          ( "width: 200px"                                  );
-$obComboCadastro->addOption                         ( "", "Selecione"                                 );
-$obComboCadastro->addOption                         ( "ativos", "Ativos"                              );
-$obComboCadastro->addOption                         ( "aposentados", "Aposentados"                    );
-$obComboCadastro->addOption                         ( "pensionistas", "Pensionistas"                  );
-$obComboCadastro->addOption                         ( "estagiarios", "Estagiários"                    );
-$obComboCadastro->addOption                         ( "resdincidos", "Rescindidos"                    );
-$obComboCadastro->addOption                         ( "pensao_judicial", "Pensão Judicial"            );
-$obComboCadastro->addOption                         ( "todos", "Todos"                                );
-$obComboCadastro->setNull                           ( false                                           );
+$obComboCadastro->setRotulo( "Cadastro" );
+$obComboCadastro->setTitle ( "Selecione o cadastro para filtro." );
+$obComboCadastro->setName  ( "stSituacao" );
+$obComboCadastro->setValue ( "ativos" );
+$obComboCadastro->setStyle ( "width: 200px" );
+$obComboCadastro->addOption( "", "Selecione" );
+$obComboCadastro->addOption( "ativos", "Ativos" );
+$obComboCadastro->addOption( "aposentados", "Aposentados" );
+$obComboCadastro->addOption( "pensionistas", "Pensionistas" );
+$obComboCadastro->addOption( "estagiarios", "Estagiários" );
+$obComboCadastro->addOption( "resdincidos", "Rescindidos" );
+$obComboCadastro->addOption( "pensao_judicial", "Pensão Judicial");
+$obComboCadastro->addOption( "todos", "Todos" );
+$obComboCadastro->setNull  ( false );
 $obComboCadastro->obEvento->setOnChange("montaParametrosGET('gerarSpan','stSituacao');");
 
 $obSpnCadastro = new Span();
@@ -106,16 +106,16 @@ $obSpnAtivosAposentadosPensionistas->setId("spnAtivosAposentadosPensionistas");
 
 $obMonValorLiquidoInicial = new Moeda();
 $obMonValorLiquidoInicial->setRotulo("Filtrar Valores Líquidos de:");
-$obMonValorLiquidoInicial->setName("nuValorLiquidoInicial");
-$obMonValorLiquidoInicial->setTitle("Informe a faixa de salários líquidos que deverão ser considerados no arquivo.");
-$obMonValorLiquidoInicial->setValue("0,00");
+$obMonValorLiquidoInicial->setName  ("nuValorLiquidoInicial");
+$obMonValorLiquidoInicial->setTitle ("Informe a faixa de salários líquidos que deverão ser considerados no arquivo.");
+$obMonValorLiquidoInicial->setValue ("0,00");
 $obMonValorLiquidoInicial->obEvento->setOnChange("montaParametrosGET('validarValores','nuValorLiquidoInicial,nuValorLiquidoFinal');");
 
 $obLblAte = new Label();
 $obLblAte->setValue("Até");
 
 $obMonValorLiquidoFinal = new Moeda();
-$obMonValorLiquidoFinal->setName("nuValorLiquidoFinal");
+$obMonValorLiquidoFinal->setName ("nuValorLiquidoFinal");
 $obMonValorLiquidoFinal->setValue("99.999.999,99");
 $obMonValorLiquidoFinal->obEvento->setOnChange("montaParametrosGET('validarValores','nuValorLiquidoInicial,nuValorLiquidoFinal');");
 
@@ -123,9 +123,9 @@ $arFiltrarValores = array($obMonValorLiquidoInicial,$obLblAte,$obMonValorLiquido
 
 $obPercentual = new Numerico();
 $obPercentual->setRotulo("Percentual à Pagar do Líquido:");
-$obPercentual->setName("nuPercentualPagar");
-$obPercentual->setTitle("Informe o percentual à pagar do salário líquido de cada servidor.");
-$obPercentual->setSize(10);
+$obPercentual->setName  ("nuPercentualPagar");
+$obPercentual->setTitle ("Informe o percentual à pagar do salário líquido de cada servidor.");
+$obPercentual->setSize  (10);
 $obPercentual->setMaxLength(6);
 $obPercentual->setValue("100,00");
 
@@ -162,19 +162,19 @@ $obDtGeracaoArquivo->setValue(date('d/m/Y'));
 
 $obDtPagamento = new Data();
 $obDtPagamento->setRotulo("Data do Pagamento");
-$obDtPagamento->setName("dtPagamento");
-$obDtPagamento->setTitle("Informar a data provável de pagamento (informar a data com previsão de no mínimo 3 dias úteis).");
-$obDtPagamento->setNull(false);
-$obDtPagamento->setValue(date('d/m/Y'));
+$obDtPagamento->setName  ("dtPagamento");
+$obDtPagamento->setTitle ("Informar a data provável de pagamento (informar a data com previsão de no mínimo 3 dias úteis).");
+$obDtPagamento->setNull  (false);
+$obDtPagamento->setValue (date('d/m/Y'));
 $obDtPagamento->obEvento->setOnChange("montaParametrosGET('validarDataPagamento','dtPagamento,dtGeracaoArquivo')");
 
 $obCmbTipoMovimento = new Select();
-$obCmbTipoMovimento->setName("inTipoMovimento");
+$obCmbTipoMovimento->setName  ("inTipoMovimento");
 $obCmbTipoMovimento->setRotulo("Tipo de Movimento");
-$obCmbTipoMovimento->setTitle("Selecionar o tipo de movimento do arquivo. Para inclusão de lançamento novo, informar no campo Sequencial do arquivo um número novo, para Alteração de Lançamento, utilizar mesmo número de Sequencial do arquivo gerado anteriormente.");
-$obCmbTipoMovimento->setNull(false);
-$obCmbTipoMovimento->setStyle( "width: 250px" );
-$obCmbTipoMovimento->setValue("0");
+$obCmbTipoMovimento->setTitle ("Selecionar o tipo de movimento do arquivo. Para inclusão de lançamento novo, informar no campo Sequencial do arquivo um número novo, para Alteração de Lançamento, utilizar mesmo número de Sequencial do arquivo gerado anteriormente.");
+$obCmbTipoMovimento->setNull  (false);
+$obCmbTipoMovimento->setStyle ( "width: 250px" );
+$obCmbTipoMovimento->setValue ("0");
 $obCmbTipoMovimento->addOption("","Selecione");
 $obCmbTipoMovimento->addOption("0","0 - Débito/Crédito Normal");
 $obCmbTipoMovimento->addOption("1","1 - Cancelamento");
@@ -187,31 +187,31 @@ $obTAdministracaoConfiguracao->pegaConfiguracao($stValor,"num_sequencial_arquivo
 
 $obIntNumeroSequencial = new Inteiro();
 $obIntNumeroSequencial->setRotulo("Número Seqüencial Arquivo");
-$obIntNumeroSequencial->setTitle("Informar o número da remessa. Deve ser seqüencial e maior que zero. Deve repetir-se somente quando o tipo de movimento for Alteração de Lançamento. Para Inclusões de Lançamentos Novos, o número deverá ser crescente (sequencial anterior + 1).");
-$obIntNumeroSequencial->setName("inNumeroSequencial");
-$obIntNumeroSequencial->setValue($stValor);
+$obIntNumeroSequencial->setTitle ("Informar o número da remessa. Deve ser seqüencial e maior que zero. Deve repetir-se somente quando o tipo de movimento for Alteração de Lançamento. Para Inclusões de Lançamentos Novos, o número deverá ser crescente (sequencial anterior + 1).");
+$obIntNumeroSequencial->setName  ("inNumeroSequencial");
+$obIntNumeroSequencial->setValue ($stValor);
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario();
-$obFormulario->addForm                          ( $obForm                                                               );
-$obFormulario->addTitulo                        ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right"      );
-$obFormulario->addHidden                        ( $obHdnAcao                                                            );
-$obFormulario->addHidden                        ( $obHdnCtrl                                                            );
-$obFormulario->addHidden                        ( $obHdnTipoFiltroExtra,true											);
-$obFormulario->addComponente($obComboCadastro);
-$obFormulario->addSpan($obSpnCadastro);
-$obFormulario->addSpan($obSpnAtivosAposentadosPensionistas);
-$obFormulario->addTitulo( "Informações Gerais para emissão do arquivo" ,"left");
+$obFormulario->addForm          ($obForm );
+$obFormulario->addTitulo        ($obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
+$obFormulario->addHidden        ($obHdnAcao );
+$obFormulario->addHidden        ($obHdnCtrl );
+$obFormulario->addHidden        ($obHdnTipoFiltroExtra,true );
+$obFormulario->addComponente    ($obComboCadastro);
+$obFormulario->addSpan          ($obSpnCadastro);
+$obFormulario->addSpan          ($obSpnAtivosAposentadosPensionistas);
+$obFormulario->addTitulo        ("Informações Gerais para emissão do arquivo" ,"left");
 $obFormulario->agrupaComponentes($arFiltrarValores);
 $obFormulario->agrupaComponentes($arPercentual);
-$obFormulario->addComponente($obLblCodigoConvenio);
-$obFormulario->addComponente($obLblAgenciaConvenio);
-$obFormulario->addComponente($obLblContaConvenio);
-$obFormulario->addComponente($obDtGeracaoArquivo);
-$obFormulario->addComponente($obDtPagamento);
-$obFormulario->addComponente($obCmbTipoMovimento);
-$obFormulario->addComponente($obIntNumeroSequencial);
-$obFormulario->defineBarra                      ( array($obBtnOk,$obBtnLimpar)                          );
+$obFormulario->addComponente    ($obLblCodigoConvenio);
+$obFormulario->addComponente    ($obLblAgenciaConvenio);
+$obFormulario->addComponente    ($obLblContaConvenio);
+$obFormulario->addComponente    ($obDtGeracaoArquivo);
+$obFormulario->addComponente    ($obDtPagamento);
+$obFormulario->addComponente    ($obCmbTipoMovimento);
+$obFormulario->addComponente    ($obIntNumeroSequencial);
+$obFormulario->defineBarra      (array($obBtnOk,$obBtnLimpar) );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

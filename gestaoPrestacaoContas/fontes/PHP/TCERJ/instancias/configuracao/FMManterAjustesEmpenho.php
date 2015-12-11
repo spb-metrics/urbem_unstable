@@ -32,10 +32,10 @@
 
     * @ignore
 
-    $Revision: 59612 $
+    $Revision: 63835 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: franver $
+    $Date: 2015-10-22 11:53:31 -0200 (Qui, 22 Out 2015) $
 
     * Casos de uso: uc-02.08.14
 */
@@ -61,9 +61,6 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
-
-//SistemaLegado::mostraVar($_POST);
-//die();
 
 $arFiltro = array();
 foreach ($_POST as $stCampo => $stValor) {

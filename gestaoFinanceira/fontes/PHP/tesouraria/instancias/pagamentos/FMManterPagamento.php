@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterPagamento.php 63464 2015-08-31 17:30:39Z michel $
+    * $Id: FMManterPagamento.php 63957 2015-11-11 16:13:50Z lisiane $
 
     * Casos de uso: uc-02.04.05,uc-02.03.28
 
@@ -985,12 +985,12 @@ if ($stAcao == 'incluir') {
         $obFormulario->addComponente ( $obCboOrigemRecurso );
     }
 
-    if ($stSiglaUf != "AL") {
+    if ($stSiglaUf != "BA" && $stSiglaUf != "AL") {
         if (($boMostrarComboTipoDocTcmgo  == 'true') || ($boMostrarComboTipoDocTcemg == 'true')) {
             $obFormulario->addComponente( $obCboDocTipo );
             $obFormulario->addSpan( $obSpnDocumento );
         }
-    }else{
+    }elseif($stSiglaUf == "AL"){
         if( !Sessao::read('arCheque') ) {
             $obFormulario->addComponente( $obCboDocTipoAL );
             $obFormulario->addComponente( $obTxtValorDoc );

@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: PRDefinirElementos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRDefinirElementos.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -71,9 +71,6 @@ $pgOcul     = "OC".$stPrograma.".php";
 $pgJS       = "JS".$stPrograma.".js" ;
 //$pgDefResp  = "FMDefinirResponsaveis.php";
 
-//sistemaLegado::mostravar($sessao->transf7["elementos"]);
-//exit();
-
 $obErro = new Erro;
 $obRCEMInscricaoEconomica = new RCEMInscricaoEconomica;
 
@@ -86,7 +83,6 @@ switch ($stAcao) {
         $obRCEMInscricaoEconomica->setInscricaoEconomica( $_REQUEST['inInscricaoEconomica'] );
         $arElementosSessao = Sessao::read( "elementos" );
         if ( count( $arElementosSessao ) > 0 ) {
-//            sistemaLegado::mostravar($sessao->transf7["elementos"]);exit;
             foreach ($arElementosSessao as $inChave => $arElementos) {
                 $obRCEMInscricaoEconomica->addElementoAtividade();
                 $obRCEMInscricaoEconomica->roUltimoElemento->setCodigoElemento( $arElementos['inCodigoElemento'] );
@@ -98,8 +94,6 @@ switch ($stAcao) {
         } else {
             $obErro->setDescricao( "É necessário a inclusão de pelo menos um elemento." );
         }
-/*        SistemaLegado::mostravar($arElementos['arElementos']);
-        exit(); */
 
         if ( !$obErro->ocorreu() ) {
             $obErro = $obRCEMInscricaoEconomica->definirElementos();

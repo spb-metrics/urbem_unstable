@@ -79,7 +79,7 @@ class TTBAResCont extends Persistente
     {
         $stSql .= " SELECT 1 AS tipo_registro
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                        , contrato.num_contrato
+                        , contrato.numero_contrato AS num_contrato
                         , rescisao_contrato.num_rescisao
                         , SUBSTR(TRIM(rescisao_contrato.motivo), 1, 50) AS motivo_rescisao
                         , TO_CHAR(rescisao_contrato.dt_rescisao, 'dd/mm/yyyy') AS dt_rescisao
@@ -103,7 +103,7 @@ class TTBAResCont extends Persistente
                      AND contrato.cod_entidade = rescisao_contrato.cod_entidade
                      AND contrato.num_contrato = rescisao_contrato.num_contrato
 
-               LEFT JOIN licitacao.publicacao_rescisao_contrato
+              INNER JOIN licitacao.publicacao_rescisao_contrato
                       ON rescisao_contrato.num_contrato = publicacao_rescisao_contrato.num_contrato
                      AND rescisao_contrato.exercicio_contrato = publicacao_rescisao_contrato.exercicio_contrato
                      AND rescisao_contrato.cod_entidade = publicacao_rescisao_contrato.cod_entidade

@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMManterServicoNivel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterServicoNivel.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.03
 
@@ -70,8 +70,6 @@ $stAcao = $request->get('stAcao');
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
-
-//sistemaLegado::mostravar ( $_REQUEST );
 
 //DEFINICAO DAS VERIFICACOES
 if ($stAcao == "incluir") {

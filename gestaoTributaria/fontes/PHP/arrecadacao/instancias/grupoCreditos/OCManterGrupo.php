@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Teixeira Stephanou
 
-    * $Id: OCManterGrupo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: OCManterGrupo.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.02
 */
@@ -436,7 +436,6 @@ switch ($_REQUEST ["stCtrl"]) {
         $stJs .= excluirCredito($_REQUEST["inLinha"]);
     break;
     case "buscaAcrescimo":
-        //mostravar($_REQUEST);
         if ($_REQUEST["inCodAcrescimo"]) {
             $obRARRGrupo->obRMONAcrescimo->setCodAcrescimo($_REQUEST["inCodAcrescimo"]);
             $obRARRGrupo->obRMONAcrescimo->consultarAcrescimo( $rsAcrescimos );

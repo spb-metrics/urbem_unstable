@@ -85,7 +85,7 @@ class TTCMBATermoParc extends Persistente
                          , despesa.num_orgao AS cod_orgao
                          , despesa.cod_funcao
                          , despesa.cod_subfuncao
-                         , despesa.cod_programa
+                         , ppaprograma.num_programa AS cod_programa
                          , 2 AS indicador_siga
 
                     FROM tcmba.termo_parceria
@@ -110,6 +110,17 @@ class TTCMBATermoParc extends Persistente
               INNER JOIN ppa.acao
                       ON acao.cod_acao = pao_ppa_acao.cod_acao
 
+              INNER JOIN orcamento.programa
+                      ON programa.cod_programa = despesa.cod_programa
+                     AND programa.exercicio = despesa.exercicio
+
+              INNER JOIN orcamento.programa_ppa_programa
+                      ON programa_ppa_programa.cod_programa = programa.cod_programa
+                     AND programa_ppa_programa.exercicio = programa.exercicio
+
+              INNER JOIN ppa.programa AS ppaprograma
+                      ON ppaprograma.cod_programa = programa_ppa_programa.cod_programa_ppa
+                      
               INNER JOIN (
                           SELECT sw_cgm_pessoa_juridica.cnpj
                                , sw_cgm.numcgm

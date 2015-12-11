@@ -75,7 +75,7 @@ $pgOcul = "OC".$stPrograma.".php";
 $stCaminho   = CAM_GF_EMP_INSTANCIAS."empenho/autorizacao/";
 
 $obRegra = new REmpenhoEmpenhoAutorizacao;
-//SistemaLegado :: mostraVar(sessao);
+
 if ( !Sessao::read('paginando') ) {
     foreach ($_POST as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;

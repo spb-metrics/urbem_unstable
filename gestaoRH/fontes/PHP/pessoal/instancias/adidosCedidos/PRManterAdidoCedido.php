@@ -129,7 +129,7 @@ switch ($stAcao) {
             $obTPessoalAdidoCedidoLocal->inclusao();
         }
         Sessao::encerraExcecao();
-        sistemaLegado::alertaAviso($pgList,"Alteração da movimentação para o contrato ".$_POST['inRegistro'],"alterar","aviso", Sessao::getId(), "../");
+        sistemaLegado::alertaAviso($pgList."&inContrato=".$_POST['inRegistro'],"Alteração da movimentação para o contrato ".$_POST['inRegistro'],"alterar","aviso", Sessao::getId(), "../");
     break;
     case "excluir":
         Sessao::setTrataExcecao(true);

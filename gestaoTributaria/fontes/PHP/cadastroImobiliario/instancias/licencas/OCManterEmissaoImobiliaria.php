@@ -331,7 +331,6 @@ switch ($_REQUEST['stCtrl']) {
         $OOParser->LoadXmlFromDoc('styles.xml');
         $OOParser->SaveXmlToDoc();
 
-        //sistemaLegado::mostravar($OOParser->GetMimetypeDoc().'name='.$stNomeArquivoDownload );
         $typefile = 'application/sxw';
         header("Content-type: $typefile");//$OOParser->GetMimetypeDoc(). 'name='.$stNomeArquivoDownload );
         header('Content-Length: '.filesize($OOParser->GetPathnameDoc()));

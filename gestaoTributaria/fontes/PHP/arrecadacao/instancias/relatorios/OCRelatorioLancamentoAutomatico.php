@@ -28,7 +28,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: OCRelatorioLancamentoAutomatico.php 62330 2015-04-24 14:32:29Z lisiane $
+    * $Id: OCRelatorioLancamentoAutomatico.php 63884 2015-10-29 12:01:23Z evandro $
 
     * Casos de uso: 
 
@@ -51,6 +51,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
+//relatorioDeLancamentosAutomatico.rptdesign
 $preview = new PreviewBirt(5,25,7);
 $preview->setTitulo('Relatório de Lançamentos Automáticos');
 $preview->setVersaoBirt( '2.5.0' );

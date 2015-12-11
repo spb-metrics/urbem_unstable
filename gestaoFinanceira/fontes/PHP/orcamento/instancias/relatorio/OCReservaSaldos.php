@@ -115,7 +115,7 @@ switch ($stCtrl) {
         $obRRelatorio      = new RRelatorio;
         $obROrcamentoReservaSaldos  = new ROrcamentoRelatorioReservaSaldos;
         $arFiltro = Sessao::read('filtroRelatorio');
-//        sistemaLegado::mostravar//sessao->filtro) ;exit();
+
         if ( is_array($arFiltro['inCodEntidade']) ) {
             foreach ($arFiltro['inCodEntidade'] as $inCodEntidadeForm) {
                 $stCodigoEntidade .= $inCodEntidadeForm.',';

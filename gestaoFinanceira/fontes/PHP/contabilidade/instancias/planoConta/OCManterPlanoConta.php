@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterPlanoConta.php 60235 2014-10-07 20:38:22Z arthur $
+    * $Id: OCManterPlanoConta.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.02
 */
@@ -85,7 +85,7 @@ switch ($stCtrl) {
 
         $obHdnCodSistemaContabil = new Hidden;
         $obHdnCodSistemaContabil->setName ( "inCodSistemaContabil" );
-    if ( sistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obHdnCodSistemaContabil->setValue( "4" );
         $obHdnIndicadorSuperavit = new Hidden;
         $obHdnIndicadorSuperavit->setName( "stIndicadorSuperavit" );
@@ -102,7 +102,7 @@ switch ($stCtrl) {
 
         $obFormulario = new Formulario;
 
-    if ( sistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obFormulario->addHidden ($obHdnIndicadorSuperavit);
     }
         $obFormulario->addHidden ($obHdnCodSistemaContabil);
@@ -176,7 +176,7 @@ switch ($stCtrl) {
 
         $stIndicadorSuperavit = $obRContabilidadePlanoBanco->getIndicadorSuperavit();
 
-        if ( sistemaLegado::is_tcems() ) {
+        if ( Sessao::getExercicio() > '2012' ) {
 
             // Define Objeto Select para o Indicador Superávit
             $obCmbIndicadorSuperavit = new Select;

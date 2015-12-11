@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: FMConsultaInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaInscricao.php 63911 2015-11-05 17:03:30Z carlos.silva $
 
   Caso de uso: uc-05.04.09
 **/
@@ -60,7 +60,6 @@ if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
 
-#sistemaLegado::mostravar( $_REQUEST);
 // EFETUA ALTERACAO DA DATA BASE CASO HAJA COBRANÇA
 
 #==============================================================
@@ -123,7 +122,7 @@ $obTDATDividaAtiva->ListaConsultaCobrancas( $rsListaCobrancas, $stFiltro );
 
 $rsListaCobrancas->addFormatacao("valor_parcelamento","NUMERIC_BR");
 $rsListaCobrancas->setPrimeiroElemento();
-//sistemaLegado::mostravar( $rsListaCobrancas );
+
 $tableCobrancas = new TableTree();
 $tableCobrancas->setRecordset       ( $rsListaCobrancas );
 $tableCobrancas->setSummary         ('Lista de Cobranças');
@@ -166,10 +165,10 @@ $obLblContribuinte->setValue    ( $_REQUEST['inNumCGMContrib']." - ".$_REQUEST["
 $obLblContribuinte->setTitle    ( "Contribuinte" );
 
 $obLblInscricaoAno = new Label;
-$obLblInscricaoAno->setRotulo   ( "Inscrição / Ano" );
+$obLblInscricaoAno->setRotulo   ( "Inscrição/Ano" );
 $obLblInscricaoAno->setName     ( "stInscricaoAno" );
-$obLblInscricaoAno->setValue    ( $_REQUEST['inCodInscricao']." / ".$_REQUEST["inExercicio"] );
-$obLblInscricaoAno->setTitle    ( "Inscrição / Ano" );
+$obLblInscricaoAno->setValue    ( $_REQUEST['inCodInscricao']."/".$_REQUEST["inExercicio"] );
+$obLblInscricaoAno->setTitle    ( "Inscrição/Ano" );
 
 $obLblDataInscricao = new Label;
 $obLblDataInscricao->setRotulo  ( "Data de Inscrição" );
@@ -235,7 +234,7 @@ $boBtnVoltar = new Voltar();
 $boBtnVoltar->setName('btVoltar');
 $boBtnVoltar->obEvento->setOnclick('Voltar()');
 
-$stLocation  = CAM_GT_DAT_INSTANCIAS."consultas/OCGeraRelatorioConsultaDivida.php?";
+$stLocation  = CAM_GT_DAT_INSTANCIAS."consultas/OCRelatorioConsultaDivida.php?";
 $stLocation .= Sessao::getId().'&stAcao='.$stAcao;
 $stLocation .= '&inCodInscricao='.$inCodInscricao;
 $stLocation .= '&inExercicio='.$inExercicio;
@@ -257,7 +256,6 @@ $stLocation .= "&";
 $obButtonRelatorio = new Button;
 $obButtonRelatorio->setName  ( "Relatorio" );
 $obButtonRelatorio->setValue ( "Relatório" );
-#$obButtonRelatorio->obEvento->setOnClick( "window.parent.frames['oculto'].location='".$stLocation."';");
 $obButtonRelatorio->obEvento->setOnClick( "document.frm.submit();" );
 
 $obHdnCaminho = new Hidden;

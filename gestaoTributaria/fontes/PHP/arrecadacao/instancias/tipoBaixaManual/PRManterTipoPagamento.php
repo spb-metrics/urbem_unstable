@@ -32,7 +32,7 @@
     * @subpackage Regra
     * @ignore
 
-    * $Id: PRManterTipoPagamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRManterTipoPagamento.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.09
 */
@@ -490,7 +490,6 @@ switch ($stAcao) {
         }
     break;
     case "reforma":
-    //mostravar($_REQUEST);
         $obErro = new Erro;
         if ($_REQUEST["hdnVinculoEdificacao"] == "Condomínio") {
             //ATRIBUTOS

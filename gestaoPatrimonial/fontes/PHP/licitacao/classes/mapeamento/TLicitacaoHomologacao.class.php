@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: TLicitacaoHomologacao.class.php 63367 2015-08-20 21:27:34Z michel $
+    $Id: TLicitacaoHomologacao.class.php 64005 2015-11-17 16:49:06Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -46,7 +46,7 @@ class TLicitacaoHomologacao extends Persistente
     /**
     * Método Construtor
     * @access Private
-*/
+    **/
     public function __construct()
     {
         parent::Persistente();
@@ -411,6 +411,91 @@ class TLicitacaoHomologacao extends Persistente
 
     }
 
+    public function recuperaItensAutorizacaoParcial(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stGroupBy = " GROUP BY catalogo_item.cod_item
+                              , catalogo_item.descricao_resumida
+                              , cotacao_fornecedor_item.vl_cotacao
+                              , sw_cgm.nom_cgm
+                              , to_char(homologacao.timestamp,'dd/mm/yyyy')
+                              , cotacao_item.quantidade
+                        HAVING coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) > 0 ";
+
+        $stSql  = $this->montaRecuperaItensAutorizacaoParcial().$stFiltro.$stGroupBy.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+    public function montaRecuperaItensAutorizacaoParcial()
+    {
+        $stSql = "
+                    SELECT catalogo_item.cod_item
+                         , catalogo_item.descricao_resumida AS item
+                         , cotacao_fornecedor_item.vl_cotacao
+                         , sw_cgm.nom_cgm AS fornecedor
+                         , to_char(homologacao.timestamp,'dd/mm/yyyy') AS dt_homologacao
+                         , cotacao_item.quantidade
+                         , SUM(COALESCE(item_pre_empenho.quantidade, 0.00)) AS quantidade_empenho
+                         , COALESCE(cotacao_item.quantidade, 0.00) - SUM(COALESCE(item_pre_empenho.quantidade, 0.00)) AS quantidade_saldo
+                      FROM licitacao.homologacao
+                INNER JOIN licitacao.adjudicacao
+                        ON adjudicacao.num_adjudicacao     = homologacao.num_adjudicacao
+                       AND adjudicacao.cod_entidade        = homologacao.cod_entidade
+                       AND adjudicacao.cod_modalidade      = homologacao.cod_modalidade
+                       AND adjudicacao.cod_licitacao       = homologacao.cod_licitacao
+                       AND adjudicacao.exercicio_licitacao = homologacao.exercicio_licitacao
+                       AND adjudicacao.cod_item            = homologacao.cod_item
+                       AND adjudicacao.cod_cotacao         = homologacao.cod_cotacao
+                       AND adjudicacao.lote                = homologacao.lote
+                       AND adjudicacao.exercicio_cotacao   = homologacao.exercicio_cotacao
+                       AND adjudicacao.cgm_fornecedor      = homologacao.cgm_fornecedor
+                INNER JOIN compras.cotacao_fornecedor_item
+                        ON adjudicacao.cod_cotacao       = cotacao_fornecedor_item.cod_cotacao
+                       AND adjudicacao.exercicio_cotacao = cotacao_fornecedor_item.exercicio
+                       AND adjudicacao.cod_item          = cotacao_fornecedor_item.cod_item
+                       AND adjudicacao.lote              = cotacao_fornecedor_item.lote
+                       AND adjudicacao.cgm_fornecedor    = cotacao_fornecedor_item.cgm_fornecedor
+                INNER JOIN compras.cotacao_item
+                        ON cotacao_item.exercicio   = cotacao_fornecedor_item.exercicio
+                       AND cotacao_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
+                       AND cotacao_item.cod_item    = cotacao_fornecedor_item.cod_item
+                       AND cotacao_item.lote        = cotacao_fornecedor_item.lote 
+                INNER JOIN almoxarifado.catalogo_item
+                        ON catalogo_item.cod_item = cotacao_item.cod_item
+                INNER JOIN sw_cgm
+                        ON sw_cgm.numcgm = cotacao_fornecedor_item.cgm_fornecedor
+                 LEFT JOIN empenho.item_pre_empenho_julgamento
+                        ON item_pre_empenho_julgamento.exercicio_julgamento = homologacao.exercicio_cotacao
+                       AND item_pre_empenho_julgamento.cod_cotacao          = homologacao.cod_cotacao
+                       AND item_pre_empenho_julgamento.cod_item             = homologacao.cod_item
+                       AND item_pre_empenho_julgamento.lote                 = homologacao.lote
+                       AND item_pre_empenho_julgamento.cgm_fornecedor       = homologacao.cgm_fornecedor
+                 LEFT JOIN empenho.item_pre_empenho
+                        ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+                       AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+                       AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+                 LEFT JOIN licitacao.homologacao_anulada
+                        ON homologacao_anulada.num_homologacao     = homologacao.num_homologacao
+                       AND homologacao_anulada.cod_licitacao       = homologacao.cod_licitacao
+                       AND homologacao_anulada.cod_modalidade      = homologacao.cod_modalidade
+                       AND homologacao_anulada.cod_entidade        = homologacao.cod_entidade
+                       AND homologacao_anulada.num_adjudicacao     = homologacao.num_adjudicacao
+                       AND homologacao_anulada.exercicio_licitacao = homologacao.exercicio_licitacao
+                       AND homologacao_anulada.lote                = homologacao.lote
+                       AND homologacao_anulada.cod_cotacao         = homologacao.cod_cotacao
+                       AND homologacao_anulada.cod_item            = homologacao.cod_item
+                       AND homologacao_anulada.exercicio_cotacao   = homologacao.exercicio_cotacao
+                       AND homologacao_anulada.cgm_fornecedor      = homologacao.cgm_fornecedor
+                 ";
+
+        return  $stSql;
+    }
+
     public function recuperaItensRelatorio(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
     {
         $obErro      = new Erro;
@@ -627,7 +712,217 @@ from (
                          ";
 
         return $stSql;
+    }
 
+    public function recuperaCotacoesParaEmpenhoParcial(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        $stSql  = $this->montaRecuperaCotacoesParaEmpenhoParcial().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    public function montaRecuperaCotacoesParaEmpenhoParcial()
+    {
+        $stSql = "
+                     SELECT licitacao.cod_licitacao
+                          , licitacao.exercicio
+                          , licitacao.cod_mapa
+                          , TO_CHAR( licitacao.timestamp,'dd/mm/yyyy') AS data
+                          , modalidade.cod_modalidade
+                          , modalidade.descricao AS modalidade
+                          , sw_cgm.nom_cgm AS entidade
+                          , entidade.cod_entidade
+                          , mapa_cotacao.cod_mapa
+                          , mapa_cotacao.exercicio_mapa
+                          , mapa_cotacao.cod_cotacao
+                          , mapa_cotacao.exercicio_cotacao
+                       FROM licitacao.licitacao
+                  LEFT JOIN licitacao.licitacao_anulada
+                         ON licitacao_anulada.cod_licitacao     = licitacao.cod_licitacao
+                        AND licitacao_anulada.cod_modalidade    = licitacao.cod_modalidade
+                        AND licitacao_anulada.cod_entidade      = licitacao.cod_entidade
+                        AND licitacao_anulada.exercicio         = licitacao.exercicio
+                 INNER JOIN compras.mapa_cotacao
+                         ON licitacao.cod_mapa      = mapa_cotacao.cod_mapa
+                        AND licitacao.exercicio_mapa= mapa_cotacao.exercicio_mapa
+                 INNER JOIN compras.modalidade
+                         ON licitacao.cod_modalidade= modalidade.cod_modalidade
+                 INNER JOIN orcamento.entidade
+                         ON licitacao.cod_entidade  = entidade.cod_entidade
+                        AND licitacao.exercicio     = entidade.exercicio
+                 INNER JOIN sw_cgm
+                         ON entidade.numcgm = sw_cgm.numcgm
+                 INNER JOIN ( select homologacao.cod_licitacao
+                                   , homologacao.cod_modalidade
+                                   , homologacao.cod_entidade
+                                   , homologacao.exercicio_licitacao
+                                   , homologacao.cod_cotacao
+                                   , homologacao.exercicio_cotacao
+                                from licitacao.adjudicacao
+                           left join licitacao.adjudicacao_anulada
+                                  on adjudicacao_anulada.num_adjudicacao      = adjudicacao.num_adjudicacao
+                                 and adjudicacao_anulada.cod_entidade         = adjudicacao.cod_entidade
+                                 and adjudicacao_anulada.cod_modalidade       = adjudicacao.cod_modalidade
+                                 and adjudicacao_anulada.cod_licitacao        = adjudicacao.cod_licitacao
+                                 and adjudicacao_anulada.exercicio_licitacao  = adjudicacao.exercicio_licitacao
+                                 and adjudicacao_anulada.cod_item             = adjudicacao.cod_item
+                                 and adjudicacao_anulada.cod_cotacao          = adjudicacao.cod_cotacao
+                                 and adjudicacao_anulada.lote                 = adjudicacao.lote
+                                 and adjudicacao_anulada.exercicio_cotacao    = adjudicacao.exercicio_cotacao
+                                 and adjudicacao_anulada.cgm_fornecedor       = adjudicacao.cgm_fornecedor
+                          inner join licitacao.homologacao
+                                  on homologacao.num_adjudicacao        = adjudicacao.num_adjudicacao
+                                 and homologacao.cod_entidade           = adjudicacao.cod_entidade
+                                 and homologacao.cod_modalidade         = adjudicacao.cod_modalidade
+                                 and homologacao.cod_licitacao          = adjudicacao.cod_licitacao
+                                 and homologacao.exercicio_licitacao    = adjudicacao.exercicio_licitacao
+                                 and homologacao.cod_item               = adjudicacao.cod_item
+                                 and homologacao.cod_cotacao            = adjudicacao.cod_cotacao
+                                 and homologacao.lote                   = adjudicacao.lote
+                                 and homologacao.exercicio_cotacao      = adjudicacao.exercicio_cotacao
+                                 and homologacao.cgm_fornecedor         = adjudicacao.cgm_fornecedor
+                                 and homologacao.num_homologacao        = (   select max(h.num_homologacao)
+                                                                                from licitacao.homologacao as h
+                                                                               where h.num_adjudicacao      = adjudicacao.num_adjudicacao
+                                                                                 and h.cod_entidade         = adjudicacao.cod_entidade
+                                                                                 and h.cod_modalidade       = adjudicacao.cod_modalidade
+                                                                                 and h.cod_licitacao        = adjudicacao.cod_licitacao
+                                                                                 and h.exercicio_licitacao  = adjudicacao.exercicio_licitacao
+                                                                                 and h.cod_item             = adjudicacao.cod_item
+                                                                                 and h.cod_cotacao          = adjudicacao.cod_cotacao
+                                                                                 and h.lote                 = adjudicacao.lote
+                                                                                 and h.exercicio_cotacao    = adjudicacao.exercicio_cotacao
+                                                                                 and h.cgm_fornecedor       = adjudicacao.cgm_fornecedor )
+                           left join licitacao.homologacao_anulada
+                                  on homologacao_anulada.num_homologacao        = homologacao.num_homologacao
+                                 and homologacao_anulada.cod_licitacao          = homologacao.cod_licitacao
+                                 and homologacao_anulada.cod_modalidade         = homologacao.cod_modalidade
+                                 and homologacao_anulada.cod_entidade           = homologacao.cod_entidade
+                                 and homologacao_anulada.num_adjudicacao        = homologacao.num_adjudicacao
+                                 and homologacao_anulada.exercicio_licitacao    = homologacao.exercicio_licitacao
+                                 and homologacao_anulada.lote                   = homologacao.lote
+                                 and homologacao_anulada.cod_cotacao            = homologacao.cod_cotacao
+                                 and homologacao_anulada.cod_item               = homologacao.cod_item
+                                 and homologacao_anulada.exercicio_cotacao      = homologacao.exercicio_cotacao
+                                 and homologacao_anulada.cgm_fornecedor         = homologacao.cgm_fornecedor
+                          inner join licitacao.cotacao_licitacao
+                                  on cotacao_licitacao.cod_licitacao        = adjudicacao.cod_licitacao
+                                 and cotacao_licitacao.cod_modalidade       = adjudicacao.cod_modalidade
+                                 and cotacao_licitacao.cod_entidade         = adjudicacao.cod_entidade
+                                 and cotacao_licitacao.exercicio_licitacao  = adjudicacao.exercicio_licitacao
+                                 and cotacao_licitacao.lote                 = adjudicacao.lote
+                                 and cotacao_licitacao.cod_cotacao          = adjudicacao.cod_cotacao
+                                 and cotacao_licitacao.cod_item             = adjudicacao.cod_item
+                                 and cotacao_licitacao.exercicio_cotacao    = adjudicacao.exercicio_cotacao
+                                 and cotacao_licitacao.cgm_fornecedor       = adjudicacao.cgm_fornecedor  
+                          inner join compras.cotacao_fornecedor_item
+                                  on cotacao_fornecedor_item.cod_item       = cotacao_licitacao.cod_item
+                                 and cotacao_fornecedor_item.cgm_fornecedor = cotacao_licitacao.cgm_fornecedor
+                                 and cotacao_fornecedor_item.cod_cotacao    = cotacao_licitacao.cod_cotacao
+                                 and cotacao_fornecedor_item.exercicio      = cotacao_licitacao.exercicio_cotacao
+                                 and cotacao_fornecedor_item.lote           = cotacao_licitacao.lote
+                          inner join compras.cotacao_item
+                                  on cotacao_item.exercicio	    = cotacao_fornecedor_item.exercicio
+                                 and cotacao_item.cod_cotacao	= cotacao_fornecedor_item.cod_cotacao
+                                 and cotacao_item.cod_item      = cotacao_fornecedor_item.cod_item
+                                 and cotacao_item.lote		    = cotacao_fornecedor_item.lote
+                           left join compras.cotacao_anulada
+                                  on cotacao_anulada.cod_cotacao = cotacao_licitacao.cod_cotacao
+                                 and cotacao_anulada.exercicio   = cotacao_licitacao.exercicio_cotacao
+                           left join ( select item_pre_empenho_julgamento.exercicio_julgamento
+                                            , item_pre_empenho_julgamento.cod_cotacao
+                                            , item_pre_empenho_julgamento.cod_item
+                                            , item_pre_empenho_julgamento.lote
+                                            , item_pre_empenho_julgamento.cgm_fornecedor
+                                            , sum(coalesce(item_pre_empenho.quantidade, 0.00)) as quantidade
+                                         from empenho.item_pre_empenho_julgamento
+                                   inner join empenho.item_pre_empenho
+                                           on item_pre_empenho.cod_pre_empenho  = item_pre_empenho_julgamento.cod_pre_empenho
+                                          and item_pre_empenho.exercicio        = item_pre_empenho_julgamento.exercicio
+                                          and item_pre_empenho.num_item         = item_pre_empenho_julgamento.num_item
+                                     group by item_pre_empenho_julgamento.exercicio_julgamento
+                                            , item_pre_empenho_julgamento.cod_cotacao
+                                            , item_pre_empenho_julgamento.cod_item
+                                            , item_pre_empenho_julgamento.lote
+                                            , item_pre_empenho_julgamento.cgm_fornecedor
+                                     ) as item_pre_empenho_julgamento
+                                  on item_pre_empenho_julgamento.exercicio_julgamento = homologacao.exercicio_cotacao
+                                 and item_pre_empenho_julgamento.cod_cotacao          = homologacao.cod_cotacao
+                                 and item_pre_empenho_julgamento.cod_item             = homologacao.cod_item
+                                 and item_pre_empenho_julgamento.lote                 = homologacao.lote
+                                 and item_pre_empenho_julgamento.cgm_fornecedor       = homologacao.cgm_fornecedor
+                               where homologacao.homologado
+                                 and homologacao_anulada.cod_item is null
+                                 and adjudicacao.adjudicado
+                                 and adjudicacao_anulada.cod_item is null
+                                 and coalesce(cotacao_item.quantidade, 0.00) - coalesce(item_pre_empenho_julgamento.quantidade, 0.00) > 0
+                                 and cotacao_anulada.cod_cotacao is null
+                            group by homologacao.cod_licitacao
+                                   , homologacao.cod_modalidade
+                                   , homologacao.cod_entidade
+                                   , homologacao.exercicio_licitacao
+                                   , homologacao.cod_cotacao
+                                   , homologacao.exercicio_cotacao
+                            order by homologacao.exercicio_licitacao
+                                   , homologacao.cod_licitacao
+                            ) AS homologacao
+                         ON homologacao.cod_licitacao          = licitacao.cod_licitacao
+                        AND homologacao.cod_modalidade         = licitacao.cod_modalidade
+                        AND homologacao.cod_entidade           = licitacao.cod_entidade
+                        AND homologacao.exercicio_licitacao    = licitacao.exercicio
+                        AND homologacao.cod_cotacao            = mapa_cotacao.cod_cotacao
+                        AND homologacao.exercicio_cotacao      = mapa_cotacao.exercicio_cotacao
+                  LEFT JOIN licitacao.edital
+                         ON licitacao.cod_licitacao    = edital.cod_licitacao
+                        AND licitacao.cod_modalidade   = edital.cod_modalidade
+                        AND licitacao.cod_entidade     = edital.cod_entidade
+                        AND licitacao.exercicio        = edital.exercicio
+                  LEFT JOIN licitacao.edital_suspenso
+                         ON edital_suspenso.num_edital = edital.num_edital
+                        AND edital_suspenso.exercicio  = edital.exercicio
+                      WHERE licitacao_anulada.cod_licitacao IS NULL
+                        AND edital_suspenso.num_edital IS NULL
+                        -- Para as modalidades 1,2,3,4,5,6,7,10,11 é obrigatório exister um edital
+                        AND CASE WHEN licitacao.cod_modalidade in (1,2,3,4,5,6,7,10,11)
+                                    THEN edital.num_edital IS NOT NULL
+                                -- Para as modalidades 8,9 é facultativo possuir um edital
+                                 WHEN licitacao.cod_modalidade in (8,9)
+                                    THEN ( edital.num_edital IS NOT NULL OR edital.num_edital IS NULL )
+                            END
+                        AND EXISTS (   SELECT mp.exercicio
+                                            , mp.cod_mapa
+                                            , mp.cod_objeto
+                                            , mp.timestamp
+                                            , mp.cod_tipo_licitacao
+                                            , solicitacao.registro_precos
+                                         FROM compras.mapa AS mp
+                                       INNER JOIN compras.mapa_solicitacao
+                                           ON mapa_solicitacao.exercicio = mp.exercicio
+                                          AND mapa_solicitacao.cod_mapa  = mp.cod_mapa
+                                       INNER JOIN compras.solicitacao_homologada
+                                           ON solicitacao_homologada.exercicio       = mapa_solicitacao.exercicio_solicitacao
+                                          AND solicitacao_homologada.cod_entidade    = mapa_solicitacao.cod_entidade
+                                          AND solicitacao_homologada.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                                       INNER JOIN compras.solicitacao
+                                           ON solicitacao.exercicio       = solicitacao_homologada.exercicio
+                                          AND solicitacao.cod_entidade    = solicitacao_homologada.cod_entidade
+                                          AND solicitacao.cod_solicitacao = solicitacao_homologada.cod_solicitacao
+                                        WHERE mp.cod_mapa	= mapa_cotacao.cod_mapa
+                                          AND mp.exercicio	= mapa_cotacao.exercicio_mapa
+                                         GROUP BY mp.exercicio
+                                            , mp.cod_mapa
+                                            , mp.cod_objeto
+                                            , mp.timestamp
+                                            , mp.cod_tipo_licitacao
+                                            , solicitacao.registro_precos )                                                                 \n";
+
+        return $stSql;
     }
 
     public function recuperaItensAgrupadosSolicitacaoLicitacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
@@ -1079,7 +1374,8 @@ from (
                               , solicitacao_item.cod_solicitacao
                               , solicitacao_item.cod_entidade
                               , solicitacao_item.cod_item
-                              , solicitacao_item.complemento";
+                              , solicitacao_item.complemento
+                              , solicitacao_item.cod_centro";
         $stSql = $this->montaRecuperaItensAgrupadosSolicitacaoLicitacaoImp().$stFiltro.$stGroupBy.$stOrdem;
         $this->stDebug = $stSql;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -1115,6 +1411,7 @@ from (
                        , mapa.cod_mapa
                        , mapa.exercicio as exercicio_mapa
                        , solicitacao_item.complemento
+                       , solicitacao_item.cod_centro
 
                   from licitacao.homologacao
              left join licitacao.homologacao_anulada
@@ -1544,6 +1841,7 @@ from (
                  , historico
                  , cod_tipo
                  , implantado
+                 , count(cod_item) as qtd_itens_homologados
               FROM (
             select  cotacao_fornecedor_item.cgm_fornecedor as fornecedor
                   , solicitacao_item_dotacao.cod_item

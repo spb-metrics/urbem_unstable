@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterLocalizacaoNivel.php 63673 2015-09-28 19:31:03Z carlos.silva $
+    * $Id: FMManterLocalizacaoNivel.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
@@ -58,32 +58,38 @@ $pgJS        = "JS".$stPrograma.".js";
 include_once ($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if ( empty( $_REQUEST['stAcao'] ) ) {
-    $_REQUEST['stAcao'] = "incluir";
+$stAcao = $request->get('stAcao');
+
+if ( empty( $stAcao ) ) {
+    $stAcao = "alterar";
 }
 
-$obRCIMLocalizacao  = new RCIMLocalizacao;
-$obMontaLocalizacao = new MontaLocalizacao;
-$obMontaAtributos   = new MontaAtributos;
-$rsAtributos        = new RecordSet;
-$obMascara          = new Mascara;
+$obRCIMConfiguracao = new RCIMConfiguracao();
+$obRCIMLocalizacao  = new RCIMLocalizacao();
+$obMontaLocalizacao = new MontaLocalizacao();
+$obMontaAtributos   = new MontaAtributos();
+$rsAtributos        = new RecordSet();
+$obMascara          = new Mascara();
 $stNomePai = '';
 $stCompostoPai = '';
 
-if ($_REQUEST['stAcao'] == "incluir") {
-    $inCodigoVigencia = $_REQUEST["inCodigoVigencia"];
-    $inCodigoNivel    = $_REQUEST["cmbNivel"];
-    //Sessao::write('inCodigoNivel', $inCodigoNivel);
-    $_REQUEST['inCodigoNivel'] = $_REQUEST['cmbNivel'];
+$obRCIMConfiguracao->buscaModulo();
+$boLocalizacaoAutomaitca = SistemaLegado::pegaConfiguracao( 'codigo_localizacao', $obRCIMConfiguracao->getCodigoModulo(), Sessao::getExercicio() );
+
+if ( $boLocalizacaoAutomaitca != "true" && $boLocalizacaoAutomaitca != "false" )
+    $boLocalizacaoAutomaitca = null;
+
+if ($request->get('stAcao') == "incluir") {
+    $inCodigoVigencia = $request->get('inCodigoVigencia');
+    $inCodigoNivel    = ($request->get('cmbNivel') == '') ? $request->get('inCodigoNivel') : $request->get('cmbNivel');
     $inCodigoLocalizacao = $request->get('inCodigoLocalizacao');
 
-    $obMontaLocalizacao->setNivelCorte ( $inCodigoNivel - 1 );
-
+    $obMontaLocalizacao->setNivelCorte    ( $inCodigoNivel - 1 );
     $obRCIMLocalizacao->setCodigoVigencia ( $inCodigoVigencia );
     $obRCIMLocalizacao->setCodigoNivel    ( $inCodigoNivel    );
 
     $obMontaLocalizacao->setCodigoVigencia ( $inCodigoVigencia );
-$inCodigoNivelTemp = $inCodigoNivel - 1;
+    $inCodigoNivelTemp = $inCodigoNivel - 1;
     $obMontaLocalizacao->setCodigoNivel    ( $inCodigoNivelTemp   );
     Sessao::write('inCodigoNivel', $inCodigoNivel);
 
@@ -97,23 +103,23 @@ $inCodigoNivelTemp = $inCodigoNivel - 1;
     $obRCIMLocalizacao->obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributos );
 
 } else {
-    $inCodigoVigencia = $_REQUEST["inCodigoVigencia"];
-    $inCodigoNivel    = $_REQUEST["inCodigoNivel"];
-    $inCodigoLocalizacao = $_REQUEST['inCodigoLocalizacao'];
+    $inCodigoVigencia = $request->get('inCodigoVigencia');
+    $inCodigoNivel    = $request->get('inCodigoNivel');
+    $inCodigoLocalizacao = $request->get('inCodigoLocalizacao');
 
-    $obRCIMLocalizacao->setCodigoVigencia    ( $_REQUEST["inCodigoVigencia"]    );
-    $obRCIMLocalizacao->setCodigoNivel       ( $_REQUEST["inCodigoNivel"]       );
-    $obRCIMLocalizacao->setCodigoLocalizacao ( $_REQUEST["inCodigoLocalizacao"] );
+    $obRCIMLocalizacao->setCodigoVigencia    ( $request->get('inCodigoVigencia')    );
+    $obRCIMLocalizacao->setCodigoNivel       ( $request->get('inCodigoNivel')       );
+    $obRCIMLocalizacao->setCodigoLocalizacao ( $request->get('inCodigoLocalizacao') );
 
-    $obMontaLocalizacao->setCodigoVigencia    ( $_REQUEST["inCodigoVigencia"]    );
-    $obMontaLocalizacao->setCodigoNivel       ( $_REQUEST["inCodigoNivel"]       );
-    $obMontaLocalizacao->setCodigoLocalizacao ( $_REQUEST["inCodigoLocalizacao"] );
-    $obMontaLocalizacao->setValorComposto     ( $_REQUEST["stValorComposto"]     );
+    $obMontaLocalizacao->setCodigoVigencia    ( $request->get('inCodigoVigencia')    );
+    $obMontaLocalizacao->setCodigoNivel       ( $request->get('inCodigoNivel')       );
+    $obMontaLocalizacao->setCodigoLocalizacao ( $request->get('inCodigoLocalizacao') );
+    $obMontaLocalizacao->setValorComposto     ( $request->get('stValorComposto')     );
 
     $obRCIMLocalizacao->consultarLocalizacao();
 
     //RECUPERA INFORMACOES DA LOCALIZACAO PAI
-    $stPaiComposto  = substr( $_REQUEST["stValorComposto"], 0, strlen( $_REQUEST["stValorComposto"] ) - ( strlen($obRCIMLocalizacao->getMascara() +1 )));
+    $stPaiComposto  = substr( $request->get('stValorComposto'), 0, strlen( $request->get('stValorComposto') ) - ( strlen($obRCIMLocalizacao->getMascara() +1 )));
     $stPaiComposto .= ".".str_pad( 0 , strlen($obRCIMLocalizacao->getMascara()) , 0 );
     $obRCIMLocalizacao->setValorComposto( $stPaiComposto );
 
@@ -134,6 +140,7 @@ $obRCIMConfiguracao = new RCIMConfiguracao;
 $obRCIMConfiguracao->consultarConfiguracao();
 $rsMDSelecionados = $obRCIMConfiguracao->getRSMD();
 $boM2Ativo = false;
+
 while ( !$rsMDSelecionados->Eof() ) {
     if ( $rsMDSelecionados->getCampo( "nome" ) == "Localização" ) {
         $boM2Ativo = true;
@@ -156,8 +163,8 @@ while ( !$rsAliquotaSelecionados->Eof() ) {
 //valores m2-------------------
 if ($boM2Ativo) {
     $obTCIMLocalizacaoValorM2 = new TCIMLocalizacaoValorM2;
-    if ($_REQUEST["inCodigoLocalizacao"]) {
-        $stFiltro = " AND localizacao_valor_m2.cod_localizacao = ".$_REQUEST["inCodigoLocalizacao"];
+    if ($request->get('inCodigoLocalizacao')) {
+        $stFiltro = " AND localizacao_valor_m2.cod_localizacao = ".$request->get('inCodigoLocalizacao');
         $obTCIMLocalizacaoValorM2->listaLocalizacaoValorM2( $rsDadosM2, $stFiltro );
         $rsDadosM2->addFormatacao ('valor_m2_territorial', 'NUMERIC_BR');
         $rsDadosM2->addFormatacao ('valor_m2_predial', 'NUMERIC_BR');
@@ -204,8 +211,8 @@ if ($boM2Ativo) {
 if ($boAliquotaAtivo) {
     $obTCIMLocalizacaoAliquota = new TCIMLocalizacaoAliquota;
 
-    if ($_REQUEST["inCodigoLocalizacao"]) {
-        $stFiltro = " AND localizacao_aliquota.cod_localizacao = ".$_REQUEST["inCodigoLocalizacao"];
+    if ($request->get('inCodigoLocalizacao')) {
+        $stFiltro = " AND localizacao_aliquota.cod_localizacao = ".$request->get('inCodigoLocalizacao');
         $obTCIMLocalizacaoAliquota->listaLocalizacaoAliquota( $rsDadosM2, $stFiltro );
         $rsDadosM2->addFormatacao ('aliquota_territorial', 'NUMERIC_BR');
         $rsDadosM2->addFormatacao ('aliquota_predial', 'NUMERIC_BR');
@@ -273,7 +280,7 @@ $obMontaAtributos->recuperaValores();
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
 $obHdnAcao->setName  ( "stAcao" );
-$obHdnAcao->setValue ( $_REQUEST['stAcao'] );
+$obHdnAcao->setValue ( $request->get('stAcao') );
 
 $obHdnCtrl =  new Hidden;
 $obHdnCtrl->setName  ( "stCtrl" );
@@ -327,6 +334,10 @@ $obHdnValComposto = new Hidden;
 $obHdnValComposto->setName( "stValorComposto" );
 $obHdnValComposto->setValue( $stValorComposto );
 
+$obHdnCodLocalAutomatico = new Hidden;
+$obHdnCodLocalAutomatico->setName( "boCodLocalAutomatico" );
+$obHdnCodLocalAutomatico->setValue( $boLocalizacaoAutomaitca );
+
 //DEFINICAO DO FORM
 $obForm = new Form;
 $obForm->setAction( $pgProc );
@@ -334,9 +345,9 @@ $obForm->setTarget( "oculto"     );
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addForm       ( $obForm );
-$obFormulario->setAjuda ( "UC-05.01.03" );
-$obFormulario->addTitulo      ( "Dados para nível" );
+$obFormulario->addForm      ( $obForm );
+$obFormulario->setAjuda     ( "UC-05.01.03" );
+$obFormulario->addTitulo    ( "Dados para nível" );
 $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addHidden    ( $obHdnAliquota );
@@ -344,22 +355,20 @@ $obFormulario->addHidden    ( $obHdnMD );
 $obFormulario->addHidden    ( $obHdnCodigoNivel    );
 $obFormulario->addHidden    ( $obHdnCodigoVigencia );
 $obFormulario->addHidden    ( $obHdnValorReduzido  );
+$obFormulario->addHidden    ( $obHdnCodLocalAutomatico );
 
-if ( $_REQUEST['stAcao'] == "alterar" )
+if ( $request->get('stAcao') == "alterar" )
     $obFormulario->addHidden    ( $obHdnValComposto );
 
 $obFormulario->addComponente ( $obLbNomeNivel       );
 
-if ($_REQUEST['stAcao'] == "incluir" && $inCodigoNivel != 1) {
-    if ($_GET["stValorComposto"]) {
-        $obMontaLocalizacao->setValorComposto(  $_GET["stValorComposto"] );
+if ($request->get('stAcao') == "incluir" && $inCodigoNivel != 1) {
+    if ($request->get('stValorComposto')){
+        $obMontaLocalizacao->setValorComposto( $request->get('stValorComposto') );
         /* Enquanto nao for otimizada a combo de localizacao o formulario é carregado com a combo não preenchida*/
-
-        //$obMontaLocalizacao->geraFormularioPreenchido( $obFormulario  );
-
         $obMontaLocalizacao->geraFormulario( $obFormulario  );
     } else {
-        $obMontaLocalizacao->setCodigoNivel ( 1 ); //$inCodigoNivelTemp );
+        $obMontaLocalizacao->setCodigoNivel ( 1 );
         $obMontaLocalizacao->geraFormulario( $obFormulario  );
     }
 } else {
@@ -368,7 +377,10 @@ if ($_REQUEST['stAcao'] == "incluir" && $inCodigoNivel != 1) {
         $obFormulario->addComponente ( $obLblValorComposto     );
     }
 }
-$obFormulario->addComponente ( $obTxtCodigoLocalizacao );
+
+if ( $boLocalizacaoAutomaitca == null || $boLocalizacaoAutomaitca == "false" || $stAcao == 'alterar' )
+    $obFormulario->addComponente ( $obTxtCodigoLocalizacao );
+    
 $obFormulario->addComponente ( $obTxtNomeLocalizacao   );
 
 if ($boM2Ativo) {
@@ -389,21 +401,22 @@ if ($boAliquotaAtivo) {
 
 $obMontaAtributos->geraFormulario( $obFormulario );
 
-if ($_REQUEST['stAcao'] == "incluir") {
+if ($request->get('stAcao') == "incluir") {
     $obFormulario->OK();
 } else {
     $obFormulario->Cancelar();
 }
 
-if ($_REQUEST['stAcao'] == "incluir") {
+if ($request->get('stAcao') == "incluir") {
     if ($inCodigoNivel == 1) {
     $obFormulario->setFormFocus( $obTxtCodigoLocalizacao->getId() );
     } else {
         SistemaLegado::executaFramePrincipal("f.stChaveLocalizacao.focus();");
     }
-} elseif ($_REQUEST['stAcao'] == "alterar") {
+} elseif ($request->get('stAcao') == "alterar") {
     $obFormulario->setFormFocus( $obTxtCodigoLocalizacao->getId() );
 }
+
 $obFormulario->show();
 
 ?>

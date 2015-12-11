@@ -51,7 +51,7 @@ class TPessoalAssentamentoGerado extends Persistente
     * Método Construtor
     * @access Private
 */
-function TPessoalAssentamentoGerado()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela('pessoal.assentamento_gerado');
@@ -59,13 +59,13 @@ function TPessoalAssentamentoGerado()
     $this->setCampoCod('');
     $this->setComplementoChave('cod_assentamento_gerado, timestamp');
 
-    $this->AddCampo('cod_assentamento_gerado' , 'integer'   ,  true,    '',  true,  true);
+    $this->AddCampo('cod_assentamento_gerado' , 'integer'       ,  true,    '',  true,  true);
     $this->AddCampo('timestamp'               , 'timestamp_now' ,  true,    '',  true, false);
-    $this->AddCampo('cod_assentamento'        , 'integer'   ,  true,    '', false,  true);
-    $this->AddCampo('observacao'              , 'char'      , false, '200', false, false);
-    $this->AddCampo('automatico'              , 'boolean'   ,  true,    '', false, false);
-    $this->AddCampo('periodo_inicial'         , 'date'      ,  true,    '', false, false);
-    $this->AddCampo('periodo_final'           , 'date'      , false,    '', false, false);
+    $this->AddCampo('cod_assentamento'        , 'integer'       ,  true,    '', false,  true);
+    $this->AddCampo('observacao'              , 'char'          , false, '200', false, false);
+    $this->AddCampo('automatico'              , 'boolean'       ,  true,    '', false, false);
+    $this->AddCampo('periodo_inicial'         , 'date'          ,  true,    '', false, false);
+    $this->AddCampo('periodo_final'           , 'date'          , false,    '', false, false);
 }
 
 function montaRecuperaRelacionamento()

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioCadastroImobiliarioBoletim.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioCadastroImobiliarioBoletim.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.26
 */
@@ -116,7 +116,7 @@ $arAtributosConstrucaoValorModificado = array(); //valores padrao seguidos do se
 $inQtdAtributosConstrucao = 0; //quantidade de atributos existentes
 $arTamMaxAtributosConstrucao = array(); //guarda a quantidade maxima de caracteres dos atributos
 $arValPadAtributoConstrucao = array(); //guarda a posicao onde esta o valor padrao do atributo
-//sistemaLegado::mostravar( $rsAtributosConstrucao );exit;
+
 while ( !$rsAtributosConstrucao->Eof() ) {
     if ($rsAtributosConstrucao->getCampo("ativo") == 't') {
         $stTmp = $rsAtributosConstrucao->getCampo("valor_padrao_desc");
@@ -167,7 +167,7 @@ $arAtributosImovelValorModificado = array(); //valores padrao seguidos do seleci
 $inQtdAtributosImovel = 0; //quantidade de atributos existentes
 $arTamMaxAtributosImovel = array(); //guarda a quantidade maxima de caracteres dos atributos
 $arValPadAtributoImovel = array(); //guarda a posicao onde esta o valor padrao do atributo
-//sistemaLegado::mostravar( $rsAtributosImovel );exit;
+
 while ( !$rsAtributosImovel->Eof() ) {
     if ($rsAtributosImovel->getCampo("ativo") == 't') {
         $stTmp = $rsAtributosImovel->getCampo("valor_padrao_desc");
@@ -617,7 +617,7 @@ for ($inX=0; $inX<$inTotalDados; $inX++) {
 
     $obPDF->setAlinhamento( "L" );
     $obPDF->addCampo      ( "confrotac", 9, B );
-//sistemaLegado::mostravar($arDadosConfrontacoes);exit;
+
     $inPosicaoLivre = $arDadosConfrontacoes[$arDados[$inX]["inscricao_municipal"]]["total_conf"];
     for ($inZ=0; $inZ<3; $inZ++) {
         $arDadosConfrontacoes[$arDados[$inX]["inscricao_municipal"]][$inPosicaoLivre+$inZ]["conf_lot_ponto_cardeal"]= "[                      ]";

@@ -90,7 +90,6 @@ switch ($stCtrl) {
 
     //monta HTML com os ATRIBUTOS relativos ao TIPO DE NORMA selecionado
     case "MontaAtributos":
-       sistemaLegado::mostraVar($_REQUEST);
         if ($_REQUEST["inCodTipoNorma"] != "") {
             $inCodTipoNorma = $_REQUEST["inCodTipoNorma"];
             $inCodNorma = $_REQUEST["inCodNorma"];

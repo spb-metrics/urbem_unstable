@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCIFiltroComponentes.php 61047 2014-12-02 18:01:27Z jean $
+    $Id: OCIFiltroComponentes.php 63818 2015-10-19 20:02:07Z evandro $
 
     $Revision: 32866 $
     $Name$
@@ -1236,8 +1236,12 @@ function preencheCGMContrato()
         }
     switch ($_GET["stTipo"]) {
             case "contrato":
+                $boValidaAtivos = Sessao::read('valida_ativos_cgm');
                 $stFiltro  = " AND registro = ".$_GET["inContrato"];
                 $stFiltro .= " AND NOT EXISTS (SELECT 1 FROM pessoal.contrato_servidor_caso_causa WHERE contrato_servidor_caso_causa.cod_contrato = contrato.cod_contrato ".$stSubFiltro.")";
+                if ($boValidaAtivos == 'true') {
+                    $stFiltro .= " AND situacao = 'Ativo' ";
+                }
                 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
                 $obTPessoalContrato = new TPessoalContrato();
                 $obTPessoalContrato->recuperaCgmDoRegistro($rsCGM,$stFiltro);
@@ -1269,13 +1273,13 @@ function preencheCGMContrato()
             case "contrato_rescisao":
                 $stFiltro  = " AND registro = ".$_GET["inContrato"];
 
-        $stFiltro  .= "
-            AND EXISTS (SELECT 1 FROM pessoal.contrato_servidor_caso_causa WHERE contrato_servidor_caso_causa.cod_contrato = contrato.cod_contrato ".$stSubFiltro."
+                $stFiltro  .= "
+                    AND EXISTS (SELECT 1 FROM pessoal.contrato_servidor_caso_causa WHERE contrato_servidor_caso_causa.cod_contrato = contrato.cod_contrato ".$stSubFiltro."
                         UNION ALL
                         SELECT 1 FROM pessoal.contrato_pensionista_caso_causa WHERE contrato_pensionista_caso_causa.cod_contrato = contrato.cod_contrato ".$stSubFiltro." ) ";
 
-        include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
-        $obTPessoalContrato = new TPessoalContrato();
+                include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
+                $obTPessoalContrato = new TPessoalContrato();
                 $obTPessoalContrato->recuperaCgmDoRegistro($rsCGM,$stFiltro);
 
                 if ($rsCGM->getNumLinhas() == 1) {

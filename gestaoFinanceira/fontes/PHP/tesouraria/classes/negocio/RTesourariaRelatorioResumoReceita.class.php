@@ -265,8 +265,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     include_once( CAM_GF_TES_MAPEAMENTO."FTesourariaResumoReceita.class.php");
     $obFTesourariaResumoReceita = new FTesourariaResumoReceita;
 
-    $boTCEMS = SistemaLegado::is_tcems();
-
     $obFTesourariaResumoReceita->setDado("stEntidade"           ,$this->getEntidade());
     $obFTesourariaResumoReceita->setDado("stExercicio"          ,$this->getExercicio());
     $obFTesourariaResumoReceita->setDado("stDataInicial"        ,$this->getDataInicial());
@@ -283,7 +281,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFTesourariaResumoReceita->setDado("inCodDetalhamento"    ,$this->inCodDetalhamento );
     $obFTesourariaResumoReceita->setDado("boUtilizaEstruturalTCE", 'false' );
 
-    if ($boTCEMS and $this->getTipoReceita() != 'extra') {
+    if (Sessao::getExercicio() > '2012' and $this->getTipoReceita() != 'extra') {
         $obFTesourariaResumoReceita->setDado("boUtilizaEstruturalTCE"    , 'true' );
     }
 

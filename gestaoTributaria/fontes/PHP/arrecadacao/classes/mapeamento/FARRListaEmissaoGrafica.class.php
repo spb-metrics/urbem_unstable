@@ -32,7 +32,7 @@
  * @package URBEM
  * @subpackage Mapeamento
 
- * $Id: FARRListaEmissaoGrafica.class.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: FARRListaEmissaoGrafica.class.php 63867 2015-10-27 17:25:14Z evandro $
 
  * Casos de uso: uc-05.03.11
  */
@@ -67,6 +67,7 @@ class FARRListaEmissaoGrafica extends Persistente
     public $stTipoInscricao;
     public $stTipoEmissao;
     public $stOrdemEmissao;
+    public $stOrdemEmissaoFuncao;
 
     # Atributos da Inscr. Imobiliaria
     public $stOrdemLote;
@@ -104,7 +105,8 @@ function FARRListaEmissaoGrafica()
 
     $this->stVinculo			= null;
     $this->stOrdemEmissao		= null;
-
+    $this->stOrdemEmissaoFuncao = '';
+    
     $this->stOrdemLote			= null;
     $this->stOrdemImovel		= null;
     $this->stOrdemEdificacao	= null;
@@ -703,7 +705,6 @@ function executaFuncao(&$rsRecordset, $stParametros,$boTransacao = "")
     $this->setDebug($stSql);
     $obErro = $obConexao->executaSQL($rsRecordset,$stSql, $boTransacao );
 
-    //$this->debug();
     return $obErro;
 }
 
@@ -755,6 +756,7 @@ function montaExecutaFuncaoImobiliaria()
                 nom_logradouro varchar,
                 numero varchar,
                 complemento varchar,
+                nome_condominio varchar,
                 nom_bairro varchar,
                 cep varchar,
                 cod_municipio varchar,
@@ -985,8 +987,8 @@ function montaExecutaFuncaoImobiliaria()
                 , area_construida_total varchar
                 , area_descoberta varchar
                 , valor_venal_predial_coberto varchar
-                                                                                    \r\n";
-    $stSql .= " )                                                                   \r\n";
+                                                               \r\n";
+    $stSql .= " ) ORDER BY ".$this->stOrdemEmissaoFuncao." \r\n";
 
     return $stSql;
 
@@ -1609,3 +1611,4 @@ function montaExecutaFuncaoEconomica()
 
 }
 ?>
+

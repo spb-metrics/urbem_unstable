@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Desenvolvedor: Fernando Piccini Cercato
 
-    * $Id: OCCondominios.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCCondominios.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.27
 */
@@ -48,7 +48,6 @@ include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMCondominio.class.php" );
 // INSTANCIA OBJETO
 $obRRelatorio = new RRelatorio;
 
-//sistemaLegado::mostravar( $arFiltroSessao );exit;
 $arFiltroSessao = Sessao::read('filtroRelatorio');
 $stFiltro = "";
 if ( ( $arFiltroSessao["inCodCondominioInicial"] ) && ( $arFiltroSessao["inCodCondominioFinal"] ) ) {
@@ -77,7 +76,6 @@ while ( !$rsCondominios->Eof() ) {
     $obTCIMCondominio->recuperaImoveisDoCondominio( $rsImoveisCondominio, $stFiltro );
 
     $arDadosImoveis = $rsImoveisCondominio->getElementos();
-//sistemaLegado::mostravar($arDadosImoveis);//DIE();
 
     for ( $inX=0; $inX<count( $arDadosImoveis ); $inX++ ) {
         $arChaveAtributoImovel = array( "inscricao_municipal" => $arDadosImoveis[$inX]['inscricao_municipal'] );

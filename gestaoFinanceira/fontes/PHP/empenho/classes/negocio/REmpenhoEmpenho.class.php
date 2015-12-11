@@ -35,7 +35,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoEmpenho.class.php 63657 2015-09-24 21:19:41Z michel $
+    $Id: REmpenhoEmpenho.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.23
                     uc-02.01.08
@@ -764,9 +764,7 @@ function incluir($boTransacao = "")
     $obTContabilidadeEmpenhamento         =  new TContabilidadeEmpenhamento;
     $obTEmpenhoEmpenho                    =  new TEmpenhoEmpenho;
 
-    $boTCEMS = SistemaLegado::is_tcems($boTransacao);
-
-    if ($boTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $obFEmpenhoEmpenhoEmissao             =  new FEmpenhoEmpenhoEmissaoTCEMS;
     } else {
         $obFEmpenhoEmpenhoEmissao             =  new FEmpenhoEmpenhoEmissao;
@@ -824,7 +822,7 @@ function incluir($boTransacao = "")
             $obFEmpenhoEmpenhoEmissao->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade()         );
             $obFEmpenhoEmpenhoEmissao->setDado( "cod_pre_empenho" , $this->inCodPreEmpenho                                   );
             //como fazer para passar o cod_despesa somente para o tcems com exercicio acima de 2012
-            if ($boTCEMS) {
+            if (Sessao::getExercicio() > '2012') {
                 $obFEmpenhoEmpenhoEmissao->setDado( "cod_despesa", $this->obROrcamentoDespesa->getCodDespesa() );
                 $obFEmpenhoEmpenhoEmissao->setDado( "cod_class_despesa", $this->obROrcamentoClassificacaoDespesa->getMascClassificacao() );
             }
@@ -974,10 +972,16 @@ function emitirEmpenhoDiverso($boTransacao = "")
             }
 
             if ( !$obErro->ocorreu() ) {
-                $obErro = $this->consultaSaldoAnterior( $nuSaldoAnterior, '', $boTransacao );
-                $nuVlReserva = str_replace( '.','',$this->obROrcamentoReservaSaldos->getVlReserva());
+                
+                $this->setdataEmpenho($this->getDtEmpenho());
+                $this->setCodEntidade($this->obROrcamentoEntidade->getCodigoEntidade());
+                
+                $obErro = $this->consultaSaldoAnteriorDataEmpenho( $nuSaldoAnterior, '', $boTransacao );
+                
+				$nuVlReserva = str_replace( '.','',$this->obROrcamentoReservaSaldos->getVlReserva());
                 $nuVlReserva = str_replace( ',','.',$nuVlReserva );
                 $this->setVlSaldoAnterior( $nuSaldoAnterior );
+                
                 if ( $this->getVlSaldoAnterior() < $nuVlReserva ) {
                     $obErro->setDescricao( "Valor da reserva é superior ao Saldo Anterior" );
                 }
@@ -1037,9 +1041,7 @@ function anular($boTransacao = "")
 
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
-    $boTCEMS = SistemaLegado::is_tcems($boTransacao);
-
-    if ($boTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $obFEmpenhoEmpenhoEmissaoAnulacao     =  new FEmpenhoEmpenhoEmissaoAnulacaoTCEMS;
     } else {
         $obFEmpenhoEmpenhoEmissaoAnulacao     =  new FEmpenhoEmpenhoEmissaoAnulacao;
@@ -1110,7 +1112,7 @@ function anular($boTransacao = "")
                             $obFEmpenhoEmpenhoEmissaoAnulacao->setDado( "tipo_lote"       , 'E'                                                      );
                             $obFEmpenhoEmpenhoEmissaoAnulacao->setDado( "cod_entidade"    , $this->obROrcamentoEntidade->getCodigoEntidade()         );
                             $obFEmpenhoEmpenhoEmissaoAnulacao->setDado( "cod_pre_empenho" , $this->inCodPreEmpenho                                   );
-                            if ($boTCEMS) {
+                            if (Sessao::getExercicio() > '2012') {
                                 $obFEmpenhoEmpenhoEmissaoAnulacao->setDado( "cod_despesa" , $this->obROrcamentoDespesa->getCodDespesa() );
                                 $obFEmpenhoEmpenhoEmissaoAnulacao->setDado( "cod_class_despesa", $this->obROrcamentoClassificacaoDespesa->getMascClassificacao() );
                             }

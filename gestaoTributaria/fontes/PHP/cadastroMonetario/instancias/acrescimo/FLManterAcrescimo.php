@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FLManterAcrescimo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLManterAcrescimo.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.11
 
@@ -96,7 +96,6 @@ $obLblCodFuncao->setRotulo( 'Código da Função' );
 $obLblCodFuncao->setValue ($_REQUEST['inCodFuncao'].' - '.$_REQUEST['stFuncao']);
 
 $obRMONAcrescimo->ListarTipo ( $rsTipo );
-//sistemaLegado::mostravar ($rsTipo);
 /*
 $obCmbTipo = new Select;
 $obCmbTipo->setRotulo        ( "Tipo de Acréscimo" );

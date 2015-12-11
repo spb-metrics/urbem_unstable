@@ -187,9 +187,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
 {
     include_once( CAM_GF_TES_MAPEAMENTO."FTesourariaExtratoBancario.class.php");
     $obFTesourariaExtratoBancario = new FTesourariaExtratoBancario;
-
-    $boTCEMS = SistemaLegado::is_tcems();
-
+    
     $codPlano = $this->getCodPlano()  ;
 
     $obFTesourariaExtratoBancario->setDado("inCodPlanoInicial"   ,$codPlano[0] );
@@ -199,10 +197,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFTesourariaExtratoBancario->setDado("stEntidade"           ,$this->getEntidade());
     $obFTesourariaExtratoBancario->setDado("stDataInicial"        ,$this->getDataInicial());
     $obFTesourariaExtratoBancario->setDado("stDataFinal"          ,$this->getDataFinal());
-
-    // if ($boTCEMS) {
-    //     $stFiltroExtratoBancario = ' AND PC.cod_estrutural like \'1.1.1.%\' ';
-    // }
 
     $obErro = $obFTesourariaExtratoBancario->recuperaDadosBancarios( $rsDadosBancarios, $stFiltroExtratoBancario, $stOrder );
     $arDadosBancarios = array();
@@ -236,7 +230,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             $obFTesourariaExtratoBancario->setDado( "boMovimentacao", "false" );
         }
         $obFTesourariaExtratoBancario->setDado( "botcems", "false" );
-        if (SistemaLegado::is_tcems()) {
+        if (Sessao::getExercicio() > '2012') {
             $obFTesourariaExtratoBancario->setDado( "botcems", "true" );
         }
         $obFTesourariaExtratoBancario->setDado( "stDtFinal", $dtAnterior );

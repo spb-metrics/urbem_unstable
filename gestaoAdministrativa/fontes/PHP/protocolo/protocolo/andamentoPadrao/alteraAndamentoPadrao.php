@@ -54,9 +54,6 @@ if (!(isset($_REQUEST["ctrl"]))) {
 $mascaraAssunto = pegaConfiguracao('mascara_assunto',5);
 $mascaraSetor = pegaConfiguracao('mascara_setor',2);
 
-#sistemalegado::mostravar($ctrl);
-#sistemalegado::mostravar($_REQUEST);
-
 switch ($ctrl) {
 case 0:
 

@@ -174,8 +174,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1135"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="rsProposta_Item" id="1146">
@@ -1549,7 +1549,7 @@ params["data_emissao"].value
                                 <property name="fontSize">8pt</property>
                                 <structure name="numberFormat">
                                     <property name="category">Currency</property>
-                                    <property name="pattern">#,##0.00</property>
+                                    <property name="pattern">#,##0.0000{RoundingMode=HALF_UP}</property>
                                 </structure>
                                 <property name="textAlign">right</property>
                                 <property name="resultSetColumn">vl_unitario</property>

@@ -421,33 +421,36 @@ function geraHrefLinks()
     } else {
         $stFiltro = "";
     }
-
+    
+    # Foreach para montar o número de páginas, ex: 1|2|3|4...
     foreach ($arNumPaginas as $stLinks) {
         if ( (integer) $stLinks == $this->getPagAtual() ) {
-            $stLink .= trim( $stLinks )." | ";
+            $stLink .= "<li class='active'><a>".trim( $stLinks )."</a></li>";
         } else {
-            $stLink .= "<a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $stLinks."&pos=".$inPosicao.$stFiltro."\">".trim( $stLinks )."</a> | ";
+            $stLink .= "<li><a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $stLinks."&pos=".$inPosicao.$stFiltro."\">".trim( $stLinks )."</a></li> ";
         }
         // mini hack, salva todos os links em um array
         $this->arLinksPaginas[] = $_SERVER["SCRIPT_NAME"]."?".Sessao::getId()."&pg=".(integer) $stLinks."&pos=".$inPosicao.$stFiltro."";
         $inPosicao++;
     }
-    $stLink = substr($stLink, 0, strlen( $stLink ) - 3);
+
+    #$stLink = substr($stLink, 0, strlen( $stLink ) - 3);
 
     $stLinkRecua = "";
+
+    # Link para voltar diversas páginas, conforme o retorno de getMaxPaginas()
     if ( $this->getBlocoAnt() > 1 ) {
-        $stLinkRecua .= "| <a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $this->getBlocoAnt()."&pos=".$this->getMaxPaginas().$stFiltro."\"><<</a> | \n";
-    } else {
-        $stLinkRecua .= "| << | ";
+        $stLinkRecua .= "<li><a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $this->getBlocoAnt()."&pos=".$this->getMaxPaginas().$stFiltro."\"> Voltar ".$this->getMaxPaginas()." </a></li> \n";
     }
+
     if ( $this->getPosPagina() > 1 or $this->getBlocoAnt() > 1  ) {
         $inPosPagina = ( (integer) $this->getPosPagina() - 1 );
         if ($inPosPagina  <= 0) {
             $inPosPagina = $this->getMaxPaginas();
         }
-        $stLinkRecua .= "<a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".( (integer) $this->getPagAtual() - 1)."&pos=".$inPosPagina.$stFiltro."\"><</a> | ";
+        $stLinkRecua .= "<li><a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".( (integer) $this->getPagAtual() - 1)."&pos=".$inPosPagina.$stFiltro."\"> Anterior </a></li> ";
     } else {
-        $stLinkRecua .= "< | ";
+        $stLinkRecua .= "<li class='disabled'><a> Anterior </a></li>";
     }
 
     $stLinkAvanca = "";
@@ -458,16 +461,19 @@ function geraHrefLinks()
     }
 
     if ( $this->getPosPagina() and ( (integer) $this->getPagAtual() * $this->getMaxLinhas() ) < $this->getNumeroLinhas() ) {
-        $stLinkAvanca .= " | <a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".( (integer) $this->getPagAtual() + 1)."&pos=".$inPosPagina.$stFiltro."\">></a> | ";
+        $stLinkAvanca .= " <li><a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".( (integer) $this->getPagAtual() + 1)."&pos=".$inPosPagina.$stFiltro."\"> Próximo </a></li> ";
     } else {
-        $stLinkAvanca .= " | > | ";
+        $stLinkAvanca .= " <li class='disabled'><a> Próximo </a></li>";
     }
+    
+    # Link para avançar diversas páginas, conforme o retorno de getMaxPaginas()
     if ( $this->getBlocoPos() > 1 and  ( (integer) $this->getBlocoPos() * $this->getMaxLinhas() ) < $this->getNumeroLinhas() ) {
-        $stLinkAvanca .= "<a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $this->getBlocoPos()."&pos=1".$stFiltro."\">>></a> | ";
-    } else {
-        $stLinkAvanca .= ">> | ";
+        $stLinkAvanca .= " <li><a href=\"".$_SERVER["PHP_SELF"]."?".Sessao::getId()."&pg=".(integer) $this->getBlocoPos()."&pos=1".$stFiltro."\"> Avançar ".$this->getMaxPaginas()." </a></li> ";
     }
-    $stLink = $stLinkRecua.trim( $stLink ).$stLinkAvanca;
+
+    # Adiciona o estilo de paginação
+    $stLink = "<ul class='pagination'>".$stLinkRecua.trim( $stLink ).$stLinkAvanca."</ul>";
+
     $this->setHTML( $stLink );
 }
 

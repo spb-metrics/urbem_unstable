@@ -117,7 +117,7 @@ function montaListaCentroCusto($rsCentroCustoPermissao)
 
     return $stJs;
 }
-//sistemaLegado::mostraVar($_REQUEST);
+
 $js = '';
 switch ($stCtrl) {
 case 'buscaUsuario':

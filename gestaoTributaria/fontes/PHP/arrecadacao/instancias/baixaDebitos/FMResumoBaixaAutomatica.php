@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMResumoBaixaAutomatica.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMResumoBaixaAutomatica.php 63839 2015-10-22 18:08:07Z franver $
     * Casos de uso: uc-05.03.19
 
 */
@@ -205,7 +205,6 @@ for ( $inX=0; $inX<count($arTMP1); $inX++ ) {
     }
 }
 
-//sistemaLegado::mostravar( $arCredOrig );exit;
 for ($inX=0; $inX<$inTot; $inX++) {
     $arTMP_lo[] = $arCredOrig[$inX];
 }

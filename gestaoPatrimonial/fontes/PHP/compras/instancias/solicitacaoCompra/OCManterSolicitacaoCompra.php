@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
+ $Id: OCManterSolicitacaoCompra.php 64051 2015-11-24 17:55:39Z franver $
 
  */
 
@@ -91,27 +91,29 @@ function montaListaDotacoesAnular($arRecordSetItem , $boExecuta = true)
     $table->setRecordset( $rsDotacoesItem );
     $table->setSummary('Itens da Solicitação');
 
-    $table->Head->addCabecalho('Item'                , 35);
-    $table->Head->addCabecalho('Unidade'             , 15);
-    $table->Head->addCabecalho('Centro de Custo'     , 25);
+    $table->Head->addCabecalho('Item'                , 25);
+    $table->Head->addCabecalho('Unidade'             ,  8);
+    $table->Head->addCabecalho('Centro de Custo'     , 20);
     $table->Head->addCabecalho('Quantidade Pendente' , 10);
-    $table->Head->addCabecalho('Quantidade Anular'   , 15);
+    $table->Head->addCabecalho('Quantidade Anular'   , 10);
     $table->Head->addCabecalho('Valor Pendente'      , 10);
-    $table->Head->addCabecalho('Valor Anular'        , 15);
+    $table->Head->addCabecalho('Valor Anular'        , 10);
 
-    $obQuantidadeTotalAnulada = new TextBox;
+    $obQuantidadeTotalAnulada = new Numerico();
     $obQuantidadeTotalAnulada->setName ( "nuQtTotalAnulada");
-    $obQuantidadeTotalAnulada->setNull ( false );
-    $obQuantidadeTotalAnulada->setSize ( 10 );
     $obQuantidadeTotalAnulada->setId   ( "" );
-    $obQuantidadeTotalAnulada->obEvento->setOnKeyUp("mascaraMoeda(this,4,event,false);");
+    $obQuantidadeTotalAnulada->setNull ( false );
+    $obQuantidadeTotalAnulada->setDefinicao("NUMERIC");
+    $obQuantidadeTotalAnulada->setSize ( 14 );
+    $obQuantidadeTotalAnulada->setMaxLength( 13 );
+    $obQuantidadeTotalAnulada->setDecimais( 4 );
     $obQuantidadeTotalAnulada->obEvento->setOnBlur ("floatDecimal(this, '4', event ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&id='+this.id+'&valorAnular='+this.value, 'calculaValorAnular' );");
 
     $obValorTotalAnulada = new TextBox;
     $obValorTotalAnulada->setName ( "nuVlTotalAnulada" );
+    $obValorTotalAnulada->setId   ( "" );
     $obValorTotalAnulada->setNull ( false );
     $obValorTotalAnulada->setSize ( 10 );
-    $obValorTotalAnulada->setId   ( "" );
     $obValorTotalAnulada->obEvento->setOnKeyUp ("mascaraMoeda(this, 2, event, false);");
     $obValorTotalAnulada->obEvento->setOnBlur  ("floatDecimal(this, '2', event);");
 
@@ -204,15 +206,15 @@ function montaListaDotacoesConsulta($arRecordSetItem , $boExecuta = true)
     $table->setRecordset( $rsDotacoesItem );
     $table->setSummary('Itens da Solicitação');
 
-    $table->Head->addCabecalho('Item'             , 18);
-    $table->Head->addCabecalho('Unidade'          , 10);
-    $table->Head->addCabecalho('Centro de Custo'  , 10);
-    $table->Head->addCabecalho('Qtde. Solicitada' , 10);
-    $table->Head->addCabecalho('Qtde. Anulada'    , 10);
-    $table->Head->addCabecalho('Qtde. Mapa'       ,  8);
-    $table->Head->addCabecalho('Valor Solicitado' ,  8);
-    $table->Head->addCabecalho('Valor Anulado'    ,  8);
-    $table->Head->addCabecalho('Valor Mapa'       ,  8);
+    $table->Head->addCabecalho('Item'             , 20);
+    $table->Head->addCabecalho('Unidade'          ,  8);
+    $table->Head->addCabecalho('Centro de Custo'  , 12);
+    $table->Head->addCabecalho('Qtde. Solicitada' ,  9);
+    $table->Head->addCabecalho('Qtde. Anulada'    ,  9);
+    $table->Head->addCabecalho('Qtde. Mapa'       ,  9);
+    $table->Head->addCabecalho('Valor Solicitado' , 10);
+    $table->Head->addCabecalho('Valor Anulado'    , 10);
+    $table->Head->addCabecalho('Valor Mapa'       , 10);
 
     $stTitle = "[stTitle]";
 

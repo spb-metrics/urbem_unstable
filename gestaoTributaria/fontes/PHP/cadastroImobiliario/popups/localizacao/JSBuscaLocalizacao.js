@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: JSBuscaLocalizacao.js 63688 2015-09-29 20:32:47Z arthur $
+    * $Id: JSBuscaLocalizacao.js 63760 2015-10-07 13:51:43Z evandro $
 
     * Casos de uso: uc-05.01.03
 */
@@ -43,7 +43,7 @@
 
 function insere(inCodigo,stNome){
     if( eval( window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"];?>') != null ) ) {
-        window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"];?>').innerHTML = inCodigo;
+        window.opener.parent.frames['telaPrincipal'].document.getElementById('<?=$_REQUEST["campoNom"];?>').innerHTML = stNome;
         var campoHidden = eval( 'window.opener.parent.frames["telaPrincipal"].document.frm.<?=$_REQUEST["campoNom"];?>' );
         if( campoHidden != null ) campoHidden.value=inCodigo;
     }

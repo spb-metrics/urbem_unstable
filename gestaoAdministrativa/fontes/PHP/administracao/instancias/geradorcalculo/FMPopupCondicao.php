@@ -76,7 +76,7 @@ if ( empty($stAcao)||$stAcao=="incluir" ) {
     $arFuncao = Sessao::read('Funcao');
     $stConteudo = $arFuncao['Corpo'][ $arPosicao[0] ]['Conteudo'];
 
-    $stHtml = substr($stConteudo,2, strlen($stConteudo)-8 );
+    $stHtml = substr(ltrim($stConteudo),2, strlen(rtrim($stConteudo))-8 );
     Sessao::write('Condicao',explode(" ",$stHtml));
     $js  = "d.getElementById('idCondicao').innerHTML = '".$stHtml."';";
     $js .= "d.getElementById('hdnCondicao').value = '".$stHtml."';";
@@ -131,7 +131,7 @@ $obCmbVariavel->setCampoDesc     ( "#[stNomeVariavel]" );
 $obCmbVariavel->addOption        ( "", "Selecione" );
 $obCmbVariavel->addOption        ( "VERDADEIRO", "VERDADEIRO" );
 $obCmbVariavel->addOption        ( "FALSO"     , "FALSO" );
-$obCmbVariavel->addOption        ( "NULO"     , "NULO" );
+$obCmbVariavel->addOption        ( "NULO"      , "NULO" );
 $obCmbVariavel->addOption        ( "VAZIO"     , "VAZIO" );
 $obCmbVariavel->setValue         ( $stVariavel );
 $obCmbVariavel->setNull          ( false );

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPagamentoLiquidacao.class.php 62476 2015-05-13 14:50:56Z evandro $
+    $Id: REmpenhoPagamentoLiquidacao.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     $Revision: 30805 $
     $Name:  $
@@ -989,7 +989,7 @@ function pagarOP($boTransacao = "")
                                         // Verifica qual o cod_recurso que possui conta contabil vinculada
                                         $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                         $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                                        if ( Sessao::getExercicio() > '2012' ) {
                                             $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.3.%'");
                                         } else {
                                             $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
@@ -1001,8 +1001,30 @@ function pagarOP($boTransacao = "")
                                 }
 
                                 $obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($inCodRecurso);
-                                if (SistemaLegado::is_tcems($boTransacao)) {
-                                    $obErro = $obRContabilidadePlanoBanco->getContasRecursoPagamentoTCEMS($rsContasRecurso, $boTransacao);
+                                if (Sessao::getExercicio() > '2012') {
+                                    $obTContabilidadePlanoBancoTeste = new TContabilidadePlanoBanco;
+                                    $obTContabilidadePlanoBancoTeste->setDado('cod_recurso', $obRContabilidadePlanoBanco->obROrcamentoRecurso->getCodRecurso());
+                                    $obTContabilidadePlanoBancoTeste->setDado('exercicio', Sessao::getExercicio());
+                                    $obTContabilidadePlanoBancoTeste->setDado('estrutural_teste', '8.2.1.1.4.%');
+                                    $obTContabilidadePlanoBancoTeste->testaRecursoPagamentoTCEMS($rsContasRecurso, $boTransacao);
+                                    if ($rsContasRecurso->getNumLinhas() > 1) {
+                                        $obErro->setDescricao('Erro ao efetuar pagamento, existe mais de uma conta do grupo 8 cadastradas para este pagamento. Favor verificar.');
+                                        break;
+                                    }
+
+                                    if (!$obErro->ocorreu()) {
+                                        $obTContabilidadePlanoBancoTeste->setDado('estrutural_teste', '8.2.1.1.3.%');
+                                        $obTContabilidadePlanoBancoTeste->testaRecursoPagamentoTCEMS($rsContasRecurso, $boTransacao);
+
+                                        if ($rsContasRecurso->getNumLinhas() > 1) {
+                                            $obErro->setDescricao('Erro ao efetuar pagamento, existe mais de uma conta do grupo 8 cadastradas para este pagamento. Favor verificar.');
+                                            break;
+                                        }
+                                    }
+
+                                    if (!$obErro->ocorreu()) {
+                                        $obErro = $obRContabilidadePlanoBanco->getContasRecursoPagamentoTCEMS($rsContasRecurso, $boTransacao);
+                                    }
                                 } else {
                                     $obErro = $obRContabilidadePlanoBanco->getContasRecurso($rsContasRecurso, $boTransacao);
                                 }
@@ -1013,534 +1035,547 @@ function pagarOP($boTransacao = "")
                                 $inCodPlanoUm = '';
                             }
 
-                            if ( $obRNotaLiquidacao->getValorPago() > 0 || $boValidaPagamentoRetencao == 'TRUE') {
-                                $obErro = $this->incluirNotaLiquidacao( $obRNotaLiquidacao, $boTransacao );
-                                if ( $obErro->ocorreu() ) {
-                                    break;
-                                }
+                            if ( !$obErro->ocorreu() ) {
 
-                                $obErro = $this->incluirPagamentoNotaLiquidacao( $obRNotaLiquidacao, $boTransacao );
-
-                                if( $obErro->ocorreu() )
-                                    break;
-                                $obErro = $this->incluirNotaLiquidacaoAuditoria( $obRNotaLiquidacao, $boTransacao );
-                                if( $obErro->ocorreu() )
-                                    break;
-
-                                if ( $this->obRContabilidadePlanoContaAnalitica->getCodPlano() )
-                                    $obErro = $this->obRContabilidadePlanoContaAnalitica->consultar( $boTransacao );
-
-                            if ( $obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() == substr($this->stTimestamp,0,4) ) {
-                                $obFEmpenhoEmpenhoPagamento->setDado("exercicio"             , substr($this->stTimestamp,0,4) );
-                                $obFEmpenhoEmpenhoPagamento->setDado("exercicio_liquidacao"  ,$obRNotaLiquidacao->getExercicio() );
-                                $obFEmpenhoEmpenhoPagamento->setDado("cod_entidade"          ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                $obFEmpenhoEmpenhoPagamento->setDado("valor"                 ,$obRNotaLiquidacao->getValorPago() );
-
-                                if ($this->obRContabilidadeLancamento->stComplemento) {
-                                    $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$this->obRContabilidadeLancamento->stComplemento ) ;
-                                    $stComplemento = $this->obRContabilidadeLancamento->stComplemento;
-                                } else {
-                                    if ($this->stObservacao) {
-                                        $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ." - ".$this->stObservacao) ;
-                                        $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ." - ".$this->stObservacao;
-                                    } else {
-                                        $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
-                                        $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio();
-                                    }
-                                }
-
-                                if ($this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote) {
-                                    $obFEmpenhoEmpenhoPagamento->setDado("nom_lote"              ,$this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote );
-                                } else {
-                                    $obFEmpenhoEmpenhoPagamento->setDado("nom_lote"              ,"Pagamento de Empenho n° ".$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
-                                }
-
-                                if ( SistemaLegado::is_tcems( $boTransacao ) ) {
-                                    $stFiltroContaCredito = " WHERE liquidacao.cod_nota = ".$obRNotaLiquidacao->getCodNota()."
-                                                                AND liquidacao.exercicio_liquidacao = '".$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio()."'
-                                                                AND lancamento.tipo = 'L'
-                                                                AND lancamento.sequencia = 2
-                                                                AND lancamento.cod_entidade = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade();
-                                    $obTContabilidadeLancamento = new TContabilidadeLancamento;
-                                    $obTContabilidadeLancamento->recuperaLancamentoEmpenhoContaCredito( $rsContaCredito, $stFiltroContaCredito, $boTransacao );
-
-                                    if ( stristr($rsContaCredito->getCampo('cod_estrutural_mascara'), '2.1.1.1') ) {
-                                        $stCodEstruturalPagamento = $rsContaCredito->getCampo('cod_estrutural');
-                                        $stCodPlanoCredito = $rsContaCredito->getCampo('cod_plano');
-                                    } else {
-                                        $stFiltroContaFixaCredito = " AND REPLACE(pc.cod_estrutural, '.', '') like '213110100%' AND pc.exercicio = '".Sessao::getExercicio()."'";
-                                        $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
-                                        $obErro = $obTContabilidadePlanoConta->recuperaContaAnalitica( $rsContaFixaCredito, $stFiltroContaFixaCredito, '', $boTransacao );
-                                        $stCodEstruturalPagamento = '213110100';
-                                        $stCodPlanoCredito = $rsContaFixaCredito->getCampo('cod_plano');
-
-                                        if ($stCodPlanoCredito == '' && Sessao::getExercicio() >= 2014) {
-                                            $obTContabilidadeConfiguracaoLancamentoCredito = new TContabilidadeConfiguracaoLancamentoCredito;
-                                            $stFiltroContaCreditoConfiguracao = " where clc.exercicio = '".Sessao::getExercicio()."'
-                                                                                   and clc.cod_conta_despesa = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->getCodConta()."
-                                                                                   and clc.estorno = 'f'";
-                                            $obTContabilidadeConfiguracaoLancamentoCredito->recuperaCodigoPlano($rsContaFixaCreditoConfiguracao, $stFiltroContaCreditoConfiguracao, '', $boTransacao);
-                                            $stCodPlanoCredito = $rsContaFixaCreditoConfiguracao->getCampo('cod_plano');
-                                        }
-                                    }
-                                    if ($stCodPlanoCredito == '') {
-                                        $obErro->setDescricao('Configuração dos lançamentos de despesa não configurados para esta despesa.');
+                                if ( $obRNotaLiquidacao->getValorPago() > 0 || $boValidaPagamentoRetencao == 'TRUE') {
+                                    $obErro = $this->incluirNotaLiquidacao( $obRNotaLiquidacao, $boTransacao );
+                                    if ( $obErro->ocorreu() ) {
                                         break;
                                     }
-                                    $obFEmpenhoEmpenhoPagamento->setDado("tcems"             , 'true' ) ;
-                                } else {
-                                    $stCodEstruturalPagamento = $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->getMascClassificacao();
-                                }
 
-                                $obFEmpenhoEmpenhoPagamento->setDado("tipo_lote"             ,"P" ) ;
-                                $obFEmpenhoEmpenhoPagamento->setDado("dt_lote"               ,$this->stDataPagamento ) ;
-                                $obFEmpenhoEmpenhoPagamento->setDado("cod_nota"              ,$obRNotaLiquidacao->getCodNota() );
-                                $obFEmpenhoEmpenhoPagamento->setDado("conta_pagamento_financ",$this->obRContabilidadePlanoContaAnalitica->getCodEstrutural() ) ;
-                                $obFEmpenhoEmpenhoPagamento->setDado("cod_estrutural"        ,$stCodEstruturalPagamento ) ;
-                                $obFEmpenhoEmpenhoPagamento->setDado("num_orgao"             ,$obRNotaLiquidacao->roREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao() ) ;
-                                if ( SistemaLegado::is_tcems($boTransacao) ) {
-                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_debito"  , $stCodPlanoCredito ) ;
-                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_credito" , $this->obRContabilidadePlanoContaAnalitica->getCodPlano() ) ;
-                                }
+                                    $obErro = $this->incluirPagamentoNotaLiquidacao( $obRNotaLiquidacao, $boTransacao );
 
-                                $obErro = $obFEmpenhoEmpenhoPagamento->executaFuncao( $rsFEmpenhoEmpenhoPagamento, $boTransacao );
+                                    if( $obErro->ocorreu() )
+                                        break;
 
-                                $inCodLote = $obFEmpenhoEmpenhoPagamento->getDado("cod_lote");
-                                if (Sessao::getExercicio() > '2008') {
-                                    if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
-                                        include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
+                                    $obErro = $this->incluirNotaLiquidacaoAuditoria( $obRNotaLiquidacao, $boTransacao );
 
-                                        $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
-                                        $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLote);
-                                        $obTContabilidadeValorLancamento->setDado("tipo", 'P');
-                                        $obTContabilidadeValorLancamento->setDado("exercicio" , Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio());
-                                        $obTContabilidadeValorLancamento->setDado("cod_entidade", $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                        $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoDois);
-                                        $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoUm);
-                                        $obTContabilidadeValorLancamento->setDado("cod_historico", 903);
-                                        $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
-                                        $obTContabilidadeValorLancamento->setDado("vl_lancamento", $obRNotaLiquidacao->getValorPago());
+                                    if( $obErro->ocorreu() )
+                                        break;
 
-                                        $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
-                                        $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
+                                    if ( $this->obRContabilidadePlanoContaAnalitica->getCodPlano() )
+                                        $obErro = $this->obRContabilidadePlanoContaAnalitica->consultar( $boTransacao );
+
+                                if ( $obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() == substr($this->stTimestamp,0,4) ) {
+                                    $obFEmpenhoEmpenhoPagamento->setDado("exercicio"             , substr($this->stTimestamp,0,4) );
+                                    $obFEmpenhoEmpenhoPagamento->setDado("exercicio_liquidacao"  ,$obRNotaLiquidacao->getExercicio() );
+                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_entidade"          ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                    $obFEmpenhoEmpenhoPagamento->setDado("valor"                 ,$obRNotaLiquidacao->getValorPago() );
+
+                                    if ($this->obRContabilidadeLancamento->stComplemento) {
+                                        $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$this->obRContabilidadeLancamento->stComplemento ) ;
+                                        $stComplemento = $this->obRContabilidadeLancamento->stComplemento;
                                     } else {
-                                        if (!$obErro->getDescricao()) {
-                                            $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                        if ($this->stObservacao) {
+                                            $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ." - ".$this->stObservacao) ;
+                                            $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ." - ".$this->stObservacao;
+                                        } else {
+                                            $obFEmpenhoEmpenhoPagamento->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
+                                            $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio();
+                                        }
+                                    }
+
+                                    if ($this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote) {
+                                        $obFEmpenhoEmpenhoPagamento->setDado("nom_lote"              ,$this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote );
+                                    } else {
+                                        $obFEmpenhoEmpenhoPagamento->setDado("nom_lote"              ,"Pagamento de Empenho n° ".$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
+                                    }
+
+                                    if ( Sessao::getExercicio() > '2012' ) {
+                                        $stFiltroContaCredito = " WHERE liquidacao.cod_nota = ".$obRNotaLiquidacao->getCodNota()."
+                                                                    AND liquidacao.exercicio_liquidacao = '".$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio()."'
+                                                                    AND lancamento.tipo = 'L'
+                                                                    AND lancamento.sequencia = 2
+                                                                    AND lancamento.cod_entidade = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade();
+                                        $obTContabilidadeLancamento = new TContabilidadeLancamento;
+                                        $obTContabilidadeLancamento->recuperaLancamentoEmpenhoContaCredito( $rsContaCredito, $stFiltroContaCredito, $boTransacao );
+
+                                        if ( stristr($rsContaCredito->getCampo('cod_estrutural_mascara'), '2.1.1.1') ) {
+                                            $stCodEstruturalPagamento = $rsContaCredito->getCampo('cod_estrutural');
+                                            $stCodPlanoCredito = $rsContaCredito->getCampo('cod_plano');
+                                        } else {
+                                            $stFiltroContaFixaCredito = " AND REPLACE(pc.cod_estrutural, '.', '') like '213110100%' AND pc.exercicio = '".Sessao::getExercicio()."'";
+                                            $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
+                                            $obErro = $obTContabilidadePlanoConta->recuperaContaAnalitica( $rsContaFixaCredito, $stFiltroContaFixaCredito, '', $boTransacao );
+                                            $stCodEstruturalPagamento = '213110100';
+                                            $stCodPlanoCredito = $rsContaFixaCredito->getCampo('cod_plano');
+
+                                            if ($stCodPlanoCredito == '' && Sessao::getExercicio() >= 2014) {
+                                                $obTContabilidadeConfiguracaoLancamentoCredito = new TContabilidadeConfiguracaoLancamentoCredito;
+                                                $stFiltroContaCreditoConfiguracao = " where clc.exercicio = '".Sessao::getExercicio()."'
+                                                                                       and clc.cod_conta_despesa = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->getCodConta()."
+                                                                                       and clc.estorno = 'f'";
+                                                $obTContabilidadeConfiguracaoLancamentoCredito->recuperaCodigoPlano($rsContaFixaCreditoConfiguracao, $stFiltroContaCreditoConfiguracao, '', $boTransacao);
+                                                $stCodPlanoCredito = $rsContaFixaCreditoConfiguracao->getCampo('cod_plano');
+                                            }
+                                        }
+
+                                        if ($stCodPlanoCredito == '') {
+                                            $obErro->setDescricao('Configuração dos lançamentos de despesa não configurados para esta despesa.');
                                             break;
                                         }
-                                    }
-                                }
-                                $inCodHistoricoAdiantamento = 903;
-                            } else {
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio"             ,substr($this->stTimestamp,0,4) );
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio_liquidacao"  ,$obRNotaLiquidacao->getExercicio() );
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_entidade"          ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("valor"                 ,$obRNotaLiquidacao->getValorPago() );
 
-                                if ($this->obRContabilidadeLancamento->stComplemento) {
-                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("complemento"           ,$this->obRContabilidadeLancamento->stComplemento ) ;
-                                    $stComplemento = $this->obRContabilidadeLancamento->stComplemento;
-                                } else {
-                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
-                                    $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio();
-                                }
+                                        $obFEmpenhoEmpenhoPagamento->setDado("tcems"             , 'true' ) ;
 
-                                if ($this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote) {
-                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("nom_lote"              ,$this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote ) ;
-                                } else {
-                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("nom_lote"              ,"Pagamento de RP n° ".$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
-                                }
-
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("tipo_lote"             ,"P" ) ;
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("dt_lote"               ,$this->stDataPagamento ) ;
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_nota"              ,$obRNotaLiquidacao->getCodNota() );
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("conta_pg"              ,$this->obRContabilidadePlanoContaAnalitica->getCodEstrutural() ) ;
-                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exerc_rp"              ,$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
-
-                              $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio_atual"       ,Sessao::getExercicio() );
-                                $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->recuperaTipoRestosPagar( $rsTipoRestosPagar, '','',$boTransacao);
-                                if ( !$obErro->ocorreu() ) {
-                                    $stRestos = $rsTipoRestosPagar->getCampo("tipo_restos");
-                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("restos"                 , $stRestos );
-                                    $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->executaFuncao( $rsFEmpenhoEmpenhoPagamento,'','', $boTransacao );
-                                    if ($obErro->ocorreu()) {
-                                        if (strstr($obErro->getDescricao(),"Não foi informado o tipo de Restos")) {
-                                            $obErro->setDescricao("Impossível realizar os lançamentos. Verificar o atributo de Restos.");
-                                        }
-                                    }
-                                    $inCodLote = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado("cod_lote");
-                                }
-                                if (Sessao::getExercicio() > '2008') {
-                                    if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
-                                        include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
-
-                                        $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
-                                        $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLote);
-                                        $obTContabilidadeValorLancamento->setDado("tipo", 'P');
-                                        $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());
-                                        $obTContabilidadeValorLancamento->setDado("cod_entidade", $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                        $obTContabilidadeValorLancamento->setDado("cod_plano_deb",$inCodPlanoDois);
-                                        $obTContabilidadeValorLancamento->setDado("cod_plano_cred",$inCodPlanoUm);
-                                        $obTContabilidadeValorLancamento->setDado("cod_historico", 917);
-                                        $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
-                                        $obTContabilidadeValorLancamento->setDado("vl_lancamento", $obRNotaLiquidacao->getValorPago());
-
-                                        $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
-                                        $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
                                     } else {
-                                        if (!$obErro->getDescricao()) {
-                                            $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                        $stCodEstruturalPagamento = $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->getMascClassificacao();
+                                    }
+
+                                    $obFEmpenhoEmpenhoPagamento->setDado("tipo_lote"             ,"P" ) ;
+                                    $obFEmpenhoEmpenhoPagamento->setDado("dt_lote"               ,$this->stDataPagamento ) ;
+                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_nota"              ,$obRNotaLiquidacao->getCodNota() );
+                                    $obFEmpenhoEmpenhoPagamento->setDado("conta_pagamento_financ",$this->obRContabilidadePlanoContaAnalitica->getCodEstrutural() ) ;
+                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_estrutural"        ,$stCodEstruturalPagamento ) ;
+                                    $obFEmpenhoEmpenhoPagamento->setDado("num_orgao"             ,$obRNotaLiquidacao->roREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao() ) ;
+
+                                    if ( Sessao::getExercicio() > '2012' ) {
+                                        $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_debito"  , $stCodPlanoCredito ) ;
+                                        $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_credito" , $this->obRContabilidadePlanoContaAnalitica->getCodPlano() ) ;
+                                    }
+
+                                    $obErro = $obFEmpenhoEmpenhoPagamento->executaFuncao( $rsFEmpenhoEmpenhoPagamento, $boTransacao );
+
+                                    $inCodLote = $obFEmpenhoEmpenhoPagamento->getDado("cod_lote");
+
+                                    if (Sessao::getExercicio() > '2008') {
+                                        if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
+                                            include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
+    
+                                            $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
+                                            $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLote);
+                                            $obTContabilidadeValorLancamento->setDado("tipo", 'P');
+                                            $obTContabilidadeValorLancamento->setDado("exercicio" , Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio());
+                                            $obTContabilidadeValorLancamento->setDado("cod_entidade", $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                            $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoDois);
+                                            $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoUm);
+                                            $obTContabilidadeValorLancamento->setDado("cod_historico", 903);
+                                            $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
+                                            $obTContabilidadeValorLancamento->setDado("vl_lancamento", $obRNotaLiquidacao->getValorPago());
+
+                                            $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
+                                            $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
+                                        } else {
+                                            if (!$obErro->getDescricao()) {
+                                                $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                                break;
+                                            }
                                         }
                                     }
+                                    $inCodHistoricoAdiantamento = 903;
+                                } else {
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio"             ,substr($this->stTimestamp,0,4) );
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio_liquidacao"  ,$obRNotaLiquidacao->getExercicio() );
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_entidade"          ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("valor"                 ,$obRNotaLiquidacao->getValorPago() );
+
+                                    if ($this->obRContabilidadeLancamento->stComplemento) {
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("complemento"           ,$this->obRContabilidadeLancamento->stComplemento ) ;
+                                        $stComplemento = $this->obRContabilidadeLancamento->stComplemento;
+                                    } else {
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("complemento"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
+                                        $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio();
+                                    }
+
+                                    if ($this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote) {
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("nom_lote"              ,$this->obRContabilidadeLancamento->obRContabilidadeLote->stNomLote ) ;
+                                    } else {
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("nom_lote"              ,"Pagamento de RP n° ".$obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
+                                    }
+
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("tipo_lote"             ,"P" ) ;
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("dt_lote"               ,$this->stDataPagamento ) ;
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_nota"              ,$obRNotaLiquidacao->getCodNota() );
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("conta_pg"              ,$this->obRContabilidadePlanoContaAnalitica->getCodEstrutural() ) ;
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exerc_rp"              ,$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio() ) ;
+
+                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("exercicio_atual"       ,Sessao::getExercicio() );
+                                    $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->recuperaTipoRestosPagar( $rsTipoRestosPagar, '','',$boTransacao);
+
+                                    if ( !$obErro->ocorreu() ) {
+                                        $stRestos = $rsTipoRestosPagar->getCampo("tipo_restos");
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("restos"                 , $stRestos );
+                                        $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->executaFuncao( $rsFEmpenhoEmpenhoPagamento,'','', $boTransacao );
+                                        if ($obErro->ocorreu()) {
+                                            if (strstr($obErro->getDescricao(),"Não foi informado o tipo de Restos")) {
+                                                $obErro->setDescricao("Impossível realizar os lançamentos. Verificar o atributo de Restos.");
+                                            }
+                                        }
+                                        $inCodLote = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado("cod_lote");
+                                    }
+
+                                    if (Sessao::getExercicio() > '2008') {
+                                        if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
+                                            include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
+
+                                            $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
+                                            $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLote);
+                                            $obTContabilidadeValorLancamento->setDado("tipo", 'P');
+                                            $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());
+                                            $obTContabilidadeValorLancamento->setDado("cod_entidade", $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                            $obTContabilidadeValorLancamento->setDado("cod_plano_deb",$inCodPlanoDois);
+                                            $obTContabilidadeValorLancamento->setDado("cod_plano_cred",$inCodPlanoUm);
+                                            $obTContabilidadeValorLancamento->setDado("cod_historico", 917);
+                                            $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
+                                            $obTContabilidadeValorLancamento->setDado("vl_lancamento", $obRNotaLiquidacao->getValorPago());
+    
+                                            $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
+                                            $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
+                                        } else {
+                                            if (!$obErro->getDescricao()) {
+                                                $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                            }
+                                        }
+                                    }
+                                    $inCodHistoricoAdiantamento = 917;
                                 }
-                                $inCodHistoricoAdiantamento = 917;
-                            }
-                                if ( !$obErro->ocorreu() ) {
+                                    if ( !$obErro->ocorreu() ) {
 
-                                      $this->arLotes[] = Array( 'cod_lote' => $inCodLote, 'cod_nota' => $obRNotaLiquidacao->getCodNota(), 'timestamp' => $obRNotaLiquidacao->stTimestamp );
+                                        $this->arLotes[] = Array( 'cod_lote' => $inCodLote, 'cod_nota' => $obRNotaLiquidacao->getCodNota(), 'timestamp' => $obRNotaLiquidacao->stTimestamp );
 
-                                      $obFEmpenhoEmpenhoPagamento->setDado("cod_lote"           , "" );
-                                      $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado( "cod_lote", "" );
-                                      $obTContabilidadeLancamentoEmpenho->setDado("cod_lote"    ,$inCodLote );
-                                      $obTContabilidadeLancamentoEmpenho->setDado("tipo"        ,"P" );
-                                      $inSequencia = $rsFEmpenhoEmpenhoPagamento->getCampo("sequencia") ;
-                                      $obTContabilidadeLancamentoEmpenho->setDado("sequencia"   , $inSequencia );
-                                      $obTContabilidadeLancamentoEmpenho->setDado("exercicio"   ,substr($this->stTimestamp,0,4) );
-                                      $obTContabilidadeLancamentoEmpenho->setDado("cod_entidade",$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                      $obTContabilidadeLancamentoEmpenho->setDado("estorno"     ,"false" ) ;
-                                      $obErro = $obTContabilidadeLancamentoEmpenho->inclusao( $boTransacao );
-                                      if ( !$obErro->ocorreu() ) {
-                                          $obTContabilidadePagamento->setDado("exercicio"   ,substr($this->stTimestamp,0,4));
-                                          $obTContabilidadePagamento->setDado("exercicio_liquidacao" ,$obRNotaLiquidacao->getExercicio() );
-                                          $obTContabilidadePagamento->setDado("sequencia"   ,$inSequencia );
-                                          $obTContabilidadePagamento->setDado("tipo"        ,"P" );
-                                          $obTContabilidadePagamento->setDado("cod_lote"    ,$inCodLote );
-                                          $obTContabilidadePagamento->setDado("cod_entidade",$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                          $obTContabilidadePagamento->setDado("cod_nota"    ,$obRNotaLiquidacao->getCodNota() );
-                                          $obTContabilidadePagamento->setDado("timestamp"   ,$this->stTimestamp ) ;
-                                          $obErro = $obTContabilidadePagamento->inclusao( $boTransacao );
-                                      }
-                                }
+                                        $obFEmpenhoEmpenhoPagamento->setDado("cod_lote"           , "" );
+                                        $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado( "cod_lote", "" );
+                                        $obTContabilidadeLancamentoEmpenho->setDado("cod_lote"    ,$inCodLote );
+                                        $obTContabilidadeLancamentoEmpenho->setDado("tipo"        ,"P" );
+                                        $inSequencia = $rsFEmpenhoEmpenhoPagamento->getCampo("sequencia") ;
+                                        $obTContabilidadeLancamentoEmpenho->setDado("sequencia"   , $inSequencia );
+                                        $obTContabilidadeLancamentoEmpenho->setDado("exercicio"   ,substr($this->stTimestamp,0,4) );
+                                        $obTContabilidadeLancamentoEmpenho->setDado("cod_entidade",$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                        $obTContabilidadeLancamentoEmpenho->setDado("estorno"     ,"false" ) ;
+                                        $obErro = $obTContabilidadeLancamentoEmpenho->inclusao( $boTransacao );
+                                        if ( !$obErro->ocorreu() ) {
+                                            $obTContabilidadePagamento->setDado("exercicio"   ,substr($this->stTimestamp,0,4));
+                                            $obTContabilidadePagamento->setDado("exercicio_liquidacao" ,$obRNotaLiquidacao->getExercicio() );
+                                            $obTContabilidadePagamento->setDado("sequencia"   ,$inSequencia );
+                                            $obTContabilidadePagamento->setDado("tipo"        ,"P" );
+                                            $obTContabilidadePagamento->setDado("cod_lote"    ,$inCodLote );
+                                            $obTContabilidadePagamento->setDado("cod_entidade",$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                            $obTContabilidadePagamento->setDado("cod_nota"    ,$obRNotaLiquidacao->getCodNota() );
+                                            $obTContabilidadePagamento->setDado("timestamp"   ,$this->stTimestamp ) ;
+                                            $obErro = $obTContabilidadePagamento->inclusao( $boTransacao );
+                                        }
+                                    }
 
-                                /* PAGAMENTO ADIANTAMENTOS & SUBVENCOES */
-                                $codCategoria = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodCategoria();
-                                if ($codCategoria == 2 || $codCategoria == 3) {
-                                    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
-                                    include_once( TEMP."TEmpenhoResponsavelAdiantamento.class.php");
-                                    $obTEmpenhoResponsavelAdiantamento = new TEmpenhoResponsavelAdiantamento();
-                                    $stFiltro = " WHERE exercicio = '".Sessao::getExercicio()."' AND numcgm = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obRCGM->getNumCGM();
-                                    $obErro = $obTEmpenhoResponsavelAdiantamento->recuperaTodos($rsContas,$stFiltro,'',$boTransacao);
-                                    if (!$obErro->ocorreu()) {
+                                    /* PAGAMENTO ADIANTAMENTOS & SUBVENCOES */
+                                    $codCategoria = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodCategoria();
 
-                                        $stContaContrapartida   = $rsContas->getCampo('conta_contrapartida');
-                                        $stContaLancamento      = $rsContas->getCampo('conta_lancamento');
+                                    if ($codCategoria == 2 || $codCategoria == 3) {
+                                        include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
+                                        include_once( TEMP."TEmpenhoResponsavelAdiantamento.class.php");
+                                        $obTEmpenhoResponsavelAdiantamento = new TEmpenhoResponsavelAdiantamento();
+                                        $stFiltro = " WHERE exercicio = '".Sessao::getExercicio()."' AND numcgm = ".$obRNotaLiquidacao->roREmpenhoEmpenho->obRCGM->getNumCGM();
+                                        $obErro = $obTEmpenhoResponsavelAdiantamento->recuperaTodos($rsContas,$stFiltro,'',$boTransacao);
 
+                                        if (!$obErro->ocorreu()) {
+    
+                                            $stContaContrapartida   = $rsContas->getCampo('conta_contrapartida');
+                                            $stContaLancamento      = $rsContas->getCampo('conta_lancamento');
+    
+                                            $obTContabilidadeValorLancamento    = new TContabilidadeValorLancamento;
+                                            $obTContabilidadeValorLancamento->setDado( "cod_lote"      , $inCodLote                              );
+                                            $obTContabilidadeValorLancamento->setDado( "tipo"          , 'P'                                     );
+                                            $obTContabilidadeValorLancamento->setDado( "exercicio"     , Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio()      );
+                                            $obTContabilidadeValorLancamento->setDado( "cod_entidade"  , $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                            $obTContabilidadeValorLancamento->setDado( "cod_plano_deb" , $stContaLancamento                      );
+                                            $obTContabilidadeValorLancamento->setDado( "cod_plano_cred", $stContaContrapartida                   );
+                                            $obTContabilidadeValorLancamento->setDado( "cod_historico" , $inCodHistoricoAdiantamento             );
+                                            $obTContabilidadeValorLancamento->setDado( "complemento"   , $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho()."/$arDataPagamento[2]" );
+                                            $obTContabilidadeValorLancamento->setDado( "vl_lancamento" , $obRNotaLiquidacao->getValorPago()      );
+    
+                                            $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl( $rsRecordSet, $boTransacao   );
+                                        }
+                                    }
+
+                                    /* RETENÇÕES */
+                                    if (!$obErro->ocorreu() && $this->obREmpenhoOrdemPagamento->getRetencao() && !$this->obREmpenhoOrdemPagamento->boRetencaoExecutada) {
+                                        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoOrdemPagamentoRetencao.class.php"  );
+                                        include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
+                                        include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoRetencao.class.php" );
+                                        include_once ( CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php');
+                                        include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoNotaLiquidacaoPaga.class.php" );
+                                        include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoNotaLiquidacaoContaPagadora.class.php" );
+                                        include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoPagamentoLiquidacaoNotaLiquidacaoPaga.class.php"  );
+
+                                        $obTContabilidadeLancamentoRetencao = new TContabilidadeLancamentoRetencao;
                                         $obTContabilidadeValorLancamento    = new TContabilidadeValorLancamento;
-                                        $obTContabilidadeValorLancamento->setDado( "cod_lote"      , $inCodLote                              );
-                                        $obTContabilidadeValorLancamento->setDado( "tipo"          , 'P'                                     );
-                                        $obTContabilidadeValorLancamento->setDado( "exercicio"     , Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio()      );
-                                        $obTContabilidadeValorLancamento->setDado( "cod_entidade"  , $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                        $obTContabilidadeValorLancamento->setDado( "cod_plano_deb" , $stContaLancamento                      );
-                                        $obTContabilidadeValorLancamento->setDado( "cod_plano_cred", $stContaContrapartida                   );
-                                        $obTContabilidadeValorLancamento->setDado( "cod_historico" , $inCodHistoricoAdiantamento             );
-                                        $obTContabilidadeValorLancamento->setDado( "complemento"   , $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho()."/$arDataPagamento[2]" );
-                                        $obTContabilidadeValorLancamento->setDado( "vl_lancamento" , $obRNotaLiquidacao->getValorPago()      );
+                                        $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade;
+                                        $obTEmpenhoNotaLiquidacaoPagaRet                  =  new TEmpenhoNotaLiquidacaoPaga;
+                                        $obTEmpenhoNotaLiquidacaoContaPagadoraRet         =  new TEmpenhoNotaLiquidacaoContaPagadora;
+                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet =  new TEmpenhoPagamentoLiquidacaoNotaLiquidacaoPaga;
 
-                                        $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl( $rsRecordSet, $boTransacao   );
-                                    }
+                                        $inCodEntidade = $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade();
+                                        $stFiltroConta = "  WHERE parametro = 'conta_caixa' AND cod_entidade = ".$inCodEntidade." AND exercicio = '".substr($this->stTimestamp,0,4)."' ";
+                                        $obErro = $obTAdministracaoConfiguracaoEntidade->recuperaTodos($rsContas, $stFiltroConta, '', $boTransacao);
 
-                                }
+                                        if (!$obErro->ocorreu() && !$rsContas->EOF() && $rsContas->getNumLinhas() == 1) {
+                                            include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoContaAnalitica.class.php"              );
+                                            $obContaAnalitica = new RContabilidadePlanoContaAnalitica;
+                                            $obContaAnalitica->setCodPlano( $rsContas->getCampo('valor') );
+                                            $obContaAnalitica->setExercicio( substr($this->stTimestamp,0,4) );
+                                            $obErro = $obContaAnalitica->consultar( $boTransacao );
+                                            $stCodEstruturalCaixa = $obContaAnalitica->getCodEstrutural();
+                                            $inCodPlanoCaixa = $obContaAnalitica->getCodPlano();
+                                        }
 
-                                /* RETENÇÕES */
-                                if (!$obErro->ocorreu() && $this->obREmpenhoOrdemPagamento->getRetencao() && !$this->obREmpenhoOrdemPagamento->boRetencaoExecutada) {
-                                    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoOrdemPagamentoRetencao.class.php"  );
-                                    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php" );
-                                    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoRetencao.class.php" );
-                                    include_once ( CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php');
-                                    include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoNotaLiquidacaoPaga.class.php" );
-                                    include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoNotaLiquidacaoContaPagadora.class.php" );
-                                    include_once ( CAM_GF_EMP_MAPEAMENTO.   "TEmpenhoPagamentoLiquidacaoNotaLiquidacaoPaga.class.php"  );
+                                        $inCountTime = 0;
+                                        $inCountPagamentoRetencao = 0;
 
-                                    $obTContabilidadeLancamentoRetencao = new TContabilidadeLancamentoRetencao;
-                                    $obTContabilidadeValorLancamento    = new TContabilidadeValorLancamento;
-                                    $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade;
-                                    $obTEmpenhoNotaLiquidacaoPagaRet                  =  new TEmpenhoNotaLiquidacaoPaga;
-                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet         =  new TEmpenhoNotaLiquidacaoContaPagadora;
-                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet =  new TEmpenhoPagamentoLiquidacaoNotaLiquidacaoPaga;
+                                        if ($stCodEstruturalCaixa && $inCodPlanoCaixa && !$obErro->ocorreu() ) {
+                                            // Efetua o lançamento das arrecadações (quando não for pela tesouraria) e pgtos ref. Retenções
+                                            foreach ( $this->obREmpenhoOrdemPagamento->getRetencoes() as $arRetencao ) {
+                                                // Timestamp diferente para cada pgto de retenção com a conta caixa.
+                                                $arTmp = explode(' ',$this->stTimestamp);
+                                                $arData = explode('-',$arTmp[0]);
+                                                $arHora = explode(':',$arTmp[1]);
 
-                                    $inCodEntidade = $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade();
-                                    $stFiltroConta = "  WHERE parametro = 'conta_caixa' AND cod_entidade = ".$inCodEntidade." AND exercicio = '".substr($this->stTimestamp,0,4)."' ";
-                                    $obErro = $obTAdministracaoConfiguracaoEntidade->recuperaTodos($rsContas, $stFiltroConta, '', $boTransacao);
-                                    if (!$obErro->ocorreu() && !$rsContas->EOF() && $rsContas->getNumLinhas() == 1) {
-                                        include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoContaAnalitica.class.php"              );
-                                        $obContaAnalitica = new RContabilidadePlanoContaAnalitica;
-                                        $obContaAnalitica->setCodPlano( $rsContas->getCampo('valor') );
-                                        $obContaAnalitica->setExercicio( substr($this->stTimestamp,0,4) );
-                                        $obErro = $obContaAnalitica->consultar( $boTransacao );
-                                        $stCodEstruturalCaixa = $obContaAnalitica->getCodEstrutural();
-                                        $inCodPlanoCaixa = $obContaAnalitica->getCodPlano();
-                                    }
-                                    $inCountTime = 0;
-                                    $inCountPagamentoRetencao = 0;
-                                    if ($stCodEstruturalCaixa && $inCodPlanoCaixa && !$obErro->ocorreu() ) {
-                                        // Efetua o lançamento das arrecadações (quando não for pela tesouraria) e pgtos ref. Retenções
-                                        foreach ( $this->obREmpenhoOrdemPagamento->getRetencoes() as $arRetencao ) {
-                                            // Timestamp diferente para cada pgto de retenção com a conta caixa.
-                                            $arTmp = explode(' ',$this->stTimestamp);
-                                            $arData = explode('-',$arTmp[0]);
-                                            $arHora = explode(':',$arTmp[1]);
+                                                // Adiciona 0.010 no milissegundo
+                                                $inCountTime = $inCountTime + 0.010;
+                                                $arHora[2] = bcadd($arHora[2], $inCountTime, 4);
+                                                $arHoraTmp = explode('.', $arHora[2]);
+                                                $arHoraTmp[0] = str_pad($arHoraTmp[0], 2, 0, STR_PAD_LEFT);
 
-                                            // Adiciona 0.010 no milissegundo
-                                            $inCountTime = $inCountTime + 0.010;
-                                            $arHora[2] = bcadd($arHora[2], $inCountTime, 4);
-                                            $arHoraTmp = explode('.', $arHora[2]);
-                                            $arHoraTmp[0] = str_pad($arHoraTmp[0], 2, 0, STR_PAD_LEFT);
+                                                $stTimestampPagamentoCtaCaixa = $arData[0]."-".$arData[1]."-".$arData[2]." ".$arHora[0].":".$arHora[1].":".$arHoraTmp[0].".".$arHoraTmp[1];
 
-                                            $stTimestampPagamentoCtaCaixa = $arData[0]."-".$arData[1]."-".$arData[2]." ".$arHora[0].":".$arHora[1].":".$arHoraTmp[0].".".$arHoraTmp[1];
+                                                $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_nota'] = $obRNotaLiquidacao->getCodNota();
+                                                $this->arPagamentosRetencao[$inCountPagamentoRetencao]['timestamp'] = $stTimestampPagamentoCtaCaixa;
+                                                $this->arPagamentosRetencao[$inCountPagamentoRetencao]['exercicio'] = $obRNotaLiquidacao->getExercicio();
+                                                $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_entidade'] = $inCodEntidade;
+                                                $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_plano'] = $inCodPlanoCaixa;
+                                                $inCountPagamentoRetencao++;
 
-                                            $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_nota'] = $obRNotaLiquidacao->getCodNota();
-                                            $this->arPagamentosRetencao[$inCountPagamentoRetencao]['timestamp'] = $stTimestampPagamentoCtaCaixa;
-                                            $this->arPagamentosRetencao[$inCountPagamentoRetencao]['exercicio'] = $obRNotaLiquidacao->getExercicio();
-                                            $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_entidade'] = $inCodEntidade;
-                                            $this->arPagamentosRetencao[$inCountPagamentoRetencao]['cod_plano'] = $inCodPlanoCaixa;
-                                            $inCountPagamentoRetencao++;
-
-                                            // PAGAMENTOS USANDO A CONTA CAIXA
-                                            if (!$stRestos) { // Empenho do exercicio
-                                                $obFEmpenhoEmpenhoPagamento->setDado("cod_lote"           , "" );
-                                                $obFEmpenhoEmpenhoPagamento->setDado("conta_pagamento_financ", $stCodEstruturalCaixa );
-                                                if (SistemaLegado::is_tcems($boTransacao)) {
-                                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_credito", $inCodPlanoCaixa );
-                                                }
-                                                $obFEmpenhoEmpenhoPagamento->setDado("valor", $arRetencao['vl_retencao']);
-                                                $obErro = $obFEmpenhoEmpenhoPagamento->executaFuncao( $rsFEmpenhoEmpenhoPagamento, $boTransacao );
-                                                $inCodLotePgto = $obFEmpenhoEmpenhoPagamento->getDado('cod_lote');
-                                                $inSequenciaPgto = $obFEmpenhoEmpenhoPagamento->getDado('sequencia');
-                                                $inCodHistorico = 903;
-                                            } else { // Empenho do exercicio anterior
-                                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_lote", "" );
-                                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("conta_pg", $stCodEstruturalCaixa );
-                                                $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("valor" , $arRetencao['vl_retencao']);
-                                                $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->executaFuncao( $rsFEmpenhoEmpenhoPagamento,'','', $boTransacao );
-                                                $inCodLotePgto = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado('cod_lote');
-                                                $inSequenciaPgto = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado('sequencia');
-                                                $inCodHistorico = 917;
-                                            }
-
-                                            if (Sessao::getExercicio() > '2008') {
-                                                if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
-                                                    include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
-
-                                                    $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
-                                                    $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLotePgto);
-                                                    $obTContabilidadeValorLancamento->setDado("tipo", 'P');
-                                                    $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio());
-                                                    $obTContabilidadeValorLancamento->setDado("cod_entidade", $inCodEntidade);
-                                                    $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoDois);
-                                                    $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoUm);
-                                                    $obTContabilidadeValorLancamento->setDado("cod_historico", $inCodHistorico);
-                                                    $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
-                                                    $obTContabilidadeValorLancamento->setDado("vl_lancamento", $arRetencao['vl_retencao']);
-
-                                                    $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
-                                                    $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
-                                                } else {
-                                                    if (!$obErro->getDescricao()) {
-                                                        $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                                // PAGAMENTOS USANDO A CONTA CAIXA
+                                                if (!$stRestos) { // Empenho do exercicio
+                                                    $obFEmpenhoEmpenhoPagamento->setDado("cod_lote"           , "" );
+                                                    $obFEmpenhoEmpenhoPagamento->setDado("conta_pagamento_financ", $stCodEstruturalCaixa );
+                                                    if (Sessao::getExercicio() > '2012') {
+                                                        $obFEmpenhoEmpenhoPagamento->setDado("cod_plano_credito", $inCodPlanoCaixa );
                                                     }
+                                                    $obFEmpenhoEmpenhoPagamento->setDado("valor", $arRetencao['vl_retencao']);
+                                                    $obErro = $obFEmpenhoEmpenhoPagamento->executaFuncao( $rsFEmpenhoEmpenhoPagamento, $boTransacao );
+                                                    $inCodLotePgto = $obFEmpenhoEmpenhoPagamento->getDado('cod_lote');
+                                                    $inSequenciaPgto = $obFEmpenhoEmpenhoPagamento->getDado('sequencia');
+                                                    $inCodHistorico = 903;
+                                                } else { // Empenho do exercicio anterior
+                                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("cod_lote", "" );
+                                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("conta_pg", $stCodEstruturalCaixa );
+                                                    $obFEmpenhoEmpenhoPagamentoRestosAPagar->setDado("valor" , $arRetencao['vl_retencao']);
+                                                    $obErro = $obFEmpenhoEmpenhoPagamentoRestosAPagar->executaFuncao( $rsFEmpenhoEmpenhoPagamento,'','', $boTransacao );
+                                                    $inCodLotePgto = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado('cod_lote');
+                                                    $inSequenciaPgto = $obFEmpenhoEmpenhoPagamentoRestosAPagar->getDado('sequencia');
+                                                    $inCodHistorico = 917;
                                                 }
-                                            }
 
-                                            if ($inCodLotePgto && !$obErro->ocorreu()) {
-                                                $obTContabilidadeLancamentoEmpenho->setDado("cod_lote"    ,$inCodLotePgto );
-                                                $obTContabilidadeLancamentoEmpenho->setDado("tipo"        ,"P" );
-                                                $obTContabilidadeLancamentoEmpenho->setDado("sequencia"   , $inSequenciaPgto );
-                                                $obTContabilidadeLancamentoEmpenho->setDado("exercicio"   ,substr($this->stTimestamp,0,4) );
-                                                $obTContabilidadeLancamentoEmpenho->setDado("cod_entidade", $inCodEntidade );
-                                                $obTContabilidadeLancamentoEmpenho->setDado("estorno"     ,"false" ) ;
-                                                $obErro = $obTContabilidadeLancamentoEmpenho->inclusao( $boTransacao );
-                                                if ( !$obErro->ocorreu() ) {
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'cod_entidade', $inCodEntidade );
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'cod_nota'    , $obRNotaLiquidacao->getCodNota()   );
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'exercicio'   , $obRNotaLiquidacao->getExercicio() );
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'timestamp'   , $stTimestampPagamentoCtaCaixa          );
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'vl_pago'     , $arRetencao['vl_retencao']         );
-                                                    $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'observacao'  , $this->stObservacao
-);
-                                                    $obErro = $obTEmpenhoNotaLiquidacaoPagaRet->inclusao( $boTransacao );
+                                                if (Sessao::getExercicio() > '2008') {
+                                                    if ( !$obErro->ocorreu() && $inCodPlanoUm != '' && $inCodPlanoDois != '') {
+                                                        include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
 
-                                                  if (!$obErro->ocorreu()) {
-                                                       $obTContabilidadePagamento->setDado("exercicio"   ,substr($this->stTimestamp,0,4));
-                                                       $obTContabilidadePagamento->setDado("exercicio_liquidacao" ,$obRNotaLiquidacao->getExercicio() );
-                                                       $obTContabilidadePagamento->setDado("sequencia"   ,$inSequenciaPgto );
-                                                       $obTContabilidadePagamento->setDado("tipo"        ,"P" );
-                                                       $obTContabilidadePagamento->setDado("cod_lote"    ,$inCodLotePgto );
-                                                       $obTContabilidadePagamento->setDado("cod_entidade", $inCodEntidade );
-                                                       $obTContabilidadePagamento->setDado("cod_nota"    ,$obRNotaLiquidacao->getCodNota() );
-                                                       $obTContabilidadePagamento->setDado("timestamp"   ,$stTimestampPagamentoCtaCaixa ) ;
-                                                       $obErro = $obTContabilidadePagamento->inclusao( $boTransacao );
-                                                       if (!$obErro->ocorreu()) {
-                                                           $obTContabilidadeLancamentoRetencao->setDado('cod_lote' , $inCodLotePgto   );
-                                                           $obTContabilidadeLancamentoRetencao->setDado( "tipo"    , 'P'              );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('cod_entidade', $inCodEntidade);
-                                                           $obTContabilidadeLancamentoRetencao->setDado('exercicio', $arDataPagamento[2] );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('sequencia', $inSequenciaPgto );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('cod_ordem', $this->obREmpenhoOrdemPagamento->getCodigoOrdem() );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('cod_plano', $arRetencao['cod_plano'] );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('exercicio_retencao', $arRetencao['exercicio'] );
-                                                           $obTContabilidadeLancamentoRetencao->setDado('sequencial', $arRetencao['sequencial']);
+                                                        $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
+                                                        $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLotePgto);
+                                                        $obTContabilidadeValorLancamento->setDado("tipo", 'P');
+                                                        $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());//$obRNotaLiquidacao->getExercicio());
+                                                        $obTContabilidadeValorLancamento->setDado("cod_entidade", $inCodEntidade);
+                                                        $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoDois);
+                                                        $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoUm);
+                                                        $obTContabilidadeValorLancamento->setDado("cod_historico", $inCodHistorico);
+                                                        $obTContabilidadeValorLancamento->setDado("complemento", $stComplemento);
+                                                        $obTContabilidadeValorLancamento->setDado("vl_lancamento", $arRetencao['vl_retencao']);
 
-                                                           $obErro = $obTContabilidadeLancamentoRetencao->inclusao( $boTransacao );
-
-                                                           if (!$obErro->ocorreu()) {
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_nota"     ,$obRNotaLiquidacao->getCodNota() );
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_entidade" ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()  );
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("exercicio_liquidacao"    ,$obRNotaLiquidacao->getExercicio() );
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("timestamp"    ,$stTimestampPagamentoCtaCaixa );
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("exercicio"
-,$this->obRContabilidadePlanoContaAnalitica->getExercicio() );
-                                                               $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_plano"    ,$inCodPlanoCaixa  );
-                                                               $obErro = $obTEmpenhoNotaLiquidacaoContaPagadoraRet->inclusao($boTransacao);
-
-                                                               if (!$obErro->ocorreu()) {
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_entidade', $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_nota'    , $obRNotaLiquidacao->getCodNota()                           );
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'exercicio'
-, $this->obREmpenhoOrdemPagamento->getExercicio()            );
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'timestamp'   , $stTimestampPagamentoCtaCaixa                              );
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado(
-'exercicio_liquidacao'   ,  $obRNotaLiquidacao->getExercicio()              );
-                                                                    $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_ordem'   , $this->obREmpenhoOrdemPagamento->getCodigoOrdem()          );
-                                                                    $obErro = $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->inclusao( $boTransacao );
-                                                               }
-                                                            }
+                                                        $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
+                                                        $inSequenciaLancamento = $rsRecordSet->getCampo('sequencia');
+                                                    } else {
+                                                        if (!$obErro->getDescricao()) {
+                                                            $obErro->setDescricao('Contas do compensado não estão cadastradas.');
                                                         }
                                                     }
                                                 }
-                                            }
-                                            /* Arrecadações das Retenções */
-                                            if (!$this->getTesouraria() && !$obErro->ocorreu()) { // Se não for via Tesouraria
-                                                $obTContabilidadeLancamentoRetencao->setDado( "cod_lote"      , '');
-                                                $obTContabilidadeLancamentoRetencao->setDado( "tipo"          , $arRetencao['tipo'] == 'O' ? 'A' : 'T'      );
-                                                $obTContabilidadeLancamentoRetencao->setDado( "nom_lote"      , $arRetencao['tipo'] == 'O' ? "Arrecadação por Retenção Orçamentária - OP ".$this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/$arDataPagamento[2]" : "Transferência - CD:".$inCodPlanoCaixa." | CC:".$arRetencao['cod_plano'] );
-                                                $obTContabilidadeLancamentoRetencao->setDado( "dt_lote"       , $this->stDataPagamento );
-                                                $obTContabilidadeLancamentoRetencao->setDado( "exercicio"     , Sessao::getExercicio());//$arDataPagamento[2] );
-                                                $obTContabilidadeLancamentoRetencao->setDado( "cod_entidade"  , $inCodEntidade      );
-                                                $obTContabilidadeLancamentoRetencao->setDado( "sequencial"    , $arRetencao['sequencial']      );
-                                                $obErro = $obTContabilidadeLancamentoRetencao->insereLote( $inCodLoteArrecadacao, $boTransacao );
-                                                if ($arRetencao['tipo'] == 'O') { // Retenção Receita Orçamentária
-                                                    if (!$obErro->ocorreu()) {
-                                                        include_once( CAM_GF_CONT_NEGOCIO."RContabilidadeLancamentoReceita.class.php"        );
-                                                        $obRContabilidadeLancamentoReceita = new RContabilidadeLancamentoReceita;
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $inCodEntidade );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote( $inCodLoteArrecadacao );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote( "Arrecadação por Retenção Orçamentária - OP ".$this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/$arDataPagamento[2]" );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( $this->stDataPagamento );
-                                                        $obRContabilidadeLancamentoReceita->setContaDebito( $inCodPlanoCaixa );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico( 950 );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->setBoComplemento( true );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->setComplemento( $this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/".$arDataPagamento[2] );
-                                                        $obRContabilidadeLancamentoReceita->obROrcamentoReceita->setCodReceita( $arRetencao['cod_receita'] );
-                                                        $obRContabilidadeLancamentoReceita->setValor(  $arRetencao['vl_retencao'] );
-                                                        $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( $arRetencao['exercicio'] );
-                                                        $obErro = $obRContabilidadeLancamentoReceita->incluir( $boTransacao, true );
+
+                                                if ($inCodLotePgto && !$obErro->ocorreu()) {
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("cod_lote"    ,$inCodLotePgto );
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("tipo"        ,"P" );
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("sequencia"   , $inSequenciaPgto );
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("exercicio"   ,substr($this->stTimestamp,0,4) );
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("cod_entidade", $inCodEntidade );
+                                                    $obTContabilidadeLancamentoEmpenho->setDado("estorno"     ,"false" ) ;
+                                                    $obErro = $obTContabilidadeLancamentoEmpenho->inclusao( $boTransacao );
+
+                                                    if ( !$obErro->ocorreu() ) {
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'cod_entidade', $inCodEntidade );
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'cod_nota'    , $obRNotaLiquidacao->getCodNota()   );
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'exercicio'   , $obRNotaLiquidacao->getExercicio() );
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'timestamp'   , $stTimestampPagamentoCtaCaixa      );
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'vl_pago'     , $arRetencao['vl_retencao']         );
+                                                        $obTEmpenhoNotaLiquidacaoPagaRet->setDado( 'observacao'  , $this->stObservacao                );
+                                                        $obErro = $obTEmpenhoNotaLiquidacaoPagaRet->inclusao( $boTransacao );
+
                                                         if (!$obErro->ocorreu()) {
-                                                            $inSequenciaRet = $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->getSequencia();
+                                                            $obTContabilidadePagamento->setDado("exercicio"   ,substr($this->stTimestamp,0,4));
+                                                            $obTContabilidadePagamento->setDado("exercicio_liquidacao" ,$obRNotaLiquidacao->getExercicio() );
+                                                            $obTContabilidadePagamento->setDado("sequencia"   ,$inSequenciaPgto );
+                                                            $obTContabilidadePagamento->setDado("tipo"        ,"P" );
+                                                            $obTContabilidadePagamento->setDado("cod_lote"    ,$inCodLotePgto );
+                                                            $obTContabilidadePagamento->setDado("cod_entidade", $inCodEntidade );
+                                                            $obTContabilidadePagamento->setDado("cod_nota"    ,$obRNotaLiquidacao->getCodNota() );
+                                                            $obTContabilidadePagamento->setDado("timestamp"   ,$stTimestampPagamentoCtaCaixa ) ;
+                                                            $obErro = $obTContabilidadePagamento->inclusao( $boTransacao );
+
+                                                            if (!$obErro->ocorreu()) {
+                                                                $obTContabilidadeLancamentoRetencao->setDado('cod_lote' , $inCodLotePgto   );
+                                                                $obTContabilidadeLancamentoRetencao->setDado( "tipo"    , 'P'              );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('cod_entidade', $inCodEntidade);
+                                                                $obTContabilidadeLancamentoRetencao->setDado('exercicio', $arDataPagamento[2] );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('sequencia', $inSequenciaPgto );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('cod_ordem', $this->obREmpenhoOrdemPagamento->getCodigoOrdem() );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('cod_plano', $arRetencao['cod_plano'] );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('exercicio_retencao', $arRetencao['exercicio'] );
+                                                                $obTContabilidadeLancamentoRetencao->setDado('sequencial', $arRetencao['sequencial']);
+                                                                $obErro = $obTContabilidadeLancamentoRetencao->inclusao( $boTransacao );
+
+                                                                if (!$obErro->ocorreu()) {
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_nota"               ,$obRNotaLiquidacao->getCodNota() );
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_entidade"           ,$obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade()  );
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("exercicio_liquidacao"   ,$obRNotaLiquidacao->getExercicio() );
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("timestamp"              ,$stTimestampPagamentoCtaCaixa );
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("exercicio"              ,$this->obRContabilidadePlanoContaAnalitica->getExercicio() );
+                                                                    $obTEmpenhoNotaLiquidacaoContaPagadoraRet->setDado("cod_plano"              ,$inCodPlanoCaixa  );
+                                                                    $obErro = $obTEmpenhoNotaLiquidacaoContaPagadoraRet->inclusao($boTransacao);
+
+                                                                    if (!$obErro->ocorreu()) {
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_entidade'            , $obRNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_nota'                , $obRNotaLiquidacao->getCodNota() );
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'exercicio'               , $this->obREmpenhoOrdemPagamento->getExercicio() );
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'timestamp'               , $stTimestampPagamentoCtaCaixa );
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'exercicio_liquidacao'    ,  $obRNotaLiquidacao->getExercicio() );
+                                                                        $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->setDado( 'cod_ordem'   , $this->obREmpenhoOrdemPagamento->getCodigoOrdem() );
+                                                                        $obErro = $obTEmpenhoPagamentoLiquidacaoNotaLiquidacaoPagaRet->inclusao( $boTransacao );
+                                                                    }
+                                                                }
+                                                            }
                                                         }
                                                     }
-                                                } elseif ($arRetencao['tipo'] == 'E') {
-                                                    if (Sessao::getExercicio() > '2008') {
-                                                        $obRContabilidadePlanoBanco->setCodPlano($arRetencao['cod_plano']);
-                                                        $obErro = $obRContabilidadePlanoBanco->getRecursoVinculoConta($rsCodRecurso, $boTransacao);
-                                                        $inCodRecursoRet = $rsCodRecurso->getCampo('cod_recurso');
+                                                }
+                                                /* Arrecadações das Retenções */
+                                                if (!$this->getTesouraria() && !$obErro->ocorreu()) { // Se não for via Tesouraria
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "cod_lote"      , '');
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "tipo"          , $arRetencao['tipo'] == 'O' ? 'A' : 'T'      );
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "nom_lote"      , $arRetencao['tipo'] == 'O' ? "Arrecadação por Retenção Orçamentária - OP ".$this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/$arDataPagamento[2]" : "Transferência - CD:".$inCodPlanoCaixa." | CC:".$arRetencao['cod_plano'] );
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "dt_lote"       , $this->stDataPagamento );
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "exercicio"     , Sessao::getExercicio());//$arDataPagamento[2] );
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "cod_entidade"  , $inCodEntidade      );
+                                                    $obTContabilidadeLancamentoRetencao->setDado( "sequencial"    , $arRetencao['sequencial']      );
+                                                    $obErro = $obTContabilidadeLancamentoRetencao->insereLote( $inCodLoteArrecadacao, $boTransacao );
+                                                    if ($arRetencao['tipo'] == 'O') { // Retenção Receita Orçamentária
+                                                        if (!$obErro->ocorreu()) {
+                                                            include_once( CAM_GF_CONT_NEGOCIO."RContabilidadeLancamentoReceita.class.php"        );
+                                                            $obRContabilidadeLancamentoReceita = new RContabilidadeLancamentoReceita;
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $inCodEntidade );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setCodLote( $inCodLoteArrecadacao );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setNomLote( "Arrecadação por Retenção Orçamentária - OP ".$this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/$arDataPagamento[2]" );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setDtLote( $this->stDataPagamento );
+                                                            $obRContabilidadeLancamentoReceita->setContaDebito( $inCodPlanoCaixa );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeHistoricoPadrao->setCodHistorico( 950 );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->setBoComplemento( true );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->setComplemento( $this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/".$arDataPagamento[2] );
+                                                            $obRContabilidadeLancamentoReceita->obROrcamentoReceita->setCodReceita( $arRetencao['cod_receita'] );
+                                                            $obRContabilidadeLancamentoReceita->setValor(  $arRetencao['vl_retencao'] );
+                                                            $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->obRContabilidadeLote->setExercicio( $arRetencao['exercicio'] );
+                                                            $obErro = $obRContabilidadeLancamentoReceita->incluir( $boTransacao, true );
+                                                            if (!$obErro->ocorreu()) {
+                                                                $inSequenciaRet = $obRContabilidadeLancamentoReceita->obRContabilidadeLancamento->getSequencia();
+                                                            }
+                                                        }
+                                                    } elseif ($arRetencao['tipo'] == 'E') {
+                                                        if (Sessao::getExercicio() > '2008') {
+                                                            $obRContabilidadePlanoBanco->setCodPlano($arRetencao['cod_plano']);
+                                                            $obErro = $obRContabilidadePlanoBanco->getRecursoVinculoConta($rsCodRecurso, $boTransacao);
+                                                            $inCodRecursoRet = $rsCodRecurso->getCampo('cod_recurso');
 
-                                                        $boDestinacao = false;
-                                                        $obTOrcamentoConfiguracao = new TOrcamentoConfiguracao;
-                                                        $obTOrcamentoConfiguracao->setDado("exercicio", Sessao::getExercicio() );
-                                                        $obTOrcamentoConfiguracao->setDado("parametro","recurso_destinacao");
-                                                        $obTOrcamentoConfiguracao->consultar($boTransacao);
-                                                        if($obTOrcamentoConfiguracao->getDado("valor") == 'true')
-                                                            $boDestinacao = true;
+                                                            $boDestinacao = false;
+                                                            $obTOrcamentoConfiguracao = new TOrcamentoConfiguracao;
+                                                            $obTOrcamentoConfiguracao->setDado("exercicio", Sessao::getExercicio() );
+                                                            $obTOrcamentoConfiguracao->setDado("parametro","recurso_destinacao");
+                                                            $obTOrcamentoConfiguracao->consultar($boTransacao);
+                                                            if($obTOrcamentoConfiguracao->getDado("valor") == 'true')
+                                                                $boDestinacao = true;
 
-                                                        if ($boDestinacao && $inCodRecursoRet != '') {
-                                                            $obTOrcamentoRecursoDestinacao = new TOrcamentoRecursoDestinacao;
-                                                            $obTOrcamentoRecursoDestinacao->setDado("exercicio", Sessao::getExercicio());
+                                                            if ($boDestinacao && $inCodRecursoRet != '') {
+                                                                $obTOrcamentoRecursoDestinacao = new TOrcamentoRecursoDestinacao;
+                                                                $obTOrcamentoRecursoDestinacao->setDado("exercicio", Sessao::getExercicio());
 
-                                                            $stFiltro  = ' WHERE recurso_destinacao.cod_recurso = '.$inCodRecursoRet;
-                                                            $stFiltro .= '   AND recurso_destinacao.exercicio = '.Sessao::getExercicio();
-                                                            $obErro = $obTOrcamentoRecursoDestinacao->recuperaTodos($rsDestinacao, $stFiltro, '', $boTransacao);
-                                                            $inCodEspecificacao = $rsDestinacao->getCampo('cod_especificacao');
+                                                                $stFiltro  = ' WHERE recurso_destinacao.cod_recurso = '.$inCodRecursoRet;
+                                                                $stFiltro .= '   AND recurso_destinacao.exercicio = '.Sessao::getExercicio();
+                                                                $obErro = $obTOrcamentoRecursoDestinacao->recuperaTodos($rsDestinacao, $stFiltro, '', $boTransacao);
+                                                                $inCodEspecificacao = $rsDestinacao->getCampo('cod_especificacao');
 
-                                                            if ($inCodEspecificacao != '') {
-                                                                // Verifica qual o cod_recurso que possui conta contabil vinculada C
-                                                                $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
-                                                                $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                                                if ( SistemaLegado::is_tcems( $boTransacao ) ) {
-                                                                    $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.3.%'");
+                                                                if ($inCodEspecificacao != '') {
+                                                                    // Verifica qual o cod_recurso que possui conta contabil vinculada C
+                                                                    $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
+                                                                    $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
+                                                                    if ( Sessao::getExercicio() > '2012' ) {
+                                                                        $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.3.%'");
+                                                                    } else {
+                                                                        $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
+                                                                    }
+                                                                    $obTOrcamentoRecursoDestinacao->recuperaRecursoVinculoConta($rsContaRecurso, '', '', $boTransacao);
+
+                                                                    $inCodRecursoRet = $rsContaRecurso->getCampo('cod_recurso');
+                                                                }
+                                                            }
+
+                                                            if (!$obErro->ocorreu() && $inCodRecursoRet != '') {
+                                                                $obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($inCodRecursoRet);
+                                                                if (Sessao::getExercicio() > '2012') {
+                                                                    $obErro = $obRContabilidadePlanoBanco->getContasRecursoPagamentoTCEMS($rsContasRecursoRet, $boTransacao);
                                                                 } else {
-                                                                    $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
+                                                                    $obErro = $obRContabilidadePlanoBanco->getContasRecurso($rsContasRecursoRet, $boTransacao);
                                                                 }
-                                                                $obTOrcamentoRecursoDestinacao->recuperaRecursoVinculoConta($rsContaRecurso, '', '', $boTransacao);
+                                                                $inCodPlanoRetUm = $rsContasRecursoRet->getCampo('cod_plano_um');
+                                                                $inCodPlanoRetDois = $rsContasRecursoRet->getCampo('cod_plano_dois');
 
-                                                                $inCodRecursoRet = $rsContaRecurso->getCampo('cod_recurso');
-                                                            }
-                                                        }
+                                                                if ($inCodPlanoRetUm != '' && $inCodPlanoRetDois != '') {
+                                                                    include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
 
-                                                        if (!$obErro->ocorreu() && $inCodRecursoRet != '') {
-                                                            $obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($inCodRecursoRet);
-                                                            if (SistemaLegado::is_tcems($boTransacao)) {
-                                                                $obErro = $obRContabilidadePlanoBanco->getContasRecursoPagamentoTCEMS($rsContasRecursoRet, $boTransacao);
-                                                            } else {
-                                                                $obErro = $obRContabilidadePlanoBanco->getContasRecurso($rsContasRecursoRet, $boTransacao);
-                                                            }
-                                                            $inCodPlanoRetUm = $rsContasRecursoRet->getCampo('cod_plano_um');
-                                                            $inCodPlanoRetDois = $rsContasRecursoRet->getCampo('cod_plano_dois');
+                                                                    $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
+                                                                    $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLoteArrecadacao);
+                                                                    $obTContabilidadeValorLancamento->setDado("tipo", 'T');
+                                                                    $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());//$arDataPagamento[2]);
+                                                                    $obTContabilidadeValorLancamento->setDado("cod_entidade", $inCodEntidade);
+                                                                    $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoRetDois);
+                                                                    $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoRetUm);
+                                                                    $obTContabilidadeValorLancamento->setDado("cod_historico", 952);
+                                                                    $obTContabilidadeValorLancamento->setDado("complemento", $this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/".$arDataPagamento[2]);
+                                                                    $obTContabilidadeValorLancamento->setDado("vl_lancamento", $arRetencao['vl_retencao']);
 
-                                                            if ($inCodPlanoRetUm != '' && $inCodPlanoRetDois != '') {
-                                                                include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeValorLancamento.class.php";
-
-                                                                $obTContabilidadeValorLancamento = new TContabilidadeValorLancamento;
-                                                                $obTContabilidadeValorLancamento->setDado("cod_lote", $inCodLoteArrecadacao);
-                                                                $obTContabilidadeValorLancamento->setDado("tipo", 'T');
-                                                                $obTContabilidadeValorLancamento->setDado("exercicio", Sessao::getExercicio());//$arDataPagamento[2]);
-                                                                $obTContabilidadeValorLancamento->setDado("cod_entidade", $inCodEntidade);
-                                                                $obTContabilidadeValorLancamento->setDado("cod_plano_deb", $inCodPlanoRetDois);
-                                                                $obTContabilidadeValorLancamento->setDado("cod_plano_cred", $inCodPlanoRetUm);
-                                                                $obTContabilidadeValorLancamento->setDado("cod_historico", 952);
-                                                                $obTContabilidadeValorLancamento->setDado("complemento", $this->obREmpenhoOrdemPagamento->getCodigoOrdem()."/".$arDataPagamento[2]);
-                                                                $obTContabilidadeValorLancamento->setDado("vl_lancamento", $arRetencao['vl_retencao']);
-
-                                                                $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
-                                                                $inSequenciaRet = $rsRecordSet->getCampo('sequencia');
-                                                            } else {
-                                                                if (!$obErro->getDescricao()) {
-                                                                    $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                                                    $obErro = $obTContabilidadeValorLancamento->inclusaoPorPl($rsRecordSet, $boTransacao);
+                                                                    $inSequenciaRet = $rsRecordSet->getCampo('sequencia');
+                                                                } else {
+                                                                    if (!$obErro->getDescricao()) {
+                                                                        $obErro->setDescricao('Contas do compensado não estão cadastradas.');
+                                                                    }
                                                                 }
                                                             }
-
                                                         }
                                                     }
-                                                }
-                                                if (!$obErro->ocorreu()) {
-                                                        $obTContabilidadeLancamentoRetencao->setDado('tipo'     , $arRetencao['tipo'] == 'O' ? 'A' : 'T'           );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('cod_lote' , $inCodLoteArrecadacao );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('cod_entidade' , $inCodEntidade );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('exercicio', $arDataPagamento[2] );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('sequencia', $inSequenciaRet );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('cod_ordem', $this->obREmpenhoOrdemPagamento->getCodigoOrdem() );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('cod_plano', $arRetencao['cod_plano'] );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('exercicio_retencao', $arRetencao['exercicio'] );
-                                                        $obTContabilidadeLancamentoRetencao->setDado('sequencial', $arRetencao['sequencial'] );
-                                                        $obErro = $obTContabilidadeLancamentoRetencao->inclusao( $boTransacao );
-                                                }
-                                            } /* fim se não utiliza Tesouraria. Via tesouraria os lançamentos de
+
+                                                    if (!$obErro->ocorreu()) {
+                                                            $obTContabilidadeLancamentoRetencao->setDado('tipo'     , $arRetencao['tipo'] == 'O' ? 'A' : 'T'           );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('cod_lote' , $inCodLoteArrecadacao );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('cod_entidade' , $inCodEntidade );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('exercicio', $arDataPagamento[2] );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('sequencia', $inSequenciaRet );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('cod_ordem', $this->obREmpenhoOrdemPagamento->getCodigoOrdem() );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('cod_plano', $arRetencao['cod_plano'] );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('exercicio_retencao', $arRetencao['exercicio'] );
+                                                            $obTContabilidadeLancamentoRetencao->setDado('sequencial', $arRetencao['sequencial'] );
+                                                            $obErro = $obTContabilidadeLancamentoRetencao->inclusao( $boTransacao );
+                                                    }
+                                                } /* fim se não utiliza Tesouraria. Via tesouraria os lançamentos de
                                                  arrecadações orçamentárias e extra das retenções serão feitos pelas classes da tesouraria */
-                                        } // Fim foreach nas retenções da OP
-                                    } else {
-                                        $obErro->setDescricao('Uma conta de Caixa deve ser configurada para esta Entidade.');
-                                    }// fim verificação da configuração da conta de caixa para a entidade da nota.
-                                } /* FIM RETENÇÕES */
-                            } // Fim se o valor a pagar da nota for maior que zero
+                                            } // Fim foreach nas retenções da OP
+                                        } else {
+                                            $obErro->setDescricao('Uma conta de Caixa deve ser configurada para esta Entidade.');
+                                        }// fim verificação da configuração da conta de caixa para a entidade da nota.
+                                    } /* FIM RETENÇÕES */
+                                } // Fim se o valor a pagar da nota for maior que zero
+                                }
                         } // Fim foreach nas notas da OP
                     }
                 }
@@ -1710,7 +1745,7 @@ function estornarOP($boTransacao = "")
                                 // Verifica qual o cod_recurso que possui conta contabil vinculada
                                 $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                 $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                                if ( Sessao::getExercicio() > '2012' ) {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.3.%'");
                                 } else {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
@@ -1722,7 +1757,7 @@ function estornarOP($boTransacao = "")
 
                             $obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($inCodRecurso);
 
-                            if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                            if ( Sessao::getExercicio() > '2012' ) {
                                 $obErro = $obRContabilidadePlanoBanco->getContasRecursoPagamentoTCEMS($rsContasRecurso, $boTransacao);
                             } else {
                                 $obErro = $obRContabilidadePlanoBanco->getContasRecurso($rsContasRecurso, $boTransacao);
@@ -1787,7 +1822,7 @@ function estornarOP($boTransacao = "")
                                     $stComplemento = $obRNotaLiquidacao->roREmpenhoEmpenho->getCodEmpenho().'/'.$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio();
                                 }
 
-                                if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                                if ( Sessao::getExercicio() > '2012' ) {
                                     $stFiltroContaCredito = " WHERE liquidacao.cod_nota = ".$obRNotaLiquidacao->getCodNota()."
                                                                 AND liquidacao.exercicio_liquidacao = '".$obRNotaLiquidacao->roREmpenhoEmpenho->getExercicio()."'
                                                                 AND lancamento.tipo = 'E'
@@ -1831,7 +1866,7 @@ function estornarOP($boTransacao = "")
                                 $obFEmpenhoEmpenhoPagamentoAnulacao->setDado("conta_pagamento_financ", $this->obRContabilidadePlanoContaAnalitica->getCodEstrutural() ) ;
                                 $obFEmpenhoEmpenhoPagamentoAnulacao->setDado("cod_estrutural", $stCodEstruturalPagamento ) ;
                                 $obFEmpenhoEmpenhoPagamentoAnulacao->setDado("num_orgao"     ,$obRNotaLiquidacao->roREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao() ) ;
-                                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                                if ( Sessao::getExercicio() > '2012' ) {
                                     $obFEmpenhoEmpenhoPagamentoAnulacao->setDado("cod_plano_debito"  , $this->obRContabilidadePlanoContaAnalitica->getCodPlano() ) ;
                                     $obFEmpenhoEmpenhoPagamentoAnulacao->setDado("cod_plano_credito" , $stCodPlanoCredito ) ;
                                 }
@@ -2092,7 +2127,7 @@ function estornarOP($boTransacao = "")
                                                         // Verifica qual o cod_recurso que possui conta contabil vinculada
                                                         $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                                         $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                                                        if ( Sessao::getExercicio() > '2012' ) {
                                                             $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.3.%'");
                                                         } else {
                                                             $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");

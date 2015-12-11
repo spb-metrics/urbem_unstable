@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Mapeamento
 
-    * $Id: VCIMLocalizacaoAtiva.class.php 63688 2015-09-29 20:32:47Z arthur $
+    * $Id: VCIMLocalizacaoAtiva.class.php 63826 2015-10-21 16:39:23Z arthur $
 
      * Casos de uso: uc-05.01.03
 */
@@ -72,8 +72,27 @@ function __construct()
     $this->AddCampo('nom_localizacao', 'string', true,'' ,true, false);
     $this->AddCampo('mascara',         'string', true,'' ,true, false);
     $this->AddCampo('nom_nivel',       'string', true,'' ,true, false);
-
 }
+
+function recuperaUltimoValorComposto(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = ""){
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaUltimoValorComposto().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    return $obErro;
+}
+    
+function montaRecuperaUltimoValorComposto(){
+    
+    $stSql = " SELECT (COALESCE( SPLIT_PART(MAX(valor_composto), '.', ".$this->getDado("cod_nivel").")::INTEGER, 0) + 1) AS codigo_localizacao
+                 FROM imobiliario.vw_localizacao_ativa ";
+    
+    return $stSql;
+}
+
+public function __destruct(){}
 
 }
 

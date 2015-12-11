@@ -119,7 +119,6 @@ function mostraTitulo()
        </table>";
 }
 /*
-//mostravar(sessao);
 $sSQL = "SELECT count(cod_acao) as contar FROM administracao.permissao WHERE cod_acao = ".Sessao::read('acao')." AND numcgm = ".Sessao::read('numCgm')."
  And ano_exercicio = ".Sessao::getExercicio();
 //echo $sSQL;
@@ -173,9 +172,8 @@ while (!$dbEmp->eof()) {
 $dbEmp->limpaSelecao();
 $dbEmp->fechaBD();
 if ($codigomodulo != 0) {
-    //mostravar(sessao);
     $sSQL = "SELECT count(cod_acao) as contar FROM administracao.permissao WHERE cod_acao = ".Sessao::read('acao')." AND numcgm = ".Sessao::read('numCgm')." And ano_exercicio = ".Sessao::getExercicio();
-    //echo $sSQL;
+
     $dbEmp = new dataBaseLegado;
     $dbEmp->abreBD();
     $dbEmp->abreSelecao($sSQL);

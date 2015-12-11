@@ -32,45 +32,14 @@
 
 * @ignore
 
-* $Id: LSProcurarContrato.php 59612 2014-09-02 12:00:51Z gelson $
+* $Id: LSProcurarContrato.php 64081 2015-11-30 15:36:50Z michel $
 
 * Casos de uso :uc-03.04.07, uc-03.04.05
 */
 
-/*
-$Log$
-Revision 1.1  2006/10/11 17:21:12  domluc
-p/ Diegon:
-   O componente de Contrato gera no formulario que o chama um buscainner e um span, o buscainner somente aceita preenchimento via PopUp, ou seja, não é possivel digitar diretamente o numero do contrato.
-   Chamando a popup do buscainner, ele devera poder filtrar por ( em ordem)
-1) Número do Contrato ( inteiro)
-2) Exercicio ( ref a Contrato) ( componente exercicio)
-3) Modalidade ( combo)
-4) Codigo da Licitação  ( inteiro )
-5) Entidade ( componente)
-
-entao o usuario clica em Ok, e o sistema exibe uma lista correspondente ao filtro informado.
-o usuario seleciona um dos contratos na listageme o sistema fecha a popup, retornando ao formulario, onde o sistema preenche o numero do convenio e no span criado pelo componente , exibe as informações recorrentes, que sao:
-- exercicio
-- modalidade
-- licitação
-- entidade
-- cgm contratado
-
-era isso
-
-Revision 1.4  2006/10/04 08:53:22  cleisson
-novo componente IPopUpObjeto
-
-Revision 1.3  2006/07/06 14:05:54  diego
-Retirada tag de log com erro.
-
-Revision 1.2  2006/07/06 12:11:10  diego
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GP_LIC_MAPEAMENTO . 'TLicitacaoContrato.class.php' );
+include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoContrato.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ProcurarObjeto";
@@ -80,24 +49,21 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
-  $stFncJavaScript .= " function insereObjeto(num,nom) {  \n";
-  $stFncJavaScript .= " var sNum;                  \n";
-  $stFncJavaScript .= " var sNom;                  \n";
-  $stFncJavaScript .= " sNum = num;                \n";
-  $stFncJavaScript .= " sNom = nom;                \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom; \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"  ].".value = sNum; \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"  ].".focus(); \n";
-  $stFncJavaScript .= " window.close();            \n";
-  $stFncJavaScript .= " }                          \n";
+$stFncJavaScript  = "function insereObjeto(num,nom){                                                                                                    \n";
+$stFncJavaScript .= "   var sNum;                                                                                                                       \n";
+$stFncJavaScript .= "   var sNom;                                                                                                                       \n";
+$stFncJavaScript .= "   sNum = num;                                                                                                                     \n";
+$stFncJavaScript .= "   sNom = nom;                                                                                                                     \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get('campoNom')."').innerHTML = sNom;         \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".value = sNum;  \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".focus();       \n";
+$stFncJavaScript .= "   window.close();                                                                                                                 \n";
+$stFncJavaScript .= "}                                                                                                                                  \n";
 
 $stCaminho = CAM_GP_COM_INSTANCIAS."objeto/";
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if ( empty( $stAcao ) ) {
-    $stAcao = "excluir";
-}
+$stAcao = $request->get('stAcao', 'excluir');
 
 switch ($stAcao) {
     case 'alterar': $pgProx = $pgForm; break;
@@ -108,14 +74,14 @@ switch ($stAcao) {
 $stLink = "&stAcao=".$stAcao;
 
 $filtro = Sessao::read('filtro');
-if ($_REQUEST['stHdnDescricao'] || $_REQUEST['inCodEntidade']) {
-    foreach ($_REQUEST as $key => $value) {
+if ( $request->get('stHdnDescricao') || $request->get('inCodEntidade') || ( $request->get('stDataInicial') && $request->get('stDataFinal') ) || $filtro=='' ){
+    foreach ( $request->getAll() as $key => $value ){
         $filtro[$key] = $value;
     }
-} else {
-    if ($filtro) {
-        foreach ($filtro as $key => $value) {
-            $_REQUEST[$key] = $value;
+}else{
+    if( $filtro ){
+        foreach ( $filtro as $key => $value ){
+            $request->set($key, $value);
         }
     }
     Sessao::write('paginando', true);
@@ -124,17 +90,29 @@ Sessao::write('filtro', $filtro);
 
 $obTLicitacaoContrato = new TLicitacaoContrato;
 
-if ( ( $_POST['stDataInicial']) ) {
-    $stFiltro .= " and contrato.dt_assinatura >= to_date( '" . $_POST['stDataInicial'] . "', 'dd/mm/yyyy')  ";
-}
+if ( $request->get('stDataInicial') )
+    $stFiltro .= " and contrato.dt_assinatura >= to_date( '".$request->get('stDataInicial')."', 'dd/mm/yyyy')  ";
 
-if ($_POST['stDataFinal']) {
-    $stFiltro .= " and contrato.dt_assinatura <= to_date( '" .$_POST['stDataFinal'] . "' ,'dd/mm/yyyy' )";
-}
+if ( $request->get('stDataFinal') )
+    $stFiltro .= " and contrato.dt_assinatura <= to_date( '".$request->get('stDataFinal')."' ,'dd/mm/yyyy' )";
 
-$obTLicitacaoContrato->setDado ( 'cod_entidade', $_POST['inCodEntidade'] );
+$obTLicitacaoContrato->setDado ( 'cod_entidade', $request->get('inCodEntidade') );
 
-$obTLicitacaoContrato->recuperaRelacionamento ( $rsLista, $stFiltro );
+if( $request->get('boFornecedor') ){
+    $inCodEntidade = $request->get('inCodEntidade', '');
+    $stCodEntidade = ($inCodEntidade!='') ? '= '.$inCodEntidade : 'IS NULL';
+    $stFiltro .= " and contrato.cod_entidade ".$stCodEntidade;
+
+    $inCodFornecedor = $request->get('inCodFornecedor', '');
+    $stCodFornecedor = ($inCodFornecedor!='') ? '= '.$inCodFornecedor : 'IS NULL';
+    $stFiltro .= " and contrato.cgm_contratado ".$stCodFornecedor;
+
+    $stFiltro .= " and contrato.exercicio = '".$request->get('stExercicio')."'";
+
+    $obTLicitacaoContrato->recuperaContratoEmpenho ( $rsLista, $stFiltro );
+}else
+    $obTLicitacaoContrato->recuperaRelacionamento ( $rsLista, $stFiltro );
+
 $obLista = new Lista;
 
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );

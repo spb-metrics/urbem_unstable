@@ -102,11 +102,9 @@ function validaMascaraDinamica($mascara,$digitos)
 
     //Explode a mascara
     $elementosMascara =  preg_split("/[^a-zA-Z0-9]/",$mascara);
-    //mostraVar($elementosMascara);
 
     //Pega somente os separadores da máscara
     $separadoresMascara =  preg_replace("/[a-zA-Z0-9]/","",$mascara);
-    //mostraVar($separadoresMascara);
 
     //Total de elementos  da mascara
     $totalElMascara = sizeof($elementosMascara);

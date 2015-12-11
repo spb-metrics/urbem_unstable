@@ -277,6 +277,12 @@ params['stQuery'] = this.queryText;]]></method>
     ,   cgm_fornecedor.bairro
     ,   cgm_fornecedor.cep
     ,   cgm_fornecedor.fone_comercial AS telefone
+    ,   cgm_fornecedor.tipo_logradouro
+    ,   CASE WHEN TRIM(cgm_fornecedor.complemento) <> '' THEN
+                  ', '||cgm_fornecedor.complemento
+             ELSE
+                  ''
+        END AS complemento
     ,   sw_uf.sigla_uf AS uf
     ,   sw_municipio.nom_municipio 
     ,   (CASE WHEN licitacao.cod_processo IS NOT NULL THEN licitacao.cod_processo||'/'||licitacao.exercicio_processo
@@ -957,8 +963,9 @@ WHERE NOT EXISTS (
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">logradouro</property>
-                                <expression name="expression">dataSetRow["logradouro"] + ", " + dataSetRow["numero"] + ". " + dataSetRow["bairro"] + ", " + dataSetRow["cep"] + " " + dataSetRow["nom_municipio"] + "/" + dataSetRow["uf"] + " " + dataSetRow["telefone"]</expression>
+                                <expression name="expression" type="javascript">dataSetRow['tipo_logradouro'] + ' ' + dataSetRow["logradouro"] +  ", " + dataSetRow["numero"] + "" + dataSetRow['complemento'] + ", " + dataSetRow["bairro"] + ", " + dataSetRow["nom_municipio"] + "/" + dataSetRow["uf"]</expression>
                                 <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <property name="resultSetColumn">logradouro</property>

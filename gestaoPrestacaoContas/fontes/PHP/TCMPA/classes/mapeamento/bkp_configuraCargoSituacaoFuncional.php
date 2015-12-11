@@ -78,7 +78,6 @@ foreach ($sessao->transf['lotacao'] as $key =>$valores) {
 }
 
 if (!$boErro->ocorreu()) {
-    //sistemaLegado::mostraVar($sessao->transf['lotacao']);
     foreach ($sessao->transf['lotacao'] as $chave =>$valor) {
         $obTTPALotacao->setDado( 'cod_situacao'   , $valor['inCodSituacao']);
         $obTTPALotacao->setDado( 'cod_tipo', $valor['inCodTipoCargo']);

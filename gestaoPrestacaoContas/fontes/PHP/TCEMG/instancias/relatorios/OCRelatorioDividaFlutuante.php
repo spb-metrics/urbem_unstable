@@ -27,7 +27,7 @@
   * Página de Formulario
   * Data de Criação: 31/07/2014
   * @author Desenvolvedor: Evandro Melos
-  * $Id: OCRelatorioDividaFlutuante.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCRelatorioDividaFlutuante.php 64143 2015-12-08 17:05:11Z jean $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -119,7 +119,7 @@ $arDados['data_final']              = $stDataFinal;
 $arDados['total_restos_entidade']   = $artotal;
 
 $arDados['restos_pagar']            = $rsRestosPagar;
-$arDados['depositos']               = $rsBalVerificacao;
+$arDados['depositos']               = $rsDepositoDividaFlutuante;
 $arDados['totais_orgao']            = $rsTotalOrgao;
 $arDados['totais_contas_devedoras'] = $rsTotalOrgao;
 

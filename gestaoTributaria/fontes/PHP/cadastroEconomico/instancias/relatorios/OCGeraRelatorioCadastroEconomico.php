@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioCadastroEconomico.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioCadastroEconomico.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.17
 
@@ -71,8 +71,6 @@ $rsResultadosEntidades = version_compare(phpversion(), '5.0') < 0 ? $arSessaoTra
 $arSessaoTransf6 = Sessao::read( "sessao_transf6" );
 $rsResultados = new RecordSet;
 $rsResultados = $arSessaoTransf6->arElementos;
-
-//sistemaLegado::mostravar( $arSessaoTransf7 );
 
 $inContRg = $arSessaoTransf7->getNumLinhas();
 $inCont = 0;

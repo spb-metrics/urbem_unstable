@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioEmpenhoOrcamentario.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioEmpenhoOrcamentario.php 64072 2015-11-27 12:54:23Z evandro $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.17
@@ -300,7 +300,6 @@ if (isset($arFiltroRelatorio['stCtrl']) && $arFiltroRelatorio['stCtrl']=='imprim
     $dadosImpressao[0]['cod_empenho'] = $arFiltroRelatorio['inCodEmpenho'];
     $dadosImpressao[0]['cod_entidade'] = $arFiltroRelatorio['inCodEntidade'];
 }
-
 $boTransacao = "";
 foreach ($arRecordSetTodos as $inChave => $arRecordSet) {
     $arFiltroRelatorio = $dadosImpressao[$inChave];
@@ -315,8 +314,17 @@ foreach ($arRecordSetTodos as $inChave => $arRecordSet) {
         // cabeçalho e descricao = 2
         $inNumComplementar = 2;
     }
-
-    $flTotal = ($inNumHistorico+$inNumDescEmpenho+$inNumItens+$inNumComplementar)/8;
+    foreach ($arRecordSet[9]->getElementos() as $key => $value) {        
+        $arMax[] = $value['Item'];
+    }
+    
+    //caso existir somento 1 item mostrar apenas 1 pagina final
+    $maxItens = max($arMax);    
+    if($maxItens != 1)
+        $flTotal = ($inNumHistorico+$inNumDescEmpenho+$inNumItens+$inNumComplementar)/$maxItens;
+    else
+        $flTotal = 1;
+    
     if (is_integer($flTotal)) {
         $obPDF->setPaginaFinal($flTotal);
     } else {

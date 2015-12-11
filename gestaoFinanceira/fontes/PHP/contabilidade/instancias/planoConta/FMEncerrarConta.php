@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMEncerrarConta.php 60107 2014-09-30 17:56:47Z evandro $
+    * $Id: FMEncerrarConta.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.02
 */
@@ -177,7 +177,7 @@ if (!$inCodEntidade) {
 }
 
 if ($stAcao == "encerrar") {
-    if ( ($inCodSistemaContabil == "5") || ( $inCodSistemaContabil == "4" && SistemaLegado::is_tcems() && $stEscrituracao == 'sintetica' ) ) {
+    if ( ($inCodSistemaContabil == "5") || ( $inCodSistemaContabil == "4" && Sessao::getExercicio() > '2012' && $stEscrituracao == 'sintetica' ) ) {
         $js .= " buscaValor('tipoContaSintetica');";
     } else {
         $js .= " buscaValor('tipoContaAnalitica');";

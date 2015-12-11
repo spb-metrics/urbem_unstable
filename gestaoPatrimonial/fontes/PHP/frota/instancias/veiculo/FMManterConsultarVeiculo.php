@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    $Id: FMManterConsultarVeiculo.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterConsultarVeiculo.php 63833 2015-10-22 13:05:17Z franver $
 
     * Casos de uso: uc-03.02.06
 */
@@ -228,8 +228,6 @@ if ( $rsVeiculo->getCampo( 'num_proprietario' ) != '' ) {
     $obLblBem->setRotulo( 'Bem' );
     $obLblBem->setValue( $rsVeiculo->getCampo( 'cod_bem' ).' - '.$rsVeiculo->getCampo( 'nom_bem' ) );
 }
-
-//sistemaLegado::mostraVar($rsVeiculo);exit;
 
 /***
 * Dados financeiros do veiculo

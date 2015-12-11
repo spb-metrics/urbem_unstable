@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-* $Id: MontaAtividade.class.php 59807 2014-09-12 12:31:14Z evandro $
+* $Id: MontaAtividade.class.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.02.07
 */
@@ -511,7 +511,7 @@ function preencheProxComboCNAE($inPosCombo, $inNumCombos)
         $inContador = 1;
         if ($inPosCombo != $inNumCombos) {
             $this->stValorReduzido .= ".";
-//sistemaLegado::mostravar( $rsListaCnae );
+
             while ( !$rsListaCnae->eof() ) {
                 $stChaveCnae  = $rsListaCnae->getCampo( "cod_nivel" )."§";
                 $stChaveCnae .= $rsListaCnae->getCampo( "cod_atividade")."§";
@@ -550,7 +550,6 @@ function preencheCombos2()
 
     $stValorReduzido = $this->stValorReduzido;
     $arValorReduzido = explode( ".", $stValorReduzido );
-//sistemaLegado::mostravar( $arValorReduzido );
 /*
     $stTMP = $arValorReduzido[2];
     $arValorReduzido[2] = substr( $stTMP, 0, 1 );
@@ -566,12 +565,10 @@ function preencheCombos2()
         $stValorSelecionar = $rsListaCnae->getCampo( "cod_atividade");
     }
 
-//sistemaLegado::mostravar( $arValorReduzido );
-
     $this->obRCEMAtividade->setCodigoNivel ( 1 );
     $this->obRCEMAtividade->setValorReduzido( "" );
     $obErro = $this->obRCEMAtividade->listarAtividadeComboCNAE( $rsListaCnae );
-//echo "teste1<br>";exit;
+
     $inContador = 1;
     $inPosCombo = 1;
     while ( !$rsListaCnae->Eof() ) {
@@ -806,7 +803,6 @@ function preencheCombosAtividade()
         $this->obRCEMAtividade->setCodigoNivel    ( $this->inCodigoNivel    );
         // $this->obRCEMAtividade->setCodigoNivel    ( 3    );
         $obErro = $this->obRCEMAtividade->listarNiveisAnteriores( $rsListaNivel );
-        //sistemaLegado::mostravar ( $rsListaNivel );
     } else {
 
         $this->obRCEMAtividade->recuperaVigenciaAtual( $rsVigenciaAtual );

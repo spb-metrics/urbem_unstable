@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRRelatorioDevedores.class.php 60480 2014-10-23 18:32:04Z carolina $
+    * $Id: TARRRelatorioDevedores.class.php 63959 2015-11-11 17:07:46Z evandro $
 
 * Casos de uso: uc-05.03.05
 */
@@ -198,7 +198,7 @@ class TARRRelatorioDevedores extends Persistente {
                          , divida_ativa.inscricao
               ) AS final
                  
-        ORDER BY final.valor DESC";
+        ORDER BY final.inscricao";
         
         if($this->getDado('limite') != 0) {
             $stSql.= " LIMIT ".$this->getDado('limite');
@@ -356,7 +356,7 @@ class TARRRelatorioDevedores extends Persistente {
                                 , divida_ativa.inscricao
                      ) AS final
                      
-            ORDER BY final.valor DESC";
+            ORDER BY final.inscricao DESC";
         
         if($this->getDado('limite') != 0) {
             $stSql.= " LIMIT ".$this->getDado('limite');

@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCConcederLicencaGeralUsoSolo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: OCConcederLicencaGeralUsoSolo.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -112,8 +112,6 @@ function excluirElemento($inLinha)
 
 function montaListaElementos(&$rsListaElementos)
 {
-    #sistemaLegado::mostravar ( $rsListaElementos );
-
     $stAcao = $request->get('stAcao');
     $rsListaElementos->setPrimeiroElemento();
      if ( !$rsListaElementos->eof() ) {
@@ -280,8 +278,6 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case "buscaInscricao":
-///        sistemaLegado::mostravar("qrarasdf");die();
-
         if ($_REQUEST["inInscricaoEconomica"] != "") {
             $obRCEMInscricaoEconomica = new RCEMInscricaoEconomica;
             $obRCEMInscricaoEconomica->setInscricaoEconomica( $_REQUEST["inInscricaoEconomica"] );

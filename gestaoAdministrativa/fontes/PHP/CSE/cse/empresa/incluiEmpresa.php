@@ -138,7 +138,6 @@ case 0:
     break;
     //Inclusão, alteração ou exclusão de dados
     case 1:
-        //mostraVar($HTTP_POST_VARS);
         $js = "";
         $ok = true;
         $vet = $HTTP_POST_VARS;

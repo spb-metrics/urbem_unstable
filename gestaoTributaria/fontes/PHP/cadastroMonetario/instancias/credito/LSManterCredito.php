@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: LSManterCredito.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCredito.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.10
 
@@ -174,7 +174,6 @@ $obLista->ultimaAcao->addCampo("&stDescQuestao","[cod_credito]-[descricao_credit
 
 if ($_REQUEST['stAcao'] == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
-     //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

@@ -201,7 +201,7 @@ setAjuda("UC-03.01.13");
                                 administracao.orgao
                             ORDER
                                 by nom_orgao";
-                    //mostravar($sSQL);
+
                     $dbEmp = new dataBaseLegado;
                     $dbEmp->abreBD();
                     $dbEmp->abreSelecao($sSQL);

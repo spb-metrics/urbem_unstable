@@ -154,7 +154,6 @@ echo $html;
 <?php
     break;
 case 1:
-//mostraVar($HTTP_GET_VARS);
 $agencia = new agencia($codBanco,$codAgencia);
 $agencia->retornaAgencia();
 $nomBanco = $agencia->nomBanco;

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCPeriodicidade.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCPeriodicidade.php 63993 2015-11-16 17:16:46Z jean $
 
     * Casos de uso: uc-01.01.00
 */
@@ -67,6 +67,7 @@ switch ($_REQUEST["stCtrl"]) {
                     $obComboPeriodicidade->obAnoMes->montaHTML();
                     $stHTML .= $obComboPeriodicidade->obAnoMes->getHTML();
                 }
+                
                 $obComboPeriodicidade->obMes->montaHTML();
                 $stHTML .= '&nbsp;/&nbsp;'.$obComboPeriodicidade->obMes->getHTML();
 
@@ -99,11 +100,12 @@ switch ($_REQUEST["stCtrl"]) {
                 break;
             }
 
+        //$obComboPeriodicidade->obAnoMes->setTitle("Informe o ano e mês. Se quiser recuperar todos os anos, deixe o campo ano em branco.");
         $stHTML = nl2br(addslashes(str_replace("\r\n", "\n", preg_replace("/(\r\n|\n|\r)/", "", $stHTML))));
-        $stJs .= "$('".$obComboPeriodicidade->obSpan->getId()."').innerHTML = '".$stHTML."';";
-        $stJs .= "document.frm.".$obComboPeriodicidade->obDataInicial->getName().".value = '".$stDataInicial."';";
-        $stJs .= "document.frm.".$obComboPeriodicidade->obDataFinal->getName().".value = '".$stDataFinal."';";
-
+        $stJs .= "$('".$obComboPeriodicidade->obSpan->getId()."').innerHTML = '".$stHTML."';\n";
+        $stJs .= "document.frm.".$obComboPeriodicidade->obDataInicial->getName().".value = '".$stDataInicial."';\n";
+        $stJs .= "document.frm.".$obComboPeriodicidade->obDataFinal->getName().".value = '".$stDataFinal."';\n";
+        $stJs .= "jq('#stAnoMes').prop('title', 'Se você quiser recuperar todos os anos, deixe este campo em branco.');\n";
         break;
 
     case 'preencheDia' :
@@ -121,6 +123,9 @@ switch ($_REQUEST["stCtrl"]) {
             $inUltDia = cal_days_in_month(CAL_GREGORIAN,$_REQUEST[$obComboPeriodicidade->obMes->getName()],$_REQUEST[$obComboPeriodicidade->obAnoMes->getName()] );
             $stJs .= "document.forms[0].".$obComboPeriodicidade->obDataInicial->getName().".value = '01/".$_REQUEST[$obComboPeriodicidade->obMes->getName()]."/".$_REQUEST[$obComboPeriodicidade->obAnoMes->getName()]."'; ";
             $stJs .= "document.forms[0].".$obComboPeriodicidade->obDataFinal->getName().".value = '".$inUltDia."/".$_REQUEST[$obComboPeriodicidade->obMes->getName()]."/".$_REQUEST[$obComboPeriodicidade->obAnoMes->getName()]."';";
+        } else if ($obComboPeriodicidade->getAnoVazio() == true AND $_REQUEST[$obComboPeriodicidade->obAnoMes->getName()] == '') {
+            $stJs .= "document.forms[0].".$obComboPeriodicidade->obDataInicial->getName().".value = '".$_REQUEST[$obComboPeriodicidade->obMes->getName()]."'; ";
+            $stJs .= "document.forms[0].".$obComboPeriodicidade->obDataFinal->getName().".value = '".$_REQUEST[$obComboPeriodicidade->obMes->getName()]."';";
         }
         break;
     case 'preencheAno' :

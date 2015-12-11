@@ -60,7 +60,6 @@ if ( empty( $stAcao ) ) {
 }
 
 //MANTEM FILTRO E PAGINACAO
-//sistemalegado::mostravar($_REQUEST);
 $arLink = Sessao::read("link");
 $stLink = Sessao::getId()."&stAcao=".$stAcao;
 if ($_GET["pg"] and  $_GET["pos"]) {

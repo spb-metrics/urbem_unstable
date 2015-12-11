@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63687 $
+    $Revision: 63825 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -83,6 +83,7 @@ public function montaRecuperaDadosTribunal()
                     , TO_CHAR(contrato_documento.dt_emissao ,'DDMMYYYY') AS dt_emissao 
                     , TO_CHAR(contrato_documento.dt_validade,'DDMMYYYY') AS dt_validade
                     , '".$this->getDado('competencia')."' AS competencia
+                    , documento.nom_documento AS descricao
 
                  FROM licitacao.documento
 
@@ -100,9 +101,9 @@ public function montaRecuperaDadosTribunal()
                    ON documento.cod_documento  = contrato_documento.cod_documento
 
            INNER JOIN licitacao.contrato
-                   ON contrato.exercicio           = contrato_documento.exercicio
-                  AND contrato.cod_entidade       = contrato_documento.cod_entidade
-                  AND contrato.num_contrato       = contrato_documento.num_contrato
+                   ON contrato.exercicio = contrato_documento.exercicio
+                  AND contrato.cod_entidade = contrato_documento.cod_entidade
+                  AND contrato.num_contrato = contrato_documento.num_contrato
 
             LEFT JOIN ( SELECT documento_de_para.cod_documento_tcm AS cod_tipo_tcm
                              , documento_de_para.cod_documento
@@ -122,6 +123,7 @@ public function montaRecuperaDadosTribunal()
                     , contrato_documento.num_documento 
                     , contrato_documento.dt_emissao    
                     , contrato_documento.dt_validade
+                    , documento.nom_documento
                       
            ORDER BY contrato_documento.exercicio     
                     , contrato_documento.dt_validade
@@ -129,6 +131,7 @@ public function montaRecuperaDadosTribunal()
                     , contrato.numero_contrato
                     , contrato_documento.num_documento
                     , documento_de_para.cod_tipo_tcm
+                    , documento.nom_documento
     ";
     
     return $stSql;

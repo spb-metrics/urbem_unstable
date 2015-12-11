@@ -1640,7 +1640,6 @@ $stComposição =
 //         /* imposto/taxa */
 //         $arTMP = explode( ";", $this->stImpostoTaxa); //teste aqui
 //         /*
-// sistemaLegado::mostravar( $arTMP );exit;
 // */
 //         $inContImpostTaxa = 0;
 //         $stImpostoTaxaTmp = '';

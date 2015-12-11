@@ -344,7 +344,7 @@ function consultar($boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php"         );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php"         );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -369,7 +369,7 @@ function consultar($boTransacao = "")
     if ( !$obErro->ocorreu() ) {
         $this->stNomConta = $rsRecordSet->getCampo( "nom_conta" );
         $this->stCodEstrutural = $rsRecordSet->getCampo( "cod_estrutural" );
-        if ( SistemaLegado::is_tcems($boTransacao) ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $this->stIndicadorSuperavit = trim($rsRecordSet->getCampo( "indicador_superavit" ));
             $this->stEscrituracao = trim($rsRecordSet->getCampo( "escrituracao" ));
             $this->stFuncao = trim($rsRecordSet->getCampo( "funcao" ));
@@ -402,7 +402,7 @@ function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php"         );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php"         );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -418,7 +418,7 @@ function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
         $stFiltro .= " publico.fn_mascarareduzida(cod_estrutural) like (publico.fn_mascarareduzida('".$this->stCodEstrutural."')||'%') AND ";
     if($this->inCodSistema)
         $stFiltro .= " cod_sistema = " . $this->inCodSistema . " AND ";
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         if($this->stEscrituracao)
             $stFiltro .= " escrituracao = '" . $this->stEscrituracao . "' AND ";
         if($this->stNaturezaSaldo)
@@ -446,7 +446,7 @@ function listarGrupos(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -462,7 +462,7 @@ function listarGrupos(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
         $stFiltro .= " publico.fn_mascarareduzida(cod_estrutural) like (publico.fn_mascarareduzida('".$this->stCodEstrutural."')||'%') AND ";
     if($this->inCodSistema)
         $stFiltro .= " cod_sistema = " . $this->inCodSistema . " AND ";
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         if($this->stEscrituracao)
             $stFiltro .= " escrituracao = '" . $this->stEscrituracao . "' AND ";
         if($this->stNaturezaSaldo)
@@ -521,14 +521,8 @@ function gerarCodigoEstruturalPai()
 function validarCodigoEstrutural($boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
-    //include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
-    //if ( SistemaLegado::is_tcems($boTransacao)  ) {
-    //    $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
-    //    $stFiltro = " WHERE cod_estrutural ilike '".substr($this->stCodEstrutural,0,15)."%' ";
-    //} else {
-        $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
-        $stFiltro = " WHERE cod_estrutural = '".$this->stCodEstrutural."' ";
-    //}
+    $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
+    $stFiltro = " WHERE cod_estrutural = '".$this->stCodEstrutural."' ";
 
     $stFiltro.= " AND exercicio = '".$this->stExercicio."' ";
 
@@ -551,7 +545,7 @@ function validarCodigoEstruturalPai($boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -560,7 +554,7 @@ function validarCodigoEstruturalPai($boTransacao = "")
     $obErro = new Erro;
     $stCodEstruturalPai = $this->gerarCodigoEstruturalPai();
     if ($stCodEstruturalPai) {
-        if ( SistemaLegado::is_tcems($boTransacao) ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $stCodEstruturalPaiTCEMS = substr($stCodEstruturalPai, 0, 12);
             $stFiltro = ' WHERE cod_estrutural like \''.$stCodEstruturalPaiTCEMS.'%\' ';
         } else {
@@ -588,7 +582,7 @@ function validarCodigoEstruturalFilho($boTransacao = "")
     $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
 
     $stFiltro  = " WHERE publico.fn_mascarareduzida(cod_estrutural) like (publico.fn_mascarareduzida('".$this->stCodEstrutural."')||'%') AND ";
-    if ( sistemaLegado::is_tcems( $boTransacao ) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stFiltro .= " publico.fn_mascara_completa((select valor from administracao.configuracao where cod_modulo = 9 and
             exercicio = '".$this->stExercicio."' and parametro = 'masc_plano_contas'), cod_estrutural) != '".$this->stCodEstrutural."' ";
     } else {
@@ -609,7 +603,7 @@ function validarNivelConta($boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -617,7 +611,7 @@ function validarNivelConta($boTransacao = "")
 
     $obTContabilidadePlanoConta->setDado( "exercicio"         , $this->stExercicio        );
 
-    if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obErro = $this->recuperaMascaraConta( $stMascara, $boTransacao );
         if ( !$obErro->ocorreu() ) {
             $obTContabilidadePlanoConta->setDado( "cod_estrutural"    , SistemaLegado::doMask( $this->stCodEstrutural, $stMascara ) );
@@ -630,7 +624,7 @@ function validarNivelConta($boTransacao = "")
 
     $obErro = $obTContabilidadePlanoConta->recuperaNivelConta( $rsRecordSet, $stFiltro, '', $boTransacao );
 
-    if ( !SistemaLegado::is_tcems( $boTransacao ) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         if (strlen($this->stCodEstrutural) != 24) {
             $obErro->setDescricao('Código de classificação inválido!');
         }
@@ -657,7 +651,7 @@ function checarContaPai($boTransacao = "")
 {
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -690,7 +684,7 @@ function salvar($boTransacao = "")
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeClassificacaoPlano.class.php" );
     $obTContabilidadeClassificacaoPlano    = new TContabilidadeClassificacaoPlano;
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -714,7 +708,7 @@ function salvar($boTransacao = "")
         $obTContabilidadePlanoConta->setDado( "cod_classificacao" , $this->obRContabilidadeClassificacaoContabil->getCodClassificacao() );
         $obTContabilidadePlanoConta->setDado( "cod_sistema"       , $this->obRContabilidadeSistemaContabil->getCodSistema() );
         $obTContabilidadePlanoConta->setDado( "cod_estrutural"    , $this->stCodEstrutural );
-        if ( SistemaLegado::is_tcems($boTransacao) ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $obTContabilidadePlanoConta->setDado( "escrituracao"    , $this->stEscrituracao );
             $obTContabilidadePlanoConta->setDado( "natureza_saldo"    , $this->stNaturezaSaldo );
             $obTContabilidadePlanoConta->setDado( "indicador_superavit"    , $this->stIndicadorSuperavit );
@@ -792,7 +786,7 @@ function salvarEscolhaPlanoConta($boTransacao = "")
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoContaTCEMS.class.php" );
     include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadeClassificacaoPlano.class.php" );
     $obTContabilidadeClassificacaoPlano    = new TContabilidadeClassificacaoPlano;
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -806,7 +800,7 @@ function salvarEscolhaPlanoConta($boTransacao = "")
         $obTContabilidadePlanoConta->setDado( "cod_estrutural"    , $this->stCodEstrutural    );
         $obTContabilidadePlanoConta->setDado( "cod_classificacao" , $this->obRContabilidadeClassificacaoContabil->getCodClassificacao() );
         $obTContabilidadePlanoConta->setDado( "cod_sistema"       , $this->obRContabilidadeSistemaContabil->getCodSistema() );
-        if ( SistemaLegado::is_tcems($boTransacao) ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $obTContabilidadePlanoConta->setDado( "escrituracao"    , $this->stEscrituracao );
             $obTContabilidadePlanoConta->setDado( "natureza_saldo"    , $this->stNaturezaSaldo );
             $obTContabilidadePlanoConta->setDado( "indicador_superavit"    , $this->stIndicadorSuperavit );

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id:$
+    $Id: OCGeraManterJulgamentoProposta.php 63841 2015-10-22 19:14:30Z michel $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -53,7 +53,7 @@ $stAcao             = $_REQUEST['stAcao'];
 $preview = new PreviewBirt(3,37,2);
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setNomeArquivo('julgamentoPropostas');
-$preview->setTitulo('Relatório de Julgamento de Prospostas');
+$preview->setTitulo('Relatório de Julgamento de Propostas');
 
 # Para Compra Direta.
 if ($stAcao == "dispensaLicitacao" || !empty($inCodCompraDireta)) {

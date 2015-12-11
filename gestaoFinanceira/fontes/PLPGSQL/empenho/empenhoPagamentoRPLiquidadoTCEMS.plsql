@@ -144,11 +144,10 @@ BEGIN
              ON debito.exercicio = credito.exercicio
           WHERE debito.exercicio = '''||EXERCICIO||'''
     ';
-
-    FOR ReContaLiq IN EXECUTE SqlContaLiq
-    LOOP
-        Sequencia := FazerLancamento( ReContaLiq.estrutural_debito , ReContaLiq.estrutural_credito , 917 , Exercicio , Valor , Complemento , CodLote , TipoLote , CodEntidade, ReContaLiq.plano_debito, ReContaLiq.plano_credito );
-    END LOOP;
+   FOR ReContaLiq IN EXECUTE SqlContaLiq
+   LOOP
+       Sequencia := FazerLancamento( ReContaLiq.estrutural_debito , ReContaLiq.estrutural_credito , 917 , Exercicio , Valor , Complemento , CodLote , TipoLote , CodEntidade, ReContaLiq.plano_debito, ReContaLiq.plano_credito );
+   END LOOP;
 
     IF boImplantado = FALSE THEN
         SqlContaPg := '
@@ -210,6 +209,8 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CodNota || '
                        AND nota_liquidacao.exercicio = '''||ExercLiquidacao||'''
+                       AND nota_liquidacao.cod_empenho::TEXT =  split_part(''' || Complemento || ''',''/'', 1)
+                       AND nota_liquidacao.exercicio_empenho::TEXT =  split_part(''' || Complemento || ''',''/'', 2);
             ';
     ELSE
         SqlContaPg := '

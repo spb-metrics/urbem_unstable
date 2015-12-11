@@ -125,8 +125,7 @@ $obTPontoRelogioPontoHorario->obTPontoRelogioPontoDias        = &$obTPontoRelogi
 
 $arHorarios = montaHorarios();
 $arJustificativas = Sessao::read("arJustificativas");
-//sistemalegado::mostravar($arHorarios);
-//exit;
+
 if (count($arHorarios) > 0) {
     if (trim($_REQUEST["boTipoManutencao"]) == "LOTE_DIARIO") {
         foreach ($arHorarios as $inCodContrato => $arDatas) {

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioResumoLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioResumoLote.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.03
 */
@@ -117,8 +117,6 @@ $arDados[0]["tipo"] = $stTipo;
 $rsResumoLote->preenche( $arDados );
 $rsResumoLote->setPrimeiroElemento();
 
-#sistemaLegado::mostravar( $rsResumoLote );
-
 //titulo
 $arTitulo1 = array("tit" => "DADOS DO LOTE");
 $rsTit1 = new Recordset;
@@ -149,16 +147,13 @@ $obPDF->addCampo       ( "registros"   , 8 );
 $obPDF->addCampo       ( "[num_banco] - [nom_banco]"     , 8 );
 $obPDF->addCampo       ( "[num_agencia] - [nom_agencia]" , 8 );
 
-#echo '<br><b>'.$stTipo.'</b>'; exit;
-
 if ($stTipo == "Pagamento") {
 
     $obRARRPagamento->listaResumoLoteOrigem ( $rsListaOrigem );
-//    sistemaLegado::mostravar ( $rsListaOrigem );exit;
 
     $flSomaValorNormal = $flSomaValorJuros = $flSomaValorMulta = $flSomaValorDiff = 0.00;
     $flSomaValorTotal = $flSomaValorInconsistentes = 0.00;
-//sistemaLegado::mostravar( $rsListaOrigem );exit;
+
     while ( !$rsListaOrigem->eof() ) {
 
         if ( $rsListaOrigem->getCampo('tipo') == 'grupo' ) {
@@ -194,10 +189,6 @@ if ($stTipo == "Pagamento") {
 
         $obRARRPagamento->listaResumoLote( $rsListaCreditos, NULL, $boDivida );
 
-//        if ( $rsListaOrigem->getCampo("origem") == "003.001.01.1" ) {
-  //          sistemaLegado::mostravar( $rsListaCreditos );
-    //        exit;
-      //  }
         #SOMATORIO DAS PARCELAS NORMAIS
         $arSomatorios = null;
         $flOrigemValorNormalOK = $flOrigemValorJurosOK = $flOrigemValorMultaOK = $flOrigemValorDiffOK = $flOrigemValorTotalOK = 0.00;

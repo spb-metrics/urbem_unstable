@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: incluiDespacho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: incluiDespacho.php 63829 2015-10-22 12:06:07Z franver $
 */
 
 include '../../../framework/include/cabecalho.inc.php';
@@ -382,12 +382,10 @@ case 1:
     <td class="alt_dados" colspan="3">Documentos</td>
   </tr>
 <?php
-//mostravar($lista_domentos_processo);
 if (is_array($lista_domentos_processo)) {
 
         while (list($key,$val) = each($lista_domentos_processo)) {
             $selected = "";
-            //mostravar($lista_domentos_entregues);
             if (is_array($lista_domentos_entregues)) {
                 //continue;
             } else {
@@ -454,7 +452,6 @@ $obj = "Despacho para Processo: ".$codProcesso."/".$anoE;
 $processo = new processos;
 $processo->setaValorDespacho($codAndamento,$codProcesso,$anoE,$codUsuario,$descricao);
 if ($processo->insertDespacho()) {
-    //mostravar($documento);
     //if ($processo->updateDocumento($documento,$codProcesso,$exercicio)) {
                     include '../../classes/auditoria.class.php';
                     $audicao = new auditoria;

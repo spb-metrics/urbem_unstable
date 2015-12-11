@@ -282,6 +282,8 @@ public function calcularFolha($boRecisaoContrato = false)
         if (!$boRecisaoContrato) {
             $pgList = "LS".$this->getNameProgram().".php?".Sessao::getId();
             SistemaLegado::alertaAviso($pgList,"Cálculo concluído","incluir","aviso", Sessao::getId(), "../");
+        }else{
+            SistemaLegado::LiberaFrames();    
         }
     } else {
         SistemaLegado::LiberaFrames();
@@ -844,5 +846,303 @@ public function gerarSpanErroCalculo()
     return $stJs;
 }
 
+public function processarRegistroEvento()
+{
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEvento.class.php"                                );
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculado.class.php"                       );
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculadoDependente.class.php"             );
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculo.class.php"                        );
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php"               );
+
+    Sessao::setTrataExcecao(true);
+    $obTPessoalContrato = new TPessoalContrato;
+    $stFiltro = " WHERE registro = ".Sessao::read('inContrato');
+    $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
+    $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao;
+    $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsUltimaMovimentacao);
+
+    $obTFolhaPagamentoContratoServidorPeriodo = new TFolhaPagamentoContratoServidorPeriodo;
+    $obTFolhaPagamentoRegistroEventoPeriodo   = new TFolhaPagamentoRegistroEventoPeriodo;
+    $obTFolhaPagamentoRegistroEventoPeriodo->obTFolhaPagamentoContratoServidorPeriodo = &$obTFolhaPagamentoContratoServidorPeriodo;
+    $obTFolhaPagamentoRegistroEvento        = new TFolhaPagamentoRegistroEvento;
+    $obTFolhaPagamentoRegistroEvento->obTFolhaPagamentoRegistroEventoPeriodo = &$obTFolhaPagamentoRegistroEventoPeriodo;
+    $obTFolhaPagamentoUltimoRegistroEvento  = new TFolhaPagamentoUltimoRegistroEvento;
+    $obTFolhaPagamentoUltimoRegistroEvento->obTFolhaPagamentoRegistroEvento = &$obTFolhaPagamentoRegistroEvento;
+    $obTFolhaPagamentoRegistroEventoParcela = new TFolhaPagamentoRegistroEventoParcela;
+    $obTFolhaPagamentoRegistroEventoParcela->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
+    $obTFolhaPagamentoLogErroCalculo = new TFolhaPagamentoLogErroCalculo;
+    $obTFolhaPagamentoLogErroCalculo->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
+    $obTFolhaPagamentoEventoCalculado = new TFolhaPagamentoEventoCalculado;
+    $obTFolhaPagamentoEventoCalculado->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
+    $obTFolhaPagamentoEventoCalculadoDependente = new TFolhaPagamentoEventoCalculadoDependente;
+    $obTFolhaPagamentoEventoCalculadoDependente->obTFolhaPagamentoEventoCalculado = &$obTFolhaPagamentoEventoCalculado;
+
+    $stFiltro  = "   AND cod_contrato = ".$rsContrato->getCampo("cod_contrato");
+    $stFiltro .= "   AND cod_periodo_movimentacao = ".$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao");
+    $obTFolhaPagamentoUltimoRegistroEvento->recuperaRelacionamento($rsRegistroEventoPeriodo,$stFiltro);
+    while (!$rsRegistroEventoPeriodo->eof()) {
+        $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_registro",$rsRegistroEventoPeriodo->getCampo("cod_registro"));
+        $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_evento",$rsRegistroEventoPeriodo->getCampo("cod_evento"));
+        $obTFolhaPagamentoUltimoRegistroEvento->setDado("desdobramento",$rsRegistroEventoPeriodo->getCampo("desdobramento"));
+        $obTFolhaPagamentoUltimoRegistroEvento->setDado("timestamp",$rsRegistroEventoPeriodo->getCampo("timestamp"));
+        $obTFolhaPagamentoUltimoRegistroEvento->deletarUltimoRegistroEvento();
+        $rsRegistroEventoPeriodo->proximo();
+    }
+    $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+
+    $obTFolhaPagamentoContratoServidorPeriodo->setDado("cod_contrato",$rsContrato->getCampo("cod_contrato"));
+    $obTFolhaPagamentoContratoServidorPeriodo->setDado("cod_periodo_movimentacao",$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
+    $obTFolhaPagamentoContratoServidorPeriodo->recuperaPorChave($rsContratoServidorPeriodo);
+    if ( $rsContratoServidorPeriodo->getNumLinhas() < 0 ) {
+        $obTFolhaPagamentoContratoServidorPeriodo->inclusao();
+    }
+
+    //Inclusão de eventos fixos
+    $arEventosFixos = Sessao::read("eventosFixos");
+    if (is_array($arEventosFixos)) {
+        foreach ($arEventosFixos as $arEvento) {
+            $stFiltro = " WHERE codigo = '".$arEvento["inCodigo"]."'";
+            $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
+            $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro);
+
+            $nuValor        = ( $arEvento['nuValor']        != "" ) ? $arEvento['nuValor']      : 0;
+            $nuQuantidade   = ( $arEvento['nuQuantidade']   != "" ) ? $arEvento['nuQuantidade'] : 0;
+
+            $obTFolhaPagamentoRegistroEvento->setDado("cod_evento"  ,$rsEvento->getCampo("cod_evento"));
+            $obTFolhaPagamentoRegistroEvento->setDado("valor"       ,$nuValor);
+            $obTFolhaPagamentoRegistroEvento->setDado("quantidade"  ,$nuQuantidade);
+            $obTFolhaPagamentoRegistroEvento->setDado("proporcional",false);
+            $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
+            $obTFolhaPagamentoRegistroEvento->inclusao();
+            $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+        }
+    }
+
+    //Inclusão de eventos variáveis
+    $arEventosVariaveis = Sessao::read("eventosVariaveis");
+    if (is_array($arEventosVariaveis)) {
+        foreach ($arEventosVariaveis as $arEvento) {
+            $stFiltro = " WHERE codigo = '".$arEvento["inCodigo"]."'";
+            $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
+            $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro);
+                
+            $nuValor        = ( $arEvento['nuValor']        != "" ) ? $arEvento['nuValor']      : 0;
+            $nuQuantidade   = ( $arEvento['nuQuantidade']   != "" ) ? $arEvento['nuQuantidade'] : 0;
+                
+            $obTFolhaPagamentoRegistroEvento->setDado("cod_evento"  ,$rsEvento->getCampo("cod_evento"));
+            $obTFolhaPagamentoRegistroEvento->setDado("valor"       ,$nuValor);
+            $obTFolhaPagamentoRegistroEvento->setDado("quantidade"  ,$nuQuantidade);
+            $obTFolhaPagamentoRegistroEvento->setDado("proporcional",false);
+            $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
+            $obTFolhaPagamentoRegistroEvento->inclusao();
+            $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
+            if ($arEvento['inQuantidadeParc'] != "") {
+                $inMesCarencia  = ( $arEvento['inMesCarencia']   != "" ) ? $arEvento['inMesCarencia'] : 0;
+                
+                $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela"      , $arEvento['inQuantidadeParc']);
+                $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia" , $inMesCarencia);
+                $obTFolhaPagamentoRegistroEventoParcela->inclusao();
+            }
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+        }
+    }
+
+    //Inclusão de eventos proporcionais
+    $arEventosProporcionais = Sessao::read("eventosProporcionais");
+    if (is_array($arEventosProporcionais)) {
+        foreach ($arEventosProporcionais as $arEvento) {
+            $stFiltro = " WHERE codigo = '".$arEvento["inCodigo"]."'";
+            $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
+            $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro);
+
+            $nuValor        = ( $arEvento['nuValor']        != "" ) ? $arEvento['nuValor']      : 0;
+            $nuQuantidade   = ( $arEvento['nuQuantidade']   != "" ) ? $arEvento['nuQuantidade'] : 0;
+
+            $obTFolhaPagamentoRegistroEvento->setDado("cod_evento"  ,$rsEvento->getCampo("cod_evento"));
+            $obTFolhaPagamentoRegistroEvento->setDado("valor"       ,$nuValor);
+            $obTFolhaPagamentoRegistroEvento->setDado("quantidade"  ,$nuQuantidade);
+            $obTFolhaPagamentoRegistroEvento->setDado("proporcional",true);
+            $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
+            $obTFolhaPagamentoRegistroEvento->inclusao();
+            $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
+                
+            if ($arEvento['inQuantidadeParc'] != "") {
+                $inMesCarencia  = ( $arEvento['inMesCarencia']   != "" ) ? $arEvento['inMesCarencia'] : 0;
+                
+                $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela"  ,$arEvento['inQuantidadeParc']);
+                $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia" , $inMesCarencia);
+                $obTFolhaPagamentoRegistroEventoParcela->inclusao();
+            }
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+        }
+    }
+
+    //Para funcionamento correto dessa PL, foi inserido no registro de evento uma verificação
+    //que identifica se o contrato possui registros de eventos, caso não possua, é excluído
+    //o dado da tabela folhapagamento.deducao_dependente que identifica a utilização de valor
+    //de dedução de dependente.
+    if (count($arEventosFixos) == 0 AND count($arEventosVariaveis) == 0 AND count($arEventosProporcionais) == 0) {
+        $stFiltro = " AND contrato.registro = ".Sessao::read('inContrato');
+        $obTPessoalContrato->recuperaCgmDoRegistro($rsCGM,$stFiltro);
+
+        include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDeducaoDependente.class.php");
+        $obTFolhaPagamentoDeducaoDependente = new TFolhaPagamentoDeducaoDependente();
+        $obTFolhaPagamentoDeducaoDependente->setDado("numcgm",$rsCGM->getCampo("numcgm"));
+        $obTFolhaPagamentoDeducaoDependente->setDado("cod_periodo_movimentacao",$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
+        $obTFolhaPagamentoDeducaoDependente->setDado("cod_tipo",2);
+        $obTFolhaPagamentoDeducaoDependente->exclusao();
+    }
+    
+    Sessao::encerraExcecao();
+
 }
+
+public function processarPreviaCalculoSalario($arNumCGM,$stTipoFiltro)
+{
+    include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
+    $this->setTipoFiltro( $stTipoFiltro );
+    $this->setCodigos( $arNumCGM );
+    //Verificação de configuração de tabelas.
+    //Caso exista uma que não esteja configurada estoura erro.
+    //BUSCA COMPETENCIA
+    include_once(CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php");
+    $obPeriodoMovimentacao = new RFolhaPagamentoPeriodoMovimentacao;
+    $obPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao);
+    $stCompetencia = $rsUltimaMovimentacao->getCampo('dt_final');
+    //VERIFICA SE EXISTE CÁLCULO DE PENSÃO ALIMENTÍCIA CONFIGURADA
+    include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoPensaoEvento.class.php' );
+    $obTFolhaPagamentoPensaoEvento = new TFolhaPagamentoPensaoEvento;
+    $obTFolhaPagamentoPensaoEvento->recuperaTodos($rsPensaoEvento);
+    if ($rsPensaoEvento->getNumLinhas() < 0) {
+        SistemaLegado::exibeAviso(urlencode("Configuração do Cálculo de Pensão Alimentícia inexistente!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE EXISTE CÁLCULO DE FÉRIAS
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoFeriasEvento.class.php" );
+    $obTFolhaPagamentoFeriasEvento = new TFolhaPagamentoFeriasEvento;
+    $obTFolhaPagamentoFeriasEvento->recuperaTodos($rsFeriasEvento);
+    if ($rsFeriasEvento->getNumLinhas() < 0) {
+        SistemaLegado::exibeAviso(urlencode("Configuração do Cálculo de Férias inexistente!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE EXISTE CÁLCULO DE 13º
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDecimoEvento.class.php" );
+    $obTFolhaPagamentoDecimoEvento = new TFolhaPagamentoDecimoEvento;
+    $obTFolhaPagamentoDecimoEvento->recuperaTodos($rsDecimoEvento);
+    if ($rsDecimoEvento->getNumLinhas() < 0) {
+        SistemaLegado::exibeAviso(urlencode("Configuração Cálculo de 13º Salário inexistente!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE O CÁLCULO PREVIDÊNCIA ESTÁ EM VIGÊNCIA
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPrevidenciaPrevidencia.class.php" );
+    $obTFolhaPagamentoPrevidenciaPrevidencia = new TFolhaPagamentoPrevidenciaPrevidencia;
+    $obTFolhaPagamentoPrevidenciaPrevidencia->recuperaTodos($rsPrevidenciaPrevidencia);
+    $rsPrevidenciaPrevidencia->setUltimoElemento();
+    if ($rsPrevidenciaPrevidencia->getCampo("vigencia") > $stCompetencia || $rsPrevidenciaPrevidencia->getCampo("vigencia") == "") {
+        SistemaLegado::exibeAviso(urlencode("Configuração da Previdência inexistente ou não está em vigor para competência!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE O CÁLCULO SALÁRIO FAMÍLIA ESTÁ EM VIGOR
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoSalarioFamilia.class.php" );
+    $obTFolhaPagamentoSalarioFamilia = new TFolhaPagamentoSalarioFamilia;
+    $obTFolhaPagamentoSalarioFamilia->recuperaTodos($rsSalarioFamilia);
+    $rsSalarioFamilia->setUltimoElemento();
+    if ($rsSalarioFamilia->getCampo("vigencia") > $stCompetencia || $rsSalarioFamilia->getCampo("vigencia") == "") {
+        SistemaLegado::exibeAviso(urlencode("Configuração do Salário Família inexistente ou não está em vigor para competência!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE O CÁLCULO IRRF ESTÁ EM VIGOR
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoTabelaIrrf.class.php" );
+    $obTFolhaPagamentoTabelaIRRF = new TFolhaPagamentoTabelaIrrf;
+    $obTFolhaPagamentoTabelaIRRF->recuperaUltimaVigencia($rsRecordset);
+    if (SistemaLegado::dataToBr($rsRecordset->getCampo("vigencia")) > $stCompetencia || $rsRecordset->getCampo("vigencia") == "") {
+        SistemaLegado::exibeAviso(urlencode("Configuração da Tabela IRRF inexistente ou não está em vigor para competência!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    //VERIFICA SE O CÁLCULO DO FGTS ESTÁ EM VIGOR
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoFgts.class.php" );
+    $obTFolhaPagamentoFgts = new TFolhaPagamentoFgts;
+    $obTFolhaPagamentoFgts->recuperaTodos($rsRecordSet);
+    $rsRecordSet->setUltimoElemento();
+    if ($rsRecordSet->getCampo("vigencia") > $stCompetencia || $rsRecordSet->getCampo("vigencia") == "") {
+        SistemaLegado::exibeAviso(urlencode("Configuração do FGTS inexistente ou não está em vigor para competência!"),"n_incluir","erro");
+        SistemaLegado::LiberaFrames();
+        exit();
+    }
+    $this->setRecalcular(Sessao::read("rsRecalcular"));
+    $this->setCalcularSalario();
+    //Evitando o redirecionamento da pagina
+    $this->calcularFolhaPreviaFolha();
+}
+
+public function calcularFolhaPreviaFolha()
+{
+    $obErro = new erro;
+    $obTransacao = new Transacao;
+    $rsContratos = $this->getCodContratosFiltro();
+    if ($this->getExcluirCalculados()) {
+        $obErro = $this->detetarInformacoesDoCalculo($rsContratos);
+        $rsContratos->setPrimeiroElemento();
+    }
+
+    if ($rsContratos->getNumLinhas() < 0) {
+        $obErro->setDescricao("Não há contratos a serem calculados.");
+    }
+    foreach ($this->getDesdobramentos() as $stDesdobramento) {
+        while (!$rsContratos->eof() && !$obErro->ocorreu()) {
+            $boFlagTransacao = false;
+            $boTransacao = "";
+            $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+            if ( !$obErro->ocorreu() ) {
+                $inCodContrato = $rsContratos->getCampo("cod_contrato");
+                
+                include_once(CAM_GRH_FOL_MAPEAMENTO."FFolhaPagamentoCalculaFolha.class.php");
+                $obFFolhaPagamentoCalculaFolha = new FFolhaPagamentoCalculaFolha();
+                $obFFolhaPagamentoCalculaFolha->setDado('cod_contrato',$inCodContrato);
+                $obFFolhaPagamentoCalculaFolha->setDado('boErro',($this->getTipoFiltro()=="recalcular")?'t':'f');
+                $obErro = $obFFolhaPagamentoCalculaFolha->calculaFolha($rsCalcula,$boTransacao);
+
+                //Se isso ocorreu deverá ser atualizado a tabela como o erro que ocorreu
+                if ($this->getTipoFiltro() == "recalcular" and $rsCalcula->getNumLinhas() == -1) {
+                    $stErro = $obErro->getDescricao();
+                    $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro );
+                    $boFlagTransacao = false;
+                    $boTransacao     = "";
+                    $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+                    include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculo.class.php");
+                    $obTFolhaPagamentoLogErroCalculo = new TFolhaPagamentoLogErroCalculo;
+                    $stFiltro = " AND registro_evento_periodo.cod_contrato = ".$inCodContrato;
+                    $obErro = $obTFolhaPagamentoLogErroCalculo->recuperaLogErroCalculo($rsLogErro,$stFiltro,"",$boTransacao);
+                    if ( !$obErro->ocorreu() ) {
+                        $obTFolhaPagamentoLogErroCalculo->setDado('cod_evento',$rsLogErro->getCampo('cod_evento'));
+                        $obTFolhaPagamentoLogErroCalculo->setDado('cod_registro',$rsLogErro->getCampo('cod_registro'));
+                        $obTFolhaPagamentoLogErroCalculo->setDado('cod_configuracao',$rsLogErro->getCampo('cod_configuracao'));
+                        $obTFolhaPagamentoLogErroCalculo->setDado('desdobramento',$rsLogErro->getCampo('desdobramento'));
+                        $obTFolhaPagamentoLogErroCalculo->setDado('erro',substr($stErro,0,2000));
+                        $obErro = $obTFolhaPagamentoLogErroCalculo->alteracao($boTransacao);
+                    }
+                }
+            }
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro );
+            $rsContratos->proximo();
+        }
+    }
+
+    if ( $obErro->ocorreu() ) {
+        SistemaLegado::LiberaFrames();
+        SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+    } else {
+        SistemaLegado::LiberaFrames();
+    }
+}
+
+
+}//End Of Class
 ?>

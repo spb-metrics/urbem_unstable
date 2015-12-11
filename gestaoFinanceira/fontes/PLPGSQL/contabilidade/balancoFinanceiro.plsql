@@ -23,7 +23,7 @@
 /* Script de função PLPGSQL
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-$Id: balancoFinanceiro.plsql 62743 2015-06-15 18:15:02Z michel $
+$Id: balancoFinanceiro.plsql 63822 2015-10-20 18:24:23Z lisiane $
 */
 
 
@@ -496,6 +496,7 @@ EXECUTE stSql;
                         ,0.00 AS vl_saldo_creditos_anterior
                         ,0.00 AS vl_saldo_atual_anterior
                         ,0.00 AS vl_saldo_inicial_anterior
+                        ,cod_estrutural 
                         FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||'
                                                                             ,''cod_entidade IN  ('|| stCodEntidade ||') ''
                                                                             ,'|| quote_literal(dtInicial) ||'
@@ -513,6 +514,7 @@ EXECUTE stSql;
                                                 ,vl_saldo_atual    numeric                                                   
                                                 )
                             GROUP BY descricao
+                                   , cod_estrutural 
                      
                      UNION ALL
                      
@@ -568,6 +570,7 @@ EXECUTE stSql;
                         ,(sum(vl_saldo_creditos)) AS vl_saldo_creditos_anterior
                         ,(sum(vl_saldo_atual)) AS vl_saldo_atual_anterior
                         ,(sum(vl_saldo_anterior)) AS vl_saldo_inicial_anterior
+                        ,cod_estrutural 
                         FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicioAnterior) ||'
                                                                             ,''cod_entidade IN  ('|| stCodEntidade ||') ''
                                                                             ,'|| quote_literal(dtInicialAnterior) ||'
@@ -584,12 +587,16 @@ EXECUTE stSql;
                                                 ,vl_saldo_creditos numeric                                                   
                                                 ,vl_saldo_atual    numeric                                                   
                                                 )
-                            GROUP BY descricao                             
+                            GROUP BY descricao
+                                   , cod_estrutural 
                        ) AS fluxo_caixa_saldo
+                  JOIN contabilidade.plano_conta
+                    on plano_conta.exercicio = '|| quote_literal(stExercicio) ||'
+                   and plano_conta.cod_estrutural = fluxo_caixa_saldo.cod_estrutural
+                   and escrituracao ilike ''anali%''
                  WHERE descricao IS NOT NULL
               GROUP BY descricao    
     ';
-
 EXECUTE stSql;
 
 --SELECT para armazenar saldos referente ao cod_estrutural relativos às Transferências, pois não podem possuir histórico = 8

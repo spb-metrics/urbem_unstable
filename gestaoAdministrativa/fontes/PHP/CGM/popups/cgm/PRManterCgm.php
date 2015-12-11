@@ -47,8 +47,6 @@ include_once(CAM_GA_CGM_MAPEAMENTO."TCGMPessoaJuridica.class.php");
 include_once(CAM_GA_CGM_MAPEAMENTO."TCGMAtributoValor.class.php");
 include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoLogradouro.class.php");
 
-//SistemaLegado::mostravar( $_POST );
-
 $stAcao = $request->get('stAcao');
 
 //Define o nome dos arquivos PHP

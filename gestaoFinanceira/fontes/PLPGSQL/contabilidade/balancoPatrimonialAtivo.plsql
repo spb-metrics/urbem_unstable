@@ -46,14 +46,6 @@ DECLARE
     arRetorno           NUMERIC[];
 
 BEGIN
-   CREATE TEMPORARY TABLE tmp_ativo_financeiro (
-         cod_estrutural  varchar
-       , valores         numeric[] 
-    );
-    CREATE TEMPORARY TABLE tmp_ativo_permanente (
-         cod_estrutural  varchar
-       , valores         numeric[] 
-    );
 
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
@@ -190,57 +182,6 @@ BEGIN
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
-    
-    --ATIVO FINANCEIRO
-    stSql := ' Select *
-                 from contabilidade.plano_conta
-                where exercicio = ' || quote_literal(stExercicio) || '
-                  and cod_estrutural like ''1%''
-                  and escrituracao = ''analitica''
-                  and indicador_superavit = ''financeiro''
-             ';
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        INSERT INTO tmp_ativo_financeiro VALUES ( reRegistro.cod_estrutural
-                                                , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
-                                              );
-        
-    END LOOP;
-    
-    --ATIVO PERMANENTE
-    stSql := ' Select *
-                 from contabilidade.plano_conta
-                where exercicio = ' || quote_literal(stExercicio) || '
-                  and cod_estrutural like ''1%''
-                  and escrituracao = ''analitica''
-                  and indicador_superavit = ''permanente''
-             ';
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        INSERT INTO tmp_ativo_permanente VALUES ( reRegistro.cod_estrutural
-                                                , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
-                                              );
-        
-    END LOOP;
-    
-    stSql := 'CREATE TEMPORARY TABLE tmp_soma_ativo_financeiro AS
-                SELECT SUM(valores[1]) as vl_saldo_anterior
-                     , SUM(valores[2]) as vl_saldo_debitos
-                     , SUM(valores[3]) as vl_saldo_creditos
-                     , SUM(valores[4]) as vl_saldo_atual
-                  FROM tmp_ativo_financeiro
-             ';
-    EXECUTE stSql;
-    
-     stSql := 'CREATE TEMPORARY TABLE tmp_soma_ativo_permanente AS
-                SELECT SUM(valores[1]) as vl_saldo_anterior
-                     , SUM(valores[2]) as vl_saldo_debitos
-                     , SUM(valores[3]) as vl_saldo_creditos
-                     , SUM(valores[4]) as vl_saldo_atual
-                  FROM tmp_ativo_permanente
-             ';
-    EXECUTE stSql;
-    
 
     stSql := ' CREATE TEMPORARY TABLE tmp_balanco_patrimonial_ativo AS
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
@@ -250,6 +191,7 @@ BEGIN
              , SUM(valores[2] * multiplicador) as vl_saldo_debitos
              , SUM(valores[3] * multiplicador) as vl_saldo_creditos
              , SUM(valores[4] * multiplicador) as vl_saldo_atual
+             , tipo_conta::VARCHAR AS tipo_conta
           FROM (
                 --CONTA ATIVO CIRCULANTE
                 SELECT '||quote_literal('1.1.0.0.0.00.00')||' as cod_estrutural
@@ -257,6 +199,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.0.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -266,6 +216,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.1.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -275,6 +233,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -284,6 +250,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.5.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -293,6 +267,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
 
             UNION ALL
@@ -303,6 +285,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.0.0.0.00.00')||') as nivel
                      , ''ATIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -312,6 +302,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.1.0.0.00.00')||') as nivel
                      , ''Caixa e Equivalentes de Caixa'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.1.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -321,6 +319,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.1.0.0.00.00')||') as nivel
                      , ''Caixa e Equivalentes de Caixa'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.1.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -330,6 +336,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.0.0.00.00')||') as nivel
                      , ''Créditos a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -339,6 +353,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.0.0.00.00')||') as nivel
                      , ''Créditos a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -348,6 +370,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.0.0.00.00')||') as nivel
                      , ''Créditos a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.5.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -357,6 +387,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.0.0.00.00')||') as nivel
                      , ''Créditos a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -366,6 +404,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.1.0.00.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.1.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -375,6 +421,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.1.0.00.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -384,6 +438,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.2.0.00.00')||') as nivel
                      , ''Clientes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.2.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -393,6 +455,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.3.0.00.00')||') as nivel
                      , ''Créditos de Transferências a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.3.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -402,6 +472,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.4.0.00.00')||') as nivel
                      , ''Empréstimos e Financiamentos Concedidos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.4.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -411,6 +489,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.5.0.00.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.5.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -420,6 +506,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.5.0.00.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.5.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -429,6 +523,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.6.0.00.00')||') as nivel
                      , ''Dívida Ativa não Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.6.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -438,6 +540,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.9.0.00.00')||') as nivel
                      , ''(-) Ajuste de Perdas de Créditos a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.9.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -447,6 +557,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.2.9.0.00.00')||') as nivel
                      , ''(-) Ajuste de Perdas de Créditos a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -456,6 +574,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.3.0.0.00.00')||') as nivel
                      , ''Demais Créditos e Valores a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.3.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -465,6 +591,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.4.0.0.00.00')||') as nivel
                      , ''Investimentos e Aplicações Temporárias a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.4.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -474,6 +608,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.5.0.0.00.00')||') as nivel
                      , ''Estoques'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.5.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -483,6 +625,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.1.9.0.0.00.00')||') as nivel
                      , ''VPD Pagas Antecipadamente'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.1.9.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -492,6 +642,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.0.0.0.00.00')||') as nivel
                      , ''ATIVO NÃO-CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.0.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -501,6 +659,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.0.0.0.00.00')||') as nivel
                      , ''ATIVO NÃO-CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -510,6 +676,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.0.0.0.00.00')||') as nivel
                      , ''ATIVO NÃO-CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -519,6 +693,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.0.0.0.00.00')||') as nivel
                      , ''ATIVO NÃO-CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -528,6 +710,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.0.0.00.00')||') as nivel
                      , ''Ativo Realizável a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -537,6 +727,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.0.0.00.00')||') as nivel
                      , ''Ativo Realizável a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -546,6 +744,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.00.00')||') as nivel
                      , ''Créditos a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -555,6 +761,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.00.00')||') as nivel
                      , ''Créditos a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -564,6 +778,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.01.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -573,6 +795,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.01.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -582,6 +812,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.01.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -591,6 +829,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.01.00')||') as nivel
                      , ''Créditos Tributários a Receber'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -600,6 +846,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.02.00')||') as nivel
                      , ''Clientes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -609,6 +863,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.02.00')||') as nivel
                      , ''Clientes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -618,6 +880,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.02.00')||') as nivel
                      , ''Clientes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -627,6 +897,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.02.00')||') as nivel
                      , ''Clientes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -636,6 +914,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.03.00')||') as nivel
                      , ''Empréstimos e Financiamentos Concedidos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -645,6 +931,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.03.00')||') as nivel
                      , ''Empréstimos e Financiamentos Concedidos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -654,6 +948,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.03.00')||') as nivel
                      , ''Empréstimos e Financiamentos Concedidos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -663,6 +965,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.03.00')||') as nivel
                      , ''Empréstimos e Financiamentos Concedidos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -672,6 +982,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.04.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -681,6 +999,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.04.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -690,6 +1016,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.04.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -699,6 +1033,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.04.00')||') as nivel
                      , ''Dívida Ativa Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -708,6 +1050,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.05.00')||') as nivel
                      , ''Dívida Ativa não Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.05.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -717,6 +1067,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.05.00')||') as nivel
                      , ''Dívida Ativa não Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.05.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -726,6 +1084,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.05.00')||') as nivel
                      , ''Dívida Ativa não Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.05.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -735,6 +1101,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.05.00')||') as nivel
                      , ''Dívida Ativa não Tributária'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.05.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -744,6 +1118,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.99.00')||') as nivel
                      , ''Ajuste de Perdas de Créditos a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.1.99.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -753,6 +1135,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.99.00')||') as nivel
                      , ''Ajuste de Perdas de Créditos a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.3.99.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -762,6 +1152,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.99.00')||') as nivel
                      , ''Ajuste de Perdas de Créditos a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.4.99.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -771,6 +1169,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.1.0.99.00')||') as nivel
                      , ''Ajuste de Perdas de Créditos a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.1.5.99.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -780,6 +1186,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.2.0.00.00')||') as nivel
                      , ''Demais Créditos e Valores a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.2.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -789,6 +1203,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.3.0.00.00')||') as nivel
                      , ''Investimentos e Aplicações Temporárias a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.3.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -798,6 +1220,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.4.0.00.00')||') as nivel
                      , ''Estoques'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.4.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -807,6 +1237,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.1.9.0.00.00')||') as nivel
                      , ''VDP Pagas Antecipadamente'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.1.9.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -816,6 +1254,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.0.0.00.00')||') as nivel
                      , ''Investimentos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -825,6 +1271,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.0.0.00.00')||') as nivel
                      , ''Investimentos'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -834,6 +1288,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.0.0.00.00')||') as nivel
                      , ''Investimentos'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -843,6 +1305,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.00.00')||') as nivel
                      , ''Participações Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -852,6 +1322,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.00.00')||') as nivel
                      , ''Participações Permanentes'' as nom_conta
                      , -1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.2.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -861,6 +1339,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.01.00')||') as nivel
                      , ''Participações Avaliadas pelo Método de Equivalência Patrimonial'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -870,6 +1356,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.01.00')||') as nivel
                      , ''Participações Avaliadas pelo Método de Equivalência Patrimonial'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.3.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -879,6 +1373,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.01.00')||') as nivel
                      , ''Participações Avaliadas pelo Método de Equivalência Patrimonial'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.4.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -888,6 +1390,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.01.00')||') as nivel
                      , ''Participações Avaliadas pelo Método de Equivalência Patrimonial'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.5.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -897,6 +1407,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.02.00')||') as nivel
                      , ''Padrões Avaliadas pelo Método de Custo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -906,6 +1424,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.02.00')||') as nivel
                      , ''Padrões Avaliadas pelo Método de Custo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.3.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -915,6 +1441,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.02.00')||') as nivel
                      , ''Padrões Avaliadas pelo Método de Custo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.4.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -924,6 +1458,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.1.0.02.00')||') as nivel
                      , ''Padrões Avaliadas pelo Método de Custo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.1.5.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -933,6 +1475,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.01.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Participações Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -942,6 +1492,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.01.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Participações Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.3.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -951,6 +1509,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.01.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Participações Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.4.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -960,6 +1526,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.01.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Participações Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.5.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -969,6 +1543,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.2.0.00.00')||') as nivel
                      , ''Propriedades para Investimentos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.2.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -978,6 +1560,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.8.1.01.00')||') as nivel
                      , ''Depreciação Acumulada de Propriedades para Investimentos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.8.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -987,6 +1577,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.1.02.00')||') as nivel
                      , ''Redução ao Valor Recuperável de Propriedades de Investimentos'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -996,6 +1594,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.3.0.00.00')||') as nivel
                      , ''Investimentos do RPPS de Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.3.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1005,6 +1611,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.1.03.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Investimentos do RPPS'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.1.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1014,6 +1628,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.7.0.00.00')||') as nivel
                      , ''Demais Investimentos Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.7.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1023,6 +1645,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.04.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Demais Investimentos Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.1.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1032,6 +1662,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.04.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Demais Investimentos Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.3.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1041,6 +1679,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.04.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Demais Investimentos Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.4.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1050,6 +1696,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.2.9.0.04.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Demais Investimentos Permanentes'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.2.9.5.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1059,6 +1713,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.0.0.00.00')||') as nivel
                      , ''Imobilizado'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1068,6 +1730,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.1.0.00.00')||') as nivel
                      , ''Bens Móveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.1.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1077,6 +1747,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.01.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Móveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1086,6 +1764,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.01.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Móveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1095,6 +1781,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.01.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Móveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.05.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1104,6 +1798,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.9.1.01.00')||') as nivel
                      , ''Redução ao Valor Recuperável de Bens Móveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.9.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1113,6 +1815,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.2.0.00.00')||') as nivel
                      , ''Bens Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.2.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1122,6 +1832,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.02.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1131,6 +1849,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.02.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.04.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1140,6 +1866,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.8.1.02.00')||') as nivel
                      , ''(-) Depreciação/Amortização/Exaustão Acumulada de Bens Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.8.1.06.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1149,6 +1883,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.3.9.1.02.00')||') as nivel
                      , ''Redução ao Valor Recuperável de Bens Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.3.9.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1158,6 +1900,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.0.0.00.00')||') as nivel
                      , ''Intangível'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.0.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1167,6 +1917,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.1.0.00.00')||') as nivel
                      , ''Softwares'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.1.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1176,6 +1934,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.8.1.01.00')||') as nivel
                      , ''(-) Amortização Acumulada de Softwares'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.8.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1185,6 +1951,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.9.1.01.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Softwares'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.9.1.01.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1194,6 +1968,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.2.0.00.00')||') as nivel
                      , ''Marcas, Direitos e Patentes Industriais'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.2.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1203,6 +1985,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.8.1.02.00')||') as nivel
                      , ''(-) Amortização Acumulada de Marcas, Direitos e Patentes Industriais'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.8.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1212,6 +2002,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.9.1.02.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Marcas, Direitos e Patentes Industriais'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.9.1.02.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1221,6 +2019,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.3.0.00.00')||') as nivel
                      , ''Direito de Uso de Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.3.0.00.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1230,6 +2036,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.8.1.03.00')||') as nivel
                      , ''(-) Amortização Acumulada de Direitos de Uso de Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.8.1.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
 
             UNION ALL
 
@@ -1239,31 +2053,22 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('1.2.4.9.1.03.00')||') as nivel
                      , ''(-) Redução ao Valor Recuperável de Direitos de Uso de Imóveis'' as nom_conta
                      , 1 as  multiplicador
+                     , (SELECT nom_sistema
+                          FROM contabilidade.sistema_contabil
+                          INNER JOIN contabilidade.plano_conta
+                                  ON plano_conta.exercicio = sistema_contabil.exercicio
+                                 AND plano_conta.cod_sistema = sistema_contabil.cod_sistema
+                        WHERE plano_conta.cod_estrutural LIKE '||quote_literal('1.2.4.9.1.03.00%')||'
+                          AND plano_conta.exercicio = '||quote_literal(stExercicio)||'
+                       ) AS tipo_conta
              ) as tabela
       GROUP BY cod_estrutural
              , nivel
              , nom_conta
+             , tipo_conta
     ';
     EXECUTE stSql;
-    
-    INSERT INTO tmp_balanco_patrimonial_ativo  SELECT '1.0.0.0.0.00.00' 
-                                                    , 2 
-                                                    , 'Ativo Financeiro' 
-                                                    , vl_saldo_anterior
-                                                    , vl_saldo_debitos
-                                                    , vl_saldo_creditos
-                                                    , vl_saldo_atual
-                                                 FROM tmp_soma_ativo_financeiro ;
 
-    INSERT INTO tmp_balanco_patrimonial_ativo  SELECT '1.0.0.0.0.00.01' 
-                                                    , 2 
-                                                    , 'Ativo Permanente' 
-                                                    , vl_saldo_anterior
-                                                    , vl_saldo_debitos
-                                                    , vl_saldo_creditos
-                                                    , vl_saldo_atual
-                                                 FROM tmp_soma_ativo_permanente ;
-    
     stSql := ' SELECT * FROM tmp_balanco_patrimonial_ativo ';
 
     FOR reRegistro IN EXECUTE stSql
@@ -1282,10 +2087,6 @@ BEGIN
     DROP TABLE tmp_credito;
     DROP TABLE tmp_totaliza_debito;
     DROP TABLE tmp_totaliza_credito;
-    DROP TABLE tmp_ativo_financeiro;
-    DROP TABLE tmp_ativo_permanente;
-    DROP TABLE tmp_soma_ativo_financeiro;
-    DROP TABLE tmp_soma_ativo_permanente;
     DROP TABLE tmp_balanco_patrimonial_ativo;
     
 

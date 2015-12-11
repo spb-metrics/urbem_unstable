@@ -29,7 +29,7 @@
 
     * @author Leandro André Zis
 
-    * $Id: FMManterContrato.php 63574 2015-09-11 15:53:11Z carlos.silva $
+    * $Id: FMManterContrato.php 64112 2015-12-03 16:56:16Z michel $
 
     * Casos de uso : uc-03.05.22
 */
@@ -72,7 +72,7 @@ $inCodEntidade = $request->get('inCodEntidade');
 $stExercicio = $request->get('stExercicio');
 
 $obTLicitacaoTipoContrato = new TLicitacaoTipoContrato();
-$obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE cod_tipo IN (43,38,19,46,20,35,27,23,42,10,12,14,6,1,39,28,16,4,18,26,30,24,45,8,34,31,32,33,3,22) ', ' ORDER BY descricao ' );
+$obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE ativo IS TRUE ', ' ORDER BY descricao ' );
 
 if ($inNumContrato) {
   $obTContrato = new TLicitacaoContrato();
@@ -288,6 +288,7 @@ $obCmbTipoObjeto->setCampoDesc( 'descricao'  );
 $obCmbTipoObjeto->addOption   ( '','Selecione' );
 $obCmbTipoObjeto->preencheCombo( $rsTipoObjeto );
 $obCmbTipoObjeto->setValue    ( $inCodTipoObjeto );
+$obCmbTipoObjeto->setNull     ( false );
 
 $obTxtNumeroContrato = new TextBox;
 $obTxtNumeroContrato->setName  ( "inNumeroContrato" );

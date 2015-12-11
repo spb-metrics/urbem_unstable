@@ -55,29 +55,31 @@ function montaListaDotacoesAnular($arRecordSetItem)
     $table->setRecordset( $rsDotacoesItem );
     $table->setSummary('Itens da Solicitação');
 
-    //$table->setConditional( true , "#efefef" );
-
-    $table->Head->addCabecalho('Item'                , 35);
-    $table->Head->addCabecalho('Unidade'             , 15);
-    $table->Head->addCabecalho('Centro de Custo'     , 25);
+    $table->Head->addCabecalho('Item'                , 25);
+    $table->Head->addCabecalho('Unidade'             ,  8);
+    $table->Head->addCabecalho('Centro de Custo'     , 20);
     $table->Head->addCabecalho('Quantidade Pendente' , 10);
-    $table->Head->addCabecalho('Quantidade Anular'   , 15);
+    $table->Head->addCabecalho('Quantidade Anular'   , 10);
     $table->Head->addCabecalho('Valor Pendente'      , 10);
-    $table->Head->addCabecalho('Valor Anular'        , 15);
+    $table->Head->addCabecalho('Valor Anular'        , 10);
 
-    $obQuantidadeTotalAnulada = new TextBox;
+    $obQuantidadeTotalAnulada = new Numerico();
     $obQuantidadeTotalAnulada->setName ( "nuQtTotalAnulada");
     $obQuantidadeTotalAnulada->setNull ( false );
-    $obQuantidadeTotalAnulada->setSize ( 10 );
-    $obQuantidadeTotalAnulada->obEvento->setOnKeyUp("mascaraMoeda(this,2,event,false);");
-    $obQuantidadeTotalAnulada->obEvento->setOnBlur ("floatDecimal(this, '2', event ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&id='+this.id+'&nuQtTotalAnulada='+this.value, 'validaQntTotalAnulada' );");
+    $obQuantidadeTotalAnulada->setDefinicao("NUMERIC");
+    $obQuantidadeTotalAnulada->setSize ( 14 );
+    $obQuantidadeTotalAnulada->setMaxLength( 13 );
+    $obQuantidadeTotalAnulada->setDecimais( 4 );
+    $obQuantidadeTotalAnulada->obEvento->setOnBlur ("floatDecimal(this, '4', event ); ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&id='+this.id+'&nuQtTotalAnulada='+this.value, 'validaQntTotalAnulada' );");
 
     $obValorTotalAnulada = new TextBox;
     $obValorTotalAnulada->setName ( "nuVlTotalAnulado" );
     $obValorTotalAnulada->setNull ( false );
-    $obValorTotalAnulada->setSize ( 10 );
     $obValorTotalAnulada->setDisabled( true );
-
+    $obValorTotalAnulada->setDecimais ( 2 );
+    $obValorTotalAnulada->setSize     ( 23 );
+    $obValorTotalAnulada->setMaxLength( 21 );
+    
     $table->Body->addCampo("[cod_item] - [descricao_resumida]" , "E", "Item");
     $table->Body->addCampo('nom_unidade'             , "E", "Unidade");
     $table->Body->addCampo('descricao'               , "E", "Centro de Custo");
@@ -166,6 +168,7 @@ function validaQntTotalAnulada($id, $nuQtTotalAnulada)
                 $nuVlUnitario = $vl_pendente / $qnt_pendente;
                 $nuVlAnular   = $nuVlUnitario * $nuQtTotalAnulada;
                 $nuVlAnular   = number_format( $nuVlAnular , 2, ",",".");
+                $nuQtTotalAnulada = number_format( $nuQtTotalAnulada, 4, ",", "." );
 
                 $stJs .= atualizaValorQuantidadeAnular($id, $nuVlAnular, $nuQtTotalAnulada);
                 $stJs .= "jq('#nuVlTotalAnulado_".$id."').val('".$nuVlAnular."');";

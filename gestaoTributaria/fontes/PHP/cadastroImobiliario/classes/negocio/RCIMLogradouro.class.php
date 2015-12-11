@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLogradouro.class.php 63653 2015-09-24 13:52:31Z evandro $
+    * $Id: RCIMLogradouro.class.php 63920 2015-11-09 12:18:49Z evandro $
 
      * Casos de uso: uc-05.01.04
                      uc-04.04.07
@@ -326,6 +326,7 @@ function alterarLogradouro($boTransacao = "")
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     $arDadosHistorico = $this->getDadosHistorico();
+    $arDadosHistorico = end($arDadosHistorico);
     if ( !$obErro->ocorreu() ) {
         if ( count( $this->arBairro ) < 1 ) {
             $obErro->setDescricao( "Deve ser informado ao menos um bairro!" );
@@ -335,14 +336,27 @@ function alterarLogradouro($boTransacao = "")
             $obErro = $this->validaNomeLogradouro( $boTransacao );
             if ( !$obErro->ocorreu() ) {
                 $arDados = $this->validaAlteracao($boTransacao);
-                foreach ($arDados as $key => $value) {
+                foreach ( $arDados as $key => $value) {
                     $this->obTNomeLogradouro->setDado( "cod_logradouro", $this->inCodigoLogradouro );
                     $this->obTNomeLogradouro->setDado( "cod_tipo"      , $this->inCodigoTipo       );
                     $this->obTNomeLogradouro->setDado( "nom_logradouro", $value['nome_anterior']   );
                     $this->obTNomeLogradouro->setDado( "dt_inicio"     , $value['dt_inicio']   );
                     $this->obTNomeLogradouro->setDado( "dt_fim"        , $value['dt_fim']   );
-                    $this->obTNomeLogradouro->setDado( "cod_norma"     , $value['cod_norma']   );
-                    
+                    $this->obTNomeLogradouro->setDado( "cod_norma"     , $value['cod_norma']   );    
+
+                    if ( $arDadosHistorico['sequencial'] == $value['sequencial'] ) {
+                        $obErro = $this->obTNomeLogradouro->exclusao( $boTransacao );        
+                        if ( !$obErro->ocorreu() ) {
+                            $this->obTNomeLogradouro->setDado( "cod_logradouro", $this->inCodigoLogradouro );
+                            $this->obTNomeLogradouro->setDado( "cod_tipo"      , $this->inCodigoTipo       );
+                            $this->obTNomeLogradouro->setDado( "nom_logradouro", $_REQUEST['stNomeLogradouro'] );
+                            $this->obTNomeLogradouro->setDado( "dt_inicio"     , $_REQUEST['stDataInicial'] );
+                            $this->obTNomeLogradouro->setDado( "dt_fim"        , $_REQUEST['stDataFinal'] );
+                            $this->obTNomeLogradouro->setDado( "cod_norma"     , $_REQUEST['inCodNorma'] );
+                            $obErro = $this->obTNomeLogradouro->inclusao ( $boTransacao );    
+                        }
+                    }                    
+
                     if ( $value['confirma_alterar'] == 'true' && array_key_exists("sequencial", $value)) {
                         $obErro = $this->obTNomeLogradouro->alteracao( $boTransacao );    
                     }else{
@@ -517,6 +531,9 @@ function listarLogradouros(&$rsRecordSet, $boTransacao = "")
     if ( $this->getCEP() ) {
         $stFiltro .= " AND imobiliario.fn_consulta_cep(L.cod_logradouro) = ".$this->getCEP()."::VARCHAR ";   
     }
+    if ( $this->getBairro() ) {
+        $stFiltro .= " AND B.cod_bairro = ".$this->getBairro();   
+    }
     
     $stOrder = " ORDER BY NL.nom_logradouro ";
     $obErro = $this->obTLogradouro->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
@@ -560,18 +577,12 @@ function listarHistoricoLogradouros(&$rsRecordSet, $boTransacao = "")
 function validaAlteracao($boTransacao = "")
 {
     $stFiltro = " WHERE sw_logradouro.cod_logradouro = ".$this->inCodigoLogradouro." ";
-    // $stFiltro .= " AND sw_nome_logradouro.timestamp = (SELECT max(timestamp) 
-                                                            // FROM sw_nome_logradouro as max 
-                                                            // WHERE max.cod_logradouro = sw_nome_logradouro.cod_logradouro)
-                    // ";
-    //$stFiltro .= " AND UPPER( sw_nome_logradouro.nom_logradouro ) ";
-    //$stFiltro .= " LIKE UPPER( '".$this->stNomeLogradouro."' )";
     $stFiltro .= " AND sw_logradouro.cod_uf = ".$this->getCodigoUF()." ";
     $stFiltro .= " AND sw_logradouro.cod_municipio = ".$this->inCodigoMunicipio." ";
     $stFiltro .= " AND sw_tipo_logradouro.cod_tipo = ".$this->inCodigoTipo;
     $stOrder = "";
     $obErro = $this->obTLogradouro->recuperaHistoricoLogradouro( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-
+    
     $arDadosHistorico = $this->getDadosHistorico();
     $arDadosConsulta = $rsRecordSet->getElementos();
 

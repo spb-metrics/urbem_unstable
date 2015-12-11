@@ -69,6 +69,7 @@ class TTCMBAObraMedicao extends Persistente
                          , obra_medicao.cod_medicao AS num_medicao
                          , obra_medicao.data_inicio AS dt_inicio_medicao
                          , obra_medicao.data_final AS dt_final_medicao
+                         , obra_medicao.data_medicao
                          , obra_medicao.vl_medicao
                          , obra_medicao.nro_nota_fiscal AS num_nota_fiscal
                          , obra_medicao.data_nota_fiscal AS dt_nota_fiscal
@@ -79,6 +80,7 @@ class TTCMBAObraMedicao extends Persistente
                          , obra_fiscal.matricula AS matricula_fiscal_1
                          , '' AS cpf_cnpj_resp_2
                          , '' AS matricula_fiscal_2
+                         , '' AS registro_classe_2
                          , '".$this->getDado('competencia')."' AS competencia
 
                     FROM tcmba.obra
@@ -88,6 +90,12 @@ class TTCMBAObraMedicao extends Persistente
                      AND obra_fiscal.cod_entidade = obra.cod_entidade
                      AND obra_fiscal.exercicio = obra.exercicio
                      AND obra_fiscal.cod_tipo = obra.cod_tipo
+                     AND obra_fiscal.data_inicio = (SELECT MAX(OF.data_inicio) FROM tcmba.obra_fiscal AS OF
+                                                     WHERE OF.cod_obra = obra_fiscal.cod_obra
+                                                       AND OF.cod_entidade = obra_fiscal.cod_entidade
+                                                       AND OF.exercicio = obra_fiscal.exercicio
+                                                       AND OF.cod_tipo = obra_fiscal.cod_tipo
+                                                   )
 
               INNER JOIN tcmba.obra_medicao
                       ON obra_medicao.cod_obra = obra.cod_obra
@@ -109,8 +117,8 @@ class TTCMBAObraMedicao extends Persistente
                          ) AS responsavel_fiscal
                       ON responsavel_fiscal.numcgm = obra_fiscal.numcgm
 
-                   WHERE obra_medicao.data_final > TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')
-                     AND obra_medicao.data_inicio < TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+                   WHERE obra_medicao.data_medicao BETWEEN TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')
+                                                       AND TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
                 ";
         return $stSql;
     }

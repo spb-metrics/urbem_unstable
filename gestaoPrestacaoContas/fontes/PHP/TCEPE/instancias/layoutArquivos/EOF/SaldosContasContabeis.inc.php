@@ -31,10 +31,10 @@
   * @author Desenvolvedor:
   *
   * @ignore
-  * $Id: SaldosContasContabeis.inc.php 60705 2014-11-11 12:09:24Z jean $
-  * $Date: 2014-11-11 10:09:24 -0200 (Ter, 11 Nov 2014) $
-  * $Author: jean $
-  * $Rev: 60705 $
+  * $Id: SaldosContasContabeis.inc.php 63835 2015-10-22 13:53:31Z franver $
+  * $Date: 2015-10-22 11:53:31 -0200 (Qui, 22 Out 2015) $
+  * $Author: franver $
+  * $Rev: 63835 $
   *
 */
 include_once CAM_GPC_TCEPE_MAPEAMENTO."TTCEPESaldosContasContabeis.class.php";
@@ -49,8 +49,7 @@ $obTTCEPESaldosContasContabeis->setDado('cod_entidade', $inCodEntidade    );
 $obTTCEPESaldosContasContabeis->setDado('competencia' , $inCodCompetencia );
 
 $obTTCEPESaldosContasContabeis->recuperaTodos($rsRecordSet, '', '', '');
-//sistemaLegado::mostravar($rsRecordSet);
-//die('Fim');
+
 $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("reservado_tce");

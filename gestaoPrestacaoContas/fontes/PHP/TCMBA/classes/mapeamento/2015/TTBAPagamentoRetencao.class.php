@@ -28,7 +28,7 @@
  *
  * @package URBEM
  * @subpackage Mapeamento
- * @version $Id: TTBAPagamentoRetencao.class.php 63710 2015-10-01 17:30:49Z carlos.silva $
+ * @version $Id: TTBAPagamentoRetencao.class.php 63992 2015-11-16 16:49:19Z lisiane $
  * @author Michel Teixeira
  */
 
@@ -61,142 +61,163 @@ class TTBAPagamentoRetencao extends Persistente
         return $obErro;
     }
 
-    function montaRecuperaDadosTribunal()
+function montaRecuperaDadosTribunal()
     {
         $stSql = " SELECT 1 AS tipo_registro
-                        , opr.exercicio AS ano_criacao
-                        , des.num_orgao AS cod_orgao
-                        , des.num_unidade AS unidade_orcamentaria
-                        , emp.cod_empenho AS num_empenho
-                        , emp.cod_empenho AS num_sub_empenho
-                        , conta_receita.descricao AS nome_conta_retencao
-                        , REPLACE(conta_receita.cod_estrutural,'.','') AS conta_contabil
-                        , COALESCE(SUM(vl.vl_lancamento),0.00) AS vl_pagamento_retencao
-                        , ".$this->getDado('exercicio')."::VARCHAR||".$this->getDado('inMes')."::VARCHAR AS competencia
-                        , to_char(nlp.timestamp,'dd/mm/yyyy') AS dt_pagamento_retencao
+                        , empenho.exercicio  
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                        , REPLACE(plano_conta.cod_estrutural,'.','') AS conta_contabil_pagadora
-                        , plano_conta.nom_conta AS nome_conta_pagadora
-                        , ptdp.cod_tipo AS tipo_pagamento
-                        , ptdp.num_documento AS detalhe_tipo_pagamento
+                        , despesa.num_orgao AS cod_orgao
+                        , despesa.num_unidade AS unidade_orcamentaria   
+                        , empenho.cod_empenho AS num_empenho
+                        , empenho.cod_empenho AS num_sub_empenho 
+                        , REPLACE(pc.cod_estrutural,'.','') AS conta_contabil                                                 
+                        , opr.cod_ordem   
+                        , TO_CHAR(nlp.timestamp,'yyyymm') AS competencia                                                       
+                        , opr.vl_retencao as vl_total_retencao   
+                        , TO_CHAR(nlp.timestamp,'dd/mm/yyyy') AS dt_pagamento  
+                        , REPLACE(conta.cod_estrutural,'.','') AS conta_pagadora        
+                        , pagamento_tipo_documento_pagamento.cod_tipo AS tipo_pagamento
+                        , pagamento_tipo_documento_pagamento.num_documento AS detalhe_tipo_pagamento
+                        ,(coalesce(sum(nlp.vl_pago),0.00) - coalesce(sum(nlpa.vl_anulado),0.00)) as vl_pagamento_retencao  
+                     FROM empenho.ordem_pagamento_retencao as OPR  
+                     JOIN contabilidade.plano_analitica as PA                             
+                       ON pa.cod_plano = opr.cod_plano                                
+                      AND pa.exercicio = opr.exercicio                               
+                     JOIN contabilidade.plano_conta as PC                                 
+                       ON pa.cod_conta = pc.cod_conta                                 
+                      AND pa.exercicio = pc.exercicio
+               INNER JOIN empenho.pagamento_liquidacao as pl 
+                       ON OPR.exercicio    = pl.exercicio_liquidacao                                         
+                      AND OPR.cod_entidade = pl.cod_entidade                                                 
+                      AND OPR.cod_ordem     = pl.cod_ordem 
+               INNER JOIN empenho.nota_liquidacao as nl                                                             
+                       ON nl.exercicio    = pl.exercicio_liquidacao                                         
+                      AND nl.cod_entidade = pl.cod_entidade                                                 
+                      AND nl.cod_nota     = pl.cod_nota 
+               INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga as plnlp
+                       ON plnlp.exercicio            = pl.exercicio                                          
+                      AND plnlp.cod_entidade         = pl.cod_entidade                                       
+                      AND plnlp.cod_ordem            = pl.cod_ordem                                          
+                      AND plnlp.exercicio_liquidacao = pl.exercicio_liquidacao                               
+                      AND plnlp.cod_nota             = pl.cod_nota  
+                      AND plnlp.timestamp = (SELECT max(timestamp) FROM empenho.pagamento_liquidacao_nota_liquidacao_paga
+                                                                  WHERE pagamento_liquidacao_nota_liquidacao_paga.exercicio = plnlp.exercicio                                              
+                                                                    AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = plnlp.cod_entidade                                       
+                                                                    AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem            = plnlp.cod_ordem                                          
+                                                                    AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = plnlp.exercicio_liquidacao                               
+                                                                    AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = plnlp.cod_nota     )                                         
+               INNER JOIN empenho.nota_liquidacao_paga as nlp
+                       ON nlp.exercicio    = plnlp.exercicio_liquidacao                                      
+                      AND nlp.cod_entidade = plnlp.cod_entidade                                              
+                      AND nlp.cod_nota     = plnlp.cod_nota                                                  
+                      AND nlp.timestamp    = plnlp.timestamp                                                 
+                LEFT JOIN ( SELECT exercicio
+                                 , cod_entidade
+                                 , cod_nota
+                                 , timestamp                               
+                                 , coalesce(sum(vl_anulado),0.00) as vl_anulado                                
+                              FROM empenho.nota_liquidacao_paga_anulada                                        
+                          GROUP BY exercicio, cod_entidade, cod_nota, timestamp                                      
+                        ) AS nlpa
+                       ON nlpa.exercicio    = nlp.exercicio                                                 
+                      AND nlpa.cod_entidade = nlp.cod_entidade                                              
+                      AND nlpa.cod_nota     = nlp.cod_nota                                                   
+                      AND nlpa.timestamp    = nlp.timestamp                                                  
+               INNER JOIN empenho.nota_liquidacao_conta_pagadora AS nlcp
+                       ON nlcp.exercicio_liquidacao = nlp.exercicio                                          
+                      AND nlcp.cod_entidade         = nlp.cod_entidade                                       
+                      AND nlcp.cod_nota             = nlp.cod_nota                                           
+                      AND nlcp.timestamp            = nlp.timestamp                                          
+               INNER JOIN ( SELECT pa.exercicio                                                               
+                                 , pa.cod_plano                                                               
+                                 , pc.nom_conta                                                               
+                                 , rec.cod_recurso                                                             
+                                 , rec.nom_recurso  
+                                 , pc.cod_estrutural                                                          
+                              FROM contabilidade.plano_analitica as pa                                        
+                                 , contabilidade.plano_conta as pc                                            
+                                 , contabilidade.plano_recurso as pr                                          
+                                 , orcamento.recurso as rec                                                   
+                             WHERE pa.cod_conta = pc.cod_conta                                                
+                               AND pa.exercicio = pc.exercicio                                                
+                               AND pa.cod_plano = pr.cod_plano                                                
+                               AND pa.exercicio = pr.exercicio                                                
+                               AND pr.cod_recurso = rec.cod_recurso                                           
+                               AND pr.exercicio   = rec.exercicio                                             
+                        ) AS conta
+                        ON conta.cod_plano = nlcp.cod_plano                                                   
+                       AND conta.exercicio = nlcp.exercicio                                                   
+               INNER JOIN empenho.empenho
+                       ON empenho.exercicio    = nl.exercicio_empenho
+                      AND empenho.cod_entidade = nl.cod_entidade
+                      AND empenho.cod_empenho  = nl.cod_empenho
+                LEFT JOIN tcmba.pagamento_tipo_documento_pagamento
+                       ON pagamento_tipo_documento_pagamento.cod_entidade = nlp.cod_entidade
+                      AND pagamento_tipo_documento_pagamento.exercicio    = nlp.exercicio
+                      AND pagamento_tipo_documento_pagamento.timestamp    = nlp.timestamp
+                      AND pagamento_tipo_documento_pagamento.cod_nota     = nlp.cod_nota
+               INNER JOIN empenho.pre_empenho
+                       ON empenho.exercicio       = pre_empenho.exercicio
+                      AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho             
+               INNER JOIN empenho.pre_empenho_despesa
+                       ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio
+                      AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+               INNER JOIN orcamento.despesa
+                       ON despesa.exercicio    = pre_empenho_despesa.exercicio
+                      AND despesa.cod_despesa  = pre_empenho_despesa.cod_despesa 
+                    WHERE opr.exercicio         = '".$this->getDado('exercicio')."'             
+                      AND opr.cod_entidade      IN (".$this->getDado('entidades').")
+                      AND to_date(to_char(nlp.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('data_inicial')."', 'dd/mm/yyyy')
+                									 AND TO_DATE('".$this->getDado('data_final')."', 'dd/mm/yyyy')
+                 GROUP BY empenho.exercicio  
+                        , despesa.num_orgao   
+                        , despesa.num_unidade   
+                        , empenho.cod_empenho 
+                        , empenho.cod_empenho 
+                        , pc.cod_estrutural                                                 
+                        , opr.cod_ordem
+                        , nlp.timestamp
+                        , opr.vl_retencao 
+                        , conta.cod_estrutural 
+                        , pagamento_tipo_documento_pagamento.cod_tipo 
+                        , pagamento_tipo_documento_pagamento.num_documento 
+        ";
 
-                     FROM empenho.empenho                   AS emp
+      return $stSql;
+    }
 
-               INNER JOIN empenho.pre_empenho               AS pre
-                       ON emp.exercicio       = pre.exercicio
-                      AND emp.cod_pre_empenho = pre.cod_pre_empenho                   
+    function recuperaLogErro(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
 
-               INNER JOIN empenho.nota_liquidacao           AS liq
-                       ON emp.exercicio       = liq.exercicio_empenho
-                      AND emp.cod_entidade    = liq.cod_entidade
-                      AND emp.cod_empenho     = liq.cod_empenho                
+        $stSql = $this->montaRecuperaLogErro().$stCondicao.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
-               INNER JOIN empenho.pagamento_liquidacao      AS pli
-                       ON liq.exercicio       = pli.exercicio
-                      AND liq.cod_entidade    = pli.cod_entidade
-                      AND liq.cod_nota        = pli.cod_nota
+        return $obErro;
+    }
 
-               INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga AS plnlp
-                       ON plnlp.exercicio               = pli.exercicio
-                      AND plnlp.cod_entidade            = pli.cod_entidade
-                      AND plnlp.cod_ordem               = pli.cod_ordem
-                      AND plnlp.exercicio_liquidacao    = pli.exercicio_liquidacao
-                      AND plnlp.cod_nota                = pli.cod_nota
-
-               INNER JOIN empenho.nota_liquidacao_paga      AS nlp
-                       ON plnlp.cod_nota        = nlp.cod_nota
-                      AND plnlp.cod_entidade    = nlp.cod_entidade
-                      AND plnlp.exercicio       = nlp.exercicio
-                      AND plnlp.timestamp       = nlp.timestamp
-
-               INNER JOIN empenho.ordem_pagamento           AS opa
-                       ON pli.exercicio       = opa.exercicio
-                      AND pli.cod_entidade    = opa.cod_entidade
-                      AND pli.cod_ordem       = opa.cod_ordem
-
-               INNER JOIN empenho.ordem_pagamento_retencao  AS opr
-                       ON opa.exercicio       = opr.exercicio
-                      AND opa.cod_entidade    = opr.cod_entidade
-                      AND opa.cod_ordem       = opr.cod_ordem          
-
-               INNER JOIN contabilidade.lancamento_retencao AS lr
-                       ON lr.exercicio      = opr.exercicio
-                      AND lr.cod_entidade   = opr.cod_entidade
-                      AND lr.cod_ordem      = opr.cod_ordem
-                      AND lr.cod_plano      = opr.cod_plano
-                      AND lr.sequencial     = opr.sequencial
-
-               INNER JOIN contabilidade.lancamento          AS l
-                       ON l.exercicio       = lr.exercicio
-                      AND l.cod_entidade    = lr.cod_entidade
-                      AND l.tipo            = lr.tipo
-                      AND l.cod_lote        = lr.cod_lote
-                      AND l.sequencia       = lr.sequencia
-
-               INNER JOIN contabilidade.valor_lancamento    AS vl
-                       ON l.exercicio       = vl.exercicio
-                      AND l.cod_entidade    = vl.cod_entidade
-                      AND l.cod_lote        = vl.cod_lote
-                      AND l.tipo            = vl.tipo
-                      AND l.sequencia       = vl.sequencia
-                      AND vl.tipo_valor     = 'D'        
-
-               INNER JOIN empenho.pre_empenho_despesa       AS ped
-                       ON pre.exercicio       = ped.exercicio
-                      AND pre.cod_pre_empenho = ped.cod_pre_empenho
-
-               INNER JOIN orcamento.despesa                 AS des
-                       ON des.exercicio       = ped.exercicio
-                      AND des.cod_despesa     = ped.cod_despesa
-
-               INNER JOIN orcamento.receita
-                       ON receita.exercicio      = opr.exercicio
-                      AND receita.cod_receita    = opr.cod_receita
-
-               INNER JOIN orcamento.conta_receita
-                       ON receita.exercicio      = conta_receita.exercicio
-                      AND receita.cod_conta      = conta_receita.cod_conta
-
+    function montaRecuperaLogErro()
+    {
+        $stSql = " SELECT count(to_char(nlp.timestamp,'yyyy')) registros
+                        , count(ptdp.exercicio) as obrigatorio
+                     FROM empenho.nota_liquidacao_paga      AS nlp
                INNER JOIN tesouraria.pagamento
-                       ON pagamento.exercicio	    = nlp.exercicio
-                      AND pagamento.cod_nota	    = nlp.cod_nota
+                       ON pagamento.exercicio       = nlp.exercicio
+                      AND pagamento.cod_nota        = nlp.cod_nota
                       AND pagamento.cod_entidade    = nlp.cod_entidade
-                      AND pagamento.timestamp	    = nlp.timestamp
-
-               INNER JOIN contabilidade.plano_analitica
-                       ON pagamento.exercicio_plano = plano_analitica.exercicio
-                      AND pagamento.cod_plano       = plano_analitica.cod_plano   
-
-               INNER JOIN contabilidade.plano_conta
-                       ON plano_conta.exercicio = plano_analitica.exercicio
-                      AND plano_conta.cod_conta = plano_analitica.cod_conta
-
+                      AND pagamento.timestamp       = nlp.timestamp
                 LEFT JOIN tcmba.pagamento_tipo_documento_pagamento AS ptdp
                        ON ptdp.cod_entidade = pagamento.cod_entidade
                       AND ptdp.exercicio    = pagamento.exercicio
                       AND ptdp.timestamp    = pagamento.timestamp
                       AND ptdp.cod_nota     = pagamento.cod_nota
-
                     WHERE to_char(nlp.timestamp,'yyyy')  = '".$this->getDado('exercicio')."'
                       AND to_date(to_char(nlp.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                      AND liq.cod_entidade IN (".$this->getDado('stEntidades').")
-
-                 GROUP BY tipo_registro
-                        , opr.exercicio
-                        , des.num_orgao
-                        , des.num_unidade
-                        , emp.cod_empenho
-                        , conta_receita.descricao
-                        , conta_receita.cod_estrutural
-                        , to_char(nlp.timestamp,'dd/mm/yyyy')
-                        , plano_conta.cod_estrutural
-                        , plano_conta.nom_conta
-                        , ptdp.cod_tipo
-                        , ptdp.num_documento
-
-                 ORDER BY num_empenho
-                        , dt_pagamento_retencao
-                ";
+                      AND nlp.cod_entidade IN (".$this->getDado('stEntidades').")
+                      ";
         return $stSql;
     }
 

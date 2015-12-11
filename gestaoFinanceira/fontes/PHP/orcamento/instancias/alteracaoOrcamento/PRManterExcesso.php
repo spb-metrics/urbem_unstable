@@ -58,19 +58,20 @@ $stAcao = $request->get('stAcao');
 
 //valida a utilização da rotina de encerramento do mês contábil
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
+
 include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
+
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
 $arDtAutorizacao = explode('/', $request->get('stData'));
-if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
+if ($boUtilizarEncerramentoMes == 'true' && $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
     SistemaLegado::exibeAviso(urlencode("Mês do Crédito encerrado!"),"n_incluir","erro");
     exit;
 }
 
-//echo $stAcao;
 switch ($stAcao) {
     case "Suplementa":
     case "Especial":
@@ -82,7 +83,7 @@ switch ($stAcao) {
         $obROrcamentoSuplementacao->obRNorma->setCodNorma( $request->get('inCodNorma') );
         $obROrcamentoSuplementacao->setVlTotal( $nuVlNorma );
         $obROrcamentoSuplementacao->setDecreto( $stDecreto );
-        $obROrcamentoSuplementacao->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
+        $obROrcamentoSuplementacao->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
         $obROrcamentoSuplementacao->setCredSuplementar( 'Excesso' );
         $obROrcamentoSuplementacao->setMotivo( $request->get('stMotivo') );
         $obROrcamentoSuplementacao->setDtLancamento( $request->get('stData') );

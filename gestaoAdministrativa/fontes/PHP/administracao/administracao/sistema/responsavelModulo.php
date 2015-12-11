@@ -307,7 +307,6 @@ Casos de uso: uc-01.03.91
                             administracao.usuario
                         WHERE
                             numcgm = ".$usuarioResponsavel;
-            //mostravar($sSQL);
             $conn = new dataBaseLegado;
             $conn->abreBd();
             $conn->abreSelecao($sSQL);

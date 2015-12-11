@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCAIXA.class.php 63511 2015-09-04 17:49:49Z michel $
+    * $Id: TTCEMGCAIXA.class.php 63912 2015-11-05 18:10:02Z lisiane $
 
 */
 
@@ -316,9 +316,8 @@ class TTCEMGCAIXA extends Persistente
     public function montaRecuperaCAIXA12()
     {
         $stSql = " SELECT tipo_registro
-                        , exercicio||tipo_movimentacao::VARCHAR||tipo_entr_saida as cod_reduzido
+                        , exercicio||tipo_movimentacao::VARCHAR||tipo_entr_saida||cod_ctb_transf  as cod_reduzido
                         , cod_fonte_caixa
-                      --  , tabela.tipo
                         , tipo_movimentacao
                         , tipo_entr_saida
                         , descr_movimentacao
@@ -352,21 +351,22 @@ class TTCEMGCAIXA extends Persistente
                                 , replace(plano_conta.cod_estrutural,'.','') AS cod_estrutural 
                                 , conta_debito.cod_entidade AS cod_orgao
                                 , plano_analitica.exercicio
-                                , CASE WHEN conta_debito.tipo_valor = 'D' AND lote.tipo = 'T' AND transferencia.cod_tipo = 5  THEN
-                                            CASE WHEN transferencia.cod_plano_credito::TEXT is null THEN ' '
-                                                 ELSE transferencia.cod_plano_credito::TEXT
-                                             END                                                     
-                                       WHEN lote.tipo = 'T' AND transferencia.cod_tipo = 5 AND conta_debito.tipo_valor = 'C' then
-                                            CASE WHEN transferencia.cod_plano_debito::TEXT is null THEN ' '
-                                                 ELSE  transferencia.cod_plano_debito::TEXT
-                                             END
-                                       ELSE ' '
-                                  END AS cod_ctb_transf
-                                , CASE WHEN (conta_debito.tipo_valor = 'D' AND lote.tipo = 'T' AND transferencia.cod_tipo = 5 )
-                                            OR (lote.tipo = 'T' AND transferencia.cod_tipo = 5 AND conta_debito.tipo_valor = 'C')  THEN
-                                                plano_recurso.cod_recurso::VARCHAR
-                                        ELSE ' '
-                                   END as cod_fonte_ctb_transf
+                                , CASE WHEN (lote.tipo = 'T' AND transferencia.cod_tipo = 5) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 3) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 4) THEN
+                                            cod_ctb_transferencia.cod_ctb_anterior::VARCHAR
+                                       ELSE ' ' 
+                                  END AS cod_ctb_transf   
+                                , CASE WHEN (lote.tipo = 'T' AND transferencia.cod_tipo = 5) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 3) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 4) THEN
+                                            (   SELECT plano_recurso.cod_recurso 
+                                                  FROM contabilidade.plano_conta     
+                                            INNER JOIN contabilidade.plano_analitica 
+                                                    ON plano_conta.cod_conta = plano_analitica.cod_conta
+                                                   AND plano_conta.exercicio = plano_analitica.exercicio 
+                                            INNER JOIN contabilidade.plano_recurso
+                                                    ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                                                   AND plano_recurso.exercicio = plano_analitica.exercicio
+                                                WHERE plano_analitica.cod_plano = transferencia.cod_plano_credito
+                                                   AND plano_analitica.exercicio = transferencia.exercicio
+                                            ) END::VARCHAR AS cod_fonte_ctb_transf 
                             FROM contabilidade.conta_debito
                       INNER JOIN contabilidade.valor_lancamento
                               ON valor_lancamento.cod_lote = conta_debito.cod_lote
@@ -426,7 +426,47 @@ class TTCEMGCAIXA extends Persistente
                              AND transferencia_estornada.cod_entidade = lote.cod_entidade
                              AND transferencia_estornada.tipo = lote.tipo
                              AND transferencia_estornada.cod_lote_estorno = lote.cod_lote  
-
+                        
+                       LEFT JOIN ( SELECT conta_debito.cod_lote
+                                        , conta_debito.tipo
+                                        , conta_debito.exercicio
+                                        , conta_debito.cod_entidade
+                                        , CASE WHEN (conta_bancaria.cod_ctb_anterior is null) THEN transferencia.cod_plano_credito
+                                                                Else conta_bancaria.cod_ctb_anterior
+                                                                END AS cod_ctb_anterior
+                                        , transferencia.cod_plano_credito
+                                        , transferencia.cod_plano_debito
+                                        , conta_debito.sequencia
+                                     FROM contabilidade.conta_debito
+                               INNER JOIN contabilidade.lote AS lo
+                                       ON conta_debito.cod_lote     = lo.cod_lote
+                                      AND conta_debito.tipo         = lo.tipo
+                                      AND conta_debito.exercicio    = lo.exercicio
+                                      AND conta_debito.cod_entidade = lo.cod_entidade
+                               INNER JOIN tesouraria.transferencia
+                                       ON transferencia.cod_plano_debito = conta_debito.cod_plano
+                                      AND lo.cod_lote = transferencia.cod_lote
+                                      AND transferencia.cod_entidade = lo.cod_entidade
+                                      AND transferencia.tipo = 'T'
+                                      AND transferencia.exercicio = conta_debito.exercicio
+                               INNER JOIN contabilidade.plano_analitica
+                                       ON plano_analitica.cod_plano = transferencia.cod_plano_credito
+                                      AND plano_analitica.natureza_saldo = 'D'
+                                      AND plano_analitica.exercicio = conta_debito.exercicio
+                                LEFT JOIN tcemg.conta_bancaria
+                                       ON conta_bancaria.cod_conta = plano_analitica.cod_conta
+                                      AND conta_bancaria.exercicio = plano_analitica.exercicio
+                                   WHERE conta_debito.exercicio = '".$this->getDado('exercicio')."'
+                                     AND conta_debito.cod_entidade IN (".$this->getDado('entidades').")
+                                     AND lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                                     AND conta_debito.tipo         = 'T'
+                                ) AS cod_ctb_transferencia
+                              ON cod_ctb_transferencia.exercicio = conta_debito.exercicio                           
+                             AND cod_ctb_transferencia.sequencia = conta_debito.sequencia
+                             AND cod_ctb_transferencia.cod_lote = conta_debito.cod_lote
+                             AND cod_ctb_transferencia.tipo = conta_debito.tipo
+                             AND cod_ctb_transferencia.cod_plano_debito = conta_debito.cod_plano
+                        
                            WHERE conta_debito.exercicio =  '".$this->getDado('exercicio')."'
                              AND conta_debito.cod_entidade IN (".$this->getDado('entidades').")  
                              AND plano_conta.cod_estrutural like  '1.1.1.1.1.01%'
@@ -468,21 +508,22 @@ class TTCEMGCAIXA extends Persistente
                                 , replace(plano_conta.cod_estrutural,'.','') AS cod_estrutural
                                 , conta_credito.cod_entidade AS cod_orgao
                                 , plano_analitica.exercicio
-                                , CASE WHEN conta_credito.tipo_valor = 'D' AND lote.tipo = 'T' AND transferencia.cod_tipo = 5  THEN
-                                            CASE WHEN transferencia.cod_plano_credito::TEXT is null THEN ' '
-                                                 ELSE transferencia.cod_plano_credito::TEXT
-                                            END                                                     
-                                       WHEN lote.tipo = 'T' AND transferencia.cod_tipo = 5 AND conta_credito.tipo_valor = 'C' THEN
-                                            CASE WHEN transferencia.cod_plano_debito::TEXT is null THEN ' '
-                                                 ELSE  transferencia.cod_plano_debito::TEXT
-                                            END
-                                        ELSE ' '     
-                                 END AS cod_ctb_transf
-                                , CASE WHEN (conta_credito.tipo_valor = 'D' AND lote.tipo = 'T' AND transferencia.cod_tipo = 5 )
-                                            OR (lote.tipo = 'T' AND transferencia.cod_tipo = 5 AND conta_credito.tipo_valor = 'C')  THEN
-                                plano_recurso.cod_recurso::VARCHAR
-                                       ELSE ' '
-                           END as cod_fonte_ctb_transf
+                                , CASE WHEN (lote.tipo = 'T' AND transferencia.cod_tipo = 5) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 3) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 4) THEN
+                                            cod_ctb_transferencia.cod_ctb_anterior::VARCHAR
+                                      ELSE ' ' 
+                                  END AS cod_ctb_transf   
+                                , CASE WHEN (lote.tipo = 'T' AND transferencia.cod_tipo = 5) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 3) OR (lote.tipo = 'T' AND transferencia.cod_tipo = 4) THEN
+                                    (   SELECT plano_recurso.cod_recurso 
+                                          FROM contabilidade.plano_conta     
+                                    INNER JOIN contabilidade.plano_analitica 
+                                            ON plano_conta.cod_conta = plano_analitica.cod_conta
+                                           AND plano_conta.exercicio = plano_analitica.exercicio 
+                                    INNER JOIN contabilidade.plano_recurso
+                                            ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                                           AND plano_recurso.exercicio = plano_analitica.exercicio
+                                         WHERE plano_analitica.cod_plano = transferencia.cod_plano_credito
+                                           AND plano_analitica.exercicio = transferencia.exercicio
+                                    ) END::VARCHAR AS cod_fonte_ctb_transf 
                             FROM contabilidade.conta_credito
                       INNER JOIN contabilidade.valor_lancamento
                               ON valor_lancamento.cod_lote = conta_credito.cod_lote
@@ -541,7 +582,46 @@ class TTCEMGCAIXA extends Persistente
                              AND lancamento_receita.cod_lote = lancamento.cod_lote
                              AND lancamento_receita.tipo = lancamento.tipo
                              AND lancamento_receita.cod_entidade = lancamento.cod_entidade
-
+                       LEFT JOIN ( SELECT conta_credito.cod_lote
+                                        , conta_credito.tipo
+                                        , conta_credito.exercicio
+                                        , conta_credito.cod_entidade
+                                        , CASE WHEN (conta_bancaria.cod_ctb_anterior is null) THEN transferencia.cod_plano_debito
+                                                                Else conta_bancaria.cod_ctb_anterior
+                                                                END AS cod_ctb_anterior
+                                        , transferencia.cod_plano_credito
+                                        , transferencia.cod_plano_debito
+                                        , conta_credito.sequencia
+                                     FROM contabilidade.conta_credito
+                               INNER JOIN contabilidade.lote AS lo
+                                       ON conta_credito.cod_lote     = lo.cod_lote
+                                      AND conta_credito.tipo         = lo.tipo
+                                      AND conta_credito.exercicio    = lo.exercicio
+                                      AND conta_credito.cod_entidade = lo.cod_entidade
+                               INNER JOIN tesouraria.transferencia
+                                       ON transferencia.cod_plano_credito = conta_credito.cod_plano
+                                      AND lo.cod_lote = transferencia.cod_lote
+                                      AND transferencia.cod_entidade = lo.cod_entidade
+                                      AND transferencia.tipo = 'T'
+                                      AND transferencia.exercicio = conta_credito.exercicio
+                               INNER JOIN contabilidade.plano_analitica
+                                       ON plano_analitica.cod_plano = transferencia.cod_plano_debito
+                                      AND plano_analitica.natureza_saldo = 'D'
+                                      AND plano_analitica.exercicio = conta_credito.exercicio
+                                LEFT JOIN tcemg.conta_bancaria
+                                       ON conta_bancaria.cod_conta = plano_analitica.cod_conta
+                                      AND conta_bancaria.exercicio = plano_analitica.exercicio
+                                   WHERE conta_credito.exercicio = '".$this->getDado('exercicio')."'
+                                     AND conta_credito.cod_entidade IN (".$this->getDado('entidades').")
+                                     AND lo.dt_lote BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                                     AND conta_credito.tipo         = 'T'
+                                ) AS cod_ctb_transferencia
+                              ON cod_ctb_transferencia.exercicio = conta_credito.exercicio                           
+                             AND cod_ctb_transferencia.sequencia = conta_credito.sequencia
+                             AND cod_ctb_transferencia.cod_lote  = conta_credito.cod_lote
+                             AND cod_ctb_transferencia.tipo = conta_credito.tipo
+                             AND cod_ctb_transferencia.cod_plano_credito = conta_credito.cod_plano
+                       
                            WHERE conta_credito.exercicio = '".$this->getDado('exercicio')."'
                              AND conta_credito.cod_entidade IN (".$this->getDado('entidades').")  
                              AND plano_conta.cod_estrutural like  '1.1.1.1.1.01%'

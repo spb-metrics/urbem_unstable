@@ -52,11 +52,9 @@ if ($alterar == 1) {
     $alterar = 0;
     $obj = new cse();
     $arr = $obj->retornaTratamento($HTTP_GET_VARS);
-    //mostraVar($arr[cse]);
     $sessao->transf['cse'][2] = $arr[cse];
     $sessao->transf[exame] = $arr[exame];
     $sessao->transf[internacao] = $arr[internacao];
-    //mostraVar($sessao->transf['cse']);
 }
 
 if (isset($pagina)) {
@@ -180,8 +178,6 @@ if ($ctrl >= 2) {
 <table width='100%' cellspacing=1 cellpadding=4><tr>
 
 <?php
-    //mostravar($aAbas)."<br>";
-    //echo $ctrl."<br>";
     while (list($key, $val) = each($aAbas)) {
         if ($ctrl == $key) {
             $abas = "show_dados";
@@ -194,9 +190,6 @@ if ($ctrl >= 2) {
 
     }
     echo "</tr></table>";
-
-    //echo $ctrl."<br>";
-    //mostravar($sessao->transf);
 
     //Grava os campos do vetor como variáveis
     foreach ($sessao->transf['cse'] as $vet) {
@@ -595,7 +588,6 @@ if (!isset($controle)) {
 switch ($controle) {
 //Inclusão, alteração ou exclusão de dados
 case 1:
-    //mostraVar($HTTP_POST_VARS);
     $js = "f.ok.disabled = false; \n";
     //break;
     $js = "";
@@ -683,7 +675,7 @@ case 2:
         $nomCidadao = "";
     }
     $js .= 'f.nomCidadao.value = "'.$nomCidadao.'" ';
-    //mostraVar($js);
+
     break;
 
 //Cria uma lista de opções de Tipo de Tratamento de acordo com a Classificação de Tratamento escolhida

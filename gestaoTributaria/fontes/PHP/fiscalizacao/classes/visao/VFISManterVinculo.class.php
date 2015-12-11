@@ -320,7 +320,6 @@ class VFISManterVinculo
 
     public function preencheCombosAtividade()
     {
-        //sistemaLegado::mostravar($_REQUEST);
         $this->obMontaAtividade->setCodigoVigencia($_REQUEST["inCodigoVigencia"]);
         $this->obMontaAtividade->setCodigoNivel($_REQUEST["inCodigoNivel"]);
         $this->obMontaAtividade->setValorReduzido($_REQUEST["stChaveAtividade"]);

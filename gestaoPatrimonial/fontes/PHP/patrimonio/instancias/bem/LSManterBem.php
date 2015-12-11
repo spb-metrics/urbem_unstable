@@ -40,19 +40,9 @@
     * Casos de uso: uc-03.01.06
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/17 13:27:03  hboaventura
-correção dos arquivos
-
-Revision 1.1  2007/10/05 12:59:35  hboaventura
-inclusão dos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php");
+include_once CAM_GP_PAT_MAPEAMENTO.'TPatrimonioBem.class.php';
 
 $stPrograma = "ManterBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -63,7 +53,7 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //seta o caminho para a popup de exclusao
 $stCaminho = CAM_GP_PAT_INSTANCIAS."bem/";
@@ -74,12 +64,12 @@ if ( !Sessao::read('paginando') ) {
     foreach ($_POST as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;
     }
-    Sessao::write('pg',($_GET['pg'] ? $_GET['pg'] : 0));
-    Sessao::write('pos',($_GET['pos']? $_GET['pos'] : 0));
+    Sessao::write('pg',($request->get('pg') ? $request->get('pg') : 0));
+    Sessao::write('pos',($request->get('pos') ? $request->get('pos') : 0));
     Sessao::write('paginando',true);
 } else {
-    Sessao::write('pg',$_GET['pg']);
-    Sessao::write('pos',$_GET['pos']);
+    Sessao::write('pg',$request->get('pg'));
+    Sessao::write('pos',$request->get('pos'));
 }
 
 if ($arFiltro) {
@@ -142,7 +132,7 @@ if ($_REQUEST['inValorDepreciacao'] != '') {
 }
 //data depreciacao
 if ($_REQUEST['stDataInicialDepreciacao'] != '') {
-    $stFiltro .= " AND bem.dt_depreciacao BETWEEN TO_DATE('".$_REQUEST['stDataInicialDepreciacao']."','dd/mm/yyyy') AND TO_DATE('".$_REQUEST['stDataFinalDepreciacao']."','dd/mm/yyyy') ";
+    $stFiltro .= " AND depreciacao.dt_depreciacao BETWEEN TO_DATE('".$_REQUEST['stDataInicialDepreciacao']."','dd/mm/yyyy') AND TO_DATE('".$_REQUEST['stDataFinalDepreciacao']."','dd/mm/yyyy') ";
 }
 //data aquisicao
 if ($_REQUEST['stDataInicialAquisicao'] != '') {

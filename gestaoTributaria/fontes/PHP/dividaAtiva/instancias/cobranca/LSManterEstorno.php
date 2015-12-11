@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterEstorno.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterEstorno.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.04.04
 */
@@ -187,7 +187,6 @@ if ( !$rsListaDocumentos->Eof() ) {
 
 $rsListaDocumentos->preenche($arDocumentosTMP);
 $rsListaDocumentos->setPrimeiroElemento();
-//sistemaLegado::mostravar( $rsListaDocumentos );exit;
 
 $stCaminho = CAM_GT_DAT_INSTANCIAS."cobranca/";
 

@@ -112,37 +112,42 @@ switch ($stAcao) {
         break;
 }
 
-$stLocation  = $pgList.'?'.Sessao::getId()."&stAcao=".$stAcao."&stTipoFiltro=".$_REQUEST['stTipoFiltro'];
+$stLocation = $pgList.'?'.Sessao::getId()."&stAcao=".$stAcao."&stTipoFiltro=".$_REQUEST['stTipoFiltro'];
 
 //DEFINICAO DOS COMPONENTES
-$obHdnAcao =  new Hidden;
-$obHdnAcao->setName                             ( "stAcao"                                                              );
-$obHdnAcao->setValue                            ( $stAcao                                                               );
+$obHdnAcao = new Hidden;
+$obHdnAcao->setName                             ( "stAcao"                 );
+$obHdnAcao->setValue                            ( $stAcao                  );
 
-$obHdnCtrl =  new Hidden;
-$obHdnCtrl->setName                             ( "stCtrl"                                                              );
-$obHdnCtrl->setValue                            ( $stCtrl                                                               );
+$obHdnCtrl = new Hidden;
+$obHdnCtrl->setName                             ( "stCtrl"                 );
+$obHdnCtrl->setValue                            ( $stCtrl                  );
 
-$obHdnContrato =  new Hidden;
-$obHdnContrato->setName                         ( "inCodContrato"                                                       );
-$obHdnContrato->setValue                        ( $_GET['inCodContrato']                                                );
+$obHdnContrato = new Hidden;
+$obHdnContrato->setName                         ( "inCodContrato"          );
+$obHdnContrato->setValue                        ( $_GET['inCodContrato']   );
 
-$obHdnRegistro =  new Hidden;
-$obHdnRegistro->setName                         ( "inRegistro"                                                          );
-$obHdnRegistro->setValue                        ( $_GET['inRegistro']                                                   );
+$obHdnRegistro = new Hidden;
+$obHdnRegistro->setName                         ( "inRegistro"             );
+$obHdnRegistro->setValue                        ( $_GET['inRegistro']      );
 
-$obHdnCGMOrgaoEntidade =  new Hidden;
-$obHdnCGMOrgaoEntidade->setName                         ( "inCGMOrgaoEntidade"                                                          );
-$obHdnCGMOrgaoEntidade->setValue                        ( $inCGMOrgao                                                   );
+$obHdnCGMOrgaoEntidade = new Hidden;
+$obHdnCGMOrgaoEntidade->setName                 ( "inCGMOrgaoEntidade"     );
+$obHdnCGMOrgaoEntidade->setValue                ( $inCGMOrgao              );
 
 //DEFINICAO DO FORM
 $obForm = new Form;
-$obForm->setAction                              ( $pgProc                                                               );
-$obForm->setTarget                              ( "oculto"                                                              );
+if ($stAcao == "consultar") {
+    $obForm->setAction                              ( $pgFilt                  );
+    $obForm->setTarget                              ( "telaPrincipal"          );
+} else {
+    $obForm->setAction                              ( $pgProc                  );
+    $obForm->setTarget                              ( "oculto"                 );
+}
 
 Sessao::write('obForm', $obForm);
 
-$obIFiltroContrato = new IFiltroContrato;
+$obIFiltroContrato = new IFiltroContrato(false,false);
 $obIFiltroContrato->setTituloFormulario("");
 $obIFiltroContrato->obIContratoDigitoVerificador->setNull(false);
 $stOnChange = $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->getOnChange();
@@ -152,6 +157,9 @@ $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvent
 if ($stAcao == "alterar" or $stAcao == "consultar") {
     $obIFiltroContrato->obIContratoDigitoVerificador->setPagFiltro(false);
     $obIFiltroContrato->obIContratoDigitoVerificador->setAutomatico(true);
+}
+if ($stAcao != 'consultar') {
+    $obIFiltroContrato->obIContratoDigitoVerificador->setTipo('contrato_ativos');
 }
 
 $obRConfiguracaoPessoal = new RConfiguracaoPessoal();
@@ -323,24 +331,25 @@ $obLblLocal->setValue($stLocal);
 $obBtnOk = new OK;
 $obBtnOk->obEvento->setOnClick("montaParametrosGET('submeter', '', true);");
 
-$obBtnVoltar = new OK;
-$obBtnVoltar->setValue("Voltar");
-$obBtnVoltar->obEvento->setOnClick("back();");
+$obBtnVoltar = new Voltar;
 
 if ($stAcao == "incluir") {
     $obBtnLimpar = new Limpar();
     $obBtnLimpar->obEvento->setOnClick("montaParametrosGET('limparForm');");
-}
-if ($stAcao == "alterar") {
+    $arBotaoAcao = array( $obBtnOk, $obBtnLimpar );
+} else if ($stAcao == "consultar") {
+    $arBotaoAcao = array( $obBtnVoltar );
+} else {
     $obBtnLimpar = new Ok();
     $obBtnLimpar->setValue("Limpar");
     $obBtnLimpar->obEvento->setOnClick("montaParametrosGET('limparFormAlterar');");
+    $arBotaoAcao = array( $obBtnOk, $obBtnLimpar );
 }
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
 $obFormulario->addForm                          ( $obForm                                                               );
-$obFormulario->addTitulo ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
+$obFormulario->addTitulo                        ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right"      );
 $obFormulario->addHidden                        ( $obHdnAcao                                                            );
 $obFormulario->addHidden                        ( $obHdnCtrl                                                            );
 switch ($stAcao) {
@@ -357,7 +366,7 @@ switch ($stAcao) {
         $obFormulario->agrupaComponentes                ( array($obRdoIndicativoAdido,$obRdoIndicativoCedido)                   );
         $obFormulario->addComponente                    ( $obTxtNroConvenio                                                     );
         $obIBuscaInnerLocal->geraFormulario             ( $obFormulario                                                         );
-        $obFormulario->defineBarra                      ( array($obBtnOk,$obBtnLimpar)                                          );
+        $obFormulario->defineBarra                      ( $arBotaoAcao                                                          );
     break;
     case "alterar":
         $obFormulario->addTitulo                        ( "Dados para Alteração de Movimentação"                                );
@@ -371,13 +380,13 @@ switch ($stAcao) {
         $obFormulario->addComponente                    ( $obTxtDataInicialAto                                                  );
         $obFormulario->addComponente                    ( $obTxtDataFinalAto                                                    );
         $obFormulario->addComponente                    ( $obLblTipoCedencia                                                    );
-        $obFormulario->addHidden($obHdnTipoCedencia);
+        $obFormulario->addHidden                        ( $obHdnTipoCedencia                                                    );
         $obFormulario->addComponente                    ( $obLblCgmOrgaoEntidade                                                );
         $obFormulario->addComponente                    ( $obLblIndicativoOnus                                                  );
-        $obFormulario->addHidden($obHdnIndicativoOnus);
+        $obFormulario->addHidden                        ( $obHdnIndicativoOnus                                                  );
         $obFormulario->addComponente                    ( $obTxtNroConvenio                                                     );
         $obIBuscaInnerLocal->geraFormulario             ( $obFormulario                                                         );
-        $obFormulario->defineBarra                      ( array($obBtnOk,$obBtnLimpar)                                          );
+        $obFormulario->defineBarra                      ( $arBotaoAcao                                                          );
     break;
     case "consultar":
         $obFormulario->addTitulo                        ( "Dados para Alteração de Movimentação"                                );
@@ -392,7 +401,7 @@ switch ($stAcao) {
         $obFormulario->addComponente                    ( $obLblIndicativoOnus                                                  );
         $obFormulario->addComponente                    ( $obLblNroConvenio                                                     );
         $obFormulario->addComponente                    ( $obLblLocal                                                           );
-        $obFormulario->defineBarra                      ( array($obBtnVoltar),"",""                                                   );
+        $obFormulario->defineBarra                      ( $arBotaoAcao                                                          );
     break;
 }
 $obFormulario->show();

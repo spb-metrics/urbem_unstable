@@ -1657,17 +1657,6 @@ function imprimirCarne($diffBaixa = FALSE)
         $flValorTotalCorrecao = 0.00;
         $flValorTotalGeral = 0.00;
 
-/*
-echo "total geral = ".$flValorTotalGeral."<br>";
-echo "total correcao = ".$flValorTotalCorrecao."<br>";
-echo "total multa = ".$flValorTotalMulta."<br>";
-echo "total juros = ".$flValorTotalJuros."<br>";
-echo "total = ".$flValorTotal."<br>";
-
-sistemaLegado::mostravar( $rsGeraCarneCabecalho );
-sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
-*/
-
         if ( $obErro->ocorreu() ) {
             break;
         }

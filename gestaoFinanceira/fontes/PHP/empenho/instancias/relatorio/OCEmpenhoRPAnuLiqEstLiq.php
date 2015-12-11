@@ -283,7 +283,6 @@ switch ($_REQUEST['stCtrl']) {
 
         $obREmpenhoRPAnuLiqEstLiq->geraRecordSet( $rsEmpenhoRPAnuLiqEstLiq );
         Sessao::write('rsRecordSet', $rsEmpenhoRPAnuLiqEstLiq);
-        //mostravar($rsEmpenhoRPAnuLiqEstLiq);
         $obRRelatorio->executaFrameOculto( "OCGeraRelatorioEmpenhoRPAnuLiqEstLiq.php" );
 
     break;

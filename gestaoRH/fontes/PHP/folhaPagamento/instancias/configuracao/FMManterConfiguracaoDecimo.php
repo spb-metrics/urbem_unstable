@@ -109,6 +109,48 @@ $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
 $obRFolhaPagamentoConfiguracao->consultar();
 $inMesCalculoDecimo = $obRFolhaPagamentoConfiguracao->getMesCalculoDecimo();
 
+$obRdnTodos = new Radio;
+$obRdnTodos->setRotulo  ( "Numeração" );
+$obRdnTodos->setName    ( "boNumeracao"      );
+$obRdnTodos->setId      ( "boNumeracao"      );
+$obRdnTodos->setLabel   ( "Todos"            );
+$obRdnTodos->setValue   ( "Todos"            );
+$obRdnTodos->setChecked ( true               );
+
+$obRdnPares = new Radio;
+$obRdnPares->setRotulo  ( "Numeração" );
+$obRdnPares->setName    ( "boNumeracao"      );
+$obRdnPares->setId      ( "boNumeracao"      );
+$obRdnPares->setLabel   ( "Pares"            );
+$obRdnPares->setValue   ( "Pares"            );
+$obRdnPares->setChecked ( false              );
+
+$obRdAdiantamento13MesSalarioSim = new Radio();
+$obRdAdiantamento13MesSalarioSim->setRotulo ('Gera Adiant. de 13º Salário no mês de aniversário');
+$obRdAdiantamento13MesSalarioSim->setName   ('boRdGerarAdiantamento13');
+$obRdAdiantamento13MesSalarioSim->setId     ('boRdGerarAdiantamento13');
+$obRdAdiantamento13MesSalarioSim->setLabel  ('Sim');
+$obRdAdiantamento13MesSalarioSim->setValue  ('true');
+
+$obRdAdiantamento13MesSalarioNao = new Radio();
+$obRdAdiantamento13MesSalarioNao->setRotulo ('Gera Adiant. de 13º Salário no mês de aniversário');
+$obRdAdiantamento13MesSalarioNao->setName   ('boRdGerarAdiantamento13');
+$obRdAdiantamento13MesSalarioNao->setId     ('boRdGerarAdiantamento13');
+$obRdAdiantamento13MesSalarioNao->setLabel  ('Não');
+$obRdAdiantamento13MesSalarioNao->setValue  ('false');
+
+//busca configuracao ja realizada
+$boAdiantamentoDecimo = SistemaLegado::pegaConfiguracao('adiantamento_13_salario'.Sessao::getEntidade(),27,Sessao::getExercicio(), $boTransacao);
+if ( $boAdiantamentoDecimo == 'true' ) {
+    $obRdAdiantamento13MesSalarioSim->setChecked(true);
+    $obRdAdiantamento13MesSalarioNao->setChecked(false);
+}else{
+    $obRdAdiantamento13MesSalarioSim->setChecked(false);
+    $obRdAdiantamento13MesSalarioNao->setChecked(true);
+}
+
+$arRadAdiantamento13 = array($obRdAdiantamento13MesSalarioSim, $obRdAdiantamento13MesSalarioNao);
+
 $obRdbDecimoNovembro = new Radio;
 $obRdbDecimoNovembro->setRotulo ( "Saldo de 13º Salário" );
 $obRdbDecimoNovembro->setName   ( "inMesCalculoDecimo" );
@@ -135,13 +177,14 @@ $obFormulario->addTitulo("Eventos" );
 foreach ($arCompEventos as $componente) {
     $obFormulario->addComponente( $componente );
 }
+
+$obFormulario->agrupaComponentes ( $arRadAdiantamento13 );
 $obFormulario->addTitulo("Competência de Pagamento" );
 $obFormulario->agrupaComponentes(array($obRdbDecimoNovembro,$obRdbDecimoDezembro));
 
 $obFormulario->Ok();
 $obFormulario->show();
 preencherInnerEventos( true );
-//preencheFuncao       ( true );
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 

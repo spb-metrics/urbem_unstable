@@ -408,19 +408,19 @@ function recuperaRegistrosServidor(&$rsRecordSet, $stFiltro = "", $stOrdem = "" 
 
 function montaConsultaRegistrosServidor()
 {
-    $stSql  = " SELECT                                        \n";
-    $stSql .= "     ps.cod_servidor,                          \n";
-    $stSql .= "     pc.registro,                              \n";
-    $stSql .= "     pc.cod_contrato                           \n";
-    $stSql .= " FROM                                          \n";
-    $stSql .= "     pessoal.servidor as ps,                   \n";
-    $stSql .= "     pessoal.servidor_contrato_servidor as sc, \n";
-    $stSql .= "     pessoal.contrato_servidor as cs,          \n";
-    $stSql .= "     pessoal.contrato as pc                    \n";
-    $stSql .= " WHERE                                         \n";
-    $stSql .= "         ps.cod_servidor = sc.cod_servidor     \n";
-    $stSql .= "     AND sc.cod_contrato = cs.cod_contrato     \n";
-    $stSql .= "     AND cs.cod_contrato = pc.cod_contrato     \n";
+    $stSql  = " SELECT                                        
+                     ps.cod_servidor,                          
+                     pc.registro,                              
+                     pc.cod_contrato
+                 FROM                                          
+                     pessoal.servidor as ps,                   
+                     pessoal.servidor_contrato_servidor as sc, 
+                     pessoal.contrato_servidor as cs,          
+                     pessoal.contrato as pc                    
+                 WHERE                                         
+                         ps.cod_servidor = sc.cod_servidor     
+                     AND sc.cod_contrato = cs.cod_contrato     
+                     AND cs.cod_contrato = pc.cod_contrato ";
 
     return $stSql;
 }

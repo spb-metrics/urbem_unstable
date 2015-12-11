@@ -170,11 +170,11 @@ BEGIN
                  , tabela.recurso
                  , tabela.descricao
                  , coalesce(sum(tabela.valor_previsto),0.00)
-                 , coalesce(sum(tabela.arrecadado_mes),0.00)
-                 , coalesce(sum(tabela.arrecadado_ate_periodo),0.00)
+                 , coalesce(sum(tabela.arrecadado_mes + tabela.anulado_mes ),0.00)
+                 , coalesce(sum(tabela.arrecadado_ate_periodo + tabela.anulado_ate_periodo),0.00)
                  , coalesce(sum(tabela.anulado_mes),0.00)
                  , coalesce(sum(tabela.anulado_ate_periodo),0.00)
-                 , coalesce(sum(tabela.valor_previsto),0.00) + coalesce(sum(tabela.arrecadado_ate_periodo),0.00) AS valor_diferenca
+                 , coalesce(sum(tabela.valor_previsto),0.00) + coalesce(sum(tabela.arrecadado_ate_periodo + tabela.anulado_ate_periodo),0.00) AS valor_diferenca
               FROM ( 
                     SELECT conta_receita.cod_estrutural AS cod_estrutural
                          , receita.cod_receita          AS receita
@@ -226,7 +226,6 @@ BEGIN
                    , tabela.receita
                    , tabela.recurso
                    , tabela.descricao ';
-   
     FOR reRegistro IN EXECUTE stSql
     LOOP
         RETURN next reRegistro;

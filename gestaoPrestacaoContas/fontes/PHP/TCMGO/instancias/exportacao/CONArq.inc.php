@@ -328,7 +328,7 @@ if (Sessao::getExercicio() <= '2008') { //deixar == geracao do arquivo exercicio
     $obTTCMGOContrato->recuperaRescisaoContratual  ( $rsRescisaoContratual  , $stFiltro);
 
     $inCount = 0;
-   //  SistemaLegado::mostraVar($arRecordSet);die;
+
     foreach ($arRecordSet[$stArquivo]->arElementos as $arContrato) {
         $arContrato['nro_sequencial'] = ++$inCount;
         $stChave = $arContrato['cod_programa'].$arContrato['num_orgao'].$arContrato['num_unidade'].
@@ -603,7 +603,6 @@ if (Sessao::getExercicio() <= '2008') { //deixar == geracao do arquivo exercicio
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
 
         // tipo registro 21 --Termos Aditivos de Prorrogacao de Prazos
-       // SistemaLegado::mostraVar($rsProrrogacaoPrazo);die;
         foreach ($rsProrrogacaoPrazo->arElementos as $arTempProrrogacao) {
                 $stChaveProrrogacao = $arTempProrrogacao['cod_programa'].$arTempProrrogacao['num_orgao'].
                            $arTempProrrogacao['num_unidade'].$arTempProrrogacao['cod_funcao'].$arTempProrrogacao['cod_subfuncao'].
@@ -833,7 +832,6 @@ if (Sessao::getExercicio() <= '2008') { //deixar == geracao do arquivo exercicio
                      }
 
                     // tipo registro 23 --Rescisao contratual
-                    // SistemaLegado::mostraVar($rsRescisaoContratual);die;
                      foreach ($rsRescisaoContratual->arElementos  as $arRescisao) {
                         $stChaveRescisao = $arRescisao['cod_programa'].$arRescisao['num_orgao'].
                                 $arRescisao['num_unidade'].$arRescisao['cod_funcao'].$arRescisao['cod_subfuncao'].

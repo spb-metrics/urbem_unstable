@@ -220,7 +220,6 @@ switch ($_REQUEST['stCtrl']) {
         }
         break;
     case 'preencheCombos' :
-        //sistemaLegado::mostraVar($_REQUEST);
         //preenche os outros combos de acordo com o código da localizacao
         $stJs.= "$('".$obIMontaLocalizacao->obSelectOrgao->getId()."').selectedIndex = 0;";
         $stJs.= "limpaSelect(f.".$obIMontaLocalizacao->obSelectUnidade->getName().",0);";

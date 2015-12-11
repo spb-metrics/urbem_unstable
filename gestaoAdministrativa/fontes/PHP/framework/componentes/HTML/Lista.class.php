@@ -32,7 +32,7 @@
 * @package framework
 * @subpackage componentes
 
-* $Id: Lista.class.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+* $Id: Lista.class.php 64140 2015-12-08 15:56:29Z diogo.zarpelon $
 
 * Casos de uso: uc-01.01.00
 
@@ -1092,7 +1092,7 @@ function montaHTML()
                         switch ( $obAcao->getAcao() ) {
                             case 'excluir':
                                 $obAcao->setLink( str_replace('&','*_*',$obAcao->getLink()) );
-                                $obAcao->setLink( "javascript:alertaQuestao('".$obAcao->getLink()."','sn_excluir','".Sessao::getId()."');" );
+                                $obAcao->setLink( "javascript:alertaQuestao('".$obAcao->getLink()."','sn_excluir','".Sessao::getId()."'); BloqueiaFrames(true,false);" );
                             break;
                             case 'remover':
                                 $obAcao->setLink( str_replace('&','*_*',$obAcao->getLink()) );

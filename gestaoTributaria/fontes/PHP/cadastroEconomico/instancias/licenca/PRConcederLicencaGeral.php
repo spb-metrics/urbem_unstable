@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: PRConcederLicencaGeral.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRConcederLicencaGeral.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -76,7 +76,6 @@ $obAtributos->setName('AtributoLicenca_');
 $obAtributos->recuperaVetor( $arChave );
 $obErro = new Erro;
 
-//sistemaLegado::mostravar($stAcao);
 switch ($stAcao) {
 
     case "incGeral":
@@ -158,8 +157,6 @@ switch ($stAcao) {
                 $stFiltro .="AND b.cod_documento = ". $_REQUEST['stCodDocumentoTxt'];
                 $obTModeloDocumento = new TAdministracaoModeloDocumento;
                 $obTModeloDocumento->recuperaRelacionamento( $rsDocumentos, $stFiltro );
-
-                #sistemaLegado::mostravar( $rsDocumentos ); exit;
 
                 while ( !$rsDocumentos->Eof() ) {
                      $inCodTipoDocAtual  = $rsDocumentos->getCampo( "cod_tipo_documento" );

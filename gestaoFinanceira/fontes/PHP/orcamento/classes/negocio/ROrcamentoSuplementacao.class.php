@@ -42,24 +42,6 @@
                     uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.15  2007/06/06 13:21:38  vitor
-#8624#
-
-Revision 1.14  2006/07/17 16:29:31  cleisson
-Bug #6556#
-
-Revision 1.13  2006/07/14 17:58:17  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.12  2006/07/05 20:42:11  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_GF_ORC_NEGOCIO   ."ROrcamentoDespesa.class.php"                                     );
 include_once ( CAM_GA_NORMAS_NEGOCIO."RNorma.class.php"                                                );
@@ -792,7 +774,7 @@ function fazerLancamento($boTransacao = "")
             $this->stDecreto  = $this->obRNorma->obRTipoNorma->getNomeTipoNorma().' '.$this->obRNorma->getNumNorma().'/'.$this->obRNorma->getExercicio();
             $this->stDecreto .= ' - '.$this->obRNorma->getNomeNorma();
             //Desabilitado, para a funcionalidade Alteração Orçamentária pois ainda não temos os lançamentos oficiais de suplementação para a nova contabilidade. Somente para cliente do tcems
-            if (Sessao::getExercicio() > 2012 || !SistemaLegado::is_tcems($boTransacao)) {
+            if (Sessao::getExercicio() > '2012') {
                 if ( in_array( $this->inCodTipo, array( 1,2,3,4,5 ) ) ) {
                     $obErro = $this->fazerLancamentoSuplementar( $boTransacao );
                 } elseif ( in_array( $this->inCodTipo, array( 6,7,8,9,10 ) ) ) {
@@ -1243,7 +1225,7 @@ function listarSuplementacao(&$rsLista, $stOrder = "", $boTransacao = "")
 
     if ( $this->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade() ) {
         $inCodEntidade = $this->obRContabilidadeTransferenciaDespesa->obRContabilidadeLancamentoTransferencia->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->getCodigoEntidade();
-        if (SistemaLegado::is_tcems($boTransacao)) {
+        if (Sessao::getExercicio() > '2012') {
             $stFiltro .= " ( OSS.cod_entidade IN ( ".$inCodEntidade. " ) OR OSR.cod_entidade IN ( ".$inCodEntidade. " ) ) AND ";
         } else {
             $stFiltro .= " CTD.cod_entidade IN ( ".$inCodEntidade. " ) AND ";
@@ -1464,3 +1446,5 @@ function consultarHistoricoLancamento($boTransacao = "")
 }
 
 }
+
+?>

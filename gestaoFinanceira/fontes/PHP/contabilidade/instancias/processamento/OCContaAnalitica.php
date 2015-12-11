@@ -35,7 +35,7 @@ $Name:  $
 $Author: lbbarreiro $
 $Date: 2007-10-31 15:55:22 -0200 (Qua, 31 Out 2007) $
 
- $Id: OCContaAnalitica.php 63740 2015-10-05 11:17:51Z franver $
+ $Id: OCContaAnalitica.php 64153 2015-12-09 19:16:02Z evandro $
 
 Casos de uso: uc-02.02.02,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -78,7 +78,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= " ( pb.cod_banco IS NOT NULL
                              AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                              AND ( pc.cod_estrutural LIKE '1.1.1.%'
@@ -114,7 +114,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= " ( pb.cod_banco IS NOT NULL
                              AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                              AND ( pc.cod_estrutural LIKE '1.1.1.%'
@@ -151,7 +151,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "( pb.cod_banco IS NOT NULL
                             AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                             AND ( pc.cod_estrutural LIKE '1.1.1.%'
@@ -190,7 +190,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= " ( pb.cod_banco IS NOT NULL
                              AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                              AND ( pc.cod_estrutural LIKE '1.1.1.%'
@@ -228,7 +228,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "  ( pb.cod_banco IS NOT NULL
                               AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                               AND ( pc.cod_estrutural LIKE '1.1.1.%'
@@ -267,7 +267,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= " ( pb.cod_banco IS NOT NULL
                              AND pb.cod_entidade IN ( ".$request->get('inCodEntidade').")
                              AND ( pc.cod_estrutural like '1.1.1.%'
@@ -305,7 +305,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n ( pc.cod_estrutural like '1.1.2.%'
                                 OR pc.cod_estrutural like '1.1.3.%'
                                 OR pc.cod_estrutural like '1.1.4.9.%'
@@ -342,7 +342,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
 
-            if (SistemaLegado::is_tcems()) {
+            if (Sessao::getExercicio() > '2012') {
                     $stFiltro .= "\n   pc.cod_estrutural like '7.1.1.1.%'  AND ";
             } else {
                     $stFiltro .= "\n pc.cod_estrutural like '1.9.9.1%' AND ";
@@ -369,7 +369,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n( pb.cod_banco is not null AND ";
                 $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
                 $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%'  OR ";
@@ -409,7 +409,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n( pb.cod_banco is not null AND ";
                 $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
                 $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%'  OR ";
@@ -449,7 +449,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                     $stFiltro .= "\n ( pc.cod_estrutural like '1.1.2.%'
                                     OR pc.cod_estrutural like '1.1.3.%'
                                     OR pc.cod_estrutural like '1.1.4.9.%'
@@ -511,7 +511,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n( pb.cod_banco is not null AND ";
                 $stFiltro .= "\n   pb.cod_entidade in ( ".$stCodEntidades.") AND ";
                 $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%' OR ";
@@ -627,7 +627,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '". $inExercicio ."' AND ";
 
-            if (SistemaLegado::is_tcems()) {
+            if (Sessao::getExercicio() > '2012') {
                 $stFiltro .= "\n   pc.cod_estrutural like '8.1.1.1.%' AND ";
             } else {
                 $stFiltro .= "\n   pc.cod_estrutural like '2.9.9.1.%' AND ";
@@ -655,7 +655,7 @@ switch ( $request->get('stCtrl') ) {
             $stFiltro .= "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pa.cod_plano = ".$_GET[$_GET['stNomCampoCod']]."  AND ";
             $stFiltro .= "\n pc.exercicio = '".Sessao::getExercicio()."' AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n ( pc.cod_estrutural like '1.1.2.%' OR ";
                 $stFiltro .= "\n   pc.cod_estrutural like '1.1.3.%' OR ";
                 $stFiltro .= "\n   pc.cod_estrutural like '1.2.1.%' OR ";

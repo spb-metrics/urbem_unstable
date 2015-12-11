@@ -59,7 +59,6 @@ function geraArquivosConvenios(&$obExportador , $stDataInicial, $stDataFinal)
     $obTLicitacaoConvenio->setDado( 'dt_inicial'  , $stDataInicial );
     $obTLicitacaoConvenio->setDado( 'dt_final'  , $stDataFinal );
     $obTLicitacaoConvenio->recuperaConvenioEsfinge( $rsConvenio);
-    sistemaLegado::mostravar( $rsConvenio);
 
     $obExportador->addArquivo("convenio.txt");
     $obExportador->roUltimoArquivo->addBloco($rsConvenio);
@@ -104,7 +103,6 @@ function geraArquivosConvenios(&$obExportador , $stDataInicial, $stDataFinal)
     $obTParticipanteConvenio->setDado( 'dt_inicial'  , $stDataInicial );
     $obTParticipanteConvenio->setDado( 'dt_final'  , $stDataFinal );
     $obTParticipanteConvenio->recuperaParticipanteConvenioEsfinge( $rsParticipanteConvenio );
-//    sistemaLegado::mostravar( $rsParticipanteConvenio );
 
     $obExportador->addArquivo("participanteconvenio.txt");
     $obExportador->roUltimoArquivo->addBloco($rsParticipanteConvenio );
@@ -139,7 +137,6 @@ function geraArquivosConvenios(&$obExportador , $stDataInicial, $stDataFinal)
     $obTParticipanteConvenio->setDado( 'dt_inicial'  , $stDataInicial );
     $obTParticipanteConvenio->setDado( 'dt_final'  , $stDataFinal );
     $obTParticipanteConvenio->recuperaCertidaoConveniadoEsfinge( $rsCertidaoConveniado );
-//    sistemaLegado::mostravar( $rsCertidaoConveniado );
 
     $obExportador->addArquivo("certidaoconvenianado.txt");
     $obExportador->roUltimoArquivo->addBloco($rsCertidaoConveniado);

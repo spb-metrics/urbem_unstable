@@ -30,7 +30,7 @@
     * @author Analista: Diego Victoria
     * @author Desenvolvedor: Leandro André Zis
 
-    * $Id: OCMontaAgencia.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCMontaAgencia.php 64131 2015-12-04 21:03:54Z jean $
 
     * Casos de uso: uc-05.05.02
                     uc-03.03.05
@@ -64,19 +64,26 @@ Revision 1.2  2006/07/06 12:11:10  diego
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-function PreencheAgencia()
+function PreencheAgencia(Request $request)
 {
-    ;
+    if ($request == "") {
+        $arRequest = $_REQUEST;
+    } else {
+        $arRequest = $request->getAll();
+    }
+
     $stJs .= "limpaSelect(f.stNumAgencia,1); \n";
     $stJs .= "f.stNumAgenciaTxt.value = ''; \n";
     $stJs .= ' d.getElementById(\'stNumAgencia\').value = \'\';';
-    if ($_GET['stNumBanco']) {
+
+    if ($arRequest['stNumBanco']) {
         $rsBanco = new RecordSet;
         $rsAgencia = new RecordSet;
         include_once ( CAM_GT_MON_MAPEAMENTO."TMONBanco.class.php" );
         $obTMONBanco = new TMONBanco;
-        $stFiltro = ' where num_banco = \''.$_GET['stNumBanco'].'\'';
+        $stFiltro = ' where num_banco = \''.$arRequest['stNumBanco'].'\'';
         $obTMONBanco->recuperaTodos($rsBanco, $stFiltro);
+
         if ($rsBanco->getCampo('cod_banco') ) {
             include_once ( CAM_GT_MON_MAPEAMENTO."TMONAgencia.class.php" );
             $obTMONAgencia = new TMONAgencia;
@@ -92,14 +99,8 @@ function PreencheAgencia()
         }
         $inCount = 1;
 
-        //  if ($rsAgencia->getNumLinhas()>1) {
         $stJs .= "f.stNumAgencia.options[0] = new Option('Selecione','', 'selected');\n";
-        //  }
-        /*  elseif ($rsAgencia->getNumLinhas()==1) {
-        $inCount--;
-        $stJs .= "f.stNumAgencia.value= '".$rsAgencia->getCampo('num_agencia')."';\n";
-        $stJs .= "f.stNumAgenciaTxt.value= '".$rsAgencia->getCampo('num_agencia')."';\n";
-        }*/
+
         while (!$rsAgencia->eof()) {
             $inId   = $rsAgencia->getCampo("num_agencia");
             $stDesc = $rsAgencia->getCampo("nom_agencia");
@@ -113,9 +114,9 @@ function PreencheAgencia()
     return $stJs;
 }
 
-switch ($_REQUEST["stCtrl"]) {
+switch ($request->get("stCtrl")) {
    case "PreencheAgencia":
-        $stJs .= PreencheAgencia();
+        $stJs .= PreencheAgencia($request);
    break;
 }
 

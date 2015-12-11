@@ -65,9 +65,6 @@ $codOrgao       = $_REQUEST["codOrgao"];
 <script src="../../../../../../gestaoAdministrativa/fontes/javaScript/funcoesJs.js" type="text/javascript"></script>
 <?php
 
-#sistemalegado::mostravar($_REQUEST);
-#sistemalegado::mostravar($ctrl);
-
 switch ($ctrl) {
 case 0:
 

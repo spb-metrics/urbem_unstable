@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RARRRelatorioValoresLancados.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RARRRelatorioValoresLancados.class.php 63839 2015-10-22 18:08:07Z franver $
 
      * Casos de uso: uc-05.03.13
 */
@@ -492,9 +492,7 @@ function geraRecordSetRelatorio(&$rsRecordSet, &$rsRecordSetSomas, &$arCabecalho
 
         if ( $this->getCodCreditoInicio() || $this->getCodCreditoTermino() ) {
 
-            #echo 'CREDITO: '.$this->getCodCreditoInicio();
             $arDadosIniciais =  explode( ".", $this->getCodCreditoInicio() );
-            #sistemaLegado::mostravar( $arDadosIniciais );
             $arDadosFinais = explode(".", $this->getCodCreditoTermino() );
             $arTipos = array("cod_credito", "cod_especie", "cod_genero", "cod_natureza");
             for ($inX=0; $inX<4; $inX++) {
@@ -558,13 +556,11 @@ function geraRecordSetRelatorio(&$rsRecordSet, &$rsRecordSetSomas, &$arCabecalho
         }
 
         $stFiltro .= ", '".$this->getCodEstAtivInicial()."', '".$this->getCodEstAtivFinal()."' ";
-        #echo '<b>FILTRO: </b><br>'.$stFiltro;
 
         if ( $this->getTipoRelatorio() == 'sintetico' ) {
 
             $obErro = $this->obFARRRelatorioValoresLancados->recuperaRelatorioSintetico ( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
 
-            #sistemaLegado::mostravar ( $rsRecordSet );
 
             $arListaSintetico = array();
             $arListaSomas = array();
@@ -633,8 +629,6 @@ function geraRecordSetRelatorio(&$rsRecordSet, &$rsRecordSetSomas, &$arCabecalho
             $rsRecordSet->setPrimeiroElemento();
             $rsRecordSetSomas->setPrimeiroElemento();
 
-            #sistemaLegado::mostravar( $rsRecordSet );
-            #sistemaLegado::mostravar( $rsRecordSetSomas );
         } else {
             $obErro = $this->obFARRRelatorioValoresLancados->recuperaRelatorioAnalitico ( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
         }
@@ -683,9 +677,7 @@ function geraRecordSetPeriodico(&$rsRecordSet, &$rsRecordSetSomas, &$arCabecalho
 
     if ( $this->getCodCreditoInicio() || $this->getCodCreditoTermino() ) {
 
-        #echo 'CREDITO: '.$this->getCodCreditoInicio();
         $arDadosIniciais =  explode( ".", $this->getCodCreditoInicio() );
-        #sistemaLegado::mostravar( $arDadosIniciais );
         $arDadosFinais = explode(".", $this->getCodCreditoTermino() );
         $arTipos = array("cod_credito", "cod_especie", "cod_genero", "cod_natureza");
         for ($inX=0; $inX<4; $inX++) {

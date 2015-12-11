@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: PRManterVeiculo.php 62535 2015-05-18 19:36:53Z jean $
+    * $Id: PRManterVeiculo.php 64139 2015-12-08 15:47:35Z diogo.zarpelon $
 
     * Casos de uso: uc-03.02.06
 */
@@ -808,8 +808,11 @@ switch ($stAcao) {
         $obTFrotaVeiculo->setDado('cod_veiculo', $_REQUEST['inCodVeiculo'] );
         $obTFrotaVeiculo->exclusao();
 
-        $obTTCERNVeiculoCategoriaVinculo->setDado('cod_veiculo', $_REQUEST['inCodVeiculo']);
-        $obTTCERNVeiculoCategoriaVinculo->exclusao();
+        # Caso o município faça parte do estado do RN.
+        if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == '20') {
+            $obTTCERNVeiculoCategoriaVinculo->setDado('cod_veiculo', $_REQUEST['inCodVeiculo']);
+            $obTTCERNVeiculoCategoriaVinculo->exclusao();
+        }
 
         $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacao, " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo'] );
         if ($rsVeiculoLocacao->getNumLinhas() > 0) {

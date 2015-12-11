@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioBalanceteVerificacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioBalanceteVerificacao.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.22
 */
@@ -102,7 +102,7 @@ if ($arFiltro['stEstrutural'] == 'S') {
 
 $obPDF->setAlinhamento ('C');
 
-if ( SistemaLegado::is_tcems() ) {
+if ( Sessao::getExercicio() > '2012' ) {
     $obPDF->addCabecalho   ('N.C.'              , 4 , 10);
 } else {
     $obPDF->addCabecalho   ('S.C.'              , 4 , 10);

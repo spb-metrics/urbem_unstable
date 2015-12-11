@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.24
 
-    $Id: OCConfiguracaoBradesco.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCConfiguracaoBradesco.php 64131 2015-12-04 21:03:54Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -45,14 +45,14 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-function preencherDados()
+function preencherDados(Request $request)
 {
     include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoConvenioBradesco.class.php");
     $obTIMAConfiguracaoConvenioBradesco = new TIMAConfiguracaoConvenioBradesco;
     $obTIMAConfiguracaoConvenioBradesco->recuperaRelacionamento($rsDados);
     if ($rsDados->getNumLinhas() > 0 ) {
-        $_GET['stNumAgenciaTxt'] = $rsDados->getCampo("num_agencia");
-        $stJs .= preencheDadosConta();
+        $request->set('stNumAgenciaTxt', $rsDados->getCampo("num_agencia"));
+        $stJs .= preencheDadosConta($request);
         $stJs .= "f.stCodEmpresa.value = '".$rsDados->getCampo("cod_empresa")."';\n";
         $stJs .= "f.stNumAgencia.value = '".$rsDados->getCampo("num_agencia")."';\n";
         $stJs .= "f.stNumAgenciaTxt.value = '".$rsDados->getCampo("num_agencia")."';\n";
@@ -62,21 +62,21 @@ function preencherDados()
     return $stJs;
 }
 
-function preencherDadosAgencia()
+function preencherDadosAgencia(Request $request)
 {
     include_once(CAM_GT_MON_INSTANCIAS."agenciaBancaria/OCMontaAgencia.php");
-    $_GET['stNumBanco'] = Sessao::read("stNumBanco");
-    $stJs = PreencheAgencia();
+    $request->set('stNumBanco', Sessao::read("stNumBanco"));
+    $stJs = PreencheAgencia($request);
 
     return $stJs;
 }
 
-function preencheDadosConta()
+function preencheDadosConta(Request $request)
 {
     include_once ( CAM_GT_MON_MAPEAMENTO."TMONAgencia.class.php" );
     $obTMONAgencia = new TMONAgencia;
     $stFiltro  = " where num_banco = '".Sessao::read("stNumBanco")."'";
-    $stFiltro .= "   and num_agencia = '".$_GET["stNumAgenciaTxt"]."'";
+    $stFiltro .= "   and num_agencia = '".$request->get("stNumAgenciaTxt")."'";
     $obTMONAgencia->recuperaRelacionamento($rsAgencia, $stFiltro);
     $rsConta = new RecordSet();
     if ($rsAgencia->getCampo('cod_agencia')) {
@@ -100,13 +100,13 @@ function preencheDadosConta()
 
     return $stJs;
 }
-switch ($_GET['stCtrl']) {
+switch ($request->get('stCtrl')) {
     case "preencherDadosAgencia":
-        $stJs .= preencherDadosAgencia();
-        $stJs .= preencherDados();
+        $stJs .= preencherDadosAgencia($request);
+        $stJs .= preencherDados($request);
         break;
     case "preencheDadosConta";
-        $stJs .= preencheDadosConta();
+        $stJs .= preencheDadosConta($request);
         break;
 }
 if ($stJs) {

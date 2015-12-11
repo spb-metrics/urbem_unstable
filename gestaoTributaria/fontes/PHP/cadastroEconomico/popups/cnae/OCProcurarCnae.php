@@ -29,7 +29,7 @@
 
     * @author Tonismar Régis Bernardo
 
-    * $Id: OCProcurarCnae.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCProcurarCnae.php 63839 2015-10-22 18:08:07Z franver $
 
     * @ignore
 */
@@ -63,8 +63,6 @@ $obMontaCnae = new MontaCnae;
 $obErro      = new Erro;
 
 //$obMontaCnae = new MontaCnae;
-
-mostravar( $_REQUEST );
 
 $obMontaCnae->setCodigoVigencia ( $_REQUEST["inCodigoVigencia"] );
 

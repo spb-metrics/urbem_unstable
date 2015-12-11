@@ -390,7 +390,6 @@ Sql referente a atributo patrimonial que não existe mais
         $sXML       = '../../../../../../gestaoPatrimonial/fontes/PHP/patrimonio/patrimonio/relatorios/cargaPatrimonialCadastral.xml';
         $sSubTitulo = "Cadastral";
     }
-//    sistemaLegado::mostravar($sqlPDF) ;
       $botoesPDF  = new botoesPdfLegado;
     $botoesPDF->imprimeBotoes($sXML,$sqlPDF,'',$sSubTitulo);
 

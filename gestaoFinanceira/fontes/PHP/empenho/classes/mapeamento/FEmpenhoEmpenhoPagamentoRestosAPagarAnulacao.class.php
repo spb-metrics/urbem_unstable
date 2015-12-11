@@ -150,7 +150,7 @@ function executaFuncao(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTran
     if ( !$obErro->ocorreu() ) {
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-        if ( SistemaLegado::is_tcems($boTransacao) ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $stSql = $this->montaExecutaFuncaoTCEMS();
         } else {
             $stSql = $this->montaExecutaFuncao();

@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: OCEmitirDocumento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCEmitirDocumento.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.03.11
 **/
@@ -100,8 +100,6 @@ function BuscarCredito($stParam1, $stParam2)
 
     return $stJs;
 }
-
-//sistemaLegado::mostravar ( $_REQUEST ); //exit;
 
 switch ($_REQUEST['stCtrl']) {
     case "montaFiltro":
@@ -215,7 +213,6 @@ switch ($_REQUEST['stCtrl']) {
         }
 
         $obRARRGrupo->listarCreditos( $rsCreditos );
-        //sistemaLegado::mostravar($rsCreditos);
 
     break;
     case "buscaGrupo":

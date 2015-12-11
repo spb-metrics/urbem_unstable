@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterBaixaManual.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterBaixaManual.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.18
 */
@@ -80,8 +80,6 @@ include_once ( CAM_GT_ARR_NEGOCIO."RARRPagamento.class.php" );
 include_once ( CAM_GT_ARR_NEGOCIO."RARRCarne.class.php"  );
 include_once ( CAM_GT_DAT_COMPONENTES."IPopUpDivida.class.php" );
 include_once ( CAM_GT_DAT_COMPONENTES."IPopUpCobranca.class.php" );
-
-#sistemaLegado::mostravar( $_REQUEST );
 
 function montaListaRegistroPagamento($rsLista)
 {
@@ -518,7 +516,7 @@ switch ($_REQUEST["stCtrl"]) {
         if ($_REQUEST['inNumbanco']) {
             $obRMONAgencia->obRMONBanco->setNumBanco( $_REQUEST["inNumbanco"] );
             $obRMONAgencia->listarAgencia( $rsAgencia );
-            //sistemaLegado::mostravar($rsAgencia);
+
             $inContador = 1;
             while ( !$rsAgencia->eof() ) {
                 $inNumAgencia = $rsAgencia->getCampo( "num_agencia" );

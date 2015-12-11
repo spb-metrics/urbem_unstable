@@ -43,37 +43,11 @@
                     uc-02.03.02
 */
 
-/*
-$Log$
-Revision 1.15  2007/09/06 14:52:01  rodrigo_sr
-Ticket#9851#
-
-Revision 1.14  2007/08/17 20:43:45  vitor
-Bug#9851#
-
-Revision 1.13  2007/01/04 18:15:59  rodrigo
-#7857#
-
-Revision 1.12  2006/07/14 17:58:02  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.11  2006/07/05 20:47:06  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_FW_BANCO_DADOS  ."Transacao.class.php"                   );
-include_once ( CAM_GF_EMP_NEGOCIO          ."REmpenhoEmpenho.class.php"             );
-include_once ( CAM_GF_EMP_NEGOCIO          ."REmpenhoAutorizacaoEmpenho.class.php"  );
+include_once CAM_FW_BANCO_DADOS."Transacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
 
-/**
-    * Classe de Regra de EmpenhoAutorizacao
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Eduardo Martins
-*/
 class REmpenhoEmpenhoAutorizacao
 {
 /*
@@ -186,7 +160,8 @@ function autorizarEmpenho($boTransacao = "")
     $obTEmpenhoEmpenhoAutorizacao = new TEmpenhoEmpenhoAutorizacao;
 
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-    $obErro = $this->obREmpenhoEmpenho->consultaSaldoAnterior( $nuSaldoAnterior, '', $boTransacao );
+    $obErro = $this->obREmpenhoEmpenho->consultaSaldoAnteriorDataEmpenho( $nuSaldoAnterior, '', $boTransacao );
+    
     $nuVlReserva = str_replace( '.','',$this->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->getVlReserva() );
     $nuVlReserva = str_replace( ',','.',$nuVlReserva );
     $this->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setExercicio( $this->obREmpenhoEmpenho->getExercicio() );
@@ -227,7 +202,7 @@ function autorizarEmpenho($boTransacao = "")
                     $obErro->setDescricao( "Data de Empenho deve ser maior que '".$rsMaiorData->getCampo( "dataempenho" )."'!" );
                 }
 
-                if (SistemaLegado::comparaDatas($this->obREmpenhoAutorizacaoEmpenho->getDtAutorizacao(),$_REQUEST['stDtEmpenho'])) {
+                if (SistemaLegado::comparaDatas($this->obREmpenhoAutorizacaoEmpenho->getDtAutorizacao(),$this->obREmpenhoEmpenho->getDtEmpenho())) {
                    $obErro->setDescricao( "A data de Empenho deve ser igual ou posterior à data da Autorização de Empenho." );
                 }
 
@@ -412,3 +387,5 @@ function listarAutorizacao(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
 }
 
 }
+
+?>

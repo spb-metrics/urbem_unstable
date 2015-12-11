@@ -33,12 +33,14 @@
 * @package URBEM
 * @subpackage
 
+$Id: IPopUpCentroCustoUsuario.class.php 64005 2015-11-17 16:49:06Z michel $
+
 * Casos de uso: uc-03.03.07
                 uc-03.04.01
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/GA.inc.php';
-include_once ( CLA_BUSCAINNER );
+include_once CLA_BUSCAINNER;
 
 class  IPopUpCentroCustoUsuario extends BuscaInner
 {
@@ -49,39 +51,41 @@ class  IPopUpCentroCustoUsuario extends BuscaInner
 
     public $obForm;
 
+    public $boLiberaFrame;
+
+    public function setLiberaFrame($valor){ $this->boLiberaFrame = $valor; }
+
+    public function getLiberaFrame(){ return $this->boLiberaFrame; }
+
     /**
         * Metodo Construtor
         * @access Public
-
     */
 
-    public function IPopUpCentroCustoUsuario($obForm)
+    public function __construct($obForm)
     {
         parent::BuscaInner();
 
         $this->obForm = $obForm;
 
-        $this->setRotulo                 ( 'Centro de Custo'              );
-        $this->setTitle                  ( 'Informe o centro de custo.'                 );
-        $this->setId                     ( 'stNomCentroCusto'  );
-        $this->setNull                   ( false              );
+        $this->setRotulo                 ( 'Centro de Custo'            );
+        $this->setTitle                  ( 'Informe o centro de custo.' );
+        $this->setId                     ( 'stNomCentroCusto'           );
+        $this->setNull                   ( false                        );
 
-        $this->obCampoCod->setName       ( "inCodCentroCusto" );
-        $this->obCampoCod->setSize       ( 10                  );
-        $this->obCampoCod->setMaxLength  ( 10                 );
-        $this->obCampoCod->setAlign      ( "left"             );
-
+        $this->obCampoCod->setName       ( "inCodCentroCusto"           );
+        $this->obCampoCod->setSize       ( 10                           );
+        $this->obCampoCod->setMaxLength  ( 10                           );
+        $this->obCampoCod->setAlign      ( "left"                       );
     }
 
     public function montaHTML()
     {
+        $this->setFuncaoBusca("abrePopUp('".CAM_GP_ALM_POPUPS."centroCusto/FLManterCentroCusto.php','".$this->obForm->getName()."', '".$this->obCampoCod->stName."','".$this->stId."','','".Sessao::getId()."&usuario=TRUE','800','550');");
 
-        $this->setFuncaoBusca("abrePopUp('" . CAM_GP_ALM_POPUPS . "centroCusto/FLManterCentroCusto.php','".$this->obForm->getName()."', '". $this->obCampoCod->stName ."','". $this->stId . "','','" . Sessao::getId() .
-"&usuario=1','800','550');");
+        $this->obCampoCod->obEvento->setOnChange("ajaxJavaScript( '".CAM_GP_ALM_PROCESSAMENTO.'OCCentroCustoUsuario.php?'.Sessao::getId()."&usuario=TRUE&nomCampoUnidade=".$this->obCampoCod->getName()."&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->stId."&boLiberaFrame=".$this->getLiberaFrame()."&stNomForm=".$this->obForm->getName()."&inCodigo='+this.value, 'buscaPopup' );");
 
-     $this->obCampoCod->obEvento->setOnChange("ajaxJavaScript( '".CAM_GP_ALM_PROCESSAMENTO.'OCCentroCustoUsuario.php?'.Sessao::getId()."&usuario=1&nomCampoUnidade=".$this->obCampoCod->getName()."&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->stId."&stNomForm=".$this->obForm->getName()."&inCodigo='+this.value, 'buscaPopup' );");
-
-       parent::montaHTML();
+        parent::montaHTML();
     }
 }
 ?>

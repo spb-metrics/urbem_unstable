@@ -33,11 +33,13 @@
     * @package URBEM
     * @subpackage Mapeamento
 
+    $Id: TEmpenhoEmpenhoContrato.class.php 64081 2015-11-30 15:36:50Z michel $
+    
     * Casos de uso: uc-02.03.37
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TEmpenhoEmpenhoContrato extends Persistente
 {
@@ -45,19 +47,18 @@ class TEmpenhoEmpenhoContrato extends Persistente
     * Método Construtor
     * @access Private
 */
-function TEmpenhoEmpenhoContrato()
+function __construct()
 {
     parent::Persistente();
-    $this->setTabela("empenho".Sessao::getEntidade().".empenho_contrato");
+    $this->setTabela("empenho.empenho_contrato");
 
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_entidade,cod_empenho');
 
-    $this->AddCampo('exercicio'   ,'char'   ,true  ,'4'  ,true,'TLicitacaoContrato');
-    $this->AddCampo('cod_entidade','integer',true  ,''   ,true,'TLicitacaoContrato');
-    $this->AddCampo('cod_empenho' ,'integer',true  ,''   ,true,'TEmpenhoEmpenho');
-    $this->AddCampo('num_contrato','integer',true  ,''   ,false,'TLicitacaoContrato');
-
+    $this->AddCampo('exercicio'     ,'char'   ,true  ,'4'  ,true ,'TLicitacaoContrato'  );
+    $this->AddCampo('cod_entidade'  ,'integer',true  ,''   ,true ,'TLicitacaoContrato'  );
+    $this->AddCampo('cod_empenho'   ,'integer',true  ,''   ,true ,'TEmpenhoEmpenho'     );
+    $this->AddCampo('num_contrato'  ,'integer',true  ,''   ,false,'TLicitacaoContrato'  );
 }
 
 function montaRecuperaTodos()
@@ -91,6 +92,7 @@ function recuperaRelacionamentoEmpenhoContrato(&$rsRecordSet, $stFiltro = "")
     $rsRecordSet = new RecordSet;
 
     $stSql = $this->montaRecuperaRelacionamentoEmpenhoContrato().$stFiltro;
+    $this->stDebug = $stSql;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql);
 
     return $obErro;
@@ -145,5 +147,65 @@ function montaRecuperaProximoContrato()
     return $stSql;
 }
 
+public function recuperaEmpenhoPorContrato(&$rsRecordSet) {
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql = $this->montaRecuperaEmpenhoPorContrato();
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql);
+
+    return $obErro;    
 }
-?>
+
+
+public function montaRecuperaEmpenhoPorContrato() {
+    
+    $stSql = "SELECT 
+                    empenho.cod_empenho
+                  , sw_cgm.numcgm
+                  , sw_cgm.nom_cgm
+                  , TO_CHAR(empenho.dt_empenho, 'dd/mm/yyyy') AS dt_empenho
+                  , SUM(COALESCE(item_pre_empenho.vl_total, 0.00)) AS valor_empenho
+                  , SUM(COALESCE(empenho_anulado_item.vl_anulado, 0.00)) AS valor_anulado
+                  , SUM(COALESCE(item_pre_empenho.vl_total, 0.00)) - SUM(COALESCE(empenho_anulado_item.vl_anulado, 0.00)) AS valor_total
+       
+               FROM empenho.empenho_contrato
+               
+         INNER JOIN empenho.empenho
+                 ON empenho.cod_entidade = empenho_contrato.cod_entidade
+                AND empenho.exercicio    = empenho_contrato.exercicio
+                AND empenho.cod_empenho  = empenho_contrato.cod_empenho
+            
+         INNER JOIN empenho.pre_empenho
+                 ON pre_empenho.exercicio       = empenho.exercicio
+                AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+         
+         INNER JOIN empenho.item_pre_empenho
+                 ON item_pre_empenho.exercicio       = empenho.exercicio
+                AND item_pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+         
+          LEFT JOIN empenho.empenho_anulado_item
+                 ON empenho_anulado_item.exercicio       = item_pre_empenho.exercicio
+                AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho       
+                AND empenho_anulado_item.num_item        = item_pre_empenho.num_item
+         
+         INNER JOIN sw_cgm
+                 ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
+         
+              WHERE empenho_contrato.cod_entidade = ".$this->getDado('cod_entidade')."
+                AND empenho_contrato.exercicio    = '".$this->getDado('exercicio')."'
+                AND empenho_contrato.num_contrato = ".$this->getDado('num_contrato')."
+                  
+           GROUP BY empenho.cod_empenho
+                  , sw_cgm.numcgm
+                  , sw_cgm.nom_cgm
+                  , empenho.dt_empenho
+                  
+           ORDER BY empenho.cod_empenho";
+           
+    return $stSql;
+}
+
+
+}

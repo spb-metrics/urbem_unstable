@@ -45,7 +45,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
 
-// SistemaLegado::mostravar($_POST); exit;
 switch ($_POST['stTipoFiltro']) {
     case "contrato_todos":
     case "cgm_contrato_todos":

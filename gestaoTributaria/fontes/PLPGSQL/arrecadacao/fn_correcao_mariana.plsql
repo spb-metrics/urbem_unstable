@@ -50,26 +50,28 @@ CREATE OR REPLACE FUNCTION fn_correcao_mariana (date,date,numeric,integer,intege
        -- Calculo de Juros simples
         inDiff := diff_datas_em_meses(dtVencimento,dtDataCalculo);
 
-        SELECT MAX(inicio_vigencia)
-          INTO dtMinVigencia
-          FROM monetario.valor_acrescimo
-         WHERE cod_acrescimo = inCodAcrescimo
-           AND cod_tipo      = inCodTipo
-           AND inicio_vigencia <= dtVencimento
-             ;
+        IF inDiff > 0 THEN
+            SELECT MAX(inicio_vigencia)
+              INTO dtMinVigencia
+              FROM monetario.valor_acrescimo
+             WHERE cod_acrescimo = inCodAcrescimo
+               AND cod_tipo      = inCodTipo
+               AND inicio_vigencia <= dtVencimento
+                 ;
 
-        SELECT SUM(valor)
-          INTO nuPercent
-          FROM monetario.valor_acrescimo
-         WHERE cod_acrescimo = inCodAcrescimo
-           AND cod_tipo      = inCodTipo
-           AND inicio_vigencia >= dtMinVigencia
-           AND inicio_vigencia <= dtDataCalculo - interval '1 month'
-             ;
+            SELECT SUM(valor)
+              INTO nuPercent
+              FROM monetario.valor_acrescimo
+             WHERE cod_acrescimo = inCodAcrescimo
+               AND cod_tipo      = inCodTipo
+               AND inicio_vigencia >= dtMinVigencia
+               AND inicio_vigencia <= dtDataCalculo - interval '1 month'
+                 ;
+            
+            nuCorrecao := nuValor * (nuPercent / 100);
 
-        nuCorrecao := nuValor * (nuPercent / 100);
-
-        nuRetorno  := nuCorrecao::NUMERIC(14,2);
+            nuRetorno  := nuCorrecao::NUMERIC(14,2);
+        END IF;
 
         RETURN nuRetorno::numeric(14,2);
     END;

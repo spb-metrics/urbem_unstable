@@ -61,7 +61,7 @@ class IPopUpLivroIntervalo extends Objeto
     {
         $this->obTDATDividaAtiva = new TDATDividaAtiva;
         $this->obTDATDividaAtiva->recuperaLivroMax( $rsLivro );
-//sistemaLegado::mostravar( $rsLivro );
+
         if ( $rsLivro->Eof() ) {
             $this->stMascara = "9/9999";
         } else {

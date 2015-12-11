@@ -140,6 +140,26 @@ BEGIN
            AND nota_liquidacao_assinatura.cod_entidade = reRecord.cod_entidade
            AND nota_liquidacao_assinatura.cod_nota     = reRecord.cod_nota
              ;
+
+        DELETE
+          FROM tceal.documento
+         WHERE documento.exercicio    = reRecord.exercicio
+           AND documento.cod_entidade = reRecord.cod_entidade
+           AND documento.cod_nota     = reRecord.cod_nota
+             ;
+        DELETE
+          FROM tcepe.documento
+         WHERE documento.exercicio    = reRecord.exercicio
+           AND documento.cod_entidade = reRecord.cod_entidade
+           AND documento.cod_nota     = reRecord.cod_nota
+             ;
+        DELETE
+          FROM tceam.documento
+         WHERE documento.exercicio    = reRecord.exercicio
+           AND documento.cod_entidade = reRecord.cod_entidade
+           AND documento.cod_nota     = reRecord.cod_nota
+             ;
+
         DELETE
           FROM empenho.nota_liquidacao
          WHERE nota_liquidacao.exercicio    = reRecord.exercicio

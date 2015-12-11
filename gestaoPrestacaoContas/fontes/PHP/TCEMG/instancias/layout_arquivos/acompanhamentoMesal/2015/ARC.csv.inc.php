@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: ARC.csv.inc.php 62404 2015-05-04 20:44:10Z arthur $
-  * $Date: 2015-05-04 17:44:10 -0300 (Seg, 04 Mai 2015) $
-  * $Author: arthur $
-  * $Rev: 62404 $
+  * $Id: ARC.csv.inc.php 63835 2015-10-22 13:53:31Z franver $
+  * $Date: 2015-10-22 11:53:31 -0200 (Qui, 22 Out 2015) $
+  * $Author: franver $
+  * $Rev: 63835 $
   *
 */
 /**
@@ -290,7 +290,6 @@ if (count($rsRecordSetARC20->getElementos()) > 0) {
         if (count($rsRecordSetARC21->getElementos()) > 0) {
             foreach ($rsRecordSetARC21->getElementos() as $arARC21) {
                 $stChave2 = $arARC21['cod_correcao'];
-                //sistemaLegado::mostravar("CODIGO 21: ".$stChave1);
            
                 if ($stChave1 === $stChave2) {
                     $rsBloco = 'rsBloco_'.$inCount;

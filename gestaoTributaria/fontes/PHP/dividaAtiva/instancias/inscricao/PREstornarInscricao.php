@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Fernando Piccini Cercato
     * @ignore
 
-    * $Id: PREstornarInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PREstornarInscricao.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.04.02
 
@@ -78,7 +78,6 @@ if ( empty( $_REQUEST['stAcao'] ) ) {
 //Define o nome dos arquivos PHP
 $pgForm = "FMEstornarInscricao.php";
 
-#sistemaLegado::mostravar( $_REQUEST );
 Sessao::remove('link');
 Sessao::remove('stLink');
 
@@ -98,7 +97,6 @@ if ( !$rsInscricao->Eof() ) {
     SistemaLegado::alertaAviso( $pgForm."?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'], "Inscrição de Dívida Ativa (".$inCodInscricao.") já estava cancelada.", "n_erro", "erro", Sessao::getId(), "../" );
     exit;
 }
-#sistemaLegado::mostravar($rsInscricao);
 
 $obTDATDividaEstorno = new TDATDividaEstorno;
 $obTDATDividaEstorno->recuperaTodos( $rsInscricao, $stFiltro );
@@ -139,11 +137,9 @@ $stFiltro = " WHERE cod_inscricao = ".$inCodInscricao." AND exercicio = '".$inEx
 $obTDATDividaParcelamento = new TDATDividaParcelamento;
 $obTDATDividaParcelamento->recuperaTodos( $rsListaNumeracao, $stFiltro, " num_parcelamento ASC LIMIT 1 " );
 $inNumeroParcelamento = $rsListaNumeracao->getCampo( "num_parcelamento" );
-#sistemaLegado::mostravar( $rsListaNumeracao);
 
 $obTDATDividaParcelamento->recuperaTodos( $rsListaNumeracao, $stFiltro, " num_parcelamento DESC LIMIT 1 " );
 $inNumeroUltimoParcelamento = $rsListaNumeracao->getCampo( "num_parcelamento" );
-#sistemaLegado::mostravar( $rsListaNumeracao);
 
 $stFiltraParcelas = " WHERE num_parcelamento = ".$inNumeroUltimoParcelamento." AND paga = FALSE AND cancelada = FALSE ";
 $obTDATDividaParcela = new TDATDividaParcela;

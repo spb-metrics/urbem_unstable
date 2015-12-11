@@ -27,7 +27,7 @@
  * Página de Processamento Manter Solicitação de Compra
  * Data de Criação   : 21/09/2006
 
- $Id: PRManterSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
+ $Id: PRManterSolicitacaoCompra.php 63962 2015-11-11 18:32:34Z franver $
 
  * @ignore
 
@@ -369,14 +369,14 @@ switch ($stAcao) {
 
                 # AGRUPA ITENS IGUAIS PARA LANÇAMENTO EM TABELAS
                 $arItemAgrupado = array();
-
                 foreach ($arValores as $value) {
                     $nuVlAnular = str_replace(",",".",str_replace(".","",$value['vl_anular']));
-                    $nuVlTotal  = $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['vl_total'] + $nuVlAnular;
-                    $nuVlTotal  =  number_format($nuVlTotal, 2, ".",",");
-
-                    $nuQntTotal  = $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['qnt_total'] + $value['qnt_anular'];
-                    $nuQntTotal  = number_format($nuQntTotal, 4, ".",",");
+                    $nuVlTotal  = number_format($arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['vl_total'], 2, ".", ",") + $nuVlAnular;
+                    $nuVlTotal  = number_format($nuVlTotal, 2, ",", ".");
+                    
+                    $nuQntAnular = str_replace(",",".",str_replace(".","",$value['qnt_anular']));
+                    $nuQntTotal  = number_format($arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['qnt_total'], 4, ".", ",") + $nuQntAnular;
+                    $nuQntTotal  = number_format($nuQntTotal, 4, ",", ".");
 
                     $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['vl_total']    = $nuVlTotal;
                     $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['qnt_total']   = $nuQntTotal;
@@ -384,7 +384,6 @@ switch ($stAcao) {
                     $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['cod_item']    = $value['cod_item'];
                     $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['cod_conta']   = $value['cod_conta'];
                     $arItemAgrupado[$value['cod_item']."_".$value['cod_centro']]['cod_despesa'] = $value['cod_despesa'];
-
                 }
                 ### FIM AGRUPAMENTO
 

@@ -237,7 +237,6 @@ $descricao = pegaDado("descricao","cse.programa_social","
 
 //Inclusão, alteração ou exclusão de dados
 case 2:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     //Verifica se já existe o registro a ser incluido

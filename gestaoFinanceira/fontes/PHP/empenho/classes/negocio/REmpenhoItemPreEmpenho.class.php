@@ -33,366 +33,350 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Revision: 30668 $
-    $Name$
-    $Author: domluc $
-    $Date: 2007-02-15 15:56:01 -0200 (Qui, 15 Fev 2007) $
+    $Id: REmpenhoItemPreEmpenho.class.php 64005 2015-11-17 16:49:06Z michel $
 
     * Casos de uso: uc-02.03.03, uc-02.03.02, uc-02.03.30
 */
 
-/**
-
-/*
-$Log$
-Revision 1.16  2007/02/15 17:55:46  domluc
-Refletir mudanças na base
-
-Revision 1.15  2007/01/18 19:12:51  domluc
-Autorização de Licitação
-
-Revision 1.14  2006/09/26 17:58:16  tonismar
-Manter Empenho Despesas Mensais Fixas
-
-Revision 1.13  2006/08/09 12:54:38  jose.eduardo
-Bug #6741#
-
-Revision 1.12  2006/07/11 20:28:24  eduardo
-Bug #6531#
-
-Revision 1.11  2006/07/05 20:47:06  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_FW_BANCO_DADOS."Transacao.class.php"           );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoPreEmpenho.class.php"          );
-include_once ( CAM_GA_ADM_NEGOCIO."RUnidadeMedida.class.php"              );
+include_once CAM_FW_BANCO_DADOS."Transacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPreEmpenho.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RUnidadeMedida.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenho.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenhoCompra.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenhoJulgamento.class.php';
 
-/**
-    * Classe de Regra de Item Pre Empenho
-    * @author Analista: Jorge B. Ribarr
-    * @author Desenvolvedor: Anderson R. M. Buzo
-*/
 class REmpenhoItemPreEmpenho
 {
     /**
     * @access Private
     * @var Object
-*/
+    **/
     public $obRUnidadeMedida;
     /**
     * @access Private
     * @var Integer
-*/
+    **/
     public $inNumItem;
     /**
     * @access Private
     * @var Integer
-*/
+    **/
     public $inCodMaterial;
     /**
     * @access Private
     * @var Integer
-*/
+    **/
     public $inQuantidade;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stNomUnidade;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stSiglaUnidade;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stNomItem;
     /**
     * @access Private
     * @var String
-*/
+    **/
     public $stComplemento;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorTotal;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorEmpenhadoAnulado;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorALiquidar;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorAAnular;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorLiquidado;
     /**
     * @access Private
     * @var Numeric
-*/
+    **/
     public $nuValorLiquidadoAnulado;
     /**
     * @access Private
     * @var Reference Object
-*/
+    **/
     public $roPreEmpenho;
     /**
     * @access Public;
     * @var Date;
-*/
+    **/
     public $dtDataDocumento;
     /**
     * @access Public;
     * @var Boolean;
-*/
+    **/
     public $boCompra;
     /**
     * @access Public;
     * @var Integer;
-*/
+    **/
     public $inCodCotacao;
     /**
     * @access Public;
     * @var Integer;
-    */
+    **/
     public $inExercicioJulgamento;
     /**
     * @access Public;
     * @var Integer;
-    */
+    **/
     public $inCgmFornecedor;
     /**
     * @access Public;
     * @var Integer;
-    */
+    **/
     public $inLoteCompras;
-
     /**
     * @access Public;
     * @var Integer;
-*/
+    **/
     public $inCodItem;
     /**
     * @access Public;
     * @var Integer;
-*/
+    **/
     public $inCodItemPreEmp;
+    /**
+    * @access Public;
+    * @var Integer;
+    **/
+    public $inCodCentroCusto;
     /**
     * @access Public
     * @param Object $Valor
-*/
+    **/
     public function setRUnidadeMedida($valor) { $this->obRUnidadeMedida = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-    */
+    **/
     public function setNumItem($valor) { $this->inNumItem = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setCodMaterial($valor) { $this->inCodMaterial = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-*/
+    **/
     public function setQuantidade($valor) { $this->inQuantidade = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setNomUnidade($valor) { $this->stNomUnidade = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setSiglaUnidade($valor) { $this->stSiglaUnidade = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setNomItem($valor) { $this->stNomItem = $valor; }
     /**
     * @access Public
     * @param String $Valor
-*/
+    **/
     public function setComplemento($valor) { $this->stComplemento = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorTotal($valor) { $this->nuValorTotal = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorEmpenhadoAnulado($valor) { $this->nuValorEmpenhadoAnulado = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorALiquidar($valor) { $this->nuValorALiquidar = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorAAnular($valor) { $this->nuValorAAnular = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorLiquidado($valor) { $this->nuValorLiquidado = $valor; }
     /**
     * @access Public
     * @param Numeric $Valor
-*/
+    **/
     public function setValorLiquidadoAnulado($valor) { $this->nuValorLiquidadoAnulado = $valor; }
     /**
     * @access Public
     * @param Date $Valor
-*/
+    **/
     public function setDataDocumento($valor) { $this->dtDataDocumento = $valor; }
     /**
     * @access Public
     * @param Boolean $Valor
-*/
+    **/
     public function setCompra($valor) { $this->boCompra = $valor; }
-/**
+    /**
     * @access Public
     * @param Integer $Valor
-    */
+    **/
     public function setCodItem($valor) { $this->inCodItem = $valor; }
     /**
     * @access Public
     * @param Integer $Valor
-    */
-    public function setCodItemPreEmp($valor) { $this->inCodItemPreEmp = $valor; } 
-/**
+    **/
+    public function setCodItemPreEmp($valor) { $this->inCodItemPreEmp = $valor; }
+    /**
     * @access Public
     * @param Integer $Valor
-    */
+    **/
+    public function setCodCentroCusto($valor) { $this->inCodCentroCusto = $valor; }
+    /**
+    * @access Public
+    * @param Integer $Valor
+    **/
     public function setCodCotacao($valor) { $this->inCodCotacao = $valor; }
     public function setExercicioJulgamento($valor) { $this->inExercicioJulgamento = $valor; }
     public function setLoteCompras($valor) { $this->inLoteCompras = $valor; }
     public function setCgmFornecedor($valor) { $this->inCgmFornecedor = $valor; }
-/**
+    /**
     * @access Public
     * @param Integer $Valor
     */
     public function setExercicioMapa($valor) { $this->inExercicioMapa= $valor; }
-
     /**
     * @access Public
     * @return Object
-*/
+    **/
     public function getRUnidadeMedida() { return $this->obRUnidadeMedida; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getNumItem() { return $this->inNumItem; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getCodMaterial() { return $this->inCodMaterial; }
     /**
     * @access Public
     * @return Integer
-*/
+    **/
     public function getQuantidade() { return $this->inQuantidade; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getNomUnidade() { return $this->stNomUnidade; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getSiglaUnidade() { return $this->stSiglaUnidade; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getNomItem() { return $this->stNomItem; }
     /**
     * @access Public
     * @return String
-*/
+    **/
     public function getComplemento() { return $this->stComplemento; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorTotal() { return $this->nuValorTotal; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorEmpenhadoAnulado() { return $this->nuValorEmpenhadoAnulado; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorALiquidar() { return $this->nuValorALiquidar; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorAAnular() { return $this->nuValorAAnular; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorLiquidado() { return $this->nuValorLiquidado; }
     /**
     * @access Public
     * @return Numeric
-*/
+    **/
     public function getValorLiquidadoAnulado() { return $this->nuValorLiquidadoAnulado; }
     /**
     * @access Public
     * @return Date
-*/
+    **/
     public function getDataDocumento() { return $this->dtDataDocumento; }
     /**
     * @access Public
     * @return Boolean
-*/
+    **/
     public function getCompra() { return $this->boCompra; }
     /**
     * @access Public
     * @return Integer
-*/    
+    */
     public function getCodItemPreEmp() { return $this->inCodItemPreEmp; }
+    /**
+    * @access Public
+    * @return Integer
+    */
+    public function getCodCentroCusto() { return $this->inCodCentroCusto; }
 
     /**
-     * Método construtor
-     * @access Public
-     * @param Reference Object $roPreEmpenho
-*/
+    * Método construtor
+    * @access Public
+    * @param Reference Object $roPreEmpenho
+    **/
     public function REmpenhoItemPreEmpenho(&$roPreEmpenho)
     {
-        $this->obTransacao               = new Transacao;
-        $this->obRUnidadeMedida          = new RUnidadeMedida;
-        $this->roPreEmpenho              = &$roPreEmpenho;
+        $this->obTransacao      = new Transacao;
+        $this->obRUnidadeMedida = new RUnidadeMedida;
+        $this->roPreEmpenho     = &$roPreEmpenho;
     }
 
     /**
@@ -401,10 +385,9 @@ class REmpenhoItemPreEmpenho
     * @param  String $stOrder Parâmetro de Ordenação
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function consultar(&$rsRecordSet,$boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php" );
         $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
 
         $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho", $this->roPreEmpenho->getCodPreEmpenho() );
@@ -431,10 +414,9 @@ class REmpenhoItemPreEmpenho
     * @param  String $stOrder Parâmetro de Ordenação
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php" );
         $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
 
         if( $this->roPreEmpenho->getCodPreEmpenho() )
@@ -466,7 +448,6 @@ class REmpenhoItemPreEmpenho
 
     public function consultaCodMaterial($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoCompra.class.php" );
         $obTEmpenhoItemPreEmpenhoCompra  = new TEmpenhoItemPreEmpenhoCompra;
 
         $obTEmpenhoItemPreEmpenhoCompra->setDado( 'cod_pre_empenho', $this->roPreEmpenho->getCodPreEmpenho() );
@@ -478,20 +459,31 @@ class REmpenhoItemPreEmpenho
         $this->inCodMaterial = $obTEmpenhoItemPreEmpenhoCompra->getDado( 'cod_item' );
     }
 
+    public function consultaCodCentroCusto($boTransacao = "")
+    {
+        $obTEmpenhoItemPreEmpenhoJulgamento = new TEmpenhoItemPreEmpenhoJulgamento();
+
+        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_pre_empenho" , $this->roPreEmpenho->getCodPreEmpenho()   );
+        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio"       , $this->roPreEmpenho->getExercicio()       );
+        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "num_item"        , $this->getNumItem()                       );
+
+        $obErro = $obTEmpenhoItemPreEmpenhoJulgamento->recuperaCentroCustoMapaItem( $rsCentroCusto, $boTransacao );
+
+        if ( !$obErro->ocorreu() )
+            $this->setCodCentroCusto( $rsCentroCusto->getCampo( "cod_centro" ) );
+    }
+
     /**
     * Incluir Pre Empenho
     * @access Public
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function incluir($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php" );
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoCompra.class.php" );
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoJulgamento.class.php" );
-        $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
-        $obTEmpenhoItemPreEmpenhoCompra  = new TEmpenhoItemPreEmpenhoCompra;
-        $obTEmpenhoItemPreEmpenhoJulgamento  = new TEmpenhoItemPreEmpenhoJulgamento();
+        $obTEmpenhoItemPreEmpenho = new TEmpenhoItemPreEmpenho;
+        $obTEmpenhoItemPreEmpenhoCompra = new TEmpenhoItemPreEmpenhoCompra;
+        $obTEmpenhoItemPreEmpenhoJulgamento = new TEmpenhoItemPreEmpenhoJulgamento();
 
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -513,6 +505,7 @@ class REmpenhoItemPreEmpenho
             $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"     , $this->obRUnidadeMedida->getCodUnidade()               );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"    , $this->obRUnidadeMedida->obRGrandeza->getCodGrandeza() );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_item"        , $this->inCodItemPreEmp                                 );
+            $obTEmpenhoItemPreEmpenho->setDado( "cod_centro"      , $this->inCodCentroCusto                                );
 
             $obErro = $obTEmpenhoItemPreEmpenho->inclusao( $boTransacao );
             if ( !$obErro->ocorreu() ) {
@@ -527,14 +520,14 @@ class REmpenhoItemPreEmpenho
                 if ( !$obErro->ocorreu() ) {
                     // vincula autorização ao compras
                     if ( $this->getCompra() ) {
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_pre_empenho" , $this->roPreEmpenho->getCodPreEmpenho() );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio"       , $this->roPreEmpenho->getExercicio()     );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "num_item"        , $this->inNumItem                        );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_cotacao"           , $this->inCodCotacao               );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio_julgamento"  , $this->inExercicioJulgamento      );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cgm_fornecedor"        , $this->inCgmFornecedor            );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "lote"                  , $this->inLoteCompras              );
-                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_item"        , $this->inCodItem   		                );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_pre_empenho"     , $this->roPreEmpenho->getCodPreEmpenho()   );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio"           , $this->roPreEmpenho->getExercicio()       );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "num_item"            , $this->inNumItem                          );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_cotacao"         , $this->inCodCotacao                       );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio_julgamento", $this->inExercicioJulgamento              );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cgm_fornecedor"      , $this->inCgmFornecedor                    );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "lote"                , $this->inLoteCompras                      );
+                        $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "cod_item"            , $this->inCodItem                          );
 
                         $obErro = $obTEmpenhoItemPreEmpenhoJulgamento->inclusao( $boTransacao );
                     }
@@ -551,11 +544,10 @@ class REmpenhoItemPreEmpenho
     * @access Public
     * @param  Object $boTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function alterar($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php" );
-        $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
+        $obTEmpenhoItemPreEmpenho = new TEmpenhoItemPreEmpenho;
 
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -584,13 +576,11 @@ class REmpenhoItemPreEmpenho
     * @access Public
     * @param  Object $obTransacao Parâmetro Transação
     * @return Object Objeto Erro
-*/
+    **/
     public function excluir($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php" );
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenhoCompra.class.php" );
-        $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
-        $obTEmpenhoItemPreEmpenhoCompra  = new TEmpenhoItemPreEmpenhoCompra;
+        $obTEmpenhoItemPreEmpenho = new TEmpenhoItemPreEmpenho;
+        $obTEmpenhoItemPreEmpenhoCompra = new TEmpenhoItemPreEmpenhoCompra;
 
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -602,7 +592,6 @@ class REmpenhoItemPreEmpenho
             if ( !$obErro->ocorreu() ) {
                 $obTEmpenhoItemPreEmpenho->setDado("cod_pre_empenho", $this->roPreEmpenho->getCodPreEmpenho() );
                 $obTEmpenhoItemPreEmpenho->setDado("exercicio"      , $this->roPreEmpenho->getExercicio()     );
-                //            $obTEmpenhoItemPreEmpenho->setDado("num_item"       , $this->inNumItem );
                 $stCampoCodTEMP = $obTEmpenhoItemPreEmpenho->getCampoCod();
                 $obTEmpenhoItemPreEmpenho->setCampoCod( "" );
                 $obErro = $obTEmpenhoItemPreEmpenho->exclusao( $boTransacao );

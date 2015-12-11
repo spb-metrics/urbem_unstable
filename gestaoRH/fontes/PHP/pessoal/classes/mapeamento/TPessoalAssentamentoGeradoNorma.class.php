@@ -31,28 +31,19 @@
 
     * Casos de uso: uc-04.04.14
 
-    $Id: TPessoalAssentamentoGeradoNorma.class.php 60896 2014-11-21 13:59:00Z franver $
+    $Id: TPessoalAssentamentoGeradoNorma.class.php 63789 2015-10-13 19:21:18Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-/**
-  * Efetua conexão com a tabela  pessoal.assentamento_gerado_norma
-  * Data de Criação: 10/01/2008
-
-  * @author Desenvolvedor: Diego Lemos de Souza
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TPessoalAssentamentoGeradoNorma extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TPessoalAssentamentoGeradoNorma()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela("pessoal.assentamento_gerado_norma");
@@ -60,9 +51,9 @@ function TPessoalAssentamentoGeradoNorma()
     $this->setCampoCod('');
     $this->setComplementoChave('cod_assentamento_gerado,timestamp');
 
-    $this->AddCampo('cod_assentamento_gerado','integer'                        ,true  ,''   ,true,'TPessoalAssentamentoGerado');
-    $this->AddCampo('timestamp'              ,'timestamp'                      ,true  ,''   ,true,'TPessoalAssentamentoGerado');
-    $this->AddCampo('cod_norma'              ,'integer'                        ,true  ,''   ,false,'TNormasNorma');
+    $this->AddCampo('cod_assentamento_gerado','integer'       ,true  ,'' ,true  ,'TPessoalAssentamentoGerado');
+    $this->AddCampo('timestamp'              ,'timestamp_now' ,true  ,'' ,true  ,'TPessoalAssentamentoGerado');
+    $this->AddCampo('cod_norma'              ,'integer'       ,true  ,'' ,false ,'TNormasNorma');
 }
 
 function montaRecuperaRelacionamento()
@@ -101,4 +92,5 @@ function montaExcluirAssentamentoGeradoNorma($stFiltro)
 }
 
 }
+
 ?>

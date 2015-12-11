@@ -65,7 +65,7 @@ class TTCMBAContrataMdo extends Persistente
                          , '".$this->getDado('unidade_gestora')."' as  unidade_gestora
                          , contratado.cpf AS cpf_contratado
                          , contratado.nom_cgm AS nom_contratado
-                         , obra_contratos.cod_tipo AS tipo_contratacao
+                         , obra_contratos.cod_contratacao AS tipo_contratacao
                          , obra_contratos.nro_instrumento AS num_instrumento
                          , obra_contratos.nro_contrato AS num_contrato
                          , obra_contratos.nro_convenio AS num_convenio

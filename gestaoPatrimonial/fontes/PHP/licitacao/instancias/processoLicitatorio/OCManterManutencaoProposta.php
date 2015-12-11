@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.25
 
-    $Id: OCManterManutencaoProposta.php 62270 2015-04-15 20:13:46Z arthur $
+    $Id: OCManterManutencaoProposta.php 64149 2015-12-09 16:55:40Z michel $
 
     */
 
@@ -45,6 +45,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/reques
 include_once CAM_FW_COMPONENTES."Table/TableTree.class.php";
 include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
 include_once TCOM."TComprasConfiguracao.class.php";
+
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterManutencaoProposta";
 $pgFilt     = "FL".$stPrograma.".php";
@@ -154,12 +155,12 @@ function montaFormDadosItem($arDadosItem)
 
     $obLblQtd = new Label;
     $obLblQtd->setRotulo( 'Quantidade' );
-    $obLblQtd->setValue( $arDadosItem[ 'quantidade' ] );
+    $obLblQtd->setValue( number_format($arDadosItem[ 'quantidade' ], 4, ",", ".") );
 
     $obHdnQtd = new Hidden;
     $obHdnQtd->setId   ( 'qtd' );
     $obHdnQtd->setName ( 'qtd' );
-    $obHdnQtd->setValue( $arDadosItem[ 'quantidade' ] );
+    $obHdnQtd->setValue( number_format($arDadosItem[ 'quantidade' ], 4, ",", ".") );
 
     $obLblVUR = new Label;
     $obLblVUR->setRotulo( 'Valor Referência' );
@@ -318,12 +319,15 @@ function atualizaItens()
         $obTComprasMapaItem->setDado( 'cod_mapa', $inCodMapa );
 
         /* verificar tipo do mapa */
-        $inTIpo = SistemaLegado::pegaDado( "cod_tipo_licitacao", "compras.mapa" , " where cod_mapa = " . $inCodMapa  . " and exercicio = " . $stExercicioMapa . "::VARCHAR" );
+        $inTIpo = SistemaLegado::pegaDado( "cod_tipo_licitacao", "compras.mapa" , " where cod_mapa = " . $inCodMapa  . " and exercicio = '" . $stExercicioMapa . "' " );
 
         $obTComprasMapaItem->recuperaItensPropostaAgrupado( $rsMapaItens );
 
-        while ( !$rsMapaItens->eof() ) {
+        $rsMapaItens->addFormatacao('valor_unitario'   ,'NUMERIC_BR');
+        $rsMapaItens->addFormatacao('valor_total'      ,'NUMERIC_BR');
+        $rsMapaItens->addFormatacao('valor_referencia' ,'NUMERIC_BR');
 
+        while ( !$rsMapaItens->eof() ) {
             $itemComplemento = "";
             $obTComprasMapaItem->setDado('cod_mapa'  , $rsMapaItens->getCampo('cod_mapa'));
             $obTComprasMapaItem->setDado('cod_item'  , $rsMapaItens->getCampo('cod_item'));
@@ -342,7 +346,7 @@ function atualizaItens()
             $rsMapaItens->setCampo( 'complemento', $itemComplemento);
 
             $obTComprasMapaItem->setDado('cod_item'  , $rsMapaItens->getCampo('cod_item'));
-            $obTComprasMapaItem->setDado('exercicio' , $rsMapaItens->getCampo('exercicio')."::VARCHAR");
+            $obTComprasMapaItem->setDado('exercicio' , $rsMapaItens->getCampo('exercicio'));
             $obTComprasMapaItem->recuperaValorReferenciaItem( $rsItemEmpenhado );
 
             $obTAlmoxarifadoCatalogoItem->setDado('cod_item'  , $rsMapaItens->getCampo('cod_item'));
@@ -386,7 +390,7 @@ function atualizaItens()
 
                     foreach ($arItensFornecedor as $chave =>$dados) {
                         $obTComprasCotacaoFornecedorItem->setDado('cod_cotacao', $arManterPropostas["cod_cotacao"] );
-                        $obTComprasCotacaoFornecedorItem->setDado('exercicio', $arManterPropostas["exercicio_cotacao"]."::VARCHAR" );
+                        $obTComprasCotacaoFornecedorItem->setDado('exercicio', $arManterPropostas["exercicio_cotacao"] );
 
                         $obTComprasCotacaoFornecedorItem->setDado('cod_item', $arItensFornecedor[$chave]['cod_item']);
 
@@ -398,11 +402,10 @@ function atualizaItens()
                         if ( $rsItem->getNumLinhas() == 1) {
                             list( $a , $m , $d ) = explode('-', $rsItem->getCampo('dt_validade'));
 
-                            $quantidadeItemFornecedor = str_replace('.','',$arItensFornecedor[$inCount]['quantidade']);
-                            $quantidadeItemFornecedor = str_replace(',','.',$quantidadeItemFornecedor);
+                            $quantidadeItemFornecedor = $arItensFornecedor[$inCount]['quantidade'];
 
                             $arItensFornecedor[$inCount]['data_validade']  = $d . '/' . $m . '/' . $a;
-                            $arItensFornecedor[$inCount]['valor_unitario'] = number_format(($rsItem->getCampo('vl_cotacao') / $quantidadeItemFornecedor), 2, ",", ".");
+                            $arItensFornecedor[$inCount]['valor_unitario'] = number_format(($rsItem->getCampo('vl_cotacao') / $quantidadeItemFornecedor), 4, ",", ".");
                             $arItensFornecedor[$inCount]['valor_total']    = number_format($rsItem->getCampo('vl_cotacao'), 2, ",", ".");
                             $arItensFornecedor[$inCount]['cod_marca']      = $rsItem->getCampo('cod_marca');
                             $arItensFornecedor[$inCount]['desc_marca']     = $rsItem->getCampo('descricao');
@@ -434,42 +437,46 @@ function montaListaItens($rsItens , $stHtm = "")
 {
     $arManterPropostas = Sessao::read('arManterPropostas');
     $rsItens->setPrimeiroElemento();
+    
+    $rsItens->addFormatacao('quantidade'         ,'NUMERIC_BR_4');
+    $rsItens->addFormatacao('valor_referencia'   ,'NUMERIC_BR');
+    $rsItens->addFormatacao('valor_ultima_compra','NUMERIC_BR');
 
     $table = new Table;
     $table->setRecordset($rsItens);
 
     $table->setSummary('Itens');
-    $table->Head->addCabecalho('Item' 		    , 35);
+    $table->Head->addCabecalho('Item' 		    , 30);
     if ($arManterPropostas["tipo_mapa"] == 2) {
-        $table->Head->addCabecalho('Lote'           , 10);
+        $table->Head->addCabecalho('Lote'           , 5);
     }
     $table->Head->addCabecalho('Qtde'               , 10);
-    $table->Head->addCabecalho('Valor Referência'   , 15);
-    $table->Head->addCabecalho('Valor Última Compra', 15);
-    $table->Head->addCabecalho('Valor Unitário'	    , 15);
-    $table->Head->addCabecalho('Valor Total'	    , 15);
-    $table->Head->addCabecalho('Selecione'	     , 7);
+    $table->Head->addCabecalho('Valor Referência'   , 10);
+    $table->Head->addCabecalho('Valor Última Compra', 10);
+    $table->Head->addCabecalho('Valor Unitário'	    , 10);
+    $table->Head->addCabecalho('Valor Total'	    , 10);
+    $table->Head->addCabecalho('Selecione'	        , 5);
 
     $stTitle = "[stTitle]";
 
     $table->Body->addCampo("[cod_item] - [descricao]<br/>[complemento]","E", $stTitle);
     if ($arManterPropostas["tipo_mapa"] == 2) {
-        $table->Body->addCampo("lote"                                  ,"E", $stTitle);
+        $table->Body->addCampo("lote", "E", $stTitle);
     }
-    $table->Body->addCampo('quantidade'                                ,"D", $stTitle);
-    $table->Body->addCampo('valor_referencia'                          ,"D", $stTitle);
-    $table->Body->addCampo('valor_ultima_compra'		       ,"D", $stTitle);
-    $table->Body->addCampo('valor_unitario'			       ,"D", $stTitle);
-    $table->Body->addCampo('valor_total'			       ,"D", $stTitle);
+    $table->Body->addCampo('quantidade'         , "D", $stTitle);
+    $table->Body->addCampo('valor_referencia'   , "D", $stTitle);
+    $table->Body->addCampo('valor_ultima_compra', "D", $stTitle);
+    $table->Body->addCampo('valor_unitario'     , "D", $stTitle);
+    $table->Body->addCampo('valor_total'        , "D", $stTitle);
 
     $obRdSelecione = new Radio;
-    $obRdSelecione->setName               ( "rd_item"            );
-    $obRdSelecione->setId                 ( ""            );
+    $obRdSelecione->setName               ( "rd_item" );
+    $obRdSelecione->setId                 ( "" );
     $obRdSelecione->obEvento->setOnChange ( "selecionaItem(this)" );
-    $obRdSelecione->setValue              ( "[lote],[cod_item]"   );
+    $obRdSelecione->setValue              ( "[lote],[cod_item]" );
 
     $table->Body->addComponente($obRdSelecione);
-    $table->Foot->addSoma('valor_total'                                         , "D");
+    $table->Foot->addSoma('valor_total', "D");
 
     $table->montaHTML();
     $stHTML = $table->getHtml();
@@ -758,10 +765,9 @@ function incluirParticipante($inCgmParticipante)
     return $stJs;
 }
 
-function validaValoresItemRequest()
+function validaValoresItemRequest(Request $request)
 {
     $stErro = false;
-    $request = new Request($_REQUEST);
     $arManterPropostas = Sessao::read('arManterPropostas');
     $boProximoItem = Sessao::read('boProximoItem');
     //validações
@@ -1148,8 +1154,6 @@ function incluirUltimaCotacaoAnulada($cod,$mapa,$exercicio)
         $rsUltimosItens->proximo();
     }
 
-    $stJs .= "alert('www')";
-
     return $stJs;
 }
 
@@ -1239,7 +1243,7 @@ switch ( $request->get('stCtrl') ) {
                     
                     require_once( TCOM . "TComprasCotacao.class.php" );
                     $obTComprasCotacao = new TComprasCotacao;
-                    $stFiltro          = "  WHERE mapa_cotacao.cod_mapa =  ".$inCodMapa." AND mapa_cotacao.exercicio_mapa = ".$stExercicioMapa."::VARCHAR";
+                    $stFiltro          = "  WHERE mapa_cotacao.cod_mapa =  ".$inCodMapa." AND mapa_cotacao.exercicio_mapa = '".$stExercicioMapa."' ";
                     $obTComprasCotacao->recuperaCotacaoNaoAnulada($rsCotacao, $stFiltro);
                     
                     if ($rsCotacao->inNumLinhas <= 0) {
@@ -1439,7 +1443,7 @@ switch ( $request->get('stCtrl') ) {
                     require_once (TLIC.'TLicitacaoEditalImpugnado.class.php');
                     $obTLicitacaoEditalImpugnado = new TLicitacaoEditalImpugnado;
                     $obTLicitacaoEditalImpugnado->setDado( 'num_edital' , $rsMapa->getCampo('num_edital') );
-                    $obTLicitacaoEditalImpugnado->setDado( 'exercicio' , $rsMapa->getCampo('exercicio_edital')."::VARCHAR" );
+                    $obTLicitacaoEditalImpugnado->setDado( 'exercicio' , $rsMapa->getCampo('exercicio_edital') );
                     $obTLicitacaoEditalImpugnado->recuperaProcessos( $rsProcessosEdital );
                     if ( $rsProcessosEdital->getNumLinhas() > 0 and !$rsProcessosEdital->getCampo('parecer_juridico') )
                         $stErro = "Mapa de Compras inválido, Edital esta impugnado!";
@@ -1456,7 +1460,7 @@ switch ( $request->get('stCtrl') ) {
                     $arManterPropostas["exercicio_cotacao"] = $rsCotaca->getCampo('exercicio_cotacao');
 
                     /* verifica julgamento*/
-                    $inCodCotacaoJulgada =  SistemaLegado::pegaDado('cod_cotacao','compras.julgamento','where cod_cotacao = '. $rsCotaca->getCampo('cod_cotacao') .' and exercicio = ' . $rsCotaca->getCampo('exercicio_cotacao').'::VARCHAR' );
+                    $inCodCotacaoJulgada =  SistemaLegado::pegaDado("cod_cotacao","compras.julgamento","where cod_cotacao = ". $rsCotaca->getCampo('cod_cotacao') ." and exercicio = '" . $rsCotaca->getCampo('exercicio_cotacao')."' " );
                     if ($inCodCotacaoJulgada) {
                         $stErro = "Proposta do Mapa de Compras ".$inCodMapa."/".$stExercicioMapa." está em Julgamento";
                     }
@@ -1626,7 +1630,7 @@ switch ( $request->get('stCtrl') ) {
     break;
 
     case 'proxItem':
-        $stJs .= validaValoresItemRequest();
+        $stJs .= validaValoresItemRequest($request);
     break;
 
     case 'atualizaProxItem':

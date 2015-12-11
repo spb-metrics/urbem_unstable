@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMExtratoDebito.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMExtratoDebito.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.19
 */
@@ -183,7 +183,6 @@ if ( $request->get('inCodImovel') ) {
 
     $stFiltro = " AND CE.inscricao_economica = ".$_REQUEST["inInscricaoEconomica"];
     $obTCEMCadastroEconomico->recuperaInscricao( $rsEmpresas, $stFiltro );
-    #sistemaLegado::mostravar ( $rsEmpresas );
 
     $stTituloInscricao = "Inscrição Econômica";
     $stInscricao =    $_REQUEST['inInscricaoEconomica'].' - ';

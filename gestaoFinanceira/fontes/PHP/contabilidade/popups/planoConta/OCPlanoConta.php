@@ -99,7 +99,7 @@ switch ($_GET['stCtrl']) {
             $stFiltro  = "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pc.exercicio = '" . Sessao::getExercicio() . "' AND ";
             $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%'  ";
                 $stFiltro .= "\n   OR pc.cod_estrutural like '1.1.4.%' ))  ";
                 $stFiltro .= "\n   ) AND ";
@@ -134,7 +134,7 @@ switch ($_GET['stCtrl']) {
             $stFiltro  = "\n pa.cod_plano is not null AND ";
             $stFiltro .= "\n pc.exercicio = '" . Sessao::getExercicio() . "' AND ";
             $stFiltro .= "\n(( pb.cod_banco is not null AND ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "\n   ( pc.cod_estrutural like '1.1.1.%'  ";
                 $stFiltro .= "\n   OR pc.cod_estrutural like '1.1.4.%' ))  ";
                 $stFiltro .= "\n   ) AND ";

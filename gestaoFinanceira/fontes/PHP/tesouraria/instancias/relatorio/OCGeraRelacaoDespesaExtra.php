@@ -49,8 +49,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once (CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php");
 
-$boTCEMS = SistemaLegado::is_tcems();
-
 $preview = new PreviewBirt(2,30,4);
 $preview->setTitulo('Relatório do Birt');
 $preview->setVersaoBirt('2.5.0');
@@ -107,7 +105,7 @@ if ($_REQUEST['stTipoRelatorio'] != '') {
     $preview->addParametro( 'tipo_relatorio', '' );
 }
 
-if ($boTCEMS) {
+if (Sessao::getExercicio() > '2012') {
     $filtroExtras = " AND (
            ( cpcd.cod_estrutural like '1.1.2.%' AND cpc.cod_estrutural like '1.1.2.%' ) OR
            ( cpcd.cod_estrutural like '1.1.3.%' AND cpc.cod_estrutural like '1.1.3.%' ) OR

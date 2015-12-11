@@ -32,21 +32,13 @@
 
     * @ignore
 
-    * $Id: FLManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLManterLocalizacao.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
 
-/*
-$Log$
-Revision 1.10  2006/09/18 10:30:48  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMNivel.class.php"       );
 //include_once ( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php"       );
 
@@ -64,7 +56,9 @@ $pgJS   = "JS".$stPrograma.".js";
 
 include_once ($pgJS);
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
+
 $stAcao = $request->get('stAcao');
+
 if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }

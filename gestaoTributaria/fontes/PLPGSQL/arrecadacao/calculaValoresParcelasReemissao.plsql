@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: calculaValoresParcelasReemissao.plsql 61622 2015-02-18 15:50:46Z evandro $
+* $Id: calculaValoresParcelasReemissao.plsql 64141 2015-12-08 16:23:59Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
@@ -79,37 +79,41 @@ begin
             else
                 0.00
             end as desconto
-       into inNrParcela , nuValorParcela, nuDescontoParcela
-       FROM arrecadacao.parcela p
-  		left join arrecadacao.parcela_desconto pd
-        on pd.cod_parcela = p.cod_parcela
-		LEFT JOIN
-        (
-            select apr.cod_parcela, vencimento, valor
-            from arrecadacao.parcela_reemissao apr
-            inner join (
-                select cod_parcela, min(timestamp) as timestamp
-                from arrecadacao.parcela_reemissao as x
-                group by cod_parcela
-            ) as apr2
-            ON apr2.cod_parcela = apr.cod_parcela AND
-            apr2.timestamp = apr.timestamp
-        ) as apr
+    
+    INTO inNrParcela 
+        , nuValorParcela
+        , nuDescontoParcela
+    
+    FROM arrecadacao.parcela p
+    
+    LEFT JOIN arrecadacao.parcela_desconto pd
+           ON pd.cod_parcela = p.cod_parcela
+		
+    LEFT JOIN(  SELECT apr.cod_parcela, vencimento, valor
+                FROM arrecadacao.parcela_reemissao apr
+                INNER JOIN ( SELECT cod_parcela
+                                    , min(timestamp) as timestamp
+                             FROM arrecadacao.parcela_reemissao as x
+                             GROUP BY cod_parcela
+                ) as apr2
+                    ON apr2.cod_parcela = apr.cod_parcela 
+                   AND apr2.timestamp = apr.timestamp
+    ) as apr
         ON apr.cod_parcela = p.cod_parcela
 
-      WHERE p.cod_parcela = inCodParcela;
+    WHERE p.cod_parcela = inCodParcela;
 
     -- proporcao da parcela para lancamento
-    nuProporcao := arrecadacao.calculaProporcaoParcela(inCodParcela);
+    nuProporcao := COALESCE(arrecadacao.calculaProporcaoParcela(inCodParcela),0.00);
     -- juros
-    nuJuros := aplica_juro(stNumeracao,inExercicio,inCodParcela,dtDataBase);
+    nuJuros     := COALESCE(aplica_juro(stNumeracao,inExercicio,inCodParcela,dtDataBase),0.00);
     -- multa
-    nuMulta := aplica_multa(stNumeracao,inExercicio,inCodParcela,dtDataBase);
+    nuMulta     := COALESCE(aplica_multa(stNumeracao,inExercicio,inCodParcela,dtDataBase),0.00);
     -- correcao
-    nuCorrecao := aplica_correcao(stNumeracao,inExercicio,inCodParcela,dtDataBase);
+    nuCorrecao  := COALESCE(aplica_correcao(stNumeracao,inExercicio,inCodParcela,dtDataBase),0.00);
 
     -- retorno
-    nuTotal := ( nuValorParcela + nuMulta + nuJuros + nuCorrecao )::numeric(14,2);
+    nuTotal := ( nuValorParcela + nuMulta + nuJuros + nuCorrecao );
     nuRetorno := nuTotal||'§'||nuValorParcela||'§'||nuMulta||'§'||nuJuros||'§'||nuDescontoParcela||'§'||nuCorrecao;
 
    return nuRetorno::varchar;

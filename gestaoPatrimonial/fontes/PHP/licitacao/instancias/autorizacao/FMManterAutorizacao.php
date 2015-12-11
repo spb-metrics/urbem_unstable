@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.05.21
 
- $Id: FMManterAutorizacao.php 63584 2015-09-14 13:11:00Z michel $
+ $Id: FMManterAutorizacao.php 64021 2015-11-19 18:39:44Z michel $
 
  */
 
@@ -44,6 +44,7 @@ include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
 include_once CAM_GA_ADM_COMPONENTES.'ITextBoxSelectDocumento.class.php';
 include_once CAM_GP_LIC_COMPONENTES.'IMontaNumeroLicitacao.class.php';
 include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoLicitacao.class.php';
+include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoHomologacao.class.php';
 include_once CAM_GF_EMP_NEGOCIO.'REmpenhoAutorizacaoEmpenho.class.php';
 include_once CAM_GP_COM_COMPONENTES.'ILabelEditObjeto.class.php';
 require_once TCOM.'TComprasMapaItem.class.php';
@@ -102,6 +103,27 @@ $stCtrl = $request->get('stCtrl');
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
+
+$obTLicitacaoHomolgacao = new TLicitacaoHomologacao;
+
+$stFiltro = "where homologacao.homologado                                           \n".
+            " and homologacao.cod_cotacao       = ".$request->get('inCodCotacao')." \n".
+            " and homologacao.exercicio_cotacao = '".Sessao::getExercicio()."'      \n";
+$obTLicitacaoHomolgacao->recuperaItensAutorizacaoParcial ( $rsItens, $stFiltro );
+
+$boParcial = false;
+while ( !$rsItens->eof() ) {
+    if($rsItens->getCampo('quantidade_empenho') > 0)
+        $boParcial = true;
+
+    $rsItens->proximo();
+}
+
+if($boParcial){
+    $stMsg  = "Licitação ".$request->get('inCodLicitacao')."/".Sessao::getExercicio()." possui autorização de empenho parcial.";
+    $stMsg .= " Para autorizar está licitação, utilize a ação: Gestão Patrimonial :: Licitação :: Autorização de Empenho :: Emitir Autorização de Empenho Parcial";
+    SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId(), $stMsg , "unica", "erro", Sessao::getId(), "../");
+}
 
 $stUltimaDataContabil = recuperaUltimaDataContabil();
 
@@ -299,7 +321,7 @@ $stJs .= "</script>	\n";
 echo $stJs;
 
 if($boRegistroPreco)
-    SistemaLegado::exibeAviso("Autorizações de Empenho de Registros de Preços devem ser feitas na ação: Gestão Financeira :: Empenho :: Autorização :: Incluir Autorização Diversos.","aviso","aviso");
+    SistemaLegado::exibeAviso("Autorizações de Empenho de Registros de Preços devem ser feitas na ação: Gestão Patrimonial :: Licitação :: Autorização de Empenho :: Emitir Autorização de Empenho Parcial.","aviso","aviso");
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 

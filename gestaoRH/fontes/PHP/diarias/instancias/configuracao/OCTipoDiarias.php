@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCTipoDiarias.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCTipoDiarias.php 63836 2015-10-22 14:06:51Z franver $
 
     * Casos de uso: uc-04.09.01
 */
@@ -437,7 +437,6 @@ function submeter()
     return $stJs;
 }
 
-//SistemaLegado::mostraVar($_REQUEST);
 switch ($_REQUEST['stCtrl']) {
     case "gerarListaTipoDiaria":
         $stJs .= gerarListaTipoDiaria();

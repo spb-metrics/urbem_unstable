@@ -34,15 +34,17 @@
 
     * @ignore
 
-    * $Id: OCProcurarLogradouro.php 62960 2015-07-13 14:00:58Z evandro $
+    * $Id: OCProcurarLogradouro.php 63963 2015-11-11 19:01:08Z evandro $
 
     * Casos de uso: uc-05.01.04
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GT_CIM_NEGOCIO."RCIMBairro.class.php"  );
-include_once CAM_GT_CIM_NEGOCIO.'RCIMLogradouro.class.php';
+include_once ( CAM_GT_CIM_NEGOCIO.'RCIMLogradouro.class.php');
+include_once ( CAM_GT_CIM_NEGOCIO."RCIMBairro.class.php"  );
+include_once ( CAM_GT_CIM_NEGOCIO."RCIMConfiguracao.class.php" );
+include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMTrecho.class.php" );
 
 // Guarda a ação antiga para ser escrita ao final do script.
 $acao   = Sessao::read('acao');
@@ -224,102 +226,372 @@ function montaListaCEP($arListaCEP, $boRetorna = false)
     }
 }
 
+
+function carregaDados()
+{
+    GLOBAL $request;
+    
+    $stAcao = $request->get('stAcao');
+    // DEFINE OBJETOS DAS CLASSES
+    $obRCIMConfiguracao = new RCIMConfiguracao;
+    $obRCIMLogradouro   = new RCIMLogradouro;
+    $obRCIMBairro       = new RCIMBairro;
+    $rsTipos            = new RecordSet;
+    
+    //Busca UF e Municipio que foi da configuracao
+    $obRCIMConfiguracao->consultarConfiguracao();
+    $obRCIMConfiguracao->listaDadosMunicipio( $arConfiguracao );
+    
+    //Busca todos os UFs
+    $obRCIMLogradouro->listarUF( $rsUF );
+    //Busca os tipos de logradouros
+    $obRCIMLogradouro->listarTipoLogradouro( $rsTipos );
+    //Busca os municipios de acordo com o estado
+    $obRCIMLogradouro->setCodigoUF( $arConfiguracao['cod_uf']);
+    $obRCIMLogradouro->listarMunicipios( $rsMunicipios );
+    //Busca os Bairros de acordo com o estado e municipio
+    $obRCIMBairro->setCodigoUF( $arConfiguracao['cod_uf'] );
+    $obRCIMBairro->setCodigoMunicipio( $arConfiguracao['cod_municipio'] );
+    $obRCIMBairro->listarBairros( $rsBairros );
+
+    //Busca proximo codigo logradouro
+    $inProxCodLogradouro = null;
+    $obTLogradouro= new TLogradouro();
+    $obTLogradouro->proximoCod($inProxCodLogradouro);
+
+    //Preenche Tipo
+    if ( $rsTipos->getNumLinhas() > 0 ) {
+        foreach ($rsTipos->getElementos() as $key => $value) {
+            $stJs .= " jq_('#inCodTipo').append(new Option('".$value['nom_tipo']."','".$value['cod_tipo']."') ); ";
+        }
+    }    
+
+    //Preenche UF
+    if ( $rsUF->getNumLinhas() > 0 ) {
+        foreach ($rsUF->getElementos() as $key => $value) {
+            $value['nom_uf'] = addslashes($value['nom_uf']);
+            $stJs .= " jq_('#inCodUF').append(new Option('".$value['nom_uf']."','".$value['cod_uf']."') ); ";                    
+        }
+    }
+    
+    //Preenche Municipios            
+    if ( $rsMunicipios->getNumLinhas() > 0 ) {
+        foreach ($rsMunicipios->getElementos() as $key => $value) {
+            $value['nom_municipio'] = addslashes($value['nom_municipio']);
+            $stJs .= " jq_('#inCodMunicipio').append(new Option('".$value['nom_municipio']."','".$value['cod_municipio']."') ); ";                    
+        }
+    }
+
+    //Preenche Bairros
+    if ( $rsBairros->getNumLinhas() > 0 ) {
+        foreach ($rsBairros->getElementos() as $key => $value) {
+            $value['nom_bairro'] = addslashes($value['nom_bairro']);
+            $stJs .= " jq_('#inCodBairro').append(new Option('".$value['nom_bairro']."','".$value['cod_bairro']."') );";
+        }
+    }
+
+    //De acordo com a acao preenche os campos
+    switch ($stAcao) {
+        case 'incluir':
+            $stJs .= " jq_('#inCodLogradouro').val(".$inProxCodLogradouro."); ";
+            $stJs .= " jq_('#inCodigoUF').val('".$arConfiguracao['cod_uf']."'); ";
+            $stJs .= " jq_('#inCodUF').val('".$arConfiguracao['cod_uf']."'); ";
+            $stJs .= " jq_('#inCodigoMunicipio').val('".$arConfiguracao['cod_municipio']."'); ";
+            $stJs .= " jq_('#inCodMunicipio').val('".$arConfiguracao['cod_municipio']."'); ";  
+        break;
+        
+        case 'alterar':
+            $obRCIMLogradouro = new RCIMLogradouro;    
+            $obRCIMLogradouro->setCodigoUF( $request->get("inCodUF") );
+            $obRCIMLogradouro->setCodigoMunicipio( $request->get("inCodMunicipio") );
+            $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodigoLogradouro") );
+            $obRCIMLogradouro->listarHistoricoLogradouros( $rsLista, $boTransacao, "" );    
+            
+            $stJs .= " jq_('#inCodigoLogradouro').html(".$request->get('inCodigoLogradouro')."); ";
+            $stJs .= " jq_('#stNomeUF').html('".$request->get('stNomeUF')."'); ";
+            $stJs .= " jq_('#stNomeMunicipio').html('".$request->get('stNomeMunicipio')."'); ";
+            $stJs .= " jq_('#inCodTipo').val(".$request->get('inCodigoTipo')."); ";
+            //buscando o ultimo dado cadastrado de acordo com a data inicial e final
+            $rsLista->setUltimoElemento();
+            $stJs .= " jq_('#inCodNorma').val(".$rsLista->getCampo('cod_norma')."); ";
+            $stJs .= " jq_('#stNorma').html('".$rsLista->getCampo('descricao_norma')."'); ";
+            $stJs .= " jq_('#stDataInicial').val('".$rsLista->getCampo('dt_inicio')."'); ";
+            $stJs .= " jq_('#stDataFinal').val('".$rsLista->getCampo('dt_fim')."'); ";
+            
+            foreach ($rsLista->getElementos() as $key => $value) {
+                $arDadosHistorico[$key]['inId']             = $key;
+                $arDadosHistorico[$key]['sequencial']       = $value['sequencial'];
+                $arDadosHistorico[$key]['descricao_norma']  = $value['descricao_norma'];
+                $arDadosHistorico[$key]['nome_anterior']    = $value['nome_anterior'];
+                $arDadosHistorico[$key]['dt_inicio']        = $value['dt_inicio'];
+                $arDadosHistorico[$key]['dt_fim']           = $value['dt_fim'];
+                $arDadosHistorico[$key]['exercicio']        = $value['exercicio'];
+                $arDadosHistorico[$key]['cod_norma']        = $value['cod_norma'];
+            }
+
+            Sessao::write('arDadosHistorico',$arDadosHistorico);
+
+            $stFiltro = ' WHERE cod_logradouro = '.$request->get('inCodigoLogradouro');
+            $obTCIMTrecho = new TCIMTrecho();
+            $obTCIMTrecho->retornaSomaExtensao($rsRecordSet, $stFiltro);
+            if ($rsRecordSet->getNumLinhas > 0) {
+                $stJs .= " jq_('#stExtensao').html(".$rsRecordSet->getCampo('extensao_total')."); ";
+            }
+        break;
+        case 'consultar':
+            $obRCIMLogradouro = new RCIMLogradouro;    
+            $obRCIMLogradouro->setCodigoUF( $request->get("inCodUF") );
+            $obRCIMLogradouro->setCodigoMunicipio( $request->get("inCodMunicipio") );
+            $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodigoLogradouro") );
+            $obRCIMLogradouro->listarHistoricoLogradouros( $rsLista, $boTransacao, "" );    
+
+            foreach ($rsLista->getElementos() as $key => $value) {
+                $arDadosHistorico[$key]['inId']             = $key;
+                $arDadosHistorico[$key]['sequencial']       = $value['sequencial'];
+                $arDadosHistorico[$key]['descricao_norma']  = $value['descricao_norma'];
+                $arDadosHistorico[$key]['nome_anterior']    = $value['nome_anterior'];
+                $arDadosHistorico[$key]['dt_inicio']        = $value['dt_inicio'];
+                $arDadosHistorico[$key]['dt_fim']           = $value['dt_fim'];
+                $arDadosHistorico[$key]['exercicio']        = $value['exercicio'];
+                $arDadosHistorico[$key]['cod_norma']        = $value['cod_norma'];
+            }
+
+            Sessao::write('arDadosHistorico',$arDadosHistorico);
+            
+            $stFiltro = ' WHERE cod_logradouro = '.$request->get('inCodigoLogradouro');
+            $obTCIMTrecho = new TCIMTrecho();
+            $obTCIMTrecho->retornaSomaExtensao($rsRecordSet, $stFiltro);
+            if ($rsRecordSet->getNumLinhas > 0) {
+                $stJs .= " jq_('#stExtensao').html('".$rsRecordSet->getCampo('extensao_total')."'); ";
+            }
+        break;
+
+    }
+
+    return $stJs;
+}
+
+
 function montaListaHistorico()
 {
+    if ($_REQUEST['stAcao'] != 'consultar') {
+        include_once '../../../../../../gestaoAdministrativa/fontes/PHP/normas/classes/componentes/IPopUpNorma.class.php';
+        $obTxtNomeAnterior = new TextBox;
+        $obTxtNomeAnterior->setRotulo    ( "*Nome Anterior"              );
+        $obTxtNomeAnterior->setTitle     ( "Nome na qual o logradouro era chamado anteriormente" );    
+        $obTxtNomeAnterior->setName      ( "stNomeLogradouroAnterior"    );
+        $obTxtNomeAnterior->setId        ( "stNomeLogradouroAnterior"    );
+        $obTxtNomeAnterior->setSize      ( 70                            );
+        $obTxtNomeAnterior->setMaxLength ( 60                            );
+        $obTxtNomeAnterior->setNull      ( false                         );
+        $obTxtNomeAnterior->setValue     ( str_replace('\\', '', $_REQUEST["stNomeLogradouroAnterior"]));
     
-    $obRCIMLogradouro = new RCIMLogradouro;    
+        $obIPopUpNorma = new IPopUpNorma();
+        $obIPopUpNorma->obInnerNorma->setRotulo          ( "**Norma"     );
+        $obIPopUpNorma->obInnerNorma->setTitle           ( "Informe a Norma que determinou o Nome do Logradouro."    );
+        $obIPopUpNorma->obInnerNorma->setId              ( "stNormaHistorico" );
+        $obIPopUpNorma->obInnerNorma->obCampoCod->setId  ( "inCodNormaHistorico"  );
+        $obIPopUpNorma->obInnerNorma->obCampoCod->setName( "inCodNormaHistorico"  );
+        $obIPopUpNorma->obInnerNorma->setNull            ( true );
+        
+        $obDtInicial = new Data();
+        $obDtInicial->setRotulo    ( "**Data Inicial" );
+        $obDtInicial->setTitle     ( "Informe a Data Inicial do Nome do Logradouro." );
+        $obDtInicial->setName      ( "stDataInicialHistorico" );
+        $obDtInicial->setId        ( "stDataInicialHistorico" );
+        $obDtInicial->setMaxLength ( 10 );
+        $obDtInicial->setSize      ( 10 );
     
-    $obRCIMLogradouro->setCodigoUF( $_REQUEST["inCodUF"] );
-    $obRCIMLogradouro->setCodigoMunicipio( $_REQUEST["inCodMunicipio"] );
-    $obRCIMLogradouro->setCodigoLogradouro( $_REQUEST["inCodigoLogradouro"] );
-
-    $obRCIMLogradouro->listarHistoricoLogradouros( $rsLista, $boTransacao, "" );
-
-    if ($rsLista->getNumLinhas() > 0) {
-        
-        $obLista = new Lista;
-        $obLista->setRecordSet                 ( $rsLista     );
-        $obLista->setTitulo                    ( "Histórico do Logradouro" );
-        $obLista->setMostraPaginacao           ( false            );
-        
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-        $obLista->ultimoCabecalho->setWidth( 5 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("Código ");
-        $obLista->ultimoCabecalho->setWidth( 10 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo( "Nome do Logradouro" );
-        $obLista->ultimoCabecalho->setWidth( 30 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo( "Nome do Bairro" );
-        $obLista->ultimoCabecalho->setWidth( 10 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo( "Município" );
-        $obLista->ultimoCabecalho->setWidth( 20 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo( "CEP" );
-        $obLista->ultimoCabecalho->setWidth( 8 );
-        $obLista->commitCabecalho();
-
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo( "Data Logradouro" );
-        $obLista->ultimoCabecalho->setWidth( 10 );
-        $obLista->commitCabecalho();
-
-
-        $obLista->addDado();
-        $obLista->ultimoDado->setAlinhamento("DIREITA");
-        $obLista->ultimoDado->setCampo( "cod_logradouro" );
-        $obLista->commitDado();
-
-        $obLista->addDado();        
-        $obLista->ultimoDado->setCampo( "tipo_nome" );
-        $obLista->commitDado();
-
-        $obLista->addDado();
-        $obLista->ultimoDado->setAlinhamento("CENTRO");
-        $obLista->ultimoDado->setCampo( "nom_bairro" );
-        $obLista->commitDado();
-
-        $obLista->addDado();
-        $obLista->ultimoDado->setAlinhamento("CENTRO");
-        $obLista->ultimoDado->setCampo( "[sigla_uf] - [nom_municipio]" );
-        $obLista->commitDado();
-
-        $obLista->addDado();
-        $obLista->ultimoDado->setAlinhamento("CENTRO");
-        $obLista->ultimoDado->setCampo( "cep" );
-        $obLista->commitDado();
-
-        $obLista->addDado();
-        $obLista->ultimoDado->setAlinhamento("CENTRO");
-        $obLista->ultimoDado->setCampo( "data_logradouro" );
-        $obLista->commitDado();
-
-        $obLista->montaHTML                    (                  );
-        $stHTML = $obLista->getHtml            (                  );
-        $stHTML = str_replace                  ( "\n","",$stHTML  );
-        $stHTML = str_replace                  ( "  ","",$stHTML  );
-        $stHTML = str_replace                  ( "'","\\'",$stHTML);
-        
-        $js .= "d.getElementById('spanListarHistorico').innerHTML = '".$stHTML."';\n";
+        $obDtFinal = new Data();
+        $obDtFinal->setRotulo    ( "**Data Final" );
+        $obDtFinal->setTitle     ( "Informe a Data Final do Nome do Logradouro." );
+        $obDtFinal->setName      ( "stDataFinalHistorico" );
+        $obDtFinal->setId        ( "stDataFinalHistorico" );
+        $obDtFinal->setMaxLength ( 10 );
+        $obDtFinal->setSize      ( 10 );
     
-        return $js;
-    }    
+        //Botoes da lista
+        $obOkLista  = new Ok(false);
+        $obOkLista->setRotulo('Incluir');
+        $obOkLista->setValue ('Incluir');
+        $obOkLista->setId    ('btIncluir');
+        $obOkLista->setName  ('btIncluir');
+        $obOkLista->obEvento->setOnClick(" if ( validaCamposLista() ){ manterHistorico('incluirHistoricoLista'); }");
+    
+        $obLimparLista  = new Button();
+        $obLimparLista->setId    ('btLimpaLista');
+        $obLimparLista->setName  ('btLimpaLista');
+        $obLimparLista->setValue ('Limpar');
+        $obLimparLista->obEvento->setOnClick(" manterHistorico('limparHistoricoLista'); ");
+    
+        $obFormulario = new Formulario();
+        $obFormulario->addTitulo             ( "Histórico de Nome do Logradouro"   );
+        $obFormulario->addComponente         ( $obTxtNomeAnterior                  );
+        $obIPopUpNorma->geraFormulario       ( $obFormulario                       );
+        $obFormulario->addComponente         ( $obDtInicial                        );
+        $obFormulario->addComponente         ( $obDtFinal                          );
+        $obFormulario->defineBarra           ( array( $obOkLista, $obLimparLista ), 'center' );
+    
+        $obFormulario->montaInnerHTML();
+        $stHTMLHistorico = $obFormulario->getHTML();
+    
+        $js .= "jq_(\"#spanListarHistorico\").html('".$stHTMLHistorico."'); \n";
+    }
+
+    $rsLista = new RecordSet();
+    $rsLista->preenche($arDadosHistorico);
+    
+    $obLista = new Lista;
+    $obLista->setRecordSet                 ( $rsLista     );
+    $obLista->setTitulo                    ( "Histórico do Logradouro" );
+    $obLista->setMostraPaginacao           ( false            );
+        
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 2 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Nome do Logradouro" );
+    $obLista->ultimoCabecalho->setWidth( 30 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Data Inicial" );
+    $obLista->ultimoCabecalho->setWidth( 4 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Data Final" );
+    $obLista->ultimoCabecalho->setWidth( 4 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Exercício" );
+    $obLista->ultimoCabecalho->setWidth( 4 );
+    $obLista->commitCabecalho();
+
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Norma" );
+    $obLista->ultimoCabecalho->setWidth( 25 );
+    $obLista->commitCabecalho();
+
+    $obLista->addDado();        
+    $obLista->ultimoDado->setCampo( "nome_anterior" );
+    $obLista->commitDado();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setAlinhamento("CENTRO");
+    $obLista->ultimoDado->setCampo( "dt_inicio" );
+    $obLista->commitDado();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setAlinhamento("CENTRO");
+    $obLista->ultimoDado->setCampo( "dt_fim" );
+    $obLista->commitDado();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setAlinhamento("CENTRO");
+    $obLista->ultimoDado->setCampo( "exercicio" );
+    $obLista->commitDado();
+
+    $obLista->addDado();
+    $obLista->ultimoDado->setAlinhamento("CENTRO");
+    $obLista->ultimoDado->setCampo( "descricao_norma" );
+    $obLista->commitDado();
+
+    if ($_REQUEST['stAcao'] != 'consultar') {
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Ação");
+        $obLista->ultimoCabecalho->setWidth( 3 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addAcao();
+        $obLista->ultimaAcao->setAcao( "ALTERAR" );
+        $obLista->ultimaAcao->setFuncao( true );
+        $obLista->ultimaAcao->setLink( " JavaScript:modificaDado('alterarHistoricoLista'); " );
+        $obLista->ultimaAcao->addCampo("1" , "inId");
+        $obLista->commitAcao();
+    
+        $obLista->addAcao();
+        $obLista->ultimaAcao->setAcao( "EXCLUIR" );
+        $obLista->ultimaAcao->setFuncao( true );
+        $obLista->ultimaAcao->setLink( " JavaScript:modificaDado('excluirHistoricoLista'); " );
+        $obLista->ultimaAcao->addCampo("1" , "inId");
+        $obLista->commitAcao();
+    }
+
+    $obLista->montaHTML();
+    $stHTMLLista = $obLista->getHtml();
+    $stHTMLLista = str_replace( "\n","",$stHTMLLista );
+    $stHTMLLista = str_replace( "  ","",$stHTMLLista );
+    $stHTMLLista = str_replace( "'","\\'",$stHTMLLista );    
+        
+    $js .= "jq_('#spanListarHistorico').append('".$stHTMLLista."'); \n";
+    
+    return $js;
     
 }
 
+function validaInclusaoLista($arDados)
+{
+    $boValida = true;
+    foreach ($arDados as $key => $value) {
+        if ($boValida == true) {
+            if ( $_REQUEST['inCodNormaHistorico'] == $value['cod_norma'] &&
+                     $_REQUEST['stDataInicialHistorico'] == $value['dt_inicio'] &&
+                     $_REQUEST['stDataFinalHistorico'] == $value['dt_fim'] &&
+                     $_REQUEST['stNomeLogradouroAnterior'] == $value['nome_anterior']
+                    ) {
+                        $boValida = false;
+                        SistemaLegado::executaFrameOculto("alertaAviso('Não foi possível incluir porque o registro já existe na lista!','form','erro','".Sessao::getId()."','../');");
+            }else{
+                if ( $_REQUEST['stDataFinalHistorico'] == '' ) {
+                    if($_REQUEST['stDataFinalHistorico'] == $value['dt_fim']) {
+                        $stMensagem = "A data final deve ser preenchida.";
+                        $boValida = false;
+                    }
+                } else {
+                    if ( $value['dt_fim'] != '') {
+                        if (SistemaLegado::comparaDatas($_REQUEST['stDataFinalHistorico'],$value['dt_inicio'],false)) {
+                            if (!SistemaLegado::comparaDatas($_REQUEST['stDataInicialHistorico'],$value['dt_fim'],false)) {
+                                $stMensagem = "A data inicial deve ser maior que a data final dos registros cadastrados"; 
+                                $boValida = false;
+                            }
+                        }else{
+                            if (!SistemaLegado::comparaDatas($_REQUEST['stDataFinalHistorico'],$value['dt_inicio'],true)) {
+                                $boValida = true;
+                            }else{
+                                $stMensagem = "A data final deve ser menor que a data inicial dos registros cadastrados"; 
+                                $boValida = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }//end of IF
+    }
+
+    SistemaLegado::executaFrameOculto("alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."','../');");
+    return $boValida;
+}
+
+function limparHistoricoLista()
+{
+    $stJs  = "jq_('#stNomeLogradouroAnterior').val(''); \n";
+    $stJs .= "jq_('#inCodNormaHistorico').val(''); \n";
+    $stJs .= "jq_('#stNormaHistorico').html('&nbsp;'); \n";
+    $stJs .= "jq_('#stDataInicialHistorico').val(''); \n";
+    $stJs .= "jq_('#stDataFinalHistorico').val(''); \n";
+    return $stJs ;
+}
+
+function ordenaArrayDados(&$arDadosHistorico)
+{
+    usort($arDadosHistorico, function ($a, $b){
+        return strcmp(SistemaLegado::dataToSql($a['dt_inicio']), SistemaLegado::dataToSql($b['dt_inicio']));
+    });
+}
 
 // SELECIONA ACAO
 switch ($_REQUEST ["stCtrl"]) {
@@ -667,7 +939,9 @@ switch ($_REQUEST ["stCtrl"]) {
             $stJs .= montaListaCEP ( $arCepSessao, true);
         }
 
-        $stJs .= montaListaHistorico();
+        $stJs .= carregaDados();
+        
+        $stJs .= montaListaHistorico(Sessao::read("arDadosHistorico"));
 
         SistemaLegado::executaIFrameOculto($stJs);
     break;
@@ -681,6 +955,8 @@ switch ($_REQUEST ["stCtrl"]) {
 
         $stJs = montaListaBairro    ( $arBairrosSessao , true);
         $stJs .= montaListaCEP      ( $arCepSessao     , true);
+        $stJs .= montaListaHistorico( $arDadosHistorico );
+        $stJs .= carregaDados();
 
         SistemaLegado::executaIFrameOculto($stJs);
     break;
@@ -708,6 +984,113 @@ switch ($_REQUEST ["stCtrl"]) {
         }
 
         SistemaLegado::executaIFrameOculto($stJs);
+    break;
+    case 'limparHistoricoLista':
+        $stJs = limparHistoricoLista();
+        
+        SistemaLegado::executaFrameOculto($stJs);
+    break;
+    case 'incluirHistoricoLista':
+        $arDadosHistorico = Sessao::read('arDadosHistorico');
+        $inProx = count($arDadosHistorico);
+        $boValida = true;
+        if( $inProx > 0 ){
+            $boValida = validaInclusaoLista($arDadosHistorico);
+        }
+        
+        if ($boValida) {
+            $stDescricaoLei = $_REQUEST['inCodNormaHistorico'].' - '.$_REQUEST['stDescricaoNormaHistorico'];
+            
+            $arDadosHistorico[$inProx]['inId']             = $inProx;
+            $arDadosHistorico[$inProx]['sequencial']       = '';
+            $arDadosHistorico[$inProx]['descricao_norma']  = $stDescricaoLei;
+            $arDadosHistorico[$inProx]['nome_anterior']    = $request->get('stNomeLogradouroAnterior');
+            $arDadosHistorico[$inProx]['dt_inicio']        = $request->get('stDataInicialHistorico');
+            $arDadosHistorico[$inProx]['dt_fim']           = $request->get('stDataFinalHistorico');
+            $arDadosHistorico[$inProx]['exercicio']        = Sessao::getExercicio();
+            $arDadosHistorico[$inProx]['cod_norma']        = $request->get('inCodNormaHistorico');
+            
+            ordenaArrayDados($arDadosHistorico);
+
+            Sessao::write('arDadosHistorico',$arDadosHistorico);
+            $stJs  = montaListaHistorico($arDadosHistorico);
+            $stJs .= " jq_('#stNomeLogradouroAnterior').val(''); \n";
+            $stJs .= " jq_('#inCodNormaHistorico').val(''); \n";
+            $stJs .= " jq_('#stNormaHistorico').html('&nbsp;'); \n";
+            $stJs .= " jq_('#stDataInicialHistorico').val(''); \n";
+            $stJs .= " jq_('#stDataFinalHistorico').val(''); \n";
+        }
+
+        SistemaLegado::executaFrameOculto($stJs);
+    break;
+
+    case 'alterarHistoricoLista':
+        $arDadosHistorico = Sessao::read('arDadosHistorico');
+
+        foreach ($arDadosHistorico as $key => $value) {
+            if ($_REQUEST['inId'] == $value['inId']) {
+                $stJs  = " jq_('#stNomeLogradouroAnterior').val('".$value['nome_anterior']."'); \n";
+                $stJs .= " jq_('#inCodNormaHistorico').val('".$value['cod_norma']."'); \n";
+                $stJs .= " jq_('#inCodNormaHistorico').blur(); \n";
+                $stJs .= " jq_('#stDataInicialHistorico').val('".$value['dt_inicio']."'); \n";
+                $stJs .= " jq_('#stDataFinalHistorico').val('".$value['dt_fim']."'); \n";
+                $stJs .= " jq_('#btIncluir').val('Alterar'); \n";
+                $stJs .= " jq_('#btIncluir').attr('onclick','if ( validaCamposLista() ){ manterHistorico(\'alterarListaHistorico\');}'); \n";
+            }
+        }
+
+        SistemaLegado::executaFrameOculto($stJs);
+    
+    break;
+    
+    case 'excluirHistoricoLista':
+        $arDadosHistorico = Sessao::read('arDadosHistorico');
+                
+        foreach ($arDadosHistorico as $key => $value) {
+            if ($_REQUEST['inId'] != $value['inId']) {
+                $arTmp[] = $value;
+            }
+        }
+
+        $arDadosHistorico = array();
+        $arDadosHistorico[] = $arTmp;
+        
+        Sessao::write('arDadosHistorico',$arTmp);
+        
+        $stJs .= montaListaHistorico($arTmp);
+        $stJs .= limparHistoricoLista();
+
+        SistemaLegado::executaFrameOculto($stJs);
+
+    break;
+
+    case 'alterarListaHistorico':
+        //validação para os dados
+        $arDadosHistorico = Sessao::read('arDadosHistorico');
+        
+        foreach ($arDadosHistorico as $key => $value) {
+            if ($_REQUEST['inId'] == $value['inId']) {
+                $stDescricaoLei = $_REQUEST['inCodNormaHistorico'].' - '.$_REQUEST['stDescricaoNormaHistorico'];
+                $arDadosHistorico[$key]['inId']             = $value['inId'];
+                $arDadosHistorico[$key]['descricao_norma']  = $stDescricaoLei;
+                $arDadosHistorico[$key]['nome_anterior']    = $request->get('stNomeLogradouroAnterior');
+                $arDadosHistorico[$key]['dt_inicio']        = $request->get('stDataInicialHistorico');
+                $arDadosHistorico[$key]['dt_fim']           = $request->get('stDataFinalHistorico');
+                $arDadosHistorico[$key]['exercicio']        = Sessao::getExercicio();
+                $arDadosHistorico[$key]['cod_norma']        = $request->get('inCodNormaHistorico');
+            }
+        }
+
+        ordenaArrayDados($arDadosHistorico);
+
+        Sessao::write('arDadosHistorico',$arDadosHistorico);
+
+        $stJs .= " jq_('#btIncluir').val('Incluir'); \n";
+        $stJs .= " jq_('#btIncluir').attr('onclick','if ( validaCamposLista() ){ manterHistorico(\'incluirHistoricoLista\'); }'); \n";
+        $stJs .= montaListaHistorico($arDadosHistorico);
+        $stJs .= limparHistoricoLista();
+
+        SistemaLegado::executaFrameOculto($stJs);
     break;
 }
 

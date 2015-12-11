@@ -409,7 +409,6 @@ function validarDataPagamento()
     return $stJs;
 }
 
-//SistemaLegado::mostraVar($_REQUEST);
 switch ($_GET['stCtrl']) {
     case "gerarSpan":
         $stJs .= gerarSpan();

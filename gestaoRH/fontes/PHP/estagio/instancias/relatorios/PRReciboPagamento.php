@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.07.04
 
-    $Id: PRReciboPagamento.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRReciboPagamento.php 63836 2015-10-22 14:06:51Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -93,8 +93,6 @@ $stCompetencia = $inMes."/".$inAno;
 $stFiltro = " AND to_char(FPM.dt_final,'mm/yyyy') = '".$stCompetencia."'";
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaPeriodoMovimentacao($rsPeriodoMovimentacao,$stFiltro);
 ###
-//sistemaLegado::mostravar($rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao"));
-//die('Fim!');
 ###
 $preview = new PreviewBirt(4,39,1);
 $preview->setVersaoBirt("2.5.0");

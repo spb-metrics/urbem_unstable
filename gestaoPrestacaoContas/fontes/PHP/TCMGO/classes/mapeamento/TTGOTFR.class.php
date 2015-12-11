@@ -194,8 +194,7 @@ class TTGOTFR extends Persistente
               , c.tipo_conta
               , c.fonte_origem
         ";
-        //sistemaLegado::mostravar($stSql);
-        //die('Fim');
+
         return $stSql;
     }
 
@@ -351,8 +350,7 @@ class TTGOTFR extends Persistente
              , c. fonte_destino
              , c. tipo_conta
         ";
-        //sistemaLegado::mostravar($stSql);
-        //die('Fim');
+
         return $stSql;
     }
 }

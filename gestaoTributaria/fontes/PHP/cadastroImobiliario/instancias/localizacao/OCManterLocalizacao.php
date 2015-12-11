@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterLocalizacao.php 63673 2015-09-28 19:31:03Z carlos.silva $
+    * $Id: OCManterLocalizacao.php 63887 2015-10-29 18:10:14Z evandro $
 
     * Casos de uso: uc-05.01.03
 */
@@ -76,9 +76,7 @@ switch ($_REQUEST["stCtrl"]) {
         $obTxtLocalizacao->setMinLength ( strlen( $stMascara ) );
         $obTxtLocalizacao->setSize      ( strlen( $stMascara ) );
         $obTxtLocalizacao->obEvento->setOnKeyUp("mascaraDinamico('".$stMascara."', this, event);");
-        if($request->get('stAcao') != 'consultar') {
-            $obTxtLocalizacao->setNull(false);
-        }
+        $obTxtLocalizacao->setNull(true);
 
         $obTxtNomeLocalizacao = new TextBox;
         $obTxtNomeLocalizacao->setName      ( "stNomeLocalizacao" );

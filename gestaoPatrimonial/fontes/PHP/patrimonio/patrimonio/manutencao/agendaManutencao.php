@@ -39,49 +39,10 @@
 
     * Casos de uso: uc-03.01.07
 */
-
-/*
-$Log$
-Revision 1.33  2007/04/23 20:57:19  rodrigo_sr
-Bug #8351#
-
-Revision 1.32  2007/02/28 18:52:51  bruce
-Bug #8350#
-
-Revision 1.31  2006/12/06 11:41:47  larocca
-Bug #6925#
-
-Revision 1.30  2006/11/21 17:19:16  hboaventura
-Bug #6929#
-
-Revision 1.29  2006/11/06 15:55:58  hboaventura
-bug #6880#
-
-Revision 1.28  2006/10/25 17:33:41  hboaventura
-bug #6929#
-
-Revision 1.27  2006/07/27 12:58:59  fernando
-Bug #6660#
-
-Revision 1.26  2006/07/21 11:36:02  fernando
-Inclusão do  Ajuda.
-
-Revision 1.25  2006/07/13 19:14:14  fernando
-Alteração de hints
-
-Revision 1.24  2006/07/06 14:06:58  diego
-Retirada tag de log com erro.
-
-Revision 1.23  2006/07/06 12:11:28  diego
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../bens.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/funcoesLegado.lib.php';
-
-//SistemaLegado::mostraVar($_REQUEST);
 
 setAjuda("UC-03.01.07");
 $agenda = new bens;

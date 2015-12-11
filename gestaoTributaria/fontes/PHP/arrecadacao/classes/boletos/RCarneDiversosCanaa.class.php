@@ -32,7 +32,7 @@
 
   * @package URBEM
 
-    * $Id: RCarneDiversosCanaa.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCarneDiversosCanaa.class.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.03.11
 */
@@ -1648,17 +1648,6 @@ function imprimirCarne($diffBaixa = FALSE)
         $flValorTotalMulta = 0.00;
         $flValorTotalCorrecao = 0.00;
         $flValorTotalGeral = 0.00;
-
-/*
-echo "total geral = ".$flValorTotalGeral."<br>";
-echo "total correcao = ".$flValorTotalCorrecao."<br>";
-echo "total multa = ".$flValorTotalMulta."<br>";
-echo "total juros = ".$flValorTotalJuros."<br>";
-echo "total = ".$flValorTotal."<br>";
-
-sistemaLegado::mostravar( $rsGeraCarneCabecalho );
-sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
-*/
 
         if ( $obErro->ocorreu() ) {
             break;

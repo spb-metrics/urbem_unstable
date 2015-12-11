@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Texeira Stephanou
 
-    * $Id: FMManterTipoSuspensao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterTipoSuspensao.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.07
 */
@@ -65,7 +65,6 @@ Sessao::write( "link", "" );
 
 // instancia regra
 //$obRARRTipoSuspensao = new RARRTipoSuspensao;
-//mostravar($_REQUEST);
 //DEFINICAO DOS COMPONENTES
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName  ( "stCtrl" );

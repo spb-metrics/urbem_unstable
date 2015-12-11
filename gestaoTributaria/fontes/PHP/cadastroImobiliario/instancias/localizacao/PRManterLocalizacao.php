@@ -32,58 +32,67 @@
 
     * @ignore
 
-    * $Id: PRManterLocalizacao.php 63673 2015-09-28 19:31:03Z carlos.silva $
+    * $Id: PRManterLocalizacao.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
 
-/*
-$Log$
-Revision 1.14  2006/09/18 10:30:48  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php"       );
 
 $stAcao = $request->get('stAcao');
-
 $stLink = Sessao::read('stLink');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLocalizacao";
-$pgFilt      = "FL".$stPrograma.".php?stAcao=$stAcao";
-$pgList      = "LS".$stPrograma.".php?stAcao=$stAcao".$stLink;
-$pgForm      = "FM".$stPrograma.".php?stAcao=$stAcao";
-$pgFormNivel = "FM".$stPrograma."Nivel.php?stAcao=$stAcao";
-$pgProc      = "PR".$stPrograma.".php?stAcao=$stAcao";
-$pgOcul      = "OC".$stPrograma.".php?stAcao=$stAcao";
+$pgFilt      = "FL".$stPrograma.".php?stAcao=".$stAcao;
+$pgList      = "LS".$stPrograma.".php?stAcao=".$stAcao.$stLink;
+$pgForm      = "FM".$stPrograma.".php?stAcao=".$stAcao;
+$pgFormNivel = "FM".$stPrograma."Nivel.php?stAcao=".$stAcao;
+$pgProc      = "PR".$stPrograma.".php?stAcao=".$stAcao;
+$pgOcul      = "OC".$stPrograma.".php?stAcao=".$stAcao;
 $pgJS        = "JS".$stPrograma.".js";
 
-$obRCIMLocalizacao = new RCIMLocalizacao;
-$obAtributos = new MontaAtributos;
+$obRCIMLocalizacao = new RCIMLocalizacao();
+$obAtributos = new MontaAtributos();
 $obAtributos->setName('Atributo_');
 $obAtributos->recuperaVetor( $arChave );
 
 switch ($stAcao) {
     case "incluir":
+        
+        if ( $request->get('boCodLocalAutomatico') == 'true' ) {
+            $obRCIMLocalizacao->setLocalizacaoAutomatica ( $request->get('boCodLocalAutomatico') );
+            $obRCIMLocalizacao->setCodigoVigencia ( $request->get('inCodigoVigencia') );
+            $obRCIMLocalizacao->setCodigoNivel    ( $request->get('inCodigoNivel') );
+            
+            $stValorReduzido = $request->get('stChaveLocalizacao');
+            if (isset($stValorReduzido)){
+                $obRCIMLocalizacao->setValorReduzido  ( $request->get('stChaveLocalizacao') );    
+            }
+            $obRCIMLocalizacao->ultimorValorComposto($rsCodLocalizacao);            
+            $request->set("inValorLocalizacao", $rsCodLocalizacao->getCampo('codigo_localizacao'));
+        }
 
         $arValidaLocalizacao['cod_nivel']        = $request->get('inCodigoNivel');
         $arValidaLocalizacao['cod_vigencia']     = $request->get('inCodigoVigencia');
         $arValidaLocalizacao['valor']            = preg_replace( "/0/", "", trim( $request->get("inValorLocalizacao") ) );
         $arValidaLocalizacao['codigo_composto']  = $request->get('stChaveLocalizacao').".";
-
-        $obRCIMLocalizacao->setCodigoVigencia   ( $request->get("inCodigoVigencia")   );
-        $obRCIMLocalizacao->setCodigoNivel         ( $request->get("inCodigoNivel")      );
+        
+        $obRCIMLocalizacao->setCodigoVigencia  ( $request->get("inCodigoVigencia")   );
+        $obRCIMLocalizacao->setCodigoNivel     ( $request->get("inCodigoNivel")      );
         $obRCIMLocalizacao->setNomeLocalizacao ( $request->get("stNomeLocalizacao")  );
         $obRCIMLocalizacao->setValor           ( preg_replace( "/0/", "", trim( $request->get("inValorLocalizacao") ) ) );
         $obRCIMLocalizacao->setValorComposto   ( $request->get("stChaveLocalizacao") );
+        
         //MONTAR UM LOOP PARA PEGAR O VALOR DOS COMBOS
         include_once ( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php"       );
+        
         $obRCIMLocTmp = new RCIMLocalizacao;
+        
         $stMascara = $request->get("stChaveLocalizacao");
+        
         if ($stMascara != "") {
             $stComposto = "";
             $arMascara = explode(".",$stMascara);
@@ -99,7 +108,7 @@ switch ($stAcao) {
                 $i++;
             }
         }
-
+        
         if ($_REQUEST["boAliquotaAtivo"]) {
             $obRCIMLocalizacao->setAliquotaVigencia( $request->get("dtVigenciaAliquota") );
             $obRCIMLocalizacao->setAliquotaCodNorma( $request->get("inCodigoFundamentacaoAliquota") );
@@ -176,15 +185,12 @@ switch ($stAcao) {
         $obRCIMLocalizacao->setCodigoVigencia    ( $_REQUEST["inCodigoVigencia"]    );
         $obRCIMLocalizacao->setCodigoLocalizacao ( $_REQUEST["inCodigoLocalizacao"] );
         $obRCIMLocalizacao->setValorReduzido     ( $_REQUEST["stValorReduzido"]     );
-//        $obRCIMLocalizacao->setValorComposto   ( $_REQUEST["stChaveLocalizacao"] );
 
         $obErro = $obRCIMLocalizacao->excluirLocalizacao();
 
         if ( !$obErro->ocorreu() ) {
-
             SistemaLegado::alertaAviso($pgList,"Nome Localização: ".$_REQUEST['stNomeLocalizacao'],"excluir","aviso", Sessao::getId(), "../");
-
-sistemaLegado::executaFrameOculto ( "buscaDado('SetarMascaraLocalizacao');" );
+            sistemaLegado::executaFrameOculto ( "buscaDado('SetarMascaraLocalizacao');" );
         } else {
             SistemaLegado::alertaAviso($pgList,urlencode($obErro->getDescricao()),"n_excluir","erro",Sessao::getId(), "../");
         }
@@ -241,4 +247,5 @@ sistemaLegado::executaFrameOculto ( "buscaDado('SetarMascaraLocalizacao');" );
         }
     break;
 }
+
 ?>

@@ -865,7 +865,6 @@ switch ($_REQUEST['stCtrl']) {
         break;
 
     case "carregaModulo":
-        //sistemaLegado::mostravar( $_REQUEST );
         if ($_GET["inCodTipo"]) {
             $stOrdem = " ORDER BY cod_cadastro ASC ";
             if ($_GET["inCodTipo"] == 1) {

@@ -68,37 +68,43 @@ class TTCMBADocDiver extends Persistente {
     }
     
     public function montaRecuperaDados()
-    {   $stSql = " SELECT 1 AS tp_registro
-                        , de.num_unidade AS cd_unidade
+    {   $stSql = " SELECT 1 AS tipo_registro
+                        , despesa.num_unidade AS unidade_orcamentaria
                         , '".$this->getDado('unidade_gestora')."' AS unidade_gestora
-                        , em.cod_empenho AS nu_empenho
-		                , nota_liq_paga.data_pagamento AS dt_pagamento_empenho   
-		                , nota_liq_paga.num_documento AS num_documento                   
-                        , de.num_orgao AS cd_orgao
-                        , op.exercicio AS dt_ano
-                        , cgm_pe.tp_pessoa
+                        , empenho.cod_empenho AS num_empenho
+                        , empenho.cod_empenho AS subempenho
+		                    , nota_liq_paga.data_pagamento AS dt_pagamento_empenho   
+		                    , nota_liq_paga.num_documento AS num_documento                   
+                        , despesa.num_orgao AS cod_orgao
+                        , ordem_pagamento.exercicio AS dt_ano
+                        , cgm_pe.tipo_pessoa
                         , cgm_pe.documento
-                        , cgm_pe.nom_cgm as beneficiario    
-                        , nota_liq_paga.nm_documento
+                        , cgm_pe.nom_cgm AS emitente    
+                        , nota_liq_paga.tipo_documento
                         , nota_liq_paga.data_emissao
-                        , nota_liq_paga.vl_pago 
-                        , op.observacao AS objeto_documento     
-                        , TO_CHAR(nota_liq_paga.data_pagamento, 'yyyymm') as competencia
-                     FROM empenho.ordem_pagamento AS op                                                                                                  
-                LEFT JOIN empenho.ordem_pagamento_anulada AS opa
-                       ON op.cod_ordem     = opa.cod_ordem                                                                                        
-                      AND op.exercicio     = opa.exercicio                                                                                        
-                      AND op.cod_entidade = opa.cod_entidade                                                                                      
-                      AND op.exercicio =  '".$this->getDado('exercicio')."'                              
-                     JOIN empenho.pagamento_liquidacao as pl
-                       ON op.cod_ordem    = pl.cod_ordem                                                                                          
-                      AND op.cod_entidade = pl.cod_entidade                                                                                       
-                      AND op.exercicio = '".$this->getDado('exercicio')."'                                
-                      AND op.exercicio = pl.exercicio                                                                                          
-                     JOIN empenho.nota_liquidacao as nl
-                       ON pl.cod_nota              = nl.cod_nota                                             
-                      AND pl.cod_entidade          = nl.cod_entidade                                         
-                      AND pl.exercicio_liquidacao  = nl.exercicio        
+                        , nota_liq_paga.vl_pago AS vl_doc
+                        , ordem_pagamento.observacao AS objeto     
+                        , TO_CHAR(nota_liq_paga.data_pagamento, 'yyyymm') AS competencia
+
+                     FROM empenho.ordem_pagamento      
+
+                LEFT JOIN empenho.ordem_pagamento_anulada
+                       ON ordem_pagamento.cod_ordem     = ordem_pagamento_anulada.cod_ordem                                                                                        
+                      AND ordem_pagamento.exercicio     = ordem_pagamento_anulada.exercicio                                                                                        
+                      AND ordem_pagamento.cod_entidade  = ordem_pagamento_anulada.cod_entidade                                                                                      
+                      AND ordem_pagamento.exercicio     =  '".$this->getDado('exercicio')."'
+
+                     JOIN empenho.pagamento_liquidacao
+                       ON ordem_pagamento.cod_ordem    = pagamento_liquidacao.cod_ordem                                                                                          
+                      AND ordem_pagamento.cod_entidade = pagamento_liquidacao.cod_entidade                                                                                       
+                      AND ordem_pagamento.exercicio    = '".$this->getDado('exercicio')."'                                
+                      AND ordem_pagamento.exercicio    = pagamento_liquidacao.exercicio
+
+                     JOIN empenho.nota_liquidacao
+                       ON pagamento_liquidacao.cod_nota              = nota_liquidacao.cod_nota                                             
+                      AND pagamento_liquidacao.cod_entidade          = nota_liquidacao.cod_entidade                                         
+                      AND pagamento_liquidacao.exercicio_liquidacao  = nota_liquidacao.exercicio        
+
                 LEFT JOIN ( SELECT nlp.cod_entidade                                                                                           
                                  , nlp.cod_nota                                                                                               
                                  , plnlp.cod_ordem                                                                                            
@@ -108,7 +114,7 @@ class TTCMBADocDiver extends Persistente {
                                  , sum(coalesce(nlpa.vl_anulado ,0.00)) as vl_anulado                                                          
                                  , TO_DATE(TO_CHAR(nlp.timestamp, 'dd/mm/yyyy'),'dd/mm/yyyy') AS data_pagamento      
                                  , ptdp.num_documento
-                                 , tipo_documento_pagamento.descricao AS nm_documento
+                                 , tipo_documento_pagamento.descricao AS tipo_documento
                                  , TO_DATE(TO_CHAR(ptdp.timestamp, 'dd/mm/yyyy'),'dd/mm/yyyy') AS data_emissao    
                               FROM empenho.pagamento_liquidacao_nota_liquidacao_paga as plnlp   
                                  , tesouraria.pagamento as tp     
@@ -120,57 +126,61 @@ class TTCMBADocDiver extends Persistente {
                          LEFT JOIN tcmba.tipo_documento_pagamento 
                                 ON tipo_documento_pagamento.cod_tipo = ptdp.cod_tipo
                                  , empenho.nota_liquidacao_paga as nlp                
-                         LEFT JOIN (SELECT exercicio                                                                  
+                         LEFT JOIN (
+                                    SELECT exercicio                                                                  
                                          , cod_nota                                                                   
                                          , cod_entidade                                                               
                                          , timestamp                                                                  
                                          , coalesce(sum(nlpa.vl_anulado),0.00) as vl_anulado                          
                                       FROM empenho.nota_liquidacao_paga_anulada as nlpa                               
                                   GROUP BY exercicio, cod_nota, cod_entidade, timestamp                             
-                                  ) as nlpa
-                                 ON nlp.exercicio    = nlpa.exercicio                                              
-                                AND nlp.cod_nota     = nlpa.cod_nota             
-                                AND nlp.cod_entidade = nlpa.cod_entidade         
-                                AND nlp.timestamp    = nlpa.timestamp 
-                              WHERE nlp.cod_entidade = plnlp.cod_entidade                                                                    
-                                AND nlp.cod_nota     = plnlp.cod_nota                                                                        
-                                AND nlp.exercicio    = plnlp.exercicio_liquidacao                                                            
-                                AND nlp.timestamp    = plnlp.timestamp                    
-                                AND plnlp.exercicio = '".$this->getDado('exercicio')."'   
-                                AND nlp.cod_entidade = tp.cod_entidade                                                                    
-                                AND nlp.cod_nota     = tp.cod_nota                                                                        
-                                AND nlp.exercicio    = tp.exercicio                                                            
-                                AND nlp.timestamp    = tp.timestamp 
-                                AND nlpa.cod_nota IS NULL
-                           GROUP BY nlp.cod_entidade                                      
-                                  , nlp.cod_nota                                          
-                                  , nlp.exercicio                                         
-                                  , nlpa.vl_anulado                                       
-                                  , plnlp.cod_ordem                                       
-                                  , plnlp.exercicio                                       
-                                  , nlp.timestamp     
-                                  , num_documento
-                                  , tipo_documento_pagamento.descricao
-                                  , ptdp.timestamp                                                   
-                          ) as nota_liq_paga
-                       ON pl.cod_nota     = nota_liq_paga.cod_nota                       
-                      AND pl.cod_entidade = nota_liq_paga.cod_entidade                   
-                      AND pl.exercicio    = nota_liq_paga.exercicio                      
-                      AND pl.cod_ordem    = nota_liq_paga.cod_ordem                      
-                      AND pl.exercicio_liquidacao = nota_liq_paga.exercicio_liquidacao   
-                     JOIN empenho.empenho as em
-                       ON nl.cod_empenho       = em.cod_empenho                          
-                      AND nl.exercicio_empenho = em.exercicio                            
-                      AND nl.cod_entidade      = em.cod_entidade                         
-                      AND em.exercicio = '".$this->getDado('exercicio')."'                                  
-                     JOIN empenho.pre_empenho as pe
-                       ON em.exercicio       = pe.exercicio                              
-                      AND em.cod_pre_empenho = pe.cod_pre_empenho                        
-                      AND em.exercicio = '".$this->getDado('exercicio')."'    
+                                   ) AS nlpa
+                                ON nlp.exercicio    = nlpa.exercicio                                              
+                               AND nlp.cod_nota     = nlpa.cod_nota             
+                               AND nlp.cod_entidade = nlpa.cod_entidade         
+                               AND nlp.timestamp    = nlpa.timestamp 
+                             WHERE nlp.cod_entidade = plnlp.cod_entidade                                                                    
+                               AND nlp.cod_nota     = plnlp.cod_nota                                                                        
+                               AND nlp.exercicio    = plnlp.exercicio_liquidacao                                                            
+                               AND nlp.timestamp    = plnlp.timestamp                    
+                               AND plnlp.exercicio = '".$this->getDado('exercicio')."'   
+                               AND nlp.cod_entidade = tp.cod_entidade                                                                    
+                               AND nlp.cod_nota     = tp.cod_nota                                                                        
+                               AND nlp.exercicio    = tp.exercicio                                                            
+                               AND nlp.timestamp    = tp.timestamp 
+                               AND nlpa.cod_nota IS NULL
+                          GROUP BY nlp.cod_entidade                                      
+                                 , nlp.cod_nota                                          
+                                 , nlp.exercicio                                         
+                                 , nlpa.vl_anulado                                       
+                                 , plnlp.cod_ordem                                       
+                                 , plnlp.exercicio                                       
+                                 , nlp.timestamp     
+                                 , num_documento
+                                 , tipo_documento_pagamento.descricao
+                                 , ptdp.timestamp                                                   
+                          ) AS nota_liq_paga
+                       ON pagamento_liquidacao.cod_nota             = nota_liq_paga.cod_nota                       
+                      AND pagamento_liquidacao.cod_entidade         = nota_liq_paga.cod_entidade                   
+                      AND pagamento_liquidacao.exercicio            = nota_liq_paga.exercicio                      
+                      AND pagamento_liquidacao.cod_ordem            = nota_liq_paga.cod_ordem  
+                      AND pagamento_liquidacao.exercicio_liquidacao = nota_liq_paga.exercicio_liquidacao  
+
+                     JOIN empenho.empenho
+                       ON nota_liquidacao.cod_empenho       = empenho.cod_empenho                          
+                      AND nota_liquidacao.exercicio_empenho = empenho.exercicio                            
+                      AND nota_liquidacao.cod_entidade      = empenho.cod_entidade                         
+                      AND empenho.exercicio                 = '".$this->getDado('exercicio')."' 
+
+                     JOIN empenho.pre_empenho
+                       ON empenho.exercicio       = pre_empenho.exercicio                              
+                      AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho                        
+                      AND empenho.exercicio       = '".$this->getDado('exercicio')."'  
+
                      JOIN ( SELECT sw_cgm.numcgm
-			                     , nom_cgm
+			                           , nom_cgm
                                  , sw_cgm_pessoa_fisica.cpf AS documento
-                                 , 1 AS tp_pessoa
+                                 , 1 AS tipo_pessoa
                               FROM sw_cgm
                               JOIN sw_cgm_pessoa_fisica
                                 ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
@@ -178,20 +188,24 @@ class TTCMBADocDiver extends Persistente {
                              SELECT sw_cgm.numcgm
                                   , nom_cgm
                                   , sw_cgm_pessoa_juridica.cnpj AS documento
-                                  , 2 AS tp_pessoa
+                                  , 2 AS tipo_pessoa
                               FROM sw_cgm
                               JOIN sw_cgm_pessoa_juridica
                                 ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
-                        )  as cgm_pe
-                      ON pe.cgm_beneficiario = cgm_pe.numcgm
-               LEFT JOIN empenho.pre_empenho_despesa as ped
-                      ON pe.cod_pre_empenho = ped.cod_pre_empenho                       
-                     AND pe.exercicio       = ped.exercicio                             
-               LEFT JOIN orcamento.despesa as de
-                      ON ped.cod_despesa = de.cod_despesa
-                     AND ped.exercicio   = de.exercicio                                 
-                   WHERE nota_liq_paga.data_pagamento BETWEEN TO_DATE('".$this->getDado('dt_inicial')."' , 'dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."' , 'dd/mm/yyyy')    
-                     AND opa.cod_ordem IS NULL
+                        ) AS cgm_pe
+                      ON pre_empenho.cgm_beneficiario = cgm_pe.numcgm
+
+               LEFT JOIN empenho.pre_empenho_despesa
+                      ON pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho                       
+                     AND pre_empenho.exercicio       = pre_empenho_despesa.exercicio            
+
+               LEFT JOIN orcamento.despesa
+                      ON pre_empenho_despesa.cod_despesa = despesa.cod_despesa
+                     AND pre_empenho_despesa.exercicio   = despesa.exercicio             
+
+                   WHERE nota_liq_paga.data_pagamento BETWEEN TO_DATE('".$this->getDado('dt_inicial')."' , 'dd/mm/yyyy')
+                                                          AND TO_DATE('".$this->getDado('dt_final')."' , 'dd/mm/yyyy')    
+                     AND ordem_pagamento_anulada.cod_ordem IS NULL
         ";
         return $stSql;
     }

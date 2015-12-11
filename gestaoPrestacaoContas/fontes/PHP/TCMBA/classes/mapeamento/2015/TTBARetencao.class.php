@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63720 $
+    $Revision: 63882 $
     $Name$
     $Author: domluc $
     $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
@@ -139,7 +139,10 @@ function montaRecuperaDadosTribunal()
             INNER JOIN empenho.nota_liquidacao_paga
                     ON nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio    
                    AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade    
-                   AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota    
+                   AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
+				   
+-- Ao retirar esta linha os registros bem duplicados porque são lançados 2 na nota_liquidacao_paga. O registro de pagamento e o de retenção, assim para trazer apenas um registro de retenção é necessário igualar a retenção ao valor da nota_liquidacao
+				   AND nota_liquidacao_paga.vl_pago = ordem_pagamento_retencao.vl_retencao
             
             INNER JOIN empenho.pre_empenho_despesa
                     ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio    

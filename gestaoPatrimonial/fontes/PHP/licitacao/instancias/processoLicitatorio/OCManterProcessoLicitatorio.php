@@ -31,7 +31,7 @@
 
   * Casos de uso: uc-03.05.15
 
-  $Id: OCManterProcessoLicitatorio.php 63094 2015-07-24 16:57:15Z franver $
+  $Id: OCManterProcessoLicitatorio.php 63865 2015-10-27 13:55:57Z franver $
 
   */
 
@@ -557,6 +557,7 @@ function montaListaItens($rsItens)
 
     $rsItens->addFormatacao('valor_unitario'      , 'NUMERIC_BR');
     $rsItens->addFormatacao('quantidade'          , 'NUMERIC_BR_4');
+    $rsItens->addFormatacao('quantidade_real'     , 'NUMERIC_BR_4');
     $rsItens->addFormatacao('valor_total_real'    , 'NUMERIC_BR');
     $rsItens->addFormatacao('valor_ultima_compra' , 'NUMERIC_BR');
 
@@ -567,12 +568,12 @@ function montaListaItens($rsItens)
     $table->setRecordset( $rsItens );
     $table->setSummary('Itens');
 
-    $table->Head->addCabecalho( 'Item' , 40  );
-    $table->Head->addCabecalho( 'Centro de Custo', 25 );
-    $table->Head->addCabecalho( 'Valor de Referência' , 10  );
-    $table->Head->addCabecalho( 'Valor da Última Compra' , 10  );
-    $table->Head->addCabecalho( 'Qtde' , 10  );
-    $table->Head->addCabecalho( 'Valor Total' , 10  );
+    $table->Head->addCabecalho( 'Item'                   , 30);
+    $table->Head->addCabecalho( 'Centro de Custo'        , 25);
+    $table->Head->addCabecalho( 'Valor de Referência'    , 10);
+    $table->Head->addCabecalho( 'Valor da Última Compra' , 10);
+    $table->Head->addCabecalho( 'Qtde'                   , 10);
+    $table->Head->addCabecalho( 'Valor Total'            , 10);
 
     $table->Body->addCampo( '[cod_item] - [descricao_completa]. [complemento]' , 'E');
     $table->Body->addCampo( '[cod_centro] - [centro_custo_descricao]' , 'E');

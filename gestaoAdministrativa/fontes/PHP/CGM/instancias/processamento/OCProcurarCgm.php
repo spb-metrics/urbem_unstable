@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: OCProcurarCgm.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: OCProcurarCgm.php 63969 2015-11-12 18:43:12Z evandro $
 $Revision: 26876 $
 $Name$
 $Author: hboaventura $
@@ -62,6 +62,10 @@ function buscaPopup()
             }
 
             $stFiltroVinculado = $arCampo['stFiltroVinculado'];
+
+            if ( $request->get('stTabelaVinculo') == 'patrimonio.bem_responsavel') {
+                $stFiltroVinculado .= " AND tabela_vinculo.dt_fim IS NULL ";
+            }
 
             if ($_REQUEST['buscaContrato']) {
                 $stFiltro .= retornaFiltroBuscaContratos();

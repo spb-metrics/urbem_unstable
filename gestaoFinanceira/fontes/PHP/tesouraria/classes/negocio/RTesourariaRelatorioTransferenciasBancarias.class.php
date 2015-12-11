@@ -38,7 +38,7 @@
     $Autor: $
     $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
 
-	$Id: RTesourariaRelatorioTransferenciasBancarias.class.php 60879 2014-11-20 13:53:10Z michel $
+	$Id: RTesourariaRelatorioTransferenciasBancarias.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.04.16
 */
@@ -205,9 +205,7 @@ function geraRecordSet(&$rsRecordSet, $stOrder = '')
 {
     include_once CAM_GF_TES_MAPEAMENTO.'FTesourariaTransferenciasBancarias.class.php';
     $obFTesourariaTransferenciasBancarias = new FTesourariaTransferenciasBancarias;
-
-    $boTCEMS = SistemaLegado::is_tcems();
-
+    
     $obFTesourariaTransferenciasBancarias->setDado('stExercicio'           , $this->getExercicio());
     $obFTesourariaTransferenciasBancarias->setDado('stEntidade'            , $this->getEntidade());
     $obFTesourariaTransferenciasBancarias->setDado('stDataInicial'         , $this->getDataInicial());
@@ -217,7 +215,7 @@ function geraRecordSet(&$rsRecordSet, $stOrder = '')
     $obFTesourariaTransferenciasBancarias->setDado('inCodTipoTransferencia', $this->getCodTipoTransferencia());
     $obFTesourariaTransferenciasBancarias->setDado('boUtilizaEstruturalTCE', 'false');
 
-    if ($boTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $obFTesourariaTransferenciasBancarias->setDado("boUtilizaEstruturalTCE", 'true' );
     }
 

@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObra.class.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: TTCMBAObra.class.php 63771 2015-10-08 13:39:13Z jean $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -123,7 +123,7 @@ class TTCMBAObra extends Persistente
                         , obra.cod_uf
                         , obra.cod_municipio
                         , obra.cod_funcao
-                        , LPAD(obra.nro_obra::VARCHAR, 10, '0') AS nro_obra
+                        , obra.nro_obra
                         , obra.descricao
                         , obra.vl_obra
                         , TO_CHAR(obra.data_cadastro,'dd/mm/yyyy') AS data_cadastro

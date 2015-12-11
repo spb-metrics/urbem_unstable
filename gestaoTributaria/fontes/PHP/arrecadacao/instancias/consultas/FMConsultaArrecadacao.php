@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMConsultaArrecadacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaArrecadacao.php 63839 2015-10-22 18:08:07Z franver $
 */
 
 /*
@@ -106,7 +106,6 @@ $stCompetencia      = $_REQUEST['stCompetencia'];
 
 //DEFINICAO DOS COMPONENTES
 
-#sistemaLegado::mostravar( $_REQUEST );
 Sessao::remove('stIdCarregamento');
     //* LISTAGEM DE PROPRIETARIOS
     include_once( CAM_GT_CIM_NEGOCIO . "RCIMImovel.class.php"        );
@@ -257,8 +256,6 @@ $obLblTipoCalculo->setRotulo   ( "Tipo Cálculo"     );
 $obLblTipoCalculo->setTitle    ( "Tipo Cálculo");
 $obLblTipoCalculo->setValue    ( $_REQUEST["stTipoCalculo"] );
 
-#sistemaLegado::mostravar( $_REQUEST );
-
 $obLblGrupoCredito = new Label;
 $obLblGrupoCredito->setRotulo   ( "Grupo de Créditos"   );
 $obLblGrupoCredito->setValue    ( $inCodGrupo." - ".$stOrigem );
@@ -365,7 +362,6 @@ if ($inCodGrupo) {         // caso seja grupo de credito
     Sessao::write( 'tipoLancamento', 'Grupo' );
     $obRARRGrupo  = new RARRGrupo;
     $rsCreditosDescontos->setPrimeiroElemento();
-    #sistemaLegado::mostravar( $rsCreditosDescontos );
 
     $cont = 0;
     while ( !$rsCreditosDescontos->eof() ) {
@@ -391,7 +387,6 @@ $rsCreditos->addFormatacao("valor_calculado","NUMERIC_BR");
 $rsCreditos->addFormatacao("valor","NUMERIC_BR");
 $rsCreditos->setPrimeiroElemento();
 ########################### TABELA DOM
-#sistemaLegado::mostravar ( $rsCreditos );
 $table = new Table();
 $table->setRecordset( $rsCreditos );
 $table->setSummary('Lista de Créditos');
@@ -421,7 +416,6 @@ echo $table->getHtml();
 
 // listar parcelas
 $obRARRParcela->listarConsulta ( $rsListaParcelas );
-//sistemaLegado::mostravar( $rsListaParcelas );
 $rsListaParcelas->ordena ("nr_parcela");
 $rsListaParcelas->addFormatacao("valor","NUMERIC_BR");
 ###################################### TABELA DOM
@@ -441,7 +435,6 @@ $table = new TableTree();
 $table->setMostrarTodos ( false );
 $table->setRecordset( $rsListaParcelas );
 $table->setSummary('Lista de Parcelas');
-#sistemaLegado::mostravar( $rsListaParcelas );
 
 //$table->setArquivo( 'FMConsultaArrecadacaoDetalheParcela.php' );
 $table->setArquivo('OCConsultaArrecadacao.php?&stCtrl=detalheParcela&');

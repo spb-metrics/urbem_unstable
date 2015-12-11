@@ -79,7 +79,7 @@ class TTCMBAContrato2 extends Persistente
         $stSql = " SELECT 1 AS tipo_registro 
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo 
-                        , contrato.num_contrato
+                        , contrato.numero_contrato 
                         , 1 as tipo_moeda
                         , objeto.descricao AS objeto_contrato
                         , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN 1 
@@ -101,7 +101,7 @@ class TTCMBAContrato2 extends Persistente
                         , TO_CHAR(contrato.inicio_execucao, 'dd/mm/yyyy') AS dt_inicio_execucao
                         , 'N' AS exame_previo
                         , '1' AS anterior_siga
-                        , 17 AS tipo_contrato -- 17 = outros (forçado por enquanto)
+                        , tipo_contrato.tipo_tc AS tipo_contrato
                         , 'S' AS indicador_licitacao -- (forçado por enquanto)
                         , 'N' AS indicador_dispensa -- (forçado por enquanto)
 
@@ -222,6 +222,9 @@ class TTCMBAContrato2 extends Persistente
                       AND item_pre_empenho.cod_pre_empenho = empenho_anulado_item.cod_pre_empenho
                       AND item_pre_empenho.num_item = empenho_anulado_item.num_item
 
+               INNER JOIN licitacao.tipo_contrato
+                       ON tipo_contrato.cod_tipo = contrato.cod_tipo_contrato
+
                     WHERE contrato_anulado.num_contrato IS NULL
                       AND cotacao_anulada.cod_cotacao IS NULL
                       AND julgamento_item.ordem = 1
@@ -232,7 +235,7 @@ class TTCMBAContrato2 extends Persistente
                                                      AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
 
                  GROUP BY licitacao.cod_processo,
-                          contrato.num_contrato,
+                          contrato.numero_contrato,
                           objeto.descricao,
                           sw_cgm_pessoa_fisica.cpf,
                           sw_cgm_pessoa_juridica.cnpj,
@@ -243,9 +246,14 @@ class TTCMBAContrato2 extends Persistente
                           publicacao_contrato.dt_publicacao,
                           contrato.valor_contratado,
                           tipo_item.cod_tipo,
-                          contrato.inicio_execucao
+                          contrato.inicio_execucao,
+                          licitacao.exercicio,
+                          licitacao.cod_entidade,
+                          licitacao.cod_modalidade,
+                          licitacao.cod_licitacao,
+                          mapa_cotacao.cod_mapa,
+                          tipo_contrato.tipo_tc
         ";
-
         return $stSql;
     }
 

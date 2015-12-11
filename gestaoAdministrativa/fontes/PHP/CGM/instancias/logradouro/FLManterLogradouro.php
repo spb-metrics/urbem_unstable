@@ -181,7 +181,7 @@ $obCmbUF->setNull               ( false                   );
 $obCmbUF->obEvento->setOnChange ( "preencheMunicipio('')" );
 
 $obTxtCodMunicipio = new TextBox;
-$obTxtCodMunicipio->setRotulo    ( "Munic&iacute;pio"  );
+$obTxtCodMunicipio->setRotulo    ( "Município"  );
 $obTxtCodMunicipio->setName      ( "inCodigoMunicipio" );
 $obTxtCodMunicipio->setId        ( "inCodigoMunicipio" );
 $obTxtCodMunicipio->setValue     ( $_REQUEST['inCodigoMunicipio']  );

@@ -1,4 +1,4 @@
-<?php
+<script type="text/javascript">
 /*
     **********************************************************************************
     *                                                                                *
@@ -21,14 +21,32 @@
     *                                                                                *
     **********************************************************************************
 */
+</script>
+<?php
+/**
+    * Página JavaScript de Licitações para Autorização de Empenho Parcial
+    * Data de Criação   : 23/11/2015
+
+    * @author Analista: Gelson Wolowski Gonçalves
+    * @author Desenvolvedor: Michel Teixeira
+
+    * @ignore
+
+    $Id: JSManterAutorizacaoParcial.js 64052 2015-11-24 18:26:04Z michel $
+*/
 ?>
-<?
 
-include( "../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php");
-include_once( "../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php" );
+<script type="text/javascript">
 
-switch($_REQUEST['stAcao']){
-    default:
-    SistemaLegado::mostravar( $_REQUEST);
-    include_once(CAM_GT_ECONOMICO."instancias/licenca/FMConcederLicencaGeralTipo.php");
+function buscaValor(valor,parametros){
+    var stTarget = document.frm.target;
+    var stAction = document.frm.action;
+    document.frm.stCtrl.value = valor;
+    document.frm.target = 'oculto';
+    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>'+parametros;
+    document.frm.submit();
+    document.frm.target = stTarget;
+    document.frm.action = stAction;
 }
+
+</script>

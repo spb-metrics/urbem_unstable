@@ -26,7 +26,7 @@
  * URBEM Soluções de Gestão Pública Ltda
  * www.urbem.cnm.org.br
  *
- $Id: balancoPatrimonialPatrimonioLiquido.plsql 63434 2015-08-27 19:45:12Z lisiane $
+ $Id: balancoPatrimonialPatrimonioLiquido.plsql 64099 2015-12-02 17:14:05Z lisiane $
  *
  * Casos de uso: uc-02.02.11
  */
@@ -190,6 +190,7 @@ BEGIN
              , SUM(valores[2] * multiplicador * -1) as vl_saldo_debitos
              , SUM(valores[3] * multiplicador * -1) as vl_saldo_creditos
              , SUM(valores[4] * multiplicador) AS vl_saldo_atual
+             , ''''::VARCHAR AS tipo_conta
           
           FROM (
             
@@ -198,7 +199,7 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.0.0.0.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.0.0.0.00.00')||') as nivel
                      , ''Patrimônio Liquido'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
             
             UNION ALL
             
@@ -244,7 +245,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVAS DE CAPITAL
@@ -253,7 +254,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVAS DE CAPITAL
@@ -262,7 +263,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVAS DE CAPITAL
@@ -271,7 +272,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVAS DE CAPITAL
@@ -280,7 +281,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVAS DE CAPITAL
@@ -289,7 +290,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.3.0.0.00.00')||') as nivel
                      , ''Adiantamento para Futuro Aumento de Capital'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE AVALIAÇÃO PATRIMONIAL
@@ -298,7 +299,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.4.0.0.00.00')||') as nivel
                      , ''Ajustes de Avaliação Patrimonial'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESERVA DE LUCROS
@@ -307,7 +308,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -316,7 +317,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -325,7 +326,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -334,7 +335,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                    
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -343,7 +344,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -352,7 +353,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -361,7 +362,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.5.0.0.00.00')||') as nivel
                      , ''Reserva de Lucros'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESERVA DE LUCROS
@@ -379,7 +380,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.6.0.0.00.00')||') as nivel
                      , ''Demais Reservas'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA DEMAIS RESERVAS
@@ -388,7 +389,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.6.0.0.00.00')||') as nivel
                      , ''Demais Reservas'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA DEMAIS RESERVAS
@@ -397,6 +398,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.3.6.0.0.00.00')||') as nivel
                      , ''Demais Reservas'' as nom_conta
                      , -1 as  multiplicador
+                    
     ';
 
 IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercicio) ) THEN
@@ -409,7 +411,7 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.0.0.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.00.00')||') as nivel
                      , ''Resultados Acumulados'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -419,7 +421,7 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.00.00')||') as nivel
                      , ''Resultados Acumulados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA RESULTADOS ACUMULADOS
@@ -428,7 +430,7 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.00.00')||') as nivel
                      , ''Resultados Acumulados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -436,8 +438,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.1.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                     
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -445,8 +447,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.3.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                    
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -454,8 +456,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.4.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                     
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -463,8 +465,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.1.5.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                     
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -472,8 +474,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.1.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                     
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -481,7 +483,7 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.3.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
 
             UNION ALL
 
@@ -490,8 +492,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.4.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                    
             UNION ALL
 
                 --CONTA RESULTADO DO EXERCICIO
@@ -499,7 +501,8 @@ IF ( (stDtInicial = '01/01/'||stExercicio ) AND (stDtFinal = '31/12/'||stExercic
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.3.7.2.5.01.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
-                     , 1 as  multiplicador
+                     , -1 as  multiplicador
+                     
             ';
 ELSE
 --regra do relatorio para quando o relatorio for emitido durante o exercicio
@@ -514,7 +517,7 @@ ELSE
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
                      , -1 as  multiplicador
-                
+                     
             UNION ALL
             
                 --CONTA RESULTADO DO EXERCICIO
@@ -532,7 +535,7 @@ ELSE
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.01.00')||') as nivel
                      , ''Resultado do Exercício'' as nom_conta
                      , -1 as  multiplicador
-            
+                     
             UNION ALL         
                 
                 --CONTA RESULTADO DO EXERCICIO
@@ -550,7 +553,7 @@ ELSE
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.00.00')||') as nivel
                      , ''Resultados Acumulados'' as nom_conta
                      , 1 as  multiplicador
-            
+                    
     ';
 END IF;
 
@@ -563,7 +566,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -572,7 +575,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -581,7 +584,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -590,7 +593,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -599,7 +602,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                    
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -608,7 +611,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.02.00')||') as nivel
                      , ''Resultado de Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DE EXERCÍCIOS ANTERIORES
@@ -626,7 +629,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE EXERCÍCIOS ANTERIORES
@@ -635,7 +638,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE EXERCÍCIOS ANTERIORES
@@ -644,7 +647,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE EXERCÍCIOS ANTERIORES
@@ -671,7 +674,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE EXERCÍCIOS ANTERIORES
@@ -680,7 +683,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA AJUSTES DE EXERCÍCIOS ANTERIORES
@@ -689,7 +692,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.03.00')||') as nivel
                      , ''Ajustes Exercícios Anteriores'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -698,7 +701,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -707,7 +710,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -716,7 +719,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -725,7 +728,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -734,7 +737,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -752,7 +755,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -761,7 +764,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -770,7 +773,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -779,7 +782,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -797,7 +800,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -806,7 +809,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -815,7 +818,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -824,7 +827,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.7.0.0.04.00')||') as nivel
                      , ''Outros Resultados'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OUTROS RESULTADOS
@@ -842,7 +845,7 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.9.0.0.00.00')||') as nivel
                      , ''Ações/Cotas em Tesouraria'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --DEDUZ DA CONTA AÇÕES/COTAS EM TESOURARIA
@@ -860,7 +863,6 @@ END IF;
                      , publico.fn_nivel('||quote_literal('2.3.9.0.0.00.00')||') as nivel
                      , ''Ações/Cotas em Tesouraria'' as nom_conta
                      , -1 as  multiplicador
-
 
             --ADICIONADO LINHAS PARA ALINHAR O RELATÓRIO
 
@@ -1053,11 +1055,30 @@ END IF;
                      , '''' as nom_conta
                      , 1 as  multiplicador
             
+             UNION ALL
+
+                --LINHA PARA COMPENSAR TAMANHO DE TABELAS
+                SELECT '||quote_literal('2.9999999999999999999999')||' as cod_estrutural
+                     , ARRAY[0.00,0.00,0.00,0.00] as valores
+                     , publico.fn_nivel('||quote_literal('2.9999999999999999999999')||') as nivel
+                     , '''' as nom_conta
+                     , 1 as  multiplicador
+                     
+             UNION ALL
+
+                --LINHA PARA COMPENSAR TAMANHO DE TABELAS
+                SELECT '||quote_literal('2.99999999999999999999999')||' as cod_estrutural
+                     , ARRAY[0.00,0.00,0.00,0.00] as valores
+                     , publico.fn_nivel('||quote_literal('2.99999999999999999999999')||') as nivel
+                     , '''' as nom_conta
+                     , 1 as  multiplicador
+                                  
                ) as tabela
       GROUP BY cod_estrutural
              , nivel
              , nom_conta
     ';
+
 EXECUTE stSql;
 
 IF (boUpdateRelatorio = true) THEN

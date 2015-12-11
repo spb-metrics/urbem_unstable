@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.00
 
-    $Id: OCFiltroCGM.php 60995 2014-11-27 18:34:36Z carlos.silva $
+    $Id: OCFiltroCGM.php 63818 2015-10-19 20:02:07Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -46,6 +46,7 @@ function buscaCGM()
     $obRPessoalServidor = new RPessoalServidor;
     $stJs = "";
     $boTransacao = "";
+    $boValidaCgmAtivos = Sessao::read('valida_ativos_cgm');
 
     $campoNum = (isset($_GET['campoNum']))?$_GET['campoNum']:"inNumCGM";
     $campoNom = (isset($_GET['campoNom']))?$_GET['campoNom']:"inCampoInner";
@@ -62,11 +63,13 @@ function buscaCGM()
             $boErro = true;
         }
         if ( $obRCGMPessoaFisica->getNumCGM() and !$boErro ) {
-
             $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM( $_GET['inNumCGM'] );
             $obRPessoalServidor->addContratoServidor();
-            $obRPessoalServidor->consultaCGMServidor( $rsServidor, "", $boTransacao );
-
+            if ($boValidaCgmAtivos == 'true') {
+                $obRPessoalServidor->recuperaCgmDoRegistro( $rsServidor, '','', $boTransacao );
+            }else{
+                $obRPessoalServidor->consultaCGMServidor( $rsServidor, "", $boTransacao );
+            }
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalPensionista.class.php");
             $obTPessoalPensionista = new TPessoalPensionista();
             $stFiltro = " WHERE numcgm = ".trim($_GET['inNumCGM']);
@@ -138,6 +141,7 @@ function montaContrato($boRescindido)
     $obRPessoalServidor = new RPessoalServidor;
     $stJs = "";
     $boTransacao = "";
+    $boValidaCgmAtivos = Sessao::read('valida_ativos_cgm');
 
     if ($_GET['inNumCGM'] != '') {
         $obRCGMPessoaFisica->setNumCGM( $_GET['inNumCGM'] );
@@ -151,7 +155,11 @@ function montaContrato($boRescindido)
         if ( $obRCGMPessoaFisica->getNumCGM() and !$boErro ) {
             $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM( $_GET['inNumCGM'] );
             $obRPessoalServidor->addContratoServidor();
-            $obRPessoalServidor->consultaCGMServidor( $rsServidor, "", $boTransacao );
+            if ($boValidaCgmAtivos == 'true') {
+                $obRPessoalServidor->recuperaCgmDoRegistro( $rsServidor, '','', $boTransacao );
+            }else{
+                $obRPessoalServidor->consultaCGMServidor( $rsServidor, "", $boTransacao );
+            }
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalPensionista.class.php");
             $obTPessoalPensionista = new TPessoalPensionista();
@@ -173,7 +181,10 @@ function montaContrato($boRescindido)
                     $stFiltro .= "    FROM                                                      \n";
                     $stFiltro .= "        pessoal.contrato_servidor_caso_causa )                \n";
                 }
-                $obErro = $obTPessoalServidor->recuperaRegistrosServidor( $rsRegistros, $stFiltro );
+                if($boValidaCgmAtivos == 'true'){
+                    $stFiltro .= " AND recuperarSituacaoDoContratoLiteral(pc.cod_contrato, 0, '".Sessao::getEntidade()."') = 'Ativo' ";
+                }
+               $obErro = $obTPessoalServidor->recuperaRegistrosServidor( $rsRegistros, $stFiltro );
                $stJs .= "limpaSelect(f.inContrato,0);\n";
                $stJs .= "f.inContrato[0] = new Option('Selecione','','selected');\n";
                $inIndex = 1;

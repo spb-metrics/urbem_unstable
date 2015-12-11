@@ -29,7 +29,7 @@
     * @author Analista      Dagiane Vieira
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: OCManterConfiguracaoObrasServicos.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: OCManterConfiguracaoObrasServicos.php 63809 2015-10-19 16:52:56Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -788,6 +788,9 @@ function incluirMedicao()
     if($_REQUEST['dtFinalMedicao']=='')
         $obErro->setDescricao('Informe a Data Final da Medição da Obra.');
 
+    if($_REQUEST['dtMedicao']=='')
+        $obErro->setDescricao('Informe a Data da Medição da Obra.');
+
     if($_REQUEST['dtInicioMedicao']=='')
         $obErro->setDescricao('Informe a Data de Início da Medição da Obra.');
 
@@ -815,6 +818,7 @@ function incluirMedicao()
         $arMedicaoTemp['inCodMedidaObra']       = $_REQUEST['inCodMedidaObra'];
         $arMedicaoTemp['dtInicioMedicao']       = $_REQUEST['dtInicioMedicao'];
         $arMedicaoTemp['dtFinalMedicao']        = $_REQUEST['dtFinalMedicao'];
+        $arMedicaoTemp['dtMedicao']        = $_REQUEST['dtMedicao'];
         $arMedicaoTemp['nuVlMedicao']           = $_REQUEST['nuVlMedicao'];
         $arMedicaoTemp['stNFMedicao']           = $_REQUEST['stNFMedicao'];
         $arMedicaoTemp['dtNFMedicao']           = $_REQUEST['dtNFMedicao'];
@@ -867,6 +871,10 @@ function montaListaMedicao()
     $obLista->ultimoCabecalho->setWidth( 12 );
     $obLista->commitCabecalho();
     $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo( "Data da medição" );
+    $obLista->ultimoCabecalho->setWidth( 20 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "Valor da medição" );
     $obLista->ultimoCabecalho->setWidth( 20 );
     $obLista->commitCabecalho();
@@ -885,6 +893,10 @@ function montaListaMedicao()
     $obLista->commitDado();
     $obLista->addDado();
     $obLista->ultimoDado->setCampo( "dtFinalMedicao" );
+    $obLista->ultimoDado->setAlinhamento('CENTRO' );
+    $obLista->commitDado();
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "dtMedicao" );
     $obLista->ultimoDado->setAlinhamento('CENTRO' );
     $obLista->commitDado();
     $obLista->addDado();
@@ -936,6 +948,7 @@ function montaAlteraMedicao()
             $stJs .= "jQuery('#inCodMedidaObra').val('".$value['inCodMedidaObra']."');                  \n";
             $stJs .= "jQuery('#dtInicioMedicao').val('".$value['dtInicioMedicao']."');                  \n";
             $stJs .= "jQuery('#dtFinalMedicao').val('".$value['dtFinalMedicao']."');                    \n";
+            $stJs .= "jQuery('#dtMedicao').val('".$value['dtMedicao']."');                              \n";
             $stJs .= "jQuery('#nuVlMedicao').val('".$value['nuVlMedicao']."');                          \n";
             $stJs .= "jQuery('#stNFMedicao').val('".$value['stNFMedicao']."');                          \n";
             $stJs .= "jQuery('#dtNFMedicao').val('".$value['dtNFMedicao']."');                          \n";
@@ -973,6 +986,9 @@ function alteraMedicao()
     if($_REQUEST['dtInicioMedicao']=='')
         $obErro->setDescricao('Informe a Data de Início da Medição da Obra.');
 
+    if($_REQUEST['dtMedicao']=='')
+        $obErro->setDescricao('Informe a Data da Medição da Obra.');
+
     if($_REQUEST['inCodMedidaObra']=='')
         $obErro->setDescricao('Informe a Unidade de Medida da Obra.');
 
@@ -998,6 +1014,7 @@ function alteraMedicao()
                 $arMedicao[$key]['inCodMedidaObra']       = $_REQUEST['inCodMedidaObra'];
                 $arMedicao[$key]['dtInicioMedicao']       = $_REQUEST['dtInicioMedicao'];
                 $arMedicao[$key]['dtFinalMedicao']        = $_REQUEST['dtFinalMedicao'];
+                $arMedicao[$key]['dtMedicao']             = $_REQUEST['dtMedicao'];
                 $arMedicao[$key]['nuVlMedicao']           = $_REQUEST['nuVlMedicao'];
                 $arMedicao[$key]['stNFMedicao']           = $_REQUEST['stNFMedicao'];
                 $arMedicao[$key]['dtNFMedicao']           = $_REQUEST['dtNFMedicao'];
@@ -1050,6 +1067,7 @@ function limparMedicao()
     $stJs .= "jQuery('#inCodMedidaObra').val('');                                                       \n";
     $stJs .= "jQuery('#dtInicioMedicao').val('');                                                       \n";
     $stJs .= "jQuery('#dtFinalMedicao').val('');                                                        \n";
+    $stJs .= "jQuery('#dtMedicao').val('');                                                             \n";
     $stJs .= "jQuery('#nuVlMedicao').val('');                                                           \n";
     $stJs .= "jQuery('#stNFMedicao').val('');                                                           \n";
     $stJs .= "jQuery('#dtNFMedicao').val('');                                                           \n";
@@ -1568,6 +1586,7 @@ function montaObra()
         $arMedicao[$inId]['inCodMedidaObra']       = $rsObraMedicao->getCampo('cod_medida');
         $arMedicao[$inId]['dtInicioMedicao']       = $rsObraMedicao->getCampo('data_inicio');
         $arMedicao[$inId]['dtFinalMedicao']        = $rsObraMedicao->getCampo('data_final');
+        $arMedicao[$inId]['dtMedicao']             = $rsObraMedicao->getCampo('data_medicao');
         $arMedicao[$inId]['nuVlMedicao']           = number_format($rsObraMedicao->getCampo('vl_medicao'), 2, ",", ".");
         $arMedicao[$inId]['stNFMedicao']           = $rsObraMedicao->getCampo('nro_nota_fiscal');
         $arMedicao[$inId]['dtNFMedicao']           = $rsObraMedicao->getCampo('data_nota_fiscal');

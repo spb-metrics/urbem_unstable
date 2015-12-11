@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.03.93
 
-    $Id: definePermissoes.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: definePermissoes.php 63829 2015-10-22 12:06:07Z franver $
 
     */
 session_cache_limiter('private_no_expire');
@@ -642,22 +642,14 @@ setAjuda("UC-01.03.93");
                         ?>
                     <?php
                     if ($exercicio < '2013' && ($conectaBD->pegaCampo("cod_funcionalidade") == 314 || $conectaBD->pegaCampo("cod_funcionalidade") == 315)) {
-                        //sistemaLegado::mostravar(' funcionalidade');
-                        //sistemaLegado::mostravar($conectaBD->pegaCampo("nom_funcionalidade"));
-                        //sistemaLegado::mostravar('acao');
-                        //sistemaLegado::mostravar($conectaBD->pegaCampo("nom_acao"));
                         if (!preg_match('/ANEXO[ ]{0,}[0-9]{1,2}/i',$conectaBD->pegaCampo("nom_acao"))) {
                             $nom_acao = $conectaBD->pegaCampo("nom_acao");
                             $cod_acao = $conectaBD->pegaCampo("cod_acao");
-                            //sistemaLegado::mostravar(' acao certa');
-                            //sistemaLegado::mostravar($nom_acao);
                     ?>
                     <tr>
                         <td class='field' width='1%'>
                             <input type="checkbox" name="codAcao[]" value='<?=$cod_acao;?>'
                             <?php if ($permissao->checaPermissaoAcao($cgm,$cod_acao,$exercicio)) {
-                                    //sistemaLegado::mostravar('CHECKED');
-                                    //sistemaLegado::mostravar($nom_acao);
                                     echo "checked";
                                 }
                             ?>
@@ -675,8 +667,6 @@ setAjuda("UC-01.03.93");
                         <td class='field' width='1%'>
                             <input type="checkbox" name="codAcao[]" value='<?=$cod_acao;?>'
                                 <?php if ($permissao->checaPermissaoAcao($cgm,$cod_acao,$exercicio)) {
-                                        //sistemaLegado::mostravar('CHECKED');
-                                        //sistemaLegado::mostravar($nom_acao);
                                         echo "checked";
                                     } ?>
                             >

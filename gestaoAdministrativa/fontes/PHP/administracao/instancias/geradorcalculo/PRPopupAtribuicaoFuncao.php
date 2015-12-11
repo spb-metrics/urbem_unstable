@@ -95,7 +95,6 @@ if ( substr($stFuncao,strlen($stFuncao)-1,strlen($stFuncao)) == ',') {
 $stFuncao .= ' ); ';
 ///////////////////////
 
-//SistemaLegado::mostravar("AQUI Funcao".$stAcao);die();
 switch ($stAcao) {
 
     case "incluir":

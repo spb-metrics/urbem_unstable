@@ -59,9 +59,6 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-//SistemaLegado::mostraVar($_POST);
-//die();
-
 foreach ($_POST as $stCampo => $stValor) {
         $sessao->transf4[$stCampo] = $stValor;
 }

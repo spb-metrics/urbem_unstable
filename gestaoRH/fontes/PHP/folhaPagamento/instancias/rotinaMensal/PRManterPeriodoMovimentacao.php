@@ -45,7 +45,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                       );
 include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoCalculoFolhaPagamento.class.php"                     );
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterPeriodoMovimentacao";
@@ -56,16 +56,17 @@ $pgOcul     = "OC".$stPrograma.".php";
 
 $obRFolhaPagamentoPeriodoMovimentacao = new RFolhaPagamentoPeriodoMovimentacao;
 $obRFolhaPagamentoCalculoFolhaPagamento = new RFolhaPagamentoCalculoFolhaPagamento;
-$obErro = new Erro;
-
+$obErro = new Erro();
 switch ($stAcao) {
     case "incluir":
-        if ($_POST['hdnNovaDataInicial'] != '') {
-            $dataInicial = $_POST['hdnNovaDataInicial'];
+        
+        if ($request->get('hdnNovaDataInicial') != '') {
+            $dataInicial = $request->get('hdnNovaDataInicial');
         } else {
-            $dataInicial = $_POST['stNovaDataInicial'];
+            $dataInicial = $request->get('stNovaDataInicial');
         }
-        if ( SistemaLegado::comparaDatas($dataInicial,$_POST['stNovaDataFinal']) ) {
+        
+        if ( SistemaLegado::comparaDatas($dataInicial,$request->get('stNovaDataFinal')) ) {
             $obErro->setDescricao("A data final deve ser posterior a data inicial.");
         }
         if ( !$obErro->ocorreu() ) {
@@ -75,30 +76,26 @@ switch ($stAcao) {
             }
         }
         if ( !$obErro->ocorreu() ) {
-            if ($_POST['hdnNovaDataInicial'] != '') {
-                $obRFolhaPagamentoPeriodoMovimentacao->setDtInicial($dataInicial);
-            } else {
-                $obRFolhaPagamentoPeriodoMovimentacao->setDtInicial($dataInicial);
-            }
-            $obRFolhaPagamentoPeriodoMovimentacao->setDtFinal($_POST['stNovaDataFinal']);
-            $obErro = $obRFolhaPagamentoPeriodoMovimentacao->abrirPeriodoMovimentacao();
+            $obRFolhaPagamentoPeriodoMovimentacao->setDtInicial($dataInicial);
+            $obRFolhaPagamentoPeriodoMovimentacao->setDtFinal($request->get('stNovaDataFinal'));
+            $obErro = $obRFolhaPagamentoPeriodoMovimentacao->abrirPeriodoMovimentacao($boTransacao);
 
             if ( !$obErro->ocorreu() ) {
-                sistemaLegado::alertaAviso($pgForm,"Data Inicial: ".$dataInicial." e Data Final: ".$_POST['stNovaDataFinal'],"incluir","aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgForm,"Data Inicial: ".$dataInicial." e Data Final: ".$request->get('stNovaDataFinal'),"incluir","aviso", Sessao::getId(), "../");
             } else {
-                sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
         } else {
-
-            sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
     break;
+
     case "excluir":
 
-        $obErro = $obRFolhaPagamentoPeriodoMovimentacao->cancelarPeriodoMovimentacao();
+        $obErro = $obRFolhaPagamentoPeriodoMovimentacao->cancelarPeriodoMovimentacao($boTransacao);
 
         if ( !$obErro->ocorreu() ) {
-            sistemaLegado::alertaAviso($pgForm,"Periodo Movimentação: ".$_GET["inCodPeriodoMovimentacao"],"excluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgForm,"Periodo Movimentação: ".$request->get("inCodPeriodoMovimentacao"),"excluir","aviso", Sessao::getId(), "../");
         } else {
             sistemaLegado::alertaAviso($pgList,urlencode($obErro->getDescricao()),"n_excluir","erro",Sessao::getId(), "../");
         }

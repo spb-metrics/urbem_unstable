@@ -138,6 +138,21 @@ function montaRecuperaDadosTribunal()
                 WHERE contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('stDataInicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('stDataFinal')."','dd/mm/yyyy')
                   AND contrato.cod_entidade IN (".$this->getDado('stEntidades').")
                   AND contrato.exercicio = '".$this->getDado('exercicio')."'
+
+                GROUP BY tipo_registro
+                       , unidade_gestora
+                       , contrato.numero_contrato
+                       , num_termo
+                       , pessoa_fisica_juridica.documento
+                       , pessoa_fisica_juridica.tipo_pessoa
+                       , dt_termo
+                       , nom_responsavel
+                       , publicacao_contrato.dt_publicacao
+                       , vl_termo
+                       , competencia
+                       , contrato.justificativa
+                       , contrato.fundamentacao_legal
+                       , contrato.objeto
             ";
     return $stSql;
 }

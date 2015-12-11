@@ -223,7 +223,6 @@ $cnpj = pegaDado("cnpj","cse.empresa","Where cod_empresa = '".$codEmpresa."' ");
 
 //Inclusão, alteração ou exclusão de dados
 case 2:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     $vet = $HTTP_POST_VARS;

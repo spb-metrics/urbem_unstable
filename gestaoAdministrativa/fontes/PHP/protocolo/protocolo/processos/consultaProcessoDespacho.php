@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: consultaProcessoDespacho.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+$Id: consultaProcessoDespacho.php 63829 2015-10-22 12:06:07Z franver $
 
 $Revision: 4412 $
 $Name$
@@ -149,7 +149,6 @@ include '../../../framework/legado/processosLegado.class.php';
     </td>
 </tr>
 <?php
-//mostravar($despachos);
 if (is_array($despachos)) {
     while (list($key, $val) = each($despachos)) {
 ?>

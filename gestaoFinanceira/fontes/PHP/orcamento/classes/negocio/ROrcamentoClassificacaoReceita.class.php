@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoClassificacaoReceita.class.php 63193 2015-08-03 20:34:35Z arthur $
+    $Id: ROrcamentoClassificacaoReceita.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.04, uc-02.01.06
 */
@@ -427,9 +427,7 @@ function listar(&$rsLista, $stOrder = "", $obTransacao = "")
                 $stFiltro .= "    WHERE                                         \n";
                 $stFiltro .= "        pc.cod_conta = pa.cod_conta               \n";
                 $stFiltro .= "    AND pc.exercicio = pa.exercicio               \n";
-                if ( !SistemaLegado::is_tcems($boTransacao) || Sessao::getExercicio() < 2012 ) {
-                    $stFiltro .= "    AND pc.cod_estrutural = '4.'||conta_receita.cod_estrutural \n";
-                }
+                $stFiltro .= "    AND pc.cod_estrutural = '4.'||conta_receita.cod_estrutural \n";
                 $stFiltro .= "    AND pc.exercicio = conta_receita.exercicio     \n";
                 $stFiltro .= "    AND pa.exercicio = '".$this->getExercicio()."' \n";
                 $stFiltro .= " )                                                 \n"; 
@@ -460,7 +458,7 @@ function consultar(&$rsLista, $boTransacao = "")
         $stFiltro .= " AND cod_estrutural = '".$this->getMascClassificacao()."'";
     }
     if ( $this->getListarAnaliticas() ) {
-        if (!SistemaLegado::is_tcems($boTransacao)) {
+        if (!Sessao::getExercicio() > '2012') {
             if ($this->getDedutora()) {
                 $stFiltro .= " AND cod_estrutural||exercicio in (         \n";
                 $stFiltro .= "    SELECT pc.cod_estrutural||pc.exercicio        \n";

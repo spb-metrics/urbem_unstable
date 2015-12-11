@@ -68,7 +68,7 @@ $stTitulo = $obRFolhaPagamentoFolhaSituacao->consultarCompetencia();
 //**************************************************************************************************************************//
 $obHdnAcao =  new Hidden;
 $obHdnAcao->setName                             	( "stAcao"                                                              );
-$obHdnAcao->setValue                            	( $_REQUEST["stAcao"]                                                   );
+$obHdnAcao->setValue                            	( $request->get('stAcao')                                               );
 
 $obHdnCtrl =  new Hidden;
 $obHdnCtrl->setName                             	( "stCtrl"                                                              );
@@ -199,7 +199,6 @@ if (trim($stAcao) == "incluir") {
     $obCmbTipoNorma = new Select;
     $obCmbTipoNorma->setRotulo              ( "Tipo de Norma"             );
     $obCmbTipoNorma->setName                ( "inCodTipoNorma"            );
-//    $obCmbTipoNorma->setValue               ( $inCodTipoNorma           );
     $obCmbTipoNorma->setCampoID             ( "cod_tipo_norma"            );
     $obCmbTipoNorma->setCampoDesc           ( "nom_tipo_norma"            );
     $obCmbTipoNorma->addOption              ( "", "Selecione"             );
@@ -210,7 +209,6 @@ if (trim($stAcao) == "incluir") {
     $obCmbNorma = new Select;
     $obCmbNorma->setRotulo        ( "Norma"         );
     $obCmbNorma->setName          ( "inCodNorma"    );
-//    $obCmbNorma->setValue         ( $inCodNorma     );
     $obCmbNorma->setCampoID       ( "cod_norma"     );
     $obCmbNorma->setCampoDesc     ( "nom_norma"     );
     $obCmbNorma->addOption        ( "", "Selecione" );
@@ -253,10 +251,11 @@ if (trim($stAcao) == "incluir") {
 
     $obBtnOk = new Ok;
     $obBtnOk->setValue              ( "Listar"                                                     );
-    $obBtnOk->setName				( "btnListar" 											       );
-    $obBtnOk->setTitle				( "Clique para listar os contratos para exclusão de reajuste." );
-    $obBtnOk->obEvento->setOnClick	( "montaParametrosGET('submeter', '', true);"                  );
+    $obBtnOk->setName		    ( "btnListar" 						   );
+    $obBtnOk->setTitle		    ( "Clique para listar os contratos para exclusão de reajuste." );
+    $obBtnOk->obEvento->setOnClick  ( "montaParametrosGET('submeter', '', true);"                  );
 }
+
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoAssentamento.class.php");
 $obTPessoalAssentamentoAssentamento = new TPessoalAssentamentoAssentamento();
 $stFiltro  = " AND classificacao_assentamento.cod_tipo = 1";
@@ -266,7 +265,7 @@ $obTPessoalAssentamentoAssentamento->recuperaAssentamento($rsAssentamentoAssenta
 $obFormulario = new Formulario;
 $obFormulario->addHidden                        	( $obHdnAcao                                                            );
 $obFormulario->addHidden                        	( $obHdnCtrl                                                            );
-$obFormulario->addTitulo 							( $stTitulo , "right" 	);
+$obFormulario->addTitulo 				( $stTitulo , "right" 	);
 if (trim($stAcao) == "incluir") {
     if ($rsAssentamentoAssentamento->getNumLinhas() <= 0) {
         $obFormulario->addComponente($obLblMensagem);
@@ -302,4 +301,5 @@ if (trim($stAcao) == "incluir") {
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

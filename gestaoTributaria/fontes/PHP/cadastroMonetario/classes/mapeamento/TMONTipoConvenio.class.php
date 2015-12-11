@@ -33,7 +33,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-  * $Id: TMONTipoConvenio.class.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: TMONTipoConvenio.class.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.05.04
  */
@@ -85,7 +85,6 @@ class TMONTipoConvenio extends Persistente
         if ($this->getDado('cod_funcao') != '') {
             $stSql .= "cod_funcao = ".$this->getDado('cod_funcao')." AND  ";
         }
-        SistemaLegado::mostravar($stSql);
 
         return substr($stSql,0,-6);
 

@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: SistemaLegado.class.php 63542 2015-09-10 12:37:11Z evandro $
+ $Id: SistemaLegado.class.php 64153 2015-12-09 19:16:02Z evandro $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -72,9 +72,6 @@ public static function pegaConfiguracao($stParametro,$inCodModulo=2,$inExercicio
 // Usa o CNPJ do tribunal para verificar
 public static function is_tcems($boTransacao='')
 {
-    if (Sessao::getExercicio() > '2012') {
-      return true;
-    }
     $stSql = "SELECT
                 valor
               FROM
@@ -623,11 +620,9 @@ public static function validaMascaraDinamica($mascara,$digitos)
 
     //Explode a mascara
     $elementosMascara =  preg_split( "/[^a-zA-Z0-9]/",$mascara);
-    //mostraVar($elementosMascara);
 
     //Pega somente os separadores da máscara
     $separadoresMascara =  preg_replace( "/[a-zA-Z0-9]/","",$mascara);
-    //mostraVar($separadoresMascara);
 
     //Total de elementos  da mascara
     $totalElMascara = sizeof($elementosMascara);

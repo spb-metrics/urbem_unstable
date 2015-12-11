@@ -61,8 +61,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( TEMP."TEmpenhoDespesasFixas.class.php" );
 
-//sistemaLegado::mostraVar($_REQUEST); die;
-
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterDespesasMensaisFixas";
 $pgFilt = "FL".$stPrograma.".php";

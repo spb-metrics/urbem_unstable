@@ -255,11 +255,7 @@ $obBtLimpar->obEvento->setOnClick( "limparResponsavel();");
 $obSpnGestor = new Span();
 $obSpnGestor->setId( 'spnResponsavel' );
 
-/*if (Sessao::read('arResponsavel')) {
-        sistemaLegado::mostravar($_REQUEST);
-    die('Fim');
-}*/
-//****************************************//
+f//****************************************//
 // Monta FORMULARIO
 //****************************************//
 $obFormulario = new Formulario;

@@ -114,7 +114,7 @@ $obBscConta->obCampoCod->setNull       ( true      );
 $obBscConta->obCampoCod->setValue      ( $inCodConta       );
 $obBscConta->obCampoCod->setAlign      ( "left"            );
 $obBscConta->obCampoCod->obEvento->setOnChange("montaParametrosGET('buscaEstrutural','inTipoLancamento,inCodConta,inSubTipo','true');");
-$obBscConta->setFuncaoBusca("abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodConta','stConta','conta_analitica_estrutural','".Sessao::getId()."&inCodIniEstrutural=1,2,5,6&tipoBusca2=extmmaa','800','550');");
+$obBscConta->setFuncaoBusca("abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodConta','stConta','conta_analitica_estrutural','".Sessao::getId()."&inCodIniEstrutural=1,2,3.5,4.5,5,6&tipoBusca2=extmmaa','800','550');");
 
 $obBtnOk = new Button();
 $obBtnOk->setValue('Incluir');

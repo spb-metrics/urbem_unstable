@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: PRManterAutorizacao.php 63367 2015-08-20 21:27:34Z michel $
+ $Id: PRManterAutorizacao.php 64005 2015-11-17 16:49:06Z michel $
 
  * Casos de uso: uc-03.04.32
  */
@@ -454,6 +454,7 @@ $stDtCompraDireta = $_REQUEST['stDtCompraDireta'];
                     $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $rsItensSolicitacaoAgrupados->getCampo( 'cod_unidade' )  );
                     $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $rsItensSolicitacaoAgrupados->getCampo( 'cod_grandeza') );
                     $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade( $rsItensSolicitacaoAgrupados->getCampo( 'simbolo') );
+                    $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto( $rsItensSolicitacaoAgrupados->getCampo('cod_centro') );
 
                     $rsItensSolicitacaoAgrupados->proximo();
                 }

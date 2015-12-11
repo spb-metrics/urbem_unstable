@@ -30,7 +30,7 @@
     * @author Analista: Anderson cAko Konze
     * @author Desenvolvedor: Anderson cAko Konze
 
-    $Id: TOrcamentoRecursoDestinacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TOrcamentoRecursoDestinacao.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.38
 */
@@ -83,7 +83,7 @@ function montaRecuperaRecursoVinculoConta($boTransacao = "")
     $stSql .= '  JOIN contabilidade.plano_recurso ';
     $stSql .= '    ON plano_recurso.exercicio = recurso_destinacao.exercicio ';
     $stSql .= '   AND plano_recurso.cod_recurso = recurso_destinacao.cod_recurso ';
-    if ( !SistemaLegado::is_tcems($boTransacao) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $stSql .= '  JOIN contabilidade.plano_analitica ';
         $stSql .= '    ON plano_analitica.cod_plano = plano_recurso.cod_plano ';
         $stSql .= '   AND plano_analitica.exercicio = plano_recurso.exercicio ';

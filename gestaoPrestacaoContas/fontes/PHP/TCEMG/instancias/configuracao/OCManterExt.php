@@ -109,7 +109,7 @@ switch ($stCtrl) {
         $obTContabilidadePlanoAnalitica = new TContabilidadePlanoAnalitica();
         $stFiltro.= " AND pa.exercicio = '".Sessao::getExercicio()."' ";
         $stFiltro.= " AND pa.cod_plano = ".$_REQUEST['inCodConta']." ";
-        $stFiltro.= " AND (pc.cod_estrutural LIKE '1.%' OR pc.cod_estrutural LIKE '2.%' OR pc.cod_estrutural LIKE '5.%' OR pc.cod_estrutural LIKE '6.%' ) ";
+        $stFiltro.= " AND pc.cod_estrutural SIMILAR TO('1.%|2.%|3.5%|4.5%|5.%|6.%') ";
         $obTContabilidadePlanoAnalitica->recuperaContaAnalitica( $rsConta, $stFiltro );
         if ( $rsConta->getNumLinhas() > 0 ) {
             $stJs = "document.getElementById('stConta').innerHTML = '".$rsConta->getCampo('nom_conta')."'; ";

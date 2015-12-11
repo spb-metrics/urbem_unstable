@@ -26,12 +26,12 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 
-    $Id: FTCEMGBalanceteContabil12.plsql 62872 2015-07-01 20:16:55Z franver $
+    $Id: FTCEMGBalanceteContabil12.plsql 64050 2015-11-24 17:11:25Z franver $
 
-* $Revision: 62872 $
+* $Revision: 64050 $
 * $Name$
 * $Author: franver $
-* $Date: 2015-07-01 17:16:55 -0300 (Qua, 01 Jul 2015) $
+* $Date: 2015-11-24 15:11:25 -0200 (Ter, 24 Nov 2015) $
 *
 * Casos de uso: uc-02.02.22
 */
@@ -79,6 +79,7 @@ BEGIN
                           , vl.oid as oid_temp
                           , plano_conta.escrituracao
                           , plano_conta.indicador_superavit
+                          , plano_conta.atributo_tcemg
                        FROM orcamento.receita as ore
                  INNER JOIN orcamento.conta_receita as ocr
                          ON ocr.cod_conta = ore.cod_conta
@@ -119,6 +120,24 @@ BEGIN
                         AND plano_conta.cod_conta = plano_analitica.cod_conta
                       WHERE ore.exercicio = '''||stExercicio||'''
                         AND vl.tipo_valor = ''D''
+                        AND plano_conta.cod_conta IN (SELECT plano_conta.cod_conta
+                                FROM contabilidade.plano_conta
+                          INNER JOIN (SELECT publico.fn_mascarareduzida(plano_conta.cod_estrutural)||''%'' AS cod_estrutural_reduzido
+                                           , plano_conta.atributo_tcemg
+                                           , plano_conta.exercicio
+                                        FROM contabilidade.plano_conta
+                                       WHERE plano_conta.escrituracao_pcasp = ''S''
+                                         AND plano_conta.atributo_tcemg = 12
+                                         AND plano_conta.exercicio = '''||stExercicio||'''
+                                    GROUP BY cod_estrutural_reduzido
+                                           , plano_conta.atributo_tcemg
+                                           , plano_conta.exercicio
+                                     ) AS plano_conta_reduzido
+                                  ON plano_conta.cod_estrutural ILIKE plano_conta_reduzido.cod_estrutural_reduzido
+                                 AND plano_conta.atributo_tcemg = plano_conta_reduzido.atributo_tcemg
+                                 AND plano_conta.exercicio = plano_conta_reduzido.exercicio
+                               WHERE plano_conta.exercicio = '''||stExercicio||''')
+
                    GROUP BY plano_conta.cod_estrutural
                           , plano_analitica.cod_plano
                           , natureza_receita
@@ -134,6 +153,7 @@ BEGIN
                           , oid_temp
                           , plano_conta.escrituracao
                           , plano_conta.indicador_superavit
+                          , plano_conta.atributo_tcemg
                    ORDER BY plano_conta.cod_estrutural
                   ) as tabela
             WHERE ' || stFiltro ;
@@ -158,6 +178,7 @@ BEGIN
                           , vl.oid as oid_temp
                           , plano_conta.escrituracao
                           , plano_conta.indicador_superavit
+                          , plano_conta.atributo_tcemg
                        FROM orcamento.receita as ore
                  INNER JOIN orcamento.conta_receita as ocr
                          ON ocr.cod_conta = ore.cod_conta
@@ -198,6 +219,24 @@ BEGIN
                         AND plano_conta.cod_conta = plano_analitica.cod_conta
                       WHERE ore.exercicio       = '''||stExercicio||'''
                         AND vl.tipo_valor   = ''C''
+                        AND plano_conta.cod_conta IN (SELECT plano_conta.cod_conta
+                                FROM contabilidade.plano_conta
+                          INNER JOIN (SELECT publico.fn_mascarareduzida(plano_conta.cod_estrutural)||''%'' AS cod_estrutural_reduzido
+                                           , plano_conta.atributo_tcemg
+                                           , plano_conta.exercicio
+                                        FROM contabilidade.plano_conta
+                                       WHERE plano_conta.escrituracao_pcasp = ''S''
+                                         AND plano_conta.atributo_tcemg = 12
+                                         AND plano_conta.exercicio = '''||stExercicio||'''
+                                    GROUP BY cod_estrutural_reduzido
+                                           , plano_conta.atributo_tcemg
+                                           , plano_conta.exercicio
+                                     ) AS plano_conta_reduzido
+                                  ON plano_conta.cod_estrutural ILIKE plano_conta_reduzido.cod_estrutural_reduzido
+                                 AND plano_conta.atributo_tcemg = plano_conta_reduzido.atributo_tcemg
+                                 AND plano_conta.exercicio = plano_conta_reduzido.exercicio
+                               WHERE plano_conta.exercicio = '''||stExercicio||''')
+
                    GROUP BY plano_conta.cod_estrutural
                           , plano_analitica.cod_plano
                           , natureza_receita
@@ -213,6 +252,7 @@ BEGIN
                           , oid_temp
                           , plano_conta.escrituracao
                           , plano_conta.indicador_superavit
+                          , plano_conta.atributo_tcemg
                    ORDER BY plano_conta.cod_estrutural
                     ) as tabela
               WHERE ' || stFiltro ;
@@ -275,7 +315,7 @@ BEGIN
     CREATE UNIQUE INDEX unq_contas_utilizadas ON tmp_contas_utilizadas (cod_estrutural varchar_pattern_ops, cod_recurso, natureza_receita, oid_temp);
 
     stSql := '
-           SELECT 12::INTEGER AS tipo_regostro
+           SELECT 12::INTEGER AS tipo_registro
                 , plano_conta.cod_estrutural_contabil AS conta_contabil
                 , RPAD(COALESCE(tmp_contas_utilizadas.natureza_receita, ''0'')::VARCHAR, 8, ''0'')::VARCHAR AS natureza_receita_reduzida
                 , COALESCE(tmp_contas_utilizadas.cod_recurso, 0) AS cod_recurso
@@ -295,6 +335,7 @@ BEGIN
                   ) AS plano_conta
         LEFT JOIN tmp_contas_utilizadas
                ON tmp_contas_utilizadas.cod_estrutural ILIKE plano_conta.cod_estrutural_reduzido
+              --AND tmp_contas_utilizadas.atributo_tcemg = plano_conta.atributo_tcemg 
          GROUP BY conta_contabil
                 , natureza_receita_reduzida
                 , tmp_contas_utilizadas.cod_recurso

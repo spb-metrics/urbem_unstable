@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: FMConsultaArrecadacaoDetalheParcela.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaArrecadacaoDetalheParcela.php 63839 2015-10-22 18:08:07Z franver $
 
     Caso de uso: uc-05.03.19
 **/
@@ -79,15 +79,10 @@ include_once '../../classes/negocio/RARRCarne.class.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
 
-#echo '<h1>DETALHE PARCELA</h1>';
-#print_r ( $_REQUEST );
-
-#exit;
 // pegando variaveis no request
 #foreach ($_REQUEST as $key =>$value) {
 #    $$key = $value;
 #}
-//sistemaLegado::mostravar($_REQUEST);
 if ($_GET['stDescricao']) {
 
     $arTMP          = explode ( '§', $_REQUEST['stDescricao'] );
@@ -141,19 +136,6 @@ if ($dtDataBaseBR && !$dtPagamento) {
 }
 */
 
-/*
-echo '<br><b>PAGMENT: ['.$dtPagamento.']</b>';
-echo '<br>Numeração: '.$inNumeracao;
-echo '<br>ID carregamento: '.$stIdCarregamento;
-echo '<br>COD PARCELA: '.$inCodParcela;
-echo '<br>DataUS: '.$dtDataUS;
-echo '<br>DataBase: '.$dtDataBase;
-echo '<br>dtVencimentoPR: '.$dtVencimentoPR;
-echo '<br>Pagamento: '.$dtPagamento;
-echo '<br>OCORRENCIA PAGTO:'.$inOcorrencia;
-*/
-//exit;
-
 //$dtVencimentoPR
 include_once ( CAM_GT_ARR_MAPEAMENTO."Ffn_situacao_carne.class.php"               );
 $obSituacao = new Ffn_situacao_carne;
@@ -169,11 +151,6 @@ $obRARRCarne->obRARRParcela->setCodParcela                      ( $inCodParcela 
 $obRARRCarne->setDataPagamento                                  ( $dtPagamento      );
 $obRARRCarne->listarConsulta    ( $rsDetalheParcela, '', $dtDataUS, $dtVencimentoPR );
 
-//sistemaLegado::mostravar ( $rsDetalheParcela );
-//exit;
-
-//echo "data us = ".$dtDataUS."<br>";
-//echo "venc = ".$dtVencimentoPR."<br>";
 //$dtDataUS = $rsDetalheParcela->getCampo("parcela_vencimento_us"); //comentado 03_06
 
 $obSpnQuebra = new Span;
@@ -211,8 +188,6 @@ $obLblNumeracao->setRotulo      ( "Ultima Numeração"   );
 $obRARRParcela = new RARRParcela ( new RARRLancamento (new RARRCalculo) );
 $obRARRParcela->setCodParcela ( $inCodParcela );
 $obRARRParcela->listarReemissaoConsulta( $rsNumeracoes );
-
-#sistemaLegado::mostravar( $rsNumeracoes );
 
 $obCmbNumeracao = new Select;
 $obCmbNumeracao->setName         ( "cmbNumeracao"               );
@@ -358,7 +333,7 @@ $stTipoBaixa = $rsDetalheParcela->getCampo("cod_lote");
 // antes de form , apresentar lista de pagamentos duplicados
 $obRARRCarne->listarPagamentosConsulta( $rsPagDuplicados );
 $rsPagDuplicados->addFormatacao("valor","NUMERIC_BR");
-#sistemaLegado::mostravar( $rsPagDuplicados );
+
 $inContPagamentos =  $rsPagDuplicados->getNumLinhas();
 $arParcelasDuplicadas = array();
 if ($inContPagamentos > 1) {
@@ -384,7 +359,6 @@ if ($inContPagamentos > 1) {
 if ( $rsPagDuplicados->getNumLinhas() > 0 ) {
 
     ########################### TABELA DOM
-    #sistemaLegado::mostravar( $rsPagDuplicados );
     $table = new Table();
     $table->setRecordset( $rsPagDuplicados );
     $table->setSummary('Pagamentos Duplicados');
@@ -616,7 +590,6 @@ $table = new Table();
 $table->setRecordset( $rsListaDetalheCreditos );
 $table->setSummary('Detalhamento por Crédio');
 
-#sistemaLegado::nmostravar( $rsListaDetalheCreditos );
 // lista zebrada
 //$table->setConditional( true , "#efefef" );
 

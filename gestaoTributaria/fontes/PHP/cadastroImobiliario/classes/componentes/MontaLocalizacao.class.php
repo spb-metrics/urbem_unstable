@@ -33,20 +33,9 @@
     * @package URBEM
     * @subpackage Interface
 
-    * $Id: MontaLocalizacao.class.php 63638 2015-09-23 17:09:46Z jean $
+    * $Id: MontaLocalizacao.class.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
-*/
-
-/*
-$Log$
-Revision 1.18  2006/11/17 12:08:25  dibueno
-Adição da função setEscondeID, para não exibir o campo de nome da localização
-
-Revision 1.17  2006/09/18 09:12:58  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 class MontaLocalizacao extends Objeto
@@ -292,7 +281,6 @@ function geraFormulario(&$obFormulario, $boObrigatorio = true)
     if ($this->inNivelCorte) {
         $stTmpAcao = "buscaReduzido";
     }
-//    $this->obBscChaveLocalizacao->setValoresBusca(CAM_GT_CIM_POPUPS."localizacao/OCBuscaLocalizacao.php?".Sessao::getId(),$obFormulario->obForm->getName(),$stTmpAcao);
     $this->obBscChaveLocalizacao->setFuncaoBusca("abrePopUp('".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php','frm','stChaveLocalizacao','stNomeChaveLocalizacao','buscaLocalizacaoInner','".Sessao::getId()."','800','550');");
 
     if ( $this->getObrigatorio() ) {
@@ -341,14 +329,12 @@ function geraFormulario2(&$obFormulario, $boObrigatorio = true, $inCodNvl)
 
     $this->obBscChaveLocalizacao->obCampoCod->setName ( "stChaveLocalizacao" );
     $this->obBscChaveLocalizacao->obCampoCod->setAlign ("center");
-//    $this->obBscChaveLocalizacao->obCampoCod->obEvento->setOnBlur("buscaDado('buscaLocalizacao');");
     $this->obBscChaveLocalizacao->obCampoCod->obEvento->setOnChange("buscaDado('buscaLocalizacao');");
     $this->obBscChaveLocalizacao->obCampoCod->obEvento->setOnKeyUp("mascaraDinamico('".$this->stMascara."', this, event);");
     $stTmpAcao = "nomLocalizacao";
     if ($this->inNivelCorte) {
         $stTmpAcao = "buscaReduzido";
     }
-//    $this->obBscChaveLocalizacao->setValoresBusca(CAM_GT_CIM_POPUPS."localizacao/OCBuscaLocalizacao.php?".Sessao::getId(),$obFormulario->obForm->getName(),$stTmpAcao);
     $this->obBscChaveLocalizacao->setFuncaoBusca("abrePopUp('".CAM_GT_CIM_POPUPS."localizacao/FLBuscaLocalizacao.php','frm','stChaveLocalizacao&inCodNvl=".$inCodNvl."','stNomeChaveLocalizacao','buscaLocalizacaoInner','".Sessao::getId()."','800','550');");
 
     if ( $this->getObrigatorio() ) {
@@ -397,7 +383,6 @@ function geraFormularioPreenchido(&$obFormulario)
 
         //RECUPERA O VALOR DO CODIGO DA LOCALIZACAO EM RELACAO AO VALOR COMPOSTO
         while ( !$rsListaLocalizacao->eof() ) {
-            //echo $rsListaLocalizacao->getCampo("valor_reduzido")." == ".$stValorComposto."<br>";
             if ( $rsListaLocalizacao->getCampo("valor_reduzido") == $stValorComposto ) {
                 $inCodigoLocalizacao = $rsListaLocalizacao->getCampo("cod_localizacao");
                 $stValor             = $rsListaLocalizacao->getCampo("valor");
@@ -617,7 +602,5 @@ function preencheCombos()
 }
 
 }
-/*--------------------------------------------------+
-|FIM DA CLASSE CLASSE                               |
-+--------------------------------------------------*/
+
 ?>

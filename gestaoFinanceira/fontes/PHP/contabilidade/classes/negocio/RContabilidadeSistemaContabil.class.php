@@ -208,12 +208,12 @@ function listarSistemaContaAnalitica(&$rsRecordSet, $stOrder = "" , $boTransacao
 
     $stFiltro .= " cod_sistema != 5  AND ";
 
-    if ( sistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stFiltro .= " cod_sistema < 4  AND ";
     }
 
     $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
-    if ( sistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
 
     }
     $stOrder = ($stOrder) ? $stOrder : "cod_sistema";

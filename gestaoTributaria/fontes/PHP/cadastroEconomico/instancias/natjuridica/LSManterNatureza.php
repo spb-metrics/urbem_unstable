@@ -33,7 +33,7 @@
     * @author Desenvolvedor: Lizandro Kirst da Silva
     * @ignore
 
-    * $Id: LSManterNatureza.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterNatureza.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.08
 
@@ -153,7 +153,6 @@ $obLista->ultimaAcao->addCampo("&inCodigoNatureza",       "cod_natureza"        
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[cod_natureza]-[nom_natureza]");
 if ($stAcao == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
- //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

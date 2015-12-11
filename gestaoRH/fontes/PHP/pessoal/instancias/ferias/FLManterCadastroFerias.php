@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: FLManterCadastroFerias.php 59816 2014-09-12 17:30:42Z michel $
+    $Id: FLManterCadastroFerias.php 63818 2015-10-19 20:02:07Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -103,10 +103,10 @@ $obIFiltroComponentes->setCgmMatricula();
 $obIFiltroComponentes->setLotacao();
 $obIFiltroComponentes->setLocal();
 $obIFiltroComponentes->setFuncao();
-
+Sessao::write('valida_ativos_cgm', 'true');
 if ($stAcao == "consultar") {
     $obIFiltroComponentes->setTodos();
-    $obIFiltroComponentes->setFiltroPadrao( "contrato_todos" );
+    Sessao::write('valida_ativos_cgm', 'false');
 }
 
 //DEFINICAO DO FORM

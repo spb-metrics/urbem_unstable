@@ -67,8 +67,6 @@ class RCodigoBarraFichaCompensacaoCaixa
         //$stDV = digito verificador das posicoes 1 ate 4 + 6 ate 44
         $stDVModOnze = $this->_modulo11( '104'.$tipoMoeda.$stFator.$valor.$nNumero.$stAgCodCedente );
 
-        // SistemaLegado::mostravar('104'."/".$tipoMoeda."/".$stDVModOnze."/".$stFator."/".$valor."/".$stCampoLivre); exit;
-
         //$stFator  vou fazer vir do banco, eh a data de vencimento - 07/10/1997 (para pagamentos que nao podem ser feitos apos vencimento tacar mais 15 dias)
         $barraFebraban = '104'.$tipoMoeda.$stDVModOnze.$stFator.$valor.$nNumero.$stAgCodCedente;
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCConcederDiarias.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCConcederDiarias.php 63836 2015-10-22 14:06:51Z franver $
 
     * Casos de uso: uc-04.09.02
 */
@@ -365,7 +365,6 @@ function incluirConcessao()
         $arConcessoes[]                          = $arConcessao;
         Sessao::write('arConcessoes', $arConcessoes);
 
-        //SistemaLegado::mostraVar($arConcessoes);
         $stJs .= "parent.frames[2].limpaFormularioConcessao();";
         $stJs .= montaListaConcessoes($arConcessoes);
     } else {
@@ -457,8 +456,6 @@ function alterarConcessao()
 
                 $arConcessoes[$arConcessaoKey]           = $arConcessao;
                 Sessao::write('arConcessoes', $arConcessoes);
-
-                //SistemaLegado::mostraVar($arConcessoes);
 
                 $stJs .= "parent.frames[2].limpaFormularioConcessao();";
                 $stJs .= montaListaConcessoes($arConcessoes);

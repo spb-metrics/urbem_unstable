@@ -141,8 +141,6 @@ switch ($controle) {
 
 if ($pessoa == "fisica") {
             if (comparaValor("cpf", $cpfigual, "sw_cgm_pessoa_fisica", "and numcgm <> $dadosCgm[numCgm]")) {
-                //mostravar($objCgm->alteraCgmConverte($dadosCgm));
-                //die();
                 if ($objCgm->alteraCgmConverte($dadosCgm)) {
                     //Insere auditoria
                     //echo "1";

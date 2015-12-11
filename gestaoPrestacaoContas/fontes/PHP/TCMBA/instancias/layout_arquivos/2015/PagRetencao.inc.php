@@ -33,18 +33,49 @@
 
     * @ignore
 
-    $Id: PagRetencao.inc.php 63484 2015-09-01 17:16:10Z michel $
+    $Id: PagRetencao.inc.php 63895 2015-11-03 18:27:25Z lisiane $
 */
 
 include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio().'/TTBAPagamentoRetencao.class.php';
 
 $obTTBAPagamentoRetencao = new TTBAPagamentoRetencao();
 $obTTBAPagamentoRetencao->setDado('inMes'           , $inMes                );
-$obTTBAPagamentoRetencao->setDado('stEntidades'     , $stEntidades          );
+$obTTBAPagamentoRetencao->setDado('entidades'     , $stEntidades          );
 $obTTBAPagamentoRetencao->setDado('unidade_gestora' , $inCodUnidadeGestora  );
-$obTTBAPagamentoRetencao->setDado('dt_inicial'      , $stDataInicial        );
-$obTTBAPagamentoRetencao->setDado('dt_final'        , $stDataFinal          );
-$obTTBAPagamentoRetencao->recuperaDadosTribunal($rsArquivo);
+$obTTBAPagamentoRetencao->setDado('data_inicial'      , $stDataInicial        );
+$obTTBAPagamentoRetencao->setDado('data_final'        , $stDataFinal          );
+
+#Teste de Erro
+if($arFiltro['stInformativoErro']=='Sim'){
+    $obTTBAPagamentoRetencao->recuperaLogErro($rsLogErro);
+
+    //Variável $boLogErro para se houver algum erro que impeça a geração do arquivo
+    $boLogErro = false;
+    if( !$rsLogErro->eof( )){
+        $arLogErrosTemp = array();
+        $inRegistros = $rsLogErro->getCampo("registros");
+        $inObrigatorio = $rsLogErro->getCampo("obrigatorio");
+
+        if( $inRegistros > 0 && ( $inObrigatorio == 0 || $inObrigatorio <> $inRegistros ) ){
+            $arLogErrosTemp['nome_arquivo'] = $stArquivo;
+            if( $inObrigatorio==0 ){
+                $arLogErrosTemp['erro'] = 'Obrigatório informar o Tipo de Pagamento TCM-BA em: Gestão Financeira :: Tesouraria :: Pagamentos :: Orçamentária - Pagamentos';
+            }elseif( $inObrigatorio <> $inRegistros ){
+                $arLogErrosTemp['erro'] = 'Foram realizados pagamentos sem informar o Tipo de Pagamento TCM-BA(Obrigatório) em: Gestão Financeira :: Tesouraria :: Pagamentos :: Orçamentária - Pagamentos';
+            }
+
+            $arLogErros[] = $arLogErrosTemp;
+        }
+
+        unset($arLogErrosTemp);
+    }
+    unset($rsLogErro);
+}
+#Fim Teste de Erro
+
+$rsArquivo = new RecordSet();
+if( !$boLogErro )
+    $obTTBAPagamentoRetencao->recuperaDadosTribunal($rsArquivo);    
 
 $obExportador->roUltimoArquivo->addBloco($rsArquivo);
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
@@ -64,18 +95,18 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUME
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_empenho");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_sub_empenho");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_pagamento_retencao");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_total_retencao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
@@ -83,20 +114,20 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_pagamento_retencao");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_pagamento");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil_pagadora");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_pagadora");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil_pagadora2");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_pagadora2");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_contabil_pagadora3");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_pagadora3");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_pagamento");
@@ -135,6 +166,6 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_pagamento_retencao3
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_criacao");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);

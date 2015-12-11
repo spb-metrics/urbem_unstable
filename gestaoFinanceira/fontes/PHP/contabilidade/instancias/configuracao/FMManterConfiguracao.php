@@ -110,7 +110,7 @@ $obRegra = new RContabilidadePlanoConta;
 $obRegra->setExercicio( Sessao::getExercicio() );
 $obRegra->listar( $rsLista, "" );
 
-if ( ($rsLista->getNumLinhas() > 0) && (!SistemaLegado::is_tcems() ) ) {
+if ( ($rsLista->getNumLinhas() > 0) && (!Sessao::getExercicio() > '2012' ) ) {
     $boExiste = true;
 } else {
     $boExiste = false;

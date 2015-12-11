@@ -30,22 +30,12 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 63565 2015-09-11 11:25:25Z carlos.silva $
+    $Id: TLicitacaoContrato.class.php 64081 2015-11-30 15:36:50Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.contrato
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Nome do Programador
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TLicitacaoContrato extends Persistente
 {
 /**
@@ -53,7 +43,7 @@ class TLicitacaoContrato extends Persistente
     * @access Private
 */
 
-function TLicitacaoContrato()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela("licitacao.contrato");
@@ -61,35 +51,35 @@ function TLicitacaoContrato()
     $this->setCampoCod('num_contrato');
     $this->setComplementoChave('exercicio,cod_entidade');
 
-    $this->AddCampo('num_contrato','sequence',true,''   ,true,false);
-    $this->AddCampo('exercicio','char',true,'4'  ,true,'TLicitacaoLicitacao');
-    $this->AddCampo('cod_entidade','integer',true,'',true,'TLicitacaoLicitacao');
-    $this->AddCampo('cod_tipo_documento','integer',false,'',false,'TAdministracaoModeloDocumento');
-    $this->AddCampo('cod_tipo_contrato','integer',false,'',false,'TLicitacaoTipoContrato');
-    $this->AddCampo('cod_documento','integer',false,'',false,'TAdministracaoModeloDocumento');
-    $this->AddCampo('cgm_responsavel_juridico','integer',true,'',false,'TCGM');
-    $this->AddCampo('cgm_contratado','integer',true,'',false,'TComprasFornecedor');
-    $this->AddCampo('dt_assinatura','date',true,'',false,false);
-    $this->AddCampo('vencimento','date',true,'',false,false);
-    $this->AddCampo('valor_contratado','numeric',true,'14,2',false,false);
-    $this->AddCampo('valor_garantia','numeric',true,'14,2',false,false);
-    $this->AddCampo('inicio_execucao', 'date',true,'',false,false );
-    $this->AddCampo('fim_execucao', 'date',true,'',false,false );
-    
-    $this->AddCampo('num_orgao','integer',true,'', true,'TOrcamentoOrgao');
-    $this->AddCampo('num_unidade','integer',true,'', true,'TOrcamentoUnidade');
-    $this->AddCampo('numero_contrato','integer',true,'', true, false);
-    $this->AddCampo('tipo_objeto','integer',true,'', true,'TComprasTipoObjeto');
-    $this->AddCampo('objeto','char',true,''  ,true, false);
-    $this->AddCampo('forma_fornecimento','char',true,'50', true, false);
-    $this->AddCampo('forma_pagamento','char',true,'100', true, false);
-    $this->AddCampo('cgm_signatario','integer',true,'', true,'TCGM');
-    $this->AddCampo('prazo_execucao','char',true,'100', true, false);
-    $this->AddCampo('multa_rescisoria','char',true,'250', true, false);
-    $this->AddCampo('justificativa','char',true,'250',true, false);
-    $this->AddCampo('razao','char',true,'250', true, false);
-    $this->AddCampo('fundamentacao_legal','char',true,'250' ,true, false);
-}    
+    $this->AddCampo('num_contrato'             ,'sequence',true ,''    ,true ,false                            );
+    $this->AddCampo('exercicio'                ,'char'    ,true ,'4'   ,true ,'TLicitacaoLicitacao'            );
+    $this->AddCampo('cod_entidade'             ,'integer' ,true ,''    ,true ,'TLicitacaoLicitacao'            );
+    $this->AddCampo('cod_tipo_documento'       ,'integer' ,false,''    ,false,'TAdministracaoModeloDocumento'  );
+    $this->AddCampo('cod_tipo_contrato'        ,'integer' ,false,''    ,false,'TLicitacaoTipoContrato'         );
+    $this->AddCampo('cod_documento'            ,'integer' ,false,''    ,false,'TAdministracaoModeloDocumento'  );
+    $this->AddCampo('cgm_responsavel_juridico' ,'integer' ,true ,''    ,false,'TCGM'                           );
+    $this->AddCampo('cgm_contratado'           ,'integer' ,true ,''    ,false,'TComprasFornecedor'             );
+    $this->AddCampo('dt_assinatura'            ,'date'    ,true ,''    ,false,false                            );
+    $this->AddCampo('vencimento'               ,'date'    ,true ,''    ,false,false                            );
+    $this->AddCampo('valor_contratado'         ,'numeric' ,true ,'14,2',false,false                            );
+    $this->AddCampo('valor_garantia'           ,'numeric' ,true ,'14,2',false,false                            );
+    $this->AddCampo('inicio_execucao'          , 'date'   ,true ,''    ,false,false                            );
+    $this->AddCampo('fim_execucao'             , 'date'   ,true ,''    ,false,false                            );
+
+    $this->AddCampo('num_orgao'                ,'integer' ,true ,''    ,true ,'TOrcamentoOrgao'                );
+    $this->AddCampo('num_unidade'              ,'integer' ,true ,''    ,true ,'TOrcamentoUnidade'              );
+    $this->AddCampo('numero_contrato'          ,'integer' ,true ,''    ,true ,false                            );
+    $this->AddCampo('tipo_objeto'              ,'integer' ,true ,''    ,true ,'TComprasTipoObjeto'             );
+    $this->AddCampo('objeto'                   ,'char'    ,true ,''    ,true ,false                            );
+    $this->AddCampo('forma_fornecimento'       ,'char'    ,true ,'50'  ,true ,false                            );
+    $this->AddCampo('forma_pagamento'          ,'char'    ,true ,'100' ,true ,false                            );
+    $this->AddCampo('cgm_signatario'           ,'integer' ,true ,''    ,true ,'TCGM'                           );
+    $this->AddCampo('prazo_execucao'           ,'char'    ,true ,'100' ,true ,false                            );
+    $this->AddCampo('multa_rescisoria'         ,'char'    ,true ,'250' ,true ,false                            );
+    $this->AddCampo('justificativa'            ,'char'    ,true ,'250' ,true ,false                            );
+    $this->AddCampo('razao'                    ,'char'    ,true ,'250' ,true ,false                            );
+    $this->AddCampo('fundamentacao_legal'      ,'char'    ,true ,'250' ,true ,false                            );
+}
 
 function recuperaDadosContrato(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
 {
@@ -850,6 +840,56 @@ function montaRecuperaDadosAditivosCompraDireta()
     $stSql.= "   AND contrato.num_contrato = ".$this->getDado('num_contrato')."                 \n";
     $stSql.= "   AND contrato.cod_entidade = ".$this->getDado('cod_entidade')."                 \n";
     $stSql.= "   AND contrato.exercicio = '".$this->getDado('exercicio')."'                     \n";
+
+    return $stSql;
+}
+
+function recuperaContratoEmpenho(&$rsRecordSet, $stFiltro = "",$boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaContratoEmpenho().$stFiltro;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaContratoEmpenho()
+{
+    $stSql = " SELECT contrato.num_contrato
+                    , objeto.descricao
+                    , to_char(contrato.dt_assinatura, 'dd/mm/yyyy') as dt_assinatura
+                 FROM licitacao.contrato
+            LEFT JOIN licitacao.contrato_licitacao
+                   ON (contrato.num_contrato = contrato_licitacao.num_contrato
+                  AND contrato.exercicio = contrato_licitacao.exercicio
+                  AND contrato.cod_entidade = contrato_licitacao.cod_entidade)
+
+            LEFT JOIN licitacao.contrato_compra_direta
+                   ON (contrato.num_contrato = contrato_compra_direta.num_contrato
+                  AND contrato.exercicio = contrato_compra_direta.exercicio
+                  AND contrato.cod_entidade = contrato_compra_direta.cod_entidade)
+
+            LEFT JOIN licitacao.licitacao
+                   ON (licitacao.cod_licitacao = contrato_licitacao.cod_licitacao
+                  AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade
+                  AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao
+                  AND licitacao.cod_entidade = contrato_licitacao.cod_entidade)
+
+            LEFT JOIN compras.compra_direta
+                   ON (compra_direta.cod_compra_direta = contrato_compra_direta.cod_compra_direta
+                  AND compra_direta.cod_modalidade = contrato_compra_direta.cod_modalidade
+                  AND compra_direta.exercicio_entidade = contrato_compra_direta.exercicio
+                  AND compra_direta.cod_entidade = contrato_compra_direta.cod_entidade)
+
+            LEFT JOIN compras.objeto
+                   ON (   licitacao.cod_objeto   = objeto.cod_objeto
+                       OR compra_direta.cod_objeto   = objeto.cod_objeto
+                      )
+
+            WHERE objeto.cod_objeto IS NOT NULL ";
 
     return $stSql;
 }

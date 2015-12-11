@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: OCRelatorioDivida.php 60055 2014-09-26 16:08:49Z michel $
+    * $Id: OCRelatorioDivida.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.04.10
 */
@@ -195,7 +195,7 @@ function montaCredito(){
     $stJs .= "d.getElementById('spnListaGrupos').innerHTML = '';";
     return $stJs;
 }
-//sistemaLegado::mostraVar($_REQUEST["stCtrl"]);
+
 switch ($_REQUEST["stCtrl"]) {
     case "limpaGrupoCredito":
         $stJs = "f.inCodGrupo.value = '';";

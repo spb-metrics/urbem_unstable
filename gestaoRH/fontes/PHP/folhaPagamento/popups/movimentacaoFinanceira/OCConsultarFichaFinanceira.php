@@ -67,10 +67,13 @@ function gerarSpan1($boExecuta=false)
     global $request;
 
     $arLink                   = Sessao::read("link");
+
     $inCodContrato            = $arLink["inCodContrato"];
     $inCodConfiguracao        = ($arLink["inCodConfiguracao"] != "")?$arLink["inCodConfiguracao"]:0;
     $inCodComplementar        = ($arLink["inCodComplementar"]) ? $arLink["inCodComplementar"] : 0;
     $inCodPeriodoMovimentacao = $arLink["inCodPeriodoMovimentacao"];
+    $inCodMes                 = $arLink["inCodMes"];
+    $inAno                    = $arLink["inAno"];
 
     if (trim($inCodPeriodoMovimentacao)=="") {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
@@ -185,12 +188,10 @@ function gerarSpan1($boExecuta=false)
                 break;
         }
 
-        $dtPeriodoConsultadoMes = Sessao::read("inCodMes");
-        $dtPeriodoConsultadoAno = Sessao::read("inAno");
         $stTabela0  = "<center>";
         $stTabela0 .= "<table border=0 width=100% >";
         $stTabela0 .= "<tr><td class=labelcenterCabecalho align=right width=20%><font size=-1>Período Consultado</font></td>";
-        $stTabela0 .= "<td class=labelcenterCabecalho width=80%><font size=-1>".$dtPeriodoConsultadoMes."/".$dtPeriodoConsultadoAno."</font></td>";
+        $stTabela0 .= "<td class=labelleftCabecalho width=80%><font size=-1>"."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".SistemaLegado::mesExtensoBR($inCodMes)." / ".$inAno."</font></td>";
         $stTabela0 .= "</table>";
         $stTabela0 .= "</center>";
 

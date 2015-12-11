@@ -1600,9 +1600,6 @@ function RCarneItbiUrbem($arEmissao, $horizontal = 7, $vertical = 95)
     $this->inHorizontal     = $horizontal;
     $this->inVertical       = $vertical;
 
-//sistemaLegado::mostravar( $arEmissao );
-//echo "destino raro<br>";
-//exit;
 }
 
 function imprimirCarne($diffBaixa = FALSE)
@@ -1748,17 +1745,6 @@ function imprimirCarne($diffBaixa = FALSE)
         $flValorTotalMulta = 0.00;
         $flValorTotalCorrecao = 0.00;
         $flValorTotalGeral = 0.00;
-
-/*
-echo "total geral = ".$flValorTotalGeral."<br>";
-echo "total correcao = ".$flValorTotalCorrecao."<br>";
-echo "total multa = ".$flValorTotalMulta."<br>";
-echo "total juros = ".$flValorTotalJuros."<br>";
-echo "total = ".$flValorTotal."<br>";
-
-sistemaLegado::mostravar( $rsGeraCarneCabecalho );
-sistemaLegado::mostravar( $rsListaDetalheCreditos );exit;
-*/
 
         if ( $obErro->ocorreu() ) {
             break;

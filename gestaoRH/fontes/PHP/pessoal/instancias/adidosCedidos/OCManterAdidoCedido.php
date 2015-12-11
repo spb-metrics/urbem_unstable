@@ -173,18 +173,31 @@ function validaMatricula()
 
 function preencherSpanFiltro()
 {
-    include_once( CAM_GRH_PES_COMPONENTES."IFiltroContrato.class.php"                                       );
-    include_once( CAM_GRH_PES_COMPONENTES."IFiltroCGMContrato.class.php"                                    );
+    include_once( CAM_GRH_PES_COMPONENTES."IFiltroContrato.class.php" );
+    include_once( CAM_GRH_PES_COMPONENTES."IFiltroCGMContrato.class.php");
     $stHtml = "";
     $obFormulario = new Formulario;
-    if ($_GET['stOpcao'] == "cgm_contrato") {
+    if ($_GET['stOpcao'] == 'cgm_contrato') {
         $obIFiltroCGMContrato = new IFiltroCGMContrato;
         $obIFiltroCGMContrato->obBscCGM->setNull(false);
         $obIFiltroCGMContrato->obCmbContrato->setNull(false);
+
+        if ( $_REQUEST['stAcao'] != 'consultar' ) {
+            Sessao::write('valida_ativos_cgm','true');
+        }else{
+            Sessao::write('valida_ativos_cgm','false');
+        }
+
         $obIFiltroCGMContrato->geraFormulario($obFormulario);
     } else {
-        $obIFiltroContrato = new IFiltroContrato;
+        $obIFiltroContrato = new IFiltroContrato();
         $obIFiltroContrato->obIContratoDigitoVerificador->setNull(false);
+        if ( $_REQUEST['stAcao'] == 'consultar' ) {
+            $obIFiltroContrato->setSituacao('todos');
+            $obIFiltroContrato->obIContratoDigitoVerificador->setSituacao('todos');
+        }else{
+            $obIFiltroContrato->obIContratoDigitoVerificador->setTipo('contrato_ativos');
+        }
         $obIFiltroContrato->geraFormulario($obFormulario);
     }
     $obFormulario->montaInnerHTML();
@@ -288,8 +301,6 @@ function submeter()
         $obErro->setDescricao($obErro->getDescricao()."@$msg!()");
     }
 
-   // sistemaLegado::mostraVar($_REQUEST);
-
     if ( $obErro->ocorreu() ) {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','aviso','".Sessao::getId()."');";
     } else {
@@ -335,7 +346,7 @@ switch ($_GET['stCtrl']) {
     break;
     case "submeter":
         $stJs .= submeter();
-        break;
+    break;
 }
 
 if ($stJs) {

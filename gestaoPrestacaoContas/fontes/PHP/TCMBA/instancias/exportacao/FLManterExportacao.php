@@ -29,7 +29,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
     * @ignore
-    $Id: FLManterExportacao.php 63753 2015-10-05 20:51:52Z jean $
+    $Id: FLManterExportacao.php 64093 2015-12-02 12:16:17Z evandro $
     * Casos de uso: uc-06.03.00
 */
 
@@ -81,12 +81,15 @@ if ($inCodUnidadeGestora != "") {
     $obRdbTipoExportArqIndividual->setRotulo ( "*Tipo de Exportação"    );
     $obRdbTipoExportArqIndividual->setTitle  ( "Tipo de Exportação"     );
     $obRdbTipoExportArqIndividual->setChecked( true                     );
+    $obRdbTipoExportArqIndividual->obEvento->setOnClick("jq('input[name=stInformativoErro]').removeAttr('disabled');");
+
     /* Tipo Arquivo Compactado */
     $obRdbTipoExportArqCompactado = new Radio;
     $obRdbTipoExportArqCompactado->setName  ( "stTipoExport"    );
     $obRdbTipoExportArqCompactado->setLabel ( "Compactados"     );
     $obRdbTipoExportArqCompactado->setValue ( "compactados"     );
-    
+    $obRdbTipoExportArqCompactado->obEvento->setOnClick("jq('#stInformativoErroNao').prop('checked', 'checked'); jq('input[name=stInformativoErro]').attr('disabled','disabled'); ");
+
     switch ($stAcao) {
         case 'basicos':
             $arNomeArquivos = array( 
@@ -120,6 +123,7 @@ if ($inCodUnidadeGestora != "") {
                                         ,"Frota.txt"    
                                         ,"Patrimonio.txt"
                                     );
+
         break;
         case 'consolidados':
             $arNomeArquivos = array( 
@@ -207,6 +211,9 @@ if ($inCodUnidadeGestora != "") {
                                         ,"FiscalCadastro.txt"
                                         ,"DotTermoParc.txt"
                                         ,"TermoParc.txt"
+                                        ,"FolhaPgt.txt"
+                                        ,"EditalDotacao.txt"
+                                        ,"EditPregaoElet.txt"
                                     );
         break;
     }
@@ -228,6 +235,24 @@ if ($inCodUnidadeGestora != "") {
     $obISelectEntidade = new ITextBoxSelectEntidadeGeral();
     $obISelectEntidade->setCodEntidade(1);
     
+    /* Radio para selecionar gera Informativo de Erros Internos*/
+    /* Informativo de Erros Sim */
+    $obRdbInformativoErroSim = new Radio;
+    $obRdbInformativoErroSim->setName   ( "stInformativoErro"       );
+    $obRdbInformativoErroSim->setId     ( "stInformativoErroSim"    );
+    $obRdbInformativoErroSim->setLabel  ( "Sim"                     );
+    $obRdbInformativoErroSim->setValue  ( "Sim"                     );
+    $obRdbInformativoErroSim->setRotulo ( "*Informativo de Erros"   );
+    $obRdbInformativoErroSim->setTitle  ( "Selecione para gerar informativo de erros para uso interno" );
+    $obRdbInformativoErroSim->setChecked( true                      );
+    /* Informativo de Erros Não */
+    $obRdbInformativoErroNao = new Radio;
+    $obRdbInformativoErroNao->setName   ( "stInformativoErro"       );
+    $obRdbInformativoErroNao->setId     ( "stInformativoErroNao"    );
+    $obRdbInformativoErroNao->setLabel  ( "Não"                     );
+    $obRdbInformativoErroNao->setValue  ( "Não"                     );
+    $obRdbInformativoErroNao->setChecked( true                      );
+
     $rsArqSelecionados = new RecordSet;
     $rsArqDisponiveis = new RecordSet;
     $rsArqDisponiveis->preenche($arElementosArq);
@@ -249,6 +274,37 @@ if ($inCodUnidadeGestora != "") {
     $obCmbArquivos->setCampoId2     ( 'Arquivo'                 );
     $obCmbArquivos->setCampoDesc2   ( 'Nome'                    );
     $obCmbArquivos->SetRecord2($rsArqSelecionados);
+
+    $stTipoPeriodicidade = SistemaLegado::pegaConfiguracao("tcmba_tipo_periodicidade_patrimonio", 45, Sessao::getExercicio(), $boTransacao);
+
+    $obRdbTipoPeriodicidadeAquisicao = new Radio;
+    $obRdbTipoPeriodicidadeAquisicao->setName   ( "stTipoPeriodicidade" );
+    $obRdbTipoPeriodicidadeAquisicao->setId     ( "stTipoPeriodicidadeAquisicao" );
+    $obRdbTipoPeriodicidadeAquisicao->setLabel  ( "Data de Aquisição"            );
+    $obRdbTipoPeriodicidadeAquisicao->setValue  ( "aquisicao"                    );
+    $obRdbTipoPeriodicidadeAquisicao->setRotulo ( "*Tipo de Periodicidade"       );
+    $obRdbTipoPeriodicidadeAquisicao->setTitle  ( "Selecione o Tipo de Periodicidade para Exportação do Patrimônio." );
+
+    $obRdbTipoPeriodicidadeIncorporacao = new Radio;
+    $obRdbTipoPeriodicidadeIncorporacao->setName   ( "stTipoPeriodicidade" );
+    $obRdbTipoPeriodicidadeIncorporacao->setId     ( "stTipoPeriodicidadeIncorporacao" );
+    $obRdbTipoPeriodicidadeIncorporacao->setLabel  ( "Data de Incorporação"            );
+    $obRdbTipoPeriodicidadeIncorporacao->setValue  ( "incorporacao"                    );
+
+    switch ($stTipoPeriodicidade) {
+        case 'incorporacao':
+            $arBooleanPeriodo[0] = false;
+            $arBooleanPeriodo[1] = true;
+        break;
+        
+        default:
+            $arBooleanPeriodo[0] = true;
+            $arBooleanPeriodo[1] = false;
+        break;
+    }
+
+    $obRdbTipoPeriodicidadeAquisicao->setChecked    ( $arBooleanPeriodo[0] );
+    $obRdbTipoPeriodicidadeIncorporacao->setChecked ( $arBooleanPeriodo[1] );
     
     //Instancia o formulário
     $obForm = new Form;
@@ -262,7 +318,11 @@ if ($inCodUnidadeGestora != "") {
     $obFormulario->addHidden        ( $obHdnAcao                                                            );
     $obFormulario->addComponente    ( $obISelectEntidade                                                    );
     $obFormulario->agrupaComponentes( array($obRdbTipoExportArqIndividual, $obRdbTipoExportArqCompactado)   );
+    if ($stAcao == "consumo") {
+        $obFormulario->agrupaComponentes( array($obRdbTipoPeriodicidadeAquisicao, $obRdbTipoPeriodicidadeIncorporacao) );
+    }
     $obFormulario->addComponente    ( $obPeriodicidade                                                      );
+    $obFormulario->agrupaComponentes( array($obRdbInformativoErroSim,$obRdbInformativoErroNao)              );
     $obFormulario->addComponente    ( $obCmbArquivos                                                        );
     
     $obFormulario->OK   ();

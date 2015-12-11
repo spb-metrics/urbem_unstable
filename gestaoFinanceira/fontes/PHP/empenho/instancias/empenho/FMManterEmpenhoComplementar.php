@@ -32,24 +32,20 @@
 
     * @ignore
 
+    $Id: FMManterEmpenhoComplementar.php 64081 2015-11-30 15:36:50Z michel $
+
     * Casos de uso: uc-02.03.36
 */
 
-/*
-$Log$
-Revision 1.1  2007/10/02 20:03:14  rodrigo_sr
-Empenho Complementar
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once ( CAM_GF_INCLUDE."validaGF.inc.php"                                                        );
+include_once CAM_GF_INCLUDE."validaGF.inc.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php"                                );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php"                                      );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php"                                           );
-include_once ( CAM_FW_HTML."MontaAtributos.class.php"                                                   );
-include_once ( CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeUsuario.class.php'                        );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GF_ORC_COMPONENTES.'ITextBoxSelectEntidadeUsuario.class.php';
+include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma    = "ManterEmpenho";
@@ -61,19 +57,19 @@ $pgJS          = "JS".$stPrograma.".js";
 
 $stOrder = "";
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
- $hdnNumItem = "";
- $stNomFornecedor = "";
- $stDtEmpenho = "";
- $stNomItem = "";
- $stComplemento = "";
- $nuQuantidade = "";
- $nuVlUnitario = "";
- $nuVlTotal = "";
- include_once ($pgJS);
+$stAcao = $request->get('stAcao', 'incluir');
+
+$hdnNumItem = "";
+$stNomFornecedor = "";
+$stDtEmpenho = "";
+$stNomItem = "";
+$stComplemento = "";
+$nuQuantidade = "";
+$nuVlUnitario = "";
+$nuVlTotal = "";
+include_once ($pgJS);
+
+Sessao::remove('arBuscaContrato');
 
 //valida a utilização da rotina de encerramento do mês contábil
 $mesAtual = date('m');
@@ -182,6 +178,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obHdnValidaFornecedor->setName ( "boMsgValidadeFornecedor" );
     $obHdnValidaFornecedor->setId   ( "boMsgValidadeFornecedor" );
     $obHdnValidaFornecedor->setValue( 'false' );
+    
+    //Define o nome da ação para controle no oculto para o mostrar o calcúlo do saldo anterior na label
+    $obHdnEmitirEmpenhoComplementar = new Hidden;
+    $obHdnEmitirEmpenhoComplementar->setName ( "hdnNomeAcao" );
+    $obHdnEmitirEmpenhoComplementar->setId   ( "hdnNomeAcao" );
+    $obHdnEmitirEmpenhoComplementar->setValue( "stEmitirEmpenhoComplementar" );
 
     // Define Objeto TextBox para Codigo da Entidade
     $obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario;
@@ -208,25 +210,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     // Define Objeto Span Para Empenho
     $obSpanEmpenho = new Span;
     $obSpanEmpenho->setId( "spnEmpenho" );
-
-    // Define objeto Data para validade final
-    $obDtEmpenho = new Data;
-    $obDtEmpenho->setName     ( "stDtEmpenho" );
-    $obDtEmpenho->setValue    ( $stDtEmpenho  );
-    $obDtEmpenho->setRotulo   ( "Data de Empenho");
-    $obDtEmpenho->setTitle    ( 'Informe a data do empenho.' );
-    $obDtEmpenho->setNull     ( false );
-    $obDtEmpenho->obEvento->setOnBlur( "validaDataEmpenho();" );
-    $obDtEmpenho->obEvento->setOnChange( "montaParametrosGET('verificaFornecedor');" );
-
-    // Define objeto Data para validade final
-    $obDtValidadeFinal = new Data;
-    $obDtValidadeFinal->setName     ( "stDtVencimento" );
-    $obDtValidadeFinal->setValue    ( $stDtVencimento );
-    $obDtValidadeFinal->setRotulo   ( "Data de Vencimento" );
-    $obDtValidadeFinal->setTitle    ( '' );
-    $obDtValidadeFinal->setNull     ( false );
-    $obDtValidadeFinal->obEvento->setOnChange( "validaVencimento();" );
 
     // Define Objeto TextArea para Descricao do Item
     $obTxtNomItem = new TextArea;
@@ -374,7 +357,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaAssinaturas = new IMontaAssinaturas(null, 'nota_empenho');
     $obMontaAssinaturas->definePapeisDisponiveis('nota_empenho');
     $obMontaAssinaturas->setOpcaoAssinaturas( false );
-    
+
     //Radio para definicao de tipo Item
     $obRdTipoItemC = new Radio;
     $obRdTipoItemC->setTitle      ( "Selecione o tipo de Item" );
@@ -394,13 +377,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRdTipoItemD->setLabel    ( "Não" );
     $obRdTipoItemD->obEvento->setOnClick( "habilitaCampos('Descricao');" );
     $obRdTipoItemD->setChecked( true );
-    
+
     $obHdnTipoItem = new Hidden;
     $obHdnTipoItem->setName ('stTipoItem');
     $obHdnTipoItem->setValue('Catalogo');
-    
+
     $arRadios = array( $obRdTipoItemC, $obRdTipoItemD );
-         
+
     include_once CAM_GP_ALM_COMPONENTES."IMontaItemUnidade.class.php";
     $obMontaItemUnidade = new IMontaItemUnidade($obForm);
     $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
@@ -410,6 +393,18 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaItemUnidade->obIPopUpCatalogoItem->setId( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obIPopUpCatalogoItem->setName( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obSpnInformacoesItem->setStyle('visibility:hidden; display:none');
+
+    //Define o objeto para validacao da data do contrato
+    $obHdnDtContrato = new Hidden;
+    $obHdnDtContrato->setName ('dtContrato');
+    $obHdnDtContrato->setId   ('dtContrato');
+    $obHdnDtContrato->setValue('');
+
+    $obContrato = new IPopUpContrato( $obForm );
+    $obContrato->obHdnBoFornecedor->setValue(TRUE);
+    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+    $obContrato->obBuscaInner->setValoresBusca('', '', '');
+    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
 
     //****************************************//
     // Monta FORMULARIO
@@ -425,7 +420,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addHidden( $obHdnAcao              );
     $obFormulario->addHidden( $obHdnUnidadePadrao     );
     $obFormulario->addHidden( $obHdnValidaFornecedor  );
-
+    $obFormulario->addHidden( $obHdnEmitirEmpenhoComplementar  );
+    
     $obFormulario->addComponente( $obEntidadeUsuario );
     $obFormulario->addComponente( $obBscEmpenho );
     $obFormulario->addSpan( $obSpanEmpenho );
@@ -435,6 +431,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obFormulario->addComponente($obCmbModalidadeLicitacao);
         $obFormulario->addSpan($obSpanFundamentacaoLegal);
     }
+
+    $obFormulario->addTitulo('Contrato');
+    $obFormulario->addHidden( $obHdnDtContrato );
+    $obContrato->geraFormulario($obFormulario);
 
     $obFormulario->addTitulo( "Insira os Ítens do Empenho Complementar" );
     $obFormulario->addHidden($obHdnTipoItem);

@@ -261,7 +261,6 @@ class interfaceUsuario
         $paginacao->geraLinks();
         $paginacao->pegaOrder("lower(G.nom_cgm)","ASC");
         $stSql = $paginacao->geraSQL();
-        //mostravar($stSql);
         $obDb = new dataBaseLegado;
         $obDb->abreBD();
 

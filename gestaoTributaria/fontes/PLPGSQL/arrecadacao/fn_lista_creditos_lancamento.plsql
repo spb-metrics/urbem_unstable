@@ -27,7 +27,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_lista_creditos_lancamento.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_lista_creditos_lancamento.plsql 63867 2015-10-27 17:25:14Z evandro $
 *
 * Caso de uso: uc-05.03.11
 *              uc-05.03.19
@@ -44,11 +44,11 @@ correção da tag de caso de uso
 
 */
 
-CREATE OR REPLACE FUNCTION arrecadacao.fn_lista_creditos_lancamento( integer, integer, integer ) returns VARCHAR as '
+CREATE OR REPLACE FUNCTION arrecadacao.fn_lista_creditos_lancamento( integer, integer, integer ) returns VARCHAR as $$
 declare
-    stSql           varchar := '''';
-    stRetorno       varchar := '''';
-    stAux           varchar := '''';
+    stSql           varchar := '';
+    stRetorno       varchar := '';
+    stAux           varchar := '';
     inCont          integer := 0;
     nuSoma          numeric;
     reRecord        RECORD;
@@ -59,7 +59,7 @@ declare
 
 BEGIN
 
-    stSql := ''
+    stSql := '
         SELECT
             ac.cod_credito,
             mc.descricao_credito as descricao,
@@ -88,20 +88,20 @@ BEGIN
             AND ac.cod_genero   = mc.cod_genero
             AND ac.cod_natureza = mc.cod_natureza
         WHERE
-            alc.cod_lancamento      = ''|| inCodLancamento ||''
-            and acg.cod_grupo       = ''|| inCodGrupo ||''
-            and acg.ano_exercicio   = ''''|| inExercicio ||''''
+            alc.cod_lancamento      = '|| inCodLancamento ||'
+            and acg.cod_grupo       = '|| inCodGrupo ||'
+            and acg.ano_exercicio   = '''|| inExercicio ||'''
 
         ORDER BY acg.ordem
-    '';
+    ';
 
     nuSoma := 0.00;
     FOR reRecord IN EXECUTE stSql LOOP
-        stRetorno := stRetorno||''§''||reRecord.cod_credito||''§''||reRecord.descricao||''§''||reRecord.valor;
+        stRetorno := stRetorno||'§'||reRecord.cod_credito||'§'||reRecord.descricao||'§'||reRecord.valor;
         nuSoma := nuSoma + reRecord.valor;
         inCont := inCont + 1;
     END LOOP;
 
     return nuSoma||stRetorno;
 end;
-'language 'plpgsql';
+$$ language 'plpgsql';

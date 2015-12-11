@@ -40,13 +40,6 @@
     * Casos de uso: uc-02.01.08
 */
 
-/*
-$Log$
-Revision 1.5  2006/07/05 20:43:33  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
@@ -60,7 +53,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 
-$stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 $obREmpenhoAutorizacaoEmpenho = new REmpenhoPreEmpenho;
 
 function montaLabel($flSaldoDotacao)
@@ -88,22 +81,25 @@ function montaLabel($flSaldoDotacao)
 switch ($stCtrl) {
  case 'buscaDespesa':
 
-    if ($_POST["inCodDespesa"] != "" and $_POST["inCodigoEntidade"] != "") {
+    if ($request->get('inCodDespesa') != "" and $request->get('inCodigoEntidade') != "") {
 
-        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $_POST["inCodDespesa"] );
-        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $_POST["inCodigoEntidade"] );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesa') );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodigoEntidade') );
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
 
         $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
-        $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior( $nuSaldoDotacao );
+        $obREmpenhoAutorizacaoEmpenho->setdataEmpenho($request->get('dtDataReserva'));
+        $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodigoEntidade'));
+        $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
+        $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho($nuSaldoDotacao);
 
         $stNomDespesa = $rsDespesa->getCampo( "descricao" );
         if (!$stNomDespesa) {
             $js .= 'f.inCodDespesa.value = "";';
             $js .= 'window.parent.frames["telaPrincipal"].document.frm.inCodDespesa.focus();';
             $js .= 'd.getElementById("stNomDespesa").innerHTML = "&nbsp;";';
-            $js .= "alertaAviso('@Valor inválido. (".$_POST["inCodDespesa"].")','form','erro','".Sessao::getId()."');";
+            $js .= "alertaAviso('@Valor inválido. (".$request->get('inCodDespesa').")','form','erro','".Sessao::getId()."');";
             $js .= "d.getElementById('spnSaldoDotacao').innerHTML = '';";
         } else {
             $js .= 'd.getElementById("stNomDespesa").innerHTML = "'.$stNomDespesa.'";';

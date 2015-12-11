@@ -60,7 +60,6 @@ function geraArquivosContratos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTLicitacaoContrato->setDado( 'dt_inicial', $stDataInicial );
     $obTLicitacaoContrato->setDado( 'dt_final', $stDataFinal );
     $obTLicitacaoContrato->recuperaContratoEsfinge( $rsContrato );
-    sistemaLegado::mostravar( $rsContrato );
 
     $obExportador->addArquivo("contrato.txt");
     $obExportador->roUltimoArquivo->addBloco($rsContrato);
@@ -130,7 +129,6 @@ function geraArquivosContratos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTContratoDocumento->setDado( 'dt_inicial'  , $stDataInicial );
     $obTContratoDocumento->setDado( 'dt_final'  , $stDataFinal );
     $obTContratoDocumento->recuperaCertidaoContratadoEsfinge($rsCertidaoContratado);
-    sistemaLegado::mostravar( $rsCertidaoContratado );
 
     $obExportador->addArquivo("ceritdaocontratado.txt");
     $obExportador->roUltimoArquivo->addBloco($rsCertidaoContratado);

@@ -361,8 +361,6 @@ function geraRecordSet(&$arRecordSet , $stOrder = "")
     $rsNewRecord = new RecordSet;
     $rsNewRecord->preenche($arLinha9);
     $arRecordSet[9] = $rsNewRecord;
-
-//    mostraVar($arRecordSet);
 }
 
 }

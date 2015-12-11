@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCExportarRemessaBanrisul.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportarRemessaBanrisul.php 63836 2015-10-22 14:06:51Z franver $
 
     * Casos de uso: uc-04.08.17
 */
@@ -505,16 +505,6 @@ function atualizarGrupoConta()
 
     return $stJs;
 }
-
-/*function atualizarSessaoConta() {
-    include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoBanrisulConta.class.php");
-    $obTIMAConfiguracaoBanrisulConta = new TIMAConfiguracaoBanrisulConta();
-    sistemaLegado::mostravar($_REQUEST);
-    die('Fim');
-    $obTIMAConfiguracaoBanrisulConta->recuperaRelacionamento($rsConfiguracaoBanrisulConta);
-
-    return $stJs;
-}*/
 
 function atualizaCompetencia($inAno, $inMes){
     if($inAno!=''&&$inMes!=''){

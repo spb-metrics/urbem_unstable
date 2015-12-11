@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: OCExportarBalanceteContabil.php 62872 2015-07-01 20:16:55Z franver $
+ * $Id: OCExportarBalanceteContabil.php 63835 2015-10-22 13:53:31Z franver $
  */
 set_time_limit(0);
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -48,7 +48,6 @@ SistemaLegado::BloqueiaFrames();
 $obExportador = new Exportador();
 
 $arFiltro = Sessao::read('filtroRelatorio');
-//SistemaLegado::mostraVar($arFiltro);die();
 $stEntidades = implode(",",$arFiltro['inCodEntidade']);
 $inMes = $arFiltro['inMes'];
 

@@ -33,7 +33,7 @@
  * @package framework
  * @subpackage componentes
 
- $Id: cabecalho.inc.php 63462 2015-08-31 17:12:23Z franver $
+ $Id: cabecalho.inc.php 64012 2015-11-18 16:42:41Z diogo.zarpelon $
 
  Casos de uso: uc-01.01.00
 */
@@ -128,6 +128,7 @@ $jsPath = constant('ENV_TYPE') == 'dev' ? '' : 'compressed/';
 </script>
 
 <link rel="stylesheet" href="<?=CAM_GA;?>PHP/framework/temas/padrao/CSS/formalize.css" />
+<link rel="stylesheet" href="<?=CAM_GA;?>PHP/framework/temas/padrao/CSS/paginacao.css" />
 
 </head>
 <body bgcolor="#E6E6E6" leftmargin=0 topmargin=0>

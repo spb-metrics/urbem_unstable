@@ -872,7 +872,6 @@ function limparEventoAjudaCusto($boExecuta=false)
     }
 }
 
-//SistemaLegado::mostraVar($stCtrl);
 switch ($stCtrl) {
     case 'preencherEvento':
         $stJs .= preencherEvento();

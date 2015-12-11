@@ -69,13 +69,12 @@ $pagQuestao = implode('&',$arOut);
 */
 foreach ($arPagQuestao as $stKey => $stValue) {
     $arKey = explode('=',$stValue);
-    //mostravar($stKey);
+
     if ($arKey[0] == 'stDescQuestao') {
         $stDescQuestao = $arKey[1];
-        //echo $stDescQuestao;
     }
 }
-//mostravar ($arPagQuestao);
+
 $obj = stripslashes($stDescQuestao);
 $pag = $pagQuestao;
 $tipo    = $_REQUEST['tipo'];

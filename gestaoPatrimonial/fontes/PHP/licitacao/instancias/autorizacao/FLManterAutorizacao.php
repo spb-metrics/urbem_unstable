@@ -34,21 +34,24 @@
 
  * Casos de uso : uc-03.05.21
 
- $Id: FLManterAutorizacao.php 62550 2015-05-19 18:21:57Z evandro $
+ $Id: FLManterAutorizacao.php 63841 2015-10-22 19:14:30Z michel $
 
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-
 require_once CAM_GP_COM_COMPONENTES."ISelectModalidade.class.php";
 require_once CAM_GP_COM_COMPONENTES."ISelectTipoObjeto.class.php";
 require_once CAM_GP_COM_COMPONENTES."IPopUpEditObjeto.class.php";
 require_once CAM_GP_COM_COMPONENTES."IPopUpMapaCompras.class.php";
 require_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php";
+
+$stAcao = $request->get('stAcao');
+$stProgramaParcial = ($stAcao=='parcial') ? 'Parcial' : '';
 
 # Define o nome dos arquivos PHP
-$stPrograma = "ManterAutorizacao";
+$stPrograma = "ManterAutorizacao".$stProgramaParcial;
 $pgFilt     = "FL".$stPrograma.".php";
 $pgList     = "LS".$stPrograma.".php";
 $pgForm     = "FM".$stPrograma.".php";
@@ -58,19 +61,14 @@ $pgJs       = "JS".$stPrograma.".js";
 
 $obForm = new Form;
 $obForm->setAction( $pgList );
-
 $obForm->setTarget( "telaPrincipal" );
-
-$stAcao = $request->get('stAcao');
-
-# $stAcao = $stAcao == 'incluir' ? 'autorizar' : $stAcao ;
 
 //Define o Hidden de ação (padrão no framework)
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
 
-//Define o Hidde de controle (padrão no framework)
+//Define o Hidden de controle (padrão no framework)
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
@@ -78,44 +76,41 @@ $obHdnCtrl->setValue( "" );
 $obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
 $obEntidadeUsuario->setNull( true );
 
-include_once(CAM_GP_COM_MAPEAMENTO."TComprasModalidade.class.php");
 $obComprasModalidade = new TComprasModalidade();
 $rsRecordSet = new RecordSet;
-//$stFiltro = " WHERE cod_modalidade NOT IN(4,5,6,7)  ";
-$stFiltro = " WHERE cod_modalidade NOT IN(4,5,10,11)  ";
-
+$stFiltro = " WHERE cod_modalidade NOT IN(4,5,10,11) ";
 $obComprasModalidade->recuperaTodos($rsRecordSet,$stFiltro," ORDER BY cod_modalidade ");
 
 $obISelectModalidadeLicitacao = new Select();
-$obISelectModalidadeLicitacao->setRotulo            ("Modalidade"                            );
-$obISelectModalidadeLicitacao->setTitle             ("Selecione a modalidade."               );
-$obISelectModalidadeLicitacao->setName              ("inCodModalidade"                       );
-$obISelectModalidadeLicitacao->setNull              (true                                    );
-$obISelectModalidadeLicitacao->setCampoID           ("cod_modalidade"                        );
-$obISelectModalidadeLicitacao->addOption            ("","Selecione"                          );
-$obISelectModalidadeLicitacao->setCampoDesc         ("[cod_modalidade] - [descricao]"        );
-$obISelectModalidadeLicitacao->preencheCombo        ($rsRecordSet                            );
+$obISelectModalidadeLicitacao->setRotulo    ( "Modalidade"                      );
+$obISelectModalidadeLicitacao->setTitle     ( "Selecione a modalidade."         );
+$obISelectModalidadeLicitacao->setName      ( "inCodModalidade"                 );
+$obISelectModalidadeLicitacao->setNull      ( true                              );
+$obISelectModalidadeLicitacao->setCampoID   ( "cod_modalidade"                  );
+$obISelectModalidadeLicitacao->addOption    ( "","Selecione"                    );
+$obISelectModalidadeLicitacao->setCampoDesc ( "[cod_modalidade] - [descricao]"  );
+$obISelectModalidadeLicitacao->preencheCombo( $rsRecordSet                      );
 
 $obTxtLicitacao = new TextBox();
-$obTxtLicitacao->setName      ( "inCodigoLicitacao"             );
-$obTxtLicitacao->setId        ( "inCodigoLicitacao"             );
-$obTxtLicitacao->setRotulo    ( "Código Licitação"              );
-$obTxtLicitacao->setTitle     ( "Informe o código da licitação." );
-$obTxtLicitacao->setInteiro   ( true                            );
+$obTxtLicitacao->setName    ( "inCodigoLicitacao"               );
+$obTxtLicitacao->setId      ( "inCodigoLicitacao"               );
+$obTxtLicitacao->setRotulo  ( "Código Licitação"                );
+$obTxtLicitacao->setTitle   ( "Informe o código da licitação."  );
+$obTxtLicitacao->setInteiro ( true                              );
 
 $obPeriodicidade = new Periodicidade();
 $obPeriodicidade->setExercicio      ( Sessao::getExercicio());
-$obPeriodicidade->setValue          ( 4                 );
-$obPeriodicidade->setValidaExercicio( true              );
-$obPeriodicidade->obDataInicial->setName    ( "stDtInicial" );
-$obPeriodicidade->obDataFinal->setName      ( "stDtFinal" );
+$obPeriodicidade->setValue          ( 4                     );
+$obPeriodicidade->setValidaExercicio( true                  );
+$obPeriodicidade->obDataInicial->setName( "stDtInicial"     );
+$obPeriodicidade->obDataFinal->setName  ( "stDtFinal"       );
 
 $obMapa = new TextBox();
-$obMapa->setRotulo ( 'Mapa'                      );
-$obMapa->setTitle  ( 'Código do mapa de compras.' );
+$obMapa->setRotulo ( 'Mapa'                         );
+$obMapa->setTitle  ( 'Código do mapa de compras.'   );
 $obMapa->setId     ( 'inCodMapa'                    );
 $obMapa->setName   ( 'inCodMapa'                    );
-$obMapa->setInteiro( true                        );
+$obMapa->setInteiro( true                           );
 
 $obFormulario = new Formulario;
 $obFormulario->addForm ( $obForm );

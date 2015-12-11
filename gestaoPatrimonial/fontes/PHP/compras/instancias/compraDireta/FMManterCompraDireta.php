@@ -34,7 +34,7 @@
 
     * Casos de uso : uc-03.04.33
 
-    $Id: FMManterCompraDireta.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: FMManterCompraDireta.php 63859 2015-10-26 17:39:34Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -371,8 +371,8 @@ if ($stAcao == 'incluir') {
     $obMapaCompras->obCampoCod->obEvento->setOnBlur( "montaParametrosGET('montaItensAlterar','stMapaCompras,hdnMapaCompras');");
 }
 
-$obMapaCompras->obCampoCod->obEvento->setOnBlur($obMapaCompras->obCampoCod->obEvento->getOnBlur()."if (this.value != '') { montaParametrosGET('validaMapa','stDtCompraDireta, inCodEntidade,  stMapaCompras'); }");
-$obMapaCompras->setTipoBusca('processoLicitatorio');
+$obMapaCompras->obCampoCod->obEvento->setOnBlur("if (this.value != '') { montaParametrosGET('validaMapa','stDtCompraDireta, inCodEntidade,  stMapaCompras'); }".$obMapaCompras->obCampoCod->obEvento->getOnBlur());
+$obMapaCompras->setTipoBusca('verificaMapaComprasDireta');
 $obMapaCompras->setExercicio ( Sessao::getExercicio() );
 
 if ($arCompraDireta['cod_mapa'] AND $arCompraDireta['exercicio_mapa']) {

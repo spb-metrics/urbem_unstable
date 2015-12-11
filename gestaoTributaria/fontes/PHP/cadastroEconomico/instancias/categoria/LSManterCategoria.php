@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: LSManterCategoria.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCategoria.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.09
 
@@ -72,7 +72,6 @@ switch ($stAcao) {
     case 'excluir'  : $pgProx = $pgProc; break;
     DEFAULT         : $pgProx = $pgForm;
 }
-//mostravar($stAcao);
 //MANTEM FILTRO E PAGINACAO
 $link = Sessao::read( "link" );
 $stLink .= "&stAcao=".$stAcao;
@@ -139,7 +138,6 @@ $obLista->ultimaAcao->addCampo("&inCodigoCategoria",       "cod_categoria"      
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[cod_categoria]-[nom_categoria]");
 if ($stAcao == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
- //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

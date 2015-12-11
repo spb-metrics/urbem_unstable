@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPreEmpenho.class.php 63657 2015-09-24 21:19:41Z michel $
+    $Id: REmpenhoPreEmpenho.class.php 64136 2015-12-08 12:00:33Z arthur $
 
     *Casos de uso: uc-02.01.23
                    uc-02.03.15
@@ -54,6 +54,8 @@ include_once CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php";
 include_once CAM_GF_ORC_NEGOCIO."ROrcamentoClassificacaoDespesa.class.php";
 include_once CAM_GA_ADM_NEGOCIO."RUnidadeMedida.class.php";
 include_once CAM_GF_EMP_NEGOCIO."REmpenhoPermissaoAutorizacao.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoPreEmpenho.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoPreEmpenhoDespesa.class.php';
 //INCLUDE DAS CLASSES PARA O TRATAMENTO DOS ATRIBUTOS DINAMICOS
 include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAtributoEmpenhoValor.class.php";
 include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
@@ -167,8 +169,22 @@ class REmpenhoPreEmpenho
     * @var Integer
     **/
     public $inCodDespesaFixa;
-
+    /**
+    * @access Public;
+    * @var String
+    **/
+    public $stDataEmpenho;
+    /**
+    * @access Public;
+    * @var Integer
+    **/
     public $inCodEntidade;
+    /**
+    * @access Public;
+    * @var String
+    **/
+    public $stTipoEmissao;
+    
     /**
     * @access Public
     * @param Object $Valor
@@ -259,7 +275,22 @@ class REmpenhoPreEmpenho
     * @param Integer $Valor
     **/
     public function setCodDespesaFixa($valor) { $this->inCodDespesaFixa = $valor; }
-
+    /**
+    * @access Public
+    * @param Integer $Valor
+    **/
+    public function setDataEmpenho($valor) { $this->stDataEmpenho = $valor; }
+    /**
+    * @access Public
+    * @param String $Valor
+    * $valor = 'E': Comportamento padrão. Leva em consideração a data de empenho setada para a função.
+    * $valor = 'R': Comprtamento para as consultas de reserva de saldo, que não levam em consideração a data de empenho setada, mas do exercicio todo.
+    **/
+    public function setTipoEmissao($valor) { $this->stTipoEmissao = $valor; }
+    /**
+    * @access Public
+    * @param Integer $Valor
+    **/
     function setCodEntidade($valor) { $this->inCodEntidade = $valor; }
 
     /**
@@ -347,7 +378,20 @@ class REmpenhoPreEmpenho
     * @return Integer
     **/
     public function getCodDespesaFixa() { return $this->inCodDespesaFixa; }
-
+    /**
+    * @access Public
+    * @return String
+    **/
+    public function getDataEmpenho() { return $this->stDataEmpenho; }
+    /**
+    * @access Public
+    * @return String
+    **/
+    public function getTipoEmissao() { return $this->stTipoEmissao; }
+    /**
+    * @access Public
+    * @return Integer
+    **/
     public function getCodEntidade() { return $this->inCodEntidade; }
 
     /**
@@ -381,15 +425,14 @@ class REmpenhoPreEmpenho
     }
 
     /**
-    * Método para consultar saldo anterior de uma determinada Despesa
+    * Método para consultar saldo anterior de uma determinada Despesa durante o ano
     * @access Public
     * @param Object $boTransacao
     * @return Object $obErro
     **/
     public function consultaSaldoAnterior(&$nuSaldoAnterior, $stOrder = "" , $boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
-        $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
 
         $obTEmpenhoPreEmpenho->setDado( "exercicio", $this->stExercicio );
         $obTEmpenhoPreEmpenho->setDado( "cod_despesa", $this->obROrcamentoDespesa->getCodDespesa() );
@@ -405,7 +448,41 @@ class REmpenhoPreEmpenho
 
         return $obErro;
     }
+    
+    /**
+    * Método para consultar saldo anterior de uma determinada Despesa tendo seu valor sendo até a data setada
+    * @access Public
+    * @param Object $boTransacao
+    * @return Object $obErro
+    **/
+    public function consultaSaldoAnteriorDataEmpenho(&$nuSaldoAnterior, $stOrder = "" , $boTransacao = "")
+    {
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
 
+        $obTEmpenhoPreEmpenho->setDado( "exercicio"  , $this->stExercicio );
+        $obTEmpenhoPreEmpenho->setDado( "cod_despesa", $this->obROrcamentoDespesa->getCodDespesa() );
+        $obTEmpenhoPreEmpenho->setDado( "entidade"   , $this->inCodEntidade );
+        $obTEmpenhoPreEmpenho->setDado( "dt_empenho" , $this->stDataEmpenho );
+        
+        if ( empty($this->stTipoEmissao) ){
+            $this->stTipoEmissao = 'E';
+        }
+
+        $obTEmpenhoPreEmpenho->setDado( "tipo_emissao" , $this->stTipoEmissao );
+        
+        if (date('Y') > Sessao::getExercicio() && Sessao::read('data_reserva_saldo_GF')) {
+            $obErro = $obTEmpenhoPreEmpenho->recuperaSaldoAnteriorDataAtualEmpenho( $rsRecordSet, $stOrder, $boTransacao );
+        } else {
+            $obErro = $obTEmpenhoPreEmpenho->recuperaSaldoAnteriorDataEmpenho( $rsRecordSet, $stOrder, $boTransacao );
+        }
+
+        if ( !$obErro->ocorreu() ) {
+            $nuSaldoAnterior = $rsRecordSet->getCampo( "saldo_anterior" );
+        }
+
+        return $obErro;
+    }
+    
     /**
     * Método para checar Forma de Exercucao do Orcamento
     * @access public
@@ -474,7 +551,6 @@ class REmpenhoPreEmpenho
     **/
     function consultarExistenciaDespesa($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
         $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
 
         $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio", $this->stExercicio );
@@ -506,17 +582,22 @@ class REmpenhoPreEmpenho
         if ( !$obErro->ocorreu() ) {
             while ( !$rsItemPreEmpenho->eof() ) {
                 $this->addItemPreEmpenho();
-                $this->roUltimoItemPreEmpenho->setCodItemPreEmp( $rsItemPreEmpenho->getCampo( "cod_item"    ) );
-                $this->roUltimoItemPreEmpenho->setNumItem    ( $rsItemPreEmpenho->getCampo( "num_item"    ) );
-                $this->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $rsItemPreEmpenho->getCampo( "cod_unidade" ) );
-                $this->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $rsItemPreEmpenho->getCampo( "cod_grandeza") );
-                $this->roUltimoItemPreEmpenho->setNomUnidade ( $rsItemPreEmpenho->getCampo( "nom_unidade" ) );
-                $this->roUltimoItemPreEmpenho->setSiglaUnidade ( $rsItemPreEmpenho->getCampo( "sigla_unidade" ) );
-                $this->roUltimoItemPreEmpenho->setNomItem    ( $rsItemPreEmpenho->getCampo( "nom_item"    ) );
-                $this->roUltimoItemPreEmpenho->setQuantidade ( $rsItemPreEmpenho->getCampo( "quantidade"  ) );
-                $this->roUltimoItemPreEmpenho->setValorTotal ( $rsItemPreEmpenho->getCampo( "vl_total"    ) );
-                $this->roUltimoItemPreEmpenho->setComplemento( $rsItemPreEmpenho->getCampo( "complemento" ) );
+                $this->roUltimoItemPreEmpenho->setCodItemPreEmp ( $rsItemPreEmpenho->getCampo( "cod_item" )         );
+                $this->roUltimoItemPreEmpenho->setNumItem       ( $rsItemPreEmpenho->getCampo( "num_item" )         );
+                $this->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $rsItemPreEmpenho->getCampo( "cod_unidade" )                );
+                $this->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $rsItemPreEmpenho->getCampo( "cod_grandeza")  );
+                $this->roUltimoItemPreEmpenho->setNomUnidade    ( $rsItemPreEmpenho->getCampo( "nom_unidade" )      );
+                $this->roUltimoItemPreEmpenho->setSiglaUnidade  ( $rsItemPreEmpenho->getCampo( "sigla_unidade" )    );
+                $this->roUltimoItemPreEmpenho->setNomItem       ( $rsItemPreEmpenho->getCampo( "nom_item" )         );
+                $this->roUltimoItemPreEmpenho->setQuantidade    ( $rsItemPreEmpenho->getCampo( "quantidade" )       );
+                $this->roUltimoItemPreEmpenho->setValorTotal    ( $rsItemPreEmpenho->getCampo( "vl_total" )         );
+                $this->roUltimoItemPreEmpenho->setComplemento   ( $rsItemPreEmpenho->getCampo( "complemento" )      );
+                $this->roUltimoItemPreEmpenho->setCodCentroCusto( $rsItemPreEmpenho->getCampo( "cod_centro" )       );
                 $this->roUltimoItemPreEmpenho->consultaCodMaterial( $boTransacao );
+
+                if( $rsItemPreEmpenho->getCampo( "cod_centro" ) == '')
+                    $this->roUltimoItemPreEmpenho->consultaCodCentroCusto( $boTransacao );
+
                 $rsItemPreEmpenho->proximo();
             }
         }
@@ -533,8 +614,6 @@ class REmpenhoPreEmpenho
     **/
     public function consultar($boTransacao = "")
     {
-        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php";
-        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php";
         $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
         $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
         
@@ -662,25 +741,24 @@ class REmpenhoPreEmpenho
     **/
     public function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
-        $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
 
         if( $this->inCodPreEmpenho )
-        $stFiltro  = " cod_pre_empenho = ".$this->inCodPreEmpenho."  AND ";
+            $stFiltro  = " cod_pre_empenho = ".$this->inCodPreEmpenho."  AND ";
         if( $this->obREmpenhoTipoEmpenho->getCodTipo() )
-        $stFiltro  = " cod_tipo = ".$this->obREmpenhoTipoEmpenho->getCodTipo()."  AND ";
+            $stFiltro  = " cod_tipo = ".$this->obREmpenhoTipoEmpenho->getCodTipo()."  AND ";
         if( $this->obREmpenhoHistorico->getCodHistorico() )
-        $stFiltro  = " cod_historico = ".$this->obREmpenhoHistorico->getCodHistorico()."  AND ";
+            $stFiltro  = " cod_historico = ".$this->obREmpenhoHistorico->getCodHistorico()."  AND ";
         if( $this->obRCGM->getNumCGM() )
-        $stFiltro  = " cgm_beneficiado = ".$this->obRCGM->getNumCGM()."  AND ";
+            $stFiltro  = " cgm_beneficiado = ".$this->obRCGM->getNumCGM()."  AND ";
         if( $this->obRUsuario->obRCGM->getNumCGM() )
-        $stFiltro  = " cgm_usuario = ".$this->obRUsuario->obRCGM->getNumCGM()."  AND ";
+            $stFiltro  = " cgm_usuario = ".$this->obRUsuario->obRCGM->getNumCGM()."  AND ";
         if( $this->obROrcamentoDespesa->getCodDespesa() )
-        $stFiltro  = " cod_despesa = ".$this->obROrcamentoDespesa->getCodDespesa()."  AND ";
+            $stFiltro  = " cod_despesa = ".$this->obROrcamentoDespesa->getCodDespesa()."  AND ";
         if($this->stExercicio)
-        $stFiltro .= " exercicio = '".$this->stExercicio."' AND ";
+            $stFiltro .= " exercicio = '".$this->stExercicio."' AND ";
         if( $this->stDescricao )
-        $stFiltro .= " lower(descricao) like lower('%" . $this->stDescricao."%') AND ";
+            $stFiltro .= " lower(descricao) like lower('%" . $this->stDescricao."%') AND ";
         $stFiltro = ($stFiltro) ? " WHERE " . substr($stFiltro, 0, strlen($stFiltro)-4) : "";
         $stOrder = ($stOrder) ? $stOrder : "cod_pre_empenho";
         $obErro = $obTEmpenhoPreEmpenho->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
@@ -696,8 +774,7 @@ class REmpenhoPreEmpenho
     **/
     public function salvarDespesa($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
-        $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
+        $obTEmpenhoPreEmpenhoDespesa = new TEmpenhoPreEmpenhoDespesa;
 
         $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_pre_empenho", $this->inCodPreEmpenho );
         $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio"      , $this->stExercicio     );
@@ -756,8 +833,7 @@ class REmpenhoPreEmpenho
     **/
     public function incluir($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
-        $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
 
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -792,11 +868,11 @@ class REmpenhoPreEmpenho
                         }
                         if ( $this->obROrcamentoDespesa->getCodDespesa() and !$obErro->ocorreu() ) {
                             $this->consultaSaldoAnterior( $nuSaldoAnterior,'', $boTransacao );
-                                                        $nuVlTotal = number_format((float) $nuVlTotal,2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
-                                                        $nuSaldoAnterior = number_format((float) $nuSaldoAnterior,2,'.',''); // fossem demonstradas no var_dump como iguais, ficava oculto no ponto flutuante uma diferença
-                                                        if ($nuVlTotal > $nuSaldoAnterior) {
-                                                            $obErro->setDescricao( "Não há saldo disponível para esta dotação(".$this->obROrcamentoDespesa->getCodDespesa().")!" );
-                                                        }
+                            $nuVlTotal = number_format((float) $nuVlTotal,2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
+                            $nuSaldoAnterior = number_format((float) $nuSaldoAnterior,2,'.',''); // fossem demonstradas no var_dump como iguais, ficava oculto no ponto flutuante uma diferença
+                            if ($nuVlTotal > $nuSaldoAnterior) {
+                                $obErro->setDescricao( "Não há saldo disponível para esta dotação(".$this->obROrcamentoDespesa->getCodDespesa().")!" );
+                            }
                         }
                     } else {
                         $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );
@@ -829,8 +905,7 @@ class REmpenhoPreEmpenho
     **/
     public function alterar($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
-        $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho;
 
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
@@ -851,7 +926,6 @@ class REmpenhoPreEmpenho
                 if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
                     $obErro = $this->salvarDespesa( $boTransacao );
                 } else {
-                    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenhoDespesa.class.php"    );
                     $obTEmpenhoPreEmpenhoDespesa       = new TEmpenhoPreEmpenhoDespesa;
                     $obTEmpenhoPreEmpenhoDespesa->setDado( "cod_pre_empenho", $this->inCodPreEmpenho );
                     $obTEmpenhoPreEmpenhoDespesa->setDado( "exercicio"      , $this->stExercicio     );
@@ -921,7 +995,6 @@ class REmpenhoPreEmpenho
     **/
     public function incluirItemEmpenhoDespesaFixa($boTransacao = "")
     {
-        include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"           );
         include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemEmpenhoDespesasFixas.class.php");
         $obTEmpenhoPreEmpenho              = new TEmpenhoPreEmpenho;
         $obTEmpenhoItemEmpenhoDespesasFixas = new TEmpenhoItemEmpenhoDespesasFixas;

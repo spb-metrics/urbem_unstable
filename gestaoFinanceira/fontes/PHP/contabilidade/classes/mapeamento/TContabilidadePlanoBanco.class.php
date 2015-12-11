@@ -406,7 +406,7 @@ function getProximoEstruturalRecurso(&$rsRecordSet, $boTransacao = "")
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stSql  = "SELECT SUBSTR( MAX(cod_estrutural), 11, 2) AS prox_cod_estrutural ";
     } else {
         $stSql  = "SELECT SUBSTR( MAX(cod_estrutural), 17, 2) AS prox_cod_estrutural ";
@@ -502,16 +502,12 @@ function montaContasRecurso($boTransacao = "")
     $stSql .= "           JOIN contabilidade.plano_recurso                         \n";
     $stSql .= "             ON plano_recurso.cod_plano = plano_analitica.cod_plano \n";
     $stSql .= "            AND plano_recurso.exercicio = plano_analitica.exercicio \n";
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '7.2.1.1.1.%' \n";
     } else {
         $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '1.9.3.2.0.00.00.%' \n";
     }
     $stSql .= "            AND plano_recurso.cod_recurso = ".$this->getDado('cod_recurso')." \n";
-    // if ( !SistemaLegado::is_tcems($boTransacao) ) {
-    //     $stSql .= "            AND plano_conta.cod_classificacao = 1                   \n";
-    // }
-    // $stSql .= "            AND plano_conta.cod_sistema = 4                         \n";
     $stSql .= "            AND plano_conta.exercicio = '".$this->getDado('exercicio')."' \n";
     $stSql .= "       ) as cod_plano_um ,                                          \n";
     $stSql .= "      ( SELECT plano_analitica.cod_plano                           \n";
@@ -522,16 +518,12 @@ function montaContasRecurso($boTransacao = "")
     $stSql .= "           JOIN contabilidade.plano_recurso                         \n";
     $stSql .= "             ON plano_recurso.cod_plano = plano_analitica.cod_plano \n";
     $stSql .= "            AND plano_recurso.exercicio = plano_analitica.exercicio \n";
-    if ( SistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '8.2.1.1.1.%' \n";
     } else {
         $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '2.9.3.2.0.00.00.%' \n";
     }
     $stSql .= "            AND plano_recurso.cod_recurso = ".$this->getDado('cod_recurso')." \n";
-    // if ( !SistemaLegado::is_tcems($boTransacao) ) {
-    //     $stSql .= "            AND plano_conta.cod_classificacao = 1                   \n";
-    // }
-    // $stSql .= "            AND plano_conta.cod_sistema = 4                         \n";
     $stSql .= "            AND plano_conta.exercicio = '".$this->getDado('exercicio')."' \n";
     $stSql .= "       ) as cod_plano_dois                                          \n";
 
@@ -562,10 +554,6 @@ function montaContasRecursoPagamentoTCEMS()
     $stSql .= "            AND plano_recurso.exercicio = plano_analitica.exercicio \n";
     $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '8.2.1.1.4.%' \n";
     $stSql .= "            AND plano_recurso.cod_recurso = ".$this->getDado('cod_recurso')." \n";
-    // if ( !SistemaLegado::is_tcems($boTransacao) ) {
-    //     $stSql .= "            AND plano_conta.cod_classificacao = 1                   \n";
-    // }
-    // $stSql .= "            AND plano_conta.cod_sistema = 4                         \n";
     $stSql .= "            AND plano_conta.exercicio = '".$this->getDado('exercicio')."' \n";
     $stSql .= "       ) as cod_plano_um ,                                          \n";
     $stSql .= "      ( SELECT plano_analitica.cod_plano                           \n";
@@ -578,13 +566,37 @@ function montaContasRecursoPagamentoTCEMS()
     $stSql .= "            AND plano_recurso.exercicio = plano_analitica.exercicio \n";
     $stSql .= "          WHERE plano_conta.cod_estrutural LIKE '8.2.1.1.3.%' \n";
     $stSql .= "            AND plano_recurso.cod_recurso = ".$this->getDado('cod_recurso')." \n";
-    // if ( !SistemaLegado::is_tcems($boTransacao) ) {
-    //     $stSql .= "            AND plano_conta.cod_classificacao = 1                   \n";
-    // }
-    // $stSql .= "            AND plano_conta.cod_sistema = 4                         \n";
     $stSql .= "            AND plano_conta.exercicio = '".$this->getDado('exercicio')."' \n";
     $stSql .= "       ) as cod_plano_dois                                          \n";
 
+    return $stSql;
+}
+
+function testaRecursoPagamentoTCEMS(&$rsRecordSet, $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaTestaRecursoPagamentoTCEMS();
+    $this->setDebug ($stSql);
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaTestaRecursoPagamentoTCEMS()
+{
+    $stSql = "SELECT plano_analitica.cod_plano                           
+                FROM contabilidade.plano_conta                           
+                JOIN contabilidade.plano_analitica                       
+                  ON plano_analitica.cod_conta = plano_conta.cod_conta   
+                 AND plano_analitica.exercicio = plano_conta.exercicio   
+                JOIN contabilidade.plano_recurso                         
+                  ON plano_recurso.cod_plano = plano_analitica.cod_plano 
+                 AND plano_recurso.exercicio = plano_analitica.exercicio 
+               WHERE plano_conta.cod_estrutural LIKE '".$this->getDado('estrutural_teste')."'
+                 AND plano_recurso.cod_recurso = ".$this->getDado('cod_recurso')."
+                 AND plano_conta.exercicio = '".$this->getDado('exercicio')."'";
     return $stSql;
 }
 

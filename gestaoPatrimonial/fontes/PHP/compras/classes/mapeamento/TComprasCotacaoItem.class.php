@@ -36,7 +36,7 @@
     * Casos de uso: uc-03.05.25
                     uc-03.05.26
 
-    $Id: TComprasCotacaoItem.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TComprasCotacaoItem.class.php 63865 2015-10-27 13:55:57Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -66,11 +66,11 @@ function TComprasCotacaoItem()
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_cotacao,cod_item');
 
-    $this->AddCampo('exercicio','CHAR',true,'4',true,'TComprasCotacao');
-    $this->AddCampo('cod_cotacao','INTEGER',true,'',true,'TComprasCotacao');
-    $this->AddCampo('lote','INTEGER',true,'',true,false);
-    $this->AddCampo('cod_item','INTEGER',true,'',true,'TAlmoxarifadoCatalogoItem');
-    $this->AddCampo('quantidade','NUMERIC',true,'14.2',false,false);
+    $this->AddCampo('exercicio'  ,   'CHAR', true,   '4', true, 'TComprasCotacao');
+    $this->AddCampo('cod_cotacao','INTEGER', true,    '', true, 'TComprasCotacao');
+    $this->AddCampo('lote'       ,'INTEGER', true,    '', true, false);
+    $this->AddCampo('cod_item'   ,'INTEGER', true,    '', true, 'TAlmoxarifadoCatalogoItem');
+    $this->AddCampo('quantidade' ,'NUMERIC', true,'14,4',false, false);
 
 }
 

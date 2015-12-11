@@ -29,7 +29,7 @@
     * @author Analista      Dagiane Vieira
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: FMManterConfiguracaoObrasServicos.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: FMManterConfiguracaoObrasServicos.php 63809 2015-10-19 16:52:56Z lisiane $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -64,13 +64,20 @@ Sessao::write('arContrato'  , array());
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao = $request->get('stAcao');
 
-$stLink = "";
-if ($stAcao == 'alterar') {
-    $stLink  = '&stAcao='.$request->get('stAcao').'&inCodEntidade='.$request->get('inCodEntidade').'&stExercicio='.$request->get('stExercicio');
-    $stLink .= "&inCodTipoObra=".$request->get('inCodTipoObra')."&stNroObra=".$request->get('stNroObra')."&stExercicioLicitacao=".$request->get('stExercicioLicitacao');
-    $stLink .= "&inCodModalidade=".$request->get('inCodModalidade')."&inCodLicitacao=".$request->get('inCodLicitacao');
-}
-Sessao::write('stLink' , $stLink);
+$arLink = Sessao::read('arLink');
+
+if ( count($arLink) > 0 ) {
+        $stLink = '';
+        foreach ($arLink as $stCampo => $stValor) {
+            if (is_array($stValor)) {
+                foreach ($stValor as $stCampo2 => $stValor2) {
+                    $stLink .= "&".$stCampo2."=".@urlencode( $stValor2 );
+                }
+            } else {
+                $stLink .= "&".$stCampo."=".urlencode( $stValor );
+            }
+        }
+    }
 
 $rsCEP = new RecordSet();
 $rsLicitacao = new RecordSet();
@@ -531,6 +538,15 @@ $obDtFinalMedicao->setNull      ( true                              );
 $obDtFinalMedicao->setSize      ( 10                                );
 $obDtFinalMedicao->setMaxLength ( 10                                );
 
+$obDtMedicao = new Data;
+$obDtMedicao->setId        ( "dtMedicao"                       );
+$obDtMedicao->setName      ( "dtMedicao"                       );
+$obDtMedicao->setRotulo    ( "**Data da Medição"               );
+$obDtMedicao->setValue     ( $request->get('dtMedicao')        );
+$obDtMedicao->setNull      ( true                              );
+$obDtMedicao->setSize      ( 10                                );
+$obDtMedicao->setMaxLength ( 10                                );
+
 $obNumVlMedicao = new Moeda;
 $obNumVlMedicao->setId          ( 'nuVlMedicao'                 );
 $obNumVlMedicao->setName        ( 'nuVlMedicao'                 );
@@ -721,6 +737,7 @@ $obFormulario->addComponente    ( $obTxtNroMedicao );
 $obFormulario->addComponente    ( $obISelectMedidaObra );
 $obFormulario->addComponente    ( $obDtInicioMedicao );
 $obFormulario->addComponente    ( $obDtFinalMedicao );
+$obFormulario->addComponente    ( $obDtMedicao );
 $obFormulario->addComponente    ( $obNumVlMedicao );
 $obFormulario->addComponente    ( $obTxtNFMedicao );
 $obFormulario->addComponente    ( $obDtNFMedicao );

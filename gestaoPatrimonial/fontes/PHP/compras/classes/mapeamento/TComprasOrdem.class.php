@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TComprasOrdem.class.php 62703 2015-06-10 13:29:57Z michel $
+    $Id: TComprasOrdem.class.php 64005 2015-11-17 16:49:06Z michel $
     *
 */
 
@@ -46,7 +46,7 @@ class TComprasOrdem extends Persistente
     * Método Construtor
     * @access Private
     */
-    public function TComprasOrdem()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("compras.ordem");
@@ -229,6 +229,8 @@ class TComprasOrdem extends Persistente
              , ordem.cod_centro AS cod_centro_ordem
              , centro_custo.descricao AS nom_centro_ordem
              , marca.descricao AS nom_marca_ordem
+             , item_pre_empenho.cod_centro AS cod_centro_empenho
+             , centro_custo_empenho.descricao AS nom_centro_empenho
 
               FROM  empenho.empenho
 
@@ -310,6 +312,9 @@ class TComprasOrdem extends Persistente
          LEFT JOIN  almoxarifado.centro_custo
                 ON  centro_custo.cod_centro = ordem.cod_centro
 
+         LEFT JOIN  almoxarifado.centro_custo AS centro_custo_empenho
+                ON  centro_custo_empenho.cod_centro = item_pre_empenho.cod_centro
+
              WHERE  empenho.cod_empenho = ".$this->getDado('cod_empenho')."
                AND  empenho.exercicio = '".$this->getDado('exercicio')."'
                AND  empenho.cod_entidade = ".$this->getDado('cod_entidade')."
@@ -341,6 +346,8 @@ class TComprasOrdem extends Persistente
              , ordem.cod_centro
              , centro_custo.descricao
              , marca.descricao
+             , item_pre_empenho.cod_centro
+             , centro_custo_empenho.descricao
         ";
 
         return $stSql;
@@ -382,6 +389,9 @@ class TComprasOrdem extends Persistente
                  ,  ordem_item.cod_centro AS cod_centro_ordem
                  ,  centro_custo.descricao AS nom_centro_ordem
                  ,  marca.descricao AS nom_marca_ordem
+                 ,  item_pre_empenho.cod_centro AS cod_centro_empenho
+                 ,  centro_custo_empenho.descricao AS nom_centro_empenho
+                 ,  julgada.cod_centro AS cod_centro_solicitacao
               FROM  empenho.pre_empenho
         INNER JOIN  empenho.item_pre_empenho
                 ON  item_pre_empenho.exercicio = pre_empenho.exercicio
@@ -394,6 +404,7 @@ class TComprasOrdem extends Persistente
                              ,  catalogo_item.descricao
                              ,  unidade_medida.nom_unidade
                              ,  grandeza.nom_grandeza
+                             ,  solicitacao_item.cod_centro
                           FROM  empenho.item_pre_empenho_julgamento
                     INNER JOIN  almoxarifado.catalogo_item
                             ON	catalogo_item.cod_item = item_pre_empenho_julgamento.cod_item
@@ -402,6 +413,26 @@ class TComprasOrdem extends Persistente
                            AND  unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
                     INNER JOIN  administracao.grandeza
                             ON  grandeza.cod_grandeza = catalogo_item.cod_grandeza
+                     LEFT JOIN  compras.julgamento_item
+                            ON  julgamento_item.exercicio = item_pre_empenho_julgamento.exercicio_julgamento
+                           AND  julgamento_item.cod_cotacao = item_pre_empenho_julgamento.cod_cotacao
+                           AND  julgamento_item.cod_item = item_pre_empenho_julgamento.cod_item
+                           AND  julgamento_item.cgm_fornecedor = item_pre_empenho_julgamento.cgm_fornecedor
+                           AND  julgamento_item.lote = item_pre_empenho_julgamento.lote
+
+                     LEFT JOIN  compras.mapa_cotacao
+                            ON  mapa_cotacao.exercicio_cotacao = julgamento_item.exercicio
+                           AND  mapa_cotacao.cod_cotacao = julgamento_item.cod_cotacao
+
+                     LEFT JOIN  compras.mapa_solicitacao
+                            ON  mapa_solicitacao.exercicio = mapa_cotacao.exercicio_mapa
+                           AND  mapa_solicitacao.cod_mapa = mapa_cotacao.cod_mapa
+
+                     LEFT JOIN  compras.solicitacao_item
+                            ON  solicitacao_item.exercicio = mapa_solicitacao.exercicio_solicitacao
+                           AND  solicitacao_item.cod_entidade = mapa_solicitacao.cod_entidade
+                           AND  solicitacao_item.cod_solicitacao = mapa_solicitacao.cod_solicitacao
+                           AND  solicitacao_item.cod_item = julgamento_item.cod_item
                     ) AS julgada
                 ON  julgada.exercicio = item_pre_empenho.exercicio
                AND  julgada.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
@@ -474,6 +505,9 @@ class TComprasOrdem extends Persistente
 
          LEFT JOIN  almoxarifado.centro_custo
                 ON  centro_custo.cod_centro = ordem_item.cod_centro
+
+         LEFT JOIN  almoxarifado.centro_custo as centro_custo_empenho
+                ON  centro_custo_empenho.cod_centro = item_pre_empenho.cod_centro
 
              WHERE  pre_empenho.exercicio = '".$this->getDado('exercicio')."'
                AND  pre_empenho.cod_pre_empenho = ".$this->getDado('cod_pre_empenho')."

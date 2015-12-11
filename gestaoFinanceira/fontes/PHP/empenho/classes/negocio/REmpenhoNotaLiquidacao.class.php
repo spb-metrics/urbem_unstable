@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoNotaLiquidacao.class.php 63657 2015-09-24 21:19:41Z michel $
+    $Id: REmpenhoNotaLiquidacao.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.03.18, uc-02.03.20, uc-02.03.03, uc-02.03.04, uc-02.03.14
 */
@@ -664,11 +664,9 @@ function incluir($boTransacao = "")
     $obTContabilidadeLiquidacao                 = new TContabilidadeLiquidacao;
     $obFEmpenhoEmpenhoLiquidacaoRestosAPagar    = new FEmpenhoEmpenhoLiquidacaoRestosAPagar;
     $obTEmpenhoIncorporacaoPatrimonio           = new TEmpenhoIncorporacaoPatrimonio;
-    $this->obTEmpenhoNotaLiquidacao             = new TEmpenhoNotaLiquidacao;
+    $this->obTEmpenhoNotaLiquidacao             = new TEmpenhoNotaLiquidacao;    
 
-    $boTCEMS = SistemaLegado::is_tcems($boTransacao);
-
-    if ($boTCEMS)
+    if (Sessao::getExercicio() > '2012')
         $obFEmpenhoEmpenhoLiquidacao = new FEmpenhoEmpenhoLiquidacaoTCEMS;
     else
         $obFEmpenhoEmpenhoLiquidacao = new FEmpenhoEmpenhoLiquidacao;
@@ -783,7 +781,7 @@ function incluir($boTransacao = "")
                                     $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_historico_patrimon" , $this->inCodHistorico                                                                                                             );
                                     $obFEmpenhoEmpenhoLiquidacao->setDado( "num_orgao"              , $this->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao()   );
 
-                                    if ($boTCEMS) {
+                                    if (Sessao::getExercicio() > '2012') {
                                         $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_despesa"        , $this->roREmpenhoEmpenho->obROrcamentoDespesa->getCodDespesa()        );
                                         $obFEmpenhoEmpenhoLiquidacao->setDado( "cod_classificacao"  , $this->inCodContaContabilFinanc                                       );
                                     }
@@ -1017,11 +1015,9 @@ function anularItens($boTransacao = "")
     $obTEmpenhoIncorporacaoPatrimonio = new TEmpenhoIncorporacaoPatrimonio;
 
     $boFlagTransacao = false;
-    $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+    $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );    
 
-    $boTCEMS = SistemaLegado::is_tcems($boTransacao);
-
-    if ($boTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $obFEmpenhoEmpenhoLiquidacaoAnulacao = new FEmpenhoEmpenhoLiquidacaoAnulacaoTCEMS;
     } else {
         $obFEmpenhoEmpenhoLiquidacaoAnulacao = new FEmpenhoEmpenhoLiquidacaoAnulacao;
@@ -1138,7 +1134,7 @@ function anularItens($boTransacao = "")
                 $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "cod_historico_patrimon", $this->inCodHistorico );
                 $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "num_orgao", $this->roREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao() );
 
-                if ($boTCEMS) {
+                if (Sessao::getExercicio() > '2012') {
                     $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "cod_despesa", $this->roREmpenhoEmpenho->obROrcamentoDespesa->getCodDespesa() );
                     $obFEmpenhoEmpenhoLiquidacaoAnulacao->setDado( "cod_classificacao",$this->inCodContaContabilFinanc);
                 }

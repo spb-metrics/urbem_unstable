@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.05.01, uc-01.05.02, uc-01.05.03, uc-04.05.40
 
-    $Id: TOrganogramaOrgao.class.php 62319 2015-04-22 18:27:59Z evandro $
+    $Id: TOrganogramaOrgao.class.php 63843 2015-10-23 14:02:35Z lisiane $
 
     */
 
@@ -619,6 +619,59 @@ function montaRecuperaOrgaosInventario()
 
     return $stSql;
 }
+
+function recuperaLotacaoOrgao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaLotacaoOrgao();
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    $this->setDebug( $stSql );
+
+    return $obErro;
+}
+
+function montaRecuperaLotacaoOrgao()
+{
+    $stSql  = "  SELECT orgao.cod_orgao
+                      , organograma.fn_consulta_orgao(orgao_nivel.cod_organograma, orgao.cod_orgao) AS estrutural
+                      , trim(orgao_descricao.descricao) AS descricao
+                      , de_para_lotacao_orgao.num_orgao
+                   FROM organograma.orgao
+              LEFT JOIN pessoal".$this->getDado('stEntidade').".de_para_lotacao_orgao
+                     ON de_para_lotacao_orgao.cod_orgao = orgao.cod_orgao
+             INNER JOIN (SELECT orgao_descricao.cod_orgao 
+                              , MAX(orgao_descricao.timestamp) as orgao_descricao_timestamp 
+                           FROM organograma.orgao_descricao 
+                       GROUP BY orgao_descricao.cod_orgao 
+                       )  as od 
+                     ON od.cod_orgao = orgao.cod_orgao 
+             INNER JOIN organograma.orgao_descricao 
+                     ON orgao_descricao.cod_orgao = od.cod_orgao    
+                    AND orgao_descricao.timestamp = od.orgao_descricao_timestamp  
+             INNER JOIN organograma.orgao_nivel
+                     ON orgao_nivel.cod_orgao = orgao.cod_orgao
+             INNER JOIN ( SELECT contrato_servidor_orgao.cod_orgao 
+                            FROM pessoal".$this->getDado('stEntidade') .".contrato_servidor_orgao
+                        GROUP BY contrato_servidor_orgao.cod_orgao
+                       UNION ALL 
+                          SELECT contrato_pensionista_orgao.cod_orgao
+                            FROM pessoal".$this->getDado('stEntidade') .".contrato_pensionista_orgao
+                        GROUP BY contrato_pensionista_orgao.cod_orgao
+                        ORDER BY cod_orgao
+                      ) AS orgao_servidor
+                     ON orgao_servidor.cod_orgao = orgao.cod_orgao
+               GROUP BY orgao.cod_orgao
+                      , organograma.fn_consulta_orgao(orgao_nivel.cod_organograma, orgao.cod_orgao)
+                      , orgao_descricao.descricao
+                      , de_para_lotacao_orgao.num_orgao
+               ORDER BY orgao.cod_orgao            
+            ";
+
+    return $stSql;
+}
+
 
 
 }

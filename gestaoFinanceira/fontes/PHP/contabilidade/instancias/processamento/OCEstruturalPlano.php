@@ -30,29 +30,58 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-* $Id: OCEstruturalPlano.php 62511 2015-05-15 17:45:15Z evandro $
+* $Id: OCEstruturalPlano.php 63906 2015-11-05 12:31:01Z franver $
 
 Casos de uso: uc-02.02.02
 */
-
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoContaAnalitica.class.php");
+require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+require_once CAM_GF_CONT_NEGOCIO.'RContabilidadePlanoContaAnalitica.class.php';
+require_once CAM_GF_CONT_MAPEAMENTO.'TContabilidadePlanoConta.class.php';
 
 function buscaPopup()
 {
-    if ($_GET[$_GET['stNomCampoCod']]) {
+    $stErro = '';
+    
+    if( $_REQUEST['stEscrituracao'] == 'sintetica' ) {
+        $rsConta = new RecordSet();
+        $stCondicao = " AND plano_conta.escrituracao = '".$_REQUEST['stEscrituracao']."' \n";
+        
+        $obTContabilidadePlanoConta = new TContabilidadePlanoConta();
+        $obTContabilidadePlanoConta->setDado('exercicio',Sessao::getExercicio());
+        $obTContabilidadePlanoConta->setDado('cod_estrutural',$_REQUEST['stCodEstrutural']);
+        $obTContabilidadePlanoConta->recuperaContaSintetica($rsConta, $stCondicao, $stOrdem, $boTransacao);
 
-        isset($_REQUEST['stExercicio']) ? $stExercicio = $_REQUEST['stExercicio'] : Sessao::getExercicio();
+        $stDescricao = $rsConta->getCampo('nom_conta');
+        
+        if(trim($stDescricao) == '') {
+            $stErro = "Conta (".$_REQUEST['stCodEstrutural'].") não foi encontrada, ou não é do tipo Sintética.";
+        }
+
+    } else {
+        if ($_GET[$_GET['stNomCampoCod']]) {
+        
+            $stExercicio = isset($_REQUEST['stExercicio']) ? $_REQUEST['stExercicio'] : Sessao::getExercicio();
+        
+            $obRContabilidadePlanoContaAnalitica = new RContabilidadePlanoContaAnalitica;
+            $obRContabilidadePlanoContaAnalitica->setCodEstrutural( $_GET[$_GET['stNomCampoCod']] );
+            $obRContabilidadePlanoContaAnalitica->setExercicio( $stExercicio );
+            $obErro = $obRContabilidadePlanoContaAnalitica->consultar();
             
-        $obRContabilidadePlanoContaAnalitica = new RContabilidadePlanoContaAnalitica;
-        $obRContabilidadePlanoContaAnalitica->setCodEstrutural( $_GET[$_GET['stNomCampoCod']] );
-        $obRContabilidadePlanoContaAnalitica->setExercicio( $stExercicio );
-        $obRContabilidadePlanoContaAnalitica->consultar();
-        $stDescricao = $obRContabilidadePlanoContaAnalitica->getNomConta();
+            $stDescricao = $obRContabilidadePlanoContaAnalitica->getNomConta();
+            
+            if(trim($stDescricao) == '') {
+                $stErro = "Conta (".$_REQUEST['stCodEstrutural'].") não foi encontrada.";
+            }
+        }
     }
-    $stJs .= "retornaValorBscInner( '".$_GET['stNomCampoCod']."', '".$_GET['stIdCampoDesc']."', 'frm', '".$stDescricao."')";
-
+    
+    if(trim($stErro) != '') {
+        $stJs .= " alertaAviso('".$stErro."','form','aviso','".Sessao::getId()."'); \n";
+    }
+    $stJs .= "retornaValorBscInner( '".$_GET['stNomCampoCod']."', '".$_GET['stIdCampoDesc']."', 'frm', '".$stDescricao."');";
+    
+    
     return $stJs;
 }
 switch ($_GET['stCtrl']) {

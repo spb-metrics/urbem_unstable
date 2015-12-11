@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Diego Bueno Coelho
 
-    * $Id: PRParcelarCreditos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRParcelarCreditos.php 63839 2015-10-22 18:08:07Z franver $
 
     Caso de uso: uc-05.03.20
 **/
@@ -67,7 +67,6 @@ switch ($stAcao) {
 
     case "incluir":
 
-        //sistemaLegado::mostravar ( $sessao->transf5 ); //array das parcelas originais
         $cont = 0;
         $contParcelas = 0;
         foreach ($_REQUEST as $key => $valor) {
@@ -77,7 +76,6 @@ switch ($stAcao) {
                 $contParcelas++;
             }
         }
-        //sistemaLegado::mostravar ( $arrayNovasParcelas );
 
         Sessao::write( 'arNovasParcelas', $arrayNovasParcelas );
 

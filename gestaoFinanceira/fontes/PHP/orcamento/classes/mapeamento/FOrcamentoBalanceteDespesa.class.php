@@ -275,7 +275,7 @@ function consultaValorConta(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTra
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaConsultaValorConta().$stFiltro.$stGroup.$stOrdem;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-    //echo $stSql;
+
     return $obErro;
 }
 
@@ -287,8 +287,6 @@ function montaConsultaValorConta()
     $stSql .= " WHERE                                                       ".$stQuebra;
     $stSql .= "     cod_despesa IS NOT NULL                                 ".$stQuebra;
 
-    //mostravar( $stSql );
-    //die(0);
     return $stSql;
 }
 

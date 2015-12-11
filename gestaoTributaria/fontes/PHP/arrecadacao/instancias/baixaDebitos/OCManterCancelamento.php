@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterCancelamento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterCancelamento.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.10
 */
@@ -47,8 +47,6 @@ Bug#9762#
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CAM_GT_ARR_MAPEAMENTO."TARRPermissaoCancelamento.class.php" );
-
-//sistemaLegado::mostravar( $_REQUEST );
 
 function montaListaCGM($rsLista)
 {

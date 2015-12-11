@@ -33,7 +33,7 @@
  * @package URBEM
  * @subpackage Visao
 
- $Id: VFISNotificarProcesso.class.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: VFISNotificarProcesso.class.php 63839 2015-10-22 18:08:07Z franver $
 
  * Casos de uso:
  */
@@ -380,7 +380,6 @@ class VFISNotificarProcesso
         }
 
         # Monta a lista propriamente dita.
-//sistemaLegado::mostravar( $arPenalidades );echo "teje preso";exit;
         $rsPenalidades->preenche( $arPenalidades[$inCodInfracao] );
         $stHTML = $this->montaListaPenalidades( $rsPenalidades );
 

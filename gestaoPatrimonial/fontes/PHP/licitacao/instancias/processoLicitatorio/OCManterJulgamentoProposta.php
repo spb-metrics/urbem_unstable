@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterJulgamentoProposta.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterJulgamentoProposta.php 63865 2015-10-27 13:55:57Z franver $
 
     * Casos de uso: uc-03.05.26
 
@@ -334,6 +334,11 @@ function montaSpanItens($rsRecordSet = false, $inTipoLicitacao = 1)
     /// isto serve para montar a listagem vazia
     if (!$rsRecordSet) { $rsRecordSet = new Recordset; }
 
+    
+    $rsRecordSet->addFormatacao('quantidade'         , 'NUMERIC_BR_4');
+    $rsRecordSet->addFormatacao('valor_referencia'   , 'NUMERIC_BR');
+    $rsRecordSet->addFormatacao('valor_ultima_compra', 'NUMERIC_BR');
+    
     // Montagem Lista
     $obLstItens = new Lista;
     $obLstItens->setTitulo          ( 'Itens'      );
@@ -686,8 +691,6 @@ function montaDetalheItemFornecedor($inOrdem, $inCodItem)
     }
 
     $arRegistro = $arFornecedores[$inCodItem][$inPos];
-
-    //SistemaLegado::mostraVar($arFornecedores[$inCodItem]);
 
     $arRegistro['vl_total'   ] = number_format($arRegistro['vl_total']   , 2, ',', '.' );
     $arRegistro['vl_unitario'] = number_format($arRegistro['vl_unitario'], 2, ',', '.' );
@@ -1080,10 +1083,6 @@ function montaDetalheLoteFornecedor($inLote, $inCgm)
     while ( (!$rsRecordSet->eof() ) and ( $rsRecordSet->getCampo( 'cgm_fornecedor' ) != $inCgm) ) {
         $rsRecordSet->proximo();
     }
-
-    //SistemaLegado::mostraVar($arFornecedores[$inLote]);
-
-    //$rsRecordSet->addFormatacao ( 'vl_total', 'NUMERIC_BR' );
 
     if ($rsRecordSet->getCampo( 'tipo' ) == 'N') {
         $tipoEmpresa = "Empresa Padrão";

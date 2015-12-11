@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 63464 2015-08-31 17:30:39Z michel $
+    * $Id: PRManterPagamento.php 64023 2015-11-19 19:40:11Z carlos.silva $
 
     * Casos de uso: uc-02.04.05
 */
@@ -109,15 +109,17 @@ switch ($stAcao) {
     $stSiglaUf = SistemaLegado::pegaDado("sigla_uf","sw_uf","where cod_uf = ".$inCodUf."", $boTransacao);
 
     $obErro = new Erro;
-    if ($request->get('inDocTipo')) {
-        switch ($request->get('inDocTipo')) {
-            case 1 :
-            case 2 :
-            case 3 :
-            case 99:
-                if ( !$request->get('nuDoc') ) {
-                    $obErro->setDescricao("O número do documento é obrigatório");
-                }
+    if( $stSiglaUf != "BA" ){
+        if ($request->get('inDocTipo')) {
+            switch ($request->get('inDocTipo')) {
+                case 1 :
+                case 2 :
+                case 3 :
+                case 99:
+                    if ( !$request->get('nuDoc') ) {
+                        $obErro->setDescricao("O número do documento é obrigatório");
+                    }
+            }
         }
     }
     if ($request->get('inCodOrdem')) {
@@ -369,18 +371,26 @@ switch ($stAcao) {
             if ($stSiglaUf == "BA" && $inCodUf==5 && !$obErro->ocorreu() ) {
                 include_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBAPagamentoTipoPagamento.class.php';
 
-                $obTTCMBAPagamentoTipoPagamento = new TTCMBAPagamentoTipoPagamento;
-                $obTTCMBAPagamentoTipoPagamento->setDado('cod_entidade'   , $arrNota['cod_entidade']                );
-                $obTTCMBAPagamentoTipoPagamento->setDado('exercicio'      , $stExercicioLiquidacao                  );
-                $obTTCMBAPagamentoTipoPagamento->setDado('cod_nota'       , $inCodNota                              );
-                $obTTCMBAPagamentoTipoPagamento->setDado('timestamp'      , $stTimestamp                            );
-                $obTTCMBAPagamentoTipoPagamento->setDado('cod_tipo'       , $request->get('inCodTipoPagamento')     );
-                $obTTCMBAPagamentoTipoPagamento->setDado('num_documento'  , $request->get('numDocPagamento')        );
-                $obErro = $obTTCMBAPagamentoTipoPagamento->inclusao($boTransacao);
-
-                if ($obErro->ocorreu()) {
-                    SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
-                    SistemaLegado::LiberaFrames();
+                $obTTesourariaPagamento = new TTesourariaPagamento;
+                $stFiltro = " WHERE cod_nota = ".$inCodNota." AND exercicio = '".$stExercicioLiquidacao."' AND cod_entidade = ".$arrNota['cod_entidade'];
+                $obTTesourariaPagamento->recuperaTodos($rsTesourariaPagamento, $stFiltro, '', $boTransacao);
+                
+                while (!$rsTesourariaPagamento->eof()) {
+                    $obTTCMBAPagamentoTipoPagamento = new TTCMBAPagamentoTipoPagamento;
+                    $obTTCMBAPagamentoTipoPagamento->setDado('cod_entidade'   , $rsTesourariaPagamento->getCampo('cod_entidade'));
+                    $obTTCMBAPagamentoTipoPagamento->setDado('exercicio'      , $stExercicioLiquidacao);
+                    $obTTCMBAPagamentoTipoPagamento->setDado('cod_nota'       , $rsTesourariaPagamento->getCampo('cod_nota'));
+                    $obTTCMBAPagamentoTipoPagamento->setDado('timestamp'      , $rsTesourariaPagamento->getCampo('timestamp'));
+                    $obTTCMBAPagamentoTipoPagamento->setDado('cod_tipo'       , $request->get('inCodTipoPagamento'));
+                    $obTTCMBAPagamentoTipoPagamento->setDado('num_documento'  , $request->get('numDocPagamento'));
+                    $obErro = $obTTCMBAPagamentoTipoPagamento->inclusao($boTransacao);
+    
+                    if ($obErro->ocorreu()) {
+                        SistemaLegado::exibeAviso(urlencode("Erro ao executar Pagamento de Origem de Recursos Interna (".$obErro->getDescricao().")"),"","erro");
+                        SistemaLegado::LiberaFrames();
+                    }
+                    
+                    $rsTesourariaPagamento->proximo();
                 }
             }
         }

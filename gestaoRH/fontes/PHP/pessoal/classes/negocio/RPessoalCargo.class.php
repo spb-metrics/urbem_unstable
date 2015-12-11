@@ -648,10 +648,10 @@ function listarCargosPorSubDivisaoServidor(&$rsRecordSet , $boTransacao = "")
         $stFiltro .= " AND EXTRACT(MONTH FROM dt_inicial) = ".$this->getCodMes()." ";
     }
 
-    $obRFolhaPagamentoPeriodoMovimentacao->recuperaAnosPeriodoMovimentacao($rsUltimoPeriodoMovimentacao, $stFiltro);
+    $obRFolhaPagamentoPeriodoMovimentacao->recuperaAnosPeriodoMovimentacao($rsUltimoPeriodoMovimentacao, $stFiltro, $boTransacao);
 
     $stFiltro = " AND FPM.cod_periodo_movimentacao = ".$rsUltimoPeriodoMovimentacao->getCampo('cod_periodo_movimentacao');
-    $obRFolhaPagamentoPeriodoMovimentacao->listarPeriodoMovimentacao($rsPeriodoMovimentacao, $stFiltro);
+    $obRFolhaPagamentoPeriodoMovimentacao->listarPeriodoMovimentacao($rsPeriodoMovimentacao, $stFiltro, "", $boTransacao);
 
     $stFiltro  = " AND ( dt_publicacao <= to_date('".$rsPeriodoMovimentacao->getCampo('dt_final')."', 'dd/mm/yyyy')   \n";
     $stFiltro .= "   AND ( dt_termino IS NULL                                                                         \n";

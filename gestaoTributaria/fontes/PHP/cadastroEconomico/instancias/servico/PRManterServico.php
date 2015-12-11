@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: PRManterServico.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterServico.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.03
 */
@@ -63,9 +63,6 @@ $pgOcul      = "OC".$stPrograma.".php?stAcao=$stAcao";
 $pgJS        = "JS".$stPrograma.".js";
 
 $obRCEMServico = new RCEMServico;
-
-//sistemaLegado::mostravar ( $_REQUEST );
-//echo 'ACAO: '. $stAcao;
 
 switch ($stAcao) {
 

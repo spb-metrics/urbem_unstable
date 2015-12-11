@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaArrecadacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RTesourariaArrecadacao.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     $Revision: 31732 $
     $Name$
@@ -659,7 +659,7 @@ function listarArrecadacaoNaoEstornada(&$rsRecordSet, $stFiltro = "", $stOrder =
 function listarArrecadacaoValorConta(&$rsRecordSet, $stOrder = "", $boTransacao = "", $boRetencao = "")
 {
     $stFiltro="";
-    if (SistemaLegado::is_tcems($boTransacao)) {
+    if (Sessao::getExercicio() > '2012') {
         include_once( CAM_GF_TES_MAPEAMENTO ."FTesourariaListarArrecadacaoTCEMS.class.php" );
         $obFTesourariaListarArrecadacao = new FTesourariaListarArrecadacaoTCEMS();
     } else {

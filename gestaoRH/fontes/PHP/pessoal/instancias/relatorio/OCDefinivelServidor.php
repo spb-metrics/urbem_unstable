@@ -388,7 +388,7 @@ function incluirCampo()
     if (!$obErro->ocorreu()) {
         if (count($arCampos) > 0) {
             foreach ($arCampos as $arCampo) {
-                if (ereg('evento', strtolower($arCampo['campo']))  || in_array($stCampo, $arCamposValores)) {
+                if (preg_match('/evento/', strtolower($arCampo['campo']))  || in_array($stCampo, $arCamposValores)) {
                     $inCodCampoEventoUltimo = substr($arCampo['campo'], 6, 1);
                     // Vai substituindo até o último elemento
                     $inCodCampoEventoProximo = $inCodCampoEventoUltimo + 1;
@@ -402,7 +402,7 @@ function incluirCampo()
         }
     }
 
-    if (ereg('evento', strtolower($stCampo))) {
+    if (preg_match('/evento/', strtolower($stCampo))) {
         if ($_GET['inCodigoEvento'] == '') {
             $obErro->setDescricao('Informe qual o evento a ser demonstrado no relatório.');
         }
@@ -418,11 +418,27 @@ function incluirCampo()
         $arCampo['nom_evento'] = $_GET['hdnDescEvento'];
     }
 
-    if (ereg('data', strtolower($stCampo))) {
-        $stCampoDescricao = $stCampo.' (' .$_REQUEST['stDataInicial']. ' - '. $_REQUEST['stDataFinal']. ') ';
-        if ($_GET['stDataInicial'] != '' || $_GET['stDataFinal'] != '') {
-            $arCampo['stDataInicial'] = $_GET['stDataInicial'];
-            $arCampo['stDataFinal'] = $_GET['stDataFinal'];
+    if (preg_match('/data/', strtolower($stCampo))) {
+        $pattern = "((1[0-2])|(0[1-9]))"; //Expressão regular para pegar o mês exato entre 01-09 ou 10-12
+
+        /*
+            O IF tem que verificar exatamente se os campos inicial e final são o mesmo para garantir que foi adicionado corretamente
+            e ainda testar se ambos inicial e final estão dentro da expressão regular determinada anteriormente
+        */
+        if (($_REQUEST['stDataInicial'] == $_REQUEST['stDataFinal']) &&
+            (preg_match($pattern,$_REQUEST['stDataInicial']) == 1)   &&
+            (preg_match($pattern,$_REQUEST['stDataFinal']) == 1)
+           ) {
+            $inMes = (int)$_REQUEST['stDataInicial']; //convertendo o string do mês para garantir que irá corretamente
+            $stCampoDescricao = $stCampo.' ('.SistemaLegado::mesExtensoBR($inMes).') ';
+            $arCampo['stMes'] = $_GET['stDataInicial'];
+        } else {
+            $stCampoDescricao = $stCampo.' (' .$_REQUEST['stDataInicial']. ' - '. $_REQUEST['stDataFinal']. ') ';
+
+            if ($_GET['stDataInicial'] != '' || $_GET['stDataFinal'] != '') {
+                $arCampo['stDataInicial'] = $_GET['stDataInicial'];
+                $arCampo['stDataFinal'] = $_GET['stDataFinal'];
+            }
         }
     }
 
@@ -458,7 +474,7 @@ function incluirCampo()
         $arPontos += $arListaCampos[$stCampo];
         Sessao::write('pontos', $arPontos);
 
-        if (ereg('evento', strtolower($stCampo)) && !$boTipoFolha) {
+        if (preg_match('/evento/', strtolower($stCampo)) && !$boTipoFolha) {
             $obIFiltroTipoFolha = new IFiltroTipoFolha();
             $obIFiltroTipoFolha->setValorPadrao('1');
 
@@ -507,7 +523,7 @@ function excluirCampo()
             $arTemp[] = $arCampo;
             $stCampoTMP = $arCampo['campo'];
             $arCamposTMP = array('Salário Bruto', 'Salário Líquido', 'Descontos da Folha Salário');
-            if (ereg('evento', strtolower($stCampoTMP)) || in_array($stCampoTMP, $arCamposTMP)) {
+            if (preg_match('/evento/', strtolower($stCampoTMP)) || in_array($stCampoTMP, $arCamposTMP)) {
                 $boTipoFolha = true;
             }
         } else {
@@ -609,7 +625,7 @@ function submeter()
 function verificarCampo()
 {
     $stCampo = $_REQUEST['stCampo'];
-    if (ereg('evento', strtolower($stCampo))) {
+    if (preg_match('/evento/', strtolower($stCampo))) {
         $obIBscEvento = new IBscEvento();
         $obIBscEvento->setTodosEventos(true);
         $obIBscEvento->obBscInnerEvento->setObrigatorio(true);
@@ -623,12 +639,13 @@ function verificarCampo()
         $stJs = "d.getElementById('spnCampos').innerHTML = '".$stHtml."'; ";
     } else
 
-    if (ereg('data', strtolower($stCampo))) {
+    if (preg_match('/data/', strtolower($stCampo))) {
 
         $obPeriodicidade = new Periodicidade();
         $obPeriodicidade->setRotulo("Periodicidade");
-        $obPeriodicidade->setTitle("Informe a Periodicidade");
+        $obPeriodicidade->setTitle("Informe a Periodicidade.");
         $obPeriodicidade->setExercicio(Sessao::getExercicio());
+        $obPeriodicidade->setAnoVazio(true); //Necessário para poder usar o parâmetro do mês sem informar o exercicío
         $obPeriodicidade->setValue(4);
 
         $obFormulario = new Formulario();

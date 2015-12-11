@@ -39,17 +39,6 @@
 
     * Casos de uso: uc-02.03.03
 */
-
-/*
-$Log$
-Revision 1.7  2006/10/09 09:24:13  cleisson
-Ajustes
-
-Revision 1.6  2006/07/05 20:49:29  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php" );

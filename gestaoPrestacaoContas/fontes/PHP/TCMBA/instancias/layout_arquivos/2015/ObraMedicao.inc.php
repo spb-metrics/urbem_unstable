@@ -61,6 +61,10 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_final_medicao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_medicao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
                         
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_medicao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
@@ -96,7 +100,11 @@
                         
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_cnpj_resp_2");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);                        
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("registro_classe_2");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("matricula_fiscal_2");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");

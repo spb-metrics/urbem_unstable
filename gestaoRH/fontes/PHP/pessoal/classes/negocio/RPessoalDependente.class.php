@@ -498,7 +498,7 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
 
         if ( !$obErro->ocorreu() and $this->obRCGMPessoaFisica->getDataNascimento() ) {
             include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php");
-            $obTCGMPessoaFisica                 = new TCGMPessoaFisica;
+            $obTCGMPessoaFisica = new TCGMPessoaFisica;
             $stFiltro = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
 
             $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem, $boTransacao );
@@ -507,6 +507,7 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
             $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
             $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
             $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
+
             if ( $rsCGM->getCampo('cpf') ) {
                 $obTCGMPessoaFisica->setDado("cpf",             $rsCGM->getCampo('cpf'));
             }
@@ -520,7 +521,7 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
             $this->obTPessoalDependente->proximoCod( $inCodDependente , $boTransacao );
             $this->setCodDependente( $inCodDependente );
             $this->obTPessoalDependente->setDado("cod_dependente"           , $this->getCodDependente()                 );
-            $this->obTPessoalDependente->setDado("numcgm"                   , $this->obRCGMPessoaFisica->getNumCgm()   );
+            $this->obTPessoalDependente->setDado("numcgm"                   , $this->obRCGMPessoaFisica->getNumCgm()    );
             $this->obTPessoalDependente->setDado("cod_grau"                 , $this->getCodGrau()                       );
             $this->obTPessoalDependente->setDado("dependente_invalido"      , $this->getDependenteInvalido()            );
             $this->obTPessoalDependente->setDado("carteira_vacinacao"       , $this->getCarteiraVacinacao()             );
@@ -531,7 +532,7 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
             $obErro = $this->obTPessoalDependente->inclusao( $boTransacao );
             if ( !$obErro->ocorreu() ) {
                 $this->obTPessoalServidorDependente->setDado("cod_servidor"  , $this->roPessoalServidor->getCodServidor() );
-                $this->obTPessoalServidorDependente->setDado("cod_dependente", $this->getCodDependente()                   );
+                $this->obTPessoalServidorDependente->setDado("cod_dependente", $this->getCodDependente()                  );
                 $this->obTPessoalServidorDependente->setDado("dt_inicio", date('y-m-d'));
                 $obErro = $this->obTPessoalServidorDependente->inclusao( $boTransacao );
             }
@@ -608,11 +609,13 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
     {
         $boFlagTransacao = false;
         $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
         if ( !$obErro->ocorreu() and $this->obRCGMPessoaFisica->getDataNascimento() ) {
             include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php");
-            $obTCGMPessoaFisica                 = new TCGMPessoaFisica;
+            $obTCGMPessoaFisica = new TCGMPessoaFisica;
             $stFiltro = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
-            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem);
+            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+
             $obTCGMPessoaFisica->setDado("dt_nascimento",       $this->obRCGMPessoaFisica->getDataNascimento());
             $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
             $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
@@ -624,7 +627,7 @@ function getTPessoalDependenteExcluido() { return $this->obTPessoalDependenteExc
         }
         if ( !$obErro->ocorreu() ) {
             $this->obTPessoalDependente->setDado("cod_dependente"           , $this->getCodDependente()                 );
-            $this->obTPessoalDependente->setDado("numcgm"                   , $this->obRCGMPessoaFisica->getNumCgm()   );
+            $this->obTPessoalDependente->setDado("numcgm"                   , $this->obRCGMPessoaFisica->getNumCgm()    );
             $this->obTPessoalDependente->setDado("cod_grau"                 , $this->getCodGrau()                       );
             $this->obTPessoalDependente->setDado("dependente_invalido"      , $this->getDependenteInvalido()            );
             $this->obTPessoalDependente->setDado("carteira_vacinacao"       , $this->getCarteiraVacinacao()             );

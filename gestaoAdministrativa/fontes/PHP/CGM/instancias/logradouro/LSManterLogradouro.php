@@ -66,9 +66,10 @@ if ($request->get('nomForm')) {
     $stLink .= "&nomForm=".$request->get("nomForm");}
 
 //MONTA OS FILTROS
-if ($request->get("inCodigoBairro")) {
-    $obRCIMLogradouro->setBairro( $request->get("inCodigoBairro") );
-    $stLink .= "&inCodigoBairro=".$request->get("inCodigoBairro");
+$inCodBairro = ($request->get("inCodigoBairro") != '') ? $request->get("inCodigoBairro") : $request->get("inCodBairro");
+if ($inCodBairro != '' ) {
+    $obRCIMLogradouro->setBairro( $inCodBairro );
+    $stLink .= "&inCodigoBairro=".$inCodBairro;
 }
 if ($request->get("stCEP")) {
     $obRCIMLogradouro->setCEP( $request->get("stCEP") );

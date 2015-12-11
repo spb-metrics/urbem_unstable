@@ -29,12 +29,11 @@
  *
  * Data de Criação: 26/05/2008
  * @author Desenvolvedor: Lucas Stephanou
- * $Id: config.php 59614 2014-09-02 12:20:19Z gelson $
+ * $Id: config.php 63850 2015-10-23 17:45:08Z gelson $
  */
 
  /* hack para evitar erros */
 //set_error_handler(create_function('$code,$msg', 'throw new Exception($msg, $code);'), E_ALL & ~E_NOTICE);
-
 $path = realpath(dirname(__FILE__)).'/';
 
 # diretorio do arquivo em execução

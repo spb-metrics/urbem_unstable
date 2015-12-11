@@ -43,8 +43,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado
 $js = "";
 $ok = true;
 
-//mostraVar($HTTP_GET_VARS);
-
 switch ($ctrl) {
 case ("cgm"):
     if ($numCgm>0) {
@@ -74,7 +72,6 @@ case ("motorista"):
 //Verifica se o setor digitado é válido. Caso seja retorna o nome do setor
 case ("setor"):
     $setor = validaSetor($chave,$exercicio);
-    //mostraVar($setor);
     if ($setor) {
         $js .= "f.".$campo.".value = '".$setor[nomSetor]."'; \n";
     } else {

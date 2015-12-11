@@ -281,13 +281,12 @@ Atualiza estes dados na tabela usuario, em seguida atualiza a senha criptografad
                 cod_orgao='$codOrgao', ano_exercicio='$exercicio',
                 username='$usuario', status='$status'
                 Where numcgm = '$cgm' ";
-        //echo"$sSQL";
-        //mostravar($sSQL);
+
         $conectaBD = new databaseLegado ;
         $conectaBD->abreBD();
         $conectaBD->executaSql($sSQL);
         $conectaBD->fechaBD();
-        //echo $sSQL;
+
         //Criptografa a senha do usuário
         $modSenha = new sessao;
         $modSenha->setaVariaveis($usuario,$senha,$exercicio);
@@ -392,7 +391,7 @@ nas respectivas variáveis da classe
             $conectaBD->limpaSelecao();
             $conectaBD->fechaBD();
         }
-        //mostraVar($this->vetCgm);
+
         return $this->vetCgm;
     }//Fim function pegaDadosUsuario
 

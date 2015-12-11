@@ -39,17 +39,6 @@
 
     * Casos de uso: uc-03.04.05
 */
-
-/**
-
-$Log$
-Revision 1.2  2006/09/29 18:02:32  cako
-implementação do uc-03.04.05
-
-Revision 1.1  2006/09/22 18:03:45  cako
-implementação do uc-03.04.05
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 

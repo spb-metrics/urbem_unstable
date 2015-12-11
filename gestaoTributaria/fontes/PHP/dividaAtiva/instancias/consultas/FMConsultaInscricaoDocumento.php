@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: FMConsultaInscricaoDocumento.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaInscricaoDocumento.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.04.09
 **/
@@ -71,7 +71,6 @@ if ( empty( $_REQUEST['stAcao']) ) {
     $_REQUEST['stAcao'] = "incluir";
 }
 
-#sistemaLegado::mostravar( $_REQUEST);
 // EFETUA ALTERACAO DA DATA BASE CASO HAJA COBRANÇA
 
 #==============================================================
@@ -144,7 +143,7 @@ $obTDATDividaAtiva->ListaConsultaCobrancas( $rsListaCobrancas, $stFiltro );
 
 $rsListaCobrancas->addFormatacao("valor_parcelamento","NUMERIC_BR");
 $rsListaCobrancas->setPrimeiroElemento();
-#sistemaLegado::mostravar( $rsListaCobrancas );
+
 $tableCobrancas = new TableTree();
 $tableCobrancas->setRecordset       ( $rsListaCobrancas );
 $tableCobrancas->setSummary         ('Lista de Cobranças');

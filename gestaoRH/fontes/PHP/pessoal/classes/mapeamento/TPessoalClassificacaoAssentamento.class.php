@@ -96,7 +96,6 @@ class TPessoalClassificacaoAssentamento extends Persistente
         $stOrdem = $stOrdem ? $stOrdem : " ORDER BY ca.descricao ";
         $stFiltro = $stFiltro ? " WHERE ".substr($stFiltro, 4) : "";
         $stSql  = $this->montaRecuperaPorContrato($comboType).$stFiltro.$stGroup.$stOrdem;
-        // SistemaLegado::mostravar($stSql); exit;
         $this->setDebug( $stSql );
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 

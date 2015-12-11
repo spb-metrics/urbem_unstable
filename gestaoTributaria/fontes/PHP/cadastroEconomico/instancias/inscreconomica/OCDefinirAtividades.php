@@ -30,7 +30,7 @@
     * @author Tonismar Régis Bernardo
     * @ignore
 
-    * $Id: OCDefinirAtividades.php 59889 2014-09-18 14:57:20Z carlos.silva $
+    * $Id: OCDefinirAtividades.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -273,7 +273,6 @@ function BuscaAtividade()
     return $stJs;
 }
 
-//sistemaLegado::mostravar($_REQUEST["stCtrl"]);
 switch ($_REQUEST["stCtrl"]) {
     case "buscaAtividade":
         sistemaLegado::executaFrameOculto( BuscaAtividade() );
@@ -559,7 +558,6 @@ switch ($_REQUEST["stCtrl"]) {
             $obMontaAtividade->setValorReduzido ( $_REQUEST["stChaveAtividade"] );
             $obMontaAtividade->preencheCombos2();
         } else {
-            //sistemaLegado::mostravar($_REQUEST);
             $obMontaAtividade->setCodigoVigencia   ( $inCodVigencia  );
             $obMontaAtividade->setCodigoNivel         ( $_REQUEST["inCodigoNivel"]      );
             $obMontaAtividade->setValorReduzido     ( $_REQUEST["stChaveAtividade"] );

@@ -260,8 +260,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     include_once( CAM_GF_TES_MAPEAMENTO."FTesourariaResumoDespesa.class.php");
     $obFTesourariaResumoDespesa = new FTesourariaResumoDespesa;
 
-    $boTCEMS = SistemaLegado::is_tcems();
-
     $obFTesourariaResumoDespesa->setDado("stEntidade"           ,$this->getEntidade());
     $obFTesourariaResumoDespesa->setDado("stExercicio"          ,$this->getExercicio());
     $obFTesourariaResumoDespesa->setDado("stDataInicial"        ,$this->getDataInicial());
@@ -277,7 +275,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFTesourariaResumoDespesa->setDado("inNumCgm"             ,$this->obRTesourariaBoletim->roUltimaArrecadacao->obROrcamentoEntidade->obRCGM->getNumCGM());
     $obFTesourariaResumoDespesa->setDado("boUtilizaEstruturalTCE", 'false' );
 
-    if ($boTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $obFTesourariaResumoDespesa->setDado("boUtilizaEstruturalTCE", 'true' );
     }
 

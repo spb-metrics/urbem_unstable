@@ -151,7 +151,6 @@ switch ($ctrl) {
         if (!(isset($sessao->transf1))) {
                $sessao->transf1 = $select;
         }
-        //mostravar($HTTP_GET_VARS);
         $paginacao = new paginacaoLegada;
         $paginacao->pegaDados($sessao->transf1,"10");
         $paginacao->pegaPagina($pagina);

@@ -74,7 +74,7 @@ function processarFiltro($boExecuta=false,$boMensagem="")
 function processarFormInclusao($boExecuta=false,$obErro="")
 {
     $obErro = ( is_object( $obErro ) ) ? $obErro : new erro;
-    $stTipo = ( $_GET['stTipo'] != '' ) ? $_GET['stTipo']  : Sessao::read('stTipo');
+    $stTipo = ( $_REQUEST['stTipo'] != '' ) ? $_REQUEST['stTipo']  : Sessao::read('stTipo');
     //Código para habilitar a aba onde o usuário estava quando iniciou o processo de procura do evento
     //e posteriormente acionou o botão cancelar em qualquer momento deste processo.
     $inNumAba = Sessao::read('numAba');
@@ -102,7 +102,7 @@ function processarFormInclusao($boExecuta=false,$obErro="")
     $stJs .= "d.links['id_layer_1'].href = \"javascript:buscaValor('habilitaLayer_1');HabilitaLayer('layer_1');\";     \n";
     $stJs .= "d.links['id_layer_2'].href = \"javascript:buscaValor('habilitaLayer_2');HabilitaLayer('layer_2');\";     \n";
     $stJs .= "d.links['id_layer_3'].href = \"javascript:buscaValor('habilitaLayer_3');HabilitaLayer('layer_3');\";     \n";
-    $stJs .= "d.links['id_layer_4'].href = \"javascript:buscaValor('habilitaLayer_4');HabilitaLayer('layer_4');\";     \n";
+    $stJs .= "d.links['id_layer_4'].href = \"javascript:buscaValor('habilitaLayer_4');HabilitaLayer('layer_4');BloqueiaFrames(true,false);\"; \n";
     if ( Sessao::read('boBase') ) {
         $stJs .= "d.links['id_layer_5'].href = \"javascript:buscaValor('habilitaLayer_5');HabilitaLayer('layer_5');\";     \n";
     }
@@ -117,8 +117,8 @@ function processarFormInclusao($boExecuta=false,$obErro="")
         $stJs.= gerarSpan2Form();
     }
     if ( isset($stTipo) and $stTipo != "" ) {
-        $stJs .= "d.getElementById('inCampoInner').innerHTML = '".$_GET['stDescricao']."';              \n";
-        $stJs .= "f.inCampoInner.value = '".$_GET['stDescricao']."';                                    \n";
+        $stJs .= "d.getElementById('inCampoInner').innerHTML = '".$_REQUEST['stDescricao']."';              \n";
+        $stJs .= "f.inCampoInner.value = '".$_REQUEST['stDescricao']."';                                    \n";
         if ($stTipo != 'F' and $inNumAba == 1) {
             $obErro->setDescricao("O evento informado não é um evento fixo, nesta aba devem ser informados apenas eventos fixos.");
             $stJs .= "f.inCodigo.value = '';                                                         \n";
@@ -179,6 +179,328 @@ function bloqueiaAbasForm($boExecuta=false)
     }
 }
 
+function montaPreviaSalario()
+{
+    $inNumCGM = Sessao::read("inNumCGM");
+    $inCodConfiguracao = '1';
+    //Buscando o calculo realizado para mostra na ABA PREVIA
+    $obErro = new erro;
+    $obRFolhaPagamentoPeriodoMovimentacao = new RFolhaPagamentoPeriodoMovimentacao();
+    $obErro = $obRFolhaPagamentoPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao, "", "", $boTransacao);
+            
+    if ( !$obErro->ocorreu() ) {
+        include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
+        $obTPessoalContrato = new TPessoalContrato();
+        $stFiltro = " AND numcgm = ".$inNumCGM;
+        $obErro = $obTPessoalContrato->recuperaCgmDoRegistro($rsCgm,$stFiltro,"",$boTransacao);
+
+        if ( !$obErro->ocorreu() ) {
+            include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculado.class.php");
+            $obTFolhaPagamentoEventoCalculado = new TFolhaPagamentoEventoCalculado();
+            $obTFolhaPagamentoEventoCalculado->setDado("cod_periodo_movimentacao",$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
+            $obTFolhaPagamentoEventoCalculado->setDado("cod_contrato"            ,$rsCgm->getCampo("cod_contrato"));
+            $obTFolhaPagamentoEventoCalculado->setDado("cod_configuracao"        ,$inCodConfiguracao);
+            $obTFolhaPagamentoEventoCalculado->setDado("cod_complementar"        ,'0');
+            $obTFolhaPagamentoEventoCalculado->setDado("ordem"                   ,'codigo');
+            $obErro = $obTFolhaPagamentoEventoCalculado->recuperaEventosCalculadosFichaFinanceira($rsEventoCalculado,"","",$boTransacao);
+
+            if ( !$obErro->ocorreu() ) {
+                $obTFolhaPagamentoEventoCalculado->setDado("cod_contrato"            ,$rsCgm->getCampo("cod_contrato"));
+                $obTFolhaPagamentoEventoCalculado->setDado("numcgm"                  ,$rsCgm->getCampo("numcgm"));
+                $obTFolhaPagamentoEventoCalculado->setDado("cod_periodo_movimentacao",$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
+                $obTFolhaPagamentoEventoCalculado->setDado("natureza"                ,'B');
+                $obErro = $obTFolhaPagamentoEventoCalculado->recuperaValoresAcumuladosCalculo($rsValoresAcumuladosBase,'',' order by codigo',$boTransacao);
+                        
+                if ( !$obErro->ocorreu() )
+                    $obErro = $obTFolhaPagamentoEventoCalculado->recuperaValoresAcumuladosCalculoSalarioFamilia($rsValoresAcumuladosBaseSalarioFamilia,'',' order by codigo',$boTransacao);
+                
+                if ( !$obErro->ocorreu() )
+                    $obErro = $obTFolhaPagamentoEventoCalculado->recuperaRotuloValoresAcumuladosCalculo($rsRotuloValoresAcumuladosBase,"","",$boTransacao);
+                        
+                if ( !$obErro->ocorreu() )
+                    $obErro = $obTFolhaPagamentoEventoCalculado->recuperaRotuloValoresAcumuladosCalculoSalarioFamilia($rsRotuloValoresAcumuladosBaseSalarioFamilia,"","",$boTransacao);
+
+                if ( !$obErro->ocorreu() ){
+                    $obTFolhaPagamentoEventoCalculado->setDado("natureza",'D');
+                    $obErro = $obTFolhaPagamentoEventoCalculado->recuperaValoresAcumuladosCalculo($rsValoresAcumuladosDesconto,'',' order by codigo',$boTransacao);
+                }
+                        
+                if ( !$obErro->ocorreu() )
+                    $obErro = $obTFolhaPagamentoEventoCalculado->recuperaRotuloValoresAcumuladosCalculo($rsRotuloValoresAcumuladosDesconto,"","",$boTransacao);
+            }
+        }
+                
+        $rsEventos = processarEventos($rsEventoCalculado,1);
+        $inCount1  = $rsEventos->getNumLinhas();
+        $stTabela1 .= "<center>";
+        $stTabela1 .= "<table border=0 width=100%>";
+        $stTabela1 .= "<tr><td align=right width=10% class=labelcentercabecalho ><font size=-1>Evento</font></td>";
+        $stTabela1 .= "<td class=labelcentercabecalho><font size=-1>Descrição</font></td>";
+        $stTabela1 .= "<td class=labelcentercabecalho width=10%><font size=-1>Desdobramento</font></td>";
+        $stTabela1 .= "<td class=labelcentercabecalho class=labelcentercabecalho align=right width=10%><font size=-1>Quantidade</font></td>";
+        $stTabela1 .= "<td class=labelcentercabecalho align=right width=10%><font size=-1>Proventos</font></td>";
+        $stTabela1 .= "<td class=labelcentercabecalho align=right width=10%><font size=-1>Descontos</font></td></tr>";
+        while ( !$rsEventos->eof() ) {
+            $stTabela1 .= "<tr><td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('codigo')."</td>";
+            $stTabela1 .= "<td  class= fieldfinanceiro ><font size=-1>".$rsEventos->getCampo('descricao')."</font></td>";
+            $stTabela1 .= "<td  class= fieldfinanceiro><font size=-1>".$rsEventos->getCampo('desdobramento_texto')."</font></td>";
+            if ($rsEventos->getCampo('apresenta_parcela') == 't') {
+                $stQuantidadeParc = '/'.$rsEventos->getCampo('quantidade_total_parcela');
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('quantidade_parcelas').$stQuantidadeParc."</font></td>";
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('proventos')."</font></td>";
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('descontos')."</font></td></tr>";
+
+            } else {
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('quantidade')."</font></td>";
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('proventos')."</font></td>";
+                $stTabela1 .= "<td  class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('descontos')."</font></td></tr>";
+            }
+
+            $rsEventos->proximo();
+        }
+        
+        $stTabela1 .= "</table>";
+        $stTabela1 .= "</center>";
+
+        $rsEventos = processarEventos($rsEventoCalculado,2);
+        $inCount2  = $rsEventos->getNumLinhas();
+        $stTabela2  = "<center>";
+        $stTabela2 .= "<table border=0 width=100%>";
+        $stTabela2 .= "<tr><td class=labelcentercabecalho align=right width=10%><font size=-1>Evento</font></td>";
+        $stTabela2 .= "<td class=labelcentercabecalho><font size=-1>Descrição</font></td>";
+        $stTabela2 .= "<td class=labelcentercabecalho width=10%><font size=-1>Desdobramento</font></td>";
+        $stTabela2 .= "<td class=labelcentercabecalho align=right width=10%><font size=-1>Quantidade</font></td>";
+        $stTabela2 .= "<td class=labelcentercabecalho align=right width=20%><font size=-1>Valor</font></td></tr>";
+        while ( !$rsEventos->eof() ) {
+            $stTabela2 .= "<tr><td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('codigo')."</font></td>";
+            $stTabela2 .= "<td class= fieldfinanceiro ><font size=-1>".$rsEventos->getCampo('descricao')."</font></td>";
+            $stTabela2 .= "<td class= fieldfinanceiro ><font size=-1>".$rsEventos->getCampo('desdobramento_texto')."</font></td>";
+            $stTabela2 .= "<td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('quantidade')."</font></td>";
+            $stTabela2 .= "<td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('descontos')."</font></td></tr>";
+            $rsEventos->proximo();
+        }
+        $stTabela2 .= "</table>";
+        $stTabela2 .= "</center>";
+
+        $rsEventos  = processarEventos($rsEventoCalculado,3);
+        $inCount3   = $rsEventos->getNumLinhas();
+        $stTabela3  = "<center>";
+        $stTabela3 .= "<table border=0 width=100%>";
+        $stTabela3 .= "<tr><td class=labelcentercabecalho align=right width=10%><font size=-1>Evento</font></td>";
+        $stTabela3 .= "<td class=labelcentercabecalho><font size=-1>Descrição</font></td>";
+        $stTabela3 .= "<td class=labelcentercabecalho width=10%><font size=-1>Desdobramento</font></td>";
+        $stTabela3 .= "<td class=labelcentercabecalho align=right width=10%><font size=-1>Quantidade</font></td>";
+        $stTabela3 .= "<td class=labelcentercabecalho align=right width=20%><font size=-1>Valor</font></td></tr>";
+        while ( !$rsEventos->eof() ) {
+            $stTabela3 .= "<tr><td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('codigo')."</font></td>";
+            $stTabela3 .= "<td class= fieldfinanceiro><font size=-1>".$rsEventos->getCampo('descricao')."</font></td>";
+            $stTabela3 .= "<td class= fieldfinanceiro ><font size=-1>".$rsEventos->getCampo('desdobramento_texto')."</font></td>";
+            $stTabela3 .= "<td class= fieldfinanceiro  align=right><font size=-1>".$rsEventos->getCampo('quantidade')."</font></td>";
+            $stTabela3 .= "<td class= fieldfinanceiro align=right><font size=-1>".$rsEventos->getCampo('descontos')."</font></td></tr>";
+            $rsEventos->proximo();
+        }
+        $stTabela3 .= "</table>";
+        $stTabela3 .= "</center>";
+
+        $rsEventos = processarEventos($rsEventoCalculado,4);
+        $stTabela4  = "<center>";
+        $stTabela4 .= "<table border=0 width=100%>";
+
+        while ( !$rsEventos->eof() ) {
+            $stTabela4 .= "<tr><td class= fieldfinanceiro><font size=-1>".$rsEventos->getCampo('descricao')."</font></td><td class= fieldfinanceiro align=right width=10%><font size=-1>".$rsEventos->getCampo('proventos')."</font></td><td class= fieldfinanceiro align=right width=10%><font size=-1>".$rsEventos->getCampo('descontos')."</font></td></tr>";
+            $rsEventos->proximo();
+        }
+        $stTabela4 .= "</table>";
+        $stTabela4 .= "</center>";
+
+        $stTabela5  = "<center>";
+        $stTabela5 .= "<table border=0 width=100%>";
+        $stTabela5 .= "<tr><td align=right width=10% class=labelcentercabecalho><font size=-1>Evento</font></td><td class=labelcentercabecalho><font size=-1>Descrição</font></td><td align=right width=10% class=labelcentercabecalho><font size=-1>Valor</font></td></tr>";
+        if ($inCount1 == -1 and $inCount2 == -1 and $inCount3 == -1) {
+            $rsValoresAcumuladosBase = new RecordSet;
+            $rsRotuloValoresAcumuladosBase = new RecordSet;
+        }
+        while (!$rsValoresAcumuladosBase->eof()) {
+            $stTabela5 .= "<tr><td class= fieldfinanceiro align=right><font size=-1>".$rsValoresAcumuladosBase->getCampo('codigo')."</font></td><td class= fieldfinanceiro><font size=-1>".$rsValoresAcumuladosBase->getCampo('descricao')."</font></td><td class= fieldfinanceiro align=right><font size=-1>".number_format($rsValoresAcumuladosBase->getCampo('valor'),2,',','.')."</font></td></tr>";
+            $rsValoresAcumuladosBase->proximo();
+        }
+        $stTabela5 .= "</table>";
+        $stTabela5 .= "</center>";
+        
+        $stTabelaSalarioFamilia  = "<center>";
+        $stTabelaSalarioFamilia .= "<table border=0 width=100%>";
+        $stTabelaSalarioFamilia .= "<tr><td class=labelcentercabecalho align=right width=10%><font size=-1>Evento</font></td><td class=labelcentercabecalho width=50%><font size=-1>Descrição</font></td><td align=right width=40% class=labelcentercabecalho><font size=-1>Valor</font></td></tr>";
+
+        while (!$rsValoresAcumuladosBaseSalarioFamilia->eof()) {
+            $stTabelaSalarioFamilia .= "<tr><td align=right class= fieldfinanceiro><font size=-1>".$rsValoresAcumuladosBaseSalarioFamilia->getCampo('codigo')."</font></td><td class= fieldfinanceiro><font size=-1>".$rsValoresAcumuladosBaseSalarioFamilia->getCampo('descricao')."</font></td><td align=right class= fieldfinanceiro><font size=-1 >".number_format($rsValoresAcumuladosBaseSalarioFamilia->getCampo('valor'),2,',','.')."</font></td></tr>";
+            $rsValoresAcumuladosBaseSalarioFamilia->proximo();
+        }
+        $stTabelaSalarioFamilia .= "</table>";
+        $stTabelaSalarioFamilia .= "</center>";
+
+        $stTabela6  = "<center>";
+        $stTabela6 .= "<table border=0 width=100%>";
+        $stTabela6 .= "<tr><td class=labelcentercabecalho align=right width=10%><font size=-1>Evento</font></td><td class=labelcentercabecalho><font size=-1>Descrição</font></td><td class=labelcentercabecalho align=right width=10%><font size=-1>Valor</font></td></tr>";
+        if ($inCount1 == -1 and $inCount2 == -1 and $inCount3 == -1) {
+            $rsValoresAcumuladosDesconto = new RecordSet;
+            $rsRotuloValoresAcumuladosDesconto = new RecordSet;
+        }
+        while (!$rsValoresAcumuladosDesconto->eof()) {
+            $stTabela6 .= "<tr><td align=right class= fieldfinanceiro><font size=-1>".$rsValoresAcumuladosDesconto->getCampo('codigo')."</font></td><td class= fieldfinanceiro><font size=-1>".$rsValoresAcumuladosDesconto->getCampo('descricao')."</font></td><td align=right class= fieldfinanceiro><font size=-1>".number_format($rsValoresAcumuladosDesconto->getCampo('valor'),2,',','.')."</font></td></tr>";
+            $rsValoresAcumuladosDesconto->proximo();
+        }
+        $stTabela6 .= "</table>";
+        $stTabela6 .= "</center>";
+
+        $stTabela7  = "<center>";
+        $stTabela7 .= "<table border=0 width=100%>";
+        $stTabela7 .= "<tr><td class= fieldfinanceiro align=left width=100%><font size=-1>(S)Folha Salário</font></td></tr>";
+        $stTabela7 .= "<tr><td class= fieldfinanceiro align=left width=100%><font size=-1>(C)Folha Complementar</font></td></tr>";
+        $stTabela7 .= "<tr><td class= fieldfinanceiro align=left width=100%><font size=-1>(F)Folha Férias</font></td></tr>";
+        $stTabela7 .= "</table>";
+        $stTabela7 .= "</center>";
+
+        $obSpnSpan5_1 = new Span;
+        $obSpnSpan5_1->setId ( "spnSpan5_1" );
+
+        $obSpnSpan5_2 = new Span;
+        $obSpnSpan5_2->setId ( "spnSpan5_2" );
+
+        $obSpnSpan5_3 = new Span;
+        $obSpnSpan5_3->setId ( "spnSpan5_3" );
+
+        $obSpnSpan5_4 = new Span;
+        $obSpnSpan5_4->setId ( "spnSpan5_4" );
+
+        $obSpnSpan5_5 = new Span;
+        $obSpnSpan5_5->setId ( "spnSpan5_5" );
+
+        $obSpnSpan5_6 = new Span;
+        $obSpnSpan5_6->setId ( "spnSpan5_6" );
+
+        $obSpnSpan5_7 = new Span;
+        $obSpnSpan5_7->setId ( "spnSpan5_7" );
+
+        $obSpnSalarioFamilia1 = new Span();
+        $obSpnSalarioFamilia1->setId("spnSalarioFamilia");
+        $obSpnSalarioFamilia1->setValue($stTabelaSalarioFamilia);
+                
+        $obFormulario = new Formulario;
+        $obFormulario->addTitulo ( "Ficha Financeira"    );
+        $obFormulario->addTitulo ( "Eventos Calculados"  );
+        $obFormulario->addSpan   ( $obSpnSpan5_1         );
+        $obFormulario->addTitulo ( "Bases de Cálculo"    );
+        $obFormulario->addSpan   ( $obSpnSpan5_2         );
+        $obFormulario->addTitulo ( "Eventos Informativos");
+        $obFormulario->addSpan   ( $obSpnSpan5_3         );
+        $obFormulario->addTitulo ( "Totais Calculados"   );
+        $obFormulario->addSpan   ( $obSpnSpan5_4         );
+                
+        $obFormulario->addTitulo( "Valores Acumulados com o Cálculo da Matrícula","center" );
+        $obFormulario->addTitulo( "Matrícula(s): ".$rsRotuloValoresAcumuladosBase->getCampo("rotulo"),"center" );
+        $obFormulario->addSpan  ( $obSpnSpan5_5 );
+                
+        $obFormulario->addTitulo( "Valores Acumulados para Cálculo do Salário Família","center" );
+        $obFormulario->addTitulo( "Matrícula(s): ".$rsRotuloValoresAcumuladosBaseSalarioFamilia->getCampo("rotulo")              ,"center" );
+        $obFormulario->addSpan  ( $obSpnSalarioFamilia1 );
+                
+        $obFormulario->addTitulo( "Valores Acumulados até o Cálculo da Matrícula","center" );
+        $obFormulario->addTitulo( "Matrícula(s): ".$rsRotuloValoresAcumuladosDesconto->getCampo("rotulo"),"center" );
+        $obFormulario->addSpan  ( $obSpnSpan5_6 );
+        $obFormulario->addSpan  ( $obSpnSpan5_7 );
+                
+        $obFormulario->montaInnerHtml();
+        $sthtml = $obFormulario->getHTML();
+        $sthtml = str_replace("\n",""     ,$sthtml);
+        $sthtml = str_replace("  ",""     ,$sthtml);
+        $sthtml = str_replace("\"",""     ,$sthtml);
+                
+        $stJs  = "jq_(\"#spnSpan1\").html(\"".$sthtml."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_1\").html(\"".$stTabela1."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_2\").html(\"".$stTabela2."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_3\").html(\"".$stTabela3."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_4\").html(\"".$stTabela4."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_5\").html(\"".$stTabela5."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_6\").html(\"".$stTabela6."\");  \n";
+        $stJs .= "jq_(\"#spnSpan5_7\").html(\"".$stTabela7."\");  \n";
+        $stJs .= " LiberaFrames(true, true); \n";
+        
+    } else {
+        $stJs .= "alertaAviso('@".$obErro->getDescricao()."','form','erro','".Sessao::getId()."'); \n";
+    }
+        
+    return $stJs;
+}
+
+function processarEventos($rsEventos,$inNatureza)
+{
+    $arEventos = ( $rsEventos->getNumLinhas() > 0 ) ? $rsEventos->getElementos() : array();
+    $arTemp = array();
+    switch ($inNatureza) {
+        case 1:
+            $stNatureza1 = 'P';
+            $stNatureza2 = 'D';
+        break;
+        case 2:
+            $stNatureza1 = 'B';
+            $stNatureza2 = 'B';
+        break;
+        case 3:
+            $stNatureza1 = 'I';
+            $stNatureza2 = 'I';
+        break;
+        case 4:
+            $boTodos = true;
+            $nuTotalProventos = 0;
+            $nuTotalDescontos = 0;
+        break;
+    }
+
+    foreach ($arEventos as $arEvento) {
+        if( ($arEvento['natureza'] == $stNatureza1 or $arEvento['natureza'] == $stNatureza2)
+            and ($arEvento['cod_evento'] != $inCodEvento or $arEvento['desdobramento'] != $stDesdobramento) ){
+            if ($arEvento['natureza'] == 'P') {
+                $arEvento['proventos'] = $arEvento['valor'];
+            } else {
+                $arEvento['proventos'] = "0,00";
+            }
+            if ($arEvento['natureza'] == 'D' or $arEvento['natureza'] == 'B' or $arEvento['natureza'] == 'I') {
+                $arEvento['descontos'] = $arEvento['valor'];
+            } else {
+                $arEvento['descontos'] = "0,00";
+            }
+            $arTemp[] = $arEvento;
+            $stTimestamp        = $arEvento['timestamp_registro'];
+            $inCodEvento        = $arEvento['cod_evento'];
+            $stDesdobramento    = $arEvento['desdobramento'] ;
+        }
+        if ($boTodos) {
+            if ($arEvento['natureza'] == 'P') {
+                $nuTotalProventos += $arEvento['valor'];
+            }
+            if ($arEvento['natureza'] == 'D') {
+                $nuTotalDescontos += $arEvento['valor'];
+            }
+        }
+    }
+
+    if ($boTodos) {
+        $arTemp[] = array("descricao"=>"Soma dos Proventos","proventos"=>$nuTotalProventos);
+        $arTemp[] = array("descricao"=>"Soma dos Descontos","descontos"=>$nuTotalDescontos);
+        $arTemp[] = array("descricao"=>"Líquido","proventos"=>$nuTotalProventos-$nuTotalDescontos);
+
+    }
+    $rsEventos = new recordset;
+    $rsEventos->preenche($arTemp);
+    if (!$boTodos) {
+        $rsEventos->addFormatacao("quantidade","NUMERIC_BR");
+    }
+    $rsEventos->addFormatacao("proventos","NUMERIC_BR");
+    $rsEventos->addFormatacao("descontos","NUMERIC_BR");
+
+    return $rsEventos;
+}
+
 function gerarSpan1Form($boExecuta=false)
 {
     $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
@@ -202,101 +524,16 @@ function gerarSpan1Form($boExecuta=false)
     
     switch ($inNumAba) {
         case 4:
-            $obLista = new Lista;
-            $obLista->setTitulo("Dados dos Eventos");
-            $obLista->setRecordSet( processarPrevia() );
-            $obLista->setMostraPaginacao( false );
+            include_once(CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoCalcularFolhas.class.php");
+            $obRFolhaPagamentoCalcularFolhas = new RFolhaPagamentoCalcularFolhas();
+            $obRFolhaPagamentoCalcularFolhas->processarRegistroEvento();
+            
+            $arNumCGM = array("numcgm"=>Sessao::read('inNumCGM'));
+            $arNumCGM = array($arNumCGM);
+            $obRFolhaPagamentoCalcularFolhas->processarPreviaCalculoSalario($arNumCGM,"contrato");
 
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-            $obLista->ultimoCabecalho->setWidth( 5 );
-            $obLista->commitCabecalho();
+            $stSpan1 = montaPreviaSalario();
 
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Código");
-            $obLista->ultimoCabecalho->setWidth( 10 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Evento");
-            $obLista->ultimoCabecalho->setWidth( 20 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Valor");
-            $obLista->ultimoCabecalho->setWidth( 15 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Quantidade");
-            $obLista->ultimoCabecalho->setWidth( 15 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Tipo");
-            $obLista->ultimoCabecalho->setWidth( 5 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Parcelas");
-            $obLista->ultimoCabecalho->setWidth( 10 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Automático");
-            $obLista->ultimoCabecalho->setWidth( 15 );
-            $obLista->commitCabecalho();
-
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("Proventos/Descontos");
-            $obLista->ultimoCabecalho->setWidth( 15 );
-            $obLista->commitCabecalho();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("RIGHT");
-            $obLista->ultimoDado->setCampo( "inCodigo" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("LEFT");
-            $obLista->ultimoDado->setCampo( "stDescricao" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("RIGHT");
-            $obLista->ultimoDado->setCampo( "nuValor" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("RIGHT");
-            $obLista->ultimoDado->setCampo( "nuQuantidade" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("LEFT");
-            $obLista->ultimoDado->setCampo( "stTipo" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("RIGHT");
-            $obLista->ultimoDado->setCampo( "inQuantidadeParc" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("CENTRO");
-            $obLista->ultimoDado->setCampo( "boAutomatico" );
-            $obLista->commitDado();
-
-            $obLista->addDado();
-            $obLista->ultimoDado->setAlinhamento("LEFT");
-            $obLista->ultimoDado->setCampo( "stProventosDescontos" );
-            $obLista->commitDado();
-
-            $obLista->montaHTML();
-            $stSpan1 = $obLista->getHTML();
-            $stSpan1 = str_replace("\n","",$stSpan1);
-            $stSpan1 = str_replace("  ","",$stSpan1);
-            $stSpan1 = str_replace("'","\\'",$stSpan1);
         break;
         case 5:
             $obLista = new Lista;
@@ -466,14 +703,20 @@ function gerarSpan1Form($boExecuta=false)
             $stEval = str_replace("\n","",$stEval);
             $obFormulario->montaInnerHtml();
             $stSpan1 = $obFormulario->getHTML();
+            $stSpan1 = str_replace("\"", "\\\"", $stSpan1);
         break;
     }
-    $stJs .= "d.getElementById('spnSpan1').innerHTML = '".$stSpan1."';  \n";
+    if($inNumAba != 4){
+        $stJs .= "jq_(\"#spnSpan1\").html(\"".$stSpan1."\"); \n";
+    }else{
+        $stJs .= $stSpan1;
+    }
+    
     if ($boExecuta) {
         sistemaLegado::executaFrameOculto( $stJs );
     } else {
         return $stJs;
-    }
+    }    
 }
 
 function gerarSpan2Form($boExecuta=false)
@@ -955,7 +1198,7 @@ function limparEvento($boExecuta=false)
     $stJs .= "d.links['id_layer_1'].href = \"javascript:buscaValor('habilitaLayer_1');HabilitaLayer('layer_1');\";  \n";
     $stJs .= "d.links['id_layer_2'].href = \"javascript:buscaValor('habilitaLayer_2');HabilitaLayer('layer_2');\";  \n";
     $stJs .= "d.links['id_layer_3'].href = \"javascript:buscaValor('habilitaLayer_3');HabilitaLayer('layer_3');\";  \n";
-    $stJs .= "d.links['id_layer_4'].href = \"javascript:buscaValor('habilitaLayer_4');HabilitaLayer('layer_4');\";  \n";
+    $stJs .= "d.links['id_layer_4'].href = \"javascript:buscaValor('habilitaLayer_4');HabilitaLayer('layer_4');BloqueiaFrames(true,false); \";  \n";
     if ( Sessao::read('boBase') ) {
         $stJs .= "d.links['id_layer_5'].href = \"javascript:buscaValor('habilitaLayer_5');HabilitaLayer('layer_5');\";  \n";
     }
@@ -1758,7 +2001,7 @@ function preenchePrevisaoMesAno($inQuantidadeParc="",$nuQuantidade="",$inMesCare
         }
     }
 }
-switch ($_POST["stCtrl"]) {
+switch ($_REQUEST["stCtrl"]) {
     case "habilitaSpanFiltro":
         $stJs.= habilitaSpanFiltro();
     break;

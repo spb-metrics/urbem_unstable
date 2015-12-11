@@ -177,7 +177,6 @@ if ($pagina > 0 and $conn->numeroDeLinhas==0) {
 
 //Inclusão, alteração ou exclusão de dados
 case 1:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     $obj = new cse();

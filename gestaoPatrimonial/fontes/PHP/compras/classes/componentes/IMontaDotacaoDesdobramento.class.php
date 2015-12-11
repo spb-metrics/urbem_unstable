@@ -35,11 +35,12 @@
 
     * Casos de uso: uc-03.04.01
 
-    $Id: IMontaDotacaoDesdobramento.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: IMontaDotacaoDesdobramento.class.php 63841 2015-10-22 19:14:30Z michel $
 */
 
-include_once ( CLA_OBJETO );
-include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php"   					   );
+include_once CLA_OBJETO;
+include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracao.class.php';
+include_once CAM_GF_EMP_NEGOCIO.'REmpenhoAutorizacaoEmpenho.class.php';
 
 class  IMontaDotacaoDesdobramento extends Objeto
 {
@@ -49,9 +50,8 @@ class  IMontaDotacaoDesdobramento extends Objeto
     public function setMostraSintetico($valor) { $this->boMostraSintetico = $valor; }
     public function getMostraSintetico() { return $this->boMostraSintetico;}
 
-    public function IMontaDotacaoDesdobramento()
+    public function __construct()
     {
-        include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
         parent::Objeto();
 
         $obREmpenhoAutorizacaoEmpenho = new REmpenhoAutorizacaoEmpenho;
@@ -98,13 +98,11 @@ class  IMontaDotacaoDesdobramento extends Objeto
             $this->obCmbClassificacao->setId         ( "stCodClassificacao"              );
             $this->obCmbClassificacao->setValue      ( ""                                );
             $this->obCmbClassificacao->setStyle      ( "width: 600"                      );
-            // $this->obCmbClassificacao->setNull       ( ($stFormaExecucao) ? false : true );
             $this->obCmbClassificacao->setDisabled   ( ($stFormaExecucao) ? false : true );
             $this->obCmbClassificacao->addOption     ( "", "Selecione"                   );
             $this->obCmbClassificacao->setCampoId    ( "cod_estrutural"                  );
             $this->obCmbClassificacao->setCampoDesc  ( "cod_estrutural"                  );
             $this->obCmbClassificacao->preencheCombo ( $rsClassificacao                  );
-
         }
 
         // Define objeto Label para saldo anterior
@@ -123,7 +121,6 @@ class  IMontaDotacaoDesdobramento extends Objeto
         $this->obSpanSaldo->setId( "spnSaldoDotacao" );
 
         $this->setMostraSintetico( false );
-
     }
 
     public function geraFormulario(&$obFormulario)
@@ -132,32 +129,30 @@ class  IMontaDotacaoDesdobramento extends Objeto
         if ( $this->getMostraSintetico() ) {
             $stParams .= '&boMostraSintetico=true';
         }
-        $js = " if (this.value!=document.frm.inCodDespesaAnterior.value) {                                                 ";
-        $js.= "   document.frm.inCodDespesaAnterior.value=this.value;                                                    ";
-        //       $js.= "   BloqueiaFrames(true,false);                                                                            ";
-        $js.= "   var stTarget = document.frm.target;                                                                    ";
-        $js.= "   var stAction = document.frm.action;                                                                    ";
-        $js.= "   document.frm.stCtrl.value = 'buscaDespesaDiverso';                                                     ";
-        $js.= "   document.getElementById('stNomDespesa').innerHTML = '&nbsp;';                                          ";
-        $js.= "   document.frm.target ='oculto';                                                                         ";
-        $js.= "   document.frm.action ='../../instancias/processamento/OCIMontaDotacaoDesdobramento.php?".$stParams."';";
-        $js.= "   document.frm.submit();                                                                                 ";
-        $js.= "   document.frm.action = '".$pgOcul."?".Sessao::getId()."';                                                   ";
-        $js.= "   document.frm.action = stAction;                                                                        ";
-        $js.= "   document.frm.target = stTarget;                                                                        ";
-        $js.= " } ";
+        $js = " if (this.value!=document.frm.inCodDespesaAnterior.value) {                                                      ";
+        $js.= "   document.frm.inCodDespesaAnterior.value=this.value;                                                           ";
+        $js.= "   var stTarget = document.frm.target;                                                                           ";
+        $js.= "   var stAction = document.frm.action;                                                                           ";
+        $js.= "   document.frm.stCtrl.value = 'buscaDespesaDiverso';                                                            ";
+        $js.= "   document.getElementById('stNomDespesa').innerHTML = '&nbsp;';                                                 ";
+        $js.= "   document.frm.target ='oculto';                                                                                ";
+        $js.= "   document.frm.action ='".CAM_GP_COM_INSTANCIAS."processamento/OCIMontaDotacaoDesdobramento.php?".$stParams."'; ";
+        $js.= "   document.frm.submit();                                                                                        ";
+        $js.= "   document.frm.action = '".$pgOcul."?".Sessao::getId()."';                                                      ";
+        $js.= "   document.frm.action = stAction;                                                                               ";
+        $js.= "   document.frm.target = stTarget;                                                                               ";
+        $js.= " }                                                                                                               ";
 
         $this->obBscDespesa->obCampoCod->obEvento->setOnBlur($js);
 
-        $obFormulario->addHidden    ( $this->obHdnCodDespesa    );
-        $obFormulario->addHidden    ( $this->obHdnSaldoDotacao  );
-        $obFormulario->addHidden    ( $this->obHdnCodClassificacao );
-        $obFormulario->addComponente( $this->obBscDespesa       );
-        if ($this->boFormaExecucao) {
-            $obFormulario->addComponente( $this->obCmbClassificacao );
-        }
-        $obFormulario->addComponente( $this->obLblSaldoDotacao  );
-        $obFormulario->addSpan      ( $this->obSpanSaldo        );
+        $obFormulario->addHidden        ( $this->obHdnCodDespesa        );
+        $obFormulario->addHidden        ( $this->obHdnSaldoDotacao      );
+        $obFormulario->addHidden        ( $this->obHdnCodClassificacao  );
+        $obFormulario->addComponente    ( $this->obBscDespesa           );
+        if ($this->boFormaExecucao)
+            $obFormulario->addComponente( $this->obCmbClassificacao     );
+        $obFormulario->addComponente    ( $this->obLblSaldoDotacao      );
+        $obFormulario->addSpan          ( $this->obSpanSaldo            );
     }
 }
 ?>

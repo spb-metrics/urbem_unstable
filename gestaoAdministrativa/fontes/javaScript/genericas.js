@@ -384,10 +384,11 @@ function passaItem(objDe,objPara,acao,ordenacao){
 
 	// Caso não seja passado o parâmetro para ordenar, ordena default por texto. 
     if (ordenacao == "")
-      ordenacao = "text";
+        ordenacao = "text";
     
     // Executa função que ordena o combo com base na ordenação setada (text ou value).
-    sortSelect(objPara, ordenacao);
+    if (ordenacao != "selacao")
+        sortSelect(objPara, ordenacao);
     
 	return;
 }
@@ -1487,7 +1488,8 @@ function alertPopUp(stTitle,stText,stMethod)
                          'background':'transparent url(../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/overlay.png) left',
                          'position':'absolute',
                          'left':'0',
-                         'top':'0' };
+                         'top':'0'
+                          };
     
     for(i=1;i<4;i++){
         jq('html',parent.frames[i].document).append(stHTMLFrames);
@@ -1526,7 +1528,8 @@ function loadingModal(boPrincipal, boMenu, stText)
                          'background':'transparent url(../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/overlay.png) left',
                          'position':'fixed',
                          'left':'0',
-                         'top':'0' };
+                         'top':'0',
+                         'z-index':'5' };
    
     //Aplica o modal no frame de mensagens
     jq('html',parent.frames[3].document).append(stHTMLFrames);

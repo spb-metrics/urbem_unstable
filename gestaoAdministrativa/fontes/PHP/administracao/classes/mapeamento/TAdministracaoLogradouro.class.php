@@ -73,7 +73,8 @@ function montaRecuperaRelacionamento()
                                 , dt_inicio
                                 , MAX(dt_fim) as dt_fim
                                 , cod_norma
-                           FROM sw_nome_logradouro as snl 
+                           FROM sw_nome_logradouro as snl
+                           WHERE dt_fim IS NULL
                        GROUP BY cod_logradouro
                                 , timestamp
                                 , cod_tipo

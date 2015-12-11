@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacao.php 63630 2015-09-22 14:41:40Z jean $
+    $Id: OCManterAutorizacao.php 64132 2015-12-07 13:18:15Z arthur $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -69,6 +69,7 @@ function montaLista($arRecordSet, $boExecuta = true)
     $rsLista = new RecordSet;
     $rsLista->preenche( $arRecordSet );
     $rsLista->addFormatacao('vl_total', 'NUMERIC_BR');
+    $rsLista->addFormatacao('quantidade','NUMERIC_BR_4');
 
     if (!$rsLista->eof()) {
         $obLista = new Lista;
@@ -137,7 +138,7 @@ function montaLista($arRecordSet, $boExecuta = true)
             $obLista->ultimaAcao->setLink      ("JavaScript:alterarEmpenho('alterarItemPreEmpenho');");
             $obLista->ultimaAcao->addCampo     ('1', 'num_item');
             if ($codItem) {
-                $obLista->ultimaAcao->addCampo('2', 'cod_item');    
+                $obLista->ultimaAcao->addCampo('2', 'cod_item');
             }
             $obLista->commitAcao();
 
@@ -159,13 +160,14 @@ function montaLista($arRecordSet, $boExecuta = true)
         }
         $nuVlTotalAutorizacao = $nuVlTotal;
         $nuVlTotal = number_format($nuVlTotal, 2, ',', '.');
-        
+
         $nuVlReserva = $nuVlTotal ? $nuVlTotal : 0;
-        
+
         $js .= "jq('#spnLista').html('".$stHTML."'); \n";
         $js .= "jq('#Ok').attr('disabled',false); \n";
         if ($codItem) {
             $js .= "jq('#inCodItem').val(''); \n";
+            $js .= "jq('input[name=stNomItemCatalogo]').val(''); \n";
             $js .= "jq('#stNomItemCatalogo').html('&nbsp;'); \n";
             $js .= "jq('#stUnidadeMedida').html('&nbsp;'); \n";
         }else{
@@ -175,7 +177,6 @@ function montaLista($arRecordSet, $boExecuta = true)
         $js .= "jq('#nuVlTotalAutorizacao').val('".$nuVlTotalAutorizacao."'); \n";
         $js .= "jq('#nuVlReserva').html('".$nuVlReserva."'); \n";
         $js .= "jq('#hdnVlReserva').val('".$nuVlReserva."'); \n";
-        
     } else {
         $js .= "jq('#spnLista').html('&nbsp;'); \n";
         $js .= "jq('#Ok').attr('disabled',false); \n";
@@ -192,7 +193,8 @@ function montaLista($arRecordSet, $boExecuta = true)
 function montaCombo($stNomDespesa)
 {
     global $obREmpenhoAutorizacaoEmpenho;
-    if ($_REQUEST['inCodDespesa'] != '' and $stNomDespesa) {
+
+    if ($_REQUEST['inCodDespesa'] != '') {
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa($_REQUEST['inCodDespesa']);
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio(Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarRelacionamentoContaDespesa($rsConta);
@@ -200,13 +202,14 @@ function montaCombo($stNomDespesa)
         if (Sessao::read('inCodClassificacao') != ''){
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setClassificacao(Sessao::read('inCodClassificacao'));
         } else {
+            $stCodClassificacao = $rsConta->getCampo('cod_estrutural');
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascClassificacao($stCodClassificacao);
         }
-        
+
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio(Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa('');
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarCodEstruturalDespesa($rsClassificacao);
-        
+
         if (Sessao::read('inCodClassificacao') != ''){
             $js .= "jq('#stCodClassificacao_label').html('".$rsClassificacao->getCampo('cod_estrutural')." - ".$rsClassificacao->getCampo('descricao')."');\n";
         } else if ($rsClassificacao->getNumLinhas() > -1) {
@@ -386,7 +389,7 @@ function montaOrgaoUnidade($entCodOrgao = '', $entCodUnidade = '', $entCodDespes
         $js .= "jq('#inCodOrgao').val('0');\n";
         $js .= "jq('#inCodUnidadeOrcamento').val('0');\n";
     }
-    
+
     while (!$rsOrgao->eof()){
         $inCodOrgao   = $rsOrgao->getCampo('num_orgao');
         $stNomOrgao   = $rsOrgao->getCampo('num_orgao').' - '.$rsOrgao->getCampo('nom_orgao');
@@ -396,14 +399,14 @@ function montaOrgaoUnidade($entCodOrgao = '', $entCodUnidade = '', $entCodDespes
         if ($codOrgao == $inCodOrgao) {
             $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($codOrgao);
             $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->listarUnidadeDespesaEntidadeUsuario($rsUnidade);
-            
+
             $js .= "jq('#hdnCodOrgao').val('".$inCodOrgao."');\n";
-            
+
             while (!$rsUnidade->eof()){
-                
+
                 $inCodUnidade   = $rsUnidade->getCampo('num_unidade');
                 $stNomUnidade   = $rsUnidade->getCampo('num_unidade').' - '.$rsUnidade->getCampo('nom_unidade');
-                
+
                 if($entCodDespesa == ''){
                     $js .= " jq('#inCodUnidadeOrcamento').append(new Option('".$stNomUnidade."','".$inCodUnidade."')); \n"; 
                 } else {
@@ -415,7 +418,7 @@ function montaOrgaoUnidade($entCodOrgao = '', $entCodUnidade = '', $entCodDespes
                 if($codUnidade == $inCodUnidade){
                     $js .= "jq('#hdnCodUnidade').val('".$inCodUnidade."');\n";
                 }
-                
+
                 $rsUnidade->proximo();
             }
         }
@@ -439,12 +442,12 @@ switch ($stCtrl) {
             $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($_REQUEST['inCodOrgao']);
             $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade']);
             $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->listarUnidadeDespesaEntidadeUsuario($rsUnidade, 'ou.num_orgao, ou.num_unidade');
-    
+
             if ($rsUnidade->getNumLinhas() > -1) {
                 while (!$rsUnidade->eof()) {
                     $inCodUnidade = $rsUnidade->getCampo('num_unidade');
                     $stNomUnidade = $rsUnidade->getCampo('num_unidade').' - '.$rsUnidade->getCampo('nom_unidade');
-                    
+
                     $js .= "jq('#inCodUnidadeOrcamento').append(new Option('".$stNomUnidade."','".$inCodUnidade."'));\n"; 
                     $rsUnidade->proximo();
                 }
@@ -461,7 +464,10 @@ switch ($stCtrl) {
         if ($request->get('inCodDespesa') != '') {
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa($request->get('inCodDespesa'));
             $obREmpenhoAutorizacaoEmpenho->setExercicio(Sessao::getExercicio());
-            $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior($nuSaldoDotacao);
+            $obREmpenhoAutorizacaoEmpenho->setdataEmpenho($request->get('stDtInclusao'));
+            $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+            $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
+            $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho($nuSaldoDotacao);
             $nuSaldoDotacao = bcadd($nuSaldoDotacao, $request->get('nuVlItemExcluidos'), 4);
             $js .= montaLabel($nuSaldoDotacao);
         }
@@ -471,6 +477,7 @@ switch ($stCtrl) {
     break;
 
     case 'buscaDespesa':
+
         if ($request->get('inCodDespesa') != '' AND $request->get('inCodEntidade') != '') {
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa($request->get('inCodDespesa'));
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade($request->get('inCodEntidade'));
@@ -503,8 +510,11 @@ switch ($stCtrl) {
         if ($request->get("inCodDespesa") != '' AND $stNomDespesa) {
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa($request->get('inCodDespesa'));
             $obREmpenhoAutorizacaoEmpenho->setExercicio(Sessao::getExercicio());
-            $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior($nuSaldoDotacao);
-
+            $obREmpenhoAutorizacaoEmpenho->setdataEmpenho($request->get('stDtAutorizacao'));
+            $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+            $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
+            $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho($nuSaldoDotacao);
+            
             if ($request->get('inCodDespesa') == $request->get('inCodDespesaAux') and $request->get('stAcao') == 'alterar') {
                 $nuSaldoDotacao = bcadd($nuSaldoDotacao, $request->get('nuVlItemExcluidos'), 4);
             }
@@ -603,6 +613,7 @@ switch ($stCtrl) {
         }else{
             $arItens[$inCount]['nom_item']     = $request->get('stNomItem');
         }
+        $arItens[$inCount]['cod_centro']   = $request->get('inCodCentroCusto');
         $arItens[$inCount]['complemento']  = trim($request->get('stComplemento'));
         $arItens[$inCount]['quantidade']   = trim($request->get('nuQuantidade'));
         $arItens[$inCount]['vl_unitario']  = $request->get('nuVlUnitario');
@@ -615,7 +626,9 @@ switch ($stCtrl) {
             $js = "alertaAviso('Item(".$request->get('inCodItem').") Já Incluso na Lista.','frm','erro','".Sessao::getId()."'); \n";
             $js .= "jq('#Ok').prop('disabled',false);\n";
         }else{
-            $js = montaLista( $arItens, false);
+            $js  = "limparItem();";
+            $js .= montaLista( $arItens, false);
+            $js .= "bloqueiaTipoItem('".$request->get('stTipoItem')."');";
             Sessao::write('arItens', $arItens);
         }
     break;
@@ -627,26 +640,33 @@ switch ($stCtrl) {
         foreach ($arItens as $valor) {
             if ($valor['num_item'] == $request->get('num_item')) {
                 $stUnidade = $valor['cod_unidade'].'-'.$valor['cod_grandeza'].'-'.$valor['nom_unidade'];
-                $js .= "jq('#hdnNumItem').val('".$request->get('num_item')."');";
+                $js .= "jq('#hdnNumItem').val(\"".$request->get('num_item')."\");                                               \n";
                 if ($request->get('cod_item')) {
-                    $js .= "jq('#inCodItem').val('".$valor['cod_item']."');\n";
-                    $js .= "jq('#HdninCodItem').val('".$valor['cod_item']."');\n";
-                    $js .= "jq('#stNomItemCatalogo').val('".$valor["nom_item"]."');\n";
-                    $js .= "jq('#stNomItemCatalogo').html('".$valor["nom_item"]."');\n";
-                    $js .= "jq('#inCodUnidadeMedida').val('".$valor["cod_unidade"]."-". $valor["cod_grandeza"]."');\n";
-                    $js .= "jq('#stNomUnidade').val('".$valor["nom_unidade"]."');\n";
+                    $js .= "jq('#inCodItem').val(\"".$valor['cod_item']."\");                                                   \n";
+                    $js .= "jq('#HdninCodItem').val(\"".$valor['cod_item']."\");                                                \n";
+                    $js .= "jq('input[name=stNomItemCatalogo]').val(\"".$valor["nom_item"]."\");                                \n";
+                    $js .= "jq('#stNomItemCatalogo').html(\"".$valor["nom_item"]."\");                                          \n";
+                    $js .= "jq('#inCodUnidadeMedida').val(\"".$valor["cod_unidade"]."-". $valor["cod_grandeza"]."\");           \n";
+                    $js .= "jq('#stNomUnidade').val(\"".$valor["nom_unidade"]."\");                                             \n";
                 } else {
-                    $js .= "jq('#stNomItem').val('".htmlentities($valor["nom_item"], ENT_QUOTES)."');";
+                    $js .= "jq('#stNomItem').val(\"".htmlentities($valor["nom_item"], ENT_QUOTES)."\");                         \n";
                 }
-                $js .= "jq('#stComplemento').val('".htmlentities($valor["complemento"], ENT_QUOTES)."');";
-                $js .= "jq('#nuQuantidade').val('".number_format($valor['quantidade'],2,',','.')."');";
-                $js .= "jq('#inCodUnidade').val('".$stUnidade."');";
-                $js .= "jq('#nuVlUnitario').val('".$valor['vl_unitario']."');";
-                $js .= "jq('#nuVlTotal').val('".number_format($valor['vl_total'],2,',','.')."');";
-                $js .= "jq('#btnIncluir').val('Alterar');";
-                $js .= "jq('#btnIncluir').attr('onclick','return alterarItem()');\n";
-                $js .= "jq('#stNomItem').val(f.stNomItem.value.unescapeHTML());";
-                $js .= "jq('#stComplemento').val(f.stComplemento.value.unescapeHTML());";
+                $js .= "jq('#inCodCentroCusto').val(\"".$valor["cod_centro"]."\");                                              \n";
+
+                $nomCentro = '';
+                if($valor["cod_centro"]!='')
+                    $nomCentro = SistemaLegado::pegaDado("descricao","almoxarifado.centro_custo","where cod_centro = ".$valor["cod_centro"]);
+                $js .= "jq('#stNomCentroCusto').html(\"".$nomCentro."\");                                                       \n";
+
+                $js .= "jq('#stComplemento').val(\"".htmlentities($valor["complemento"], ENT_QUOTES)."\");                      \n";
+                $js .= "jq('#nuQuantidade').val(\"".number_format($valor['quantidade'],2,',','.')."\");                         \n";
+                $js .= "jq('#inCodUnidade').val(\"".$stUnidade."\");                                                            \n";
+                $js .= "jq('#nuVlUnitario').val(\"".$valor['vl_unitario']."\");                                                 \n";
+                $js .= "jq('#nuVlTotal').val(\"".number_format($valor['vl_total'],2,',','.')."\");                              \n";
+                $js .= "jq('#btnIncluir').val('Alterar');                                                                       \n";
+                $js .= "jq('#btnIncluir').attr('onclick',\"if(alterarItem()){montaParametrosGET('alteradoItemPreEmpenho');}\"); \n";
+                $js .= "jq('#stNomItem').val(f.stNomItem.value.unescapeHTML());                                                 \n";
+                $js .= "jq('#stComplemento').val(f.stComplemento.value.unescapeHTML());                                         \n";
             }
         }
     break;
@@ -658,51 +678,51 @@ switch ($stCtrl) {
             if ($valor['num_item'] == $request->get('hdnNumItem')) {
                 for($i=0;$i<count($arItens);$i++){
                     if($request->get('stTipoItem')=='Catalogo'&&($arItens[$i]['cod_item'] == $request->get('inCodItem'))&&($arItens[$i]['num_item'] != $request->get('hdnNumItem'))){
-                        $erro=true;      
+                        $erro=true;
                     }
                 }
-                
+
                 if(!$erro){
                     if($request->get('stTipoItem')=='Catalogo'){
                         list($inCodUnidade, $inCodGrandeza) = explode("-",$request->get('inCodUnidadeMedida'));
                         $stNomUnidade = $request->get('stNomUnidade');
-                        $arItens[$key]['cod_item']    = $_POST['inCodItem'];
+                        $arItens[$key]['cod_item']    = $request->get('inCodItem');
                         $arItens[$key]['nom_item']    = stripslashes($request->get('stNomItemCatalogo'));
                     }else{
                         list($inCodUnidade, $inCodGrandeza, $stNomUnidade) = explode("-",$request->get('inCodUnidade'));
                         $arItens[$key]['nom_item'   ]  = stripslashes($request->get('stNomItem'));
                     }
+                    $arItens[$key]['cod_centro']   = $request->get('inCodCentroCusto');
                     $arItens[$key]['complemento']  = stripslashes($request->get('stComplemento'));
                     $arItens[$key]['quantidade' ]  = $request->get('nuQuantidade');
                     $arItens[$key]['cod_unidade']  = $inCodUnidade;
                     $arItens[$key]['cod_grandeza'] = $inCodGrandeza;
                     $arItens[$key]['nom_unidade']  = $stNomUnidade;
                     $arItens[$key]['vl_unitario']  = $request->get('nuVlUnitario');
-        
+
                     $nuVlTotal = str_replace('.','',$request->get('nuVlTotal'));
                     $nuVlTotal = str_replace(',','.',$nuVlTotal);
-        
+
                     $arItens[$key]['vl_total'] = $nuVlTotal;
                     break;
                 }
             }
             else{
                 if($request->get('stTipoItem')=='Catalogo'&&($valor['cod_item'] == $request->get('inCodItem'))){
-                    $erro = true;    
+                    $erro = true;
                 }
             }
         }
-        
+
         if($erro){
             $js .= "alertaAviso('Item(".$request->get('inCodItem').") Já Incluso na Lista.','frm','erro','".Sessao::getId()."'); \n";
             $js .= "jq('#Ok').prop('disabled',false);\n";
-            $js .= "jq('#btnIncluir').attr('onclick','return incluirItem()');\n";
+            $js .= "jq('#btnIncluir').attr('onclick',\"if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}\");\n";
         } else {
             Sessao::write('arItens', $arItens);
-            $js .= "jq('#btnIncluir').attr('onclick','return incluirItem()');\n";        
-            $js .= "montaLista(".Sessao::read('arItens').")\n";
+            $js  = "limparItem();";
+            $js .= montaLista(Sessao::read('arItens'));
         }
-        
     break;
 
     case 'excluirItemPreEmpenho':
@@ -713,11 +733,12 @@ switch ($stCtrl) {
         for($i=0;$i<count($arItens);$i++){
             if($arItens[$i]['num_item']!=$request->get('inNumItem')){
                 $arTEMP[$inCount]['num_item']     = $inCount+1;
-                
+
                 if($request->get('stTipoItem')=='Catalogo'){
                     $arTEMP[$inCount]['cod_item']     = $arItens[$i]['cod_item'];
                 }
                 $arTEMP[$inCount]['nom_item']     = $arItens[$i]['nom_item'];
+                $arTEMP[$inCount]['cod_centro']   = $arItens[$i]['cod_centro'];
                 $arTEMP[$inCount]['complemento']  = $arItens[$i]['complemento'];
                 $arTEMP[$inCount]['quantidade']   = $arItens[$i]['quantidade'];
                 $arTEMP[$inCount]['cod_unidade']  = $arItens[$i]['cod_unidade'];
@@ -729,7 +750,7 @@ switch ($stCtrl) {
                 $inCount++;
             }
         }
-        
+
         $arItens = $arTEMP;
         $js .= montaLista($arItens, false);
         Sessao::write('arItens', $arItens);
@@ -749,7 +770,7 @@ switch ($stCtrl) {
         $js  = montaLista(Sessao::read('arItens'), false);
     break;
 
-    case 'limpar' :
+    case 'limpar':
         Sessao::remove('arItens');
         $js .= montaLista(Sessao::read('arItens'), false);
     break;
@@ -759,9 +780,9 @@ switch ($stCtrl) {
         $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obRUsuario->obRCGM->setNumCGM(Sessao::read('numCgm'));
         $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->setExercicio(Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->listarOrgaoDespesaEntidadeUsuario($rsOrgao, $stOrder);
-    
+
         $js .= "jq('#inCodOrgao').empty().append(new Option('Selecione','')); \n"; 
-    
+
         $js .= "jq('#inCodUnidadeOrcamento').empty();\n";
 
         while (!$rsOrgao->eof()) {
@@ -875,25 +896,25 @@ switch ($stCtrl) {
     break;
 
     case "unidadeItem":
-            if( $request->get("codItem") ){
-                $stFiltro=" WHERE cod_item=".$request->get("codItem");
-                
+            if( $request->get("inCodItem") ){
+                $stFiltro=" WHERE cod_item=".$request->get("inCodItem");
+
                 include_once ( CAM_GP_ALM_MAPEAMENTO."TAlmoxarifadoCatalogoItem.class.php" );
                 $obTAlmoxarifadoCatalogoItem = new TAlmoxarifadoCatalogoItem;
-                $obTAlmoxarifadoCatalogoItem->setDado('cod_item'  , $request->get("codItem"));
+                $obTAlmoxarifadoCatalogoItem->setDado('cod_item'  , $request->get("inCodItem"));
                 $obTAlmoxarifadoCatalogoItem->recuperaTodos($rsItem, $stFiltro);
-                
+
                 if($rsItem->inNumLinhas==1){
                     $value = $rsItem->getCampo('cod_unidade')."-".$rsItem->getCampo('cod_grandeza');
-    
+
                     include_once ( CAM_GA_ADM_MAPEAMENTO."TUnidadeMedida.class.php"          );
                     $obTUnidadeMedida = new TUnidadeMedida;
-                    
+
                     $stFiltro=" WHERE cod_unidade=".$rsItem->getCampo('cod_unidade')." AND cod_grandeza=".$rsItem->getCampo('cod_grandeza');
                     $obTUnidadeMedida->recuperaTodos($rsUnidade, $stFiltro);
                     if($rsUnidade->inNumLinhas==1){
                         $value=$value."-".$rsUnidade->getCampo('nom_unidade');
-                        
+
                         $js .= "for (var i = 0; i < f.inCodUnidade.options.length; i++)
                         {
                                 if (f.inCodUnidade.options[i].value == '".$value."')
@@ -903,9 +924,8 @@ switch ($stCtrl) {
                                 }
                         }\n";
                     }
-                    
                 }
-            }            
+            }
     break;
 
     case "montaOrgaoUnidade":

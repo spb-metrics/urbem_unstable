@@ -50,6 +50,7 @@ $pgProc = "PR".$stPrograma.".php";
 
 $arContratos = array();
 Sessao::write('arContratos', $arContratos);
+Sessao::write('valida_ativos_cgm', 'false');
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 
 //DEFINICAO DO FORM

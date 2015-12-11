@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: OCManterVinculoEmpenhoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterVinculoEmpenhoContrato.php 64081 2015-11-30 15:36:50Z michel $
 
 */
 
@@ -47,7 +47,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 switch ($stCtrl) {
 
@@ -61,13 +61,13 @@ switch ($stCtrl) {
         $inCount     = count($arElementos);
         $boExecuta   = false;
 
-        $arEmpenho = explode('/', $_REQUEST['numEmpenho']);
+        $arEmpenho = explode('/', $request->get('numEmpenho'));
         if ($arEmpenho[0] && strlen($arEmpenho[1]) == 4) {
-            include_once( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php" );
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
             $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
             $stFiltro .= " AND e.cod_empenho	   =  ".$arEmpenho[0];
             $stFiltro .= " AND e.exercicio  	   =  '".$arEmpenho[1]."'";
-            $stFiltro .= " AND pe.cgm_beneficiario =  ".$_REQUEST['cgm_credor'];
+            $stFiltro .= " AND pe.cgm_beneficiario =  ".$request->get('cgm_credor');
             $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
 
             if ($rsRecordSet->getNumLinhas() > 0) {
@@ -120,7 +120,7 @@ switch ($stCtrl) {
         $arElementosSessao = Sessao::read('elementos');
         $arExcluidosSessao = Sessao::read('elementos_excluidos');
 
-        $id = $_REQUEST['inId'];
+        $id = $request->get('inId');
         $inCount = 0;
         $inCountExcluidos = count(Sessao::read('elementos_excluidos'));
 
@@ -158,9 +158,9 @@ switch ($stCtrl) {
 
         include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
         $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato;
-        $stFiltro .= "   AND ec.exercicio    = '".Sessao::getExercicio()."'";
-        $stFiltro .= "   AND ec.cod_entidade =  ".Sessao::read('inCodEntidade');
-        $stFiltro .= "   AND ec.num_contrato =  ".Sessao::read('inNumContrato');
+        $stFiltro .= "   AND ec.exercicio    = '".$request->get('inExercicio')."'";
+        $stFiltro .= "   AND ec.cod_entidade =  ".$request->get('inCodEntidade');
+        $stFiltro .= "   AND ec.num_contrato =  ".$request->get('inNumContrato');
         $obTEmpenhoEmpenhoContrato->recuperaRelacionamentoEmpenhoContrato($rsEmpenhos, $stFiltro, "");
 
         if ($rsEmpenhos->getNumLinhas() > 0) {

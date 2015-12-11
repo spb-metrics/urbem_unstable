@@ -42,45 +42,57 @@ include_once( CAM_GT_MON_MAPEAMENTO."TMONAgencia.class.php" 										 );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ExportacaoBancoCaixaEconomicaFederal";
-$pgFilt = "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao$stLink";
-$pgForm = "FM".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao$stLink";
-$pgList = "LS".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao$stLink";
-$pgOcul = "OC".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao$stLink";
-$pgProc = "PR".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao$stLink";
+$pgFilt = "FL".$stPrograma.".php";
+$pgForm = "FM".$stPrograma.".php";
+$pgList = "LS".$stPrograma.".php";
+$pgOcul = "OC".$stPrograma.".php";
+$pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
+$obErro = new Erro;
+$obTransacao = new Transacao();
 
 switch ($stAcao) {
     case "configurar":
 
-        Sessao::setTrataExcecao(true);
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal = new TIMAConfiguracaoConvenioCaixaEconomicaFederal;
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->recuperaRelacionamento($rsDados);
+        if (!$obErro->ocorreu()) {
+            $obTIMAConfiguracaoConvenioCaixaEconomicaFederal = new TIMAConfiguracaoConvenioCaixaEconomicaFederal;
+            $obErro = $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->recuperaRelacionamento($rsDados,"","",$boTransacao);
 
-        if ($_POST['stNumAgenciaTxt']) {
-            $obTMONAgencia = new TMONAgencia;
-            $stFiltro = " where num_agencia = '".$_POST['stNumAgenciaTxt']."'";
-            $obTMONAgencia->recuperaTodos($rsAgencia, $stFiltro);
-            $cod_agencia = $rsAgencia->getCampo('cod_agencia');
-        }
+            if (!$obErro->ocorreu()) {
 
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_convenio_banco", $_POST['stCodConvenio']);
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_banco", Sessao::read('BANCO'));
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_agencia", $cod_agencia );
-        $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_conta_corrente", $_POST['inTxtContaCorrente']);
+                if ($request->get('stNumAgenciaTxt')) {
+                    $obTMONAgencia = new TMONAgencia;
+                    $stFiltro = " WHERE num_agencia = '".$request->get('stNumAgenciaTxt')."'";
+                    $obTMONAgencia->recuperaTodos($rsAgencia, $stFiltro);
+                    $cod_agencia = $rsAgencia->getCampo('cod_agencia');
+                }
 
-        if ($rsDados->getNumLinhas() > 0) {
-            $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_convenio", $rsDados->getCampo('cod_convenio'));
-            $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->alteracao();
-        } else {
-            $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->inclusao();
-        }
+                $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_convenio_banco", $request->get('stCodConvenio'));
+                $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_banco", Sessao::read('BANCO'));
+                $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_agencia", $cod_agencia );
+                $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_conta_corrente", $request->get('inTxtContaCorrente'));
+                $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_tipo", $request->get('inTipoConvenioLayout'));
 
-           Sessao::encerraExcecao();
-        sistemaLegado::alertaAviso($pgForm,"Configuração da exportação bancária concluída com sucesso!","incluir","aviso", Sessao::getId(), "../");
+                if ($rsDados->getNumLinhas() > 0) {
+                    $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->setDado("cod_convenio", $rsDados->getCampo('cod_convenio'));
+                    $obErro = $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->alteracao($boTransacao);
+                } else {
+                    $obErro = $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->inclusao($boTransacao);
+                }
+
+                $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao,$obErro,$obTIMAConfiguracaoConvenioCaixaEconomicaFederal);
+                if (!$obErro->ocorreu()) {
+                    SistemaLegado::alertaAviso($pgForm.'?'.Sessao::getId()."&stAcao=".$stAcao,"Configuração da exportação bancária concluída com sucesso!","incluir","aviso", Sessao::getId(), "../");
+                } else {
+                    SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_".$stAcao,"erro");
+                }
+            }
+       }
     break;
 }
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

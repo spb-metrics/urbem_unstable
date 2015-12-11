@@ -162,10 +162,11 @@ if( ($rsAdidoCedido->getCampo("tipo_cedencia") == "a" and $rsAdidoCedido->getCam
 
     $obIBscEvento = new IBscEvento;
     $obIBscEvento->obBscInnerEvento->setNullBarra   ( false                                                                 );
-    //$obIBscEvento->obTxtValor->setNullBarra         ( false                                                                 );
     $obIBscEvento->setInformarValorQuantidade       ( true                                                                  );
     $obIBscEvento->setInformarQuantidadeParcelas    ( true                                                                  );
-
+    $obIBscEvento->obBscInnerEvento->obCampoCod->obEvento->setOnChange("");
+    $obIBscEvento->obBscInnerEvento->obCampoCod->obEvento->setOnBlur("ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento='+this.value+'&stCampoNomEvento=stEvento&stCampoCodEvento=inCodigoEvento', 'preencheDescEvento' ); " );
+    
     $obTxtDesdobramento = new TextBox;
     $obTxtDesdobramento->setRotulo                  ( "Desdobramento"                                                       );
     $obTxtDesdobramento->setName                    ( "stDesdobramento"                                                     );

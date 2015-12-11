@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCManterVencimentos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterVencimentos.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.03
 
@@ -427,8 +427,6 @@ switch ($_REQUEST["stCtrl"]) {
                     }
                 }
             } else {
-//    sistemaLegado::mostravar($_REQUEST);
-//    sistemaLegado::mostravar($sessao->transf6["parcelamentos"]);
 
                 if ($_REQUEST["stDtVencimentoDesc"] == "") {
                     $stDtVencimentoDesc = "-";
@@ -557,4 +555,3 @@ switch ($_REQUEST["stCtrl"]) {
         SistemaLegado::executaFrameOculto($stJs);
     break;
 }
-//SistemaLegado::mostravar( $sessao->transf6["parcelamentos"]);

@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 63242 2015-08-06 21:09:37Z lisiane $
+    $Id: TContabilidadePlanoConta.class.php 63906 2015-11-05 12:31:01Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -111,26 +111,6 @@ function montaRecuperaContaAnalitica()
     $stSQL  = " SELECT                                          \n";
     $stSQL .= "     pa.cod_plano                                \n";
     $stSQL .= " FROM                                            \n";
-    $stSQL .= "     contabilidade.plano_analitica as pa,        \n";
-    $stSQL .= "     contabilidade.plano_conta as pc             \n";
-    $stSQL .= " WHERE  pa.cod_conta = pc.cod_conta AND          \n";
-    $stSQL .= " pa.exercicio = pc.exercicio                     \n";
-
-    return $stSQL;
-
-}
-
-function montaRecuperaContaPlanoAnalitica()
-{
-    $stSQL  = " SELECT                                          \n";
-    $stSQL .= "     pa.cod_conta ,                              \n";
-    $stSQL .= "     pc.exercicio ,                              \n";
-    $stSQL .= "     pc.nom_conta ,                              \n";
-    $stSQL .= "     pc.cod_classificacao ,                      \n";
-    $stSQL .= "     pc.cod_sistema ,                            \n";
-    $stSQL .= "     pc.cod_estrutural ,                         \n";
-    $stSQL .= "     pa.cod_plano                                \n";
-    $stSQL .= "FROM                                             \n";
     $stSQL .= "     contabilidade.plano_analitica as pa,        \n";
     $stSQL .= "     contabilidade.plano_conta as pc             \n";
     $stSQL .= " WHERE  pa.cod_conta = pc.cod_conta AND          \n";
@@ -279,12 +259,12 @@ function recuperaContaAnalitica(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
     * montaRecuperaContaPlanoAnalitica.
     * @access Public
     * @param  Object  $rsRecordSet Objeto RecordSet
-    * @param  String  $stCondicao  String de condiï¿½ï¿½o do SQL (WHERE)
-    * @param  String  $stOrdem     String de Ordenaï¿½ï¿½o do SQL (ORDER BY)
+    * @param  String  $stCondicao  String de condição do SQL (WHERE)
+    * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
     * @param  Boolean $boTransacao
     * @return Object  Objeto Erro
 */
-function recuperaContaPlanoAnalitica(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+public function recuperaContaPlanoAnalitica(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
     $obConexao   = new Conexao;
@@ -292,11 +272,32 @@ function recuperaContaPlanoAnalitica(&$rsRecordSet, $stCondicao = "" , $stOrdem 
 
     if(trim($stOrdem))
         $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
     $stSql = $this->montaRecuperaContaPlanoAnalitica().$stCondicao.$stOrdem;
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;
+}
+
+public function montaRecuperaContaPlanoAnalitica()
+{
+    $stSQL  = "
+        SELECT pa.cod_conta
+             , pc.exercicio
+             , pc.nom_conta
+             , pc.cod_classificacao
+             , pc.cod_sistema
+             , pc.cod_estrutural
+             , pa.cod_plano
+          FROM contabilidade.plano_analitica AS pa
+             , contabilidade.plano_conta as pc
+         WHERE pa.cod_conta = pc.cod_conta
+           AND pa.exercicio = pc.exercicio
+    \n";
+
+    return $stSQL;
+
 }
 
 /**
@@ -886,7 +887,6 @@ function recuperaDadosExportacaoBalVerificacao(&$rsRecordSet, $stCondicao = "" ,
     if(trim($stOrdem))
         $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
     $stSql = $this->montaRecuperaDadosExportacaoBalVerificacao().$stCondicao.$stOrdem;
-//SistemaLegado::mostravar($stSql); exit();
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 

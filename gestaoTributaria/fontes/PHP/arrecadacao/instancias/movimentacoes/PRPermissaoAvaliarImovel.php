@@ -32,7 +32,7 @@
 
   * @ignore
 
-    * $Id: PRPermissaoAvaliarImovel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRPermissaoAvaliarImovel.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.03.06
 */
@@ -65,7 +65,6 @@ $pgJS   = "JS".$stPrograma.".js";
 
 include_once ( $pgJS );
 
-//SistemaLegado::mostravar($_REQUEST);
 switch ($stAcao) {
     case "incluir":
        $obErro = new Erro;

@@ -33,32 +33,15 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 63389 $
-    $Name$
-    $Author: domluc $
-    $Date: 2008-08-18 10:43:34 -0300 (Seg, 18 Ago 2008) $
+    $Id: TTBAAltOrc.class.php 63819 2015-10-19 20:52:10Z michel $
 
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/10/16 01:38:47  diego
-Arquivos novos
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  *
-  * Data de Criação: 15/10/2007
-
-  * @author Analista: Diego Barbosa Victoria
-  * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TTBAAltOrc extends Persistente
 {
 /**
@@ -193,7 +176,7 @@ public function montaRecuperaDadosTribunal()
                         ON vinculo_tipo_norma.cod_tipo_norma = norma.cod_tipo_norma
 
                 WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
-                  AND   despesa.cod_entidade IN ( ".$this->getDado('entidades')." )
+                  AND despesa.cod_entidade IN ( ".$this->getDado('entidades')." )
                   AND su.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
                   AND su.cod_tipo <> 16
 
@@ -207,6 +190,95 @@ public function montaRecuperaDadosTribunal()
                          ,despesa.cod_recurso
             ";
             return $stSql;
+}
+
+function recuperaLogErro(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql = $this->montaRecuperaLogErro().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaLogErro()
+{
+    $stSql = " SELECT count(despesa.exercicio) as registros
+                    , count(vinculo_tipo_norma.cod_tipo) AS obrigatorio
+                 FROM (
+                        SELECT exercicio
+                              ,cod_norma
+                              ,cod_tipo
+                              ,dt_suplementacao
+                              ,cod_despesa
+                              ,SUM(vl_suplementado) AS vl_suplementado
+                              ,SUM(vl_reducao) AS vl_reducao
+                        FROM (
+                                SELECT OS.exercicio
+                                      ,OS.cod_suplementacao
+                                      ,OS.cod_norma
+                                      ,OS.cod_tipo
+                                      ,OS.dt_suplementacao
+                                      ,OSS.cod_despesa
+                                      ,OSS.valor as vl_suplementado
+                                      ,0.00 as vl_reducao
+                                FROM orcamento.suplementacao AS OS
+                          INNER JOIN orcamento.suplementacao_suplementada AS OSS
+                                  ON OSS.exercicio = OS.exercicio
+                                 AND OSS.cod_suplementacao = OS.cod_suplementacao
+                                 AND OS.exercicio='".$this->getDado('exercicio')."' 
+                           LEFT JOIN orcamento.suplementacao_anulada
+                                  ON suplementacao_anulada.exercicio = OS.exercicio
+                                 AND suplementacao_anulada.cod_suplementacao = OS.cod_suplementacao
+                               WHERE suplementacao_anulada.cod_suplementacao_anulacao IS NULL
+
+                               UNION
+
+                               SELECT OS.exercicio
+                                     ,OS.cod_suplementacao
+                                     ,OS.cod_norma
+                                     ,OS.cod_tipo
+                                     ,OS.dt_suplementacao
+                                     ,OSR.cod_despesa
+                                     ,0.00 as vl_suplementado
+                                     ,OSR.valor as vl_reducao
+                                FROM orcamento.suplementacao AS OS
+                          INNER JOIN orcamento.suplementacao_reducao AS OSR
+                                  ON OSR.exercicio = OS.exercicio
+                                 AND OSR.cod_suplementacao = OS.cod_suplementacao
+                                 AND OS.exercicio='".$this->getDado('exercicio')."'
+                           LEFT JOIN orcamento.suplementacao_anulada
+                                  ON suplementacao_anulada.exercicio = OS.exercicio
+                                 AND suplementacao_anulada.cod_suplementacao = OS.cod_suplementacao
+                               WHERE suplementacao_anulada.cod_suplementacao_anulacao IS NULL
+                            ) as tbl          
+                        GROUP BY exercicio,cod_despesa,cod_norma,cod_tipo,dt_suplementacao
+                      ) as su
+
+           INNER JOIN orcamento.despesa
+                   ON despesa.exercicio = su.exercicio
+                  AND despesa.cod_despesa = su.cod_despesa
+
+           INNER JOIN orcamento.conta_despesa
+                   ON conta_despesa.exercicio = despesa.exercicio
+                  AND conta_despesa.cod_conta = despesa.cod_conta
+
+           INNER JOIN normas.norma
+                   ON norma.cod_norma = su.cod_norma
+
+            LEFT JOIN tcmba.vinculo_tipo_norma
+                   ON vinculo_tipo_norma.cod_tipo_norma = norma.cod_tipo_norma
+
+                WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
+                  AND despesa.cod_entidade IN ( ".$this->getDado('entidades')." )
+                  AND su.dt_suplementacao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                  AND su.cod_tipo <> 16
+                  ";
+    return $stSql;
 }
 
 }

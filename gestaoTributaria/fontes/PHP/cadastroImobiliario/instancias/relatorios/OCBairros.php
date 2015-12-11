@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCBairros.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCBairros.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.19
 */
@@ -70,8 +70,6 @@ $obRCIMRelatorioBairros = new RCIMRelatorioBairros;
 
 $obRCIMConfiguracao     = new RCIMConfiguracao;
 $obRCIMConfiguracao->consultarConfiguracao();
-
-//SistemaLegado::mostravar($obRCIMConfiguracao->getRSMD());die();
 
 $boRSMD = false;
 $rsRSMD = $obRCIMConfiguracao->getRSMD();
@@ -111,7 +109,6 @@ $obRCIMRelatorioBairros->setboAliquota ( $boAliquota );
 // GERA RELATORIO ATRAVES DO FILTRO SETADO
 $obRCIMRelatorioBairros->getRecordSetValor( $rsBairros );
 
-//SistemaLegado::mostravar($rsBairros);die();
 Sessao::write('sessao_transf5', $rsBairros);
 $obRRelatorio->executaFrameOculto( "OCGeraRelatorioBairros.php" );
 

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62269 2015-04-15 18:28:39Z franver $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 63835 2015-10-22 13:53:31Z franver $
     *
     * $Name: $
     * $Date: $
@@ -416,10 +416,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                           dt_empenho, 
                           dt_pagamento ;
         ";
-                          
-        //SistemaLegado::mostravar($stSql);
-        //die;                 
-                          
+
         return $stSql;
     }
     

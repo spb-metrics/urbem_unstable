@@ -214,7 +214,6 @@ $nomClassTratamento = pegaDado("nom_classificacao","cse.classificacao_tratamento
 
 //Inclusão, alteração ou exclusão de dados
 case 2:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     //Verifica se já existe o registro a ser incluido

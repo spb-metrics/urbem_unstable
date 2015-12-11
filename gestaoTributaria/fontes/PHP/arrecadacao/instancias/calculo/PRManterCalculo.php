@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: PRManterCalculo.php 60961 2014-11-26 15:57:45Z evandro $
+    * $Id: PRManterCalculo.php 63868 2015-10-27 17:31:08Z evandro $
 
     Caso de uso: uc-05.03.05
 **/
@@ -85,6 +85,9 @@ switch ($stAcao) {
 
     case "simular":
     case "incluir":
+        $obTransacao = new Transacao();
+        $boFlagTransacao = false;
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
         Sessao::remove('calculos');
         /* validar formulario */
         if (!$_REQUEST[ 'inCodGrupo' ] and !$_REQUEST["inCodCredito"]) {
@@ -97,8 +100,7 @@ switch ($stAcao) {
             $rsRecordSet = new RecordSet;
             //---------------------------
             list( $inCodGrupo , $inExercicio ) = explode( '/' , $_REQUEST[ 'inCodGrupo' ] );
-
-            SistemaLegado::BloqueiaFrames();
+            
             if ( Sessao::read( 'calculados' ) == -1 ) {
                 require_once ( CAM_GT_ARR_NEGOCIO."RARRGrupo.class.php");
 

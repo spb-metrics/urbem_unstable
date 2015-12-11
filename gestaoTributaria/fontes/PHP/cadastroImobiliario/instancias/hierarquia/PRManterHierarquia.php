@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterHierarquia.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterHierarquia.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.02
 */
@@ -61,7 +61,6 @@ $pgProc = "PR".$stPrograma.".php?stAcao=$stAcao";
 $pgOcul = "OC".$stPrograma.".php?stAcao=$stAcao";
 $pgJS   = "JS".$stPrograma.".js";
 
-//SistemaLegado::mostravar($pgList);die();
 $obRCIMNivel = new RCIMNivel;
 $inCodAtributosSelecionados = $_REQUEST["inCodAtributoSelecionados"];
 switch ($stAcao) {

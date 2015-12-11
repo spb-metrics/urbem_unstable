@@ -48,7 +48,7 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 
-switch ($_REQUEST['stCtrl']) {
+switch ( $request->get('stCtrl')) {
     
     //Carrega itens vazios na listagem de veiculos de publicacao utilizados no carregamento do Form.
     case 'carregaListaVeiculos' :
@@ -60,18 +60,18 @@ switch ($_REQUEST['stCtrl']) {
     case 'incluirListaVeiculos':
     $arValores = Sessao::read('arValores');
 
-    if ($_REQUEST['inVeiculo'] == '') {
+    if ( $request->get('inVeiculo') == '') {
         $stMensagem = 'Preencha o campo Veículo de Publicação!';
     }
 
-    if ($_REQUEST['dtDataPublicacao'] == '') {
+    if ( $request->get('dtDataPublicacao') == '') {
         $stMensagem = 'Preencha o campo Data de Publicação!';
     }
 
     $boPublicacaoRepetida = false;
     if ( is_array( $arValores ) ) {
         foreach ($arValores as $arTEMP) {
-        if ($arTEMP['inVeiculo'] == $_REQUEST["inVeiculo"] & $arTEMP['dtDataPublicacao'] == $_REQUEST['dtDataPublicacao']) {
+        if ($arTEMP['inVeiculo'] ==  $request->get("inVeiculo") & $arTEMP['dtDataPublicacao'] ==  $request->get('dtDataPublicacao')) {
             $boPublicacaoRepetida = true ;
             $stMensagem = "Este veículos de publicação já está na lista.";
         }
@@ -80,12 +80,12 @@ switch ($_REQUEST['stCtrl']) {
 
     if (!$boPublicacaoRepetida AND !$stMensagem) {
         $inCount = sizeof($arValores);
-        $arValores[$inCount]['id'             ] = $inCount + 1;
-        $arValores[$inCount]['inVeiculo'      ] = $_REQUEST[ "inVeiculo"                  ];
-        $arValores[$inCount]['stVeiculo'      ] = $_REQUEST[ "stNomCgmVeiculoPublicadade" ];
-        $arValores[$inCount]['dtDataPublicacao' ] = $_REQUEST[ "dtDataPublicacao"             ];
-        $arValores[$inCount]['inNumPublicacao'] = $_REQUEST[ "inNumPublicacao"             ];
-        $arValores[$inCount]['stObservacao'   ] = $_REQUEST[ "stObservacao"               ];
+        $arValores[$inCount]['id'               ] = $inCount + 1;
+        $arValores[$inCount]['inVeiculo'        ] =  $request->get( "inVeiculo"                  );
+        $arValores[$inCount]['stVeiculo'        ] =  $request->get( "stNomCgmVeiculoPublicadade" );
+        $arValores[$inCount]['dtDataPublicacao' ] =  $request->get( "dtDataPublicacao"           );
+        $arValores[$inCount]['inNumPublicacao'  ] =  $request->get( "inNumPublicacao"            );
+        $arValores[$inCount]['stObservacao'     ] =  $request->get( "stObservacao"               );
     } else {
         echo "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');";
     }
@@ -111,8 +111,8 @@ switch ($_REQUEST['stCtrl']) {
     $arValores = Sessao::read('arValores');
     if ( is_array($arValores)) {
         foreach ($arValores as $key => $value) {
-        if (($key+1) == $_REQUEST['id']) {
-            $js ="$('HdnCodVeiculo').value                      ='".$_REQUEST['id']."';                                            ";
+        if (($key+1) ==  $request->get('id')) {
+            $js ="$('HdnCodVeiculo').value                      ='". $request->get('id')."';                                            ";
             $js.="$('inVeiculo').value                          ='".$arValores[$i]['inVeiculo']."';             ";
             $js.="$('dtDataPublicacao').value                   ='".$arValores[$i]['dtDataPublicacao']."';        ";
             $js.="$('inNumPublicacao').value                    ='".$arValores[$i]['inNumPublicacao']."';        ";
@@ -134,7 +134,7 @@ switch ($_REQUEST['stCtrl']) {
     $boDotacaoRepetida = false;
     $arValores = Sessao::read('arValores');
     foreach ($arValores as $key=>$value) {
-       if ($value['inVeiculo'] == $_REQUEST["inVeiculo"] & $value['dtDataPublicacao'] == $_REQUEST['dtDataPublicacao'] AND ( $key+1 != $_REQUEST['HdnCodVeiculo'] ) ) {
+       if ($value['inVeiculo'] ==  $request->get("inVeiculo") & $value['dtDataPublicacao'] ==  $request->get('dtDataPublicacao') AND ( $key+1 !=  $request->get('HdnCodVeiculo') ) ) {
            $boDotacaoRepetida = true ;
            break;
        }
@@ -142,13 +142,13 @@ switch ($_REQUEST['stCtrl']) {
 
     if (!$boDotacaoRepetida) {
           foreach ($arValores as $key=>$value) {
-            if (($key+1) == $_REQUEST['HdnCodVeiculo']) {
-            $arValores[$inCount]['id'            ] = $inCount + 1;
-            $arValores[$inCount]['inVeiculo'     ] = $_REQUEST[ "inVeiculo"                  ];
-            $arValores[$inCount]['stVeiculo'     ] = sistemaLegado::pegaDado('nom_cgm','sw_cgm',' WHERE numcgm = '.$_REQUEST['inVeiculo'].' ');
-            $arValores[$inCount]['dtDataPublicacao'] = $_REQUEST[ "dtDataPublicacao"         ];
-            $arValores[$inCount]['inNumPublicacao']  = $_REQUEST[ "inNumPublicacao"          ];
-            $arValores[$inCount]['stObservacao'  ] = $_REQUEST[ "stObservacao"               ];
+            if (($key+1) ==  $request->get('HdnCodVeiculo')) {
+            $arValores[$inCount]['id'              ] = $inCount + 1;
+            $arValores[$inCount]['inVeiculo'       ] =  $request->get( "inVeiculo"  );
+            $arValores[$inCount]['stVeiculo'       ] = sistemaLegado::pegaDado('nom_cgm','sw_cgm',' WHERE numcgm = '. $request->get('inVeiculo').' ');
+            $arValores[$inCount]['dtDataPublicacao'] =  $request->get( "dtDataPublicacao" );
+            $arValores[$inCount]['inNumPublicacao' ] =  $request->get( "inNumPublicacao"  );
+            $arValores[$inCount]['stObservacao'    ] =  $request->get( "stObservacao"     );
         }
 
         $inCount++;
@@ -177,7 +177,7 @@ switch ($_REQUEST['stCtrl']) {
     $inCount           = 0;
     $arValores = Sessao::read('arValores');
     foreach ($arValores as $key => $value) {
-        if (($key+1) != $_REQUEST['id']) {
+        if (($key+1) !=  $request->get('id')) {
           $arTEMP[$inCount]['id'               ] = $inCount + 1;
           $arTEMP[$inCount]['inVeiculo'        ] = $value[ "inVeiculo"      ];
           $arTEMP[$inCount]['stVeiculo'        ] = $value[ "stVeiculo"      ];

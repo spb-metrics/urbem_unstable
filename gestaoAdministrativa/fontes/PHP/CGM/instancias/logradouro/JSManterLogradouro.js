@@ -393,15 +393,17 @@ function verificaCodigoLogradouro() {
 
 function validaCamposLista()
 {
-    var inCodNorma      = jQuery("#inCodNorma").val();
-    var stDataInicial   = jQuery("#stDataInicial").val();
+    var inCodNorma           = jQuery("#inCodNormaHistorico").val();
+    var stDataInicial        = jQuery("#stDataInicialHistorico").val();
+    var stDataFinalHistorico = jQuery("#stDataFinalHistorico").val();
     var stNomeLogradouroAnterior = jQuery("#stNomeLogradouroAnterior").val();
     
-    if ( stDataInicial == '' || inCodNorma == '' || stNomeLogradouroAnterior == '') {
+    if ( stDataInicial == '' || inCodNorma == '' || stNomeLogradouroAnterior == '' || stDataFinalHistorico == '') {
         alertaAviso("Preencha todos os campos obrigatórios do histórico do logradouro.","erro","aviso","<?=Sessao::getId()?>");
         return false;
     }else{
-        jQuery('#stDescricaoNorma').val(jQuery('#stNorma').html());
+        jQuery("#stDescricaoNormaHistorico").val(jQuery("#stNormaHistorico").html());
+        jQuery("#stDescricaoNorma").val(jQuery("#stNorma").html());
         return true;
     };
 }

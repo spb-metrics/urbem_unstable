@@ -436,4 +436,71 @@ function montaRecuperaContratosParaConcessaoDecimoFuncao()
     return $stSql;
 }
 
+
+function recuperaContratosAdiantamentoDecidoMesAniversario(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stOrdem = ( $stOrdem != "" ) ? " ORDER BY ".$stOrdem : " ORDER BY cod_contrato";
+    $stSql = $this->montaRecuperaContratosAdiantamentoDecidoMesAniversario().$stFiltro.$stOrdem;
+    $this->setDebug($stSql);
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
+
+function montaRecuperaContratosAdiantamentoDecidoMesAniversario()
+{
+    $stSql = "
+            SELECT contrato.*
+                 , servidor.numcgm
+                 , sw_cgm.nom_cgm
+                 , TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,'mm') as mes_nascimento
+              FROM pessoal.contrato
+        INNER JOIN pessoal.servidor_contrato_servidor
+                ON servidor_contrato_servidor.cod_contrato = contrato.cod_contrato
+        INNER JOIN pessoal.servidor
+                ON servidor.cod_servidor = servidor_contrato_servidor.cod_servidor
+        INNER JOIN sw_cgm
+                ON sw_cgm.numcgm = servidor.numcgm
+        INNER JOIN sw_cgm_pessoa_fisica
+                ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+               AND TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,'mm') = '".$this->getDado('mes_aniversario')."'
+        INNER JOIN ultimo_contrato_servidor_orgao('".Sessao::getEntidade()."', ".$this->getDado("cod_periodo_movimentacao")." ) as contrato_servidor_orgao
+                ON contrato_servidor_orgao.cod_contrato = contrato.cod_contrato
+
+             WHERE NOT EXISTS ( SELECT 1
+                                  FROM pessoal.contrato_servidor_caso_causa
+                                 WHERE contrato_servidor_caso_causa.cod_contrato = contrato.cod_contrato
+                              )
+             
+        UNION
+
+            SELECT contrato.*
+                 , pensionista.numcgm
+                 , sw_cgm.nom_cgm
+                 , TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,'mm') as mes_nascimento
+              FROM pessoal.contrato
+        INNER JOIN pessoal.contrato_pensionista
+                ON contrato_pensionista.cod_contrato = contrato.cod_contrato
+        INNER JOIN pessoal.pensionista
+                ON pensionista.cod_pensionista = contrato_pensionista.cod_pensionista
+               AND pensionista.cod_contrato_cedente = contrato_pensionista.cod_contrato_cedente
+        INNER JOIN sw_cgm
+                ON sw_cgm.numcgm = pensionista.numcgm
+        INNER JOIN sw_cgm_pessoa_fisica
+                ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                AND TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,'mm') = '".$this->getDado('mes_aniversario')."'
+        INNER JOIN ultimo_contrato_pensionista_orgao('".Sessao::getEntidade()."', ".$this->getDado("cod_periodo_movimentacao")." ) as contrato_servidor_orgao
+                ON contrato_servidor_orgao.cod_contrato = contrato.cod_contrato
+
+         ";
+    
+
+    return $stSql;
+}
+
+
+
+}//END OF CLASS

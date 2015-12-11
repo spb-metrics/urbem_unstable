@@ -40,25 +40,6 @@
 
     * Casos de uso: uc-03.04.01
 */
-
-/*
-$Log$
-Revision 1.6  2006/12/07 16:51:33  rodrigo
-7393
-
-Revision 1.5  2006/11/07 16:41:27  larocca
-Inclusão dos Casos de Uso
-
-Revision 1.4  2006/10/06 17:08:23  rodrigo
-*** empty log message ***
-
-Revision 1.3  2006/07/06 14:05:54  diego
-Retirada tag de log com erro.
-
-Revision 1.2  2006/07/06 12:11:10  diego
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
@@ -86,14 +67,14 @@ function TComprasSolicitacaoItemAnulacao()
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_entidade,cod_solicitacao,timestamp,cod_centro,cod_item');
 
-    $this->AddCampo('exercicio','char',true,'4',true,true);
-    $this->AddCampo('cod_entidade','integer',true,'',true,true);
-    $this->AddCampo('cod_solicitacao','integer',true,'',true,true);
-    $this->AddCampo('timestamp','timestamp',true,'',true,true);
-    $this->AddCampo('cod_centro','integer',true,'',true,true);
-    $this->AddCampo('cod_item','integer',true,'',true,true);
-    $this->AddCampo('quantidade','numeric',true,'14,2',false,false);
-    $this->AddCampo('vl_total','numeric',true,'14,2',false,false);
+    $this->AddCampo('exercicio'      ,      'char', true,    '4',  true,  true);
+    $this->AddCampo('cod_entidade'   ,   'integer', true,     '',  true,  true);
+    $this->AddCampo('cod_solicitacao',   'integer', true,     '',  true,  true);
+    $this->AddCampo('timestamp'      , 'timestamp', true,     '',  true,  true);
+    $this->AddCampo('cod_centro'     ,   'integer', true,     '',  true,  true);
+    $this->AddCampo('cod_item'       ,   'integer', true,     '',  true,  true);
+    $this->AddCampo('quantidade'     ,   'numeric', true, '14,4', false, false);
+    $this->AddCampo('vl_total'       ,   'numeric', true, '14,2', false, false);
 
 }
 

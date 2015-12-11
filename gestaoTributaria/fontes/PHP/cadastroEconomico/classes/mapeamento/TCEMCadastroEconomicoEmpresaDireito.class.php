@@ -33,7 +33,7 @@
   * @package URBEM
   * @subpackage Mapeamento
 
-    * $Id: TCEMCadastroEconomicoEmpresaDireito.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TCEMCadastroEconomicoEmpresaDireito.class.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.02.10
 */
@@ -86,7 +86,6 @@ function recuperaInscricao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTran
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaRecuperaInscricao().$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-//sistemaLegado::mostravar( $stSql );exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
 
     return $obErro;

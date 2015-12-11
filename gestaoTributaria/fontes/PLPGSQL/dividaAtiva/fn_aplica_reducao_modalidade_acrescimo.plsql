@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_aplica_reducao_modalidade_acrescimo.plsql 63615 2015-09-18 14:11:12Z evandro $
+* $Id: fn_aplica_reducao_modalidade_acrescimo.plsql 63888 2015-10-30 15:35:08Z evandro $
 *
 * Caso de uso: uc-05.04.00
 */
@@ -106,7 +106,7 @@ begin
 
     -- executa
     FOR reRecordFuncoes IN EXECUTE stSqlFuncoes LOOP
-        stExecuta :=  'SELECT '||reRecordFuncoes.funcao_valida||'( '||inRegistro|', '''||dtDataVencimento||''', '||inQtdParcelas||' ) as utilizar ';
+        stExecuta :=  'SELECT '||reRecordFuncoes.funcao_valida||'( '||inRegistro||', '''||dtDataVencimento||''', '||inQtdParcelas||' ) as utilizar ';
         FOR reRecordExecuta IN EXECUTE stExecuta LOOP
             boUtilizar := reRecordExecuta.utilizar;
         END LOOP;

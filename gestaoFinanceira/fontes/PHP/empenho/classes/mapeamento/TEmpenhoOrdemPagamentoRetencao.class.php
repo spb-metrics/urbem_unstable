@@ -197,7 +197,7 @@ function recuperaCodPlanoReceita(&$rsRecordSet, $boTransacao = "")
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    if ( sistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stSql = $this->montaRecuperaCodPlanoReceitaTCE().$stOrdem;
     } else {
         $stSql = $this->montaRecuperaCodPlanoReceita().$stOrdem;

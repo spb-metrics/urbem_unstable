@@ -64,7 +64,7 @@ switch ( $request->get('stAcao') ) {
         $obRCIMLogradouro->setCodigoLogradouro( $request->get("inCodLogradouro")       );
         $obRCIMLogradouro->consultarLogradouro($rsLogradouro);
 
-        if ($rsLogradouro->inNumLinhas > 0) {
+        if ($rsLogradouro->getNumLinhas() > 0) {
             $obTLogradouro= new TLogradouro();
             $obTLogradouro->proximoCod($inProxCodLogradouro);
             $obRCIMLogradouro->setCodigoLogradouro($inProxCodLogradouro);
@@ -75,6 +75,17 @@ switch ( $request->get('stAcao') ) {
         $arBairrosSessao  = Sessao::read('bairros');
         $arCepSessao      = Sessao::read('cep');
         $arDadosHistorico = Sessao::read('arDadosHistorico');
+        //Adicionar dados da inclusao do logradouro no array de historico geral
+        $arDadosIncluir['inId'] = count($arDadosHistorico);
+        $arDadosIncluir['sequencial'] = '';
+        $arDadosIncluir['descricao_norma'] = $request->get('stDescricaoNorma');
+        //adicionando nome da inclusao no campos de nome_anterior do historico pq faz parte de um todo
+        $arDadosIncluir['nome_anterior'] = $request->get('stNomeLogradouro');
+        $arDadosIncluir['dt_inicio'] =  $request->get('stDataInicial');
+        $arDadosIncluir['dt_fim'] =  $request->get('stDataFinal');
+        $arDadosIncluir['exercicio'] = Sessao::getExercicio();
+        $arDadosIncluir['cod_norma'] =  $request->get('inCodNorma');
+        $arDadosHistorico[] = $arDadosIncluir;
 
         if ( count ($arBairrosSessao) < 1 ) {
 
@@ -118,6 +129,8 @@ switch ( $request->get('stAcao') ) {
             $obErro = $obRCIMLogradouro->incluirLogradouro();
         }
 
+        $inProxCodLogradouro = ($inProxCodLogradouro == '') ? $request->get('inCodLogradouro') : $inProxCodLogradouro;
+
         if ( !$obErro->ocorreu() ) {            
             SistemaLegado::alertaAviso($pgForm."?stAcao=".$request->get('stAcao'),"Logradouro: ".$inProxCodLogradouro." - ".$request->get("stNomeLogradouro"),"incluir","aviso",Sessao::getId(),"../");
         } else {            
@@ -126,6 +139,19 @@ switch ( $request->get('stAcao') ) {
     break;
     case "alterar":
         $obErro = new Erro;
+        $arDadosHistorico = Sessao::read('arDadosHistorico');
+        $arDadosHistorico = ($arDadosHistorico == '') ? array() : $arDadosHistorico;
+        $arTmp = end($arDadosHistorico);
+        foreach ($arDadosHistorico as $key => $value) {
+            if ( $value['inId'] == $arTmp['inId']) {
+                $arDadosHistorico[$key]['descricao_norma'] = $request->get('stDescricaoNorma');
+                $arDadosHistorico[$key]['nome_anterior']   = $request->get('stNomeLogradouro');
+                $arDadosHistorico[$key]['dt_inicio']       = $request->get('stDataInicial');
+                $arDadosHistorico[$key]['dt_fim']          = $request->get('stDataFinal');
+                $arDadosHistorico[$key]['exercicio']       = Sessao::getExercicio();
+                $arDadosHistorico[$key]['cod_norma']       = $request->get('inCodNorma');        
+            }
+        }
 
         $obRCIMLogradouro->setCodigoLogradouro ( $request->get("inCodigoLogradouro") );
         $obRCIMLogradouro->setCodigoUF         ( $request->get('inCodUF')            );
@@ -133,7 +159,7 @@ switch ( $request->get('stAcao') ) {
         $obRCIMLogradouro->setNomeLogradouro   ( $request->get("stNomeLogradouro") );
         $obRCIMLogradouro->setCodigoTipo       ( $request->get("inCodigoTipo")     );
         $obRCIMLogradouro->setCEP              ( Sessao::read('cep')               );
-        $obRCIMLogradouro->setDadosHistorico   ( Sessao::read('arDadosHistorico')  );
+        $obRCIMLogradouro->setDadosHistorico   ( $arDadosHistorico  );
 
         $obErro = $obRCIMLogradouro->addBairro( Sessao::read('bairros'), $boTransacao );
         if ( $obErro->ocorreu() ) {

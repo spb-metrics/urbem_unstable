@@ -595,7 +595,7 @@ function geraRecordSetBoletim(&$arRecordSet)
         $nuVlMBSaldoAtualSubTotal = '0.00';
         while ( !$rsMovimentoBanco->eof() ) {
             if ( $rsMovimentoBanco->getCampo("saldo_anterior") != '0.00' OR $rsMovimentoBanco->getCampo("vl_debito") != '0.00' OR $rsMovimentoBanco->getCampo("vl_credito") != '0.00' OR $this->boSemMovimentacao == 'S') {
-                if ( sistemaLegado::is_tcems() ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     $arMovimentoBanco[$inCount]["cod_estrutural"] = sistemaLegado::doMask($rsMovimentoBanco->getCampo("cod_estrutural"));
                 } else {
                     $arMovimentoBanco[$inCount]["cod_estrutural"] = $rsMovimentoBanco->getCampo( "cod_estrutural" );

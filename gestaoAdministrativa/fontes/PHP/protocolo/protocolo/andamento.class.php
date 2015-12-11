@@ -115,9 +115,7 @@ class andamento
         $dbConfig = new dataBaseLegado;
         $dbConfig->abreBd();
         $insert = "INSERT INTO sw_andamento_padrao (cod_assunto, cod_classificacao, cod_orgao, num_passagens, descricao, ordem, num_dia) VALUES ('".$this->assunto."', '".$this->classificacao."', '".$this->codOrgao."', '".$this->numPassagens."', '".$this->descricao."', '".$this->ordem."', '".$this->numDia."')";
-        //mostravar($this->anoE);
-        //print $insert;
-        //die();
+
         if ($dbConfig->executaSql($insert))
             return true;
         else

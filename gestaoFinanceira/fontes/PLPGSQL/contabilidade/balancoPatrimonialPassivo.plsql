@@ -42,18 +42,17 @@ DECLARE
     stCodEntidades      ALIAS FOR $4;
     stSql               VARCHAR   := '';
     stSqlComplemento    VARCHAR   := '';
+    stCodUF             VARCHAR := '';
     reRegistro          RECORD;
     arRetorno           NUMERIC[];
 
 BEGIN
-    CREATE TEMPORARY TABLE tmp_passivo_financeiro (
-         cod_estrutural  varchar
-       , valores         numeric[] 
-    );
-    CREATE TEMPORARY TABLE tmp_passivo_permanente (
-         cod_estrutural  varchar
-       , valores         numeric[] 
-    );
+    
+    SELECT valor INTO stCodUF
+      FROM administracao.configuracao
+     WHERE exercicio  = stExercicio
+       AND cod_modulo = 2
+       AND parametro  = 'cod_uf';  
 
     stSql := 'CREATE TEMPORARY TABLE tmp_debito AS
                 SELECT *
@@ -189,56 +188,10 @@ BEGIN
     ';
 
     EXECUTE stSql;
+    
+   
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
-
- --ATIVO FINANCEIRO
-    stSql := ' Select *
-                 from contabilidade.plano_conta
-                where exercicio = ' || quote_literal(stExercicio) || '
-                  and cod_estrutural like ''2%''
-                  and escrituracao = ''analitica''
-                  and indicador_superavit = ''financeiro''
-             ';
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        INSERT INTO tmp_passivo_financeiro VALUES ( reRegistro.cod_estrutural
-                                                  , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
-                                              );
-    END LOOP;
-    
-    --ATIVO PERMANENTE
-    stSql := ' Select *
-                 from contabilidade.plano_conta
-                where exercicio = ' || quote_literal(stExercicio) || '
-                  and cod_estrutural like ''2%''
-                  and escrituracao = ''analitica''
-                  and indicador_superavit = ''permanente''
-             ';
-    FOR reRegistro IN EXECUTE stSql
-    LOOP
-        INSERT INTO tmp_passivo_permanente VALUES ( reRegistro.cod_estrutural
-                                                  , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida(reRegistro.cod_estrutural) )
-                                              );
-    END LOOP;
-    
-    stSql := 'CREATE TEMPORARY TABLE tmp_soma_passivo_financeiro AS
-                SELECT SUM(valores[1]) as vl_saldo_anterior
-                     , SUM(valores[2]) as vl_saldo_debitos
-                     , SUM(valores[3]) as vl_saldo_creditos
-                     , SUM(valores[4]) as vl_saldo_atual
-                  FROM tmp_passivo_financeiro
-             ';
-    EXECUTE stSql;
-    
-     stSql := 'CREATE TEMPORARY TABLE tmp_soma_passivo_permanente AS
-                SELECT SUM(valores[1]) as vl_saldo_anterior
-                     , SUM(valores[2]) as vl_saldo_debitos
-                     , SUM(valores[3]) as vl_saldo_creditos
-                     , SUM(valores[4]) as vl_saldo_atual
-                  FROM tmp_passivo_permanente
-             ';
-    EXECUTE stSql;
     
     stSql := ' CREATE TEMPORARY TABLE tmp_balanco_patrimonial_passivo AS
         SELECT CAST(cod_estrutural AS VARCHAR) as cod_estrutural
@@ -255,7 +208,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.0.0.0.00.00')||') as nivel
                      , ''PASSIVO CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO CIRCULANTE
@@ -264,7 +217,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.0.0.0.00.00')||') as nivel
                      , ''PASSIVO CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                    
             UNION ALL
 
                 --CONTA PASSIVO CIRCULANTE
@@ -273,7 +226,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.0.0.0.00.00')||') as nivel
                      , ''PASSIVO CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO CIRCULANTE
@@ -282,7 +235,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.0.0.0.00.00')||') as nivel
                      , ''PASSIVO CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                    
             UNION ALL
 
                 --CONTA OBRIGAÇÕES TRABALHISTAS, PROVIDENCIÁRIAS E ASSISTENCIAIS A PAGAR A CURTO PRAZO
@@ -291,7 +244,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.1.0.0.00.00')||') as nivel
                      , ''Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES TRABALHISTAS, PROVIDENCIÁRIAS E ASSISTENCIAIS A PAGAR A CURTO PRAZO
@@ -309,7 +262,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.1.0.0.00.00')||') as nivel
                      , ''Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA EMPRÉSTIMOS E FINANCIAMENTOS A CURTO PRAZO
@@ -318,7 +271,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.2.0.0.00.00')||') as nivel
                      , ''Empréstimos e Financiamentos a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                    
             UNION ALL
 
                 --CONTA FORNECEDORES E CONTAS A PAGAR A CURTO PRAZO
@@ -327,7 +280,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.3.0.0.00.00')||') as nivel
                      , ''Fornecedores e Contas a Pagar a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES FISCAIS A CURTO PRAZO
@@ -336,7 +289,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.4.0.0.00.00')||') as nivel
                      , ''Obrigações Fiscais a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES DE REPARTIÇÃO A OUTROS ENTES
@@ -345,7 +298,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.5.0.0.00.00')||') as nivel
                      , ''Obrigações de Repartição a Outros Entes'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PROVISÕES A CURTO PRAZO
@@ -354,7 +307,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.7.0.0.00.00')||') as nivel
                      , ''Provisões a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA DEMAIS OBRIGAÇÕES A CURTO PRAZO
@@ -363,7 +316,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.8.0.0.00.00')||') as nivel
                      , ''Demais Obrigações a Curto Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA DEMAIS OBRIGAÇÕES A CURTO PRAZO
@@ -372,7 +325,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.8.0.0.00.00')||') as nivel
                      , ''Demais Obrigações a Curto Prazo'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --LINHA PARA COMPENSAR TAMANHO DE TABELAS
@@ -381,7 +334,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.9')||') as nivel
                      , '''' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --LINHA PARA COMPENSAR TAMANHO DE TABELAS
@@ -390,7 +343,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.99')||') as nivel
                      , '''' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --LINHA PARA COMPENSAR TAMANHO DE TABELAS
@@ -399,7 +352,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.999')||') as nivel
                      , '''' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --LINHA PARA COMPENSAR TAMANHO DE TABELAS
@@ -408,7 +361,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.9999')||') as nivel
                      , '''' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --LINHA PARA COMPENSAR TAMANHO DE TABELAS
@@ -417,7 +370,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.1.99999')||') as nivel
                      , '''' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO NÃO-CIRCULANTE
@@ -426,7 +379,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
                      , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO NÃO-CIRCULANTE
@@ -434,9 +387,19 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.1.4.2.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
                      , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
-                     , 1 as  multiplicador
-
-            UNION ALL
+                     , 1 as  multiplicador ';
+                     
+        IF (stCodUF = '11' AND stExercicio = '2014') THEN
+            stSql := stSql ||'UNION ALL
+                        --CONTA PASSIVO NÃO-CIRCULANTE
+                        SELECT '||quote_literal('2.2.0.0.0.00.00')||' as cod_estrutural
+                            , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.1.4.2.01.00')||') ) as valores
+                            , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
+                            , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
+                            , -1 as  multiplicador';
+        END IF;
+                    
+  stSql := stSql ||' UNION ALL
 
                 --CONTA PASSIVO NÃO-CIRCULANTE
                 SELECT '||quote_literal('2.2.0.0.0.00.00')||' as cod_estrutural
@@ -444,7 +407,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
                      , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO NÃO-CIRCULANTE
@@ -453,7 +416,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
                      , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PASSIVO NÃO-CIRCULANTE
@@ -462,7 +425,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.0.0.0.00.00')||') as nivel
                      , ''PASSIVO NÃO-CIRCULANTE'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES TRABALHISTAS, PREVIDENCIÁRIAS E ASSISTENCIAIS A PAGAR A LONGO PRAZO
@@ -471,7 +434,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.1.0.0.00.00')||') as nivel
                      , ''Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES TRABALHISTAS, PREVIDENCIÁRIAS E ASSISTENCIAIS A PAGAR A LONGO PRAZO
@@ -479,17 +442,28 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.1.4.2.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.2.1.0.0.00.00')||') as nivel
                      , ''Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Longo Prazo'' as nom_conta
-                     , 1 as  multiplicador
-
-            UNION ALL
-
+                     , 1 as  multiplicador';
+                     
+            IF (stCodUF = '11' AND stExercicio = '2014') THEN
+                stSql := stSql ||'
+                    UNION ALL
+                        --CONTA OBRIGAÇÕES TRABALHISTAS, PREVIDENCIÁRIAS E ASSISTENCIAIS A PAGAR A LONGO PRAZO
+                        SELECT '||quote_literal('2.2.1.0.0.00.00')||' as cod_estrutural
+                            , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.1.4.2.01.00')||') ) as valores
+                            , publico.fn_nivel('||quote_literal('2.2.1.0.0.00.00')||') as nivel
+                            , ''Obrigações Trabalhistas, Previdenciárias e Assistenciais a Pagar a Longo Prazo'' as nom_conta
+                            , -1 as  multiplicador';
+            END IF;
+                     
+          stSql := stSql ||'
+                UNION ALL
                 --CONTA EMPRÉSTIMOS E FINANCIAMENTOS A LONGO PRAZO
                 SELECT '||quote_literal('2.2.2.0.0.00.00')||' as cod_estrutural
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.2.0.0.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.2.2.0.0.00.00')||') as nivel
                      , ''Empréstimos e Financiamentos a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA FORNECEDORES A LONGO PRAZO
@@ -498,7 +472,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.3.0.0.00.00')||') as nivel
                      , ''Fornecedores a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES FISCAIS A LONGO PRAZO
@@ -507,7 +481,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.4.0.0.00.00')||') as nivel
                      , ''Obrigações Fiscais a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES FISCAIS A LONGO PRAZO
@@ -516,7 +490,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.4.0.0.00.00')||') as nivel
                      , ''Obrigações Fiscais a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES FISCAIS A LONGO PRAZO
@@ -524,8 +498,8 @@ BEGIN
                      , contabilidade.totaliza_balanco_patrimonial( publico.fn_mascarareduzida('||quote_literal('2.2.4.2.2.00.00')||') ) as valores
                      , publico.fn_nivel('||quote_literal('2.2.4.0.0.00.00')||') as nivel
                      , ''Obrigações Fiscais a Longo Prazo'' as nom_conta
-                     , 1 as  multiplicador
-
+                     , -1 as  multiplicador
+                     
             UNION ALL
 
                 --CONTA OBRIGAÇÕES FISCAIS A LONGO PRAZO
@@ -534,7 +508,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.4.0.0.00.00')||') as nivel
                      , ''Obrigações Fiscais a Longo Prazo'' as nom_conta
                      , 1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA PROVISÕES A LONGO PRAZO
@@ -543,7 +517,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.7.0.0.00.00')||') as nivel
                      , ''Provisões a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                    
             UNION ALL
 
                 --CONTA DEMAIS OBRIGAÇÕES A LONGO PRAZO
@@ -552,7 +526,7 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.8.0.0.00.00')||') as nivel
                      , ''Demais Obrigações a Longo Prazo'' as nom_conta
                      , -1 as  multiplicador
-
+                     
             UNION ALL
 
                 --CONTA RESULTADO DEFERIDO
@@ -561,31 +535,14 @@ BEGIN
                      , publico.fn_nivel('||quote_literal('2.2.9.0.0.00.00')||') as nivel
                      , ''Resultado Deferido'' as nom_conta
                      , -1 as  multiplicador
+                     
                ) as tabela
       GROUP BY cod_estrutural
              , nivel
              , nom_conta
     ';
     EXECUTE stSql;
-    
-    INSERT INTO tmp_balanco_patrimonial_passivo  SELECT '2.0.0.0.0.00.00' 
-                                                    , 2 
-                                                    , 'Permanente Financeiro' 
-                                                    , vl_saldo_anterior *-1
-                                                    , vl_saldo_debitos *-1
-                                                    , vl_saldo_creditos *-1
-                                                    , vl_saldo_atual *-1
-                                                 FROM tmp_soma_passivo_financeiro ;
 
-    INSERT INTO tmp_balanco_patrimonial_passivo  SELECT '2.0.0.0.0.00.01' 
-                                                    , 2 
-                                                    , 'Permanente Permanente' 
-                                                    , vl_saldo_anterior *-1
-                                                    , vl_saldo_debitos *-1
-                                                    , vl_saldo_creditos *-1
-                                                    , vl_saldo_atual *-1
-                                                 FROM tmp_soma_passivo_permanente ;
-   
     stSql := ' SELECT * FROM tmp_balanco_patrimonial_passivo ';
     FOR reRegistro IN EXECUTE stSql
     LOOP
@@ -604,10 +561,6 @@ BEGIN
     DROP TABLE tmp_credito;
     DROP TABLE tmp_totaliza_debito;
     DROP TABLE tmp_totaliza_credito;
-    DROP TABLE tmp_passivo_financeiro;
-    DROP TABLE tmp_passivo_permanente;
-    DROP TABLE tmp_soma_passivo_financeiro;
-    DROP TABLE tmp_soma_passivo_permanente;
     DROP TABLE tmp_balanco_patrimonial_passivo;
 
     RETURN;

@@ -32,15 +32,15 @@
 
     * @ignore
 
-    $Id: OCManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
+    $Id: OCManterOrdemCompra.php 64051 2015-11-24 17:55:39Z franver $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
-include_once( TCOM."TComprasOrdem.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once TCOM."TComprasOrdem.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterOrdemCompra";
@@ -51,7 +51,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 $stAcao = $request->get('stAcao');
 $stTipoOrdem = ( strpos($stAcao,'OS')==false ) ? 'C' : 'S';
@@ -91,13 +91,13 @@ function montaListaItens($arRecordSet , $boExecuta = true)
     $table->setRecordset( $rsListaItens );
     $table->setSummary('Itens');
 
-    $table->Head->addCabecalho( 'Item' , 25 			);
-    $table->Head->addCabecalho( 'Qtde. Emp.' , 8 		);
-    $table->Head->addCabecalho( 'Qtde. em OC' , 10 		);
-    $table->Head->addCabecalho( 'Qtde. Disponível' , 10 );
-    $table->Head->addCabecalho( 'Valor Unitário' , 10 	);
-    $table->Head->addCabecalho( 'Qtde. da OC' , 8 		);
-    $table->Head->addCabecalho( 'Valor Total Item' , 12 );
+    $table->Head->addCabecalho('Item'            , 25);
+    $table->Head->addCabecalho('Qtde. Emp.'      , 10);
+    $table->Head->addCabecalho('Qtde. em OC'     , 10);
+    $table->Head->addCabecalho('Qtde. Disponível', 10);
+    $table->Head->addCabecalho('Valor Unitário'  , 10);
+    $table->Head->addCabecalho('Qtde. da OC'     , 10);
+    $table->Head->addCabecalho('Valor Total Item', 12);
 
     $stTitle = "";
     $table->Body->addCampo( 'nom_item'      , "E", $stTitle );
@@ -107,9 +107,13 @@ function montaListaItens($arRecordSet , $boExecuta = true)
     $table->Body->addCampo( 'vl_unitario'   , "D", $stTitle );
 
     if ( strpos($_REQUEST['stAcao'],'incluir') !== false || strpos($_REQUEST['stAcao'],'alterar') !== false ) {
-        $obTextQtde = new TextBox();
+        $obTextQtde = new Numerico();
         $obTextQtde->setName('qtdeOC');
-        $obTextQtde->obEvento->setOnKeyUp("mascaraMoeda(this,4,event,false);");
+        $obTextQtde->setDecimais(4);
+        $obTextQtde->setSize (14);
+        $obTextQtde->setMaxLength(13);
+        $obTextQtde->setDefinicao('NUMERIC');
+        
         $obTextQtde->obEvento->setOnChange ("floatDecimal(this, '4', event ); executaFuncaoAjax( 'calculaValorTotal', '&inTableId=".$table->getId()."&stId='+this.id+'&inQtde='+this.value );");
 
         $table->Body->addCampo( $obTextQtde, "C");
@@ -126,13 +130,13 @@ function montaListaItens($arRecordSet , $boExecuta = true)
 
     if (strpos($_REQUEST['stAcao'],'incluir') !== false || strpos($_REQUEST['stAcao'],'alterar') !== false) {
         // Só permiti excluir o ítem se a ordem tiver mais de um (modo alterar).
-    if ((strpos($_REQUEST['stAcao'],'alterar') !== false) || (count($arItens) > 0)) {
-        if ($inTotalItem > 1) {
+        if ((strpos($_REQUEST['stAcao'],'alterar') !== false) || (count($arItens) > 0)) {
+            if ($inTotalItem > 1) {
                 $table->Body->addAcao( 'EXCLUIR' , "executaFuncaoAjax('delItem' , '&inTableId=".$table->getId()."&inNumItem=%s&stAcao=%s$stCampos')" , array( 'num_item', $_REQUEST['stAcao'] ) );
+            }
+        } else {
+            $table->Body->addAcao( 'EXCLUIR' , "executaFuncaoAjax('delItem' , '&inTableId=".$table->getId()."&inNumItem=%s&stAcao=%s$stCampos')" , array( 'num_item', $_REQUEST['stAcao'] ) );
         }
-    } else {
-        $table->Body->addAcao( 'EXCLUIR' , "executaFuncaoAjax('delItem' , '&inTableId=".$table->getId()."&inNumItem=%s&stAcao=%s$stCampos')" , array( 'num_item', $_REQUEST['stAcao'] ) );
-    }
     }
 
     $table->Foot->addSoma( 'oc_vl_total', 'D');
@@ -243,33 +247,43 @@ function BuscaEmpenhoItens($stEmpenho, $inCodEntidade, $stTipoOrdem, $stAcao)
                 $ocVlTotal = $rsItens->getCampo('vl_unitario') * $rsItens->getCampo('oc_saldo');
                 $ocVlTotal = number_format($ocVlTotal, 2, ',', '.');
 
-                $arItens[$inCount]['nom_item'] = $rsItens->getCampo('nom_item');
-                $arItens[$inCount]['num_item'] = $rsItens->getCampo('num_item');
+                $inNumItem = $rsItens->getCampo('num_item');
+                $arItens[$inCount]['nom_item']          = $rsItens->getCampo('nom_item');
+                $arItens[$inCount]['num_item']          = $inNumItem;
                 if(!is_null($rsItens->getCampo('cod_item_ordem')))
                     $inCodItem = $rsItens->getCampo('cod_item_ordem');
                 else
                     $inCodItem = $rsItens->getCampo('cod_item');
-                $arItens[$inCount]['cod_item'] = $inCodItem;
+                $arItens[$inCount]['cod_item']          = $inCodItem;
                 $arItens[$inCount]['exercicio_empenho'] = $rsItens->getCampo('exercicio');
-                $arItens[$inCount]['cod_pre_empenho'] = $rsItens->getCampo('cod_pre_empenho');
-                $arItens[$inCount]['quantidade']  = $rsItens->getCampo('quantidade');
-                $arItens[$inCount]['qtde_oc']  = $rsItens->getCampo('oc_quantidade_atendido');
-                $arItens[$inCount]['vl_unitario'] = $rsItens->getCampo('vl_unitario');
-                $arItens[$inCount]['oc_vl_total'] = $ocVlTotal;
-                $arItens[$inCount]['oc_saldo'] = $rsItens->getCampo('oc_saldo');
-                $arItens[$inCount]['oc_disponivel'] = '0,0000';
-                $arItens[$inCount]['bo_centro_marca'] = $rsItens->getCampo('bo_centro_marca');
+                $arItens[$inCount]['cod_pre_empenho']   = $rsItens->getCampo('cod_pre_empenho');
+                $arItens[$inCount]['quantidade']        = $rsItens->getCampo('quantidade');
+                $arItens[$inCount]['qtde_oc']           = $rsItens->getCampo('oc_quantidade_atendido');
+                $arItens[$inCount]['vl_unitario']       = $rsItens->getCampo('vl_unitario');
+                $arItens[$inCount]['oc_vl_total']       = $ocVlTotal;
+                $arItens[$inCount]['oc_saldo']          = $rsItens->getCampo('oc_saldo');
+                $arItens[$inCount]['oc_disponivel']     = '0,0000';
+                $arItens[$inCount]['bo_centro_marca']   = $rsItens->getCampo('bo_centro_marca');
                 $inCount++;
                 // Preenche a quantidade da OC com a quantidade do Empenho, para facilitar na operação.
                 $stJsPreenche.= "$('qtdeOC_".$inCount."').value = '".number_format($rsItens->getCampo('oc_saldo'),4,',','.')."'; ";
 
-                if(!is_null($rsItens->getCampo('cod_centro_ordem'))&&!is_null($rsItens->getCampo('cod_marca_ordem'))){
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['inCodItem'] = $inCodItem;
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomItem'] = $rsItens->getCampo('nom_item');
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['inCodCentroCusto'] = $rsItens->getCampo('cod_centro_ordem');
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomCentroCusto'] = $rsItens->getCampo('nom_centro_ordem');
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['inMarca'] = $rsItens->getCampo('cod_marca_ordem');
-                    $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomMarca'] = $rsItens->getCampo('nom_marca_ordem');
+                if((!is_null($rsItens->getCampo('cod_centro_ordem'))&&!is_null($rsItens->getCampo('cod_marca_ordem'))) || !is_null($rsItens->getCampo('cod_centro_empenho'))){
+                    $arItensAlmoxarifado[$inNumItem]['inCodItem'] = $inCodItem;
+                    $arItensAlmoxarifado[$inNumItem]['stNomItem'] = (!is_null($inCodItem)) ? $rsItens->getCampo('nom_item') : '';
+
+                    if(!is_null($rsItens->getCampo('cod_centro_empenho'))){
+                        $inCodCentro = $rsItens->getCampo('cod_centro_empenho');
+                        $stNomCentro = $rsItens->getCampo('nom_centro_empenho');
+                    }else{
+                        $inCodCentro = $rsItens->getCampo('cod_centro_ordem');
+                        $stNomCentro = $rsItens->getCampo('nom_centro_ordem');
+                    }
+
+                    $arItensAlmoxarifado[$inNumItem]['inCodCentroCusto']    = $inCodCentro;
+                    $arItensAlmoxarifado[$inNumItem]['stNomCentroCusto']    = $stNomCentro;
+                    $arItensAlmoxarifado[$inNumItem]['inMarca']             = $rsItens->getCampo('cod_marca_ordem');
+                    $arItensAlmoxarifado[$inNumItem]['stNomMarca']          = $rsItens->getCampo('nom_marca_ordem');
                 }
 
                 $rsItens->proximo();
@@ -421,31 +435,32 @@ case 'detalharItem' :
         include_once CAM_GP_ALM_COMPONENTES."IPopUpItem.class.php";
         include_once CAM_GP_ALM_COMPONENTES."IPopUpCentroCustoUsuario.class.php";
         require_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
-        
+
         $stTituloItem = '';
         $linha = explode('row_', $_REQUEST['linha_table_tree']);
-        if(!is_null($linha[1]))
+        if( !is_null($linha[1]) )
             $stTituloItem = ' - Item '.$linha[1];
         $stTitulo = 'Vínculo do Almoxarifado'.$stTituloItem;
-        
+
         $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
-        
+
         $obForm = new Form;
         $obForm->setAction( $pgOcul );
         $obForm->setTarget( "oculto" );
-        
-        if(!is_null($rsDetalheItem->getCampo('cod_item'))||!is_null($rsDetalheItem->getCampo('cod_item_ordem'))){
-            if(!is_null($rsDetalheItem->getCampo('cod_item')))
+
+        if( !is_null($rsDetalheItem->getCampo('cod_item')) || !is_null($rsDetalheItem->getCampo('cod_item_ordem')) ){
+            if( !is_null($rsDetalheItem->getCampo('cod_item')) )
                 $inCodItem = $rsDetalheItem->getCampo('cod_item');
             else
                 $inCodItem = $rsDetalheItem->getCampo('cod_item_ordem');
             $stNomItem = $rsDetalheItem->getCampo('descricao');
-        }
-        else{
+            $boCentroMarca = 'f';
+        }else{
             $inCodItem = $arItensAlmoxarifado[$_REQUEST['num_item']]['inCodItem'];
             $stNomItem = $arItensAlmoxarifado[$_REQUEST['num_item']]['stNomItem'];
+            $boCentroMarca = $rsDetalheItem->getCampo('bo_centro_marca');
         }
-            
+
         $obIPopUpCatalogoItem = new IPopUpItem($obForm);
         $obIPopUpCatalogoItem->setRotulo            ( '*Código do Item'                 );
         $obIPopUpCatalogoItem->setNull              ( true                              );
@@ -457,26 +472,40 @@ case 'detalharItem' :
         $obIPopUpCatalogoItem->obCampoCod->setValue ( $inCodItem                        );
         $obIPopUpCatalogoItem->setValue             ( $stNomItem                        );
 
-        if(!is_null($rsDetalheItem->getCampo('cod_item'))||!is_null($rsDetalheItem->getCampo('cod_item_ordem'))){
+        if( !is_null($rsDetalheItem->getCampo('cod_item')) || !is_null($rsDetalheItem->getCampo('cod_item_ordem')) ){
             $js .= "jQuery('#inCodItem".$_REQUEST['num_item']."').attr('readonly'   , 'readonly');";
             $js .= "jQuery('#imgBuscar".$_REQUEST['num_item']."').css('visibility'  , 'hidden'  );";
         }
-        
-        $inCodCentroCusto = ( !is_null($arItensAlmoxarifado[$_REQUEST['num_item']]['inCodCentroCusto']) ) ? $arItensAlmoxarifado[$_REQUEST['num_item']]['inCodCentroCusto'] : $rsDetalheItem->getCampo('cod_centro_ordem');
-        $stNomCentroCusto = ( !is_null($arItensAlmoxarifado[$_REQUEST['num_item']]['stNomCentroCusto']) ) ? $arItensAlmoxarifado[$_REQUEST['num_item']]['stNomCentroCusto'] : $rsDetalheItem->getCampo('nom_centro_ordem');
-        
+
+        $boLimparCentroCusto = 't';
+        if( !is_null($arItensAlmoxarifado[$_REQUEST['num_item']]['inCodCentroCusto']) ){
+            $inCodCentroCusto = $arItensAlmoxarifado[$_REQUEST['num_item']]['inCodCentroCusto'];
+            $stNomCentroCusto = $arItensAlmoxarifado[$_REQUEST['num_item']]['stNomCentroCusto'];
+        }else{
+            if( !is_null($rsDetalheItem->getCampo('cod_centro_empenho')) ){
+                if( !is_null($rsDetalheItem->getCampo('cod_item_ordem')) || !is_null($rsDetalheItem->getCampo('cod_centro_solicitacao')) ){
+                    $js .= "jQuery('#inCodCentroCusto".$_REQUEST['num_item']."').attr('readonly'        , 'readonly');";
+                    $js .= "jQuery('#imgBuscarCentroCusto".$_REQUEST['num_item']."').css('visibility'   , 'hidden'  );";
+                    $boLimparCentroCusto = 'f';
+                }
+            }
+            $inCodCentroCusto = $rsDetalheItem->getCampo('cod_centro_empenho');
+            $stNomCentroCusto = $rsDetalheItem->getCampo('nom_centro_empenho');
+        }
+
         $obCentroCustoUsuario = new IPopUpCentroCustoUsuario($obForm);
-        $obCentroCustoUsuario->setNull              ( true                                      );
-        $obCentroCustoUsuario->setRotulo            ( '*Centro de Custo'                        );
-        $obCentroCustoUsuario->obCampoCod->setId    ( 'inCodCentroCusto'.$_REQUEST['num_item']  );
-        $obCentroCustoUsuario->obCampoCod->setName  ( 'inCodCentroCusto'.$_REQUEST['num_item']  );
-        $obCentroCustoUsuario->setId                ( 'stNomCentroCusto'.$_REQUEST['num_item']  );
-        $obCentroCustoUsuario->obCampoCod->setValue ( $inCodCentroCusto                         );
-        $obCentroCustoUsuario->setValue             ( $stNomCentroCusto                         );
-        
+        $obCentroCustoUsuario->setNull              ( true                                          );
+        $obCentroCustoUsuario->setRotulo            ( '*Centro de Custo'                            );
+        $obCentroCustoUsuario->obCampoCod->setId    ( 'inCodCentroCusto'.$_REQUEST['num_item']      );
+        $obCentroCustoUsuario->obCampoCod->setName  ( 'inCodCentroCusto'.$_REQUEST['num_item']      );
+        $obCentroCustoUsuario->setId                ( 'stNomCentroCusto'.$_REQUEST['num_item']      );
+        $obCentroCustoUsuario->obImagem->setId      ( 'imgBuscarCentroCusto'.$_REQUEST['num_item']  );
+        $obCentroCustoUsuario->obCampoCod->setValue ( $inCodCentroCusto                             );
+        $obCentroCustoUsuario->setValue             ( $stNomCentroCusto                             );
+
         $inMarca    = ( !is_null($arItensAlmoxarifado[$_REQUEST['num_item']]['inMarca'])    ) ? $arItensAlmoxarifado[$_REQUEST['num_item']]['inMarca']      : $rsDetalheItem->getCampo('cod_marca_ordem');
         $stNomMarca = ( !is_null($arItensAlmoxarifado[$_REQUEST['num_item']]['stNomMarca']) ) ? $arItensAlmoxarifado[$_REQUEST['num_item']]['stNomMarca']   : $rsDetalheItem->getCampo('nom_marca_ordem');
-                
+ 
         $obMarca = new IPopUpMarca( new Form);
         $obMarca->setNull               ( true                                  );
         $obMarca->setRotulo             ( '*Marca'                              );
@@ -485,19 +514,19 @@ case 'detalharItem' :
         $obMarca->obCampoCod->setId     ( 'inMarca'.$_REQUEST['num_item']       );
         $obMarca->obCampoCod->setValue  ( $inMarca                              );
         $obMarca->setValue              ( $stNomMarca                           );
-        
+
         $obBtnIncluir = new Button;
         $obBtnIncluir->setName      ( "btnIncluir".$_REQUEST['num_item']        );
         $obBtnIncluir->setValue     ( "Incluir"                                 );
         $obBtnIncluir->setTipo      ( "button"                                  );
         $obBtnIncluir->setDisabled  ( false                                     );
-        $obBtnIncluir->obEvento->setOnClick ( "incluirItem(".$_REQUEST['num_item'].", '".$_REQUEST['linha_table_tree']."');"            );
-        
+        $obBtnIncluir->obEvento->setOnClick ( "incluirItem(".$_REQUEST['num_item'].", '".$_REQUEST['linha_table_tree']."');" );
+
         $obBtnLimpar = new Button;
         $obBtnLimpar->setName       ( "btnLimpar".$_REQUEST['num_item']         );
         $obBtnLimpar->setValue      ( "Limpar"                                  );
         $obBtnLimpar->setTipo       ( "button"                                  );
-        $obBtnLimpar->obEvento->setOnClick ( "limpaItem(".$_REQUEST['num_item'].", '".$rsDetalheItem->getCampo('bo_centro_marca')."');" );
+        $obBtnLimpar->obEvento->setOnClick ( "limpaItem(".$_REQUEST['num_item'].", '".$boCentroMarca."', '".$boLimparCentroCusto."');" );
     }
 
     $obLblItem = new Label();
@@ -516,7 +545,7 @@ case 'detalharItem' :
     $obFormulario->addForm( $obForm );
     $obFormulario->addTitulo( $stTitulo );
 
-    if ( ($rsDetalheItem->getCampo('bo_centro_marca')=='f')||$_REQUEST['stAcao'] == 'consultar'||$_REQUEST['stAcao'] == 'anular' ) {        
+    if ( ($rsDetalheItem->getCampo('bo_centro_marca')=='f')||$_REQUEST['stAcao'] == 'consultar'||$_REQUEST['stAcao'] == 'anular' ) {
         $obFormulario->addComponente( $obLblCodItem );
     }else{
         $obFormulario->addComponente( $obIPopUpCatalogoItem );
@@ -527,8 +556,8 @@ case 'detalharItem' :
     $obFormulario->addComponente( $obLblItem );
     $obFormulario->addComponente( $obLblGrandeza );
     $obFormulario->addComponente( $obLblUnidade );
-    
-    if ( ($rsDetalheItem->getCampo('bo_centro_marca')=='t')&&$_REQUEST['stAcao'] != 'consultar'&&$_REQUEST['stAcao'] != 'anular' )
+
+    if ( ($rsDetalheItem->getCampo('bo_centro_marca')=='t') && $_REQUEST['stAcao'] != 'consultar' && $_REQUEST['stAcao'] != 'anular' )
         $obFormulario->defineBarra ( array( $obBtnIncluir , $obBtnLimpar ) );
 
     $obFormulario->show();
@@ -536,7 +565,7 @@ case 'detalharItem' :
     break;
 
     case 'delItem':
-        $stJs = delItem( $_GET['inNumItem'] );
+        $stJs = delItem( $_REQUEST['inNumItem'] );
     break;
 
     case 'BuscaOrdemCompraItens':
@@ -544,7 +573,7 @@ case 'detalharItem' :
     break;
 
     case 'BuscaEmpenhoItens':
-    $stJs = BuscaEmpenhoItens( $_REQUEST['inCodEmpenho'],$_REQUEST['inCodEntidade'],$stTipoOrdem, $stAcao);
+        $stJs = BuscaEmpenhoItens( $_REQUEST['inCodEmpenho'],$_REQUEST['inCodEntidade'],$stTipoOrdem, $stAcao);
     break;
 
     case 'incluirItem':
@@ -560,15 +589,15 @@ case 'detalharItem' :
 
             $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
 
-            $arItensAlmoxarifado[$idItem]['inCodItem'] = $_REQUEST['inCodItem'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomItem'] = $_REQUEST['stNomItem'.$idItem];
-            $arItensAlmoxarifado[$idItem]['inCodCentroCusto'] = $_REQUEST['inCodCentroCusto'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomCentroCusto'] = $_REQUEST['stNomCentroCusto'.$idItem];
-            $arItensAlmoxarifado[$idItem]['inMarca'] = $_REQUEST['inMarca'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomMarca'] = $_REQUEST['stNomMarca'.$idItem];
-            
+            $arItensAlmoxarifado[$idItem]['inCodItem']          = $_REQUEST['inCodItem'.$idItem];
+            $arItensAlmoxarifado[$idItem]['stNomItem']          = $_REQUEST['stNomItem'.$idItem];
+            $arItensAlmoxarifado[$idItem]['inCodCentroCusto']   = $_REQUEST['inCodCentroCusto'.$idItem];
+            $arItensAlmoxarifado[$idItem]['stNomCentroCusto']   = $_REQUEST['stNomCentroCusto'.$idItem];
+            $arItensAlmoxarifado[$idItem]['inMarca']            = $_REQUEST['inMarca'.$idItem];
+            $arItensAlmoxarifado[$idItem]['stNomMarca']         = $_REQUEST['stNomMarca'.$idItem];
+
             Sessao::write('arItensAlmoxarifado', $arItensAlmoxarifado);
-            
+
             $js = "alertaAviso('Código do Item (".$_REQUEST['inCodItem'.$idItem].") vinculado ao Item - ".$stNomItem." ','form','erro','".Sessao::getId()."', '../');";
         }
     break;
@@ -579,7 +608,7 @@ case 'detalharItem' :
             $arItensTemp = array();
 
             $arItens = Sessao::read('arItens');
-            
+
             foreach ($arItens as $key => $value) {
                 if($value['num_item']==$idItem)
                     $stNomItem = $value['nom_item'];

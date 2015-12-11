@@ -46,69 +46,74 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-function preencherDados()
+function preencherDados(Request $request)
 {
     include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoConvenioCaixaEconomicaFederal.class.php");
     $obTIMAConfiguracaoConvenioCaixaEconomicaFederal = new TIMAConfiguracaoConvenioCaixaEconomicaFederal;
     $obTIMAConfiguracaoConvenioCaixaEconomicaFederal->recuperaRelacionamento($rsDados);
+
     if ($rsDados->getNumLinhas() > 0 ) {
-        $_GET['stNumAgenciaTxt'] = $rsDados->getCampo("num_agencia");
-        $stJs .= preencheDadosConta();
-        $stJs .= "f.stCodConvenio.value = '".$rsDados->getCampo("cod_convenio_banco")."';\n";
-        $stJs .= "f.stNumAgencia.value = '".$rsDados->getCampo("num_agencia")."';\n";
-        $stJs .= "f.stNumAgenciaTxt.value = '".$rsDados->getCampo("num_agencia")."';\n";
-        $stJs .= "f.inTxtContaCorrente.value = '".$rsDados->getCampo("cod_conta_corrente")."';\n";
+        $request->set('stNumAgenciaTxt', $rsDados->getCampo("num_agencia"));
+
+        $stJs .= preencheDadosConta($request);
+        $stJs .= "jq('#stCodConvenio').val('".$rsDados->getCampo("cod_convenio_banco")."');         \n";
+        $stJs .= "jq('#stNumAgencia').val('".$rsDados->getCampo("num_agencia")."');                 \n";
+        $stJs .= "jq('#stNumAgenciaTxt').val('".$rsDados->getCampo("num_agencia")."');              \n";
+        $stJs .= "jq('#inTxtContaCorrente').val('".$rsDados->getCampo("cod_conta_corrente")."');    \n";
+        $stJs .= "jq('#inTipoConvenioLayout').val('".$rsDados->getCampo("cod_tipo")."');            \n";
     }
 
     return $stJs;
 }
 
-function preencherDadosAgencia()
+function preencherDadosAgencia(Request $request)
 {
     include_once(CAM_GT_MON_INSTANCIAS."agenciaBancaria/OCMontaAgencia.php");
-    $_GET['stNumBanco'] = Sessao::read("stNumBanco");
-    $stJs .= PreencheAgencia();
+    $request->set('stNumBanco', Sessao::read("stNumBanco"));
+    $stJs .= PreencheAgencia($request);
 
     return $stJs;
 }
 
-function preencheDadosConta()
+function preencheDadosConta(Request $request)
 {
-    ;
     include_once ( CAM_GT_MON_MAPEAMENTO."TMONAgencia.class.php" );
     $obTMONAgencia = new TMONAgencia;
-    $stFiltro  = " where num_banco = '104'";
-    $stFiltro .= "   and num_agencia = '".$_GET["stNumAgenciaTxt"]."'";
+    $stFiltro  = " WHERE num_banco = '104'";
+    $stFiltro .= "   AND num_agencia = '".$request->get("stNumAgenciaTxt")."'";
     $obTMONAgencia->recuperaRelacionamento($rsAgencia, $stFiltro);
     $rsConta = new RecordSet();
+
     if ($rsAgencia->getCampo('cod_agencia')) {
         include_once ( CAM_GT_MON_MAPEAMENTO."TMONContaCorrente.class.php" );
         $obTMONContaCorrente = new TMONContaCorrente;
-        $stFiltro  = " where num_banco = '104'";
-        $stFiltro .= " and Ag.cod_agencia =".$rsAgencia->getCampo('cod_agencia');
+        $stFiltro  = " WHERE num_banco = '104'";
+        $stFiltro .= "   AND Ag.cod_agencia = ".$rsAgencia->getCampo('cod_agencia');
         $obTMONContaCorrente->recuperaRelacionamento($rsConta, $stFiltro);
     }
 
     $inCount = 1;
     $stJs .= "limpaSelect(f.inTxtContaCorrente,0);                                     \n";
-    $stJs .= "f.inTxtContaCorrente.options[0] = new Option('Selecione','', 'selected');\n";
+    $stJs .= "jq('#inTxtContaCorrente').append(new Option('Selecione','', 'selected'));\n";    
+
     while (!$rsConta->eof()) {
         $inId   = $rsConta->getCampo("cod_conta_corrente");
         $stDesc = $rsConta->getCampo("num_conta_corrente");
-        $stJs .= "f.inTxtContaCorrente.options[$inCount] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
+        $stJs .= "jq('#inTxtContaCorrente').append(new Option('".$stDesc."','".$inId."','".$stSelected."'));\n";    
         $rsConta->proximo();
         $inCount++;
     }
 
     return $stJs;
 }
-switch ($_GET['stCtrl']) {
+
+switch ($request->get('stCtrl')) {
     case "preencherDadosAgencia":
-        $stJs .= preencherDadosAgencia();
-        $stJs .= preencherDados();
+        $stJs .= preencherDadosAgencia($request);
+        $stJs .= preencherDados($request);
         break;
     case "preencheDadosConta";
-        $stJs .= preencheDadosConta();
+        $stJs .= preencheDadosConta($request);
         break;
 }
 if ($stJs) {

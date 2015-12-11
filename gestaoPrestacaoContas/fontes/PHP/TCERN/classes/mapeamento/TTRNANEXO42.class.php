@@ -83,8 +83,7 @@ function montaRecuperaOrgao()
                                                         AND exercicio = '".$this->getDado('exercicio')."' )
           AND configuracao_entidade.cod_modulo = 49
           AND configuracao_entidade.parametro = 'cod_orgao_tce'";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
     return $stSql;
 }
 
@@ -148,8 +147,7 @@ function montaRecuperaRelacionamento()
             , situacao
             , norma
             , dt_norma";
-        //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
     return $stSql;
 }
 
@@ -196,8 +194,7 @@ function montaRecuperaRespGestora()
         WHERE unidade_gestora.exercicio = '".$this->getDado('exercicio')."'
           AND unidade_gestora_responsavel.dt_inicio >= '".$this->getDado('dtIni')."'
           AND unidade_gestora_responsavel.dt_fim <= '".$this->getDado('dtFim')."'";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
     return $stSql;
 }
 
@@ -246,8 +243,7 @@ function montaRecuperaOrcamentaria()
           ON sw_uf.cod_uf = sw_municipio.cod_uf
 
         WHERE unidade_gestora.exercicio = '".$this->getDado('exercicio')."'";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
     return $stSql;
 }
 
@@ -296,8 +292,7 @@ function montaRecuperaRespOrcamentaria()
         WHERE unidade_gestora.exercicio = '".$this->getDado('exercicio')."'
           AND unidade_orcamentaria_responsavel.dt_inicio >= '".$this->getDado('dtIni')."'
           AND unidade_orcamentaria_responsavel.dt_fim <= '".$this->getDado('dtFim')."'";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
+
     return $stSql;
 }
 

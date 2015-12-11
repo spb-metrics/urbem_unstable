@@ -30,7 +30,7 @@
 * @author Analista: Fábio Bertoldi Rodrigues
 * @author Desenvolvedor: Lizandro Kirst da Silva
 
-    * $Id: OCProcurarConta.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCProcurarConta.php 63839 2015-10-22 18:08:07Z franver $
 
 Casos de uso: uc-05.05.03
 */
@@ -74,7 +74,7 @@ case "preencheAgencia":
 
         $obRMONAgencia->obRMONBanco->setNumBanco( $_REQUEST['cmbBanco'] );
         $obRMONAgencia->listarAgencia( $rsAgencia );
-        // sistemaLegado::mostravar($rsAgencia);
+
         $inContador = 1;
         while ( !$rsAgencia->eof() ) {
 

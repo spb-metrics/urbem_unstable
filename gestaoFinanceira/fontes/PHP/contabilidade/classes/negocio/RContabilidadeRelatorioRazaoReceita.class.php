@@ -335,8 +335,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
         $rsRecordSet->proximo();
     }
 
-//mostravar($arRecordSet); die;
-
     $rsRecordSet = new RecordSet;
     $rsRecordSet->preenche( $arRecordSet );
 

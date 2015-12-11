@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: FMManterCadastroFerias.php 62873 2015-07-01 20:29:22Z evandro $
+    $Id: FMManterCadastroFerias.php 64078 2015-11-30 13:14:45Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -54,16 +54,17 @@ $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
 include_once($pgJS);
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
+
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
 
-if (!$_POST["boConcederFeriasLote"]) {
+if (!$request->get("boConcederFeriasLote")) {
     if ($stAcao == "consultar") {
         $obTPessoalFerias = new TPessoalFerias;
-        $obTPessoalFerias->setDado("cod_ferias",$_REQUEST['inCodFerias']);
+        $obTPessoalFerias->setDado("cod_ferias",$request->get('inCodFerias'));
         $obTPessoalFerias->recuperaPorChave($rsFerias);
         $obTPessoalLancamentoFerias = new TPessoalLancamentoFerias;
-        $obTPessoalLancamentoFerias->setDado("cod_ferias",$_REQUEST['inCodFerias']);
+        $obTPessoalLancamentoFerias->setDado("cod_ferias",$request->get('inCodFerias'));
         $obTPessoalLancamentoFerias->recuperaPorChave($rsLancamentoFerias);
 
         $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
@@ -95,8 +96,8 @@ if (!$_POST["boConcederFeriasLote"]) {
         $stPagamento13      = ( $rsLancamentoFerias->getCampo("pagar_13") == "t" ) ? "Sim" : "Não";
         $stFormaPagamento   = $rsFormaPagamento->getCampo("codigo") ." - ".$rsFormaPagamento->getCampo("dias")." dia(s) de férias / ".$rsFormaPagamento->getCampo("abono")." dia(s) de abono";
         $stFolhaPago        = $rsTipoFolha->getCampo("descricao");
-        $stLink  = "&inCodContrato=".$_REQUEST['inCodContrato'];
-        $stLink .= "&inCodFerias=".$_REQUEST['inCodFerias'];
+        $stLink  = "&inCodContrato=".$request->get('inCodContrato');
+        $stLink .= "&inCodFerias=".$request->get('inCodFerias');
         $stLink .= "&dtInicialFerias=".$dtInicialFerias;
         $stLink .= "&dtFinalFerias=".$dtFinalFerias;
         $stLink .= "&dtRetornoFerias=".$dtRetornoFerias;
@@ -105,17 +106,17 @@ if (!$_POST["boConcederFeriasLote"]) {
         $stLink .= "&stPagamento13=".$stPagamento13;
         $jsOnload   = "executaFuncaoAjax('processarConsulta','$stLink');";
     } else {
-        Sessao::write('dtInicial', $_REQUEST["dtInicial"]);
-        $dtFinal = $_REQUEST["dtFinal"];
+        Sessao::write('dtInicial', $request->get("dtInicial"));
+        $dtFinal = $request->get("dtFinal");
         Sessao::write('dtFinal', $dtFinal);
-        Sessao::write('dtCompetencia', $_REQUEST["inCodMes"]."/".$_REQUEST["inAno"]);
+        Sessao::write('dtCompetencia', $request->get("inCodMes")."/".$request->get("inAno"));
 
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoContratoServidor.class.php");
         $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGeradoContratoServidor();
-        $stFiltro  = " AND assentamento_gerado_contrato_servidor.cod_contrato = ".$_GET["inCodContrato"]." \n";
+        $stFiltro  = " AND assentamento_gerado_contrato_servidor.cod_contrato = ".$request->get("inCodContrato")." \n";
         $stFiltro .= " AND assentamento_assentamento.cod_motivo = 10 \n";
-        $stFiltro .= " AND (assentamento_gerado.periodo_inicial BETWEEN to_date('".$_REQUEST["dtInicial"]."','dd/mm/yyyy') AND to_date('".$_REQUEST["dtFinal"]."','dd/mm/yyyy') \n";
-        $stFiltro .= "  OR  assentamento_gerado.periodo_final BETWEEN to_date('".$_REQUEST["dtInicial"]."','dd/mm/yyyy') AND to_date('".$_REQUEST["dtFinal"]."','dd/mm/yyyy')) \n";
+        $stFiltro .= " AND (assentamento_gerado.periodo_inicial BETWEEN to_date('".$request->get("dtInicial")."','dd/mm/yyyy') AND to_date('".$request->get("dtFinal")."','dd/mm/yyyy') \n";
+        $stFiltro .= "  OR  assentamento_gerado.periodo_final BETWEEN to_date('".$request->get("dtInicial")."','dd/mm/yyyy') AND to_date('".$request->get("dtFinal")."','dd/mm/yyyy')) \n";
         $obTPessoalAssentamentoGeradoContratoServidor->recuperaRelacionamento($rsAssentamentoGerado,$stFiltro);
         $inQuantFaltas = 0;
         while (!$rsAssentamentoGerado->eof()) {
@@ -146,33 +147,33 @@ $obLblContrato = new Label ;
 $obLblContrato->setRotulo                       ( "Matrícula"                                                            );
 $obLblContrato->setName                         ( "inRegistro"                                                          );
 $obLblContrato->setId                           ( "inRegistro"                                                          );
-$obLblContrato->setValue                        ( $_REQUEST["inRegistro"]                                                           );
+$obLblContrato->setValue                        ( $request->get("inRegistro")                                                           );
 
 $obHdnCodContrato =  new Hidden;
 $obHdnCodContrato->setName                      ( "inCodContrato"                                                       );
-$obHdnCodContrato->setValue                     ( $_REQUEST["inCodContrato"]                                                        );
+$obHdnCodContrato->setValue                     ( $request->get("inCodContrato")                                                        );
 
 $obHdnContrato =  new Hidden;
 $obHdnContrato->setName                         ( "inContrato"                                                          );
-$obHdnContrato->setValue                        ( $_REQUEST["inRegistro"]                                                           );
+$obHdnContrato->setValue                        ( $request->get("inRegistro")                                                           );
 
 $obLblCGM = new Label;
 $obLblCGM->setRotulo                            ( "CGM"                                                                 );
 $obLblCGM->setName                              ( "inCGM"                                                               );
 $obLblCGM->setId                                ( "inCGM"                                                               );
-$obLblCGM->setValue                             ( $_REQUEST["inNumCGM"] ."-". str_replace("\\","",$_REQUEST["stNomCGM"])                        );
+$obLblCGM->setValue                             ( $request->get("inNumCGM") ."-". str_replace("\\","",$request->get("stNomCGM"))                        );
 
 $obLblLotacao = new Label;
 $obLblLotacao->setRotulo                        ( "Lotação"                                                             );
 $obLblLotacao->setName                          ( "inLotacao"                                                           );
 $obLblLotacao->setId                            ( "inLotacao"                                                           );
-$obLblLotacao->setValue                         ( $_REQUEST["inCodEstrutural"] ."-". $_REQUEST["stDescLotacao"]                                 );
+$obLblLotacao->setValue                         ( $request->get("inCodEstrutural") ."-". $request->get("stDescLotacao")                                 );
 
 $obLblFuncao = new Label;
 $obLblFuncao->setRotulo                         ( "Regime-Função"                                                       );
 $obLblFuncao->setName                           ( "stDescFuncao"                                                        );
 $obLblFuncao->setId                             ( "stDescFuncao"                                                        );
-$obLblFuncao->setValue                          ( $_REQUEST["stDescRegime"] ."-". $_REQUEST["stDescFuncao"]                                     );
+$obLblFuncao->setValue                          ( $request->get("stDescRegime") ."-". $request->get("stDescFuncao")                                     );
 
 $obSpn1 = new Span;
 $obSpn1->setid                                  ( "spnSpan1"                                                            );
@@ -182,7 +183,7 @@ $obDtaDataInicial = new Data;
 $obDtaDataInicial->setRotulo                    ( "Data Inicial"                                                        );
 $obDtaDataInicial->setName                      ( "dtInicial"                                                           );
 $obDtaDataInicial->setId                        ( "dtInicial"                                                           );
-$obDtaDataInicial->setValue                     ( $_REQUEST["dtInicial"]                                                );
+$obDtaDataInicial->setValue                     ( $request->get("dtInicial")                                                );
 $obDtaDataInicial->setNull                      ( false                                                                 );
 $obDtaDataInicial->setTitle                     ( "Informe a data inicial do período aquisitivo."                       );
 $obDtaDataInicial->obEvento->setOnBlur          ( "executaFuncaoAjax('preencherDataFinal','&dtInicial='+this.value+'&inCodContrato='+document.frm.inCodContrato.value); if ( !verificaData( this ) ) { this.value = '';} montaParametrosGET('preencherQuantidadeFaltas','dtInicial,dtFinal,inCodContrato');");
@@ -201,7 +202,7 @@ $obDtaDataFinal = new Data;
 $obDtaDataFinal->setRotulo                    ( "Data Final"                                                        );
 $obDtaDataFinal->setName                      ( "dtFinal"                                                           );
 $obDtaDataFinal->setId                        ( "dtFinal"                                                           );
-$obDtaDataFinal->setValue                     ( $_REQUEST["dtFinal"]                                                );
+$obDtaDataFinal->setValue                     ( $request->get("dtFinal")                                                );
 $obDtaDataFinal->setNull                      ( false                                                               );
 $obDtaDataFinal->setTitle                     ( "Informe a data final do período aquisitivo."                       );
 $obDtaDataFinal->obEvento->setOnChange        ( "montaParametrosGET('preencherQuantDiasGozo');"                     );
@@ -221,12 +222,30 @@ $rsFormasPagamento = new recordset();
 
 if ( $request->get('inCodRegime') != "") {
 
+    // Necessário carregar da sessão e testar se existe no request, pois quando vai Conceder Férias não usa o request
+    $arContratos = Sessao::read("arContratos");
     $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
-    $stFiltro  = "  AND cod_regime = ".$request->get('inCodRegime')." 
-                    AND ferias.cod_contrato = ".$request->get('inCodContrato')."
-                    AND dt_inicial_aquisitivo = TO_DATE('".$request->get('dtInicial')."','dd/mm/yyyy')
-                    AND dt_final_aquisitivo = TO_DATE('".$request->get('dtFinal')."','dd/mm/yyyy') 
-                ";
+
+    $stFiltro = " AND cod_regime = ".$request->get('inCodRegime')." \n";
+    $stFiltroAux = "";
+    
+    if (!empty($arContratos)){
+        foreach ($arContratos as $campo) {
+            if ($campo["cod_contrato"] != "") {
+                $stFiltroAux .= "".$campo["cod_contrato"].",";
+            }
+        }
+    }
+
+    if ($stFiltroAux != "") {
+        $stFiltro .= " AND ferias.cod_contrato IN (".substr($stFiltroAux,0,-1).") \n";
+    }
+
+    if (($request->get('dtInicial') != "") && ($request->get('dtFinal') != "")) {
+        $stFiltro .= " AND dt_inicial_aquisitivo = TO_DATE('".$request->get('dtInicial')."','dd/mm/yyyy')
+                       AND dt_final_aquisitivo = TO_DATE('".$request->get('dtFinal')."','dd/mm/yyyy') ";
+    }
+
     $obTPessoalFormaPagamentoFerias->recuperaDiasFeriasRestantes($rsFormasPagamento,$stFiltro,"",$boTransacao);
 
     if ($rsFormasPagamento->getNumLinhas() < 0) {
@@ -241,7 +260,7 @@ if ( $request->get('inCodRegime') != "") {
 
     $obHdnRegime =  new Hidden;
     $obHdnRegime->setName                        ( "inCodRegime" );
-    $obHdnRegime->setValue                       ( $_REQUEST['inCodRegime'] );
+    $obHdnRegime->setValue                       ( $request->get('inCodRegime') );
 }
 
 $obCmbFormasPagamento = new Select;
@@ -315,23 +334,23 @@ $obLinDadosInformativos3->setRotulo             ( "Dados Informativos"          
 $obLinDadosInformativos3->setHref               ( "javascript:abrePopUpRegistrosEventosFerias();"                       );
 $obLinDadosInformativos3->setValue              ( "Consultar Registro de Evento Ferias"                                 );
 
-if ($_POST["boConcederFeriasLote"]) {
+if ($request->get("boConcederFeriasLote")) {
     $stNomeLote = "Férias em lote";
     $obHdnTipoFiltro = new Hidden();
     $obHdnTipoFiltro->setName("stTipoFiltro");
-    $obHdnTipoFiltro->setValue($_POST["stTipoFiltro"]);
+    $obHdnTipoFiltro->setValue($request->get("stTipoFiltro"));
 
     $obHdnCodigos = new Hidden();
     $obHdnCodigos->setName("stCodigos");
 
     include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalRegime.class.php");
     $obTPessoalRegime = new TPessoalRegime();
-    $obTPessoalRegime->setDado('cod_regime', $_REQUEST['inCodRegime']);
+    $obTPessoalRegime->setDado('cod_regime', $request->get('inCodRegime'));
     $obTPessoalRegime->recuperaPorChave($rsRegime);
 
     $stDescricaoRegime = " - ".$rsRegime->getCampo('descricao');
 
-    switch ($_POST["stTipoFiltro"]) {
+    switch ($request->get("stTipoFiltro")) {
         case "contrato":
         case "cgm_contrato":
             $stCodigos = "";
@@ -341,7 +360,7 @@ if ($_POST["boConcederFeriasLote"]) {
             }
             $stCodigos = substr($stCodigos,0,-1);
 
-            $stFiltro  = " AND contrato_servidor_regime_funcao.cod_regime = ".$_POST['inCodRegime'];
+            $stFiltro  = " AND contrato_servidor_regime_funcao.cod_regime = ".$request->get('inCodRegime');
             $stFiltro .= " AND contrato.cod_contrato IN (".$stCodigos.")";
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
@@ -362,24 +381,24 @@ if ($_POST["boConcederFeriasLote"]) {
             break;
         case "lotacao":
             $stNomeLote .= " para Lotação";
-            $stCodigosLote = "(".implode(",",$_POST["inCodLotacaoSelecionados"]).")";
-            $obHdnCodigos->setValue(implode(",",$_POST["inCodLotacaoSelecionados"]));
+            $stCodigosLote = "(".implode(",",$request->get("inCodLotacaoSelecionados")).")";
+            $obHdnCodigos->setValue(implode(",",$request->get("inCodLotacaoSelecionados")));
             $stTipoFiltroLote = 'O';
             break;
         case "local":
             $stNomeLote .= " para Local";
-            $stCodigosLote = "(".implode(",",$_POST["inCodLocalSelecionados"]).")";
-            $obHdnCodigos->setValue(implode(",",$_POST["inCodLocalSelecionados"]));
+            $stCodigosLote = "(".implode(",",$request->get("inCodLocalSelecionados")).")";
+            $obHdnCodigos->setValue(implode(",",$request->get("inCodLocalSelecionados")));
             $stTipoFiltroLote = 'L';
             break;
         case "funcao":
             $stNomeLote .= " para Função";
-            $stCodigosLote = "(".implode(",",$_POST["inCodFuncaoSelecionados"]).")";
-            $obHdnCodigos->setValue(implode(",",$_POST["inCodFuncaoSelecionados"]));
+            $stCodigosLote = "(".implode(",",$request->get("inCodFuncaoSelecionados")).")";
+            $obHdnCodigos->setValue(implode(",",$request->get("inCodFuncaoSelecionados")));
             $stTipoFiltroLote = 'F';
             break;
         case "geral":
-            $stFiltro  = " AND contrato_servidor_regime_funcao.cod_regime = ".$_POST['inCodRegime'];
+            $stFiltro  = " AND contrato_servidor_regime_funcao.cod_regime = ".$request->get('inCodRegime');
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
             $obTPessoalContrato = new TPessoalContrato();
             $obTPessoalContrato->recuperaContratosFerias($rsContratos,$stFiltro);
@@ -419,7 +438,7 @@ if ($_POST["boConcederFeriasLote"]) {
 
     $obHdnCodLote = new Hidden();
     $obHdnCodLote->setName("inCodLote");
-    $obHdnCodLote->setValue($_POST["inCodLote"]);
+    $obHdnCodLote->setValue($request->get("inCodLote"));
 
     $obHdnTipoFiltroLote = new Hidden();
     $obHdnTipoFiltroLote->setName("stTipoFiltroLote");
@@ -427,7 +446,7 @@ if ($_POST["boConcederFeriasLote"]) {
 
     $obHdnVencidas = new Hidden();
     $obHdnVencidas->setName("boApresentarSomenteFerias");
-    $obHdnVencidas->setValue($_POST["boApresentarSomenteFerias"]);
+    $obHdnVencidas->setValue($request->get("boApresentarSomenteFerias"));
 }
 
 $obSpn2 = new Span;
@@ -461,7 +480,7 @@ $obBtnVoltar->obEvento->setOnClick              ( "javascript: window.close();" 
 
 //DEFINICAO DO FORM
 $obForm = new Form;
-if ($_POST["boConcederFeriasLote"]) {
+if ($request->get("boConcederFeriasLote")) {
     $obForm->setAction($pgListLote);
     $obForm->setTarget("telaPrincipal");
 } else {
@@ -469,11 +488,11 @@ if ($_POST["boConcederFeriasLote"]) {
     $obForm->setTarget("oculto");
 }
 
-if ($_POST["boConcederFeriasLote"] and $_POST["stAcao"] == "excluir") {
+if ($request->get("boConcederFeriasLote") and $request->get("stAcao") == "excluir") {
     $obBtnOk->obEvento->setOnClick("montaParametrosGET('excluirLote','',true)");
 
     $obTPessoalLoteFerias = new TPessoalLoteFerias();
-    $stFiltro = " WHERE cod_lote = ".$_REQUEST["inCodLote"];
+    $stFiltro = " WHERE cod_lote = ".$request->get("inCodLote");
     $obTPessoalLoteFerias->recuperaTodos($rsLoteFeriasContrato,$stFiltro);
     $stLote = $rsLoteFeriasContrato->getCampo("nome");
 
@@ -506,7 +525,7 @@ if ($_POST["boConcederFeriasLote"] and $_POST["stAcao"] == "excluir") {
     $obFormulario->addHidden                        ( $obHdnCtrl                                                            );
     $obFormulario->addHidden                        ( $obHdnEval,true                                                       );
     $obFormulario->addHidden                        ( $obHdnEval2,true                                                      );
-    if (!$_POST["boConcederFeriasLote"]) {
+    if (!$request->get("boConcederFeriasLote")) {
         Sessao::write("boConcederFeriasLote", false);
         $obFormulario->addHidden                        ( $obHdnCodContrato                                                     );
         $obFormulario->addTitulo                        ( "Dados da Matrícula"                                                   );
@@ -542,7 +561,7 @@ if ($_POST["boConcederFeriasLote"] and $_POST["stAcao"] == "excluir") {
     }
 
     $obFormulario->addTitulo                        ( "Pagamento"                                                           );
-    if (!$_POST["boConcederFeriasLote"]) {
+    if (!$request->get("boConcederFeriasLote")) {
         $obFormulario->addComponente                    ( ( $stAcao == "consultar" ) ? $obLblQuantFaltas : $obIntQuantFaltas    );
     }
     $obFormulario->addComponente                    ( ( $stAcao == "consultar" ) ? $obLblFormasPagamento : $obCmbFormasPagamento );

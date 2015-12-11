@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCDefinirElementos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCDefinirElementos.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -429,7 +429,6 @@ switch ($_REQUEST["stCtrl"]) {
         }
 
         $obMontaAtributosElemento->setRecordSet  ( $rsAtributosElementos  );
-        //mostravar($rsAtributosElementos);
         $obMontaAtributosElemento->recuperaValores();
 
         $obFormulario = new Formulario;
@@ -507,7 +506,6 @@ switch ($_REQUEST["stCtrl"]) {
         }
     break;
     case "preencheCombosAtividade":
-        //sistemaLegado::mostravar($_REQUEST);
         $obMontaAtividade->setCodigoVigencia( $_REQUEST["inCodigoVigencia"]   );
         $obMontaAtividade->setCodigoNivel   ( $_REQUEST["inCodigoNivel"]      );
         $obMontaAtividade->setValorReduzido ( $_REQUEST["stChaveAtividade"] );

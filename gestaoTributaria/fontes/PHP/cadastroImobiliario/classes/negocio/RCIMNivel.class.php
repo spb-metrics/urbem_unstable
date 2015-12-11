@@ -33,17 +33,9 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMNivel.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RCIMNivel.class.php 63826 2015-10-21 16:39:23Z arthur $
 
      * Casos de uso: uc-05.01.02
-*/
-
-/*
-$Log$
-Revision 1.8  2006/09/18 09:12:40  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -482,7 +474,7 @@ function recuperaMascaraNiveis(&$rsNivel , $boTransacao = "")
         $stFiltro= "";
     }
     $obErro = $this->obTCIMNivel->recuperaTodos( $rsNivel, $stFiltro, $stOrdem, $boTransacao );
-//    $this->obTCIMNivel->debug();
+
     return $obErro;
 }
 

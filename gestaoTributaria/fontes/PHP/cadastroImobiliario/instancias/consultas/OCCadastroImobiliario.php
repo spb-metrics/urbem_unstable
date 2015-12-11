@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCCadastroImobiliario.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCCadastroImobiliario.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.18
 */
@@ -198,7 +198,6 @@ if ( $rsListaEdificacoes->getCampo('data_baixa') && ($rsListaEdificacoes->getCam
 $rsListaEdificacoes->preenche( $arTMP );
 $rsListaEdificacoes->setPrimeiroElemento();
 Sessao::write('rsEdificacoes', $rsListaEdificacoes);
-//echo "lista edificacoes<br>";sistemaLegado::mostravar( $rsListaEdificacoes );exit;
 
 $obRCIMConstrucaoOutros = new RCIMConstrucaoOutros;
 if ( $rsCadastroImobiliario->getCampo("inscricao_municipal" ) && !$rsCadastroImobiliario->getCampo("cod_condominio") ) {
@@ -211,8 +210,6 @@ if ( $rsCadastroImobiliario->getCampo("inscricao_municipal" ) && !$rsCadastroImo
 
 $obRCIMConstrucaoOutros->listarConstrucoes( $rsListaConstrucao );
 Sessao::write('rsConstrucoes', $rsListaConstrucao);
-//echo "lista construcoes<br>";sistemaLegado::mostravar( $rsListaConstrucao );
-//exit;
 
 if ( $rsCadastroImobiliario->getCampo("tipo_lote" ) == 'Urbano' ) {
     $obRCIMLote = new RCIMLoteUrbano;
@@ -227,8 +224,6 @@ $obRCIMLote->listarProcessos( $rsListaProcesso );
 if ( $obRCIMLote->getTimestampLote() == $rsListaProcesso->getCampo( "timestamp" ) ) {
     $stProcesso = $rsListaProcesso->getCampo( "cod_processo_ano" );
 }
-
-//echo "lista processos <br>";sistemaLegado::mostravar( $rsListaProcesso );
 
 $obRCIMConfrontacao = new RCIMConfrontacao( $obRCIMLote );
 $obErro = $obRCIMConfrontacao->listarConfrontacoesPorLote( $rsListaConfrontacao );
@@ -294,14 +289,12 @@ $rsListaConfrontacao = new RecordSet;
 $rsListaConfrontacao->preenche( $arConfrontacoesSessao );
 $arConfrontacoesSessao =  $rsListaConfrontacao;
 Sessao::write('confrontacoes', $arConfrontacoesSessao);
-//echo "lista confrontacao <br>";sistemaLegado::mostravar(  $sessao->transf4["confrontacoes"] );
 
 $arChaveAtributoLote = array( "cod_lote" => $rsCadastroImobiliario->getCampo("cod_lote") );
 $obRCIMLote->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoLote );
 $obRCIMLote->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributosLote );
 
 Sessao::write('atributos_lote', $rsAtributosLote);
-//echo "atributos_lote";sistemaLegado::mostravar( $sessao->transf4["atributos_lote"] );
 
 $arLoteSessao = array();
 $arLoteSessao[0]["numero_lote"]       = $obRCIMLote->getNumeroLote()." - ".$rsCadastroImobiliario->getCampo("tipo_lote" );
@@ -322,10 +315,6 @@ $arLoteSessao[0]["justificativa_lote"] = $obRCIMLote->getJustificativa();
 $rsListaLote = new RecordSet;
 $rsListaLote->preenche( $arLoteSessao );
 Sessao::write('lote', $rsListaLote);
-
-//echo "lista lote<br>";sistemaLegado::mostravar( $sessao->transf4["lote"] );
-
-//exit;
 
 $obRRelatorio->executaFrameOculto( "OCGeraRelatorioCadastroImobiliario.php" );
 ?>

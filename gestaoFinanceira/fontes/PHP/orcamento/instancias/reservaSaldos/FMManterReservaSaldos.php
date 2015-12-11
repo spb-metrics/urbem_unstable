@@ -138,11 +138,12 @@ $obCmbNomeEntidade->setNull          ( false                          );
 $obDtDataReserva = new Data;
 $obDtDataReserva->setName          ( "dtDataReserva"    );
 $obDtDataReserva->setRotulo        ( "Data da Reserva"  );
-$obDtDataReserva->setTitle        ( "Informe a data da reserva." );
+$obDtDataReserva->setTitle         ( "Informe a data da reserva." );
 $obDtDataReserva->setValue         ( $dtDataReserva     );
 $obDtDataReserva->setMaxLength     ( 20                 );
 $obDtDataReserva->setSize          ( 10                 );
 $obDtDataReserva->setNull          ( false              );
+$obDtDataReserva->obEvento->setOnChange("buscaDado('buscaDespesa');");
 
 // Define Objeto BuscaInner para Despesa
 $obBscDespesa = new BuscaInner;

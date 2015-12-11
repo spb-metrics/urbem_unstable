@@ -68,6 +68,7 @@ function TIMAConfiguracaoConvenioCaixaEconomicaFederal()
     $this->AddCampo('cod_banco'         ,'integer' ,true  ,''    ,false,'TMONContaCorrente');
     $this->AddCampo('cod_agencia'       ,'integer' ,true  ,''    ,false,'TMONContaCorrente');
     $this->AddCampo('cod_conta_corrente','integer' ,true  ,''    ,false,'TMONContaCorrente');
+    $this->AddCampo('cod_tipo'          ,'integer' ,true  ,''    ,false,false);
 
 }
 

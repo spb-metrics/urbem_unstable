@@ -524,6 +524,10 @@ function IContratoDigitoVerificador($inContrato="",$stSituacao=false, $boRegistr
     $this->obILinkConsultaServidor->setRotulo("Link");
     $this->obILinkConsultaServidor->setValue("Consultar Cadastro");
 
+    $boValidaAtivos = Sessao::read('valida_ativos_cgm');
+    if ($boValidaAtivos == 'true') {
+        $this->setTipo('contrato_ativos');
+    }
     $this->geraFuncaoBuscaFiltro();
 
 }

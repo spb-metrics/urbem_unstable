@@ -56,15 +56,15 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cd_unidade"); //PK
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_gestora"); //PK
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("unidade_orcamentaria");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nu_empenho");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_empenho");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
@@ -80,7 +80,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_ano");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tp_pessoa");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_pessoa");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
 
@@ -88,11 +88,23 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("documento");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
 
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("emitente");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("objeto");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(200);
+
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_documento");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
+
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_emissao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_pago");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_doc");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
@@ -104,7 +116,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nu_empenho");
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subempenho");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 

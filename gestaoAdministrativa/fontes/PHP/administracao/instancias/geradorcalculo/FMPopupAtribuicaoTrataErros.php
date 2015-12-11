@@ -121,11 +121,8 @@ if ( empty($stAcao)||$stAcao=="incluir" ) {
                 $x++;
                 
                 while ($stParametros[$x] != '"') {
-                    $stTemp = $stTemp . $stParametros[$x];
-                    $x--;
-                    
-                    if ($stParametros[$x] == '"')
-                        $stTemp = '';
+                    $stTemp = $stTemp.$stParametros[$x];
+                    $x++;
                 }
                 
                     $arPar[] = $stTemp;
@@ -137,7 +134,7 @@ if ( empty($stAcao)||$stAcao=="incluir" ) {
                         $arPar[] = $stTemp;
                     $stTemp = '';
                 } else {
-                    $stTemp = $stTemp .$stParametros[$x];
+                    $stTemp = $stTemp.$stParametros[$x];
                 }
             }
     }

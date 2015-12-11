@@ -54,7 +54,7 @@ $pgJs   = "JS".$stPrograma.".js";
 include_once($pgJs);
 
 //não possui permissão de acesso a exercícios anteriores a 2012
-if ( !SistemaLegado::is_tcems() ) {
+if ( !Sessao::getExercicio() > '2012' ) {
     SistemaLegado::AlertaAviso( CAM_FW_INSTANCIAS."index/inicial.php", "Esta ação não está disponível à exercícios anteriores à 2012!", "n_incluir", "erro" );
 }
 

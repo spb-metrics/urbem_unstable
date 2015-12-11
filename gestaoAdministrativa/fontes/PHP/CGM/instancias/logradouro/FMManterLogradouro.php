@@ -121,6 +121,10 @@ $obHdninId->setName ( "inId" );
 $obHdninId->setId   ( "inId" );
 
 //Hidden para atribuir o valor do campo html
+$obHdnDescricaoNormaHistorico = new Hidden;
+$obHdnDescricaoNormaHistorico->setName ( "stDescricaoNormaHistorico" );
+$obHdnDescricaoNormaHistorico->setId   ( "stDescricaoNormaHistorico" );
+
 $obHdnDescricaoNorma = new Hidden;
 $obHdnDescricaoNorma->setName ( "stDescricaoNorma" );
 $obHdnDescricaoNorma->setId   ( "stDescricaoNorma" );
@@ -155,6 +159,51 @@ $obLblNomeMunicipio->setName   ( "stNomeMunicipio"  );
 $obLblNomeMunicipio->setId     ( "stNomeMunicipio"  );
 $obLblNomeMunicipio->setValue  ( $request->get("stNomeMunicipio")  );
 
+$obIPopUpNorma = new IPopUpNorma();
+$obIPopUpNorma->obInnerNorma->setRotulo          ( "Norma"     );
+$obIPopUpNorma->obInnerNorma->setTitle           ( "Informe a Norma que determinou o Nome do Logradouro."    );
+$obIPopUpNorma->obInnerNorma->obCampoCod->setId  ( "inCodNorma"  );
+$obIPopUpNorma->obInnerNorma->obCampoCod->setName( "inCodNorma"  );
+$obIPopUpNorma->obInnerNorma->setNull            ( false );
+
+$obDtInicial = new Data();
+$obDtInicial->setRotulo    ( "Data Inicial" );
+$obDtInicial->setTitle     ( "Informe a Data Inicial do Nome do Logradouro." );
+$obDtInicial->setName      ( "stDataInicial" );
+$obDtInicial->setId        ( "stDataInicial" );
+$obDtInicial->setMaxLength ( 10 );
+$obDtInicial->setSize      ( 10 );
+$obDtInicial->setNull      ( false );
+    
+$obDtFinal = new Data();
+$obDtFinal->setRotulo    ( "Data Final" );
+$obDtFinal->setTitle     ( "Informe a Data Final do Nome do Logradouro." );
+$obDtFinal->setName      ( "stDataFinal" );
+$obDtFinal->setId        ( "stDataFinal" );
+$obDtFinal->setMaxLength ( 10 );
+$obDtFinal->setSize      ( 10 );
+$obDtFinal->setNull      ( true );
+
+// Mostrar endereço.
+$obRadHistoricoSim = new Radio();
+$obRadHistoricoSim->setId      ('boMostraHistorico');
+$obRadHistoricoSim->setName    ('boMostraHistorico');
+$obRadHistoricoSim->setValue   ('S');
+$obRadHistoricoSim->setRotulo  ('Histórico do Logradouro');
+$obRadHistoricoSim->setLabel   ('Sim');
+$obRadHistoricoSim->obEvento->setOnChange(" jQuery('#spanListarHistorico').show(); ");
+
+$obRadHistoricoNao = new Radio();
+$obRadHistoricoNao->setId      ('boMostraHistorico');
+$obRadHistoricoNao->setName    ('boMostraHistorico');
+$obRadHistoricoNao->setValue   ('N');
+$obRadHistoricoNao->setRotulo  ('Histórico do Logradouro');
+$obRadHistoricoNao->setLabel   ('Não');
+$obRadHistoricoNao->setChecked (true);
+$obRadHistoricoNao->obEvento->setOnChange(" jQuery('#spanListarHistorico').hide(); ");
+
+$arRadHistorico = array($obRadHistoricoSim, $obRadHistoricoNao);
+
 $obTxtCodigoLogradouro = new TextBox;
 $obTxtCodigoLogradouro->setRotulo    ( "Código do Logradouro"  );
 $obTxtCodigoLogradouro->setName      ( "inCodLogradouro"       );
@@ -184,7 +233,6 @@ $obTxtNome->setSize      ( 70                            );
 $obTxtNome->setMaxLength ( 60                            );
 $obTxtNome->setNull      ( false                         );
 $obTxtNome->setValue     ( str_replace('\\', '', $request->get("stNomeLogradouro")));
-$obTxtNome->obEvento->setOnBlur(" jQuery('#stNomeLogradouroAnterior').val(this.value); ");
 
 $obBtnIncluirNovoBairro = new Button;
 $obBtnIncluirNovoBairro->setName              ( "btnIncluirNovoBairro"   );
@@ -284,59 +332,6 @@ $obCmbMunicipio->setValue               ( $request->get("inCodigoMunicipio") );
 $obCmbMunicipio->setNull                ( false                          );
 $obCmbMunicipio->setStyle               ( "width: 220px"             );
 $obCmbMunicipio->obEvento->setOnChange  ( "preencheBairro();"            );
-
-$obTxtNomeAnterior = new TextBox;
-if ($stAcao == "incluir") {
-    $obTxtNomeAnterior->setRotulo    ( "*Nome");
-    $obTxtNomeAnterior->setTitle     ( "Nome do novo logradouro para manter seu historico." );    
-}else{
-    $obTxtNomeAnterior->setRotulo    ( "*Nome Anterior"              );
-    $obTxtNomeAnterior->setTitle     ( "Nome na qual o logradouro era chamado anteriormente" );    
-}
-$obTxtNomeAnterior->setName      ( "stNomeLogradouroAnterior"    );
-$obTxtNomeAnterior->setId        ( "stNomeLogradouroAnterior"    );
-$obTxtNomeAnterior->setSize      ( 70                            );
-$obTxtNomeAnterior->setMaxLength ( 60                            );
-$obTxtNomeAnterior->setNull      ( false                         );
-$obTxtNomeAnterior->setValue     ( str_replace('\\', '', $request->get("stNomeLogradouroAnterior")));
-
-//Norma autorizativa
-$obIPopUpNorma = new IPopUpNorma();
-$obIPopUpNorma->obInnerNorma->setRotulo          ( "**Norma"     );
-$obIPopUpNorma->obInnerNorma->setTitle           ( "Informe a Norma que determinou o Nome do Logradouro."    );
-$obIPopUpNorma->obInnerNorma->obCampoCod->setId  ( "inCodNorma"  );
-$obIPopUpNorma->obInnerNorma->obCampoCod->setName( "inCodNorma"  );
-$obIPopUpNorma->obInnerNorma->setNull            ( true );
-
-$obDtInicial = new Data();
-$obDtInicial->setRotulo    ( "**Data Inicial" );
-$obDtInicial->setTitle     ( "Informe a Data Inicial do Nome do Logradouro." );
-$obDtInicial->setName      ( "stDataInicial" );
-$obDtInicial->setId        ( "stDataInicial" );
-$obDtInicial->setMaxLength ( 10 );
-$obDtInicial->setSize      ( 10 );
-
-$obDtFinal = new Data();
-$obDtFinal->setRotulo    ( "Data Final" );
-$obDtFinal->setTitle     ( "Informe a Data Final do Nome do Logradouro." );
-$obDtFinal->setName      ( "stDataFinal" );
-$obDtFinal->setId        ( "stDataFinal" );
-$obDtFinal->setMaxLength ( 10 );
-$obDtFinal->setSize      ( 10 );
-$obDtFinal->obEvento->setOnChange(" jQuery('#btIncluir').removeProp('disabled'); ");
-
-//Botoes da lista
-$obOkLista  = new Ok(false);
-$obOkLista->setRotulo('Incluir');
-$obOkLista->setValue ('Incluir');
-$obOkLista->setId    ('btIncluir');
-$obOkLista->setName  ('btIncluir');
-$obOkLista->obEvento->setOnClick(" if ( validaCamposLista() ){ manterHistorico('incluirHistoricoLista'); }");
-$obLimparLista  = new Button();
-$obLimparLista->setId    ('btLimpaLista');
-$obLimparLista->setName  ('btLimpaLista');
-$obLimparLista->setValue ('Limpar');
-$obLimparLista->obEvento->setOnClick(" manterHistorico('limparHistoricoLista'); ");
 
 $obCmbTipo = new Select;
 $obCmbTipo->setName       ( "inCodTipo"               );
@@ -438,6 +433,7 @@ $obFormulario->addHidden ( $obHdnPais );
 $obFormulario->addHidden ( $obHdnCadastro );
 $obFormulario->addHidden ( $obHdninId );
 $obFormulario->addHidden ( $obHdnDescricaoNorma );
+$obFormulario->addHidden ( $obHdnDescricaoNormaHistorico );
 
 switch ($stAcao) {
     case 'incluir':
@@ -446,12 +442,10 @@ switch ($stAcao) {
         $obFormulario->addComponente         ( $obTxtNome                          );
         $obFormulario->addComponenteComposto ( $obTxtCodUF, $obCmbUF               );
         $obFormulario->addComponenteComposto ( $obTxtCodMunicipio, $obCmbMunicipio );
-        $obFormulario->addTitulo             ( "Histórico de Nome do Logradouro"   );
-        $obFormulario->addComponente         ( $obTxtNomeAnterior                  );
         $obIPopUpNorma->geraFormulario       ( $obFormulario                       );
         $obFormulario->addComponente         ( $obDtInicial                        );
         $obFormulario->addComponente         ( $obDtFinal                          );
-        $obFormulario->defineBarra           ( array( $obOkLista, $obLimparLista ), 'center' );
+        $obFormulario->agrupaComponentes     ( $arRadHistorico                     );        
         $obFormulario->addSpan               ( $obSpnListarHistorico               );
         $obFormulario->addTitulo             ( "Bairro"                            );
         $obFormulario->agrupaComponentes     ( array( $obTxtNovoBairro, $obBtnIncluirNovoBairro ));
@@ -477,13 +471,11 @@ switch ($stAcao) {
         $obFormulario->addComponente         ( $obTxtNome                    );
         $obFormulario->addComponente         ( $obLblNomeUF                  );
         $obFormulario->addComponente         ( $obLblNomeMunicipio           );
+        $obIPopUpNorma->geraFormulario       ( $obFormulario                 );
+        $obFormulario->addComponente         ( $obDtInicial                  );
+        $obFormulario->addComponente         ( $obDtFinal                    );
         $obFormulario->addComponente         ( $obLblExtensao                );
-        $obFormulario->addTitulo             ( "Histórico de Nome do Logradouro" );
-        $obFormulario->addComponente         ( $obTxtNomeAnterior                  );
-        $obIPopUpNorma->geraFormulario       ( $obFormulario                       );
-        $obFormulario->addComponente         ( $obDtInicial                        );
-        $obFormulario->addComponente         ( $obDtFinal                          );
-        $obFormulario->defineBarra           ( array( $obOkLista, $obLimparLista ), 'center' );
+        $obFormulario->agrupaComponentes     ( $arRadHistorico               );
         $obFormulario->addSpan               ( $obSpnListarHistorico         );
         $obFormulario->addTitulo             ( "Bairro"                      );
         $obFormulario->agrupaComponentes     ( array( $obTxtNovoBairro, $obBtnIncluirNovoBairro ));
@@ -541,10 +533,10 @@ if ($stAcao == 'alterar' || $stAcao == 'consultar') {
     if ($stAcao == 'consultar'){
         sistemalegado::executaFrameOculto("preencheInnerConsultar();");
     }else{
-        sistemalegado::executaFrameOculto("preencheInner();");
+        sistemalegado::executaFrameOculto("jQuery('#spanListarHistorico').hide(); preencheInner();");
     }
 } else {
-    sistemalegado::executaFrameOculto("IniciaSessions();");
+    sistemalegado::executaFrameOculto(" jQuery('#spanListarHistorico').hide(); IniciaSessions();");
 }
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

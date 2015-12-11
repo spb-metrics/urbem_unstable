@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRCalculo.class.php 61457 2015-01-19 13:55:53Z carolina $
+    * $Id: RARRCalculo.class.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.05
 */
@@ -453,22 +453,15 @@ class RARRCalculo
                                     $obErro->setDescricao("Não foi possível criar arquivo necessário para realizar cálculo.");
                                 } else {
 
-                                #echo '<br>ABRE TRANSACAO';
                                 $this->obCalculoTributario->setDado('inRegistro', $rsImoveis->getCampo('inscricao_municipal'));
                                 $this->obCalculoTributario->setDado('inExercicio', $this->getExercicio());
                                 $this->obCalculoTributario->setDado('stGrupo', $this->obRARRGrupo->getCodGrupo());
                                 $this->obCalculoTributario->setDado('stCredito', $this->getChaveCredito());
                                 $this->obCalculoTributario->setDado('stModulo', 12);
-                                #echo '<br>executa';
                                 $obErro = $this->obCalculoTributario->calculoTributario( $rsCalculo, $boTransacao);
 
-                                #echo 'CALCULOS:'.$rsCalculo->getCampo('retorno').' ';
-//                                sistemaLegado::mostravar ($rsCalculo);
-                                #echo '<br><b>CalcTributario</b>';
-                                #echo " Memoria:".round((memory_get_usage()/1024)/1024)." MB";
                                 // verifica erro na execução da consulta sql
                                 if ( $obErro->ocorreu() ) {
-                                    #echo '<h1> BREAK </h1>';
                                     break;
                                 } else {
 
@@ -873,12 +866,9 @@ class RARRCalculo
                                     }
                                     $boErroCalculo = true;
                             } else {
-                                #echo '<br>CALCULO OK';
                                 // listar calculos
                                 $this->buscarCalculos($rsCalculos, $boTransacao);
-                                #sistemaLegado::mostravar ( $rsCalculos );
                                 if ( $rsCalculos->getNumLinhas() < 1 ) {
-                                    #echo '<h2>ERRO!!!</h2>';
                                     if ( Sessao::read( 'TipoCalculo' ) == "individual" ) {
                                         $this->buscarCalculosMensagem($rsCalculosMensagens, $boTransacao);
 

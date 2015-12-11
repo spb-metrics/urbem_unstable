@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMManterInscricao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterInscricao.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.10
 
@@ -93,7 +93,6 @@ $obTxtCodigoEnquadramento->setInteiro            ( true                      );
 
 $rsEnquadramento = new RecordSet;
 $obRCEMInscricaoEconomica->listarCadastroAtributo( $rsEnquadramento );
-mostravar($rsEnquadramento);
 
 $obCmbEnquadramento = new Select;
 $obCmbEnquadramento->setName               ( "stEnquadramento"         );

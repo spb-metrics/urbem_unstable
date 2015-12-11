@@ -152,7 +152,12 @@ switch ( $request->get('inFiltro') ) {
         $obLblContrato->setValue ( "Pensionista" );
     break;
     default:
-        $obLblContrato->setValue ( "Todos" );
+        $boValidaCgmAtivo = Sessao::read('valida_ativos_cgm');
+        if ($boValidaCgmAtivo == 'true') {
+            $obLblContrato->setValue ( "Vigente" );    
+        }else{
+            $obLblContrato->setValue ( "Todos" );
+        }
     break;
 }
 

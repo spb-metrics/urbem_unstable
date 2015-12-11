@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: FMConcederLicencaGeralUsoSolo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConcederLicencaGeralUsoSolo.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -66,7 +66,6 @@ if ( empty( $stAcao ) ) {
     $stAcao = "incluir";
 }
 
-//SistemaLegado::mostravar($_REQUEST);
 //$sessao->transf4["lsElementos"]     = array();
 //$sessao->transf4["inNumElementos"]  = 0;
 Sessao::write('acao', '462');

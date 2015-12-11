@@ -58,7 +58,7 @@ include_once( TLIC."TLicitacaoRescisaoContratoResponsavelJuridico.class.php" );
 include_once( TLIC."TLicitacaoPublicacaoRescisaoContrato.class.php");
 
 Sessao::getExercicio();
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao =  $request->get("stAcao");
 
 $stPrograma = "ManterContrato";
 $pgFilt = "FL".$stPrograma.".php";
@@ -75,37 +75,37 @@ switch ($stAcao) {
 
 case "rescindir":
     $obTLicitacaoContrato = new TLicitacaoContrato();
-    $obTLicitacaoContrato->setDado('exercicio_contrato', $_REQUEST['stExercicio']);
-    $obTLicitacaoContrato->setDado('num_contrato', $_REQUEST['inNumContrato']);
-    $obTLicitacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+    $obTLicitacaoContrato->setDado('exercicio_contrato', $request->get('stExercicio'));
+    $obTLicitacaoContrato->setDado('num_contrato', $request->get('inNumContrato'));
+    $obTLicitacaoContrato->setDado('cod_entidade', $request->get('inCodEntidade'));
     $obTLicitacaoContrato->recuperaPorChave( $rsLicitacaoContrato );
 
-    if ( implode(array_reverse(explode('/',$_REQUEST['dtRescisao']))) < implode(array_reverse(explode('/',$_REQUEST['dtAssinatura']))) ) {
+    if ( implode(array_reverse(explode('/',$request->get('dtRescisao')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
         SistemaLegado::exibeAviso(urlencode("A data de rescisão não pode ser anterior que a data de assinatura do contrato"), "n_incluir", "erro" );
 
     } else {
 
         $obTLicitacaoRescisaoContrato = new TLicitacaoRescisaoContrato();
         $obTLicitacaoRescisaoContrato->recuperaProximoNumRescisao($rsLicitacaoRescisaoContrato);
-        $obTLicitacaoRescisaoContrato->setDado('exercicio_contrato', $_REQUEST['stExercicio']);
-        $obTLicitacaoRescisaoContrato->setDado('num_contrato', $_REQUEST['inNumContrato']);
-        $obTLicitacaoRescisaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+        $obTLicitacaoRescisaoContrato->setDado('exercicio_contrato', $request->get('stExercicio'));
+        $obTLicitacaoRescisaoContrato->setDado('num_contrato', $request->get('inNumContrato'));
+        $obTLicitacaoRescisaoContrato->setDado('cod_entidade', $request->get('inCodEntidade'));
         $obTLicitacaoRescisaoContrato->setDado('exercicio', Sessao::getExercicio());
         $obTLicitacaoRescisaoContrato->setDado('num_rescisao', $rsLicitacaoRescisaoContrato->getCampo("maximo"));
-        $obTLicitacaoRescisaoContrato->setDado('dt_rescisao', $_REQUEST['dtRescisao']);
-        $vlMulta = number_format(str_replace(".", "", $_REQUEST['vlMulta']), 2, ".", "");
+        $obTLicitacaoRescisaoContrato->setDado('dt_rescisao', $request->get('dtRescisao'));
+        $vlMulta = number_format(str_replace(".", "", $request->get('vlMulta')), 2, ".", "");
         $obTLicitacaoRescisaoContrato->setDado('vlr_multa', $vlMulta);
-        $vlIndenizacao = number_format(str_replace(".", "", $_REQUEST['vlIndenizacao']), 2, ".", "");
+        $vlIndenizacao = number_format(str_replace(".", "", $request->get('vlIndenizacao')), 2, ".", "");
         $obTLicitacaoRescisaoContrato->setDado('vlr_indenizacao', $vlIndenizacao);
-        $obTLicitacaoRescisaoContrato->setDado('motivo', $_REQUEST['stMotivo']);
+        $obTLicitacaoRescisaoContrato->setDado('motivo', $request->get('stMotivo'));
         $obTLicitacaoRescisaoContrato->inclusao();
 
-        if ($_REQUEST['inCodResponsavelJuridico']) {
+        if ($request->get('inCodResponsavelJuridico')) {
             $obTLicitacaoRescisContrRespJuridico = new TLicitacaoRescisaoContratoResponsavelJuridico();
-            $obTLicitacaoRescisContrRespJuridico->setDado('exercicio_contrato', $_REQUEST['stExercicio']);
-            $obTLicitacaoRescisContrRespJuridico->setDado('num_contrato', $_REQUEST['inNumContrato']);
-            $obTLicitacaoRescisContrRespJuridico->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-            $obTLicitacaoRescisContrRespJuridico->setDado('numcgm', $_REQUEST['inCodResponsavelJuridico']);
+            $obTLicitacaoRescisContrRespJuridico->setDado('exercicio_contrato', $request->get('stExercicio'));
+            $obTLicitacaoRescisContrRespJuridico->setDado('num_contrato', $request->get('inNumContrato'));
+            $obTLicitacaoRescisContrRespJuridico->setDado('cod_entidade', $request->get('inCodEntidade'));
+            $obTLicitacaoRescisContrRespJuridico->setDado('numcgm', $request->get('inCodResponsavelJuridico'));
             $obTLicitacaoRescisContrRespJuridico->inclusao();
         }
         
@@ -123,7 +123,7 @@ case "rescindir":
             $obTPublicacaoRescisaoContrato->inclusao();
         }
 
-        SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$_REQUEST['inNumContrato']."/".$_REQUEST['stExercicio'],"incluir", "aviso", Sessao::getId(),"");
+        SistemaLegado::alertaAviso($pgList.'?'.Sessao::getId()."&stAcao=$stAcao","Contrato: ".$request->get('inNumContrato')."/".$request->get('stExercicio'),"incluir", "aviso", Sessao::getId(),"");
     }
 
     break;

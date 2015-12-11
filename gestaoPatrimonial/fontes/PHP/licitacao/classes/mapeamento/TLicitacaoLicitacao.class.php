@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 63367 2015-08-20 21:27:34Z michel $
+    $Id: TLicitacaoLicitacao.class.php 63841 2015-10-22 19:14:30Z michel $
 
 */
 
@@ -891,6 +891,229 @@ function montaRecuperaLicitacaoNaoHomologada()
              JOIN orcamento.despesa
                ON despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
               AND despesa.exercicio   = solicitacao_item_dotacao.exercicio
+            WHERE julgamento_item.ordem = 1
+      ";
+
+      return $stSql;
+  }
+
+  public function recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+  {
+      $obErro      = new Erro;
+      $obConexao   = new Conexao;
+      $rsRecordSet = new RecordSet;
+      $stGroupBy = " GROUP BY mapa_item.cod_solicitacao
+                            , mapa_item.cod_item
+                            , mapa_item.cod_centro
+                            , centro_custo.descricao
+                            , mapa_item.lote
+                            , mapa_item_dotacao.quantidade
+                            , mapa_item_anulacao.quantidade
+                            , cotacao_fornecedor_item.vl_cotacao
+                            , cotacao_item.quantidade
+                            , desdobramento.cod_conta
+                            , desdobramento.cod_estrutural
+                            , desdobramento.descricao
+                            , julgamento_item.cgm_fornecedor
+                            , mapa_item_dotacao.cod_despesa
+                            , mapa_item_dotacao.exercicio
+                            , conta_despesa.cod_estrutural
+                            , conta_despesa.descricao
+                            , despesa_atual.cod_despesa
+                            , conta_despesa_atual.descricao
+                            , conta_despesa_atual.cod_estrutural
+                            , despesa_atual.exercicio
+                            , homologacao.cod_cotacao
+                            , homologacao.exercicio_cotacao
+                       HAVING coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) > 0 ";
+      $stSql = $this->montaRecuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao().$stFiltro.$stGroupBy.$stOrdem;
+      $this->stDebug = $stSql;
+      $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+      return $obErro;
+  }
+
+  public function montaRecuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao()
+  {
+      $stSql = "
+           SELECT mapa_item.cod_solicitacao
+                , mapa_item.cod_item
+                , mapa_item.cod_centro
+                , centro_custo.descricao AS nom_centro
+                , CASE
+                        WHEN mapa_item.lote = 0 THEN
+                            'Unico'::varchar
+                        ELSE
+                            mapa_item.lote::varchar
+                  END AS lote
+                , cotacao_item.quantidade
+                , cotacao_fornecedor_item.vl_cotacao::numeric(14,2) AS vl_total
+                , ( cotacao_fornecedor_item.vl_cotacao / cotacao_item.quantidade )::numeric(14,2) AS vl_unitario
+                , sum(coalesce(item_pre_empenho.quantidade, 0.00)) as quantidade_autorizacoes
+                , desdobramento.cod_conta as cod_desdobramento
+                , desdobramento.cod_estrutural as desdobramento
+                , desdobramento.descricao as nom_desdobramento
+                , mapa_item_dotacao.cod_despesa
+                , conta_despesa.descricao as nom_despesa
+                , conta_despesa.cod_estrutural as estrutural_despesa
+                , mapa_item_dotacao.exercicio as exercicio_despesa
+                , empenho.fn_saldo_dotacao(mapa_item_dotacao.exercicio,mapa_item_dotacao.cod_despesa) as saldo_despesa
+                , despesa_atual.cod_despesa as cod_despesa_atual
+                , conta_despesa_atual.descricao as nom_despesa_atual
+                , conta_despesa_atual.cod_estrutural as estrutural_despesa_atual
+                , despesa_atual.exercicio as exercicio_despesa_atual
+                , empenho.fn_saldo_dotacao(despesa_atual.exercicio,despesa_atual.cod_despesa) as saldo_despesa_atual
+                , julgamento_item.cgm_fornecedor
+                , ( SELECT nom_cgm FROM sw_cgm WHERE numcgm = julgamento_item.cgm_fornecedor ) AS fornecedor
+                , ((coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)))
+                   *
+                   (cotacao_fornecedor_item.vl_cotacao / coalesce(cotacao_item.quantidade, 0.00)))::numeric(14,2) as vl_cotacao_saldo
+                , coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) as quantidade_saldo
+                , homologacao.cod_cotacao
+                , homologacao.exercicio_cotacao
+             FROM licitacao.licitacao
+
+             JOIN compras.mapa
+               ON licitacao.cod_mapa = mapa.cod_mapa
+              AND licitacao.exercicio_mapa = mapa.exercicio
+
+             JOIN compras.mapa_item
+               ON mapa_item.cod_mapa = mapa.cod_mapa
+              AND mapa_item.exercicio = mapa.exercicio
+
+             JOIN compras.mapa_item_dotacao
+               ON mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
+              AND mapa_item_dotacao.exercicio             = mapa_item.exercicio
+              AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
+              AND mapa_item_dotacao.cod_entidade          = mapa_item.cod_entidade
+              AND mapa_item_dotacao.cod_solicitacao       = mapa_item.cod_solicitacao
+              AND mapa_item_dotacao.cod_centro            = mapa_item.cod_centro
+              AND mapa_item_dotacao.cod_item              = mapa_item.cod_item
+              AND mapa_item_dotacao.lote                  = mapa_item.lote
+
+        LEFT JOIN compras.mapa_item_anulacao
+               ON mapa_item_anulacao.exercicio             = mapa_item_dotacao.exercicio
+              AND mapa_item_anulacao.cod_mapa              = mapa_item_dotacao.cod_mapa
+              AND mapa_item_anulacao.exercicio_solicitacao = mapa_item_dotacao.exercicio_solicitacao
+              AND mapa_item_anulacao.cod_entidade          = mapa_item_dotacao.cod_entidade
+              AND mapa_item_anulacao.cod_solicitacao       = mapa_item_dotacao.cod_solicitacao
+              AND mapa_item_anulacao.cod_centro            = mapa_item_dotacao.cod_centro
+              AND mapa_item_anulacao.cod_item              = mapa_item_dotacao.cod_item
+              AND mapa_item_anulacao.lote                  = mapa_item_dotacao.lote
+              AND mapa_item_anulacao.cod_conta             = mapa_item_dotacao.cod_conta
+              AND mapa_item_anulacao.cod_despesa           = mapa_item_dotacao.cod_despesa
+
+             JOIN compras.mapa_cotacao
+               ON mapa_cotacao.cod_mapa       = mapa.cod_mapa
+              AND mapa_cotacao.exercicio_mapa = mapa.exercicio
+
+             JOIN compras.julgamento_item
+               ON julgamento_item.cod_cotacao = mapa_cotacao.cod_cotacao
+              AND julgamento_item.exercicio   = mapa_cotacao.exercicio_cotacao
+              AND julgamento_item.cod_item    = mapa_item.cod_item
+              AND julgamento_item.lote        = mapa_item.lote
+
+             JOIN compras.cotacao_fornecedor_item
+               ON cotacao_fornecedor_item.exercicio      = julgamento_item.exercicio
+              AND cotacao_fornecedor_item.cod_item       = julgamento_item.cod_item
+              AND cotacao_fornecedor_item.lote           = julgamento_item.lote
+              AND cotacao_fornecedor_item.cod_cotacao    = julgamento_item.cod_cotacao
+              AND cotacao_fornecedor_item.cgm_fornecedor = julgamento_item.cgm_fornecedor
+
+             JOIN compras.solicitacao_item
+               ON solicitacao_item.cod_solicitacao = mapa_item.cod_solicitacao
+              AND solicitacao_item.exercicio       = mapa_item.exercicio_solicitacao
+              AND solicitacao_item.cod_entidade    = mapa_item.cod_entidade
+              AND solicitacao_item.cod_centro      = mapa_item.cod_centro
+              AND solicitacao_item.cod_item        = mapa_item.cod_item
+
+             JOIN compras.solicitacao_item_dotacao
+               ON solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
+              AND solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
+              AND solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
+              AND solicitacao_item_dotacao.cod_centro      = solicitacao_item.cod_centro
+              AND solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
+              AND solicitacao_item_dotacao.cod_despesa     = mapa_item_dotacao.cod_despesa
+
+             JOIN compras.cotacao_item
+               ON cotacao_item.cod_item    = cotacao_fornecedor_item.cod_item
+              AND cotacao_item.exercicio   = cotacao_fornecedor_item.exercicio
+              AND cotacao_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
+              AND cotacao_item.lote        = cotacao_fornecedor_item.lote
+
+             JOIN orcamento.conta_despesa as desdobramento
+               ON desdobramento.cod_conta  = solicitacao_item_dotacao.cod_conta
+              AND desdobramento.exercicio  = solicitacao_item_dotacao.exercicio
+
+             JOIN orcamento.despesa
+               ON despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
+              AND despesa.exercicio   = solicitacao_item_dotacao.exercicio
+
+             JOIN orcamento.conta_despesa
+               ON conta_despesa.cod_conta  = despesa.cod_conta
+              AND conta_despesa.exercicio  = despesa.exercicio
+
+        LEFT JOIN orcamento.conta_despesa as conta_despesa_atual
+               ON conta_despesa_atual.cod_estrutural  = conta_despesa.cod_estrutural
+              AND conta_despesa_atual.exercicio  = '".Sessao::getExercicio()."'
+
+        LEFT JOIN orcamento.despesa as despesa_atual
+               ON despesa_atual.cod_conta 	= conta_despesa_atual.cod_conta
+              AND despesa_atual.exercicio   	= conta_despesa_atual.exercicio
+              AND despesa_atual.cod_recurso 	= despesa.cod_recurso
+              AND despesa_atual.cod_programa 	= despesa.cod_programa
+              AND despesa_atual.num_pao		= despesa.num_pao
+              AND despesa_atual.cod_funcao 	= despesa.cod_funcao
+
+        LEFT JOIN empenho.item_pre_empenho_julgamento
+               ON item_pre_empenho_julgamento.exercicio_julgamento = cotacao_fornecedor_item.exercicio
+              AND item_pre_empenho_julgamento.cod_cotacao          = cotacao_fornecedor_item.cod_cotacao
+              AND item_pre_empenho_julgamento.cod_item             = cotacao_fornecedor_item.cod_item
+              AND item_pre_empenho_julgamento.lote                 = cotacao_fornecedor_item.lote
+              AND item_pre_empenho_julgamento.cgm_fornecedor       = cotacao_fornecedor_item.cgm_fornecedor
+
+        LEFT JOIN empenho.item_pre_empenho
+               ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+              AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+              AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+
+             JOIN almoxarifado.centro_custo
+               ON centro_custo.cod_centro = mapa_item.cod_centro
+
+             JOIN licitacao.cotacao_licitacao
+               ON cotacao_licitacao.cod_licitacao 	    = licitacao.cod_licitacao
+              AND cotacao_licitacao.cod_modalidade 	    = licitacao.cod_modalidade
+              AND cotacao_licitacao.cod_entidade 	    = licitacao.cod_entidade
+              AND cotacao_licitacao.exercicio_licitacao = licitacao.exercicio
+              AND cotacao_licitacao.cod_item            = cotacao_fornecedor_item.cod_item
+              AND cotacao_licitacao.cgm_fornecedor 	    = cotacao_fornecedor_item.cgm_fornecedor
+              AND cotacao_licitacao.cod_cotacao         = cotacao_fornecedor_item.cod_cotacao
+              AND cotacao_licitacao.exercicio_cotacao   = cotacao_fornecedor_item.exercicio
+              AND cotacao_licitacao.lote                = cotacao_fornecedor_item.lote
+
+             JOIN licitacao.adjudicacao
+               ON adjudicacao.cod_licitacao         = cotacao_licitacao.cod_licitacao
+              AND adjudicacao.cod_modalidade        = cotacao_licitacao.cod_modalidade
+              AND adjudicacao.cod_entidade          = cotacao_licitacao.cod_entidade
+              AND adjudicacao.exercicio_licitacao   = cotacao_licitacao.exercicio_licitacao
+              AND adjudicacao.lote                  = cotacao_licitacao.lote
+              AND adjudicacao.cod_cotacao           = cotacao_licitacao.cod_cotacao
+              AND adjudicacao.cod_item              = cotacao_licitacao.cod_item
+              AND adjudicacao.exercicio_cotacao     = cotacao_licitacao.exercicio_cotacao
+              AND adjudicacao.cgm_fornecedor        = cotacao_licitacao.cgm_fornecedor
+
+             JOIN licitacao.homologacao
+               ON homologacao.num_adjudicacao       = adjudicacao.num_adjudicacao
+              AND homologacao.cod_entidade          = adjudicacao.cod_entidade
+              AND homologacao.cod_modalidade        = adjudicacao.cod_modalidade
+              AND homologacao.cod_licitacao         = adjudicacao.cod_licitacao 
+              AND homologacao.exercicio_licitacao   = adjudicacao. exercicio_licitacao
+              AND homologacao.cod_item              = adjudicacao.cod_item
+              AND homologacao.cod_cotacao           = adjudicacao.cod_cotacao
+              AND homologacao.lote                  = adjudicacao.lote
+              AND homologacao.exercicio_cotacao     = adjudicacao.exercicio_cotacao
+              AND homologacao.cgm_fornecedor        = adjudicacao.cgm_fornecedor
+
             WHERE julgamento_item.ordem = 1
       ";
 

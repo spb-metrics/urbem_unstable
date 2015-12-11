@@ -179,8 +179,6 @@ $obMontaServico = new MontaServico;
 $obMontaServico->setCodigoAtividade( $_REQUEST["inCodAtividade"] );
 $obMontaServico->setCodigoVigenciaServico ( $_REQUEST["inCodigoVigencia"] );
 
-#sistemaLegado::mostravar ( $_REQUEST ); #exit;
-
 $boSetaData = false;
 switch ($_REQUEST['stCtrl']) {
     case "Download":
@@ -465,16 +463,13 @@ switch ($_REQUEST['stCtrl']) {
         $obRCEMServico->setCodigoVigencia ( $_REQUEST["inCodigoVigencia"] );
 
         $obRCEMServico->recuperaUltimoNivel( $rsListaNivel );
-        #echo 'ListaNivel'; sistemaLegado::mostravar( $rsListaNivel );
 
         $obRCEMServico->setCodigoNivel( 1 );
         $obRCEMServico->setCodigoAtividade( $_REQUEST["inCodAtividade"] );
         $obRCEMServico->listarServico( $rsListaServico );
-        #echo 'ListaServiço'; sistemaLegado::mostravar( $rsListaServico );
 
         if ( $rsListaServico->getNumLinhas() > 0 ) {
 
-            //echo '<h2>Dentro do IF</h2>'; exit;
             $obRCEMServico->setValorreduzido( $rsListaServico->getCampo("valor_reduzido") );
             $obRCEMServico->setCodigoNivel( $rsListaNivel->getCampo("cod_nivel") );
             $obRCEMServico->listarServico( $rsListaServicoTMP );

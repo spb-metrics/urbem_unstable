@@ -453,7 +453,6 @@ function pegaID($sChave, $sTabela, $sWhere="")
    $DBx = new dataBaseLegado;
    $DBx->abreBD();
    $sSQL = "select max($sChave) as ultima from $sTabela $sWhere";
-//sistemaLegado::mostraVar($sSQL);exit;
    $DBx->abreSelecao($sSQL);
    $DBx->vaiPrimeiro();
    if (!$DBx->eof()) {

@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-01.03.95
 
-    $Id: OCReplicarFuncao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCReplicarFuncao.php 63910 2015-11-05 16:45:47Z evandro $
 
 */
 
@@ -46,18 +46,14 @@ $stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
 
 function preencherBiblioteca($stExtencao="")
 {
-    if (!empty($_GET['inCodModulo'.$stExtencao])) {
+    if (!empty($_REQUEST['inCodModulo'.$stExtencao])) {
         include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoBiblioteca.class.php");
         $obTAdminsitracaoBiblioteca = new TAdministracaoBiblioteca();
-        $stFiltro = " WHERE cod_modulo = ".$_GET['inCodModulo'.$stExtencao];
-        $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,$stFiltro,"nom_biblioteca");
-        $stJs.= "limpaSelect(f.inCodBiblioteca".$stExtencao.",0);                                 \n";
-        $stJs.= "f.inCodBiblioteca".$stExtencao."[0] = new Option('Selecione','','selected');     \n";
-        $inIndex = 1;
-        while (!$rsBiblioteca->eof()) {
-            $stJs.= "f.inCodBiblioteca".$stExtencao."[".$inIndex."] = new Option('".str_replace("\n","",$rsBiblioteca->getCampo("nom_biblioteca"))."','".$rsBiblioteca->getCampo("cod_biblioteca")."','');     \n";
-            $inIndex++;
-            $rsBiblioteca->proximo();
+        $stFiltro = " WHERE cod_modulo = ".$_REQUEST['inCodModulo'.$stExtencao];
+        $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,$stFiltro,"nom_biblioteca");        
+        $stJs .= " jq(\"#inCodBiblioteca".$stExtencao."\").empty().append(new Option(\"Selecione\",\"\") ); \n";
+        foreach ($rsBiblioteca->getElementos() as $value) {
+            $stJs .= " jq(\"#inCodBiblioteca".$stExtencao."\").append(new Option(\"".$value['nom_biblioteca']."\",\"".$value['cod_biblioteca']."\") ); \n";
         }
 
         return $stJs;

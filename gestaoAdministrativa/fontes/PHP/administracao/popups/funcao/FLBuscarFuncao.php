@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.03.95
 
-    $Id: FLBuscarFuncao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLBuscarFuncao.php 64004 2015-11-17 15:41:41Z evandro $
 
 */
 
@@ -40,6 +40,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CAM_GA_ADM_NEGOCIO."RFuncao.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoModulo.class.php";
+include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoBiblioteca.class.php");
 
 $stPrograma = "BuscarFuncao";
 $pgFilt = "FL".$stPrograma.".php";
@@ -53,55 +54,58 @@ include_once($pgJs);
 
 $stAcao = $request->get('stAcao');
 
-$_REQUEST['stCodModulo']     = isset($_REQUEST['stCodModulo'])     ? $_REQUEST['stCodModulo']     : Sessao::read('stCodModulo');
-$_REQUEST['stCodBiblioteca'] = isset($_REQUEST['stCodBiblioteca']) ? $_REQUEST['stCodBiblioteca'] : Sessao::read('stCodBiblioteca');
+if ( $request->get('stCodModulo') == '' ) {
+    $inCodModulo = (Sessao::read('stCodModulo') == '') ? $_REQUEST['inCodModulo'] : Sessao::read('stCodModulo') ;
+}else{
+    $inCodModulo = $request->get('stCodModulo');
+}
+if ( $request->get('stCodBiblioteca') == '' ) {
+    $inCodBiblioteca = (Sessao::read('stCodBiblioteca') == '') ? $_REQUEST['inCodBiblioteca'] : Sessao::read('stCodBiblioteca') ;
+}else{
+    $inCodBiblioteca = $request->get('stCodBiblioteca');
+}
 
 # Condição para armazenar na sessão quando telas específicas passaram a
 # biblioteca ou módulo permitidos para listagem.
-Sessao::write('stCodModulo'     , $_REQUEST['stCodModulo']    );
-Sessao::write('stCodBiblioteca' , $_REQUEST['stCodBiblioteca']);
+Sessao::write('stCodModulo'     , $inCodModulo );
+Sessao::write('stCodBiblioteca' , $inCodBiblioteca );
 
 $obHdnInCodBiblioteca = new Hidden;
-$obHdnInCodBiblioteca->setName( 'inCodBiblioteca' );
-$obHdnInCodBiblioteca->setValue(  $_REQUEST['inCodBiblioteca'] );
+$obHdnInCodBiblioteca->setName ( 'inCodBiblioteca' );
+$obHdnInCodBiblioteca->setValue( $inCodBiblioteca  );
 
 $obHdnInCodModulo = new Hidden;
-$obHdnInCodModulo->setName( 'inCodModulo' );
-$obHdnInCodModulo->setValue(  $_REQUEST['inCodModulo'] );
+$obHdnInCodModulo->setName ( 'inCodModulo' );
+$obHdnInCodModulo->setValue( $inCodModulo  );
 
 $obTAdministracaoModulo = new TModulo;
+$obTAdminsitracaoBiblioteca = new TAdministracaoBiblioteca();
 
-if ($_REQUEST['stCodBiblioteca'] && $_REQUEST['stCodModulo']) {
-    $stCondicao = " WHERE cod_modulo IN ( ".$_REQUEST['stCodModulo']." )";
-    $obTAdministracaoModulo->recuperaListaModulos($rsModulos, $stCondicao, "", "", "");
-    include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoBiblioteca.class.php");
-    $obTAdminsitracaoBiblioteca = new TAdministracaoBiblioteca();
-    $stFiltro = " WHERE cod_modulo IN ( ".$_REQUEST['stCodModulo']." ) AND cod_biblioteca IN ( ".$_REQUEST['stCodBiblioteca']." )";
+//Caso o modulo venha vazio significa que o usuario pode usar qualquer funcao na acao que esta sendo chamada
+if ($inCodModulo != '') {
+    $stCondicao = " WHERE cod_modulo IN ( ".$inCodModulo." )";
+}
+$obTAdministracaoModulo->recuperaListaModulos($rsModulos, $stCondicao, "", "", "");
+
+$rsBiblioteca = new RecordSet();
+if ($inCodBiblioteca != '') {
+    $stFiltro = " WHERE cod_modulo IN ( ".$inCodModulo." ) AND cod_biblioteca IN ( ".$inCodBiblioteca." )";
     $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,$stFiltro,"cod_biblioteca");
-} else {
-    $obTAdminsitracaoBiblioteca = new TAdministracaoBiblioteca();
-    if (empty($_REQUEST['inCodModulo'])) {
-        $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,"","cod_biblioteca");
-    } elseif (!empty($_REQUEST['inCodModulo']) && !empty($_REQUEST['inCodBiblioteca'])) {
-        $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,"","cod_biblioteca");
-    }
-    $obTAdministracaoModulo->recuperaTodos($rsModulos,"","nom_modulo");
 }
 
-//Se houver só um campo, já abre preenchido
-if ($rsModulos->getNumLinhas() > 1) {
 $obCmbModulo = new Select;
-$obCmbModulo->setRotulo             ( "Módulo Origem"     );
-$obCmbModulo->setId                 ( "inCodModulo"       );
-$obCmbModulo->setName               ( "inCodModulo"       );
-$obCmbModulo->setTitle              ( "Informe o módulo." );
-$obCmbModulo->setStyle              ( "width: 250px"      );
-$obCmbModulo->setNull               ( false               );
-$obCmbModulo->addOption             ( "","Selecione"      );
-$obCmbModulo->setCampoId            ( "cod_modulo"        );
-$obCmbModulo->setCampoDesc          ( "nom_modulo"        );
-$obCmbModulo->preencheCombo         ( $rsModulos          );
-$obCmbModulo->obEvento->setOnChange ( "executaFuncaoAjax('preencherBiblioteca','&inCodModulo='+this.value+'&inCodBiblioteca=".$_REQUEST['stCodBiblioteca']."');"            );
+$obCmbModulo->setRotulo     ( "Módulo Origem"     );
+$obCmbModulo->setId         ( "inCodModulo"       );
+$obCmbModulo->setName       ( "inCodModulo"       );
+$obCmbModulo->setTitle      ( "Informe o módulo." );
+$obCmbModulo->setStyle      ( "width: 250px"      );
+$obCmbModulo->setNull       ( false               );
+$obCmbModulo->addOption     ( "","Selecione"      );
+$obCmbModulo->setCampoId    ( "cod_modulo"        );
+$obCmbModulo->setCampoDesc  ( "nom_modulo"        );
+$obCmbModulo->preencheCombo ( $rsModulos          );
+$obCmbModulo->setValue      ( $inCodModulo        );
+$obCmbModulo->obEvento->setOnChange ( "executaFuncaoAjax('preencherBiblioteca','&inCodModulo='+this.value+'&inCodBiblioteca=".$inCodBiblioteca."');");
 
 $obCmbBiblioteca = new Select;
 $obCmbBiblioteca->setRotulo             ( "Biblioteca Origem"     );
@@ -110,40 +114,12 @@ $obCmbBiblioteca->setName               ( "inCodBiblioteca"       );
 $obCmbBiblioteca->setTitle              ( "Informe a bibliotéca." );
 $obCmbBiblioteca->setStyle              ( "width: 250px"          );
 $obCmbBiblioteca->setNull               ( false                   );
-$obCmbBiblioteca->addOption             ( "","Selecione");
+$obCmbBiblioteca->addOption             ( "","Selecione"          );
 $obCmbBiblioteca->setCampoId            ( "cod_biblioteca"        );
-$obCmbBiblioteca->setCampoDesc          ( "nom_biblioteca"       );
-$obCmbBiblioteca->setValue              ( $_REQUEST['stCodBiblioteca'] );
+$obCmbBiblioteca->setCampoDesc          ( "nom_biblioteca"        );
 $obCmbBiblioteca->preencheCombo         ( $rsBiblioteca           );
-$obCmbBiblioteca->obEvento->setOnchange ("limpaCampoFuncao()"     );
-} else {
-$obCmbModulo = new Select;
-$obCmbModulo->setRotulo             ( "Módulo Origem"     );
-$obCmbModulo->setId                 ( "inCodModulo"       );
-$obCmbModulo->setName               ( "inCodModulo"       );
-$obCmbModulo->setTitle              ( "Informe o módulo." );
-$obCmbModulo->setStyle              ( "width: 250px"      );
-$obCmbModulo->setNull               ( false               );
-$obCmbModulo->setValue              ( "33"                );
-$obCmbModulo->addOption             ( "","Selecione"      );
-$obCmbModulo->setCampoId            ( "cod_modulo"        );
-$obCmbModulo->setCampoDesc          ( "nom_modulo"        );
-$obCmbModulo->preencheCombo         ( $rsModulos          );
-$obCmbModulo->obEvento->setOnChange ( "executaFuncaoAjax('preencherBiblioteca','&inCodModulo='+this.value+'&inCodBiblioteca=".$_REQUEST['stCodBiblioteca']."');"            );
-
-$obCmbBiblioteca = new Select;
-$obCmbBiblioteca->setRotulo             ( "Biblioteca Origem"     );
-$obCmbBiblioteca->setId                 ( "inCodBiblioteca"       );
-$obCmbBiblioteca->setName               ( "inCodBiblioteca"       );
-$obCmbBiblioteca->setTitle              ( "Informe a bibliotéca." );
-$obCmbBiblioteca->setStyle              ( "width: 250px"          );
-$obCmbBiblioteca->setNull               ( false                   );
-$obCmbBiblioteca->setCampoId            ( "cod_biblioteca"        );
-$obCmbBiblioteca->setCampoDesc          ( "nom_biblioteca"       );
-$obCmbBiblioteca->setValue              ( $_REQUEST['stCodBiblioteca'] );
-$obCmbBiblioteca->preencheCombo         ( $rsBiblioteca           );
-$obCmbBiblioteca->obEvento->setOnchange ("limpaCampoFuncao()"     );
-}
+$obCmbBiblioteca->setValue              ( $inCodBiblioteca        );
+$obCmbBiblioteca->obEvento->setOnchange ( "limpaCampoFuncao();"   );
 
 $obHdnForm = new Hidden;
 $obHdnForm->setName( 'nomForm' );
@@ -196,17 +172,6 @@ $obFormulario->addHidden ( $obHdnCampoNom );
 $obFormulario->addHidden ( $obHdnCampoFuncao );
 $obFormulario->addHidden ( $obHdnTipoFuncaoBusca );
 
-# Comentado até que alguém tenha uma explicação de porque esconder os filtros
-# na tela de filtro.
-#
-# if (isset($_REQUEST['inCodBiblioteca']) and isset($_REQUEST['inCodModulo'])) {
-#     $obFormulario->addHidden            ( $obHdnInCodModulo );
-#     $obFormulario->addHidden            ( $obHdnInCodBiblioteca );
-# } else {
-#     $obFormulario->addComponente        ( $obCmbModulo      );
-#     $obFormulario->addComponente        ( $obCmbBiblioteca  );
-# }
-
 $obFormulario->addComponente ( $obCmbModulo     );
 $obFormulario->addComponente ( $obCmbBiblioteca );
 $obFormulario->addComponente ( $obTxtNomeFuncao );
@@ -228,7 +193,7 @@ $obBtnLimpar->setDisabled           ( false );
 $botoes = array( $obBtnOk, $obBtnLimpar );
 
 $obFormulario->defineBarra($botoes, 'left', '');
-$obFormulario->show                 ();
+$obFormulario->show();
 $obIFrame->show();
 $obIFrame2->show();
 

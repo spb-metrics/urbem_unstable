@@ -56,10 +56,10 @@ $stFncJavaScript .= " var sNum;                  \n";
 $stFncJavaScript .= " var sNom;                  \n";
 $stFncJavaScript .= " sNum = num;                \n";
 $stFncJavaScript .= " sNom = nom;                \n";
-$stFncJavaScript .= " if ( window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."') ) { window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom; } \n";
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sNum; \n";
-$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus(); \n";
-//$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNom"].".value = sNom; \n";
+$stFncJavaScript .= " if ( window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get("campoNom")."') ) { window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get("campoNom")."').innerHTML = sNom; } \n";
+$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$request->get("nomForm").".".$request->get("campoNum").".value = sNum; \n";
+$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$request->get("nomForm").".".$request->get("campoNum").".focus(); \n";
+//$stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$request->get("nomForm").".".$request->get("campoNom").".value = sNom; \n";
 $stFncJavaScript .= " window.close();            \n";
 $stFncJavaScript .= " }                          \n";
 
@@ -69,46 +69,54 @@ $stFiltro = "";
 $stLink   = "";
 
 //Definição do filtro de acordo com os valores informados no FL
-$stLink .= "&stTipoPessoa=".$_REQUEST["stTipoPessoa"];
+$stLink .= "&stTipoPessoa=".$request->get("stTipoPessoa");
 
-if ($_REQUEST["campoNom"]) {
-    $stLink .= '&campoNom='.$_REQUEST['campoNom'];
+if ($request->get("campoNom")) {
+    $stLink .= '&campoNom='.$request->get('campoNom');
 }
-if ($_REQUEST["nomForm"]) {
-    $stLink .= '&nomForm='.$_REQUEST['nomForm'];
+if ($request->get("nomForm")) {
+    $stLink .= '&nomForm='.$request->get('nomForm');
 }
-if ($_REQUEST["campoNum"]) {
-    $stLink .= '&campoNum='.$_REQUEST['campoNum'];
+if ($request->get("campoNum")) {
+    $stLink .= '&campoNum='.$request->get('campoNum');
 }
-if ($_REQUEST["stTipoPessoa"] == "F") {
+if ($request->get("stTipoPessoa") == "F") {
     $stFiltro .= " AND CGM.numcgm IN (select numcgm from sw_cgm_pessoa_fisica ) ";
 }
-if ($_REQUEST["stTipoPessoa"] == "J") {
+if ($request->get("stTipoPessoa") == "J") {
     $stFiltro .= " AND CGM.numcgm IN (select numcgm from sw_cgm_pessoa_juridica ) ";
 }
 if ( $request->get("stNomeCgm") ) {
-//     $stFiltro .= " AND lower(nom_cgm) like lower('".$_REQUEST["stNomeCgm"]."%') ";
-    $stFiltro .= " AND lower(nom_cgm) like lower('".$_REQUEST["stNomeCgm"]."%')||'%' ";
-    $stLink   .= "&stNomeCgm=".$_REQUEST["stNomeCgm"];
+//     $stFiltro .= " AND lower(nom_cgm) like lower('".$request->get("stNomeCgm")."%') ";
+    $stFiltro .= " AND lower(nom_cgm) like lower('".$request->get("stNomeCgm")."%')||'%' ";
+    $stLink   .= "&stNomeCgm=".$request->get("stNomeCgm");
 }
 if ( $request->get("stCPF") ) {
-    $inCPF = $_REQUEST["stCPF"];
+    $inCPF = $request->get("stCPF");
     $obMascara->desmascaraDado( $inCPF );
     $stFiltro .= " AND CGM.numcgm in ( select numcgm from sw_cgm_pessoa_fisica where cpf = '".$inCPF."') ";
-    $stLink   .= "&stCPF=".$_REQUEST["stCPF"];
+    $stLink   .= "&stCPF=".$request->get("stCPF");
 }
+
+$boValidaCgmAtivo = Sessao::read('valida_ativos_cgm');
 
 // SQL Comum ao case 1 e case 2, filtra servidores com contrato.
 $stSQL  = " AND cgm.numcgm IN (                               \n";
 $stSQL .= "SELECT ps.numcgm                                   \n";
 $stSQL .= "  FROM pessoal.servidor ps                     \n";
 $stSQL .= "     , pessoal.servidor_contrato_servidor pscs \n";
-$stSQL .= " WHERE ps.cod_servidor = pscs.cod_servidor)        \n";
+$stSQL .= " WHERE ps.cod_servidor = pscs.cod_servidor        \n";
+if ($boValidaCgmAtivo == 'true') {
+    $stSQL .= " AND recuperarSituacaoDoContratoLiteral(pscs.cod_contrato, 0, '".Sessao::getEntidade()."') = 'Ativo' \n";
+    $stSQL .= " ) \n";
+}else{
+    $stSQL .= " ) \n";
+}
 
 //Filtro setado na pagina que abre a popup
-$stLink .= "&inFiltro=".$_REQUEST['inFiltro'];
-switch ($_REQUEST['inFiltro']) {
+$stLink .= "&inFiltro=".$request->get('inFiltro');
 
+switch ($request->get('inFiltro')) {
     //CGMs de contratos
     case 1:
         $stFiltro .= $stSQL;
@@ -154,23 +162,9 @@ switch ($_REQUEST['inFiltro']) {
         $stFiltro .= "     FROM                                                          \n";
         $stFiltro .= "          pessoal.pensionista                      )               \n";
         break;
-}//end switch
 
-/*if ($_REQUEST["stCNPJ"]) {
-    $inCNPJ = $_REQUEST["stCNPJ"];
-    $obMascara->desmascaraDado( $inCNPJ );
-    $stFiltro .= " AND CGM.numcgm in ( select numcgm from ".CGM_PESSOA_JURIDICA." where cnpj = '".$inCNPJ."') ";
-    $stLink   .= "&stCNPJ=".$_REQUEST["stCNPJ"];
-}*/
-/*
-if ($_REQUEST["stNomeFantasia"]) {
-    $stFiltro .= " AND CGM.numcgm in ( select numcgm from ".CGM_PESSOA_JURIDICA." where lower(nom_fantasia) like lower('%".$_REQUEST["stNomeFantasia"]."%') ) ";
-    $stLink   .= "&stNomeFantasia=".$_REQUEST["stNomeFantasia"];
-}
-*/
-/*if ($stFiltro) {
-    $stFiltro = substr( $stFiltro, 0, strlen( $stFiltro ) - 4 );
-}*/
+
+}//end switch
 
 //faz busca dos CGM's utilizando o filtro setado
 $stAcao = isset($stAcao) ? $stAcao : "";

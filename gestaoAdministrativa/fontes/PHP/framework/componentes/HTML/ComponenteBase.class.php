@@ -48,7 +48,7 @@ class ComponenteBase extends Objeto
     # Quando o Urbem estiver com PHP 5.4 esse deve ser o método utilizado, não será mais necessário o check encondig.
     # function setTitle($valor)            { $this->stTitle =  $valor; }
     
-    public function setTitle($valor)            { $this->stTitle =  mb_check_encoding($valor, 'UTF-8') ? utf8_decode($valor) : $valor; }
+    public function setTitle($valor)            { $this->stTitle =  (strnatcmp(phpversion(),'5.4.0') < 0) ? (mb_check_encoding($valor, 'UTF-8') ? utf8_decode($valor) : $valor ) : $valor; }
     public function setRotulo($valor)           { $this->stRotulo = $valor; }
     public function setNull($valor)             { $this->boNull = $valor; }
     public function setNullBarra($valor)        { $this->boNullBarra = $valor; }

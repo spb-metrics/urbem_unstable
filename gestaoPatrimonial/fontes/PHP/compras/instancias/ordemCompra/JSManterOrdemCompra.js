@@ -30,7 +30,7 @@
 
     * @ignore
 
-    $Id: JSManterOrdemCompra.js 62696 2015-06-09 14:19:37Z michel $
+    $Id: JSManterOrdemCompra.js 64005 2015-11-17 16:49:06Z michel $
 
 */
 </script>
@@ -45,12 +45,12 @@
         document.frm.action = stAction;
         document.frm.target = stTarget;
     }
-    
+
     function limparFiltro(){
         document.frm.reset();
         passaItem('document.frm.inCodEntidade','document.frm.inCodEntidadeDisponivel','tudo');
     }
-    
+
     function incluirItem( idItem, linha_table_tree) {
         var boErro = false;
         var msg = '';
@@ -76,7 +76,7 @@
             alertaAviso(msg,'form','erro','".Sessao::getId()."', '../');
         }else{
             TableTreeLineControl( linha_table_tree , 'none', '', 'none');
-            
+
             var stTarget = document.frm.target;
             var stAction = document.frm.action;
             document.frm.target = 'oculto';
@@ -87,17 +87,19 @@
             document.frm.target = stTarget;
         }
     }
-    
-    function limpaItem( idItem, boMarcaCentro ) {
-        if (boMarcaCentro == 'f') {
+
+    function limpaItem( idItem, boMarcaCentro, boLimparCentroCusto ) {
+        if (boMarcaCentro == 't') {
             document.getElementById('inCodItem'+idItem).value = '';
             document.getElementById('stNomItem'+idItem).innerHTML = '&nbsp;';
         }
-        document.getElementById('inCodCentroCusto'+idItem).value = '';
-        document.getElementById('stNomCentroCusto'+idItem).innerHTML = '&nbsp;';
+        if (boLimparCentroCusto == 't') {
+            document.getElementById('inCodCentroCusto'+idItem).value = '';
+            document.getElementById('stNomCentroCusto'+idItem).innerHTML = '&nbsp;';
+        }
         document.getElementById('inMarca'+idItem).value = '';
         document.getElementById('stNomMarca'+idItem).innerHTML = '&nbsp;';
-        
+
         var stTarget = document.frm.target;
         var stAction = document.frm.action;
         document.frm.target = 'oculto';

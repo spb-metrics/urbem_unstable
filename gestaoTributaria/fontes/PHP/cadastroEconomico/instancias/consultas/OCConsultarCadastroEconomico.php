@@ -30,7 +30,7 @@
     * @author Marcelo B. Paulino
     * @ignore
 
-    * $Id: OCConsultarCadastroEconomico.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConsultarCadastroEconomico.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.21
 */
@@ -612,8 +612,6 @@ function montaListaElementos($rsElementos)
 
 function montaListaLicencas($rsLicencas)
 {
-    #sistemaLegado::mostravar ( $rsLicencas );
-
     $table = new Table();
     $table->setRecordset( $rsLicencas );
     $table->setSummary('Lista de Licenças');

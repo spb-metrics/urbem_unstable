@@ -30,7 +30,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    $Id: PRPopupCondicao.php 60991 2014-11-27 16:28:17Z carolina $
+    $Id: PRPopupCondicao.php 63829 2015-10-22 12:06:07Z franver $
 
     Casos de uso: uc-01.03.95
 */
@@ -88,7 +88,6 @@ switch ($stAcao) {
 
             $arFuncao = Sessao::read('Funcao');
 
-//           SistemaLegado::mostravar($arFuncao);exit;
             $inCountCorpo = count($arFuncao['Corpo']);
             for ($inCountElementos=0; $inCountElementos<$inQuantLinhas; $inCountElementos++) {
                 for ($inCount=($arPosicao[0]+$inCountElementos); $inCount<$inCountCorpo; $inCount++) {

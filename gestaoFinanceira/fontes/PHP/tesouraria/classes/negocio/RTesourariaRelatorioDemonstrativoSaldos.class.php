@@ -183,8 +183,7 @@ class RTesourariaRelatorioDemonstrativoSaldos extends PersistenteRelatorio
 
     public function geraRecordSetBanco(&$arRelatorio)
     {
-        $boTCEMS = SistemaLegado::is_tcems();
-
+        
         $this->obFTesourariaDemonstrativoSaldos->setDado('inCodEntidade', $this->getCodEntidade());
         $this->obFTesourariaDemonstrativoSaldos->setDado('stExercicio', $this->getExercicio());
         $this->obFTesourariaDemonstrativoSaldos->setDado('dtDataInicio',$this->getInicioPeriodo());
@@ -219,7 +218,7 @@ class RTesourariaRelatorioDemonstrativoSaldos extends PersistenteRelatorio
         $this->obFTesourariaDemonstrativoSaldos->setDado('inCodDetalhamento', $this->inCodDetalhamento );
         $this->obFTesourariaDemonstrativoSaldos->setDado('boUtilizaEstruturalTCE', 'false' );
 
-        if ($boTCEMS) {
+        if (Sessao::getExercicio() > '2012') {
             $this->obFTesourariaDemonstrativoSaldos->setDado('boUtilizaEstruturalTCE', 'true' );
         }
         
@@ -378,8 +377,7 @@ class RTesourariaRelatorioDemonstrativoSaldos extends PersistenteRelatorio
     //Relatorio quando for agrupado por conta corrente
     public function geraRecordSetBancoContaCorrente(&$arRelatorio)
     {
-        $boTCEMS = SistemaLegado::is_tcems();
-
+        
         $this->obFTesourariaDemonstrativoSaldos->setDado('inCodEntidade', $this->getCodEntidade());
         $this->obFTesourariaDemonstrativoSaldos->setDado('stExercicio', $this->getExercicio());
         $this->obFTesourariaDemonstrativoSaldos->setDado('dtDataInicio',$this->getInicioPeriodo());
@@ -414,7 +412,7 @@ class RTesourariaRelatorioDemonstrativoSaldos extends PersistenteRelatorio
         $this->obFTesourariaDemonstrativoSaldos->setDado('inCodDetalhamento', $this->inCodDetalhamento );
         $this->obFTesourariaDemonstrativoSaldos->setDado('boUtilizaEstruturalTCE', 'false' );
 
-        if ($boTCEMS) {
+        if (Sessao::getExercicio() > '2012') {
             $this->obFTesourariaDemonstrativoSaldos->setDado('boUtilizaEstruturalTCE', 'true' );
         }
         

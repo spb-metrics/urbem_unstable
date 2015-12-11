@@ -259,7 +259,6 @@ class interfaceBens
 
         //Carrega os campos do vetor como variáveis, cada qual com seu respectivo valor
         if (is_array($vet)) {
-            //mostravar($vet)
             foreach ($vet as $chave=>$valor) {
                 $$chave = $valor;
             }
@@ -1013,7 +1012,6 @@ if ($formAcao != 'incluir_lote') {
                                 administracao.orgao
                             ORDER
                                 by nom_orgao";
-                    //mostravar($sSQL);
                     $dbEmp = new dataBaseLegado;
                     $dbEmp->abreBD();
                     $dbEmp->abreSelecao($sSQL);
@@ -1349,7 +1347,6 @@ if ($formAcao != 'incluir_lote') {
                                 administracao.orgao
                             ORDER
                                 by nom_orgao";
-                    //mostravar($sSQL);
                     $dbEmp = new dataBaseLegado;
                     $dbEmp->abreBD();
                     $dbEmp->abreSelecao($sSQL);
@@ -1448,7 +1445,6 @@ if ($formAcao != 'incluir_lote') {
     {
         //Carrega os campos do vetor como variáveis, cada qual com seu respectivo valor
         if (is_array($vet)) {
-            //mostravar($vet)
             foreach ($vet as $chave=>$valor) {
                 $$chave = $valor;
             }

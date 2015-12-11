@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterConfiguracao.php 63672 2015-09-28 19:24:31Z arthur $
+    * $Id: FMManterConfiguracao.php 63766 2015-10-07 19:09:57Z arthur $
 
     * Casos de uso: uc-05.01.01
 */
@@ -53,6 +53,9 @@ $pgOcul = "OC".$stPrograma.".php";
 $obRCIMConfiguracao = new RCIMConfiguracao();
 $obErro = $obRCIMConfiguracao->consultarConfiguracao();
 
+$boCodLocal = $obRCIMConfiguracao->getCodigoLocal();
+$boNumIM    = $obRCIMConfiguracao->getNumeroIM();
+
 $stAcao = $request->get('stAcao');
 
 //DEFINICAO DOS COMPONENTES
@@ -70,7 +73,7 @@ $obRdbCodLocalAutomatico->setName       ( "boCodigoLocal" );
 $obRdbCodLocalAutomatico->setId         ( "boCodigoLocal" );
 $obRdbCodLocalAutomatico->setLabel      ( "Automático" );
 $obRdbCodLocalAutomatico->setValue      ( "true" );
-$obRdbCodLocalAutomatico->setChecked    ( ( $obRCIMConfiguracao->getCodigoLocal() == 'true' ) );
+$obRdbCodLocalAutomatico->setChecked    ( ( $boCodLocal == 'true' ) );
 $obRdbCodLocalAutomatico->setTitle      ( "Define se o código de localização será informado ou gerado automaticamente." );
 $obRdbCodLocalAutomatico->setNull       ( false );
 
@@ -80,7 +83,7 @@ $obRdbCodLocalManual->setName        ( "boCodigoLocal" );
 $obRdbCodLocalManual->setiD          ( "boCodigoLocal" );
 $obRdbCodLocalManual->setLabel       ( "Manual" );
 $obRdbCodLocalManual->setValue       ( "false" );
-$obRdbCodLocalManual->setChecked     ( ( empty($obRCIMConfiguracao->getCodigoLocal()) || $obRCIMConfiguracao->getCodigoLocal() == 'false') ? 'false' : "" );
+$obRdbCodLocalManual->setChecked     ( ( empty($boCodLocal) || $boCodLocal == 'false') ? 'false' : "" );
 $obRdbCodLocalManual->setNull        ( false );
 
 $obTxtMascaraLote = new TextBox;
@@ -97,7 +100,7 @@ $obRdbNumInscAutomatico->setRotulo     ( "Número de Inscrição Imobiliária" )
 $obRdbNumInscAutomatico->setName       ( "boNumeroIM" );
 $obRdbNumInscAutomatico->setLabel      ( "Automático" );
 $obRdbNumInscAutomatico->setValue      ( "true" );
-$obRdbNumInscAutomatico->setChecked    ( ( $obRCIMConfiguracao->getNumeroIM() == 'true' ) );
+$obRdbNumInscAutomatico->setChecked    ( ( $boNumIM == 'true' ) );
 $obRdbNumInscAutomatico->setTitle      ( "Define se o número da inscrição imobiliária será informado ou gerado automaticamente." );
 $obRdbNumInscAutomatico->setNull       ( false );
 
@@ -106,7 +109,7 @@ $obRdbNumInscManual->setRotulo      ( "Número de Inscrição Imobiliária" );
 $obRdbNumInscManual->setName        ( "boNumeroIM" );
 $obRdbNumInscManual->setLabel       ( "Manual" );
 $obRdbNumInscManual->setValue       ( "false" );
-$obRdbNumInscManual->setChecked     ( ( empty($obRCIMConfiguracao->getNumeroIM()) || $obRCIMConfiguracao->getNumeroIM() == 'false') ? 'false' : "" );
+$obRdbNumInscManual->setChecked     ( ( empty($boNumIM) || $boNumIM == 'false') ? 'false' : "" );
 $obRdbNumInscManual->setNull        ( false );
 
 $obTxtMascaraInscImob = new TextBox;

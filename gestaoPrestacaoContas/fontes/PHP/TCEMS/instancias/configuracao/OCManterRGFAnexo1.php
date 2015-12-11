@@ -79,7 +79,6 @@ function preencheListaDespesas()
 function montaListaDespesas()
 {
     $stJs = '';
-    //SistemaLegado::mostravar(Sessao::read('arListaDespesa')); exit;
 
     $rsLista = new RecordSet;
     $rsLista->preenche(Sessao::read('arListaDespesa'));

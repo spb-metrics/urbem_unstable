@@ -34,7 +34,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMTransferencia.class.php 63503 2015-09-03 18:25:17Z jean $
+    * $Id: RCIMTransferencia.class.php 63839 2015-10-22 18:08:07Z franver $
 
      * Casos de uso: uc-05.01.17
 */
@@ -499,13 +499,9 @@ function efetivarTransferencia($boTransacao = "", $boAbstracao = true)
 
                     }
 
-                    #echo 'CODIGO DA NATUREZA: ' .$this->getCodigoNatureza().'x';
-
                     if ( !$obErro->ocorreu() && $this->getCodigoNatureza() == 1 ) {
                         //repassa as dividas em aberto para os novos CGMs quando a natureza for COMPRA/VENDA
                         #$arAdquirentes = $this->obRCIMAdquirente->getAdquirentes();
-                        #sistemaLegado::mostravar ( $this->arAdquirentes );
-                        #echo 'Inscricao: '.$this->getInscricaoMunicipal();
                         include_once( CAM_GT_ARR_NEGOCIO."RARRCalculo.class.php" );
                         include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaImovel.class.php" );
                         include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaCGM.class.php" );

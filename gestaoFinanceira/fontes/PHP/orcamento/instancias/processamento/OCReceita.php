@@ -30,7 +30,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
 
-    $Id: OCReceita.php 61612 2015-02-13 16:47:23Z lisiane $
+    $Id: OCReceita.php 64153 2015-12-09 19:16:02Z evandro $
 
     Casos de uso: uc-02.01.06
 */
@@ -121,7 +121,7 @@ function buscaReceita($stTipoBusca, $stEntidades = "")
                                               FROM contabilidade.desdobramento_receita as dr
                                              WHERE   receita.cod_receita = dr.cod_receita_secundaria
                                                  AND receita.exercicio   = dr.exercicio ) ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $obMapeamento->recuperaReceitaAnaliticaTCE($rsRecordSet, $stFiltro);
             } else {
                 $obMapeamento->recuperaReceitaAnalitica($rsRecordSet, $stFiltro);
@@ -138,7 +138,7 @@ function buscaReceita($stTipoBusca, $stEntidades = "")
                                               FROM contabilidade.desdobramento_receita as dr
                                              WHERE   receita.cod_receita = dr.cod_receita_secundaria
                                                  AND receita.exercicio   = dr.exercicio ) ";
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= " AND CLR.estorno = 'false' ";
                 $obMapeamento->recuperaReceitaAnaliticaTCE($rsRecordSet, $stFiltro);
             } else {

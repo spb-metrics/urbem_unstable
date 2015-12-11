@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: Mascara.class.php 59612 2014-09-02 12:00:51Z gelson $
+$Id: Mascara.class.php 63829 2015-10-22 12:06:07Z franver $
 
 Casos de uso: uc-01.01.00
 */
@@ -231,11 +231,9 @@ public static function validaMascaraDinamica($mascara,$digitos)
 
     //Explode a mascara
     $elementosMascara =  preg_split("/[^a-zA-Z0-9]/",$mascara);
-    //mostraVar($elementosMascara);
 
     //Pega somente os separadores da máscara
     $separadoresMascara =  preg_replace("/[a-zA-Z0-9]/","",$mascara);
-    //mostraVar($separadoresMascara);
 
     //Total de elementos  da mascara
     $totalElMascara = sizeof($elementosMascara);

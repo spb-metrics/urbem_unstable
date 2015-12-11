@@ -33,7 +33,7 @@
 
  * @ignore
 
- $Id: menu.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+ $Id: menu.php 63977 2015-11-13 13:00:23Z diogo.zarpelon $
 
  $Revision: 28718 $
  $Name$
@@ -239,7 +239,7 @@ if (!Sessao::getId()) {
 ?>
 <center>
 
-<table border="0" width="98%" cellspacing="0" cellpadding="0">
+<table border="0" width="180px" cellspacing="0" cellpadding="0">
 <?php
 $nivel = (int) $nivel;
 

@@ -33,7 +33,7 @@
     * @package framework
     * @subpackage componentes
 
-    $Id: Periodicidade.class.php 63510 2015-09-04 15:12:29Z evandro $
+    $Id: Periodicidade.class.php 63968 2015-11-12 18:00:32Z jean $
 
     Casos de uso: uc-01.01.00
 
@@ -136,6 +136,12 @@ var $obDataFinal;
 var $boExibeDia;
 
 /**
+    * @access Private
+    * @var Object
+*/
+var $boAnoVazio;
+
+/**
     * @access Public
     * @param String $valor
 */
@@ -226,6 +232,14 @@ function setExibeDia($valor) { $this->boExibeDia = $valor; }
     * @access Public
     * @return String
 */
+
+function setAnoVazio($valor) { $this->boAnoVazio = $valor; }
+
+/**
+    * @access Public
+    * @return Boolean
+*/
+
 function getExercicio() { return $this->stExercicio; }
 /**
     * @access Public
@@ -312,6 +326,13 @@ function getExibeDia() { return $this->boExibeDia;  }
     * Método Construtor
     * @access Public
 */
+
+function getAnoVazio() { return $this->boAnoVazio;  }
+/**
+    * Método Construtor
+    * @access Public
+*/
+
 function Periodicidade()
 {
     parent::Componente();
@@ -331,10 +352,12 @@ function Periodicidade()
 
     $this->setDia                       ( new Data          );
     $this->obDia->setName               ("stDia".$this->getIdComponente() );
+    $this->obDia->setId                 ("stDia".$this->getIdComponente() );
     $this->obDia->setRotulo             ( "Dia"             );
 
     $this->setMes                       ( new Select        );
     $this->obMes->setName               ("stMes".$this->getIdComponente() );
+    $this->obMes->setId                 ("stMes".$this->getIdComponente() );
     $this->obMes->setRotulo             ( "Mes"             );
     $this->obMes->setValue              ( ""                );
     $this->obMes->addOption             ( "","Selecione"    );
@@ -353,6 +376,7 @@ function Periodicidade()
 
     $this->setHdnAnoMes ( new Hidden);
     $this->obHdnAnoMes->setName ( "stAnoMes".$this->getIdComponente() );
+    $this->obHdnAnoMes->setId   ( "stHdnAnoMes".$this->getIdComponente() );
     $this->obHdnAnoMes->setValue( ""  );
 
     $this->setLblAnoMes ( new Label);
@@ -361,6 +385,7 @@ function Periodicidade()
 
     $this->setAnoMes                       ( new TextBox       );
     $this->obAnoMes->setName               ("stAnoMes".$this->getIdComponente() );
+    $this->obAnoMes->setId                 ("stAnoMes".$this->getIdComponente() );
     $this->obAnoMes->setRotulo             ( "AnoMes"          );
     $this->obAnoMes->setSize               ( 4                 );
     $this->obAnoMes->setMaxLength          ( 4                 );
@@ -369,6 +394,7 @@ function Periodicidade()
 
     $this->setAno                       ( new TextBox       );
     $this->obAno->setName               ("stAno".$this->getIdComponente() );
+    $this->obAno->setId                 ("stAno".$this->getIdComponente() );
     $this->obAno->setRotulo             ( "Ano"             );
     $this->obAno->setSize               ( 4                 );
     $this->obAno->setMaxLength          ( 4                 );
@@ -377,10 +403,12 @@ function Periodicidade()
 
     $this->setPeriodoInicial            ( new Data          );
     $this->obPeriodoInicial->setName    ("stPeriodoInicial".$this->getIdComponente() );
+    $this->obPeriodoInicial->setId      ("stPeriodoInicial".$this->getIdComponente() );
     $this->obPeriodoInicial->setRotulo  ( "Intervalo"         );
 
     $this->setPeriodoFinal              ( new Data          );
     $this->obPeriodoFinal->setName      ("stPeriodoInicial".$this->getIdComponente() );
+    $this->obPeriodoFinal->setId        ("stPeriodoInicial".$this->getIdComponente() );
     $this->obPeriodoFinal->setRotulo    ( "Intervalo"         );
 
     $this->setPeriodoLabel              ( new Label         );
@@ -391,9 +419,14 @@ function Periodicidade()
 
     $this->setDataInicial               ( new Hidden        );
     $this->obDataInicial->setName       ('stDataInicial'.$this->getIdComponente() );
+    $this->obDataInicial->setId         ('stDataInicial'.$this->getIdComponente() );
 
     $this->setDataFinal                 ( new Hidden        );
     $this->obDataFinal->setName         ('stDataFinal'.$this->getIdComponente() );
+    $this->obDataFinal->setId           ('stDataFinal'.$this->getIdComponente() );
+
+    $this->setAnoVazio                  ( false );
+
 }
 
 /**
@@ -414,27 +447,31 @@ function montaHtml()
     $this->obDataFinal->setName         ($this->obDataFinal->getName().$this->getIdComponente() );
 
     $this->obDia->setName               ("stDia".$this->getIdComponente() );
+    $this->obDia->setId                 ("stDia".$this->getIdComponente() );
     $this->obDia->obEvento->setOnChange ("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obDia->getName()."='+this.value,'preencheDia');");
 
     $this->obAnoMes->setName               ("stAnoMes".$this->getIdComponente() );
+    $this->obAnoMes->setId                 ("stAnoMes".$this->getIdComponente() );
     $this->obAnoMes->obEvento->setOnBlur   ("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obMes->getName().$this->getIdComponente()."='+document.frm.".$this->obMes->getName().$this->getIdComponente().".value+'&".$this->obAnoMes->getName()."='+this.value,'preencheMes');");
 
     $this->obMes->setName               ("stMes".$this->getIdComponente() );
+    $this->obMes->setId                 ("stMes".$this->getIdComponente() );
     $this->obMes->obEvento->setOnChange ("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obMes->getName()."='+this.value+'&".$this->obAnoMes->getName()."='+document.frm.".$this->obAnoMes->getName().".value,'preencheMes');");
 
     $this->setHdnAnoMes ( new Hidden);
-
     $this->obHdnAnoMes->setName ( "stAnoMes".$this->getIdComponente() );
-
     $this->obLblAnoMes->setId    ( "inAnoMes".$this->getIdComponente() );
 
     $this->obAno->setName               ("stAno".$this->getIdComponente() );
+    $this->obAno->setId                 ("stAno".$this->getIdComponente() );
     $this->obAno->obEvento->setOnChange ("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obAno->getName()."='+this.value,'preencheAno');");
 
     $this->obPeriodoInicial->setName    ("stPeriodoInicial".$this->getIdComponente() );
+    $this->obPeriodoInicial->setId      ("stPeriodoInicial".$this->getIdComponente() );
     $this->obPeriodoInicial->obEvento->setOnChange("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obPeriodoInicial->getName()."='+this.value+'&stTipo=inicial','preenchePeriodo');");
 
     $this->obPeriodoFinal->setName      ("stPeriodoFinal".$this->getIdComponente() );
+    $this->obPeriodoFinal->setId        ("stPeriodoFinal".$this->getIdComponente() );
     $this->obPeriodoFinal->obEvento->setOnChange("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&".$this->obPeriodoFinal->getName()."='+this.value+'&stTipo=final','preenchePeriodo');");
 
     if ( $this->getExibeDia() ) {
@@ -446,10 +483,12 @@ function montaHtml()
 
     if (!$this->obDataInicial->getName()) {
         $this->obDataInicial->setName       ($this->obDataInicial->getName().$this->getIdComponente() );
+        $this->obDataInicial->setId         ($this->obDataInicial->getName().$this->getIdComponente() );
     }
 
     if (!$this->obDataFinal->getName()) {
         $this->obDataFinal->setName         ($this->obDataFinal->getName().$this->getIdComponente() );
+        $this->obDataFinal->setId           ($this->obDataFinal->getName().$this->getIdComponente() );
     }
 
     //MONTA O OPÇÃO "PERIODO"
@@ -468,6 +507,7 @@ function montaHtml()
 
     //MONTA A PERIODICIDADE
     $this->obPeriodicidade->setName( $this->obPeriodicidade->getName() );
+    $this->obPeriodicidade->setId  ( $this->obPeriodicidade->getName() );
     $this->obPeriodicidade->obEvento->setOnChange("ajaxJavaScript('".CAM_FW_INSTANCIAS."processamento/OCPeriodicidade.php?".Sessao::getId()."&inIdComponente=".$this->getIdComponente()."&inCodPeriodo='+this.value,'montaSpan');" );
 
     if($this->getValue())

@@ -32,16 +32,17 @@
 
     * @ignore
 
-    $Id: FMConsultarEmpenho.php 61753 2015-03-02 13:55:48Z jean $
+    $Id: FMConsultarEmpenho.php 64081 2015-11-30 15:36:50Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php"             );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php"  );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoPagamentoLiquidacao.class.php" );
-include_once ( CAM_FW_HTML."MontaAtributos.class.php"                     );
-include_once ( CAM_GF_PPA_MAPEAMENTO."TPPAAcao.class.php"                 );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPagamentoLiquidacao.class.php";
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GF_PPA_MAPEAMENTO."TPPAAcao.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ConsultarEmpenho";
@@ -55,10 +56,7 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 $obREmpenhoEmpenhoAutorizacao = new REmpenhoEmpenhoAutorizacao;
 
@@ -74,13 +72,19 @@ $stMascaraRubrica = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamen
 
 Sessao::remove('arItens');
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenho( $_REQUEST['inCodEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_REQUEST['stExercicioEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $_REQUEST['inCodAutorizacao'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $_REQUEST['inCodPreEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
+$obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato;
+$stFiltro  = "   AND e.exercicio    = '".$request->get('stExercicioEmpenho')."'";
+$stFiltro .= "   AND e.cod_entidade =  ".$request->get('inCodEntidade');
+$stFiltro .= "   AND e.cod_empenho  =  ".$request->get('inCodEmpenho');
+$obTEmpenhoEmpenhoContrato->recuperaRelacionamentoEmpenhoContrato($rsEmpenhoContrato, $stFiltro, "");
 
-if (( $_REQUEST['boImplantado'] =='t' ) || ( Sessao::getExercicio() !== $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getExercicio() ) ) {
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenho( $request->get('inCodEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $request->get('stExercicioEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $request->get('inCodAutorizacao') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+
+if (( $request->get('boImplantado') =='t' ) || ( Sessao::getExercicio() !== $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getExercicio() ) ) {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->consultarRestosAPagar();
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->listarRestosAPagar( $rsSaldos );
 } else {
@@ -96,8 +100,8 @@ $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->consultarValorItem();
 
 $nuValorSaldoAnterior = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getVlSaldoAnterior();
 $obREmpenhoOrdemPagamento = new REmpenhoOrdemPagamento;
-$obREmpenhoOrdemPagamento->setExercicio( $_REQUEST['stExercicioEmpenho'] );
-$obREmpenhoOrdemPagamento->obREmpenhoEmpenho->setCodEmpenho( $_REQUEST['inCodEmpenho'] );
+$obREmpenhoOrdemPagamento->setExercicio( $request->get('stExercicioEmpenho') );
+$obREmpenhoOrdemPagamento->obREmpenhoEmpenho->setCodEmpenho( $request->get('inCodEmpenho') );
 $obREmpenhoOrdemPagamento->listarValorPago( $rsValorPago );
 
 $inNumUnidade = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNumeroUnidade();
@@ -106,9 +110,11 @@ $inNumOrgao   = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPerm
 $stNomOrgao   = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNomeOrgao();
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->setCodDespesa( $rsSaldos->getCampo( "cod_despesa" ) );
 
-if ($_REQUEST['boImplantado'] != 't') {
+if ($request->get('boImplantado') != 't') {
+    $stFiltro = "";
+
     $obErro = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->consultar( $rsDespesa );
-        
+
     if ( !$obErro->ocorreu() ) {
         $obErro = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->listarDespesaDotacao( $rsDotacao );
         if ( !$obErro->ocorreu() ) {
@@ -120,7 +126,7 @@ if ($_REQUEST['boImplantado'] != 't') {
         $nuValorOriginal = $rsDespesa->getCampo( 'vl_original' );
     }
 
-    include_once( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoRecurso.class.php"             );
+    include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php";
     $obTOrcamentoRecurso = new TOrcamentoRecurso;
 
     $inCodRecursoTemp = $rsDespesa->getCampo( "cod_recurso" );
@@ -146,7 +152,6 @@ if ($_REQUEST['boImplantado'] != 't') {
 
 $flValorPago     = number_format( $rsValorPago->getCampo( "valor_pago" ), 2,',','.');
 $flSaldoAnterior = number_format($nuValorOriginal, 2,',','.');
-//$flSaldoAnterior = number_format( $rsSaldos->getCampo( "vl_saldo_anterior"  ), 2,',','.');
 //Recuperação de valores!!!
 $flEmpenhado        = $rsSaldos->getCampo( "vl_empenhado"         ) - $rsSaldos->getCampo( "vl_empenhado_anulado" );
 $flEmpenhado        = number_format( $flEmpenhado ,2,',','.');
@@ -188,7 +193,7 @@ $stCodPrograma      = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcam
 $stNomPrograma      = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoPrograma->getDescricao();
 
 if($stDescricaoRecurso == ""){
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setExercicio($_REQUEST['stExercicio']);
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setExercicio($request->get('stExercicio'));
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->listar($rsLista);
     $stDescricaoRecurso = $rsLista->getCampo('nom_recurso');
 }
@@ -197,7 +202,7 @@ $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcame
 
 if ($rsNumprograma->getNumLinhas() > 0) {
     foreach ($rsNumprograma->getElementos() as $indice => $valor) {
-        if ($valor['exercicio'] == $_REQUEST['stExercicio']) {
+        if ($valor['exercicio'] == $request->get('stExercicio')) {
             $inNumPrograma = intval($valor['num_programa']);
             $stNomPrograma = $valor['descricao'];
             break;
@@ -214,8 +219,8 @@ if (!isset($inNumPrograma)) {
 
 $inCodPao           = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoProjetoAtividade->getNumeroProjeto();
 $stNomPao           = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoProjetoAtividade->getNome();
-if($_REQUEST['inCodAutorizacao'])
-    $stAutorizacao = $_REQUEST['inCodAutorizacao'] . " / " . $_REQUEST['stExercicioEmpenho'];
+if($request->get('inCodAutorizacao'))
+    $stAutorizacao = $request->get('inCodAutorizacao')." / ".$request->get('stExercicioEmpenho');
 
 if ($inCodDespesa) {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->consultarSaldoDotacao();
@@ -256,7 +261,7 @@ $flEmpenhadoAnulado = number_format( $flEmpenhadoAnulado ,2,',','.');
 
 SistemaLegado::executaFramePrincipal("buscaDado('montaListaItemPreEmpenho');");
 $arChaveAtributo =  array( "cod_pre_empenho" => $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodPreEmpenho(),
-                           "exercicio"       => $_REQUEST['stExercicioEmpenho']         );
+                           "exercicio"       => $request->get('stExercicioEmpenho')         );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos     );
 
@@ -281,7 +286,7 @@ if ( Sessao::read('filtro') ) {
     $stFiltro .= '&pg='.Sessao::read('pg').'&pos='.Sessao::read('pos').'&paginando'.Sessao::read('paginando');
 }
 
-if ($_REQUEST['boImplantado'] != 't') {
+if ($request->get('boImplantado') != 't') {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->consultaSaldoAnterior( $nuSaldoDisponivel );
     $stDespesa = $inCodDespesa.' - '.$stNomDespesa;
 }
@@ -299,14 +304,14 @@ $nuSaldoAnterior = number_format($nuSaldoAnterior,2,',','.');;
 $nuSaldoDisponivel = number_format($nuSaldoDisponivel,2,',','.');
     
 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20 && !$boEmpenhoComplementar) {
-    include_once( CAM_GPC_TCERN_MAPEAMENTO . "TTCERNFundeb.class.php" );
-    $stFiltroTCERN = " WHERE cod_empenho = ".$_REQUEST['inCodEmpenho']."
-                         AND cod_entidade = ".$_REQUEST['inCodEntidade']."
-                         AND exercicio = '".$_REQUEST['stExercicioEmpenho']."' ";
+    include_once CAM_GPC_TCERN_MAPEAMENTO."TTCERNFundeb.class.php";
+    $stFiltroTCERN = " WHERE cod_empenho = ".$request->get('inCodEmpenho')."
+                         AND cod_entidade = ".$request->get('inCodEntidade')."
+                         AND exercicio = '".$request->get('stExercicioEmpenho')."' ";
     $obTTCERNFundeb = new TTCERNFundeb;
     $obTTCERNFundeb->recuperaRelacionamento($rsFundeb, $stFiltroTCERN);
 
-    include_once( CAM_GPC_TCERN_MAPEAMENTO . "TTCERNRoyalties.class.php" );
+    include_once CAM_GPC_TCERN_MAPEAMENTO."TTCERNRoyalties.class.php";
     $obTTCERNRoyalties = new TTCERNRoyalties;
     $obTTCERNRoyalties->recuperaRelacionamento($rsRoyalties, $stFiltroTCERN);
 }
@@ -317,11 +322,11 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20 &
 
 $boEmpenhoComplementar = false;
 
-include_once( CAM_GF_EMP_MAPEAMENTO . "TEmpenhoEmpenhoComplementar.class.php" );
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoComplementar.class.php";
 $obTEmpenhoEmpenhoComplementar = new TEmpenhoEmpenhoComplementar();
-$obTEmpenhoEmpenhoComplementar->setDado( 'cod_empenho' , $_REQUEST['inCodEmpenho']);
-$obTEmpenhoEmpenhoComplementar->setDado( 'cod_entidade', $_REQUEST['inCodEntidade']);
-$obTEmpenhoEmpenhoComplementar->setDado( 'exercicio'   , $_REQUEST['stExercicioEmpenho'] );
+$obTEmpenhoEmpenhoComplementar->setDado( 'cod_empenho' , $request->get('inCodEmpenho') );
+$obTEmpenhoEmpenhoComplementar->setDado( 'cod_entidade', $request->get('inCodEntidade') );
+$obTEmpenhoEmpenhoComplementar->setDado( 'exercicio'   , $request->get('stExercicioEmpenho') );
 $obErro = $obTEmpenhoEmpenhoComplementar->recuperaPorChave( $rsEmpenhoComplementar, '' );
 
 if ($rsEmpenhoComplementar->inNumLinhas > 0) {
@@ -387,13 +392,13 @@ $obHdnCodHistorico = new Hidden;
 $obHdnCodHistorico->setName  ( "inCodHistorico" );
 $obHdnCodHistorico->setValue ( $inCodHistorico  );
 
-$inCodEmpenho = $_REQUEST['inCodEmpenho'];
-$inCodEntidade = $_REQUEST['inCodEntidade'];
+$inCodEmpenho = $request->get('inCodEmpenho');
+$inCodEntidade = $request->get('inCodEntidade');
 
 // Define objeto Label para Empenho
 $obLblEmpenho = new Label;
 $obLblEmpenho->setRotulo( "N° Empenho" );
-$obLblEmpenho->setValue ( $inCodEmpenho .' / '.$_REQUEST['stExercicioEmpenho']);
+$obLblEmpenho->setValue ( $inCodEmpenho.' / '.$request->get('stExercicioEmpenho'));
 
 // Define objeto Label para Tipo de Empenho
 $obLblTipoEmpenho = new Label;
@@ -472,7 +477,7 @@ $obLblDescricao->setRotulo( "Descrição do Empenho" );
 $obLblDescricao->setId    ( "stNomEmpenho"              );
 $obLblDescricao->setValue ( $stNomEmpenho               );
 
-$flValorEmpenhado        = $rsSaldos->getCampo( "vl_empenhado"         ) - $rsSaldos->getCampo( "vl_empenhado_anulado" );
+$flValorEmpenhado = $rsSaldos->getCampo( "vl_empenhado" ) - $rsSaldos->getCampo( "vl_empenhado_anulado" );
 
 $obLblSaldoDotacao = new Label;
 $obLblSaldoDotacao->setRotulo( "Saldo Dotação"  );
@@ -490,16 +495,16 @@ $obLblHistorico->setId    ( "stNomHistorico" );
 $obLblHistorico->setValue ( $inCodHistorico." - ".$stNomHistorico  );
 
 $obREmpenhoEmpenho = new REmpenhoEmpenho;
-$obREmpenhoEmpenho->setCodEmpenho              ( $_REQUEST['inCodEmpenho']  );
-$obREmpenhoEmpenho->setCodEntidade             ( $_REQUEST['inCodEntidade'] );
-$obREmpenhoEmpenho->setExercicio               ( $_REQUEST['stExercicio']   );
+$obREmpenhoEmpenho->setCodEmpenho              ( $request->get('inCodEmpenho')  );
+$obREmpenhoEmpenho->setCodEntidade             ( $request->get('inCodEntidade') );
+$obREmpenhoEmpenho->setExercicio               ( $request->get('stExercicio')   );
 $obREmpenhoEmpenho->setBoEmpenhoCompraLicitacao( true );
-$obREmpenhoEmpenho->setCodModalidadeCompra     ( $_REQUEST['inCodModalidadeCompra'] );
-$obREmpenhoEmpenho->setCompraInicial           ( $_REQUEST['inCompraInicial'] );
-$obREmpenhoEmpenho->setCompraFinal             ( $_REQUEST['inCompraFinal'] );
-$obREmpenhoEmpenho->setCodModalidadeLicitacao  ( $_REQUEST['inCodModalidadeLicitacao'] );
-$obREmpenhoEmpenho->setLicitacaoInicial        ( $_REQUEST['inLicitacaoInicial'] );
-$obREmpenhoEmpenho->setLicitacaoFinal          ( $_REQUEST['inLicitacaoFinal'] );
+$obREmpenhoEmpenho->setCodModalidadeCompra     ( $request->get('inCodModalidadeCompra') );
+$obREmpenhoEmpenho->setCompraInicial           ( $request->get('inCompraInicial') );
+$obREmpenhoEmpenho->setCompraFinal             ( $request->get('inCompraFinal') );
+$obREmpenhoEmpenho->setCodModalidadeLicitacao  ( $request->get('inCodModalidadeLicitacao') );
+$obREmpenhoEmpenho->setLicitacaoInicial        ( $request->get('inLicitacaoInicial') );
+$obREmpenhoEmpenho->setLicitacaoFinal          ( $request->get('inLicitacaoFinal') );
 $obREmpenhoEmpenho->listarConsultaEmpenho( $rsListaModalidade );
 
 $obLblCodCompraDireta = new Label;
@@ -522,7 +527,6 @@ $obLblModalidadeLicitacao->setRotulo( "Modalidade da Licitação" );
 $obLblModalidadeLicitacao->setId    ( "inModalidadeLicitacao"   );
 $obLblModalidadeLicitacao->setValue ( $rsListaModalidade->getCampo('licitacao_cod_modalidade').' - '.$rsListaModalidade->getCampo('licitacao_modalidade') );
 
-
 if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20 && !$boEmpenhoComplementar) {
     $obLblFundeb = new Label;
     $obLblFundeb->setRotulo( "Fundeb" );
@@ -536,7 +540,6 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20 &
 }
 
 if ($boEmpenhoComplementar) {
-
     $obLblFlagComplementar = new Label;
     $obLblFlagComplementar->setRotulo( "Empenho Complementar"   );
     $obLblFlagComplementar->setId    ( "stEmpenhoComplementar" );
@@ -546,7 +549,6 @@ if ($boEmpenhoComplementar) {
     $obLblNroEmpenhoComplementar->setRotulo( "Empenho Original"   );
     $obLblNroEmpenhoComplementar->setId    ( "inCodEmpenhoOriginal" );
     $obLblNroEmpenhoComplementar->setValue ( $inCodEmpenhoOriginal );
-
 }
 
 // Atributos Dinamicos
@@ -555,6 +557,13 @@ $obMontaAtributos->setTitulo     ( "Atributos"  );
 $obMontaAtributos->setName       ( "Atributo_"  );
 $obMontaAtributos->setRecordSet  ( $rsAtributos );
 $obMontaAtributos->setLabel      ( true );
+
+if ($rsEmpenhoContrato->getNumLinhas() > 0) {
+    $obLblContrato = new Label;
+    $obLblContrato->setRotulo( "Número do Contrato"  );
+    $obLblContrato->setId    ( "inCodContrato" );
+    $obLblContrato->setValue ( $rsEmpenhoContrato->getCampo('num_contrato').'/'.$rsEmpenhoContrato->getCampo('exercicio')  );
+}
 
 // Saldos
 $obLblDotacaoInicial = new Label;
@@ -585,7 +594,7 @@ $obLblEmpenhadoAnulado->setValue  ( $flEmpenhadoAnulado        );
 $obLblEmpenhadoAnulado->obCampoCod->setName ( "flEmpenhoAnulado" );
 $obLblEmpenhadoAnulado->obCampoCod->setMinLength( 0 );
 $obLblEmpenhadoAnulado->obCampoCod->setMaxLength( 0 );
-$obLblEmpenhadoAnulado->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoAnulado.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$_REQUEST['stExercicioEmpenho']."','".Sessao::getId()."','800','450');");
+$obLblEmpenhadoAnulado->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoAnulado.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$request->get('stExercicioEmpenho')."','".Sessao::getId()."','800','450');");
 
 // Define Objeto BuscaInner para Liquidações
 $obLblVlLiquidado = new BuscaInner;
@@ -595,7 +604,7 @@ $obLblVlLiquidado->setValue  ( $flLiquidado       );
 $obLblVlLiquidado->obCampoCod->setName ( "nuVLiquidado" );
 $obLblVlLiquidado->obCampoCod->setMinLength( 0 );
 $obLblVlLiquidado->obCampoCod->setMaxLength( 0 );
-$obLblVlLiquidado->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoLiquidado.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$_REQUEST['stExercicioEmpenho']."','".Sessao::getId()."','800','450');");
+$obLblVlLiquidado->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoLiquidado.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$request->get('stExercicioEmpenho')."','".Sessao::getId()."','800','450');");
 
 // Define Objeto BuscaInner para Pagamentos
 $obLblPago = new BuscaInner;
@@ -605,9 +614,9 @@ $obLblPago->setValue  ( $nuVlTotalPago       );
 $obLblPago->obCampoCod->setName ( "flPago" );
 $obLblPago->obCampoCod->setMinLength( 0 );
 $obLblPago->obCampoCod->setMaxLength( 0 );
-$obLblPago->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoPago.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$_REQUEST['stExercicioEmpenho']."','".Sessao::getId()."','800','450');");
+$obLblPago->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/LSConsultaEmpenhoPago.php','frm','','','consultaEmpenho&inCodEntidade=".$inCodEntidade."&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$request->get('stExercicioEmpenho')."','".Sessao::getId()."','800','450');");
 
-include_once(CAM_GF_ORC_COMPONENTES."IMontaRecursoDestinacao.class.php");
+include_once CAM_GF_ORC_COMPONENTES."IMontaRecursoDestinacao.class.php";
 $obIMontaRecursoDestinacao = new IMontaRecursoDestinacao;
 $obIMontaRecursoDestinacao->setCodRecurso ( $inCodRecurso );
 $obIMontaRecursoDestinacao->setDescricaoRecurso ( $stDescricaoRecurso );
@@ -615,7 +624,7 @@ $obIMontaRecursoDestinacao->setLabel ( true );
 
 $pgProx = CAM_FW_POPUPS."relatorio/OCRelatorio.php";
 $stLink .= "&stCaminho=".CAM_GF_EMP_INSTANCIAS."empenho/OCRelatorioRazaoEmpenho.php";
-$stLink .= "&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$_REQUEST['stExercicioEmpenho']."&inCodEntidade=".$_REQUEST['inCodEntidade'];
+$stLink .= "&inCodEmpenho=".$inCodEmpenho."&stExercicio=".$request->get('stExercicioEmpenho')."&inCodEntidade=".$request->get('inCodEntidade');
 
 $obLnknRazao = new Link;
 $obLnknRazao->setRotulo ("Razão do Empenho" );
@@ -694,6 +703,11 @@ if ($boEmpenhoComplementar) {
 
 $obMontaAtributos->geraFormulario( $obFormulario   );
 
+if ($rsEmpenhoContrato->getNumLinhas() > 0) {
+    $obFormulario->addTitulo( "Contrato"           );
+    $obFormulario->addComponente( $obLblContrato   );
+}
+
 $obFormulario->addTitulo( "Saldos"                 );
 $obFormulario->addComponente( $obLblDotacaoInicial );
 $obFormulario->addComponente( $obLblSaldoAnterior  );
@@ -709,11 +723,11 @@ $obFormulario->addSpan  ( $obSpnLista              );
 
 $obFormulario->addComponente( $obLblDataFinal      );
 
-include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
+include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
 $obMontaAssinaturas = new IMontaAssinaturas;
-$obMontaAssinaturas->setCodDocumento( $_REQUEST['inCodEmpenho'] );
-$obMontaAssinaturas->setCodEntidade( $_REQUEST['inCodEntidade'] );
-$obMontaAssinaturas->setExercicio( $_REQUEST['stExercicioEmpenho'] );
+$obMontaAssinaturas->setCodDocumento( $request->get('inCodEmpenho') );
+$obMontaAssinaturas->setCodEntidade( $request->get('inCodEntidade') );
+$obMontaAssinaturas->setExercicio( $request->get('stExercicioEmpenho') );
 $obMontaAssinaturas->geraListaLeituraFormulario( $obFormulario, 'nota_empenho' );
 
 $obFormulario->defineBarra( array( $obButtonVoltar ), "left", "" );

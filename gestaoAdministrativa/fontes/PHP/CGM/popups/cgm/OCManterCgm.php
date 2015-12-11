@@ -47,8 +47,6 @@ include_once(CAM_GA_ADM_COMPONENTES."ISelectUF.class.php");
 include_once(CAM_GP_FRO_COMPONENTES."ISelectCategoriaHabilitacao.class.php");
 include_once(CAM_GRH_PES_COMPONENTES."ITextBoxPISPASEP.class.php");
 
-SistemaLegado::mostravar($_REQUEST);
-
 function montaDadosPorTipo()
 {
     $stTipo = $_REQUEST['boPessoa'];

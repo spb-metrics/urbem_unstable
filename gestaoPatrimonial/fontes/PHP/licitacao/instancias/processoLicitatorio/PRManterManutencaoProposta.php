@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-03.05.25
 
-    $Id: PRManterManutencaoProposta.php 63367 2015-08-20 21:27:34Z michel $
+    $Id: PRManterManutencaoProposta.php 63865 2015-10-27 13:55:57Z franver $
 
 */
 
@@ -306,9 +306,8 @@ if ($stAcao == 'reemitir' || $stAcao == 'reemitirCompra') {
                     $obTComprasCotacaoItem->setDado( 'cod_cotacao' , $inCodCotacao );
                     $obTComprasCotacaoItem->setDado( 'lote' , $rsItens->getCampo( 'lote' ) );
                     $obTComprasCotacaoItem->setDado( 'cod_item' , $rsItens->getCampo( 'cod_item' ) );
-                    $obTComprasCotacaoItem->setDado( 'quantidade' , str_replace(",", ".", str_replace(".", "", $rsItens->getCampo( 'quantidade' ))) );
+                    $obTComprasCotacaoItem->setDado( 'quantidade' , $rsItens->getCampo( 'quantidade' ));
                     $obTComprasCotacaoItem->inclusao();
-
                     $rsItens->proximo();
                 }
             } else {

@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Leandro André Zis
 
-    * $Id: OCManterContrato.php 63675 2015-09-28 21:31:00Z jean $
+    * $Id: OCManterContrato.php 64112 2015-12-03 16:56:16Z michel $
 
     * Casos de uso : uc-03.05.22
 */
@@ -39,11 +39,11 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 //include padrão do framework
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 //include padrão do framework
-include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoContrato.class.php"            );
-include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoContratoArquivo.class.php"     );
-include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoDocumentosAtributos.class.php" );
-include_once( CAM_FW_HTML."MontaAtributos.class.php" );
-include_once( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php" );
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoContrato.class.php";
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoContratoArquivo.class.php";
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoDocumentosAtributos.class.php";
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
 
 $stPrograma = "ManterContrato";
@@ -164,8 +164,8 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case 'carregaValorDocumentosContrato':
-    preencheValorContrato();
-    buscaDocumentoAssinado();
+        preencheValorContrato($request);
+        buscaDocumentoAssinado($request);
     break;
 
     case "sincronizaDataValida":
@@ -203,24 +203,24 @@ switch ($_REQUEST['stCtrl']) {
         $obTLicitacacaoLicitacao->recuperaLicitacaoFornecedores( $rsFornecedores, $stFiltro );
 
         if ( $rsFornecedores->getNumLinhas() == 1 ) {
-        $obTLicitacacaoContrato = new TLicitacaoContrato;
-        $obTLicitacacaoContrato->setDado('cod_licitacao', $_REQUEST['inCodLicitacao']);
-        $obTLicitacacaoContrato->setDado('cod_modalidade', $_REQUEST['inCodModalidade']);
-        $obTLicitacacaoContrato->setDado('cgm_fornecedor', $rsFornecedores->getCampo('cgm_fornecedor'));
-        $obTLicitacacaoContrato->setDado('exercicio', Sessao::getExercicio());
-        $obTLicitacacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-        $obTLicitacacaoContrato->recuperaValorContrato($rsValorContrato);
-
-        $vlContrato = $rsValorContrato->getCampo('valor_contrato');
-        $vlContrato = number_format($vlContrato, 2, ',', '.');
-        $stJs.= " d.getElementById('vlContrato').value = '".$vlContrato."';";
-        $stJs.= " d.getElementById('hdnValorContrato').value = '".$vlContrato."';";
-        $selected = 'selected';
-        }
+            $obTLicitacacaoContrato = new TLicitacaoContrato;
+            $obTLicitacacaoContrato->setDado('cod_licitacao', $_REQUEST['inCodLicitacao']);
+            $obTLicitacacaoContrato->setDado('cod_modalidade', $_REQUEST['inCodModalidade']);
+            $obTLicitacacaoContrato->setDado('cgm_fornecedor', $rsFornecedores->getCampo('cgm_fornecedor'));
+            $obTLicitacacaoContrato->setDado('exercicio', Sessao::getExercicio());
+            $obTLicitacacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+            $obTLicitacacaoContrato->recuperaValorContrato($rsValorContrato);
+    
+            $vlContrato = $rsValorContrato->getCampo('valor_contrato');
+            $vlContrato = number_format($vlContrato, 2, ',', '.');
+            $stJs.= " d.getElementById('vlContrato').value = '".$vlContrato."';";
+            $stJs.= " d.getElementById('hdnValorContrato').value = '".$vlContrato."';";
+            $selected = 'selected';
+        } 
         $selected = isset($selected) ? $selected : "";
         while ( !$rsFornecedores->eof() ) {
-        $stJs .= "f.inCGMContratado[".$rsFornecedores->getCorrente()."] = new Option('".$rsFornecedores->getCampo('nom_cgm')."','".$rsFornecedores->getCampo('cgm_fornecedor')."','".$selected."');\n";
-        $rsFornecedores->proximo();
+            $stJs .= "f.inCGMContratado[".$rsFornecedores->getCorrente()."] = new Option('".addslashes($rsFornecedores->getCampo('nom_cgm'))."','".$rsFornecedores->getCampo('cgm_fornecedor')."','".$selected."');\n";
+            $rsFornecedores->proximo();
         }
     } else {
         $stJs = "d.getElementById('stDescObjeto').innerHTML = '&nbsp;';\n";
@@ -237,7 +237,7 @@ switch ($_REQUEST['stCtrl']) {
     //Carrega itens vazios na listagem de documentos de publicacao utilizados no carregamento do Form.
     case 'carregaListaDocumentos' :
     $arDocumentos = Sessao::read('arDocumentos');
-    echo montaListaDocumentos($arDocumentos);
+    echo montaListaDocumentos($arDocumentos, true, $request->get('consultar'));
     break;
 
     //Inclui itens na listagem de documentos de publicacao utilizados
@@ -275,7 +275,7 @@ switch ($_REQUEST['stCtrl']) {
     echo 'limpaFormularioDocumentos();';
     echo 'document.getElementById("inNumDiasValido").value = "";';
     Sessao::write('arDocumentos', $arDocumentos);
-    echo montaListaDocumentos( $arDocumentos);
+    echo montaListaDocumentos($arDocumentos, true, $request->get('consultar'));
     break;
 
     //Carrega itens da listagem de documentos de publicacao utilizados em seus determinados campos no Form.
@@ -341,7 +341,7 @@ switch ($_REQUEST['stCtrl']) {
     Sessao::write('arDocumentos', $arDocumentos);
     echo 'limpaFormularioDocumentos();';
     echo 'document.getElementById("inNumDiasValido").value = "";';
-    $js.= montaListaDocumentos($arDocumentos);
+    $js.= montaListaDocumentos($arDocumentos, true, $request->get('consultar'));
     $js.= "f.btIncluirDocumentos.disabled = false;";
     $js.= "f.btAlterarDocumentos.disabled = true;";
     $js.= "f.stDataValidade.disabled = 'disabled';";
@@ -371,7 +371,7 @@ switch ($_REQUEST['stCtrl']) {
         }
     }
     Sessao::write('arDocumentos', $arTEMP);
-    echo montaListaDocumentos($arTEMP);
+    echo montaListaDocumentos($arTEMP, true, $request->get('consultar'));
     break;
 
     //Carrega itens vazios na listagem de aditivos de publicacao utilizados no carregamento do Form.
@@ -423,7 +423,7 @@ switch ($_REQUEST['stCtrl']) {
 
     case 'limparTela':
     Sessao::remove('arDocumentos');
-    $stJs  = montaListaDocumentos( array() );
+    $stJs  = montaListaDocumentos( array(), true, $request->get('consultar'));
     $stJs .= "frm.inCodLicitacao.options[0].selected = true; \n";
     $stJs .= "frm.inCGMContratado.options[0].selected = true; \n";
 
@@ -433,7 +433,7 @@ switch ($_REQUEST['stCtrl']) {
     //Carrega itens vazios na listagem de veiculos de publicacao utilizados no carregamento do Form.
     case 'carregaListaVeiculos' :
     $arValores = Sessao::read('arValores');
-    echo montaListaVeiculos($arValores);
+    echo montaListaVeiculos($arValores, true, $request->get('consultar'));
     break;
 
     //Inclui itens na listagem de Aditivos de publicacao utilizados
@@ -494,7 +494,7 @@ switch ($_REQUEST['stCtrl']) {
 
     Sessao::write('arValores', $arValores);
 
-    echo montaListaVeiculos( $arValores);
+    echo montaListaVeiculos( $arValores, true, $request->get('consultar'));
     $js.="$('HdnCodVeiculo').value ='';";
     $js.="$('inVeiculo').value ='';";
     $js.="$('dtDataPublicacao').value ='".date('d/m/Y')."';";
@@ -556,7 +556,7 @@ switch ($_REQUEST['stCtrl']) {
         $inCount++;
           }
               Sessao::write('arValores', $arValores);
-          $js.=montaListaVeiculos($arValores);
+          $js.=montaListaVeiculos($arValores, true, $request->get('consultar'));
           $js.="$('HdnCodVeiculo').value ='';";
           $js.="$('inVeiculo').value ='';";
           $js.="$('dtDataPublicacao').value ='".date('d/m/Y')."';";
@@ -592,7 +592,7 @@ switch ($_REQUEST['stCtrl']) {
     }
 
     Sessao::write('arValores', $arTEMP);
-    echo montaListaVeiculos($arTEMP);
+    echo montaListaVeiculos($arTEMP, true, $request->get('consultar'));
     break;
 
     case 'limparVeiculo' :
@@ -662,11 +662,11 @@ switch ($_REQUEST['stCtrl']) {
     //Carrega itens vazios na listagem de veiculos de publicacao utilizados no carregamento do Form.
     case 'carregaListaArquivos' :
     $arArquivos = Sessao::read('arArquivos');
-    echo montaListaArquivos($arArquivos);
+    echo montaListaArquivos($arArquivos, true, $request->get('consultar'));
     break;
 
     case 'consultarListaArquivo' :
-    consultarListaArquivo();
+        consultarListaArquivo($request);
     break;
 
     case "addArquivo":
@@ -711,7 +711,7 @@ switch ($_REQUEST['stCtrl']) {
     }
 
     Sessao::write('arArquivos', $arTEMP);
-    echo montaListaArquivos($arTEMP);
+    echo montaListaArquivos($arTEMP, true, $request->get('consultar'));
     break;
 }
 
@@ -793,103 +793,107 @@ function sincronizaDiasValidosDocumento($inDataValidade, $inDataEmissao)
     echo $stJs;
 }
 
-function montaListaDocumentos($arRecordSet , $boExecuta = true)
+function montaListaDocumentos($arRecordSet , $boExecuta = true, $stConsultar = null)
 {
     if (is_array($arRecordSet) ) {
         $rsDocumentos = new RecordSet;
         $rsDocumentos->preenche( $arRecordSet );
-    $obLista = new Lista;
+        $obLista = new Lista;
 
-    $obLista->setTitulo('Documentos Exigidos');
-    $obLista->setMostraPaginacao( false );
-    $obLista->setRecordSet( $rsDocumentos );
+        $obLista->setTitulo('Documentos Exigidos');
+        $obLista->setMostraPaginacao( false );
+        $obLista->setRecordSet( $rsDocumentos );
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 5 );
-    $obLista->commitCabecalho();
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+        $obLista->ultimoCabecalho->setWidth( 5 );
+        $obLista->commitCabecalho();
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Documento");
-    $obLista->ultimoCabecalho->setWidth( 35 );
-    $obLista->commitCabecalho();
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Documento");
+        $obLista->ultimoCabecalho->setWidth( 35 );
+        $obLista->commitCabecalho();
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Número");
-    $obLista->ultimoCabecalho->setWidth( 15 );
-    $obLista->commitCabecalho();
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Número");
+        $obLista->ultimoCabecalho->setWidth( 15 );
+        $obLista->commitCabecalho();
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Validade");
-    $obLista->ultimoCabecalho->setWidth( 25 );
-    $obLista->commitCabecalho();
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Validade");
+        $obLista->ultimoCabecalho->setWidth( 25 );
+        $obLista->commitCabecalho();
 
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Ação");
-    $obLista->ultimoCabecalho->setWidth( 5 );
-    $obLista->commitCabecalho();
+        if(!$stConsultar) {
+            $obLista->addCabecalho();
+            $obLista->ultimoCabecalho->addConteudo("Ação");
+            $obLista->ultimoCabecalho->setWidth( 5 );
+            $obLista->commitCabecalho();
+        }
 
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "stNomDocumento" );
-    $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
-    $obLista->commitDado();
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "stNomDocumento" );
+        $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+        $obLista->commitDado();
 
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "stNumDocumento" );
-    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
-    $obLista->commitDado();
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "stNumDocumento" );
+        $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+        $obLista->commitDado();
 
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "dtValidade" );
-    $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
-    $obLista->commitDado();
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "dtValidade" );
+        $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
+        $obLista->commitDado();
 
-    $obLista->addAcao();
-    $obLista->ultimaAcao->setAcao( "ALTERAR" );
-    $obLista->ultimaAcao->setFuncao( true );
-    $obLista->ultimaAcao->setLink( "JavaScript:alteraDocumentos();" );
-    $obLista->ultimaAcao->addCampo("1","id");
-    $obLista->commitAcao();
+        if(!$stConsultar) {
+            $obLista->addAcao();
+            $obLista->ultimaAcao->setAcao( "ALTERAR" );
+            $obLista->ultimaAcao->setFuncao( true );
+            $obLista->ultimaAcao->setLink( "JavaScript:alteraDocumentos();" );
+            $obLista->ultimaAcao->addCampo("1","id");
+            $obLista->commitAcao();
+    
+            $obLista->addAcao();
+            $obLista->ultimaAcao->setAcao( "EXCLUIR" );
+            $obLista->ultimaAcao->setFuncao( true );
+            $obLista->ultimaAcao->setLink( "JavaScript:excluirDocumentos();" );
+            $obLista->ultimaAcao->addCampo("1","id");
+            $obLista->commitAcao();
+        }
 
-    $obLista->addAcao();
-    $obLista->ultimaAcao->setAcao( "EXCLUIR" );
-    $obLista->ultimaAcao->setFuncao( true );
-    $obLista->ultimaAcao->setLink( "JavaScript:excluirDocumentos();" );
-    $obLista->ultimaAcao->addCampo("1","id");
-    $obLista->commitAcao();
+        $obLista->montaHTML();
+        $stHTML = $obLista->getHTML();
+        $stHTML = str_replace( "\n" ,"" ,$stHTML );
+        $stHTML = str_replace( "  " ,"" ,$stHTML );
+        $stHTML = str_replace( "'","\\'",$stHTML );
 
-    $obLista->montaHTML();
-    $stHTML = $obLista->getHTML();
-    $stHTML = str_replace( "\n" ,"" ,$stHTML );
-    $stHTML = str_replace( "  " ,"" ,$stHTML );
-    $stHTML = str_replace( "'","\\'",$stHTML );
-
-    if ($boExecuta) {
-        return "d.getElementById('spnListaDocumentos').innerHTML = '".$stHTML."';";
+        if ($boExecuta) {
+            return "d.getElementById('spnListaDocumentos').innerHTML = '".$stHTML."';";
+        } else {
+            return $stHTML;
+        }
     } else {
-        return $stHTML;
-    }
-
-    } else {
-           return "d.getElementById('spnListaDocumentos').innerHTML = '&nbsp;';";
+        return "d.getElementById('spnListaDocumentos').innerHTML = '&nbsp;';";
     }
 }
 
-function buscaDocumentoAssinado()
+function buscaDocumentoAssinado(Request $request)
 {
     $stNumDoc     = '';
     $stDtValidade = '';
     $stDtEmissao  = '';
     $inCount = 0;
-    if ( trim($_REQUEST['inCGMFornecedor']) !="") {
-        include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacaoDocumentos.class.php");
+    $inCGMFornecedor = $request->get('inCodLicitacao', '');
+    if ( trim($inCGMFornecedor) !="" ) {
+        include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoLicitacaoDocumentos.class.php";
         $obTLicitacaoDocumentos = new TLicitacaoLicitacaoDocumentos;
-        $obTLicitacaoDocumentos->setDado('cod_licitacao', $_REQUEST["inCodLicitacao"]);
-        $obTLicitacaoDocumentos->setDado('cod_entidade', $_REQUEST["inCodEntidade"]);
-        $obTLicitacaoDocumentos->setDado('exercicio', $_REQUEST["exercicio"]);
-        $obTLicitacaoDocumentos->setDado('cod_modalidade', $_REQUEST["inCodModalidade"]);
+        $obTLicitacaoDocumentos->setDado('cod_licitacao'    , $request->get('inCodLicitacao'));
+        $obTLicitacaoDocumentos->setDado('cod_entidade'     , $request->get('inCodEntidade'));
+        $obTLicitacaoDocumentos->setDado('exercicio'        , $request->get('exercicio'));
+        $obTLicitacaoDocumentos->setDado('cod_modalidade'   , $request->get('inCodModalidade'));
 
-        $stFiltro = " AND cgm_fornecedor=".$_REQUEST['inCGMFornecedor']."\n";
+        $stFiltro = " AND cgm_fornecedor=".$inCGMFornecedor."\n";
 
         $obTLicitacaoDocumentos->recuperaDocumentosLicitacaoFornecedor( $rsDocumentos, $stFiltro, "order by ld.cod_documento desc" );
     }
@@ -898,43 +902,43 @@ function buscaDocumentoAssinado()
     $arDocumentos = Sessao::read('arDocumentos');
 
     if (is_array($arRsDocumentos) ) {
-    foreach ($arRsDocumentos as $chave => $dados) {
-        if (isset($arDocumentos[$chave]['inCodDocumento']) && ($dados['cod_documento'] != $arDocumentos[$chave]['inCodDocumento'])) {
-        $stNomDocumento = $dados['nom_documento'];
-        $inCodDocumento = $dados['cod_documento'];
-        $stDtEmissao = $dados['dt_emissao'];
-        $stDtValidade = $dados['dt_validade'];
-        $inNumDocumento = $dados['num_documento'];
+        foreach ($arRsDocumentos as $chave => $dados) {
+            if (isset($arDocumentos[$chave]['inCodDocumento']) && ($dados['cod_documento'] != $arDocumentos[$chave]['inCodDocumento'])) {
+                $stNomDocumento = $dados['nom_documento'];
+                $inCodDocumento = $dados['cod_documento'];
+                $stDtEmissao = $dados['dt_emissao'];
+                $stDtValidade = $dados['dt_validade'];
+                $inNumDocumento = $dados['num_documento'];
 
-        $inCount = sizeof($arDocumentos);
-        $arDocumentos[$inCount]['id'               ] = $inCount + 1;
-        $arDocumentos[$inCount]['boNovo'           ] = true;
-        $arDocumentos[$inCount]['inCodDocumento'      ] = $inCodDocumento;
-        $arDocumentos[$inCount]['stNumDocumento'   ] = $inNumDocumento;
-        $arDocumentos[$inCount]['stNomDocumento'   ] = $stNomDocumento;
-        $arDocumentos[$inCount]['dtValidade'       ] = $stDtValidade;
-        $arDocumentos[$inCount]['dtEmissao'        ] = $stDtEmissao;
-        $inCount++;
+                $inCount = sizeof($arDocumentos);
+                $arDocumentos[$inCount]['id'               ] = $inCount + 1;
+                $arDocumentos[$inCount]['boNovo'           ] = true;
+                $arDocumentos[$inCount]['inCodDocumento'   ] = $inCodDocumento;
+                $arDocumentos[$inCount]['stNumDocumento'   ] = $inNumDocumento;
+                $arDocumentos[$inCount]['stNomDocumento'   ] = $stNomDocumento;
+                $arDocumentos[$inCount]['dtValidade'       ] = $stDtValidade;
+                $arDocumentos[$inCount]['dtEmissao'        ] = $stDtEmissao;
+                $inCount++;
+            }
         }
-       }
     }
 
     Sessao::write('arDocumentos', $arDocumentos);
     $arrayDocumentos = $arDocumentos;
     echo 'limpaFormularioDocumentos();';
-    echo montaListaDocumentos( $arrayDocumentos);
+    echo montaListaDocumentos($arrayDocumentos, true, $request->get('consultar'));
 }
 
-function preencheValorContrato()
+function preencheValorContrato(Request $request)
 {
-     $stJs = buscaDocumentoFornecedor (  $_REQUEST['inCGMFornecedor'] , $_REQUEST['inCodDocumento'] );
-     if ($_REQUEST['inCodLicitacao'] && $_REQUEST['inCGMFornecedor']) {
+     $stJs = buscaDocumentoFornecedor (  $request->get('inCGMFornecedor') , $request->get('inCodDocumento') );
+     if ($request->get('inCodLicitacao') && $request->get('inCGMFornecedor')) {
         $obTLicitacacaoContrato = new TLicitacaoContrato;
-        $obTLicitacacaoContrato->setDado('cod_licitacao', $_REQUEST['inCodLicitacao']);
-        $obTLicitacacaoContrato->setDado('cod_modalidade', $_REQUEST['inCodModalidade']);
-        $obTLicitacacaoContrato->setDado('cgm_fornecedor', $_REQUEST['inCGMFornecedor']);
-        $obTLicitacacaoContrato->setDado('exercicio', $_REQUEST['exercicio']);
-        $obTLicitacacaoContrato->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+        $obTLicitacacaoContrato->setDado('cod_licitacao'    , $request->get('inCodLicitacao'));
+        $obTLicitacacaoContrato->setDado('cod_modalidade'   , $request->get('inCodModalidade'));
+        $obTLicitacacaoContrato->setDado('cgm_fornecedor'   , $request->get('inCGMFornecedor'));
+        $obTLicitacacaoContrato->setDado('exercicio'        , $request->get('exercicio'));
+        $obTLicitacacaoContrato->setDado('cod_entidade'     , $request->get('inCodEntidade'));
         $obTLicitacacaoContrato->recuperaValorContrato($rsValorContrato);
 
         $vlContrato = $rsValorContrato->getCampo('valor_contrato');
@@ -997,7 +1001,7 @@ function montaListaAditivos($arRecordSet , $boExecuta = true)
     $obLista->ultimaAcao->setLink( "JavaScript:excluirAditivos();" );
     $obLista->ultimaAcao->addCampo("1","id");
     $obLista->commitAcao();
-
+    
     $obLista->montaHTML();
     $stHTML = $obLista->getHTML();
     $stHTML = str_replace( "\n" ,"" ,$stHTML );
@@ -1011,7 +1015,7 @@ function montaListaAditivos($arRecordSet , $boExecuta = true)
     }
 }
 
-function montaListaVeiculos($arRecordSet , $boExecuta = true)
+function montaListaVeiculos($arRecordSet , $boExecuta = true, $stConsultar=null)
 {
     if (is_array($arRecordSet)) {
         $rsRecordSet = new RecordSet;
@@ -1028,12 +1032,14 @@ function montaListaVeiculos($arRecordSet , $boExecuta = true)
 
         $table->Body->addCampo( '[inVeiculo]-[stVeiculo] ' , 'E');
         $table->Body->addCampo( 'dtDataPublicacao', 'C' );
-    $table->Body->addCampo( 'inNumPublicacao' );
+        $table->Body->addCampo( 'inNumPublicacao' );
         $table->Body->addCampo( 'stObservacao'  );
 
-        $table->Body->addAcao( 'alterar' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'alterarListaVeiculos', 'id' ) );
-        $table->Body->addAcao( 'excluir' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'excluirListaVeiculos', 'id' ) );
-
+        if(!$stConsultar) {
+            $table->Body->addAcao( 'alterar' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'alterarListaVeiculos', 'id' ) );
+            $table->Body->addAcao( 'excluir' ,  'JavaScript:executaFuncaoAjax(\'%s\' , \'&id=%s\' )' , array( 'excluirListaVeiculos', 'id' ) );
+        }
+        
         $table->montaHTML( true );
 
         if ($boExecuta) {
@@ -1044,67 +1050,71 @@ function montaListaVeiculos($arRecordSet , $boExecuta = true)
     }
 }
 
-function montaListaArquivos($arRecordSet, $boExecuta = true)
+function montaListaArquivos($arRecordSet, $boExecuta = true, $stConsultar = null)
 {
     if (is_array($arRecordSet)) {
         $rsRecordSet = new RecordSet;
         $rsRecordSet->preenche( $arRecordSet );
 
-    $obLista = new Lista();
-    $obLista->setRecordset( $rsRecordSet  );
-    $obLista->setTitulo('Arquivos Digitais');
-    $obLista->setMostraPaginacao( false );
-
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth( 5 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Arquivo");
-    $obLista->ultimoCabecalho->setWidth( 50 );
-    $obLista->commitCabecalho();
-
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Ações");
-    $obLista->ultimoCabecalho->setWidth( 5 );
-    $obLista->commitCabecalho();
-
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo( "nom_arquivo" );
-    $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
-    $obLista->commitDado();
-
-    $obLista->addAcao();
-    $obLista->ultimaAcao->setAcao( "CONSULTAR" );
-    $obLista->ultimaAcao->setFuncao( true );
-    $obLista->ultimaAcao->setLink( "JavaScript:consultarListaArquivo();" );
-    $obLista->ultimaAcao->addCampo("1","arquivo");
-    $obLista->commitAcao();
-
-    $obLista->addAcao();
-    $obLista->ultimaAcao->setAcao( "EXCLUIR" );
-    $obLista->ultimaAcao->setFuncao( true );
-    $obLista->ultimaAcao->setLink( "JavaScript:excluirListaArquivo();" );
-    $obLista->ultimaAcao->addCampo("1","id");
-    $obLista->commitAcao();
-
-    $obLista->montaHTML();
-    $stHTML = $obLista->getHTML();
-    $stHTML = str_replace( "\n" ,"" ,$stHTML );
-    $stHTML = str_replace( "  " ,"" ,$stHTML );
-    $stHTML = str_replace( "'","\\'",$stHTML );
-
-    if ($boExecuta) {
-        return "d.getElementById('spnListaArquivos').innerHTML = '".$stHTML."';";
-    } else {
-        return $stHTML;
-    }
+        $obLista = new Lista();
+        $obLista->setRecordset( $rsRecordSet  );
+        $obLista->setTitulo('Arquivos Digitais');
+        $obLista->setMostraPaginacao( false );
+    
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+        $obLista->ultimoCabecalho->setWidth( 5 );
+        $obLista->commitCabecalho();
+    
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Arquivo");
+        $obLista->ultimoCabecalho->setWidth( 50 );
+        $obLista->commitCabecalho();
+    
+        if(!$stConsultar) {
+            $obLista->addCabecalho();
+            $obLista->ultimoCabecalho->addConteudo("Ação");
+            $obLista->ultimoCabecalho->setWidth( 5 );
+            $obLista->commitCabecalho();
+        }
+    
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo( "nom_arquivo" );
+        $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+        $obLista->commitDado();
+    
+        if(!$stConsultar) {
+            $obLista->addAcao();
+            $obLista->ultimaAcao->setAcao( "CONSULTAR" );
+            $obLista->ultimaAcao->setFuncao( true );
+            $obLista->ultimaAcao->setLink( "JavaScript:consultarListaArquivo();" );
+            $obLista->ultimaAcao->addCampo("1","arquivo");
+            $obLista->commitAcao();
+        
+            $obLista->addAcao();
+            $obLista->ultimaAcao->setAcao( "EXCLUIR" );
+            $obLista->ultimaAcao->setFuncao( true );
+            $obLista->ultimaAcao->setLink( "JavaScript:excluirListaArquivo();" );
+            $obLista->ultimaAcao->addCampo("1","id");
+            $obLista->commitAcao();
+        }
+    
+        $obLista->montaHTML();
+        $stHTML = $obLista->getHTML();
+        $stHTML = str_replace( "\n" ,"" ,$stHTML );
+        $stHTML = str_replace( "  " ,"" ,$stHTML );
+        $stHTML = str_replace( "'","\\'",$stHTML );
+    
+        if ($boExecuta) {
+            return "d.getElementById('spnListaArquivos').innerHTML = '".$stHTML."';";
+        } else {
+            return $stHTML;
+        }
     }
 }
 
-function consultarListaArquivo()
+function consultarListaArquivo(Request $request)
 {
-    $pathToSave = CAM_GP_LIC_ANEXOS.'contrato/'.$_REQUEST['arquivo'];
+    $pathToSave = CAM_GP_LIC_ANEXOS.'contrato/'.$request->get('arquivo');
     echo " window.location = '".$pathToSave."'; ";
 }

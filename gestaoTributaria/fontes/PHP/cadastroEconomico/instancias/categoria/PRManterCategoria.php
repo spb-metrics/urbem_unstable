@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: PRManterCategoria.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterCategoria.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.09
 
@@ -70,7 +70,6 @@ $obErro          = new Erro;
 switch ($stAcao) {
 
     case "incluir":
-       //mostravar($_REQUEST);
        //Seta a categoria
        $obRCEMCategoria->setCodigoCategoria ( $_REQUEST["inCodigoCategoria"]        );
        $obRCEMCategoria->setNomeCategoria   ( trim( $_REQUEST["stNomeCategoria"] ) );
@@ -84,7 +83,6 @@ switch ($stAcao) {
     break;
 
  case "alterar":
-    //mostravar($_REQUEST);
     //seta a categoria
     $obRCEMCategoria->setCodigoCategoria ( $_REQUEST["inCodigoCategoria"]        );
     $obRCEMCategoria->setNomeCategoria   ( trim( $_REQUEST["stNomeCategoria"] ) );

@@ -1820,7 +1820,7 @@ function imprimirCarne($diffBaixa = FALSE)
 
                             // % de multa
                             $this->obRCarneMata->flValorMulta = number_format($stMultaNormal,2,',','.');
-                            SistemaLegado::mostraVar($stMultaNormal, '$stMultaNormal');
+
                             $this->obRCarneMata->flValorMultaJuros = ( number_format(bcadd($stJuroNormal, $stMultaNormal, 2),2,',',''));
                             $this->obRCarneMata->flValorOutros = number_format(round($stCorrecaoNormal,2),2,',','.');
                             //-----------------------------------------------------------------------

@@ -212,7 +212,6 @@ $nomDeficiencia = pegaDado("nom_deficiencia","cse.deficiencia","Where cod_defici
 
 //Inclusão, alteração ou exclusão de dados
 case 2:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     //Verifica se já existe o registro a ser incluido

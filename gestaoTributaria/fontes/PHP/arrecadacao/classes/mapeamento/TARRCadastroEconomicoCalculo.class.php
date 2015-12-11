@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRCadastroEconomicoCalculo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TARRCadastroEconomicoCalculo.class.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.05
 */
@@ -119,7 +119,6 @@ function recuperaConsultaReqReceita(&$rsRecordSet, $stFiltro = "", $stOrdem = ""
     $stOrdem = "";
     $stSql = $this->montaRecuperaConsultaReqReceita($stDataCorrente).$stFiltro.$stOrdem;
     $this->stDebug = $stSql;
-//sistemaLegado::mostravar( $stSql );exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;

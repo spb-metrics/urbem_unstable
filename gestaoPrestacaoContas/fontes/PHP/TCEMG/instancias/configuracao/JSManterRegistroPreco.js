@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: JSManterRegistroPreco.js 63282 2015-08-12 14:11:42Z michel $
+  * $Id: JSManterRegistroPreco.js 63765 2015-10-07 18:51:47Z michel $
   *
 */
 ?>
@@ -98,6 +98,7 @@ function ValidaRegistroPreco()
             alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>', '../');
         }
         else{
+            BloqueiaFrames(true,false);
             Salvar();
         }
     }

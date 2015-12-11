@@ -99,8 +99,6 @@ function montaRecuperaTodos()
     $stSql .= "    ,situacao            varchar                                                       \n";
     $stSql .= "    ,cod_situacao        varchar                                                       \n";
     $stSql .= "  )                                                                                      ";
-    #sistemaLegado::mostravar($stSql);
-    #die('Fim');
 
     return $stSql;
 

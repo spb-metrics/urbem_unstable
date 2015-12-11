@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.20
 
-    $Id: PRManterAdjudicacao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterAdjudicacao.php 63865 2015-10-27 13:55:57Z franver $
 
     */
 
@@ -65,7 +65,8 @@ $obTLicitacaoEdital = new TLicitacaoEdital();
 $obTLicitacaoEdital->recuperaListaEdital($rsEdital, $stFiltro);
 
 $stMensagemErro = "";
-if (SistemaLegado::comparaDatas(SistemaLegado::dataToBr($rsEdital->getCampo('dt_abertura_propostas')), $_REQUEST["stDtAdjudicacao"])) {
+
+if (SistemaLegado::comparaDatas(SistemaLegado::dataToBr($rsEdital->getCampo('dt_abertura_propostas')), $_REQUEST["stDtAdjudicacao"] )) {
     $stMensagemErro = "A data da Adjudicação deve ser maior ou igual à data de abertura de propostas.";
 }
 

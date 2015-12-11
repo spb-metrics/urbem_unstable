@@ -158,9 +158,6 @@ function geraRecordSet(&$rsRecordSet, $stOrder = "")
     $arCampos[$inCount] = "TOTAL";
     $arCampoRecordSet[$inCount] = "vl_total";
 
-//    echo "Valores do arCampos"; mostravar ($arCampos);
-//    echo "Valores do arCampoRecordSet"; mostravar ($arCampoRecordSet);
-
     // Monta relatorio completo conforme impressao
     $inCount = 0;
     while ( !$rsRecordSet->eof() ) {

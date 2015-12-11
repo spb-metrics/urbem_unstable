@@ -39,10 +39,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 
-// $obTOrcamentoEntidade = new TOrcamentoEntidade();
-// $obTOrcamentoEntidade->setDado( 'exercicio'   , $_REQUEST['stExercicio'] );
-// $obTOrcamentoEntidade->recuperaEntidades( $rsEntidade, "and e.cod_entidade in (".implode(',',$_REQUEST['inCodEntidade']).")" );
- // SistemaLegado::mostravar(Sessao::read('assinaturas')); exit;
 $obErro = new Erro();
 
 $preview = new PreviewBirt(6,57,4);

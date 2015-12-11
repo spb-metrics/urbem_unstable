@@ -42,16 +42,18 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once ( CLA_BUSCAINNER );
 include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
 
+
 class  IPopUpEstruturalPlano extends BuscaInner
 {
+    var $stEscrituracao = '';
+    public function getTipoEscrituracao(){ return $this->stEscrituracao;}
+    public function setTipoEscrituracao( $valor ){ $this->stEscrituracao = $valor; }
 
     public function IPopUpEstruturalPlano()
     {
-
         parent::BuscaInner();
 
         $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao;
-
         $obTAdministracaoConfiguracao->setDado( "cod_modulo", 9);
         $obTAdministracaoConfiguracao->setDado( "exercicio", Sessao::getExercicio() );
         $obTAdministracaoConfiguracao->pegaConfiguracao( $stMascara, "masc_plano_contas" );
@@ -60,6 +62,7 @@ class  IPopUpEstruturalPlano extends BuscaInner
         $this->setTitle                ( "Informe o código estrutural da conta contábil." );
         $this->setNull                 ( true );
         $this->setId                   ( "stDescricaoClassificacao" );
+        $this->setTipoEscrituracao     ( "estrutural" );
         $this->obCampoCod->setName     ( "stCodEstrutural" );
         $this->obCampoCod->setValue    ( "" );
         $this->obCampoCod->setAlign    ("left");
@@ -70,9 +73,9 @@ class  IPopUpEstruturalPlano extends BuscaInner
 
     public function montaHTML()
     {
-        $pgOcul = "'".CAM_GF_CONT_PROCESSAMENTO."OCEstruturalPlano.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+this.value+'&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."'";
+        $pgOcul = "'".CAM_GF_CONT_PROCESSAMENTO."OCEstruturalPlano.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+this.value+'&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."&stEscrituracao=".$this->getTipoEscrituracao()."'";
         $this->obCampoCod->obEvento->setOnChange ( "ajaxJavaScript($pgOcul,'buscaPopup');" );
-        $this->setFuncaoBusca ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','".$this->obCampoCod->getName()."','".$this->getId()."','estrutural','".Sessao::getId()."','800','550');");
+        $this->setFuncaoBusca ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','".$this->obCampoCod->getName()."','".$this->getId()."','".$this->getTipoEscrituracao()."','".Sessao::getId()."','800','550');");
         parent::montaHTML();
     }
 }

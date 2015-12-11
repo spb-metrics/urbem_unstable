@@ -2718,3 +2718,398 @@ DROP TABLE    migra_cnae;
 ALTER TABLE economico.cnae_fiscal ADD COLUMN risco CHAR(1) NOT NULL DEFAULT 'N';
 ALTER TABLE economico.cnae_fiscal ADD CONSTRAINT ck_cnae_fiscal_1 CHECK (risco IN ('A', 'B', 'N'));
 
+
+----------------
+-- Ticket #23328
+----------------
+
+DROP FUNCTION arrecadacao.fn_consulta_endereco_mata_saojoao(INTEGER);
+
+
+----------------
+-- Ticket #22494
+----------------
+
+DROP FUNCTION arrecadacao.fn_carne_parcela( INTEGER );
+
+
+----------------
+-- Ticket #23364
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+SELECT 3093
+     , 366
+     , 'FLRelatorioPagadores.php'
+     , 'emitir'
+     , 14
+     , ''
+     , 'Relatório de Pagadores'
+     , TRUE
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.acao
+              WHERE cod_acao = 3093
+           )
+     ;
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo )
+SELECT 5
+     , 33
+     , 9
+     , 'Relatório de Pagadores'
+     , 'LHRelatorioPagadores.php'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 5
+                AND cod_modulo    = 33
+                AND cod_relatorio = 9
+           )
+     ;
+
+
+----------------
+-- Ticket #23408
+----------------
+
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+    inCodModelo     INTEGER;
+BEGIN
+    PERFORM 1
+       FROM administracao.configuracao
+      WHERE cod_modulo = 2
+        AND exercicio  = '2015'
+        AND parametro  = 'cnpj'
+        AND valor      = '13805528000180'
+          ;
+    IF FOUND THEN
+        PERFORM 1
+           FROM arrecadacao.modelo_carne
+          WHERE nom_arquivo = 'RCarneTFFMataSaoJoao2016.class.php'
+              ;
+        IF NOT FOUND THEN
+            SELECT MAX(cod_modelo) + 1
+              INTO inCodModelo
+              FROM arrecadacao.modelo_carne
+                 ;
+            INSERT INTO arrecadacao.modelo_carne        VALUES (inCodModelo, 'Carne T.F.F. 2016', 'RCarneTFFMataSaoJoao2016.class.php', 14, FALSE);
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 963 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 964 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 978 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 979 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 1677);
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 1678);
+        END IF;
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
+
+
+----------------
+-- Ticket #23410
+----------------
+
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+    inCodModelo     INTEGER;
+BEGIN
+    PERFORM 1
+       FROM administracao.configuracao
+      WHERE cod_modulo = 2
+        AND exercicio  = '2015'
+        AND parametro  = 'cnpj'
+        AND valor      = '13805528000180'
+          ;
+    IF FOUND THEN
+        PERFORM 1
+           FROM arrecadacao.modelo_carne
+          WHERE nom_arquivo = 'RCarneIPTUMataSaoJoao2016.class.php'
+              ;
+        IF NOT FOUND THEN
+            SELECT MAX(cod_modelo) + 1
+              INTO inCodModelo
+              FROM arrecadacao.modelo_carne
+                 ;
+            INSERT INTO arrecadacao.modelo_carne        VALUES (inCodModelo, 'Carne I.P.T.U. 2016', 'RCarneIPTUMataSaoJoao2016.class.php', 12, FALSE);
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 963 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 964 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 978 );
+            INSERT INTO arrecadacao.acao_modelo_carne   VALUES (inCodModelo, 979 );
+        END IF;
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
+
+
+----------------
+-- Ticket #23442
+----------------
+
+   --
+   -- Insere a função.
+   --
+   CREATE OR REPLACE function public.manutencao_funcao( intCodmodulo       INTEGER
+                                                      , intCodBiblioteca   INTEGER
+                                                      , varNomeFunc        VARCHAR
+                                                      , intCodTiporetorno INTEGER)
+   RETURNS integer as $$
+   DECLARE
+      intCodFuncao INTEGER := 0;
+      varAux       VARCHAR;
+   BEGIN
+
+      SELECT cod_funcao
+        INTO intCodFuncao
+        FROM administracao.funcao
+       WHERE cod_modulo                = intCodmodulo
+         AND cod_biblioteca            = intCodBiblioteca
+         AND Lower(Btrim(nom_funcao))  = Lower(Btrim(varNomeFunc))
+      ;
+
+      IF FOUND THEN
+         DELETE FROM administracao.corpo_funcao_externa  WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+         DELETE FROM administracao.funcao_externa        WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+         DELETE FROM administracao.funcao_referencia     WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+         DELETE FROM administracao.parametro             WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+         DELETE FROM administracao.variavel              WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+         DELETE FROM administracao.funcao                WHERE cod_modulo = intCodmodulo AND cod_biblioteca = intCodBiblioteca AND cod_funcao = intCodFuncao;
+      END IF;
+
+     -- Raise Notice ' Entrou 1 ';
+
+     SELECT (max(cod_funcao)+1)
+       INTO intCodFuncao
+       FROM administracao.funcao
+      WHERE cod_modulo       = intCodmodulo
+        AND cod_biblioteca   = intCodBiblioteca
+     ;
+
+     --varAux := varNomeFunc || '  -   ' || To_Char( intCodFuncao, '999999') ;
+     --RAise Notice '=> % ', varAux;
+
+     IF intCodFuncao IS NULL OR intCodFuncao = 0 THEN
+        intCodFuncao := 1;
+     END IF;
+
+     INSERT INTO administracao.funcao  ( cod_modulo
+                                       , cod_biblioteca
+                                       , cod_funcao
+                                       , cod_tipo_retorno
+                                       , nom_funcao)
+                                VALUES ( intCodmodulo
+                                       , intCodBiblioteca
+                                       , intCodFuncao
+                                       , intCodTiporetorno
+                                       , varNomeFunc);
+
+      RETURN intCodFuncao;
+
+   END;
+   $$ LANGUAGE 'plpgsql';
+
+   --
+   -- Inclusão de Váriaveis.
+   --
+   CREATE OR REPLACE function public.manutencao_variavel( intCodmodulo       INTEGER
+                                                        , intCodBiblioteca   INTEGER
+                                                        , intCodFuncao       INTEGER
+                                                        , varNomVariavel     VARCHAR
+                                                        , intTipoVariavel    INTEGER)
+   RETURNS integer as $$
+   DECLARE
+      intCodVariavel INTEGER := 0;
+   BEGIN
+
+      If intCodFuncao != 0 THEN
+         SELECT COALESCE((max(cod_variavel)+1),1)
+           INTO intCodVariavel
+           FROM administracao.variavel
+          WHERE cod_modulo       = intCodmodulo
+            AND cod_biblioteca   = intCodBiblioteca
+            AND cod_funcao       = intCodFuncao
+         ;
+
+         INSERT INTO administracao.variavel ( cod_modulo
+                                            , cod_biblioteca
+                                            , cod_funcao
+                                            , cod_variavel
+                                            , nom_variavel
+                                            , cod_tipo )
+                                     VALUES ( intCodmodulo
+                                            , intCodBiblioteca
+                                            , intCodFuncao
+                                            , intCodVariavel
+                                            , varNomVariavel
+                                            , intTipoVariavel
+                                            );
+      END IF;
+
+      RETURN intCodVariavel;
+   END;
+   $$ LANGUAGE 'plpgsql';
+
+
+   --
+   -- Inclusão de parametro.
+   --
+   CREATE OR REPLACE function public.manutencao_parametro( intCodmodulo       INTEGER
+                                                         , intCodBiblioteca   INTEGER
+                                                         , intCodFuncao       INTEGER
+                                                         , intCodVariavel     INTEGER)
+   RETURNS VOID as $$
+   DECLARE
+      intOrdem INTEGER := 0;
+   BEGIN
+      If intCodFuncao != 0 THEN
+         SELECT COALESCE((max(ordem)+1),1)
+           INTO intOrdem
+           FROM administracao.parametro
+          WHERE cod_modulo       = intCodmodulo
+            AND cod_biblioteca   = intCodBiblioteca
+            AND cod_funcao       = intCodFuncao
+         ;
+
+         INSERT INTO administracao.parametro ( cod_modulo
+                                             , cod_biblioteca
+                                             , cod_funcao
+                                             , cod_variavel
+                                             , ordem)
+                                      VALUES ( intCodmodulo
+                                             , intCodBiblioteca
+                                             , intCodFuncao
+                                             , intCodVariavel
+                                             , intOrdem );
+      End If;
+
+      RETURN;
+   END;
+   $$ LANGUAGE 'plpgsql';
+
+
+   --
+   -- Inclusão de parametro.
+   --
+   CREATE OR REPLACE function public.manutencao_funcao_externa( intCodmodulo       INTEGER
+                                                              , intCodBiblioteca   INTEGER
+                                                              , intCodFuncao       INTEGER )
+   RETURNS VOID as $$
+   DECLARE
+      --intCodFuncao INTEGER;
+   BEGIN
+
+      -- RAise Notice ' =====> % ', intCodFuncao;
+
+      If intCodFuncao != 0 THEN
+         INSERT INTO administracao.funcao_externa ( cod_modulo
+                                                  , cod_biblioteca
+                                                  , cod_funcao
+                                                  , comentario
+                                                  )
+                                           VALUES ( intCodmodulo
+                                                  , intCodBiblioteca
+                                                  , intCodFuncao
+                                                  , ''
+                                                  );
+      END IF;
+      RETURN;
+   END;
+   $$ LANGUAGE 'plpgsql';
+
+   --
+   -- Função principal.
+   --
+   CREATE OR REPLACE function public.manutencao() RETURNS VOID as $$
+   DECLARE
+      intCodFuncao   INTEGER;
+      intCodVariavel INTEGER;
+   BEGIN
+
+      -- 1 | INTEIRO
+      -- 2 | TEXTO
+      -- 3 | BOOLEANO
+      -- 4 | NUMERICO
+      -- 5 | DATA
+
+    --Inclusão de função interna arrecadacao/fn_acrescimo_indice.plsql
+
+        PERFORM 1
+           FROM administracao.configuracao
+          WHERE cod_modulo = 2
+            AND exercicio  = '2015'
+            AND parametro  = 'cnpj'
+            AND valor      = '94068418000184'
+              ;
+        IF FOUND THEN
+
+          intCodFuncao   := public.manutencao_funcao   (  28, 2, 'fn_urm_mariana', 4);
+                                                     --( intCodmodulo , intCodBiblioteca , varNomeFunc , intCodTiporetorno )
+
+          intCodVariavel := public.manutencao_variavel (  28, 2, intCodFuncao, 'dtVencimento'  , 5 );
+          PERFORM           public.manutencao_parametro(  28, 2, intCodFuncao, intCodVariavel      );
+          intCodVariavel := public.manutencao_variavel (  28, 2, intCodFuncao, 'dtDataCalculo' , 5 );
+          PERFORM           public.manutencao_parametro(  28, 2, intCodFuncao, intCodVariavel      );
+          intCodVariavel := public.manutencao_variavel (  28, 2, intCodFuncao, 'nuValor'       , 4 );
+          PERFORM           public.manutencao_parametro(  28, 2, intCodFuncao, intCodVariavel      );
+          intCodVariavel := public.manutencao_variavel (  28, 2, intCodFuncao, 'inCodAcrescimo', 1 );
+          PERFORM           public.manutencao_parametro(  28, 2, intCodFuncao, intCodVariavel      );
+          intCodVariavel := public.manutencao_variavel (  28, 2, intCodFuncao, 'inCodTipo'     , 1 );
+          PERFORM           public.manutencao_parametro(  28, 2, intCodFuncao, intCodVariavel      );
+
+          PERFORM           public.manutencao_funcao_externa( 28, 2, intCodFuncao );
+
+            INSERT
+              INTO monetario.formula_acrescimo
+                 ( cod_acrescimo
+                 , cod_tipo
+                 , cod_modulo
+                 , cod_biblioteca
+                 , cod_funcao
+                 )
+            VALUES
+                 ( 1
+                 , 1
+                 , 28
+                 , 2
+                 , intCodFuncao
+                 );
+
+        END IF;
+      RETURN;
+   END;
+   $$ LANGUAGE 'plpgsql';
+
+   --
+   -- Execuçao  função.
+   --
+   Select public.manutencao();
+   Drop Function public.manutencao();
+   Drop Function public.manutencao_funcao(integer, integer, varchar, integer );
+   Drop Function public.manutencao_variavel( integer, integer, integer, varchar, integer );
+   Drop Function public.manutencao_parametro( integer, integer, integer, integer );
+   Drop Function public.manutencao_funcao_externa( integer, integer, integer ) ;
+
+

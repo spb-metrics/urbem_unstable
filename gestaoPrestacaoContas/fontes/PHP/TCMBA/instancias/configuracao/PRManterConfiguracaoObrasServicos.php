@@ -29,7 +29,7 @@
     * @author Analista      Dagiane Vieira
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: PRManterConfiguracaoObrasServicos.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: PRManterConfiguracaoObrasServicos.php 63809 2015-10-19 16:52:56Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -164,6 +164,7 @@ if(!$obErro->ocorreu()){
                         $obTTCMBAObraMedicao->setDado("cod_medida"          , $value['inCodMedidaObra']         );
                         $obTTCMBAObraMedicao->setDado("data_inicio"         , $value['dtInicioMedicao']         );
                         $obTTCMBAObraMedicao->setDado("data_final"          , $value['dtFinalMedicao']          );
+                        $obTTCMBAObraMedicao->setDado("data_medicao"        , $value['dtMedicao']               );
                         $obTTCMBAObraMedicao->setDado("vl_medicao"          , $value['nuVlMedicao']             );
                         $obTTCMBAObraMedicao->setDado("nro_nota_fiscal"     , $value['stNFMedicao']             );
                         $obTTCMBAObraMedicao->setDado("data_nota_fiscal"    , $value['dtNFMedicao']             );
@@ -333,6 +334,7 @@ if(!$obErro->ocorreu()){
                         $obTTCMBAObraMedicao->setDado("cod_medida"          , $value['inCodMedidaObra']         );
                         $obTTCMBAObraMedicao->setDado("data_inicio"         , $value['dtInicioMedicao']         );
                         $obTTCMBAObraMedicao->setDado("data_final"          , $value['dtFinalMedicao']          );
+                        $obTTCMBAObraMedicao->setDado("data_medicao"        , $value['dtMedicao']               );
                         $obTTCMBAObraMedicao->setDado("vl_medicao"          , $value['nuVlMedicao']             );
                         $obTTCMBAObraMedicao->setDado("nro_nota_fiscal"     , $value['stNFMedicao']             );
                         $obTTCMBAObraMedicao->setDado("data_nota_fiscal"    , $value['dtNFMedicao']             );

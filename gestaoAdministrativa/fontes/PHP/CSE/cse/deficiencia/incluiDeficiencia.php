@@ -113,7 +113,6 @@ case 0:
 
 //Inclusão, alteração ou exclusão de dados
 case 1:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     //Verifica se já existe o registro a ser incluido

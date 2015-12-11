@@ -72,10 +72,10 @@ class TTCMBACadastroObra extends Persistente
                         , obra_andamento.cod_situacao as situacao_obra
                         , obra.vl_obra
                         , CASE WHEN obra.cod_modalidade = 8 THEN
-                                licitacao.cod_processo
+                                licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') 
                         END as processo_dispensa
                         , CASE WHEN obra.cod_modalidade != 8 THEN
-                                licitacao.cod_processo
+                                licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') 
                         END as processo_licitatorio
                         , '' as reservado_tcm
                         , CASE WHEN obra_andamento.cod_situacao IN(2,3) THEN
@@ -92,7 +92,7 @@ class TTCMBACadastroObra extends Persistente
                         , obra.local
                         , obra.cep
                         , sw_bairro.nom_bairro
-                        , obra.cod_funcao
+                        , tipo_funcao_obra.nro_funcao
                         , obra.cod_tipo
                         , obra_medicao.cod_medida
                         , obra_medicao.vl_medicao::NUMERIC(14,3) as vl_medicao
@@ -132,6 +132,10 @@ class TTCMBACadastroObra extends Persistente
                    AND licitacao.cod_modalidade = obra.cod_modalidade
                    AND licitacao.cod_entidade   = obra.cod_entidade
                    AND licitacao.exercicio      = obra.exercicio
+                   
+            INNER JOIN tcmba.tipo_funcao_obra 
+                    ON tipo_funcao_obra.cod_funcao= obra.cod_funcao 
+
 
                  WHERE obra.data_inicio <= TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy') 
                    AND obra.data_recebimento >= TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')

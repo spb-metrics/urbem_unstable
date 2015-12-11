@@ -31,7 +31,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: FMConsultaInscricaoDetalheValor.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaInscricaoDetalheValor.php 63839 2015-10-22 18:08:07Z franver $
 
     Caso de uso: uc-05.04.09
 **/
@@ -129,8 +129,6 @@ $obTDATDividaAtiva->recuperaConsulta( $rsDetalheParcela, $stFiltro, $dtDataUS );
 
 $stFiltroDetalhes = " ap.cod_lancamento = ".$inCodLancamento." AND ap.cod_parcela = ".$inCodParcela." AND dpc.num_parcelamento = ".$inNumParcelamento;
 $obTDATDividaAtiva->recuperaListaDetalhesAcrescimosConsultaDivida( $rsListaDetalheCreditos, $stFiltroDetalhes, $dtDataUS, $inNumeracao );
-//sistemaLegado::mostravar( $rsListaDetalheCreditos );
-//sistemaLegado::mostravar( $rsDetalheParcela );
 
 $flTotalCreditos = 0;
 $inQuantidadeCreditos = 0;
@@ -332,8 +330,6 @@ $obRARRParcela = new RARRParcela ( new RARRLancamento (new RARRCalculo) );
 $obRARRParcela->setCodParcela ( $inCodParcela );
 $obRARRParcela->listarReemissaoConsulta( $rsNumeracoes );
 
-#sistemaLegado::mostravar( $rsNumeracoes );
-
 $obCmbNumeracao = new Select;
 $obCmbNumeracao->setName         ( "cmbNumeracao"               );
 $obCmbNumeracao->addOption       ( "", "Vencimentos"            );
@@ -468,7 +464,7 @@ $stTipoBaixa = $rsDetalheParcela->getCampo("cod_lote");
 // antes de form , apresentar lista de pagamentos duplicados
 $obRARRCarne->listarPagamentosConsulta( $rsPagDuplicados );
 $rsPagDuplicados->addFormatacao("valor","NUMERIC_BR");
-#sistemaLegado::mostravar( $rsPagDuplicados );
+
 $inContPagamentos =  $rsPagDuplicados->getNumLinhas();
 $arParcelasDuplicadas = array();
 if ($inContPagamentos > 1) {
@@ -494,7 +490,6 @@ if ($inContPagamentos > 1) {
 if ( $rsPagDuplicados->getNumLinhas() > 0 ) {
 
     ########################### TABELA DOM
-    #sistemaLegado::mostravar( $rsPagDuplicados );
     $table = new Table();
     $table->setRecordset( $rsPagDuplicados );
     $table->setSummary('Pagamentos Duplicados');
@@ -661,7 +656,6 @@ $table = new Table();
 $table->setRecordset( $rsListaDetalheCreditos );
 $table->setSummary('Detalhamento por Crédito');
 
-#sistemaLegado::mostravar( $rsListaDetalheCreditos );
 // lista zebrada
 //$table->setConditional( true , "#efefef" );
 

@@ -138,13 +138,9 @@ if ($_REQUEST['stCodDocumento']) {
 if ( $stFiltro )
     $stFiltro = " WHERE ".substr( $stFiltro, 0, strlen($stFiltro) - 4 );
 
-#echo 'filtro: '.$stFiltro;
-
 $obTCEMLicencaDocumento = new TCEMLicencaDocumento;
 $stOrdem = " limit 1 ";
 $obTCEMLicencaDocumento->recuperaListaDocumentoLS( $rsDocumentos, $stFiltro, $stOrdem );
-#$obTCEMLicencaDocumento->debug();
-#sistemaLegado::mostravar( $rsDocumentos );
 
 $obForm = new Form;
 $obForm->setAction ( $pgForm );

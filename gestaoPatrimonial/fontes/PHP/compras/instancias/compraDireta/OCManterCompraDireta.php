@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.04.33
 
-    $Id: OCManterCompraDireta.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterCompraDireta.php 63859 2015-10-26 17:39:34Z franver $
 
     */
 
@@ -72,8 +72,8 @@ function montaListaItens($rsItens)
     $table->setSummary('Itens');
     //$table->setConditional( true , "#ddd" );
 
-    $table->Head->addCabecalho( 'Item' , 40  );
-    $table->Head->addCabecalho( 'Centro de Custo', 25 );
+    $table->Head->addCabecalho( 'Item' , 35  );
+    $table->Head->addCabecalho( 'Centro de Custo', 20 );
     $table->Head->addCabecalho( 'Valor de Referência' , 10  );
     $table->Head->addCabecalho( 'Valor da Última Compra' , 10  );
     $table->Head->addCabecalho( 'Qtde' , 10  );
@@ -175,8 +175,12 @@ switch ($_REQUEST['stCtrl']) {
             $obTComprasMapa->recuperaMapaProcessoLicitatorio($rsComprasMapa, $stFiltro);
 
             if (($boLicitacao || $boCompraDireta || ($rsComprasMapa->getNumLinhas() <= 0 ))) {
-                $stJs  = "$('spnItens').innerHTML= '';\n";
-                $stJs .= "$('stTotalMapa').innerHTML = '';\n";
+                $stJs .= "jQuery('#spnItens').html(\"\");\n";
+                $stJs .= "jQuery('#stTotalMapa').html(\"\");\n";
+                $stJs .= "jQuery('#lblObjeto').html(\"\");\n";
+                $stJs .= "jQuery('#hdnObjeto').val(\"\");\n";
+                $stJs .= "jQuery('#stMapaCompras').val(\"\");\n";
+                $stJs .= "alertaAviso('O Mapa (".$inCodMapa."/".$stExercicioMapa."), não pode ser utilizado numa Compra Direta.','form','aviso','".Sessao::getId()."');\n";
             } else {
                 include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaItem.class.php';
                 include_once CAM_GP_ALM_MAPEAMENTO.'TAlmoxarifadoCatalogoItem.class.php';
@@ -205,9 +209,9 @@ switch ($_REQUEST['stCtrl']) {
                 $nuTotal = number_format($nuTotal,2,',','.');
 
                 $rsMapaItens->setPrimeiroElemento();
-                $stJs  = "$('stTotalMapa').innerHTML = '" . $nuTotal . "';\n";
-                $stJs .= "$('lblObjeto').innerHTML = '".$rsMapaItens->getCampo('cod_objeto')." - ".nl2br(str_replace('\r\n', '\n', preg_replace('/(\r\n|\n|\r)/', ' ', $rsMapaItens->getCampo('objeto_descricao'))))."';\n";
-                $stJs .= "$('hdnObjeto').value = '".$rsMapaItens->getCampo('cod_objeto')."';\n";
+                $stJs .= "jQuery('#stTotalMapa').html(\"" . $nuTotal . "\");\n";
+                $stJs .= "jQuery('#lblObjeto').html(\"".$rsMapaItens->getCampo('cod_objeto')." - ".nl2br(str_replace('\r\n', '\n', preg_replace('/(\r\n|\n|\r)/', ' ', $rsMapaItens->getCampo('objeto_descricao'))))."\");\n";
+                $stJs .= "jQuery('#hdnObjeto').val(\"".$rsMapaItens->getCampo('cod_objeto')."\");\n";
                 $stJs .= montaListaItens( $rsMapaItens ) ;
             }
         }
@@ -222,8 +226,8 @@ switch ($_REQUEST['stCtrl']) {
             $boExecuta = true;
         } else {
             if ($_REQUEST['stMapaCompras'] != '') {
-                $boLicitacao = SistemaLegado::pegaDado ( "cod_licitacao","licitacao.licitacao"," where cod_mapa = " . $inCodMapa  . " and exercicio_mapa = " . $stExercicioMapa . "");
-                $boCompraDireta = SistemaLegado::pegaDado ('cod_compra_direta','compras.compra_direta',' where cod_mapa = '.$inCodMapa.' and exercicio_mapa = '.$stExercicioMapa.' ' );
+                $boLicitacao = SistemaLegado::pegaDado ( "cod_licitacao","licitacao.licitacao"," where cod_mapa = " . $inCodMapa  . " and exercicio_mapa = '" . $stExercicioMapa . "' ");
+                $boCompraDireta = SistemaLegado::pegaDado("cod_compra_direta","compras.compra_direta"," where cod_mapa = ".$inCodMapa." and exercicio_mapa = '".$stExercicioMapa."' ");
 
                 include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapa.class.php';
                 $obTComprasMapa = new TComprasMapa;
@@ -275,8 +279,12 @@ switch ($_REQUEST['stCtrl']) {
             $stJs .= montaListaItens( $rsMapaItens ) ;
 
         } else {
-            $stJs  = "$('spnItens').innerHTML= '';\n";
-            $stJs .= "$('stTotalMapa').innerHTML = '';\n";
+            $stJs .= "jQuery('#spnItens').html(\"\");\n";
+            $stJs .= "jQuery('#stTotalMapa').html(\"\");\n";
+            $stJs .= "jQuery('#lblObjeto').html(\"\");\n";
+            $stJs .= "jQuery('#hdnObjeto').val(\"\");\n";
+            $stJs .= "jQuery('#stMapaCompras').val(\"\");\n";
+            $stJs .= "alertaAviso('O Mapa (".$inCodMapa."/".$stExercicioMapa."), não pode ser utilizado numa Compra Direta.','form','aviso','".Sessao::getId()."');\n";
         }
 
     break;

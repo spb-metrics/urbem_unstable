@@ -33,10 +33,7 @@
 
     * @ignore
 
-    $Revision: 32125 $
-    $Name$
-    $Author: tonismar $
-    $Date: 2008-01-30 15:54:45 -0200 (Qua, 30 Jan 2008) $
+    $Id: FMManterAutorizacao.php 64051 2015-11-24 17:55:39Z franver $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -48,6 +45,7 @@ include_once CAM_GF_EMP_NEGOCIO.'REmpenhoAutorizacaoEmpenho.class.php';
 include_once CAM_FW_HTML.'MontaAtributos.class.php';
 include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
 include_once TEMP.'TEmpenhoCategoriaEmpenho.class.php';
+include_once CAM_GP_ALM_COMPONENTES.'IPopUpCentroCustoUsuario.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = 'ManterAutorizacao';
@@ -202,6 +200,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
                 $booCodItem = false;
             }
             $arItens[$inCount]['nom_item']     = $obItemPreEmpenho->getNomItem();
+            $arItens[$inCount]['cod_centro']   = $obItemPreEmpenho->getCodCentroCusto();
             $arItens[$inCount]['complemento']  = $obItemPreEmpenho->getComplemento();
             $arItens[$inCount]['quantidade']   = $obItemPreEmpenho->getQuantidade();
             $arItens[$inCount]['vl_unitario']  = $nuVlUnitario;
@@ -231,15 +230,14 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
             }
             $rsAtributos->setPrimeiroElemento();
         }
-        
-        if($booCodItem){
-            $stJs .= "bloqueiaTipoItem('Catalogo');";
-        }
-        else{
-            $stJs .= "bloqueiaTipoItem('Descricao');";
-        }
 
         $jsOnLoad = "montaParametrosGET('alterar','');";
+
+        if($booCodItem){
+            $jsOnLoad .= "bloqueiaTipoItem('Catalogo');";
+        }else{
+            $jsOnLoad .= "bloqueiaTipoItem('Descricao');";
+        }
     } else {
         $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionados($rsAtributos);
     }
@@ -401,6 +399,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obDtAutorizacao->setRotulo('Data da Autorização');
     $obDtAutorizacao->setTitle ('Informe a data da autorização.');
     $obDtAutorizacao->setNull  (false);
+    $obDtAutorizacao->obEvento->setOnChange("buscaDado('buscaDespesa');");
 
     // Define Objeto BuscaInner para Despesa
     $obBscDespesa = new BuscaInner;
@@ -580,8 +579,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtQuantidade->setTitle    ('Informe a quantidade.');
     $obTxtQuantidade->setDecimais (4);
     $obTxtQuantidade->setNegativo (false);
-    $obTxtQuantidade->setSize     (23);
-    $obTxtQuantidade->setMaxLength(23);
+    $obTxtQuantidade->setDefinicao('NUMERIC');
+    $obTxtQuantidade->setSize     (14);
+    $obTxtQuantidade->setMaxLength(13);
     $obTxtQuantidade->obEvento->setOnChange('gerarValorTotal();');
 
     // Define Objeto Select para Unidade
@@ -598,20 +598,21 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbUnidade->setNull      (true);
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlUnitario = new Moeda;
+    $obTxtVlUnitario = new Numerico;
     $obTxtVlUnitario->setName     ('nuVlUnitario');
     $obTxtVlUnitario->setId       ('nuVlUnitario');
     $obTxtVlUnitario->setValue    ($nuVlUnitario);
     $obTxtVlUnitario->setRotulo   ('*Valor Unitário');
     $obTxtVlUnitario->setTitle    ('Informe o valor unitário.');
     $obTxtVlUnitario->setNull     (true);
-    $obTxtVlUnitario->setDecimais (4);
+    $obTxtVlUnitario->setDefinicao('NUMERIC');
+    $obTxtVlUnitario->setDecimais (2);
     $obTxtVlUnitario->setSize     (21);
     $obTxtVlUnitario->setMaxLength(21);
     $obTxtVlUnitario->obEvento->setOnChange('gerarValorTotal();');
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlTotal = new Moeda;
+    $obTxtVlTotal = new Numerico;
     $obTxtVlTotal->setName     ('nuVlTotal');
     $obTxtVlTotal->setId       ('nuVlTotal');
     $obTxtVlTotal->setValue    ($nuVlTotal);
@@ -619,6 +620,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlTotal->setTitle    ('Informe o valor total.');
     $obTxtVlTotal->setNull     (true);
     $obTxtVlTotal->setReadOnly (true);
+    $obTxtVlTotal->setDefinicao('NUMERIC');
+    $obTxtVlTotal->setDecimais (2);
     $obTxtVlTotal->setSize     (21);
     $obTxtVlTotal->setMaxLength(21);
     $obTxtVlTotal->obEvento->setOnChange('gerarValorTotal();');
@@ -763,6 +766,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obFormulario->addComponente($obDtAutorizacao);
         $obMontaAssinaturas->setOpcaoAssinaturas(false);
     }
+
+    $obCentroCustoUsuario = new IPopUpCentroCustoUsuario($obForm);
+    $obCentroCustoUsuario->setNull  (true);
+    $obCentroCustoUsuario->setRotulo('Centro de Custo');
+    $obCentroCustoUsuario->obCampoCod->setId ('inCodCentroCusto');
+
     $obFormulario->addHidden    ($obHdnVlTotalAutorizacao);
     $obFormulario->addHidden    ($obHdnBoModuloEmpenho);
     $obFormulario->addComponente($obBscDespesa);
@@ -788,6 +797,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obMontaItemUnidade->geraFormulario($obFormulario);
         $obFormulario->addComponente($obTxtNomItem);
         $obFormulario->addComponente($obTxtComplemento);
+        $obFormulario->addComponente($obCentroCustoUsuario);
         $obFormulario->addComponente($obTxtQuantidade);
         $obFormulario->addComponente($obCmbUnidade);
         $obFormulario->addComponente($obTxtVlUnitario);

@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Diego Bueno Coelho
 
-    * $Id: OCRelatorioValoresLancados.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCRelatorioValoresLancados.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.13
 */
@@ -108,7 +108,6 @@ if (!$_REQUEST ["stCtrl"]) {
 
             $obRARRRelatorioValoresLancados->setSituacao        ( $arFiltro['boSituacao'] );
 
-            #sistemaLegado::mostravar( $sessao->filtro ); exit;
             if (!$stErro) {
                 $obErro = $obRARRRelatorioValoresLancados->geraRecordSetRelatorio ( $rsRecordSet, $rsRecordSetSomas, $arCabecalho, $stOrder );
                 $stTipoRelatorio = Sessao::read( 'stTipoRelatorio' );

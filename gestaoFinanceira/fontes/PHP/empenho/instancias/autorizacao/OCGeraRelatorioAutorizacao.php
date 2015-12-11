@@ -30,7 +30,7 @@
  * @author Analista:      Tonismar Régis Bernardo
  * @author Desenvolvedor: Henrique Boaventura
 
- $Id: OCGeraRelatorioAutorizacao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: OCGeraRelatorioAutorizacao.php 63841 2015-10-22 19:14:30Z michel $
 
  */
 
@@ -174,7 +174,10 @@ if (!is_array($arAutorizacao)) {
     if (Sessao::read('modulo') == 35 && Sessao::read('acao') == 1730) {
         $stLinkRetorno = CAM_GP_COM_INSTANCIAS."compraDireta/LSManterAutorizacao.php";
     } elseif (Sessao::read('modulo') == 37 && Sessao::read('acao') == 1741) {
-        // Link de origem = Licitação
+        // Link de origem = Licitação -> Emitir Autorização de Empenho
+        $stLinkRetorno = CAM_GP_LIC_INSTANCIAS."autorizacao/FLManterAutorizacao.php";
+    } elseif (Sessao::read('modulo') == 37 && Sessao::read('acao') == 3086) {
+        // Link de origem = Licitação -> Emitir Autorização de Empenho Parcial
         $stLinkRetorno = CAM_GP_LIC_INSTANCIAS."autorizacao/FLManterAutorizacao.php";
     }
 

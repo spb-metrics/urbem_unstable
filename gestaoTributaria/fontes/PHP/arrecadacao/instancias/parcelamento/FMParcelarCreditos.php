@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMParcelarCreditos.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMParcelarCreditos.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.20
 */
@@ -63,8 +63,6 @@ $pgJS   = "JS".$stPrograma.".js";
 
 include_once( $pgJS );
 
-//SistemaLegado::mostravar($_REQUEST);
-/*exit("sai");*/
 // instancia regra de lancamento
 
 $obRARRParcelamento->obRCgm->setNumCgm( $_REQUEST["inCodContribuinte"] );

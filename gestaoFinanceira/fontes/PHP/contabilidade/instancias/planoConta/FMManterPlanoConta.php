@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMManterPlanoConta.php 61379 2015-01-12 20:10:17Z arthur $
+    * $Id: FMManterPlanoConta.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.02
 */
@@ -149,7 +149,7 @@ if ($stAcao == 'alterar') {
     $stIndicadorSuperavit = '';
     $stFuncao = '';
 
-    if ( SistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         if ( !empty( $_REQUEST['inCodPlano'] ) ) {
             $stIndicadorSuperavit = $obRContabilidadePlanoBanco->getIndicadorSuperavit();
         }
@@ -195,7 +195,7 @@ if ($stAcao == "incluir") {
 
     $js .= " buscaValor('tipoContaAnalitica');";
 } elseif ($stAcao == "alterar") {
-    if ( ($inCodSistemaContabil == "5") || ( $inCodSistemaContabil == "4" && SistemaLegado::is_tcems() && $stEscrituracao == 'sintetica' ) ) {
+    if ( ($inCodSistemaContabil == "5") || ( $inCodSistemaContabil == "4" && Sessao::getExercicio() > '2012' && $stEscrituracao == 'sintetica' ) ) {
         $js .= " buscaValor('tipoContaSintetica');";
     } else {
         $js .= " buscaValor('tipoContaAnalitica');";
@@ -223,7 +223,7 @@ $obHdnCtrl->setValue( "" );
 if ($stAcao == 'alterar') {
 
     // Verifica se a conta tem movimentacao
-    if ( SistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -235,7 +235,7 @@ if ($stAcao == 'alterar') {
         $boTemMovimentacao = true;
     }
 
-    if ( SistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obTContabilidadePlanoConta = new TContabilidadePlanoContaTCEMS;
     } else {
         $obTContabilidadePlanoConta = new TContabilidadePlanoConta;
@@ -282,7 +282,7 @@ if ($stAcao == 'alterar') {
     //Define Objeto Label para Código da Classificacao Contabil
     $obLblCodClassContabil = new Label;
     $obLblCodClassContabil->setRotulo    ( "Código de Classificação"                    );
-    if ( !SistemaLegado::is_tcems() ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $obLblCodClassContabil->setValue( $stCodClassificacao );
     } else {
         $obLblCodClassContabil->setValue( $stCodClassificacao );
@@ -298,7 +298,7 @@ $obHdnCodClassContabil->setValue( $inCodClassContabil );
 $obSpanSistemaContabil = new Span;
 $obSpanSistemaContabil->setId( "spnSistemaContabil" );
 
-if ( !SistemaLegado::is_tcems() ) {
+if ( !Sessao::getExercicio() > '2012' ) {
     // Define Objeto TextBox para Codigo da Classificacao Contabil
     $obTxtClassContabil = new TextBox;
     $obTxtClassContabil->setName   ( "txtCodClassContabil"                 );
@@ -352,7 +352,7 @@ $obTxtDescrConta->setRotulo   ( "Descrição da Conta"           );
 $obTxtDescrConta->setTitle    ( "Informe a descrição da conta" );
 $obTxtDescrConta->setNull     ( false );
 
-if ( SistemaLegado::is_tcems() ) {
+if ( Sessao::getExercicio() > '2012' ) {
     // Define Objeto TextArea para a Função
     $obTxtFuncao = new TextArea;
     $obTxtFuncao->setName     ( "stFuncao"                   );
@@ -757,7 +757,7 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
     }
     $obLblSistemaContabil->setValue ( $stNomeContaContabil  );
     
-    if ( sistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stIndicadorSuperavit = $obRContabilidadePlanoBanco->getIndicadorSuperavit();
         $obLblIndicadorSuperavit = new Label;
         $obLblIndicadorSuperavit->setRotulo ( "Indicador Superávit" );
@@ -791,7 +791,7 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
     $obFormulario->addComponente( $obLblNaturezaSaldo      );
     if($boContaAnalitica){
         $obFormulario->addComponente( $obLblSistemaContabil );
-        if ( sistemaLegado::is_tcems() ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $obFormulario->addComponente( $obLblIndicadorSuperavit );
         }
     }
@@ -895,7 +895,7 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
     
     $obFormulario->addSpan( $obSpanSistemaContabil );
     
-    if ( !SistemaLegado::is_tcems() ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $obFormulario->addComponenteComposto( $obTxtClassContabil  , $obCmbClassContabil   );
     }
     
@@ -906,7 +906,7 @@ if($rsContaEncerrada->getNumLinhas() > 0 && $stAcao == 'alterar'){
     }
     
     $obFormulario->addComponente( $obTxtDescrConta );
-    if ( SistemaLegado::is_tcems() ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $obFormulario->addComponente( $obTxtFuncao );
     }
     

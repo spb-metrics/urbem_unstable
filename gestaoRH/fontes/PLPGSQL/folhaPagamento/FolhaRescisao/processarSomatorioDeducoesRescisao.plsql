@@ -159,7 +159,7 @@ BEGIN
 
     END IF;
 	
-   IF stSituacaoFolhaSalario = 'f' THEN
+   IF stSituacaoFolhaSalario = 'f' AND trim(stDesdobramento) IN ('A','S') THEN
         stSql := 'SELECT sum(evento_calculado.valor) as valor
                     FROM folhapagamento'||stEntidade||'.tabela_irrf_evento 
               INNER JOIN (  SELECT cod_tabela

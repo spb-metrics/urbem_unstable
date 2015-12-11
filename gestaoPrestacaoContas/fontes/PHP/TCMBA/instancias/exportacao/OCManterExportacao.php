@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterExportacao.php 63563 2015-09-10 19:09:46Z michel $
+    $Id: OCManterExportacao.php 64077 2015-11-27 19:50:48Z jean $
 
     * Casos de uso: uc-06.03.00
 */
@@ -41,6 +41,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio().'/TTBAConfiguracao.class.php';
+include_once(CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
 include_once CLA_EXPORTADOR;
 
 $stAcao = $request->get('stAcao');
@@ -62,6 +63,8 @@ $inCodUnidadeGestora = $rsEntidade->getCampo('cod_unidade_gestora');
 $stDataInicial = $arFiltro['stDataInicial'];
 $stDataFinal   = $arFiltro['stDataFinal'];
 
+$stTipoPeriodicidade = $arFiltro['stTipoPeriodicidade'];
+
 Sessao::write('cod_unidade_gestora',$rsEntidade->getCampo('cod_unidade_gestora'));
 Sessao::write('nom_unidade'        ,$rsEntidade->getCampo('nom_entidade'));
 
@@ -70,6 +73,8 @@ if (SistemaLegado::pegaDado('parametro','administracao.configuracao', " WHERE va
 } else {
     $stEntidadeRH = "_".$stEntidades;
 }
+
+$arLogErros = array();
 
 foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
     $obExportador->addArquivo($stArquivo);
@@ -82,6 +87,29 @@ foreach ($arFiltro["arArquivosSelecionados"] as $stArquivo) {
 
 if ($arFiltro['stTipoExport'] == 'compactados') {
     $obExportador->setNomeArquivoZip('ExportacaoArquivosPrincipais.zip');
+}
+
+$stTemPeriodicidade = SistemaLegado::pegaConfiguracao("tcmba_tipo_periodicidade_patrimonio", 45, Sessao::getExercicio());
+
+if ($stTemPeriodicidade != $arFiltro["stTipoPeriodicidade"]) {
+    $obRConfiguracaoConfiguracao = new RConfiguracaoConfiguracao();
+    $obRConfiguracaoConfiguracao->setCodModulo( 45 );
+    $obRConfiguracaoConfiguracao->setParametro( 'tcmba_tipo_periodicidade_patrimonio' );
+    $obRConfiguracaoConfiguracao->setValor    ( $arFiltro["stTipoPeriodicidade"] );
+    $obRConfiguracaoConfiguracao->alterar($boTransacao);
+}
+
+if(count($arLogErros)>0 && $arFiltro['stInformativoErro']=='Sim'){
+    $rsLogErros = new RecordSet();
+    $rsLogErros->preenche($arLogErros);
+
+    $obExportador->addArquivo('URBEM_Informativo_de_Erros.txt');
+    $obExportador->roUltimoArquivo->setTitulo('Informativo de Erros para Usuário URBEM');
+    $obExportador->roUltimoArquivo->addBloco($rsLogErros);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nome_arquivo");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(35);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("erro");
 }
 
 $obExportador->show();

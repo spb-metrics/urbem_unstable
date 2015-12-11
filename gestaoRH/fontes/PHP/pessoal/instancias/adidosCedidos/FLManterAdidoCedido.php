@@ -53,7 +53,7 @@ $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 Sessao::remove('link');
 $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
-$jsOnload   = "montaParametrosGET('preencherSpanFiltro','stOpcao');";
+$jsOnload   = "montaParametrosGET('preencherSpanFiltro','stOpcao,stAcao');";
 
 include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                      );
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
@@ -78,7 +78,7 @@ $obRdoContrato->setTitle                        ( "Selecione o tipo de filtro a 
 $obRdoContrato->setRotulo                       ( "Opções"                                                              );
 $obRdoContrato->setLabel                        ( "Matrícula"                                                           );
 $obRdoContrato->setValue                        ( "contrato"                                                            );
-$obRdoContrato->obEvento->setOnChange           ( "montaParametrosGET('preencherSpanFiltro','stOpcao');"                           );
+$obRdoContrato->obEvento->setOnChange           ( "montaParametrosGET('preencherSpanFiltro','stOpcao,stAcao');"         );
 $obRdoContrato->setChecked                      ( $stOpcao == 'contrato' || !$stOpcao                                   );
 $obRdoContrato->setNull(false);
 
@@ -88,7 +88,7 @@ $obRdoCgmContrato->setTitle                     ( "Selecione o tipo de filtro a 
 $obRdoCgmContrato->setRotulo                    ( "Opções"                                                              );
 $obRdoCgmContrato->setLabel                     ( "CGM/Matrícula"                                                       );
 $obRdoCgmContrato->setValue                     ( "cgm_contrato"                                                        );
-$obRdoCgmContrato->obEvento->setOnChange        ( "montaParametrosGET('preencherSpanFiltro','stOpcao');"                           );
+$obRdoCgmContrato->obEvento->setOnChange        ( "montaParametrosGET('preencherSpanFiltro','stOpcao,stAcao');"         );
 $obRdoCgmContrato->setChecked                   ( $stOpcao == 'cgm_contrato'                                            );
 $obRdoCgmContrato->setNull(false);
 

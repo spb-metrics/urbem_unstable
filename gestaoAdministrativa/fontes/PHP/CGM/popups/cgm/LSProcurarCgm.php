@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.02.92, uc-02.08.05
 
-    $Id: LSProcurarCgm.php 63681 2015-09-29 17:48:28Z evandro $
+    $Id: LSProcurarCgm.php 63969 2015-11-12 18:43:12Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -204,6 +204,9 @@ if ($arCampo['FLIPopUpCGMVinculado'] !="") {
 
 if ($arCampo['stFiltroVinculado'] !="") {
     $stFiltroVinculado.= $arCampo['stFiltroVinculado'];
+}
+if ( $request->get('stTabelaVinculo') == 'patrimonio.bem_responsavel' ) {
+    $stFiltroVinculado .= " AND tabela_vinculo.dt_fim IS NULL";
 }
 
 if ( $request->get('stTabelaVinculo') ) {

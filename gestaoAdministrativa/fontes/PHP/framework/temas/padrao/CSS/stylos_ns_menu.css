@@ -60,14 +60,8 @@ TD {
 }
 
 a,a:link, a:visited ,span, span{
-    /* background:#B4B6B4; 
-    background: url("../imagens/botao_menu_claro.png") 0 0 no-repeat;
-    border:#585858 2px outset;
-    display:block;*/
     display: table-cell;
     margin:0px;
-  /*  padding-top:1px;
-    padding-bottom:1px; */
     height: 31px;
     padding-left:10px;
     text-decoration:none;
@@ -75,8 +69,7 @@ a,a:link, a:visited ,span, span{
     width: 178px;  
 }
 a:hover{
-/*    border:#585858 2px inset; */
-    background: url("../imagens/botao_menu_claro.png") 0 -31px no-repeat;
+    background:#85A5CC;
     color: #FFFFFF;
     padding-left:10px;
 }
@@ -111,7 +104,8 @@ a:hover{
 }
 
 .menu{
-    background: url("../imagens/botao_menu_claro.png") 0 0 no-repeat;
+    background: #D0E4F2;
+    border-bottom: 1px solid #85A5CC;
     color:#000000;
     height: 30px;
     margin-left:10px;
@@ -122,9 +116,7 @@ a:hover{
 .menutitle, a.menutitle {
     margin:0px;
     background: url("../imagens/botao_menu_escuro.png") 0 0 no-repeat;
-    /* background:#6A696A;*/
     color:#FFFFFF;
-    /* border:#585858 2px outset;*/
     display: table-cell;
     height: 31px;
     padding-left:10px;
@@ -132,11 +124,10 @@ a:hover{
     vertical-align:middle;  
     width: 178px;  
 }
+
 a:hover.menutitle{
     background: url("../imagens/botao_menu_escuro.png") 0 -31px no-repeat;
-    /* border:#6A696A 2px inset;*/
     color:#fff;
-    /* display:block;*/
     display: table-cell;
 	padding-left:10px;
     text-decoration: none;
@@ -155,7 +146,6 @@ a imagem na tela */
 	top: 5px;
 }
 
-
 #texto_carregando {
 	position: absolute;
 	Top: 50px;
@@ -168,5 +158,3 @@ a imagem na tela */
 	/* O filtro é a imagem alpha_branca.gif */
 	background-color: #ccc;
 }
-
-

@@ -31,33 +31,6 @@
 */
 
 ----------------
--- Ticket #23154
-----------------
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3086
-     , 362
-     , 'FLManterAutorizacao.php'
-     , 'parcial'
-     , 2
-     , ''
-     , 'Emitir Autorização de Empenho Parcial'
-     , TRUE
-     );
-
-
-----------------
 -- Ticket #23288
 ----------------
 
@@ -81,5 +54,124 @@ VALUES
      , ''
      , 'Consultar Contrato'
      , TRUE
+     );
+
+
+----------------
+-- Ticket #23340
+----------------
+
+DROP   TYPE depreciacao_automatica CASCADE;
+CREATE TYPE depreciacao_automatica AS (
+    cod_bem                           INTEGER,
+    descricao                         VARCHAR,
+    dt_incorporacao                   DATE   ,
+    dt_aquisicao                      DATE   ,
+    competencia_incorporacao          TEXT   ,
+    vl_bem                            NUMERIC,
+    quota_depreciacao_anual           NUMERIC,
+    quota_depreciacao_anual_acelerada NUMERIC,
+    depreciacao_acelerada             BOOLEAN,
+    cod_plano                         INTEGER,
+    cod_reavaliacao                   INTEGER,
+    dt_reavaliacao                    DATE   ,
+    vida_util                         INTEGER,
+    motivo                            VARCHAR,
+    exercicio_aquisicao               VARCHAR,
+    mes_aquisicao                     INTEGER
+);
+
+
+----------------
+-- Ticket #23374
+----------------
+
+UPDATE administracao.acao SET ordem = ordem + 4 WHERE cod_funcionalidade = 342;
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+     VALUES
+     ( 3095
+     , 342
+     , 'FMManterTipoContrato.php'
+     , 'incluir'
+     , 1
+     , ''
+     , 'Incluir Tipo de Contrato'
+     , TRUE
+     );
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+     VALUES
+     ( 3096
+     , 342
+     , 'FLManterTipoContrato.php'
+     , 'alterar'
+     , 2
+     , ''
+     , 'Alterar Tipo de Contrato'
+     , TRUE
+     );
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+     VALUES
+     ( 3097
+     , 342
+     , 'FLManterTipoContrato.php'
+     , 'excluir'
+     , 3
+     , ''
+     , 'Excluir Tipo de Contrato'
+     , TRUE
+     );
+
+ALTER TABLE licitacao.tipo_contrato ADD COLUMN tipo_tc INTEGER;
+ALTER TABLE licitacao.tipo_contrato ADD COLUMN ativo   BOOLEAN NOT NULL DEFAULT TRUE;
+
+----------------
+-- Ticket #23417
+----------------
+
+INSERT
+  INTO administracao.configuracao
+     ( cod_modulo
+     , exercicio
+     , parametro
+     , valor
+     )
+     VALUES
+     ( 45
+     , '2015'
+     , 'tcmba_tipo_periodicidade_patrimonio'
+     , ''
      );
 

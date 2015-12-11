@@ -80,140 +80,35 @@ class TTBAConsContRazao extends Persistente
                         , LPAD(".$this->getDado('unidade_gestora')."::VARCHAR,4,'0') AS unidade_gestora
                         , ".$this->getDado('exercicio')."::VARCHAR||LPAD(".$this->getDado('mes')."::VARCHAR,2,'0') AS competencia
                         , '' AS reservado_tcm
-                        , cod_estrutural AS conta_contabil
-                        , SUM(deb_ant) AS deb_ant
-                        , SUM(cred_ant) AS cred_ant
-                        , SUM(deb_mes) AS deb_mes
-                        , SUM(cred_mes) AS cred_mes
-                        , SUM(deb_mes_ant) AS deb_mes_ant
-                        , SUM(cred_mes_ant) AS cred_mes_ant
-                        , (SUM(COALESCE(deb_mes,0.00))+SUM(COALESCE(deb_mes_ant,0.00))) AS deb_ate_mes
-                        , (SUM(COALESCE(cred_mes,0.00))+SUM(COALESCE(cred_mes_ant,0.00))) AS cred_ate_mes
-                        , (SUM(COALESCE(deb_mes,0.00))+SUM(COALESCE(deb_mes_ant,0.00))) AS deb_exercicio
-                        , (SUM(COALESCE(cred_mes,0.00))+SUM(COALESCE(cred_mes_ant,0.00))) AS cred_exercicio
+                        , REPLACE(retorno.cod_estrutural, '.', '') AS conta_contabil
+                        , ABS(retorno.deb_ex_ant) AS deb_ex_ant
+                        , ABS(retorno.deb_mov_ant) AS deb_mov_ant
+                        , ABS(retorno.deb_mes) AS deb_mes
+                        , ABS(retorno.deb_mov) AS deb_mov
+                        , ABS(retorno.cred_ex_ant) AS cred_ex_ant
+                        , ABS(retorno.cred_mov_ant) AS cred_mov_ant
+                        , ABS(retorno.cred_mes) AS cred_mes
+                        , ABS(retorno.cred_mov) AS cred_mov
+                        , ABS(retorno.deb_ex) AS deb_ex
+                        , ABS(retorno.cred_ex) AS cred_ex
 
-                    FROM
-                    (
-                      SELECT
-                            plano_conta.cod_estrutural
-                            ,0.00 AS deb_ant
-                            ,0.00 AS cred_ant
-                            ,COALESCE(SUM(retorno_mes.saldo_debitos),0.00) AS deb_mes
-                            ,COALESCE(SUM(retorno_mes.saldo_creditos),0.00) AS cred_mes
-                            ,0.00 AS deb_mes_ant
-                            ,0.00 AS cred_mes_ant
-                      FROM
-                          contabilidade.plano_conta
-                      
-                      INNER JOIN
-                        (
-                          SELECT *
-                          FROM
-                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '".$this->getDado('dt_inicial')."', '".$this->getDado('dt_final')."', 'S') AS retorno
-                          (
-                          cod_estrutural VARCHAR
-                          ,nivel INTEGER
-                          ,nom_conta VARCHAR
-                          ,cod_sistema INTEGER
-                          ,indicador_superavit CHAR(12)
-                          ,saldo_anterior NUMERIC
-                          ,saldo_debitos NUMERIC
-                          ,saldo_creditos NUMERIC
-                          ,saldo_atual NUMERIC
-                          )
-                        ) AS retorno_mes
-                       ON plano_conta.cod_estrutural = retorno_mes.cod_estrutural
+                     FROM tcmba.fn_conscontrazao ('".Sessao::getExercicio()."',
+                                                  '".$this->getDado('entidades')."',
+                                                  '".$this->getDado('dt_inicial')."',
+                                                  '".$this->getDado('dt_final')."',
+                                                  '".$this->getDado('dt_final_ant')."') AS retorno
+
+               INNER JOIN contabilidade.plano_conta
+                       ON plano_conta.cod_estrutural = retorno.cod_estrutural
                       AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
-                      AND plano_conta.indicador_superavit = retorno_mes.indicador_superavit
-                      
-                      GROUP BY plano_conta.cod_estrutural
-                      
-                      UNION ALL
-                      
-                      SELECT
-                            plano_conta.cod_estrutural
-                            ,0.00 AS deb_ant
-                            ,0.00 AS cred_ant
-                            ,0.00 AS deb_mes
-                            ,0.00 AS cred_mes
-                            ,COALESCE(SUM(retorno_mes_ant.saldo_debitos),0.00) AS deb_mes_ant
-                            ,COALESCE(SUM(retorno_mes_ant.saldo_creditos),0.00) AS cred_mes_ant
-                      FROM
-                          contabilidade.plano_conta
-                      
-                      INNER JOIN
-                        (
-                          SELECT
-                          
-                          *
-                          
-                          FROM
-                          
-                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '".$this->getDado('dt_inicial_ant')."', '".$this->getDado('dt_final_ant')."', 'A') AS retorno
-                          (
-                          cod_estrutural VARCHAR
-                          ,nivel INTEGER
-                          ,nom_conta VARCHAR
-                          ,cod_sistema INTEGER
-                          ,indicador_superavit CHAR(12)
-                          ,saldo_anterior NUMERIC
-                          ,saldo_debitos NUMERIC
-                          ,saldo_creditos NUMERIC
-                          ,saldo_atual NUMERIC
-                          )
-                        ) AS retorno_mes_ant
-                       ON plano_conta.cod_estrutural = retorno_mes_ant.cod_estrutural
-                      AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
-                      AND plano_conta.indicador_superavit = retorno_mes_ant.indicador_superavit
-                      
-                      GROUP BY plano_conta.cod_estrutural
-                      
-                      UNION ALL
-                      
-                      SELECT
-                            plano_conta.cod_estrutural
-                            ,COALESCE(SUM(retorno_anterior.saldo_debitos),0.00) AS deb_ant
-                            ,COALESCE(SUM(retorno_anterior.saldo_creditos),0.00) AS cred_ant
-                            ,0.00 AS deb_mes
-                            ,0.00 AS cred_mes
-                            ,0.00 AS deb_mes_ant
-                            ,0.00 AS cred_mes_ant
-                      FROM
-                          contabilidade.plano_conta
-                      
-                      INNER JOIN
-                        (
-                          SELECT
-                          
-                          *
-                          
-                          FROM
-                          
-                          contabilidade.fn_rl_balancete_verificacao('".$this->getDado('exercicio_ant')."', ' cod_entidade IN (".$this->getDado('entidades').") ', '01/01/".$this->getDado('exercicio_ant')."', '31/12/".$this->getDado('exercicio_ant')."', 'A') AS retorno
-                          (
-                          cod_estrutural VARCHAR
-                          ,nivel INTEGER
-                          ,nom_conta VARCHAR
-                          ,cod_sistema INTEGER
-                          ,indicador_superavit CHAR(12)
-                          ,saldo_anterior NUMERIC
-                          ,saldo_debitos NUMERIC
-                          ,saldo_creditos NUMERIC
-                          ,saldo_atual NUMERIC
-                          )
-                        ) AS retorno_anterior
-                       ON plano_conta.cod_estrutural = retorno_anterior.cod_estrutural
-                      AND plano_conta.exercicio = '".$this->getDado('exercicio')."'
-                      AND plano_conta.indicador_superavit = retorno_anterior.indicador_superavit
-                      
-                      GROUP BY plano_conta.cod_estrutural
-                      
-                    ) AS retorno
-                      
-                    GROUP BY cod_estrutural
-                      
-                    ORDER BY cod_estrutural
+
+               INNER JOIN contabilidade.plano_analitica
+                       ON plano_analitica.exercicio = plano_conta.exercicio
+                      AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                    ORDER BY retorno.cod_estrutural
                 ";
+                
         return $stSql;
     }
 

@@ -196,15 +196,14 @@ function recuperaRelacionamentoRecurso(&$rsRecordSet, $stCondicao = "", $stOrdem
     * @return String $stSql
 */
 function montaRecuperaRelacionamentoRecurso($boTransacao = "")
-{
-    $boIsTCEMS = SistemaLegado::is_tcems($boTransacao);
+{    
     $stSql .= "SELECT OS.exercicio                                                         \n";
     $stSql .= "      ,OS.cod_suplementacao                                                 \n";
     $stSql .= "      ,OS.cod_tipo                                                          \n";
     $stSql .= "      ,CTT.nom_tipo                                                         \n";
     $stSql .= "      ,OS.cod_norma                                                         \n";
     $stSql .= "      ,OS.motivo                                                            \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "      ,CASE WHEN OSS.cod_entidade IS NOT NULL THEN                          \n";
         $stSql .= "            OSS.cod_entidade                                                \n";
         $stSql .= "       ELSE                                                                 \n";
@@ -222,7 +221,7 @@ function montaRecuperaRelacionamentoRecurso($boTransacao = "")
     $stSql .= "                  ,MAX( OSS.cod_despesa ) as cod_despesa                    \n";
     $stSql .= "                  ,MAX( RECURSO.cod_recurso ) as cod_recurso                \n";
     $stSql .= "                  ,sum( OSS.valor ) as valor                                \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "                  ,OD.cod_entidade                                          \n";
     }
     $stSql .= "            FROM orcamento.suplementacao_suplementada AS OSS                \n";
@@ -240,7 +239,7 @@ function montaRecuperaRelacionamentoRecurso($boTransacao = "")
     $stSql .= "            GROUP BY OSS.exercicio                                          \n";
     $stSql .= "                    ,OSS.cod_suplementacao                                  \n";
     $stSql .= "                    ,RECURSO.cod_recurso                                    \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "                  ,OD.cod_entidade                                          \n";
     }
     $stSql .= "            ORDER BY OSS.exercicio                                          \n";
@@ -252,18 +251,18 @@ function montaRecuperaRelacionamentoRecurso($boTransacao = "")
     $stSql .= "                  ,OSR.cod_suplementacao                                    \n";
     $stSql .= "                  ,MAX( OSR.cod_despesa ) as cod_despesa                    \n";
     $stSql .= "                  ,sum( OSR.valor ) AS valor                                \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "                  ,OD.cod_entidade                                          \n";
     }
     $stSql .= "            FROM orcamento.suplementacao_reducao AS OSR                     \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "      INNER JOIN orcamento.despesa                    AS OD                 \n";
         $stSql .= "              ON OSR.cod_despesa = OD.cod_despesa                           \n";
         $stSql .= "             AND OSR.exercicio   = OD.exercicio                             \n";
     }
     $stSql .= "            GROUP BY OSR.exercicio                                          \n";
     $stSql .= "                    ,OSR.cod_suplementacao                                  \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "                  ,OD.cod_entidade                                          \n";
     }
     $stSql .= "            ORDER BY OSR.exercicio                                          \n";
@@ -273,7 +272,7 @@ function montaRecuperaRelacionamentoRecurso($boTransacao = "")
     $stSql .= "LEFT JOIN orcamento.suplementacao_anulada AS OSA                        \n";
     $stSql .= "ON(  OS.cod_suplementacao = OSA.cod_suplementacao_anulacao                  \n";
     $stSql .= "AND  OS.exercicio         = OSA.exercicio                 )                 \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= " LEFT JOIN contabilidade.tipo_transferencia     AS CTT                   \n";
         $stSql .= "        ON OS.cod_tipo          = CTT.cod_tipo                           \n";
         $stSql .= "       AND OS.exercicio         = CTT.exercicio                          \n";
@@ -302,7 +301,7 @@ function montaRecuperaRelacionamentoRecurso($boTransacao = "")
     $stSql .= "        ,OS.cod_norma                                                       \n";
     $stSql .= "        ,OS.motivo                                                          \n";
     $stSql .= "        ,OS.dt_suplementacao                                                \n";
-    if ($boIsTCEMS) {
+    if (Sessao::getExercicio() > '2012') {
         $stSql .= "        ,OSR.cod_entidade                                                   \n";
         $stSql .= "        ,OSS.cod_entidade                                                   \n";
     } else {

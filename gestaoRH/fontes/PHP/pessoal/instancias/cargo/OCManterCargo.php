@@ -617,8 +617,6 @@ function montaListaEspecialidades()
 
 function limparQuantidades($arVagas)
 {
-    #SistemaLegado::mostraVar($arVagas);exit;
-
     foreach ($arVagas as $stCampo=>$inValor) {
         $stCampo = preg_replace('/([A-z]+_[\d]+_[\d]+)/', '$1', $stCampo);
         $stJs .= "jQuery('input[name^=\'".substr($stCampo,0,strlen($stCampo)-3)."\']').val('');\n";
@@ -711,7 +709,6 @@ function montaAlterarEspecialidade()
 
 function validaEspecialidade($arEspecialidade,$stJs)
 {
-//    SistemaLegado::mostravar($arEspecialidade);
     $inVagas = 0;
     $inCodRegime = 0;
     $inCodSubDivisao = 0;

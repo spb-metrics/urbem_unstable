@@ -32,7 +32,7 @@
 
   * @ignore
 
-    * $Id: LSManterCompensacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterCompensacao.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.03.10
 **/
@@ -181,8 +181,6 @@ if ($_REQUEST['inInscricaoEconomica']) {
 }
 
 $obTARRPagamentoCompensacao->ListaParcelasVencerDividaAtiva( $rsListaVencerDA, $stFiltro );
-//sistemaLegado::mostravar( $rsListaPagas );
-//sistemaLegado::mostravar( $rsListaVencer );
 $arTMP = $rsListaVencer->getElementos();
 $arTMP2 = $rsListaVencerDA->getElementos();
 for ( $inX=0; $inX<count($arTMP2); $inX++ ) {

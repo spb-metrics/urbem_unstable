@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterResponsavel.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterResponsavel.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.04
 */
@@ -122,7 +122,6 @@ $obRCEMResponsavelTecnico->listarResponsavelTecnico($rsRespTecnico);
 
 $stLink .= "&stAcao=".$stAcao;
 
-//sistemaLegado::mostravar( $rsRespTecnico) ;
 
 //DEFINICAO DA LISTA
 $obLista = new Lista;

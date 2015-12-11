@@ -27,11 +27,12 @@
 * Arquivo instância para popup para inserir CBO
 * Data de Criação: 13/06/2013
 * @author Desenvolvedor: Evandro Melos
+* $Id: PRInserirCBO.php 63966 2015-11-11 20:22:59Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalCbo.class.php");
+include_once CAM_GRH_PES_MAPEAMENTO.'TPessoalCbo.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "InserirCBO";
@@ -42,30 +43,44 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$obTPessoalCBO = new TPessoalCbo;
-$obErro = new Erro;
+$obTPessoalCBO = new TPessoalCbo();
+$obErro = new Erro();
+$obTransacao = new Transacao();
+$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
-$obTPessoalCBO->setDado('codigo',$_POST['stNumCbo']);
-$obTPessoalCBO->setDado('descricao',$_POST['stNomeCbo']);
-$obTPessoalCBO->setDado('dt_inicial',$_POST['dtInicial']);
-$obTPessoalCBO->setDado('dt_final',$_POST['dtFinal']);
+$stOrder = '';
 
-$obErro = $obTPessoalCBO->recuperaTodos($rsRecord, " WHERE codigo = ".$_POST['stNumCbo']." and descricao ilike '".$_POST['stNomeCbo']."'");
+$obTPessoalCBO->setDado('codigo'    ,$request->get('stNumCbo')  );
+$obTPessoalCBO->setDado('descricao' ,$request->get('stNomeCbo') );
+$obTPessoalCBO->setDado('dt_inicial',$request->get('dtInicial') );
+$obTPessoalCBO->setDado('dt_final'  ,$request->get('dtFinal')   );
 
-if ($rsRecord->getNumLinhas() < 1) {
-    $obErro = $obTPessoalCBO->inclusao();
-    if ($obErro->ocorreu()) {
-        SistemaLegado::alertaAviso($pgForm,$obErro->getDescricao(),'form','erro', Sessao::getId(),'');
-    } else {
-        $stJs = "
-        window.parent.window.opener.document.frm.inNumCBO.value = '".$_POST['stNumCbo']."';
-        window.parent.window.opener.document.getElementById('inNomCBO').innerHTML = '".$_POST['stNomeCbo']."';
-        window.parent.close();
-        ";
-        SistemaLegado::executaFrameOculto($stJs);
+$stFiltro = " WHERE codigo = ".$request->get('stNumCbo')." and descricao ilike '".$request->get('stNomeCbo')."'";
+$obErro = $obTPessoalCBO->recuperaTodos($rsRecord, $stFiltro, $stOrder, $boTransacao);
+
+if ( $rsRecord->getNumLinhas() < 1 && !$obErro->ocorreu() ) {
+    $obErro = $obTPessoalCBO->inclusao($boTransacao);
+
+    if ( !$obErro->ocorreu() ) {
+        $stFiltro = " WHERE codigo = ".trim($request->get('stNumCbo'));
+        $obErro = $obTPessoalCBO->recuperaTodos($rsCBO, $stFiltro, $stOrder, $boTransacao);
+
+        if( !$obErro->ocorreu() ){
+            $stJs  = "window.parent.window.opener.document.frm.inNumCBO.value = \"".$request->get('stNumCbo')."\";                      \n";
+            $stJs .= "window.parent.window.opener.document.getElementById('inNomCBO').innerHTML = \"".$request->get('stNomeCbo')."\";   \n";
+            $stJs .= "window.parent.window.opener.document.frm.inCodCBO.value = \"".$rsCBO->getCampo('cod_cbo')."\";                    \n";
+            $stJs .= "window.parent.close();                                                                                            \n";
+
+            SistemaLegado::executaFrameOculto($stJs);
+        }
     }
-} else {
-    SistemaLegado::alertaAviso($pgForm,"Registro já cadastrado!",'form','erro', Sessao::getId(),'');
 }
+elseif( !$obErro->ocorreu() )
+    SistemaLegado::alertaAviso($pgForm,"Registro já cadastrado!",'form','erro', Sessao::getId(),'');
+
+if( $obErro->ocorreu() )
+    SistemaLegado::alertaAviso($pgForm,$obErro->getDescricao(),'form','erro', Sessao::getId(),'');
+
+$obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalCBO );
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

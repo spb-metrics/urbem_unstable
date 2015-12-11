@@ -34,7 +34,7 @@
 
     * @ignore
 
-    * $Id: FMManterLogradouro.php 62960 2015-07-13 14:00:58Z evandro $
+    * $Id: FMManterLogradouro.php 63920 2015-11-09 12:18:49Z evandro $
 
     * Casos de uso: uc-05.01.04
 */
@@ -157,6 +157,24 @@ $obHdnPais->setValue ( $_REQUEST["inCodPais"] );
 $obHdnCadastro = new Hidden;
 $obHdnCadastro->setName  ( "stCadastro"            );
 $obHdnCadastro->setValue ( $_REQUEST["stCadastro"] );
+
+//HIDDENS para incluir dados da nova regra de logradouro mas que nao são pertinentes a essa popUp
+//Setando valores padrões para os campos
+$obHdninCodNorma = new Hidden;
+$obHdninCodNorma->setName  ( "inCodNorma" );
+$obHdninCodNorma->setValue ( 0 );
+
+$obHdnstDataInicial = new Hidden;
+$obHdnstDataInicial->setName  ( "stDataInicial" );
+$obHdnstDataInicial->setValue ( date("d/m/Y") );
+
+$obHdnstDataFinal = new Hidden;
+$obHdnstDataFinal->setName  ( "stDataFinal" );
+$obHdnstDataFinal->setValue ( "" );
+
+$obHdnstDescricaoNorma = new Hidden;
+$obHdnstDescricaoNorma->setName  ( "stDescricaoNorma" );
+$obHdnstDescricaoNorma->setValue ( "Não informado" );
 
 if ($stAcao == 'renomear' || $stAcao == 'alterar') {
 
@@ -484,6 +502,9 @@ $obFormulario->addHidden ( $obHdnCampoNome );
 $obFormulario->addHidden ( $obHdnCampoNum );
 $obFormulario->addHidden ( $obHdnPais );
 $obFormulario->addHidden ( $obHdnCadastro );
+$obFormulario->addHidden ( $obHdninCodNorma );
+$obFormulario->addHidden ( $obHdnstDataInicial );
+$obFormulario->addHidden ( $obHdnstDataFinal );
 
 if ($stAcao == 'renomear') {
 
@@ -539,7 +560,6 @@ $obFormulario->addSpan               ( $obSpnListarCEP            );
 
 $obFormulario->defineBarra           ( $arBotaoAcao                  );
 
-//$obFormulario->ok();
 $obFormulario->show();
 $obIFrame2->show();
 $obIFrame->show();

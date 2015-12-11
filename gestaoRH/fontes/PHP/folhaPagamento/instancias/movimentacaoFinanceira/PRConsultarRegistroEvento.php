@@ -46,19 +46,19 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
 //periodo de movimentação
-$inMesFinal =( $_POST["inCodMes"]<10 ) ? "0".$_POST["inCodMes"]:$_POST["inCodMes"];
-$dtCompetenciaFinal = $inMesFinal."/".$_POST["inAno"];
+$inMesFinal =( $request->get("inCodMes")<10 ) ? "0".$request->get("inCodMes"):$request->get("inCodMes");
+$dtCompetenciaFinal = $inMesFinal."/".$request->get("inAno");
 $stFiltro = " AND to_char(dt_final,'mm/yyyy') = '".$dtCompetenciaFinal."'";
 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaPeriodoMovimentacao($rsPeriodoMovimentaco,$stFiltro);
 
 $stCodigos = "";
-switch ($_POST["stTipoFiltro"]) {
+switch ($request->get("stTipoFiltro")) {
     case "lotacao":
-        $stCodigos = trim(implode(",",$_POST["inCodLotacaoSelecionados"]));
+        $stCodigos = trim(implode(",",$request->get("inCodLotacaoSelecionados")));
         break;
     case "local":
-        $stCodigos = trim(implode(",",$_POST["inCodLocalSelecionados"]));
+        $stCodigos = trim(implode(",",$request->get("inCodLocalSelecionados")));
         break;
     case "contrato_todos":
     case "contrato":
@@ -72,10 +72,13 @@ switch ($_POST["stTipoFiltro"]) {
             $stCodigos .= $arEvento["inCodEvento"].",";
         }
         $stCodigos = substr($stCodigos,0,strlen($stCodigos)-1);
+        $request->set("inCodConfiguracao",1);
         break;
 }
 $stCodigos = ($stCodigos == "")?"0":$stCodigos;
-
+//Zerando o array de eventos
+Sessao::write("arEventos",array());
+//gestaoRH/fontes/RPT/folhaPagamento/report/design/consultarRegistroEvento.rptdesign
 $preview = new PreviewBirt(4,27,30);
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setReturnURL( CAM_GRH_FOL_INSTANCIAS."movimentacaoFinanceira/FLConsultarRegistroEvento.php");
@@ -84,10 +87,10 @@ $preview->setNomeArquivo('consultarRegistroEvento');
 $preview->addParametro("entidade"                , Sessao::getCodEntidade());
 $preview->addParametro("stEntidade"              , Sessao::getEntidade());
 $preview->addParametro("inCodPeriodoMovimentacao", $rsPeriodoMovimentaco->getCampo("cod_periodo_movimentacao"));
-$preview->addParametro("stTipoFiltro"            , $_POST["stTipoFiltro"]);
+$preview->addParametro("stTipoFiltro"            , $request->get("stTipoFiltro"));
 $preview->addParametro("stCodigos"               , $stCodigos);
-$preview->addParametro("inCodConfiguracao"       , $_POST["inCodConfiguracao"]);
-$preview->addParametro("inCodComplementar"       , $_POST["inCodComplementar"]);
+$preview->addParametro("inCodConfiguracao"       , $request->get("inCodConfiguracao"));
+$preview->addParametro("inCodComplementar"       , $request->get("inCodComplementar"));
 $preview->preview();
 
 ?>

@@ -173,7 +173,6 @@ FROM
 
 $sqlPDF .= " ".$stLigacao." ".montaWhere("bem", $codInicial, $codFinal)."; \n";
 
-//sistemaLegado::mostravar($sqlPDF) ;
 $sXML       = '../../../../../../gestaoPatrimonial/fontes/PHP/patrimonio/patrimonio/relatorios/financeiraNatureza.xml';
 $sSubTitulo = "";
 $botoesPDF  = new botoesPdfLegado;

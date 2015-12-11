@@ -32,17 +32,17 @@
 
     * @ignore
 
-    $Id: PRManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
+    $Id: PRManterOrdemCompra.php 64005 2015-11-17 16:49:06Z michel $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-require_once(TCOM."TComprasOrdem.class.php");
-require_once(TCOM."TComprasOrdemItem.class.php");
-require_once(TCOM."TComprasOrdemAnulacao.class.php");
-require_once(TCOM."TComprasOrdemItemAnulacao.class.php");
-include_once(CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php");
-include_once(TALM."TAlmoxarifadoCatalogoItemMarca.class.php");
+require_once TCOM."TComprasOrdem.class.php";
+require_once TCOM."TComprasOrdemItem.class.php";
+require_once TCOM."TComprasOrdemAnulacao.class.php";
+require_once TCOM."TComprasOrdemItemAnulacao.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoItemPreEmpenho.class.php";
+include_once TALM."TAlmoxarifadoCatalogoItemMarca.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterOrdemCompra";
@@ -126,16 +126,16 @@ if ($obErro == true) {
         $stExercicioOrdemCompra = Sessao::getExercicio();
 
         $obTOrdemCompra = new TComprasOrdem();
-        $obTOrdemCompra->setDado('exercicio_empenho',$_REQUEST["stExercicioEmpenho"]);
-        $obTOrdemCompra->setDado('cod_entidade',$_REQUEST['inCodEntidade']);
-        $obTOrdemCompra->setDado('exercicio',Sessao::getExercicio());
-        $obTOrdemCompra->setDado('tipo', $stTipoOrdem);
+        $obTOrdemCompra->setDado('exercicio_empenho'    , $_REQUEST["stExercicioEmpenho"]   );
+        $obTOrdemCompra->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']        );
+        $obTOrdemCompra->setDado('exercicio'            , Sessao::getExercicio()            );
+        $obTOrdemCompra->setDado('tipo'                 , $stTipoOrdem                      );
         $obTOrdemCompra->proximoCod($inCodOrdem);
-        $obTOrdemCompra->setDado('cod_ordem', $inCodOrdem);
-        $obTOrdemCompra->setDado('cod_empenho', $_REQUEST["inCodEmpenho"]);
-        $obTOrdemCompra->setDado('observacao', $_REQUEST["stObservacao"]);
+        $obTOrdemCompra->setDado('cod_ordem'            , $inCodOrdem);
+        $obTOrdemCompra->setDado('cod_empenho'          , $_REQUEST["inCodEmpenho"]         );
+        $obTOrdemCompra->setDado('observacao'           , $_REQUEST["stObservacao"]         );
         if($_REQUEST['inEntrega'])
-            $obTOrdemCompra->setDado('numcgm_entrega', $_REQUEST['inEntrega']);
+            $obTOrdemCompra->setDado('numcgm_entrega'   , $_REQUEST['inEntrega']            );
         $obTOrdemCompra->inclusao();
 
         $inCount = 1;
@@ -155,7 +155,7 @@ if ($obErro == true) {
                 $obTOrdemCompraItem->setDado('tipo'                     , $stTipoOrdem                              );
                 $obTOrdemCompraItem->setDado('vl_total'                 , ($value['vl_unitario'] * $inQuantidade)   );
                 $obTOrdemCompraItem->inclusao();
-                
+
                 if(is_array($arItensAlmoxarifado[$value['num_item']])){                    
                     $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
                     $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
@@ -163,40 +163,41 @@ if ($obErro == true) {
                     $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $_REQUEST['stExercicioEmpenho']   );
                     $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $value['cod_pre_empenho']         );
                     $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $value['num_item']                );
-                    
+
                     $obTEmpenhoItemPreEmpenho->recuperaPorChave($rsItemPreEmpenho);
 
                     while (!$rsItemPreEmpenho->eof()) {
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"       , $rsItemPreEmpenho->getCampo("cod_unidade")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"      , $rsItemPreEmpenho->getCampo("cod_grandeza")   );
-                        $obTEmpenhoItemPreEmpenho->setDado( "quantidade"        , $rsItemPreEmpenho->getCampo("quantidade")     );
-                        $obTEmpenhoItemPreEmpenho->setDado( "nom_unidade"       , $rsItemPreEmpenho->getCampo("nom_unidade")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "sigla_unidade"     , $rsItemPreEmpenho->getCampo("sigla_unidade")  );
-                        $obTEmpenhoItemPreEmpenho->setDado( "vl_total"          , $rsItemPreEmpenho->getCampo("vl_total")       );
-                        $obTEmpenhoItemPreEmpenho->setDado( "nom_item"          , $rsItemPreEmpenho->getCampo("nom_item")       );
-                        $obTEmpenhoItemPreEmpenho->setDado( "complemento"       , $rsItemPreEmpenho->getCampo("complemento")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_item"          , $value['cod_item']                            );
-            
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"       , $rsItemPreEmpenho->getCampo("cod_unidade")                    );
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"      , $rsItemPreEmpenho->getCampo("cod_grandeza")                   );
+                        $obTEmpenhoItemPreEmpenho->setDado( "quantidade"        , $rsItemPreEmpenho->getCampo("quantidade")                     );
+                        $obTEmpenhoItemPreEmpenho->setDado( "nom_unidade"       , $rsItemPreEmpenho->getCampo("nom_unidade")                    );
+                        $obTEmpenhoItemPreEmpenho->setDado( "sigla_unidade"     , $rsItemPreEmpenho->getCampo("sigla_unidade")                  );
+                        $obTEmpenhoItemPreEmpenho->setDado( "vl_total"          , $rsItemPreEmpenho->getCampo("vl_total")                       );
+                        $obTEmpenhoItemPreEmpenho->setDado( "nom_item"          , $rsItemPreEmpenho->getCampo("nom_item")                       );
+                        $obTEmpenhoItemPreEmpenho->setDado( "complemento"       , $rsItemPreEmpenho->getCampo("complemento")                    );
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_centro"        , $arItensAlmoxarifado[$value['num_item']]['inCodCentroCusto']  );
+
                         /*
                          *Ticket #22576, NÃO está efetuando o update na tabela empenho.item_pre_empenho->cod_item, pois foi definido
                          *com o Gelson, que se o empenho não possui codigo de item, a melhor situação é incluir na tabela compras.ordem_item
                          *E a verificação de cod_item, passa inicialmente a ser feita na tabela compras.ordem_item NÃO anulada.
                          *Se a tabela empenho.item_pre_empenho já possui cod_item, a tabela compras.ordem_item utilizara o mesmo cod_item.
                         */
-                        //$obTEmpenhoItemPreEmpenho->alteracao();
+                        //$obTEmpenhoItemPreEmpenho->setDado( "cod_item"          , $value['cod_item']                                            );
+                        $obTEmpenhoItemPreEmpenho->alteracao();
 
                         $rsItemPreEmpenho->proximo();
                     }
-                    
+
                     $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$value['cod_item'];
                     $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-            
+
                     if ($rsItemMarca->getNumLinhas() < 1) {
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item',$value['cod_item']);
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca',$arItensAlmoxarifado[$value['num_item']]['inMarca']);
+                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $value['cod_item']                                    );
+                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
                         $obTAlmoxarifadoCatalogoItemMarca->inclusao();
                     }
-                    
+
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio()                                        );
                     $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                               );
                     $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                                    );
@@ -209,7 +210,7 @@ if ($obErro == true) {
                     $obTOrdemCompraItem->setDado('cod_marca'            , $arItensAlmoxarifado[$value['num_item']]['inMarca']           );
                     $obTOrdemCompraItem->setDado('cod_item'             , $value['cod_item']                                            );
                     $obTOrdemCompraItem->setDado('cod_centro'           , $arItensAlmoxarifado[$value['num_item']]['inCodCentroCusto']  );
-                    
+
                     $obTOrdemCompraItem->alteracao();
                 }
             }
@@ -244,23 +245,23 @@ if ($obErro == true) {
         $obTOrdemCompraItem->setDado('cod_ordem'            , $_REQUEST['inCodOrdemCompra']         );
         $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']       );
         $obTOrdemCompraItem->setDado('tipo'                 , $stTipoOrdem                          );
-        
+
         $obTOrdemCompraItem->recuperaPorChave($rsOrdemCompraItem);
-        
+
         $obTOrdemCompraItem->exclusao();
-        
+
         while (!$rsOrdemCompraItem->eof()) {
             if(!is_null($rsOrdemCompraItem->getCampo("cod_item"))&&!is_null($rsOrdemCompraItem->getCampo("cod_marca"))){
                 $obTOrdemCompraItem = new TComprasOrdemItem();
                 $stFiltro  = ' WHERE cod_marca='.$rsOrdemCompraItem->getCampo("cod_marca");
                 $stFiltro .= '   AND cod_item='.$rsOrdemCompraItem->getCampo("cod_item");
                 $obTOrdemCompraItem->recuperaTodos($rsCatalogoItemMarca, $stFiltro);
-                
+
                 if($rsCatalogoItemMarca->getNumLinhas() < 1){
                     $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
                     $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $rsOrdemCompraItem->getCampo("cod_item")  );
                     $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $rsOrdemCompraItem->getCampo("cod_marca") );
-                    
+
                     $obTAlmoxarifadoCatalogoItemMarca->exclusao();
                 }
             }
@@ -274,7 +275,7 @@ if ($obErro == true) {
             $inQuantidade = str_replace(',','.',str_replace('.','',$_REQUEST['qtdeOC_'.$inCount]));
             if ($inQuantidade > 0) {
                 $obTOrdemCompraItem->setDado('exercicio'            , $_REQUEST['stExercicioOrdemCompra']       );
-                $obTOrdemCompraItem->setDado('exercicio_pre_empenho',$_REQUEST['stExercicioEmpenho']            );
+                $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']           );
                 $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                );
                 $obTOrdemCompraItem->setDado('cod_ordem'            , $_REQUEST['inCodOrdemCompra']             );
                 $obTOrdemCompraItem->setDado('num_item'             , $stValor['num_item']                      );
@@ -283,7 +284,7 @@ if ($obErro == true) {
                 $obTOrdemCompraItem->setDado('vl_total'             , $inQuantidade * $stValor['vl_unitario']   );
                 $obTOrdemCompraItem->setDado('tipo'                 , $stTipoOrdem                              );
                 $obTOrdemCompraItem->inclusao();
-                
+
                 if(is_array($arItensAlmoxarifado[$stValor['num_item']])){                    
                     $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
                     $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
@@ -291,31 +292,32 @@ if ($obErro == true) {
                     $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $_REQUEST['stExercicioEmpenho']   );
                     $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $stValor['cod_pre_empenho']       );
                     $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $stValor['num_item']              );
-                    
+
                     $obTEmpenhoItemPreEmpenho->recuperaPorChave($rsItemPreEmpenho);
 
                     while (!$rsItemPreEmpenho->eof()) {
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"       , $rsItemPreEmpenho->getCampo("cod_unidade")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"      , $rsItemPreEmpenho->getCampo("cod_grandeza")   );
-                        $obTEmpenhoItemPreEmpenho->setDado( "quantidade"        , $rsItemPreEmpenho->getCampo("quantidade")     );
-                        $obTEmpenhoItemPreEmpenho->setDado( "nom_unidade"       , $rsItemPreEmpenho->getCampo("nom_unidade")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "sigla_unidade"     , $rsItemPreEmpenho->getCampo("sigla_unidade")  );
-                        $obTEmpenhoItemPreEmpenho->setDado( "vl_total"          , $rsItemPreEmpenho->getCampo("vl_total")       );
-                        $obTEmpenhoItemPreEmpenho->setDado( "nom_item"          , $rsItemPreEmpenho->getCampo("nom_item")       );
-                        $obTEmpenhoItemPreEmpenho->setDado( "complemento"       , $rsItemPreEmpenho->getCampo("complemento")    );
-                        $obTEmpenhoItemPreEmpenho->setDado( "cod_item"          , $stValor['cod_item']                          );
-            
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"       , $rsItemPreEmpenho->getCampo("cod_unidade")                        );
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"      , $rsItemPreEmpenho->getCampo("cod_grandeza")                       );
+                        $obTEmpenhoItemPreEmpenho->setDado( "quantidade"        , $rsItemPreEmpenho->getCampo("quantidade")                         );
+                        $obTEmpenhoItemPreEmpenho->setDado( "nom_unidade"       , $rsItemPreEmpenho->getCampo("nom_unidade")                        );
+                        $obTEmpenhoItemPreEmpenho->setDado( "sigla_unidade"     , $rsItemPreEmpenho->getCampo("sigla_unidade")                      );
+                        $obTEmpenhoItemPreEmpenho->setDado( "vl_total"          , $rsItemPreEmpenho->getCampo("vl_total")                           );
+                        $obTEmpenhoItemPreEmpenho->setDado( "nom_item"          , $rsItemPreEmpenho->getCampo("nom_item")                           );
+                        $obTEmpenhoItemPreEmpenho->setDado( "complemento"       , $rsItemPreEmpenho->getCampo("complemento")                        );
+                        $obTEmpenhoItemPreEmpenho->setDado( "cod_centro"        , $arItensAlmoxarifado[$stValor['num_item']]['inCodCentroCusto']    );
+
                         /*
                          *Ticket #22576, NÃO está efetuando o update na tabela empenho.item_pre_empenho->cod_item, pois foi definido
                          *com o Gelson, que se o empenho não possui codigo de item, a melhor situação é incluir na tabela compras.ordem_item
                          *E a verificação de cod_item, passa inicialmente a ser feita na tabela compras.ordem_item NÃO anulada.
                          *Se a tabela empenho.item_pre_empenho já possui cod_item, a tabela compras.ordem_item utilizara o mesmo cod_item.
                         */
-                        //$obTEmpenhoItemPreEmpenho->alteracao();
+                        //$obTEmpenhoItemPreEmpenho->setDado( "cod_item"          , $stValor['cod_item']                          );
+                        $obTEmpenhoItemPreEmpenho->alteracao();
 
                         $rsItemPreEmpenho->proximo();
                     }
-                    
+
                     $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$stValor['num_item']]['inMarca']." AND acim.cod_item = ".$stValor['cod_item'];
                     $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
             
@@ -324,7 +326,7 @@ if ($obErro == true) {
                         $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$stValor['num_item']]['inMarca'] );
                         $obTAlmoxarifadoCatalogoItemMarca->inclusao();
                     }
-                    
+
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio());
                     $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                                   );
                     $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                                        );
@@ -337,7 +339,7 @@ if ($obErro == true) {
                     $obTOrdemCompraItem->setDado('cod_marca'            , $arItensAlmoxarifado[$stValor['num_item']]['inMarca']             );
                     $obTOrdemCompraItem->setDado('cod_item'             , $stValor['cod_item']                                              );
                     $obTOrdemCompraItem->setDado('cod_centro'           , $arItensAlmoxarifado[$stValor['num_item']]['inCodCentroCusto']    );
-                    
+
                     $obTOrdemCompraItem->alteracao();
                 }
             }
@@ -347,13 +349,12 @@ if ($obErro == true) {
 
     case "anular":
     case "anularOS":
-
         $obTOrdemCompraAnulacao = new TComprasOrdemAnulacao();
-        $obTOrdemCompraAnulacao->setDado('exercicio', $_REQUEST['stExercicioOrdemCompra']);
-        $obTOrdemCompraAnulacao->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-        $obTOrdemCompraAnulacao->setDado('cod_ordem', $_REQUEST['inCodOrdemCompra']);
-        $obTOrdemCompraAnulacao->setDado('motivo', $_REQUEST['stMotivo']);
-        $obTOrdemCompraAnulacao->setDado('tipo', $stTipoOrdem);
+        $obTOrdemCompraAnulacao->setDado('exercicio'    , $_REQUEST['stExercicioOrdemCompra']   );
+        $obTOrdemCompraAnulacao->setDado('cod_entidade' , $_REQUEST['inCodEntidade']            );
+        $obTOrdemCompraAnulacao->setDado('cod_ordem'    , $_REQUEST['inCodOrdemCompra']         );
+        $obTOrdemCompraAnulacao->setDado('motivo'       , $_REQUEST['stMotivo']                 );
+        $obTOrdemCompraAnulacao->setDado('tipo'         , $stTipoOrdem                          );
         $obTOrdemCompraAnulacao->inclusao();
         $obTOrdemCompraAnulacao->recuperaDados( $rsOrdemCompraAnulacao );
 
@@ -364,16 +365,16 @@ if ($obErro == true) {
             $flQuantidade = str_replace(",", ".", str_replace(".", "", $stValor["quantidade_original"]));
             if ($flQuantidade > 0) {
                 $obTOrdemCompraItemAnulacao = new TComprasOrdemItemAnulacao();
-                $obTOrdemCompraItemAnulacao->setDado('exercicio', $rsOrdemCompraAnulacao->getCampo("exercicio"));
-                $obTOrdemCompraItemAnulacao->setDado('cod_entidade', $rsOrdemCompraAnulacao->getCampo("cod_entidade"));
-                $obTOrdemCompraItemAnulacao->setDado('cod_ordem', $rsOrdemCompraAnulacao->getCampo("cod_ordem"));
-                $obTOrdemCompraItemAnulacao->setDado('cod_pre_empenho', $stValor["cod_pre_empenho"]);
-                $obTOrdemCompraItemAnulacao->setDado('num_item', $stValor["num_item"]);
-                $obTOrdemCompraItemAnulacao->setDado('timestamp', $rsOrdemCompraAnulacao->getCampo("timestamp"));
-                $obTOrdemCompraItemAnulacao->setDado('quantidade', $flQuantidade);
-                $obTOrdemCompraItemAnulacao->setDado('vl_total', $flQuantidade * $stValor['vl_unitario']);
-                $obTOrdemCompraItemAnulacao->setDado('tipo', $stTipoOrdem);
-                $obTOrdemCompraItemAnulacao->setDado('exercicio_pre_empenho',$_REQUEST['stExercicioEmpenho']);
+                $obTOrdemCompraItemAnulacao->setDado('exercicio'            , $rsOrdemCompraAnulacao->getCampo("exercicio")     );
+                $obTOrdemCompraItemAnulacao->setDado('cod_entidade'         , $rsOrdemCompraAnulacao->getCampo("cod_entidade")  );
+                $obTOrdemCompraItemAnulacao->setDado('cod_ordem'            , $rsOrdemCompraAnulacao->getCampo("cod_ordem")     );
+                $obTOrdemCompraItemAnulacao->setDado('cod_pre_empenho'      , $stValor["cod_pre_empenho"]                       );
+                $obTOrdemCompraItemAnulacao->setDado('num_item'             , $stValor["num_item"]                              );
+                $obTOrdemCompraItemAnulacao->setDado('timestamp'            , $rsOrdemCompraAnulacao->getCampo("timestamp")     );
+                $obTOrdemCompraItemAnulacao->setDado('quantidade'           , $flQuantidade                                     );
+                $obTOrdemCompraItemAnulacao->setDado('vl_total'             , $flQuantidade * $stValor['vl_unitario']           );
+                $obTOrdemCompraItemAnulacao->setDado('tipo'                 , $stTipoOrdem                                      );
+                $obTOrdemCompraItemAnulacao->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                   );
                 $obTOrdemCompraItemAnulacao->inclusao();
             }
         }

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCConsultarLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConsultarLote.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.18
 */
@@ -53,7 +53,6 @@ include_once ( CAM_GT_ARR_NEGOCIO."RARRPagamento.class.php"             );
 include_once ( CAM_GT_CIM_NEGOCIO."RCIMUnidadeAutonoma.class.php"       );
 include_once ( CAM_GT_MON_NEGOCIO."RMONAgencia.class.php" );
 
-//sistemaLegado::mostravar ( $_REQUEST );
 switch ($_REQUEST["stCtrl"]) {
 
     case "buscaContribuinte":

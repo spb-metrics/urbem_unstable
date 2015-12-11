@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-01.03.95
 
-    $Id: FMReplicarFuncao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMReplicarFuncao.php 63893 2015-11-03 16:32:58Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -77,6 +77,7 @@ $obTAdministracaoModulo->recuperaTodos($rsModulos,"","nom_modulo");
 $obCmbModulo = new Select();
 $obCmbModulo->setRotulo             ( "Módulo Origem"     );
 $obCmbModulo->setName               ( "inCodModulo"       );
+$obCmbModulo->setId                 ( "inCodModulo"       );
 $obCmbModulo->setTitle              ( "Informe o módulo." );
 $obCmbModulo->setStyle              ( "width: 250px"      );
 $obCmbModulo->setNull               ( false               );
@@ -89,6 +90,7 @@ $obCmbModulo->obEvento->setOnChange ( "montaParametrosGET('preencherBiblioteca',
 $obCmbBiblioteca = new Select();
 $obCmbBiblioteca->setRotulo             ( "Biblioteca Origem"     );
 $obCmbBiblioteca->setName               ( "inCodBiblioteca"       );
+$obCmbBiblioteca->setId                 ( "inCodBiblioteca"       );
 $obCmbBiblioteca->setTitle              ( "Informe a bibliotéca." );
 $obCmbBiblioteca->setStyle              ( "width: 250px"          );
 $obCmbBiblioteca->setNull               ( false                   );
@@ -116,6 +118,7 @@ $rsModulos->setPrimeiroElemento(true);
 $obCmbModuloC = new Select();
 $obCmbModuloC->setRotulo             ( "Módulo Destino"                         );
 $obCmbModuloC->setName               ( "inCodModuloC"                           );
+$obCmbModuloC->setId                 ( "inCodModuloC"                           );
 $obCmbModuloC->setTitle              ( "Informe o módulo em que será copiado."  );
 $obCmbModuloC->setStyle              ( "width: 250px"                           );
 $obCmbModuloC->setNull               ( false                                    );
@@ -128,6 +131,7 @@ $obCmbModuloC->obEvento->setOnChange ( "montaParametrosGET('preencherBibliotecaC
 $obCmbBibliotecaC = new Select();
 $obCmbBibliotecaC->setRotulo     ( "Biblioteca Destino"                        );
 $obCmbBibliotecaC->setName       ( "inCodBibliotecaC"                          );
+$obCmbBibliotecaC->setId         ( "inCodBibliotecaC"                          );
 $obCmbBibliotecaC->setTitle      ( "Informe a bibliotéca em que será copiado." );
 $obCmbBibliotecaC->setStyle      ( "width: 250px"                              );
 $obCmbBibliotecaC->setNull       ( false                                       );

@@ -27,7 +27,7 @@
   * @author Analista:
   * @author Programador: Fernando Zank Correa Evangelista
 
-  $Id: TPatrimonioBem.class.php 61776 2015-03-03 17:41:03Z carlos.silva $
+  $Id: TPatrimonioBem.class.php 63945 2015-11-10 18:53:13Z arthur $
 
   Caso de uso: uc-03.01.09
   Caso de uso: uc-03.01.21
@@ -820,7 +820,7 @@ class TPatrimonioBem extends Persistente
                  , bem.detalhamento
                  , TO_CHAR(bem.dt_aquisicao,'dd/mm/yyyy') AS dt_aquisicao
                  , TO_CHAR(bem.dt_incorporacao,'dd/mm/yyyy') AS dt_incorporacao
-                 , TO_CHAR(bem.dt_depreciacao,'dd/mm/yyyy') AS dt_depreciacao
+                 , depreciacao.dt_depreciacao
                  , TO_CHAR(bem.dt_garantia,'dd/mm/yyyy') AS dt_garantia
                  , bem.vl_bem
                  , bem.vl_depreciacao
@@ -854,11 +854,15 @@ class TPatrimonioBem extends Persistente
                  , apolice.cod_apolice
                  , apolice.numcgm as num_seguradora
                  , bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal
+                 
               FROM patrimonio.bem
+              
          LEFT JOIN patrimonio.bem_comprado
                 ON bem_comprado.cod_bem = bem.cod_bem
+         
          LEFT JOIN tceal.bem_comprado_tipo_documento_fiscal
                 ON bem_comprado_tipo_documento_fiscal.cod_bem = bem_comprado.cod_bem
+         
           LEFT JOIN ( SELECT historico_bem.cod_bem
                           , historico_bem.cod_local
                           , historico_bem.cod_situacao
@@ -875,6 +879,7 @@ class TPatrimonioBem extends Persistente
                         AND historico_bem.timestamp   = historico_bem_max.timestamp
                     )   AS historico_bem
                 ON  historico_bem.cod_bem = bem.cod_bem
+         
          LEFT JOIN ( SELECT apolice_bem.cod_bem
                           , apolice_bem.cod_apolice
                           , apolice_bem.timestamp
@@ -888,10 +893,13 @@ class TPatrimonioBem extends Persistente
                         AND apolice_bem_max.timestamp = apolice_bem.timestamp
                    ) AS apolice_bem
                 ON apolice_bem.cod_bem = bem.cod_bem
+        
          LEFT JOIN patrimonio.apolice
                 ON apolice.cod_apolice = apolice_bem.cod_apolice
-         LEFT JOIN patrimonio.situacao_bem
+       
+        LEFT JOIN patrimonio.situacao_bem
                 ON situacao_bem.cod_situacao = historico_bem.cod_situacao
+    
     LEFT JOIN ( SELECT bem_responsavel.cod_bem
                           , bem_responsavel.numcgm
                           , bem_responsavel.dt_inicio
@@ -911,8 +919,10 @@ class TPatrimonioBem extends Persistente
 
                    ) AS bem_responsavel
                 ON bem_responsavel.cod_bem = bem.cod_bem
+         
          LEFT JOIN sw_cgm AS fornecedor
                 ON fornecedor.numcgm = bem.numcgm
+         
          LEFT JOIN ( SELECT bem_marca.cod_bem
                           , bem_marca.cod_marca
                           , marca.descricao
@@ -921,6 +931,24 @@ class TPatrimonioBem extends Persistente
                          ON bem_marca.cod_marca = marca.cod_marca
                    ) AS bem_marca
                 ON bem.cod_bem = bem_marca.cod_bem
+         
+         LEFT JOIN ( SELECT depreciacao.cod_bem
+                         , TO_CHAR(depreciacao.dt_depreciacao, 'DD/MM/YYYY') AS dt_depreciacao
+		      FROM patrimonio.depreciacao
+
+		 LEFT JOIN patrimonio.depreciacao_anulada
+			ON depreciacao.cod_bem         = depreciacao_anulada.cod_bem
+		       AND depreciacao.cod_depreciacao = depreciacao_anulada.cod_depreciacao
+		       AND depreciacao.timestamp       = depreciacao_anulada.timestamp
+			 
+		     WHERE depreciacao_anulada.cod_depreciacao IS NULL
+		       AND depreciacao.timestamp = ( SELECT max(depreciacao_interna.timestamp)
+						       FROM patrimonio.depreciacao AS depreciacao_interna
+						      WHERE depreciacao_interna.cod_bem = depreciacao.cod_bem
+						        AND SUBSTRING(depreciacao_interna.competencia, 1,4) = '".Sessao::getExercicio()."' )
+	           ) AS depreciacao 
+	         ON depreciacao.cod_bem = bem.cod_bem
+                 
              WHERE ";
         if ( $this->getDado('cod_bem') ) {
             $stSql.= " bem.cod_bem = ".$this->getDado('cod_bem')."   AND ";
@@ -1283,8 +1311,6 @@ class TPatrimonioBem extends Persistente
         if ( $this->getDado('cod_bem') ) {
             $stSql.= " bem.cod_bem = ".$this->getDado('cod_bem')."   AND ";
         }
-
-        //echo substr($stSql,0,-6);
         
         return substr($stSql,0,-6);
     }
@@ -1495,6 +1521,52 @@ class TPatrimonioBem extends Persistente
     public function montaRecuperaOrgaoDescricaoBem()
     {
         $stSql  = ' SELECT * FROM organograma.orgao_descricao WHERE cod_orgao = '.$this->getDado('cod_orgao');
+
+        return $stSql;
+    }
+    
+    public function recuperaValorDepreciacao(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaValorDepreciacao().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
+
+        return $obErro;
+    }
+
+    public function montaRecuperaValorDepreciacao()
+    {
+        $stSql  = " SELECT retorno.cod_bem
+                         , retorno.vl_acumulado
+                         , retorno.vl_atualizado
+                         , retorno.vl_bem
+                         , TO_CHAR(depreciacao.dt_depreciacao, 'DD/MM/YYYY') AS dt_depreciacao
+                      
+                      FROM patrimonio.fn_depreciacao_acumulada(".$this->getDado('cod_bem').")
+                        AS retorno ( cod_bem INTEGER
+                                    , vl_acumulado NUMERIC(14,2)
+                                    , vl_atualizado NUMERIC(14,2)
+                                    , vl_bem NUMERIC(14,2)
+                                    , min_competencia VARCHAR
+                                    , max_competencia VARCHAR
+                                   ) 
+
+                  INNER JOIN patrimonio.depreciacao
+                          ON retorno.cod_bem = depreciacao.cod_bem
+
+                   LEFT JOIN patrimonio.depreciacao_anulada
+                          ON depreciacao.cod_bem         = depreciacao_anulada.cod_bem
+                         AND depreciacao.cod_depreciacao = depreciacao_anulada.cod_depreciacao
+                         AND depreciacao.timestamp       = depreciacao_anulada.timestamp
+             
+                       WHERE depreciacao_anulada.cod_depreciacao IS NULL
+                         AND depreciacao.timestamp = ( SELECT max(depreciacao_interna.timestamp)
+                                                         FROM patrimonio.depreciacao AS depreciacao_interna
+                                                        WHERE depreciacao_interna.cod_bem = depreciacao.cod_bem
+                                                          AND SUBSTRING(depreciacao_interna.competencia, 1,4) = '".Sessao::getExercicio()."' )";
 
         return $stSql;
     }

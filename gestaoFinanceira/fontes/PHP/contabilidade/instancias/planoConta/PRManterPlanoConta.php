@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: PRManterPlanoConta.php 61374 2015-01-12 17:48:14Z arthur $
+    * $Id: PRManterPlanoConta.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.02
 */
@@ -68,6 +68,25 @@ if($stAcao != 'excluir') {
     if($_REQUEST['stCodClass'] != SistemaLegado::doMask($_REQUEST['stCodClass'])) {
         SistemaLegado::exibeAviso('É obrigatório o preenchimento correto do campo Código de Classificação', 'n_incluir', 'erro');
         exit;
+    }
+    /* 
+    #23315
+    Validação ao cadastrar uma nova conta com fonte de recurso o sistema deve verificar se neste grupos
+    72112. 72.111, 82.111,82.112,82.113 e 82.114 já existe uma conta com esta mesma fonte de recurso.
+    Até porque já existe uma regra estabelecida como uma unica conta por fonte de recurso.    
+    */
+
+    // Adicionada validação porque campo inCodRecurso não é obrigatório
+    if($request->get('inCodRecurso') != '') {
+        $obTOrcamentoRecurso = new TOrcamentoRecurso;
+        $obTOrcamentoRecurso->setDado('exercicio'     , Sessao::getExercicio() );
+        $obTOrcamentoRecurso->setDado('cod_estrutural', $request->get('stCodClass') );
+        $obTOrcamentoRecurso->setDado('cod_recurso', $request->get('inCodRecurso') );
+        $obTOrcamentoRecurso->verificaContaRecurso($rsContaRecurso100, $boTransacao);
+        if ($rsContaRecurso100->getNumLinhas() > 0) {
+            SistemaLegado::exibeAviso("Já existe uma conta com o recurso ".$request->get('inCodRecurso'). " nesse grupo de contas", 'n_incluir', 'aviso');
+            exit;
+        }
     }
 }
 
@@ -116,7 +135,7 @@ switch ($stAcao) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_REQUEST['inTipoContaCorrenteTCEMG']);
             }
             
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stNaturezaSaldo = '';
                 switch ($_REQUEST['stNatSaldo']) {
                     case 'D':
@@ -139,7 +158,7 @@ switch ($stAcao) {
 
             if ($_POST['stTipoConta'] == 'A') {
                 $obRContabilidadePlanoBanco->setContaAnalitica( true );
-                if ( $boDestinacao == 'true' &&  !SistemaLegado::is_tcems($boTransacao) ) {
+                if ( $boDestinacao == 'true' &&  !Sessao::getExercicio() > '2012' ) {
                     if ($_REQUEST['stDestinacaoRecurso'] != '') {
                         $arDestinacaoRecurso = explode('.',$_REQUEST['stDestinacaoRecurso']);
 
@@ -338,7 +357,7 @@ switch ($stAcao) {
             if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao) == 11) {
                 $obRContabilidadePlanoBanco->setTipoContaCorrenteTCEMG($_POST['inTipoContaCorrenteTCEMG']);
             }
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stNaturezaSaldo = '';
                 switch ($_REQUEST['stNatSaldo']) {
                     case 'D':
@@ -359,7 +378,7 @@ switch ($stAcao) {
             //if( $_POST['inTipoConta'] == 'Analitica' )
             if ($_POST['stTipoConta'] == 'A') {
                 $obRContabilidadePlanoBanco->setContaAnalitica( true );
-                if ($boDestinacao == 'true' && !SistemaLegado::is_tcems($boTransacao) ) {
+                if ($boDestinacao == 'true' && !Sessao::getExercicio() > '2012' ) {
                     $obErro = new Erro;
                     $arDestinacaoRecurso = explode('.',$_REQUEST['stDestinacaoRecurso']);
 
@@ -740,7 +759,7 @@ case 'excluir':
 
         if (!$obErro->ocorreu()) {
             $obTransacao->commitAndClose();
-            SistemaLegado::alertaAviso($pgList.'?stAcao=excluir&'.$stFiltro, $_GET['stCodEstrutural'].' - '.$_GET['stNomConta'], 'excluir', 'aviso', Sessao::getId(), '../');
+            SistemaLegado::alertaAviso($pgList.'?stAcao=excluir&'.$stFiltro, $_GET['inCodPlano']." - ". $_GET['stCodEstrutural'].' - '.$_GET['stNomConta'], 'excluir', 'aviso', Sessao::getId(), '../');
 
         } else {
             $obTransacao->rollbackAndClose();

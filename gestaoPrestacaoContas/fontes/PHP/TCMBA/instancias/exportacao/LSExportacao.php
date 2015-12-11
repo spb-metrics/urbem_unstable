@@ -32,29 +32,11 @@
 
     * @ignore
 
-    $Revision: 59612 $
-    $Name$
-    $Autor: $
-    $Date: 2008-08-18 13:56:34 -0300 (Seg, 18 Ago 2008) $
+    $Id: LSExportacao.php 63819 2015-10-19 20:52:10Z michel $
 
     * Casos de uso: uc-06.03.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/06/22 22:50:37  diego
-Primeira versão.
-
-Revision 1.3  2007/04/23 15:39:22  rodrigo_sr
-uc-06.03.00
-
-Revision 1.2  2007/04/13 04:24:51  diego
-Alterada paginação p/ lista mostrar todos resultados em uma só página
-
-Revision 1.1  2007/01/25 20:39:47  diego
-Novos arquivos de exportação.
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -65,14 +47,38 @@ if ( !is_array($arFiltro['arArquivosDownload']) ) {
     $arFiltro['arArquivosDownload'] = array();
 }
 
-$arArquivos = Sessao::read('arArquivosDownload');
+//Cria Titulo da lista de arquivos
+$codAcao = Sessao::read('acao');
+$obRAdministracaoAcao = new RAdministracaoAcao();
+$obRAdministracaoAcao->setCodigoAcao($codAcao);
+$obRAdministracaoAcao->listar($rsAcao,null,null,null);
+$stNomAcao = $rsAcao->getCampo('nom_acao');
+$stTituloRegistros = ($stNomAcao!='') ? 'Arquivos - '.$stNomAcao : 'Arquivos';
 
 // cria recordset e preenche com o conteudo do array
+$arArquivos = Sessao::read('arArquivosDownload');
+$arArquivosErro = array();
+
+//Verifica recebimento de Arquivos e separa arquivo Informativo de Erros da lista de arquivos do Tribunal
+if ( !is_array($arArquivos) )
+    $arArquivos = array();
+else{
+    $arArquivosTemp = array();
+    foreach($arArquivos as $chave => $arArquivo){
+        if( $arArquivo['stNomeArquivo'] != 'URBEM_Informativo_de_Erros.txt' )
+            $arArquivosTemp[] = $arArquivo;
+        else
+            $arArquivosErro[] = $arArquivo;
+    }
+    $arArquivos = $arArquivosTemp;
+}
+
+//Monta Lista de Arquivos do Tribunal
 $rsArquivos = new RecordSet;
 $rsArquivos->preenche($arArquivos);
 
 $obLista    = new Lista;
-
+$obLista->setTitulo($stTituloRegistros);
 $obLista->setRecordSet( $rsArquivos );
 $obLista->setMostraPaginacao( false );
 
@@ -96,12 +102,69 @@ $obLista->commitDado();
 // SETA O LINK DA ACAO
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao('download');
-//$obLista->ultimaAcao->setFuncao(true);
 $obLista->ultimaAcao->addCampo('&arq'   ,'stLink');
 $obLista->ultimaAcao->addCampo('&label' ,'stNomeArquivo');
 $obLista->ultimaAcao->setLink('../../../exportacao/instancias/processamento/download.php?sim=sim');
 $obLista->commitAcao();
+$obLista->montaInnerHtml();
+$stHtmlLista = $obLista->getHtml();
 
-$obLista->show();
+$obSpnListaRegistros = new Span;
+$obSpnListaRegistros->setId ( "spanListaRegistros" );
+$obSpnListaRegistros->setValue( $stHtmlLista );
+
+//Monta Lista de Arquivos de Erro
+if(count($arArquivosErro)>0){
+    $rsArquivosErro = new RecordSet;
+    $rsArquivosErro->preenche($arArquivosErro);
+
+    $obListaErro    = new Lista;
+    $obListaErro->setTitulo('Arquivos - Informativo de Erros');
+    $obListaErro->setRecordSet( $rsArquivosErro );
+    $obListaErro->setMostraPaginacao( false );
+
+    $obListaErro->addCabecalho();
+    $obListaErro->ultimoCabecalho->addConteudo("&nbsp;");
+    $obListaErro->ultimoCabecalho->setWidth( 5 );
+    $obListaErro->commitCabecalho();
+    $obListaErro->addCabecalho();
+    $obListaErro->ultimoCabecalho->addConteudo("Arquivos");
+    $obListaErro->ultimoCabecalho->setWidth( 55 );
+    $obListaErro->commitCabecalho();
+    $obListaErro->addCabecalho();
+    $obListaErro->ultimoCabecalho->addConteudo("&nbsp;");
+    $obListaErro->ultimoCabecalho->setWidth( 40 );
+    $obListaErro->commitCabecalho();
+
+    $obListaErro->addDado();
+    $obListaErro->ultimoDado->setCampo('stNomeArquivo');
+    $obListaErro->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obListaErro->commitDado();
+    // SETA O LINK DA ACAO
+    $obListaErro->addAcao();
+    $obListaErro->ultimaAcao->setAcao('download');
+    $obListaErro->ultimaAcao->addCampo('&arq'   ,'stLink');
+    $obListaErro->ultimaAcao->addCampo('&label' ,'stNomeArquivo');
+    $obListaErro->ultimaAcao->setLink('../../../exportacao/instancias/processamento/download.php?sim=sim');
+    $obListaErro->commitAcao();
+    $obListaErro->montaInnerHtml();
+    $stHtmlListaErro = $obListaErro->getHtml();
+
+    $obSpnListaErro = new Span;
+    $obSpnListaErro->setId ( "spanListaErro" );
+    $obSpnListaErro->setValue( $stHtmlListaErro );
+}
+
+$obForm = new Form;
+
+$obFormulario = new Formulario;
+$obFormulario->addForm( $obForm );
+
+if(count($arArquivosErro)>0)
+    $obFormulario->addSpan  ( $obSpnListaErro       );
+
+$obFormulario->addSpan      ( $obSpnListaRegistros  );
+
+$obFormulario->show();
 SistemaLegado::LiberaFrames();
 ?>

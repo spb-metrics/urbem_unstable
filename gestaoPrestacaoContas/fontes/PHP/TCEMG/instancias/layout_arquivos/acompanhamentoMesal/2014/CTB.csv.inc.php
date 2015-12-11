@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisiane Morais
   *
   * @ignore
-  * $Id: CTB.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
+  * $Id: CTB.csv.inc.php 63835 2015-10-22 13:53:31Z franver $
   * $Date:$
   * $Author:$
   * $Rev:$
@@ -118,7 +118,6 @@ if (count($rsRecordSet10->arElementos) > 0) {
                             $obTTCEMGArquivoCTB->inclusao();$obTTCEMGArquivoCTB->debug();
                         }
                     }else {
-                        SistemaLegado::mostraVar($arCTB20['tipo_aplicacao']);
                             $obTTCEMGArquivoCTB->setDado('ano', Sessao::getExercicio());
                             $obTTCEMGArquivoCTB->setDado('cod_ctb_view', $arCTB20['cod_ctb_view']);
                             $obTTCEMGArquivoCTB->setDado('cod_ctb', $arCTB20['cod_ctb']);

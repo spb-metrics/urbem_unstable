@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Anderson R. M. Buzo
 
-    $Id: RContabilidadePlanoContaAnalitica.class.php 62341 2015-04-24 21:14:44Z carlos.silva $
+    $Id: RContabilidadePlanoContaAnalitica.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.02.02, uc-02.02.19, uc-02.04.03, uc-02.04.09, uc-02.03.23
 */
@@ -519,7 +519,7 @@ function listarPlanoContaArrecadacao(&$rsRecordSet, $stOrder = "" , $boTransacao
     if( $this->stCodEstrutural )
         $stFiltro .= " pc.cod_estrutural like publico.fn_mascarareduzida('".$this->stCodEstrutural."')||'%' AND ";
 
-    if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $stFiltro .= " pb.cod_banco is not null AND ";
         if ( $this->obROrcamentoEntidade->getCodigoEntidade() ) {
             $stFiltro .= " pb.cod_entidade in ( ".$this->obROrcamentoEntidade->getCodigoEntidade()." ) AND ";

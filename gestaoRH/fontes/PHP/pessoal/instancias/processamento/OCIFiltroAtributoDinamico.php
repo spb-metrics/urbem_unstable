@@ -43,16 +43,16 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-function gerarSpanAtributo()
+function gerarSpanAtributo(Request $request)
 {
     $rsAtributos = new RecordSet();
 
-    if (trim($_GET['inCodAtributo']) != '') {
+    if (trim($request->get('inCodAtributo')) != '') {
         include_once ( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php");
         $obRCadastroDinamico = new RCadastroDinamico();
-        $obRCadastroDinamico->setCodCadastro($_REQUEST['cod_cadastro']);
-        $obRCadastroDinamico->obRModulo->setCodModulo($_REQUEST['cod_modulo']);
-        $obRCadastroDinamico->setChavePersistenteValores( array('cod_atributo'=>$_GET['inCodAtributo']) );
+        $obRCadastroDinamico->setCodCadastro($request->get('cod_cadastro'));
+        $obRCadastroDinamico->obRModulo->setCodModulo($request->get('cod_modulo'));
+        $obRCadastroDinamico->setChavePersistenteValores( array('cod_atributo'=>$request->get('inCodAtributo')) );
         $obRCadastroDinamico->recuperaAtributosSelecionados($rsAtributos);
     }
 
@@ -77,16 +77,19 @@ function gerarSpanAtributo()
     $obFormulario->montaInnerHTML();
     $obFormulario->obJavaScript->montaJavaScript();
     $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
-    $stHtml =  $obFormulario->getHTML();
-    $stJs .= "d.getElementById('spnAtributo').innerHTML         = '$stHtml';      \n";
-    $stJs .= "f.hdnTipoFiltro.value          += '$stEval';      \n";
+    //linha comentada para verificar o erro que está vindo de alguma configuracao que foi setada errada pelo usuario
+    //Provavel parametros do usuario estão errados, mas nao conseguimos reproduzir o erro em desenvolvimento
+    //$stEval = str_replace("\"", "'", $stEval);
+    $stHtml = $obFormulario->getHTML();
+    $stJs .= "jq('#spnAtributo').html('".$stHtml."');  \n";
+    $stJs .= "jq('#hdnTipoFiltro').val('".$stEval."'); \n";
 
     return $stJs;
 }
 
-switch ($_GET["stCtrl"]) {
+switch ( $request->get('stCtrl') ) {
     case "gerarSpanAtributo":
-        $stJs = gerarSpanAtributo();
+        $stJs = gerarSpanAtributo($request);
         break;
 }
 if ($stJs) {

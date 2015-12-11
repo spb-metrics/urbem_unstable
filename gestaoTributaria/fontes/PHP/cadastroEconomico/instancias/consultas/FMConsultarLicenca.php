@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: FMConsultarLicenca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultarLicenca.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.21
 */
@@ -118,7 +118,6 @@ if ( count( $arLicencasSessao ) > 0) {
     $rsLicencaLista->preenche( $arLicencasSessao );
 }
 
-//sistemaLegado::mostravar( $rsLicenca );
 $stJs = montaListaLicencas( $rsLicencaLista );
 
 // RECUPERA OS DADOS DAS MODALIDADES RELACIONADAS A INSCRICAO ECONOMICA

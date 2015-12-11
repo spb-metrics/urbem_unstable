@@ -33,30 +33,9 @@
     * @package URBEM
     * @subpackage
 
-    $Revision: 22489 $
-    $Name$
-    $Author: rodrigo $
-    $Date: 2007-05-11 10:30:15 -0300 (Sex, 11 Mai 2007) $
+    $Id: IMontaItemUnidade.class.php 64005 2015-11-17 16:49:06Z michel $
 
     * Casos de uso: uc-03.03.06
-*/
-
-/*
-$Log$
-Revision 1.7  2007/05/11 13:28:28  rodrigo
-Bug #9160#
-
-Revision 1.6  2006/10/03 10:05:18  andre.almeida
-Bug #6910#
-
-Revision 1.5  2006/07/10 19:39:47  rodrigo
-Adicionado nos componentes de itens,marca e centro de custa a função ajax para manipulação dos dados.
-
-Revision 1.4  2006/07/06 14:04:38  diego
-Retirada tag de log com erro.
-
-Revision 1.3  2006/07/06 12:09:20  diego
-
 */
 
 include_once ( CLA_OBJETO );
@@ -115,8 +94,8 @@ class  IMontaItemUnidade extends Objeto
 
         $obFormularioSpan = new Formulario;
         $obFormularioSpan->addComponente( $this->obLabelUnidadeMedida     );
-        #$obFormularioSpan->addHidden    ( $this->obHiddenCodUnidadeMedida );
-        #$obFormularioSpan->addHidden    ( $this->obHiddenNomUnidadeMedida );
+        $obFormularioSpan->addHidden    ( $this->obHiddenCodUnidadeMedida );
+        $obFormularioSpan->addHidden    ( $this->obHiddenNomUnidadeMedida );
         $obFormularioSpan->montaInnerHTML();
         $stHtmlSpan = $obFormularioSpan->getHTML();
 

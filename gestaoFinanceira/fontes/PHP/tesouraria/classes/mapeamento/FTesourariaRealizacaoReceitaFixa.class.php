@@ -63,7 +63,7 @@ class FTesourariaRealizacaoReceitaFixa extends Persistente
 function FTesourariaRealizacaoReceitaFixa($boTransacao = "")
 {
     parent::Persistente();
-    if ( sistemaLegado::is_tcems($boTransacao) ) {
+    if ( Sessao::getExercicio() > '2012' ) {
         $this->setTabela('RealizacaoReceitaFixaTribunal');
     } else {
         $this->setTabela('RealizacaoReceitaFixa');
@@ -105,12 +105,12 @@ function montaExecutaFuncao($boTransacao = "")
     $stSql .= "                        '".$this->getDado("tipo_lote")              ."', \n";
     $stSql .= "                         ".$this->getDado("cod_entidade")           ." , \n";
     //if ( $this->getDado('valor_despesa') ) {
-    if ( !sistemaLegado::is_tcems($boTransacao) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $stSql .= "                         ".$this->getDado('valor_despesa')          ." , \n";
     }
     //}
     //if ( $this->getDado('valor_disponibilidades') ) {
-    if ( !sistemaLegado::is_tcems($boTransacao) ) {
+    if ( !Sessao::getExercicio() > '2012' ) {
         $stSql .= "                         ".$this->getDado('valor_disponibilidades') ." , \n";
     }
     //}

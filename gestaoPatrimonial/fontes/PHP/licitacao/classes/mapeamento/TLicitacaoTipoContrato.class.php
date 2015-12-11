@@ -39,7 +39,8 @@ function TLicitacaoTipoContrato()
     $this->AddCampo('cod_tipo'  , 'integer'   , true ,''    , true  , false);
     $this->AddCampo('sigla'     , 'char'      , true ,'8'   , false , false);
     $this->AddCampo('descricao' , 'char'      , true ,'80'  , false , false);
-
+    $this->AddCampo('tipo_tc'   , 'integer'   , false ,''   , false , false);
+    $this->AddCampo('ativo'     , 'boolean'   , false ,''   , false , false);
 }
 
 }

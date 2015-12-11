@@ -34,11 +34,7 @@
 
     * @ignore
 
-    $Revision: 31583 $
-    $Name$
-    $Autor:$
-    $Date: 2008-04-09 11:58:21 -0300 (Qua, 09 Abr 2008) $
-    $Id: FMManterEmpenhoDiversos.php 60392 2014-10-17 12:13:56Z lisiane $
+    $Id: FMManterEmpenhoDiversos.php 64081 2015-11-30 15:36:50Z michel $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -54,6 +50,7 @@ include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNFundeb.class.php';
 include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNRoyalties.class.php';
 include_once CAM_FW_HTML.'MontaAtributos.class.php';
 include_once CAM_GF_ORC_COMPONENTES.'IPopUpDotacaoFiltroClassificacao.class.php';
+include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma    = 'ManterEmpenho';
@@ -69,7 +66,7 @@ $pgJS          = 'JS'.$stPrograma.'.js';
 SistemaLegado::liberaFrames();
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 if (empty($stAcao)) {
     $stAcao = "incluir";
 }
@@ -77,6 +74,7 @@ if (empty($stAcao)) {
 include_once ($pgJS);
 
 Sessao::remove('arItens');
+Sessao::remove('arBuscaContrato');
 Sessao::write('stTituloPagina', 'Gestão Financeira | Empenho | Empenho | Emitir Empenho Diversos');
 
 //valida a utilização da rotina de encerramento do mês contábil
@@ -228,6 +226,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obHdnValidaFornecedor->setId   ('boMsgValidadeFornecedor');
     $obHdnValidaFornecedor->setValue('false');
 
+    //Define o objeto para validacao da data do contrato
+    $obHdnDtContrato = new Hidden;
+    $obHdnDtContrato->setName ('dtContrato');
+    $obHdnDtContrato->setId   ('dtContrato');
+    $obHdnDtContrato->setValue('');
+
     // Define Objeto TextBox para Codigo da Entidade
     $obTxtCodEntidade = new TextBox;
     $obTxtCodEntidade->setName('inCodEntidade');
@@ -314,7 +318,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscFornecedor->obCampoCod->obEvento->setOnChange("montaParametrosGET('buscaFornecedorDiverso', 'inCodFornecedor');
                                                          montaParametrosGET('buscaContrapartida', 'inCodFornecedor, inCodCategoria');
                                                          montaParametrosGET('verificaFornecedor', 'inCodFornecedor, inCodCategoria, inCodContraPartida, stDtEmpenho');");
-    $obBscFornecedor->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodFornecedor','stNomFornecedor','','".Sessao::getId()."','800','550');");
+    $obBscFornecedor->setFuncaoBusca("window.parent.frames['telaPrincipal'].document.frm.inCodFornecedor.focus(); abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodFornecedor','stNomFornecedor','','".Sessao::getId()."','800','550');");
+    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
 
     // Define Objeto Select para Categoria do Empenho
     include_once TEMP.'TEmpenhoCategoriaEmpenho.class.php';
@@ -551,7 +556,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obDtEmpenho->setTitle             ('Informe a data do empenho.');
     $obDtEmpenho->setNull              (false);
     // $obDtEmpenho->obEvento->setOnBlur  ('validaDataEmpenho();');
-    $obDtEmpenho->obEvento->setOnChange("montaParametrosGET('verificaFornecedor', 'inCodFornecedor, inCodCategoria, inCodContraPartida');");
+    $obDtEmpenho->obEvento->setOnChange("montaParametrosGET('verificaFornecedor', 'inCodFornecedor, inCodCategoria, inCodContraPartida'); buscaDado('buscaDespesaDiverso')");
 
     // Define objeto Data para validade final
     $obDtValidadeFinal = new Data;
@@ -661,6 +666,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaAssinaturas->definePapeisDisponiveis('nota_empenho');
     $obMontaAssinaturas->setOpcaoAssinaturas( false );
 
+    $obContrato = new IPopUpContrato( $obForm );
+    $obContrato->obHdnBoFornecedor->setValue(TRUE);
+    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+    $obContrato->obBuscaInner->setValoresBusca('', '', '');
+    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
+
     //****************************************//
     // Monta FORMULARIO
     //****************************************//
@@ -680,9 +691,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addHidden($obHdnNumItem);
     $obFormulario->addHidden($obHdnValidaFornecedor);
     $obFormulario->addHidden($obHdnAtributos );
+    $obFormulario->addHidden($obHdnDtContrato);
 
     $obFormulario->addComponenteComposto($obTxtCodEntidade, $obCmbNomEntidade);
-
+    $obFormulario->addComponente($obDtEmpenho);
     $obFormulario->addComponente($obIPopUpDotacao);
     $obFormulario->addComponente($obCmbClassificacao);
     $obFormulario->addSpan($obSpanSaldo);
@@ -695,7 +707,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addSpan($obSpanContrapartida);
     $obFormulario->addComponente($obTxtDescricao);
     $obFormulario->addComponenteComposto($obTxtCodTipo, $obCmbNomTipo);
-    $obFormulario->addComponente($obDtEmpenho);
+    
     $obFormulario->addComponente($obDtValidadeFinal);
     $obFormulario->addComponente($obCmbHistorico);
 
@@ -716,6 +728,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     }
 
     $obMontaAtributos->geraFormulario($obFormulario);
+
+    $obFormulario->addTitulo('Contrato');
+    $obContrato->geraFormulario($obFormulario);
 
     $obFormulario->addTitulo('Insira os Ítens do Empenho');
     $obFormulario->addHidden($obHdnTipoItem);
@@ -745,4 +760,5 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 }
 echo ("<script>habilitaCampos('Descricao')</script>");
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

@@ -29,7 +29,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Texeira Stephanou
 
-    * $Id: PRManterGrupo.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRManterGrupo.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.02
 */
@@ -85,7 +85,6 @@ $obRegra = new RARRGrupo;
 
 $inCodAtributosSelecionados = $_REQUEST["inCodAtributoSelecionados"];
 
-//SistemaLegado::mostravar($_REQUEST);
 switch ($stAcao) {
     case "incluir":
 

@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Lizandro Kirst da Silva
     * @ignore
 
-    * $Id: LSManterBanco.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterBanco.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.01
 
@@ -107,7 +107,6 @@ if ($_REQUEST["stNomBanco"]) {
 
 $stLink .= "&stAcao=".$_REQUEST['stAcao'];
 $obRMONBanco->listarBanco($rsLista);
-//sistemaLegado::mostravar($rsLista);
 
 $obLista = new Lista;
 $obLista->setRecordSet( $rsLista );
@@ -144,7 +143,6 @@ $obLista->ultimaAcao->addCampo("&inCodBanco",       "cod_banco"        );
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[num_banco]-[nom_banco]");
 if ($_REQUEST['stAcao'] == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
- //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

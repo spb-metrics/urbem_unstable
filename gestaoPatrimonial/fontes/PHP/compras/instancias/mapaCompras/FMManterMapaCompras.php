@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaCompras.php 63738 2015-10-02 17:54:55Z michel $
+ $Id: FMManterMapaCompras.php 64118 2015-12-04 12:33:31Z franver $
 
  */
 
@@ -188,8 +188,8 @@ $obFormulario->addSpan               ( $obSpnSolicitacoes );
 //Aba dos Itens
 $obFormulario->addAba                ( "Itens"          );
 
-$obFormulario->addSpan               ( $obSpnItens );
 $obFormulario->addSpan               ( $obSpnItem  );
+$obFormulario->addSpan               ( $obSpnItens );
 
 //Aba de Totais por item
 $obFormulario->addAba                ( "Totais"          );
@@ -222,8 +222,10 @@ if ($stAcao != 'incluir') {
         $obTComprasObjeto = new TComprasObjeto;
         $obTComprasObjeto->setDado( 'cod_objeto' , $inCodObjeto );
         $obTComprasObjeto->consultar();
-        $txtObjeto = $obTComprasObjeto->getDado( 'descricao' );
-        $stJs .= "d.getElementById('txtObjeto').innerHTML = '$txtObjeto';";
+        $txtObjeto = $obTComprasObjeto->getDado('descricao');
+        $txtObjeto = str_replace("\r\n"," ",$txtObjeto);
+        $txtObjeto = str_replace("\n"," ",$txtObjeto); 
+        $stJs .= "d.getElementById(\"txtObjeto\").innerHTML = \"".$txtObjeto."\";";
         $stJs .= "montaParametrosGET('tipoLicitacao','inCodTipoLicitacao'  ); ";
    } elseif ($stAcao == 'anular') {
         $stJs .= liberaMapaAnulacao( $_REQUEST['cod_mapa'], $_REQUEST['exercicio'] );

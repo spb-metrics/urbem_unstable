@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoOrdemPagamento.class.php 62712 2015-06-11 15:00:29Z evandro $
+    $Id: REmpenhoOrdemPagamento.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.03.03,uc-02.03.05,uc-02.03.20,uc-02.03.23,uc-02.04.05,uc-02.03.28
 */
@@ -648,7 +648,7 @@ function incluir($boTransacao = "", $boFlagTransacao = true)
                                             $obTEmpenhoOrdemPagamentoRetencao->setDado( "exercicio",    $this->stExercicio      );
                                             $obTEmpenhoOrdemPagamentoRetencao->setDado( "cod_entidade", $this->obROrcamentoEntidade->getCodigoEntidade() );
                                             $obTEmpenhoOrdemPagamentoRetencao->setDado( "cod_ordem",    $this->inCodigoOrdem    );
-                                            if ( sistemaLegado::is_tcems($boTransacao) ) {
+                                            if ( Sessao::getExercicio() > '2012' ) {
                                                 $obTEmpenhoOrdemPagamentoRetencao->setDado( "estorno", 'f' );
                                             }
                                         foreach ($this->arRetencoes as $arRetencao => $item) {

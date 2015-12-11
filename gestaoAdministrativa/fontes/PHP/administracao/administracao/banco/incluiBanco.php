@@ -131,7 +131,6 @@ case 0:
     break;
 case 1:
     $ok = true;
-    //mostraVar($HTTP_GET_VARS);
     $objeto = "Banco ".$codBanco." - ".$nomBanco;
     //$pag = $PHP_SELF."?".Sessao::getId()."&controle=0&codBanco=".$codBanco."&nomBanco=".$nomBanco;
 /*** Primeiro valida os dados, depois faz a inclusão ***/

@@ -75,7 +75,6 @@ function geraArquivosPlanoCargos(&$obExportador , $stDataInicial, $stDataFinal)
           $rsAtualizacaoCargo->arElementos[$i]['reducao_vagas_ocupadas'] = -$rsAtualizacaoCargo->arElementos[$i]['diff_vagas_ocupadas'];
        }
     }
-    sistemaLegado::mostravar( $rsAtualizacaoCargo );
 
     $obExportador->addArquivo("atualizacaocargo.txt");
     $obExportador->roUltimoArquivo->addBloco($rsAtualizacaoCargo);
@@ -156,7 +155,6 @@ function geraArquivosPlanoCargos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTFlolhaPagamentoPadrao->setDado( 'dt_inicial'  , $stDataInicial );
     $obTFlolhaPagamentoPadrao->setDado( 'dt_final'  , $stDataFinal );
     $obTFlolhaPagamentoPadrao->recuperaAtualizacaoNivelEsfinge( $rsAtualizacaoNivel );
-//    sistemaLegado::mostravar( $rsAtualizacaoNivel );
 
     $obExportador->addArquivo("atualizacaocargogruporeferencianivel.txt");
     $obExportador->roUltimoArquivo->addBloco($rsAtualizacaoNivel);

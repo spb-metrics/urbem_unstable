@@ -31,7 +31,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: FMAlterarLicencaGeralTipo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMAlterarLicencaGeralTipo.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -74,7 +74,6 @@ if ( empty( $stAcao ) ) {
 Sessao::write( "lsElementos", array() );
 Sessao::write( "inNumElementos", 0 );
 
-//sistemalegado::mostravar( $_REQUEST );
 Sessao::write('acao', '462' );
 $inCodAlvara = $_REQUEST["cod_documento"];
 /* Atributos Dinamicos */

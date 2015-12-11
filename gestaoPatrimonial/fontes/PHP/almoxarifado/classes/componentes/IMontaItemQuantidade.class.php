@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.03.10
 
-    $Id: IMontaItemQuantidade.class.php 61357 2015-01-09 19:54:12Z diogo.zarpelon $
+    $Id: IMontaItemQuantidade.class.php 64051 2015-11-24 17:55:39Z franver $
 */
 
 $pgOc = CAM_GP_ALM_PROCESSAMENTO.'OCIMontaItemQuantidade.php?'.Sessao::getId();
@@ -131,10 +131,13 @@ class IMontaItemQuantidade extends Objeto
 
         $obTxtQuantidade = new Quantidade;
         $obTxtQuantidade->setRotulo  ( "Quantidade" );
-        $obTxtQuantidade->setValue   ( $inQuantidade  );
+        $obTxtQuantidade->setValue   ( $inQuantidade  ); 
         $obTxtQuantidade->setInteiro ( false );
         $obTxtQuantidade->setFloat   ( true  );
-
+        $obTxtQuantidade->setSize (14);
+        $obTxtQuantidade->setMaxLength(13);
+        $obTxtQuantidade->setDefinicao('NUMERIC');
+        
         $this->obIMontaItemUnidade = & $obIMontaItemUnidade;
         $this->obCmbMarca = & $obCmbMarca;
         $this->obCmbCentroCusto = & $obCmbCentroCusto;

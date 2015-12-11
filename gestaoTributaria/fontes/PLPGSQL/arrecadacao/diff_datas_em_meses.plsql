@@ -25,39 +25,32 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: diff_datas_em_meses.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: diff_datas_em_meses.plsql 64141 2015-12-08 16:23:59Z evandro $
 *
 * Caso de uso: uc-05.03.00
 */
 
-/*
-$Log$
-Revision 1.2  2006/09/15 10:20:09  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
+CREATE OR REPLACE FUNCTION diff_datas_em_meses(date,date) RETURNS integer as $$
+DECLARE
+    dtInicio    ALIAS FOR $1;
+    dtFim       ALIAS FOR $2;
+    inAnoInicio     INTEGER;
+    inAnoFim        INTEGER;
+    inDiff          INTEGER;
 
-*/
+BEGIN
 
-CREATE OR REPLACE FUNCTION diff_datas_em_meses(date,date) RETURNS integer as '
-    DECLARE
-        dtInicio    ALIAS FOR $1;
-        dtFim       ALIAS FOR $2;
-        inAnoInicio     INTEGER;
-        inAnoFim        INTEGER;
-        inDiff          INTEGER;
+    inDiff      := (extract (month from dtFim)) - (extract (month from dtInicio));
+    inAnoInicio := extract(year from dtInicio);
+    inAnoFim    := extract(year from dtFim);
+    
+    IF ( inAnoFim > inAnoInicio ) THEN
+        inDiff := (inDiff * 1) + (inAnoFim - inAnoInicio) * 12;
+    ELSE
+        inDiff := inDiff;
+    END IF;
 
-    BEGIN
-      
-         inDiff             := (extract (month from dtFim)) - (extract (month from dtInicio));
-         inAnoInicio        := extract(year from dtInicio);
-         inAnoFim           := extract(year from dtFim);
-         if ( inAnoFim > inAnoInicio ) then
-            inDiff := (inDiff * 1) + (inAnoFim - inAnoInicio) * 12;
-         else
-            inDiff := inDiff;
-         end if;
+    RETURN inDiff; 
 
-        RETURN inDiff; 
-    END;
-'language 'plpgsql';
-           
+END;
+$$ LANGUAGE 'plpgsql';

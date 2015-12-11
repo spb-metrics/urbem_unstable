@@ -119,6 +119,7 @@ if ($inNumContrato) {
 $obTLicitacaoRescisaoContrato = new TLicitacaoRescisaoContrato;
 $obTLicitacaoRescisaoContrato->setDado('num_contrato', $_REQUEST["inNumContrato"]);
 $obTLicitacaoRescisaoContrato->setDado('licitacao', true);
+$obTLicitacaoRescisaoContrato->setDado('exercicio', $stExercicio);
 $obTLicitacaoRescisaoContrato->recuperaContratoRescisao($rsRescisaoContrato);
 
 $obLblExercicioContrato = new Label;

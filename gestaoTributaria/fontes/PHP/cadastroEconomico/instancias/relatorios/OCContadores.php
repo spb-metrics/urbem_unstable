@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCContadores.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCContadores.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.14
 
@@ -59,7 +59,6 @@ $obRRelatorio              = new RRelatorio;
 $obRCEMRelatorioContadores = new RCEMRelatorioContadores;
 
 $arFiltroSessao = Sessao::read( "filtroRelatorio" );
-//sistemaLegado::mostravar( $arFiltroSessao );exit;
 // SETA ATRIBUTOS DA REGRA QUE IRA GERAR O FILTRO DO RELATORIO
 $obRCEMRelatorioContadores->setNomContador           ( $arFiltroSessao['stNomCGM']                 );
 $obRCEMRelatorioContadores->setCodInicio             ( $arFiltroSessao['inCodInicio']              );

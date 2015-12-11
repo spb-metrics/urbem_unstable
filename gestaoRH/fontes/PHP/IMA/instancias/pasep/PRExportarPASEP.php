@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.23
 
-    $Id: PRExportarPASEP.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarPASEP.php 63836 2015-10-22 14:06:51Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -606,7 +606,6 @@ switch ($_POST["inEtapaProcessamento"]) {
                 }
                 $arquivoImportacaoAux->Fechar();
                 if ($inContaRepeticaoes < 1) {
-                //SistemaLegado::mostraVar($arLinhas);
 
                 $stFiltro = " AND trim(translate(sw_cgm_pessoa_fisica.servidor_pis_pasep,'.,-','')) = trim('".$inPisPasep."')";
                 $obTIMAOcorrenciaDetalhe910->recuperaDadosServidor($rsServidor,$stFiltro);

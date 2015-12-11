@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: LSManterConvenio.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterConvenio.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.04
 
@@ -112,7 +112,6 @@ if ($_REQUEST["inCodBancoTxt"]) {
 
 $stLink .= "&stAcao=".$_REQUEST['stAcao'];
 $obRMONConvenio->listarConvenio($rsLista);
-//sistemaLegado::mostravar($rsLista);
 
 $obLista = new Lista;
 $obLista->setRecordSet( $rsLista );

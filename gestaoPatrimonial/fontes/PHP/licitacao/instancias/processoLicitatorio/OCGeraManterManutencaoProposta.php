@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id:$
+    $Id: OCGeraManterManutencaoProposta.php 63841 2015-10-22 19:14:30Z michel $
 
     **/
 
@@ -128,7 +128,7 @@ $preview = new PreviewBirt(3,37,3);
 
 $preview->setVersaoBirt('2.5.0');
 $preview->setNomeArquivo('mapaComparativoProposta');
-$preview->setTitulo('Mapa Comparativo de Prospostas');
+$preview->setTitulo('Mapa Comparativo de Propostas');
 
 if ($rsEntidade->getNumLinhas() == 1) {
     $preview->addParametro( 'codigo_e_entidade', $inCodEntidade." - ".$stNomEntidade );

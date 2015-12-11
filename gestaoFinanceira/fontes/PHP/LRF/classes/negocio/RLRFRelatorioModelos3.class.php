@@ -244,8 +244,7 @@ function geraRecordSet(&$rsRecordSet , &$rsRecordSetTotal, $stOrder = "")
         $stEntidade = substr( $stEntidade, 0, strlen($stEntidade) - 1 );
         $stEntidade = $stEntidade;
     }
-    //mostravar($this->getCodEntidade());
-    //exit;
+
     $this->obFLRFModelosExecutivo->setDado("inCodQuadro","1");
     $this->obFLRFModelosExecutivo->setDado("inCodModelo",$this->getCodModelo());
     $this->obFLRFModelosExecutivo->setDado("stDataInicial",$this->getDataInicial());
@@ -255,8 +254,6 @@ function geraRecordSet(&$rsRecordSet , &$rsRecordSetTotal, $stOrder = "")
     $this->obFLRFModelosExecutivo->setDado("stFiltro",$this->getFiltro());
     $this->obFLRFModelosExecutivo->setDado("stTipoValorDespesa",$this->getTipoValorDespesa());
     $obErro = $this->obFLRFModelosExecutivo->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
-    //mostravar($rsRecordSet);
-    //exit;
 
     $inCount            = 0;
     $inCount2           = 0;
@@ -336,9 +333,6 @@ function geraRecordSet2(&$rsRecordSet , &$rsRecordSetTotal, $stOrder = "")
     $this->obFLRFModelosExecutivo->setDado("stFiltro",$this->getFiltro());
     $this->obFLRFModelosExecutivo->setDado("stTipoValorDespesa",$this->getTipoValorDespesa());
     $obErro = $this->obFLRFModelosExecutivo->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
-    $this->obFLRFModelosExecutivo->debug();
-    //mostravar($rsRecordSet);
-    //exit;
 
     $inCount            = 0;
     $inCount2           = 0;

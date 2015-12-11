@@ -35,7 +35,7 @@
 
     * @ignore
 
-    $Id: OCManterObra.php 61522 2015-01-29 18:33:35Z carlos.silva $
+    $Id: OCManterObra.php 63835 2015-10-22 13:53:31Z franver $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -184,8 +184,6 @@ switch ($stCtrl) {
     break;
 
     case 'incluirEmpenho' :
-
-        //SistemaLegado::mostravar($_REQUEST);
 
         $arRequest = array();
         $arRequest = explode('/', $_REQUEST['inCodEmpenho']);

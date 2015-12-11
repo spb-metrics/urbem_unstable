@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoReceita.class.php 63294 2015-08-13 18:28:40Z evandro $
+    $Id: ROrcamentoReceita.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     * Casos de uso: uc-02.01.06, uc-02.02.01, uc-02.04.04
 */
@@ -451,7 +451,7 @@ function listarReceitaAnalitica(&$rsLista, $stFiltro = "", $boTransacao = "")
                                           WHERE receita.cod_receita = dr.cod_receita_secundaria
                                             AND receita.exercicio   = dr.exercicio ) ";
 
-        if ( SistemaLegado::is_tcems() ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $stFiltro .= "AND CLR.estorno = 'f'";
             $obErro = $obTOrcamentoReceita->recuperaReceitaAnaliticaTCE( $rsLista, $stFiltro, $stOrder, $boTransacao );
         } else {
@@ -476,7 +476,7 @@ function listarReceitaAnalitica(&$rsLista, $stFiltro = "", $boTransacao = "")
             $stFiltro .= " AND CLASSIFICACAO.mascara_classificacao like publico.fn_mascarareduzida('".$this->obROrcamentoClassificacaoReceita->getMascClassificacao()."')||'%' ";
         }
 
-        if ( SistemaLegado::is_tcems() ) {
+        if ( Sessao::getExercicio() > '2012' ) {
             $stFiltro .= "AND CLR.estorno = 'f'";
             $obErro = $obTOrcamentoReceita->recuperaReceitaAnaliticaTCE( $rsLista, $stFiltro, $stOrder, $boTransacao );
         } else {

@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: OCManterHomologacao.php 63178 2015-07-31 20:11:32Z carlos.silva $
+    $Id: OCManterHomologacao.php 63865 2015-10-27 13:55:57Z franver $
 
 */
 
@@ -235,10 +235,10 @@ function montaSpnItens()
         $table->setBodyHeight (150);
     }
 
-    $table->Head->addCabecalho ( 'Item'             , 35 );
-    $table->Head->addCabecalho ( 'Qtde'             , 9 );
-    $table->Head->addCabecalho ( 'Valor Ref.'       , 8 );
-    $table->Head->addCabecalho ( 'Valor'            , 8 );
+    $table->Head->addCabecalho ( 'Item'             , 30 );
+    $table->Head->addCabecalho ( 'Qtde'             , 10 );
+    $table->Head->addCabecalho ( 'Valor Ref.'       , 10 );
+    $table->Head->addCabecalho ( 'Valor'            , 10 );
     $table->Head->addCabecalho ( 'Fornecedor'       , 25 );
     $table->Head->addCabecalho ( 'Status'           , 10 );
 

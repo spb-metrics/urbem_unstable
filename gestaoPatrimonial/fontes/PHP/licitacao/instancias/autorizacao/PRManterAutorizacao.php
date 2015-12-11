@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.05.21
 
- $Id: PRManterAutorizacao.php 63584 2015-09-14 13:11:00Z michel $
+ $Id: PRManterAutorizacao.php 64005 2015-11-17 16:49:06Z michel $
 
 */
 
@@ -376,6 +376,7 @@ if ($stErro) {
                 $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $dadosItens['cod_unidade']);
                 $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $dadosItens['cod_grandeza'] );
                 $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade($dadosItens['simbolo']);
+                $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto($dadosItens['cod_centro']);
             }
 
             $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());

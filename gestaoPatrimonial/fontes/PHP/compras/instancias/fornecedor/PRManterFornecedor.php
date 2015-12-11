@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.04.03
 
-    $Id: PRManterFornecedor.php 60401 2014-10-17 14:20:45Z carlos.silva $
+    $Id: PRManterFornecedor.php 63901 2015-11-04 14:04:10Z jean $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -50,6 +50,7 @@ include_once(TALM."TAlmoxarifadoCatalogoClassificacao.class.php");
 include_once(TMON."TMONAgencia.class.php");
 include_once(TMON."TMONBanco.class.php");
 include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php" );
+include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterFornecedor";
@@ -176,7 +177,6 @@ switch ($_REQUEST['stAcao']) {
 
     case 'excluir':
         $pgProx = $pgList."?".Sessao::getId().'&stAcao='.$stAcao;
-
         include_once ( CAM_GP_LIC_MAPEAMENTO.'TLicitacaoParticipante.class.php' ) ;
         $obTLicitacaoParticipante = new TLicitacaoParticipante;
 
@@ -189,10 +189,16 @@ switch ($_REQUEST['stAcao']) {
         $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem();
         $obTComprasCotacaoFornecedorItem->recuperaTodos($rsComprasCotacaoFornecedorItem, $stFiltro );
 
+        $stFiltro = " WHERE cgm_beneficiario = ". $_REQUEST['inCGM'];
+
+        $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
+        $obTEmpenhoPreEmpenho->recuperaTodos($rsEmpenhoPreEmpenho, $stFiltro);
+
         $stErro = '';
 
         if (($rsParticipante->getNumLinhas() > 0                ) ||
-            ($rsComprasCotacaoFornecedorItem->getNumLinhas() > 0)){
+            ($rsComprasCotacaoFornecedorItem->getNumLinhas() > 0) ||
+            ($rsEmpenhoPreEmpenho->getNumLinhas() > 0)){
             $stErro = "Fornecedor ". $_REQUEST["inCGM"]. " está sendo utilizado pelo sistema.";
         }
 

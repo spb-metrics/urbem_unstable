@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Programador: Fernando Piccini Cercato
 
-    * $Id: FMConsultaInscricaoDetalheCobranca.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMConsultaInscricaoDetalheCobranca.php 63839 2015-10-22 18:08:07Z franver $
 
     Caso de uso: uc-05.04.09
 **/
@@ -42,7 +42,7 @@ include_once ( CAM_GT_DAT_MAPEAMENTO."TDATDividaParcela.class.php" );
 
 $obTDATDividaParcela = new TDATDividaParcela;
 $obTDATDividaAtiva = new TDATDividaAtiva;
-//SistemaLegado::mostravar($_REQUEST);
+
 if ($_REQUEST['situacao'] == 'Cancelada') {// and $_REQUEST['motivo_cancelamento'] ) {
     $obLblMotivo = new Label;
     $obLblMotivo->setName   ('stMotivo');

@@ -187,8 +187,6 @@ function montaListaAtributos()
 
 function mostraAtributos($boNaoReseta = true)
 {
-//    SistemaLegado::mostraVar($_REQUEST);
-
     global $stNomeItem;
     global $pgOc;
     global $obIMontaItemQuantidade;

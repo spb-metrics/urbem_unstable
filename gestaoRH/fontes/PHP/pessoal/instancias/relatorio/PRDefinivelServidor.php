@@ -200,49 +200,53 @@ if ((isset($arCampos)) && (count($arCampos)>0)) {
             $colunasVisiveis .= $arReferenciaSQL[$dados['campo']].',';
             $totalLarguraColunas += $dados['tamanho'];
 
-            if (ereg('evento', strtolower($dados['campo']))
+            if (preg_match('/evento/', strtolower($dados['campo']))
              || $dados['campo'] == 'Salário Bruto'
              || $dados['campo'] == 'Salário Líquido'
              || $dados['campo'] == 'Descontos da Folha' ) {
                 $boHideTotais = 'false';
                 $boAgrupar = 'true';
             }
-            if (ereg('data admissão', strtolower($dados['campo']))) {
+            if (preg_match('/data admissão/', strtolower($dados['campo']))) {
                 $stDataAdmInicial = $dados['stDataInicial'];
                 $stDataAdmFinal = $dados['stDataFinal'];
             }
 
-            if (ereg('data nascimento', strtolower($dados['campo']))) {
-                $stDataNascInicial = $dados['stDataInicial'];
-                $stDataNascFinal = $dados['stDataFinal'];
+            if (preg_match('/data nascimento/', strtolower($dados['campo']))) {
+                if ($dados['stMes'] != '') {
+                    $inMes = $dados['stMes'];
+                } else {
+                    $stDataNascInicial = $dados['stDataInicial'];
+                    $stDataNascFinal = $dados['stDataFinal'];
+                }
             }
 
-            if (ereg('data nomeação', strtolower($dados['campo']))) {
+            if (preg_match('/data nomeação/', strtolower($dados['campo']))) {
                 $stDataNomInicial = $dados['stDataInicial'];
                 $stDataNomFinal = $dados['stDataFinal'];
             }
 
-            if (ereg('data opção fgts', strtolower($dados['campo']))) {
+            if (preg_match('/data opção fgts/', strtolower($dados['campo']))) {
                 $stDataFgtsInicial = $dados['stDataInicial'];
                 $stDataFgtsFinal = $dados['stDataFinal'];
             }
 
-            if (ereg('data posse', strtolower($dados['campo']))) {
+            if (preg_match('/data posse/', strtolower($dados['campo']))) {
                 $stDataPosseInicial = $dados['stDataInicial'];
                 $stDataPosseFinal = $dados['stDataFinal'];
             }
 
-            if (ereg('data rescisão', strtolower($dados['campo']))) {
+            if (preg_match('/data rescisão/', strtolower($dados['campo']))) {
                 $stDataResInicial = $dados['stDataInicial'];
                 $stDataResFinal = $dados['stDataFinal'];
             }
 
-            if (ereg('evento', strtolower($dados['campo']))) {
+            if (preg_match('/evento/', strtolower($dados['campo']))) {
                 $stEvento = $dados['cod_evento'].' - '.$dados['nom_evento'];
 
                 $inCodCampoEvento = substr($dados['campo'], 6, 1);
 
-                if (ereg('quantidade', strtolower($dados['campo']))) {
+                if (preg_match('/quantidade/', strtolower($dados['campo']))) {
                     $arCodEventos['Quantidade'][$inCodCampoEvento] = $dados['cod_evento'];
                     $preview->addParametro('legenda_evento'.$inCodCampoEvento.'_qte', $stEvento);
                     $contadorEventoQte++;
@@ -368,16 +372,16 @@ $stOrdenacao = substr($stOrdenacao, 0, -1);
 
 if (isset($_POST['inCodComplementar'])) {
     $str2 = (int) $_POST['inCodComplementar'];
-    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodComplementar', '$str2', 'true', 'integer', 8 );";
+    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodComplementar', '$str2', 'true', 'integer', 8 );\n";
 } else {
-    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodComplementar', '0', 'true', 'integer', 8 );";
+    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodComplementar', '0', 'true', 'integer', 8 );\n";
 }
 
 if (isset($_POST['inCodConfiguracao'])) {
     $str3 = (int) $_POST['inCodConfiguracao'];
-    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodConfiguracao', '$str3', 'true', 'integer', 10 );";
+    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodConfiguracao', '$str3', 'true', 'integer', 10 );\n";
 } else {
-    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodConfiguracao', '0', 'true', 'integer', 10 );";
+    $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodConfiguracao', '0', 'true', 'integer', 10 );\n";
 }
 
 $preview->addParametro('entidade'            , trim(Sessao::getCodEntidade()));
@@ -393,61 +397,65 @@ $str4 = trim($_POST['stSituacao']);
 $str5 = trim($_POST['stTipoFiltro']);
 
     if ($stDataAdmInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values( 'dtDataAdmIni',   'data_admissao   >= to_date(''$stDataAdmInicial'', ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values( 'dtDataAdmIni',   'data_admissao   >= to_date(''$stDataAdmInicial'', ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataAdmFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataAdmFin',   'data_admissao   <= to_date(''$stDataAdmFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataAdmFin',   'data_admissao   <= to_date(''$stDataAdmFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
+    }
+
+    if ($inMes) {
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inMes',  'EXTRACT(month from data_nascimento)::INTEGER = ''$inMes''::INTEGER',    'false', 'date', 99);\n";
     }
 
     if ($stDataNascInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNascIni',  'data_nascimento >= to_date(''$stDataNascInicial'',   ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNascIni',  'data_nascimento >= to_date(''$stDataNascInicial'',   ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataNascFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNascFin',  'data_nascimento <= to_date(''$stDataNascFinal'',     ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNascFin',  'data_nascimento <= to_date(''$stDataNascFinal'',     ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataNomInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNomIni',   'data_nomeacao   >= to_date(''$stDataNomInicial'',    ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNomIni',   'data_nomeacao   >= to_date(''$stDataNomInicial'',    ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataNomFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNomFin',   'data_nomeacao   <= to_date(''$stDataNomFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataNomFin',   'data_nomeacao   <= to_date(''$stDataNomFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataFgtsInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataFgtsIni',  'data_opcao_fgts >= to_date('$stDataFgtsInicial'',   ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataFgtsIni',  'data_opcao_fgts >= to_date('$stDataFgtsInicial'',   ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataFgtsFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataFgtsFin',  'data_opcao_fgts <= to_date(''$stDataFgtsFinal'',     ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataFgtsFin',  'data_opcao_fgts <= to_date(''$stDataFgtsFinal'',     ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataResInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataResIni',   'data_rescisao   >= to_date(''$stDataResInicial'',    ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataResIni',   'data_rescisao   >= to_date(''$stDataResInicial'',    ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
     if ($stDataResFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataResFin',   'data_rescisao   <= to_date(''$stDataResFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataResFin',   'data_rescisao   <= to_date(''$stDataResFinal'',      ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
     if ($stDataPosseInicial) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataPosseIni', 'data_posse      >= to_date(''$stDataPosseInicial'',  ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataPosseIni', 'data_posse      >= to_date(''$stDataPosseInicial'',  ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
     if ($stDataPosseFinal) {
-        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataPosseFin', 'data_posse      <= to_date(''$stDataPosseFinal'',    ''dd/mm/yyyy'')',    'false', 'date', 99);";
+        $insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('dtDataPosseFin', 'data_posse      <= to_date(''$stDataPosseFinal'',    ''dd/mm/yyyy'')',    'false', 'date', 99);\n";
     }
 
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodPeriodoMovimentacao', '$inCodPeriodoMovimentacao', 'true', 'integer', 9  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stEntidade',               '$str7',                     'true', 'varchar', 6  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stSituacao',               '$str4',                     'true', 'varchar', 1  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stTipoFiltro',             '$str5',                     'true', 'varchar', 2  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodigos',                '$stCodigos',                'true', 'varchar', 3  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodEventosValor',        '$stCodEventosValor',        'true', 'varchar', 12 );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodEventosQte',          '$stCodEventosQte',          'true', 'varchar', 11 );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodAtributo',            '$inCodAtributo',            'true', 'integer', 4  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('boArray',                  '$boArray',                  'true', 'boolean', 5  );";
-$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodAtributos',           '$stCodAtributos',           'true', 'varchar', 7  );";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodPeriodoMovimentacao', '$inCodPeriodoMovimentacao', 'true', 'integer', 9  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stEntidade',               '$str7',                     'true', 'varchar', 6  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stSituacao',               '$str4',                     'true', 'varchar', 1  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stTipoFiltro',             '$str5',                     'true', 'varchar', 2  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodigos',                '$stCodigos',                'true', 'varchar', 3  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodEventosValor',        '$stCodEventosValor',        'true', 'varchar', 12 );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodEventosQte',          '$stCodEventosQte',          'true', 'varchar', 11 );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('inCodAtributo',            '$inCodAtributo',            'true', 'integer', 4  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('boArray',                  '$boArray',                  'true', 'boolean', 5  );\n";
+$insert .= "insert into $stNomeTabela (campo, valor, parametrosPL, tipo, ordem) values('stCodAtributos',           '$stCodAtributos',           'true', 'varchar', 7  );\n";
 
 if ( !$dbCriaTabela->executaSql($insert) ) {
     $stJs .= "alertaAviso('Erro ao criar tabela temporária','form','aviso','".Sessao::getId()."');";

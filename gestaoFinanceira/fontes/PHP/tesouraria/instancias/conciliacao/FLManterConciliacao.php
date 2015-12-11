@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLManterConciliacao.php 60529 2014-10-27 16:35:50Z jean $
+    * $Id: FLManterConciliacao.php 63831 2015-10-22 12:51:00Z franver $
 
     * Casos de uso: uc-02.04.19
 */
@@ -56,21 +56,7 @@ Sessao::remove('pos');
 Sessao::remove('paginando');
 Sessao::remove('filtro');
 Sessao::remove('filtroAux');
-//Sessao::remove('boAgrupar');
-//Sessao::remove('stDtInicial');
-//Sessao::remove('stDtFinal');
-//Sessao::remove('arMovimentacao');
-//Sessao::remove('filtroAux');
-//Sessao::remove('arMovimentacaoAux');
-//Sessao::remove('arMovimentacaoPendencia');
-//Sessao::remove('arMovimentacaoPendenciaAux');
-//Sessao::remove('arMovimentacaoManual');
-//Sessao::remove('arMovimentacaoPendenciaListagem');
-//Sessao::remove('arPendenciasMarcadas');
-//Sessao::remove('TableContext_Table');
-//Sessao::remove('filtroRelatorio');
-//Sessao::remove('arDados');
-//SistemaLegado::mostravar($_SESSION);
+
 $rsEntidadesDisponiveis  = new recordSet;
 $rsEntidadesSelecionadas = new recordSet;
 

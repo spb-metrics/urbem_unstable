@@ -297,7 +297,6 @@ switch ($stAcao) {
                                             "natureza" => $rsListaCreditos->getCampo("cod_natureza"), "genero" => $rsListaCreditos->getCampo("cod_genero"),
                                             "especie" => $rsListaCreditos->getCampo("cod_especie") );
 
-            //sistemaLegado::mostravar( $rsListaCreditos );exit;
             $rsListaCreditos->proximo();
 
             while ( !$rsListaCreditos->Eof() ) {
@@ -555,8 +554,6 @@ switch ($stAcao) {
 
            }//fim do lancamneto do valor da nota_avulsa
 
-//echo "finito<br>irmaos watchovisk<br>";
-//exit;
         if ( $_REQUEST['boEmissaoCarne'] == 0 )
             SistemaLegado::alertaAviso($pgList, "Inscrição Econômica: ".$_REQUEST["inInscricaoEconomica"], "incluir", "aviso", Sessao::getId(), "../");
 
@@ -564,12 +561,7 @@ switch ($stAcao) {
         // imprimir carne
 
         //if ( ( $_REQUEST['boEmissaoCarne'] == 1 ) && ( ( $inCodParcelaNotaAvul > 0 ) || ( $inCodParcela > 0 ) ) ) {
-/*        sistemaLegado::mostravar($inCodParcela);
-        sistemaLegado::mostravar($inCodParcelaNotaAvul); die;
-        sistemaLegado::mostravar($inCodParcelaNotaAvul);
-        sistemaLegado::mostravar($inCodLancamento); die;
-         die;
-*/        if ( ($_REQUEST['boEmissaoCarne'] == 1) && ($inCodParcelaNotaAvul != 0) || ($inCodParcela != 0)) {
+        if ( ($_REQUEST['boEmissaoCarne'] == 1) && ($inCodParcelaNotaAvul != 0) || ($inCodParcela != 0)) {
 
             $arArqMod = explode( "§", $_REQUEST["stArquivo"] );
             $stArquivoModelo = $arArqMod[0];

@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi Rodrigues
     * @author Desenvolvedor: Lucas Teixeira Stephanou
 
-    * $Id: OCManterPermissoes.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterPermissoes.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.03.02
 */
@@ -153,7 +153,7 @@ function excluirGrupo($inLinha)
                 $inContLinha++;
             }
         }
-//        mostravar($arNovaListaGrupo);
+
         Sessao::write( "grupos", $arNovaListaGrupo );
 
         $rsListaGrupos = new RecordSet;
@@ -286,7 +286,7 @@ switch ($_REQUEST ["stCtrl"]) {
                 $arGrupos["inLinha"] = count( $arGruposSessao );
                 $arGruposSessao[] = $arGrupos;
                 Sessao::write( "grupos", $arGruposSessao );
-    //            mostravar($sessao->transf4["grupos"]);
+
                 $rsGrupos->preenche( $arGruposSessao );
                 $stJs .= montaListaGrupos($rsGrupos  );
             }

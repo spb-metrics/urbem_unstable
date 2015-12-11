@@ -657,7 +657,7 @@ BEGIN
                 end if;
 
                 if (stCodElementoDispensa is not null and stCodElementoDispensa<>'') then
-                    stSql := stSql || ' AND ped_d_cd.cod_estrutural like publico.fn_mascarareduzida(''' || stCodElementoDispensaMasc || ''')|| ''%'' ';
+                    stSql := stSql || ' AND ped_d_cd.cod_estrutural like publico.fn_mascarareduzida( '''||stCodElementoDispensaMasc||''' ) || ''%'' ';
                 end if;
 
                 IF stFiltro != '' THEN

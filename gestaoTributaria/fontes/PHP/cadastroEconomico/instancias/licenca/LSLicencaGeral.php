@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: LSLicencaGeral.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSLicencaGeral.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -71,7 +71,6 @@ $pgOcul = "OC".$stPrograma.".php";
 //$stCaminho = "../modulos/cadastroEconomico/hierarqativ/";
 
  //Define arquivos PHP para cada acao
-// SistemaLegado::mostravar("aqui||".$_REQUEST["inCodigoTipo"]);die();
 $stAcao = $request->get('stAcao');
 switch ($stAcao) {
     case 'alterar'   : $pgProx = $pgForm; break;
@@ -106,7 +105,6 @@ $rsLista = new RecordSet;
 if ($_REQUEST["inCGM"]) {
     $obRegra->obRCGM->setNumCGM($_REQUEST["inCGM"]);
 }
-//SistemaLegado::mostravar($_REQUEST);
 if ($_REQUEST["stLicenca"]) {
 
     $stTipoLicenca = $_REQUEST["stTipoLicenca"];

@@ -149,7 +149,7 @@ class RTCEMGExportacaoArquivosPlanejamento
             }
             
             //Tipo Registro 12
-            /*$rsAdminConfiguracao = new Recordset();
+            $rsAdminConfiguracao = new Recordset();
             $obTAdministracaoConfiguracao = new TAdministracaoConfiguracao();
             $obTAdministracaoConfiguracao->setDado('exercicio', Sessao::getExercicio());
             $obTAdministracaoConfiguracao->setDado('parametro', 'cod_entidade_prefeitura');
@@ -161,7 +161,7 @@ class RTCEMGExportacaoArquivosPlanejamento
             $this->obTAdministracaoConfiguracaoEntidade->setDado('parametro', 'tcemg_codigo_orgao_entidade_sicom');
             $this->obTAdministracaoConfiguracaoEntidade->setDado('exercicio', Sessao::getExercicio());
             $this->obTAdministracaoConfiguracaoEntidade->recuperaPorChave($rsAdminConfigEntidade);
-            
+
             if ($rsAdminConfigEntidade->getNumLinhas() < 0) {
                 $obTAdministracaoConfiguracao->setDado('exercicio', Sessao::getExercicio());
                 $obTAdministracaoConfiguracao->setDado('parametro', 'nom_prefeitura');
@@ -170,7 +170,7 @@ class RTCEMGExportacaoArquivosPlanejamento
                 
                 SistemaLegado::alertaAviso("FLExportarArquivosPlanejamento.php?".Sessao::getId()."&stAcao=$stAcao", "As configuração de Orgão não está configuradas. Por favor configurar a Entidade (".$rsAdminConfiguracao2->getCampo('valor').").", "", "aviso", Sessao::getId(), "../");
                 die;
-            }*/
+            }
             
             
             $this->obTTCEMGAMP->setDado('entidades', $this->getCodEntidades());

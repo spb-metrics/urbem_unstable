@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FLManterCredito.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLManterCredito.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.10
 
@@ -119,7 +119,6 @@ $obTxtCodEspecie->setNull    ( true );
 
 //------------------------------------------------- COMBOS
 $obRMONCredito->ListarEspecie ( $rsEspecie );
-//sistemaLegado::mostravar ($rsTipo);
 
 $obCmbEspecie = new Select;
 $obCmbEspecie->setRotulo       ( "Espécie"    );

@@ -129,23 +129,6 @@ $boAdiantamento = false;
 if ($obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getAdiantamento()) {
     $boAdiantamento = true;
 }
-/*
-$obREmpenhoPagamentoLiquidacao->obREmpenhoNotaLiquidacao->setCodNota( $rsLiquidacaoPaga->getCampo("cod_nota") );
-$obREmpenhoPagamentoLiquidacao->setTimestamp( $rsLiquidacaoPaga->getCampo("timestamp") );
-$obREmpenhoPagamentoLiquidacao->setExercicio( $rsLiquidacaoPaga->getCampo("exercicio") );
-$obREmpenhoPagamentoLiquidacao->recuperaDadosBancoPagamento( $rsDadosBanco );
-
-SistemaLegado::mostraVar($rsDadosBanco);
-
-$stContaBanco = $rsDadosBanco->getCampo("cod_plano");
-$stNomConta = $rsDadosBanco->getCampo("nom_conta");
-*/
-//$rsLiquidacaoPaga->debug(); die;
-
-/*$stDtPagamento = $rsLiquidacaoPaga->getCampo("timestamp");
-$stDtPagamento = explode("-",substr($stDtPagamento,0,10));
-$stDtPagamento = $stDtPagamento[2] . "/" . $stDtPagamento[1] . "/" . $stDtPagamento[0];
-*/
 
 // OBJETOS HIDDEN
 $obHdnCtrl = new Hidden;

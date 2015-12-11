@@ -27,21 +27,18 @@
     include_once( CAM_GPC_TCMBA_MAPEAMENTO.Sessao::getExercicio()."/TTBAConsContRazao.class.php" );
     $obTTBAConsContRazao = new TTBAConsContRazao();
 
-    $stDtInicialAnterior = date('d/m/Y',mktime(0,0,0,1,1,substr($stDataInicial,6,4)));
     if ($stDataInicial == "01/01/".Sessao::getExercicio()) {
         $stDtFinalAnterior = date('d/m/Y',mktime(0,0,0,substr($stDataInicial,3,2),substr($stDataInicial,0,2),substr($stDataInicial,6,4)));
     } else {
         $stDtFinalAnterior = date('d/m/Y',mktime(0,0,0,substr($stDataInicial,3,2),substr($stDataInicial,0,2)-1,substr($stDataInicial,6,4)));
     }
-
+    
     $obTTBAConsContRazao->setDado('mes', $inMes);
     $obTTBAConsContRazao->setDado('dt_inicial', $stDataInicial);
     $obTTBAConsContRazao->setDado('dt_final', $stDataFinal);
-    $obTTBAConsContRazao->setDado('dt_inicial_ant', $stDtInicialAnterior);
     $obTTBAConsContRazao->setDado('dt_final_ant', $stDtFinalAnterior);
     $obTTBAConsContRazao->setDado('entidades', $stEntidades);
     $obTTBAConsContRazao->setDado('unidade_gestora', $inCodUnidadeGestora);
-    $obTTBAConsContRazao->setDado('exercicio_ant', (Sessao::getExercicio()-1));
     $obTTBAConsContRazao->recuperaDados($rs);
 
     $obExportador->roUltimoArquivo->addBloco($rs);
@@ -61,19 +58,19 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(34);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ex_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ex_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_mes_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_mov_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_mes_ant");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_mov_ant");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
@@ -85,19 +82,19 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ate_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_mov");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ate_mes");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_mov");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_exercicio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("deb_ex");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_exercicio");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cred_ex");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(16);
 

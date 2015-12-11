@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 63555 2015-09-10 17:00:04Z franver $
+    $Id: OCManterCadastroFerias.php 64078 2015-11-30 13:14:45Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -600,14 +600,14 @@ function preencherQuantDiasGozo()
     }
 
     if (!$obErro->ocorreu()) {
-        if ($_GET['inCodFormaPagamento'] != "") {
-            if ($_GET['inQuantFaltas']=="") {
+        if ($_REQUEST['inCodFormaPagamento'] != "") {
+            if ($_REQUEST['inQuantFaltas']=="") {
                 $inQuantFaltas=0;
             } else {
-                $inQuantFaltas = $_GET['inQuantFaltas'];
+                $inQuantFaltas = $_REQUEST['inQuantFaltas'];
             }
             if (Sessao::read("boConcederFeriasLote") == FALSE) {
-                $inFeriasProporcionais = recuperaQtdDiasParaGozoFerias($_GET["dtInicial"], $_GET["dtFinal"]);
+                $inFeriasProporcionais = recuperaQtdDiasParaGozoFerias($_REQUEST["dtInicial"], $_REQUEST["dtFinal"]);
             }
 
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFormaPagamentoFerias.class.php");
@@ -616,7 +616,7 @@ function preencherQuantDiasGozo()
             $obTPessoalFerias = new TPessoalFerias;
             $obTPessoalFormaPagamentoFerias = new TPessoalFormaPagamentoFerias;
             $obTPessoalConfiguracaoFerias   = new TPessoalConfiguracaoFerias;
-            $obTPessoalFormaPagamentoFerias->setDado("cod_forma",$_GET['inCodFormaPagamento']);
+            $obTPessoalFormaPagamentoFerias->setDado("cod_forma",$_REQUEST['inCodFormaPagamento']);
             $obTPessoalFormaPagamentoFerias->recuperaPorChave($rsFormas);
             
             if (Sessao::read("boConcederFeriasLote") == FALSE) {
@@ -652,10 +652,29 @@ function preencherQuantDiasGozo()
                 ou
                 cod_forma 4 (2 periodos de 15 dias)
                 */
-                $stFiltroFerias  = " AND cod_contrato = ".$_GET['inCodContrato'];
-                $stFiltroFerias .= "\n AND ferias.cod_forma = ".$_GET['inCodFormaPagamento']." ";
-                $stFiltroFerias .= "\n AND ferias.dt_inicial_aquisitivo = TO_DATE('".$_GET['dtInicial']."','dd/mm/yyyy') ";
-                $stFiltroFerias .= "\n AND ferias.dt_final_aquisitivo = TO_DATE('".$_GET['dtFinal']."','dd/mm/yyyy')     ";
+
+                // Necessário carregar da sessão e testar se existe no request, pois quando vai Conceder Férias não usa o request
+                $arContratos = Sessao::read("arContratos");
+
+                $stFiltroAux = "";
+                if (!empty($arContratos)){
+                    foreach ($arContratos as $campo) {
+                        if ($campo['cod_contrato'] != "") {
+                            $stFiltroAux .= "".$campo["cod_contrato"].",";
+                        }
+                    }
+                }
+
+                if ($stFiltroAux != "") {
+                    $stFiltroFerias .= " AND cod_contrato IN (".substr($stFiltroAux,0,-1).") \n";
+                }
+
+                if (($_REQUEST['dtInicial'] != "") && ($_REQUEST['dtFinal'] != "")) {
+                    $stFiltroFerias .= " AND ferias.dt_inicial_aquisitivo = TO_DATE('".$_REQUEST['dtInicial']."','dd/mm/yyyy') \n";
+                    $stFiltroFerias .= " AND ferias.dt_final_aquisitivo = TO_DATE('".$_REQUEST['dtFinal']."','dd/mm/yyyy') \n";
+                }
+
+                $stFiltroFerias .= "AND ferias.cod_forma = ".$_REQUEST['inCodFormaPagamento']." \n";
                 $obTPessoalFerias->recuperaRelacionamento($rsLancamentoFerias,$stFiltroFerias," ORDER BY ferias.cod_ferias",$boTransacao);
                 if ($rsLancamentoFerias->getNumLinhas() > 0){
                     $stJs .= gerarSpan2Form(false,"",false);
@@ -670,7 +689,7 @@ function preencherQuantDiasGozo()
                     $stJs .= gerarSpan2Form(false,"",true);
                 }
 
-                if ($_GET['dtInicialFerias'] != "") {
+                if ($_REQUEST['dtInicialFerias'] != "") {
                     $stJs .= validarDataInicioFerias($inQuantDiasGozo);
                 }
             
@@ -741,12 +760,10 @@ function validarDataInicioFerias($inQuantDiasGozo="")
         $boInicioFeriasFimDeSemana = false;
         if ( $dtInicioFerias != "" and date('D',mktime(0,0,0,$arInicioFerias[1],$arInicioFerias[0],$arInicioFerias[2])) == "Sun" ) {
             $stJs .= "confirmPopUp('Atenção!','A data ".$dtInicioFerias." é um Domingo! Deseja continuar a cadastrar as ferias?','');";
-            //$obErro->setDescricao("@Campo Data de Início das Férias inválido!("."a data ".$dtInicioFerias." é um Domingo)");
             $boInicioFeriasFimDeSemana = true;
         }
         if ( $dtInicioFerias != "" and date('D',mktime(0,0,0,$arInicioFerias[1],$arInicioFerias[0],$arInicioFerias[2])) == "Sat" ) {
              $stJs .= "confirmPopUp('Atenção!','A data ".$dtInicioFerias." é um Sábado! Deseja continuar a cadastrar as ferias?','');";
-             //$obErro->setDescricao("@Campo Data de Início das Férias inválido!("."a data ".$dtInicioFerias." é um Sábado)");
              $boInicioFeriasFimDeSemana = true;
         }
 

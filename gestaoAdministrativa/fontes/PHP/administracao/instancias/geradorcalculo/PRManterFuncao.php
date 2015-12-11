@@ -30,7 +30,7 @@
     * @author Analista: Cassiano
     * @author Desenvolvedor: Cassiano
 
-    $Id: PRManterFuncao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterFuncao.php 63829 2015-10-22 12:06:07Z franver $
 
     Casos de uso: uc-01.03.95
 
@@ -58,7 +58,7 @@ $obErro  = new Erro;
 $rsCorpo = new RecordSet;
 
 $arFuncao = Sessao::read('Funcao');
-//SistemaLegado::mostravar($stAcao);exit;
+
 switch ($stAcao) {
 
     case "incluir":

@@ -42,31 +42,16 @@
                     uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.6  2006/07/05 20:42:02  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-/**
-  * Efetua conexão com a tabela  ORCAMENTO.SUPLEMENTACAO_SUPLEMENTADA
-  * Data de Criação: 10/02/2005
-
-  * @author Analista: Jorge B. Ribarr
-  * @author Desenvolvedor: Eduardo Martins
-
-*/
 class TOrcamentoSuplementacaoSuplementada extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TOrcamentoSuplementacaoSuplementada()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela('orcamento.suplementacao_suplementada');
@@ -82,3 +67,5 @@ function TOrcamentoSuplementacaoSuplementada()
 }
 
 }
+
+?>

@@ -287,7 +287,7 @@ switch ($stCtrl) {
                                               WHERE receita.cod_receita = dr.cod_receita_secundaria
                                                 AND receita.exercicio   = dr.exercicio ) ";
 
-            if ( SistemaLegado::is_tcems() ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 $stFiltro .= "AND CLR.estorno = 'f'";
                 $obTOrcamentoReceita->recuperaReceitaAnaliticaTCE($rsReceita, $stFiltro);
             } else {
@@ -460,8 +460,6 @@ switch ($stCtrl) {
                     }
 
                     $rsConsultaCredito->setPrimeiroElemento();
-
-                    //sistemaLegado::mostraVar($rsConsultaCredito);
 
                     //Salva na sessao os creditos do carne para poder acessar no PR
                     Sessao::write('arCarne',$arCarne);

@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-    * $Id: MontaLocalizacaoCombos.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: MontaLocalizacaoCombos.class.php 63781 2015-10-09 20:50:07Z arthur $
 
 * Casos de uso: uc-05.01.03
 */
@@ -47,17 +47,6 @@
 
     * @package URBEM
     * @subpackage Interface
-*/
-
-/*
-$Log$
-Revision 1.8  2006/11/17 11:51:05  dibueno
-Bug #7383#
-
-Revision 1.7  2006/09/18 09:12:58  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 class MontaLocalizacaoCombos extends Objeto
@@ -214,7 +203,7 @@ function getCadastroLoteamento() { return $this->boCadastroLoteamento; }
      * Método construtor
      * @access Private
 */
-function MontaLocalizacaoCombos()
+function __construct()
 {
     include_once( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php");
     $this->obRCIMLocalizacao = new RCIMLocalizacao;
@@ -246,7 +235,7 @@ function geraFormulario(&$obFormulario, $boObrigatorio = true)
         $this->obRCIMLocalizacao->setCodigoVigencia( $this->getCodigoVigencia() );
         $obErro = $this->obRCIMLocalizacao->listarNiveis( $rsListaNivel );
     }
-
+    
     $arCombosLocalizacao = array();
     $boFlagPrimeiroNivel = true;
     $inContNomeCombo = 1;
@@ -277,9 +266,11 @@ function geraFormulario(&$obFormulario, $boObrigatorio = true)
 
         //PREENCHE APENAS O PRIMEIRO NIVEL
         if ($boFlagPrimeiroNivel) {
+           $rsListaLocalizacao = new RecordSet();
            $boFlagPrimeiroNivel = false;
-           $this->obRCIMLocalizacao->setCodigoNivel ( $rsListaNivel->getCampo("cod_nivel") );
-           $obErro = $this->obRCIMLocalizacao->listarLocalizacaoPrimeiroNivel( $rsListaLocalizacao );
+           $this->obRCIMLocalizacao->setCodigoVigencia( $rsListaNivel->getCampo("cod_vigencia") );
+           $this->obRCIMLocalizacao->setCodigoNivel   ( $rsListaNivel->getCampo("cod_nivel") );
+           $obErro = $this->obRCIMLocalizacao->listarLocalizacaoPrimeiroNivel( $rsListaLocalizacao );           
            $obCmbLocalizacao->preencheCombo( $rsListaLocalizacao );
         }
         //MONTA A MASCARA PARA A FUNCAO MASCARADINAMICO
@@ -493,22 +484,28 @@ function preencheCombos()
         $this->obRCIMLocalizacao->recuperaVigenciaAtual( $rsVigenciaAtual );
         $this->setCodigoVigencia( $rsVigenciaAtual->getCampo( "cod_vigencia" ) );
     }
+    
     $this->obRCIMLocalizacao->setCodigoVigencia ( $this->getCodigoVigencia() );
+    
     if ($this->boCadastroLocalizacao) {
         $this->obRCIMLocalizacao->setCodigoNivel    ( $this->inCodigoNivel    );
         $obErro = $this->obRCIMLocalizacao->listarNiveisAnteriores( $rsListaNivel );
     } else {
         $obErro = $this->obRCIMLocalizacao->listarNiveis( $rsListaNivel );
     }
+    
     if ( strrpos($this->stValorReduzido, ".") == strlen( $this->stValorReduzido ) ) {
         $stValorReduzido = substr( $this->stValorReduzido , 0, strlen( $this->stValorReduzido ) - 1 );
     } else {
         $stValorReduzido = $this->stValorReduzido;
     }
+    
     $arValorReduzido = explode( ".", $stValorReduzido );
     $stValorReduzido = "";
     $inCont = 1;//CONTADOR DOS COMBOS DOS NIVEIS DE LOCALIZACAO
+    
     while ( !$rsListaNivel->eof() and key( $arValorReduzido ) < count( $arValorReduzido ) ) {
+         
          if ($inCont == 1) {
              $stValorReduzido .= current( $arValorReduzido );
              $boMontaCombos = true;
@@ -520,11 +517,13 @@ function preencheCombos()
              }
              $stValorReduzido .= ".".current( $arValorReduzido );
          }
+         
          next( $arValorReduzido );
          $stNomeCombo = "inCodLocalizacao_".$inCont++;
          $stSelecione = $rsListaNivel->getCampo("nom_nivel");
          $js .= "limpaSelect(f.".$stNomeCombo.",0); \n";
          $js .= "f.".$stNomeCombo.".options[0] = new Option('Selecione $stSelecione','', 'selected');\n";
+         
          if ($boMontaCombos) {
              $this->obRCIMLocalizacao->setCodigoNivel       ( $rsListaNivel->getCampo("cod_nivel") );
              $obErro = $this->obRCIMLocalizacao->listarLocalizacao( $rsListaLocalizacao );
@@ -536,19 +535,20 @@ function preencheCombos()
                  $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor")."-";
                  $stChaveLocalizacao .= $rsListaLocalizacao->getCampo( "valor_reduzido");
                  $stNomeLocalizacao   = $rsListaLocalizacao->getCampo( "nom_localizacao" );
+                 
                  if ( $rsListaLocalizacao->getCampo( "valor_reduzido") == $stValorReduzido ) {
-                     $stSelected = "selected";
-                 } else {
-                     $stSelected = "";
+                      $stValorSelecionado = $stChaveLocalizacao;
                  }
                  $js .= "f.".$stNomeCombo.".options[$inContador] = ";
-                 $js .= "new Option('".$stNomeLocalizacao."','".$stChaveLocalizacao."','".$stSelected."'); \n";
+                 $js .= "new Option('".$stNomeLocalizacao."','".$stChaveLocalizacao."'); \n";
                  $inContador++;
                  $rsListaLocalizacao->proximo();
              }
+             $js .= "f.".$stNomeCombo.".value = '".$stValorSelecionado."';\n";  
          }
          $rsListaNivel->proximo();
     }
+    
     if ($this->boPopUp) {
         SistemaLegado::executaIFrameOculto ( $js );
     } else {
@@ -561,7 +561,5 @@ function preencheCombos()
 }
 
 }
-/*--------------------------------------------------+
-|FIM DA CLASSE CLASSE                               |
-+--------------------------------------------------*/
+
 ?>

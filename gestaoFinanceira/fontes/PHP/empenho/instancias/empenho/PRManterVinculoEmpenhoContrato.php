@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: PRManterVinculoEmpenhoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRManterVinculoEmpenhoContrato.php 64087 2015-12-01 16:10:15Z jean $
 
 */
 
@@ -105,7 +105,7 @@ switch ($stAcao) {
             $obErro->setDescricao( "Efetue a inclusão e/ou exclusão de empenho referente ao contrato relacionado!" );
         }
         if (!$obErro->ocorreu()) {
-            sistemaLegado::alertaAviso($pgFilt,"Contrato: ".Sessao::read('inNumContrato'),"incluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgFilt,"Contrato: ".Sessao::read('inNumeroContrato'),"incluir","aviso", Sessao::getId(), "../");
         } else {
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }

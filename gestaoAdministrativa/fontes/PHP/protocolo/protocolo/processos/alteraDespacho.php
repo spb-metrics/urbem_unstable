@@ -320,7 +320,7 @@ if (is_array($lista_domentos_processo)) {
 
         while (list($key,$val) = each($lista_domentos_processo)) {
             $selected = "";
-            //mostravar($lista_domentos_entregues);
+
             if (is_array($lista_domentos_entregues)) {
                 //continue;
             } else {
@@ -374,7 +374,6 @@ $obj = "Processo: ".$codProcesso."/".$anoE." (".$docObj.")";
 $processo = new processos;
 $processo->setaValorDespacho($codAndamento,$codProcesso,$anoE,$codUsuario,$descricao);
 if ($processo->updateDespacho()) {
-    //mostravar($documento);
     //if ($processo->updateDocumento($documento,$codProcesso,$anoE)) {
                     include '../../classes/auditoria.class.php';
                     $audicao = new auditoria;

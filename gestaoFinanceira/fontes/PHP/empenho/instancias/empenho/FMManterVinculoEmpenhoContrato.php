@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: FMManterVinculoEmpenhoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMManterVinculoEmpenhoContrato.php 64087 2015-12-01 16:10:15Z jean $
 
 */
 
@@ -47,80 +47,97 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$jsOnload = "executaFuncaoAjax('consultaContratoEmpenho');";
+$jsOnload = "montaParametrosGET('consultaContratoEmpenho', 'inExercicio,inNumContrato,inCodEntidade');";
 
-Sessao::write('dtContrato', $_REQUEST['dtAssinatura']);
-Sessao::write('inCodEntidade', $_REQUEST['inCodEntidade']);
-Sessao::write('inExercicio', $_REQUEST['inExercicio']);
-Sessao::write('inNumContrato', $_REQUEST['inNumContrato']);
-Sessao::write('elementos', '');
+Sessao::write('dtContrato'       , $request->get('dtAssinatura')     );
+Sessao::write('inCodEntidade'    , $request->get('inCodEntidade')    );
+Sessao::write('inExercicio'      , $request->get('inExercicio')      );
+Sessao::write('inNumeroContrato' , $request->get('inNumeroContrato') );
+Sessao::write('inNumContrato'    , $request->get('inNumContrato')    );
+Sessao::write('elementos'        , ''                                );
 
 $stAcao = "incluir";
 
 $stLocation = $pgFilt.'?'.Sessao::getId();
 
 $obHdnAcao = new Hidden;
-$obHdnAcao->setName( "stAcao" );
+$obHdnAcao->setName ( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
 
 $obHdnCtrl = new Hidden;
-$obHdnCtrl->setName( "stCtrl" );
+$obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
+$obHdnExercicio = new Hidden;
+$obHdnExercicio->setName ( "inExercicio" );
+$obHdnExercicio->setValue( $request->get('inExercicio') );
+
+$obHdnNumContrato = new Hidden;
+$obHdnNumContrato->setName ( "inNumContrato" );
+$obHdnNumContrato->setValue( $request->get('inNumContrato') );
+
+$obHdnNumeroContrato = new Hidden;
+$obHdnNumeroContrato->setName ( "inNumeroContrato" );
+$obHdnNumeroContrato->setValue( $request->get('inNumeroContrato') );
+
+$obHdnCodEntidade = new Hidden;
+$obHdnCodEntidade->setName ( "inCodEntidade" );
+$obHdnCodEntidade->setValue( $request->get('inCodEntidade') );
+
 $obHdnCgmCredor = new Hidden;
-$obHdnCgmCredor->setName("cgm_credor");
-$obHdnCgmCredor->setValue( $_REQUEST['cgm_contratado'] );
+$obHdnCgmCredor->setName ( "cgm_credor" );
+$obHdnCgmCredor->setValue( $request->get('cgm_contratado') );
 
 $obLblExercicio = new Label;
 $obLblExercicio->setRotulo( "Exercício" );
-$obLblExercicio->setValue ( $_REQUEST['inExercicio'] );
+$obLblExercicio->setValue ( $request->get('inExercicio') );
 
 $obLblEntidade = new Label;
 $obLblEntidade->setRotulo( "Entidade" );
-$obLblEntidade->setValue ( $_REQUEST['stNomEntidade'] );
+$obLblEntidade->setValue ( $request->get('stNomEntidade') );
 
 $obLblContrato = new Label;
 $obLblContrato->setRotulo( "Contrato" );
-$obLblContrato->setValue ( $_REQUEST['inNumContrato']."/".$_REQUEST['inExercicio'] );
+$obLblContrato->setValue ( $request->get('inNumeroContrato')."/".$request->get('inExercicio') );
 
 $obLblDataContrato = new Label;
 $obLblDataContrato->setRotulo( "Data do Contrato" );
-$obLblDataContrato->setValue ( $_REQUEST['dtAssinatura'] );
+$obLblDataContrato->setValue ( $request->get('dtAssinatura') );
 
 $obLblCredor = new Label;
 $obLblCredor->setRotulo( "Credor" );
-$obLblCredor->setValue ( $_REQUEST['stNomCredor'] );
+$obLblCredor->setValue ( $request->get('stNomCredor') );
 
 $obLblEmpenho = new BuscaInner;
-$obLblEmpenho->setRotulo 			   ( "Empenho"     );
-$obLblEmpenho->setId     			   ( "stEmpenho"   );
-$obLblEmpenho->setValue  			   ( $stEmpenho    );
-$obLblEmpenho->obCampoCod->setInteiro  ( false );
-$obLblEmpenho->setMostrarDescricao	   ( false  		);
-$obLblEmpenho->obCampoCod->setName 	   ( "numEmpenho" 	);
-$obLblEmpenho->obCampoCod->setValue    ( $numEmpenho	);
-$obLblEmpenho->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/FLProcurarEmpenho.php','frm','numEmpenho','stEmpenho','&stNomEntidade=".$_REQUEST['stNomEntidade']."&inCodigoEntidade=".$_REQUEST['inCodEntidade']."&cgmCredor=".$_REQUEST['cgm_contratado']."','".Sessao::getId()."','800','450');");
+$obLblEmpenho->setRotulo                ( "Empenho"     );
+$obLblEmpenho->setId                    ( "stEmpenho"   );
+$obLblEmpenho->setValue                 ( $stEmpenho    );
+$obLblEmpenho->obCampoCod->setInteiro   ( false         );
+$obLblEmpenho->setMostrarDescricao      ( false         );
+$obLblEmpenho->obCampoCod->setName      ( "numEmpenho"  );
+$obLblEmpenho->obCampoCod->setValue     ( $numEmpenho   );
+$obLblEmpenho->setFuncaoBusca("abrePopUp('".CAM_GF_EMP_POPUPS."empenho/FLProcurarEmpenho.php','frm','numEmpenho','stEmpenho','&stNomEntidade=".$request->get('stNomEntidade')."&inCodigoEntidade=".$request->get('inCodEntidade')."&cgmCredor=".$request->get('cgm_contratado')."','".Sessao::getId()."','800','450');");
 
 $obBtnIncluir = new Button;
-$obBtnIncluir->setValue             ( "Incluir" 	);
-$obBtnIncluir->setName				( "btnIncluir"  );
-$obBtnIncluir->setId				( "btnIncluir"  );
+$obBtnIncluir->setValue             ( "Incluir"     );
+$obBtnIncluir->setName              ( "btnIncluir"  );
+$obBtnIncluir->setId                ( "btnIncluir"  );
 $obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET('incluirEmpenho','numEmpenho,cgm_credor');" );
 
 $obBtnLimpar = new Button;
-$obBtnLimpar->setId                ( "limpar" );
-$obBtnLimpar->setValue             ( "Limpar" );
-$obBtnLimpar->obEvento->setOnClick ( "montaParametrosGET('limpar');" );
+$obBtnLimpar->setId                 ( "limpar" );
+$obBtnLimpar->setValue              ( "Limpar" );
+$obBtnLimpar->obEvento->setOnClick  ( "montaParametrosGET('limpar');" );
 
 $obSpnListaEmpenhos = new Span;
 $obSpnListaEmpenhos->setID ( "spnListaEmpenhos" );
 
 $obBtnCancelar = new Button;
-$obBtnCancelar->setName                    ( "btnClean"       				   );
-$obBtnCancelar->setValue                   ( "Cancelar"         			   );
-$obBtnCancelar->setTipo                    ( "button"         				   );
-$obBtnCancelar->setDisabled                ( false            				   );
-$obBtnCancelar->obEvento->setOnClick       ( "Cancelar('".$stLocation."');");
+$obBtnCancelar->setName             ( "btnClean"                        );
+$obBtnCancelar->setValue            ( "Cancelar"                        );
+$obBtnCancelar->setTipo             ( "button"                          );
+$obBtnCancelar->setDisabled         ( false                             );
+$obBtnCancelar->obEvento->setOnClick( "Cancelar('".$stLocation."');"    );
 
 $obBtnOK = new Ok;
 
@@ -133,21 +150,26 @@ $obForm->setTarget( "oculto" );
 
 //Monta o formulario
 $obFormulario = new Formulario;
-$obFormulario->addForm			( $obForm 									 );
-$obFormulario->addHidden		( $obHdnAcao 								 );
-$obFormulario->addHidden		( $obHdnCtrl 								 );
-$obFormulario->addHidden		( $obHdnCgmCredor 							 );
-$obFormulario->addTitulo( "Dados para Vinculação de Empenhos a um Contrato"  );
-$obFormulario->addComponente	( $obLblExercicio							 );
-$obFormulario->addComponente	( $obLblEntidade 							 );
-$obFormulario->addComponente	( $obLblContrato  							 );
-$obFormulario->addComponente	( $obLblDataContrato 						 );
-$obFormulario->addComponente	( $obLblCredor    							 );
-$obFormulario->addTitulo( "Empenho" 		  								 );
-$obFormulario->addComponente	( $obLblEmpenho	  							 );
+$obFormulario->addForm( $obForm );
+$obFormulario->addHidden( $obHdnAcao                                               );
+$obFormulario->addHidden( $obHdnCtrl                                               );
+$obFormulario->addHidden( $obHdnCgmCredor                                          );
+$obFormulario->addHidden( $obHdnExercicio                                          );
+$obFormulario->addHidden( $obHdnNumContrato                                        );
+$obFormulario->addHidden( $obHdnNumeroContrato                                     );
+$obFormulario->addHidden( $obHdnCodEntidade                                        );
+
+$obFormulario->addTitulo( "Dados para Vinculação de Empenhos a um Contrato" );
+$obFormulario->addComponente( $obLblExercicio                                      );
+$obFormulario->addComponente( $obLblEntidade                                       );
+$obFormulario->addComponente( $obLblContrato                                       );
+$obFormulario->addComponente( $obLblDataContrato                                   );
+$obFormulario->addComponente( $obLblCredor                                         );
+$obFormulario->addTitulo( "Empenho" );
+$obFormulario->addComponente( $obLblEmpenho                                        );
 $obFormulario->agrupaComponentes( array( $obBtnIncluir, $obBtnLimpar ),"","" );
-$obFormulario->addSpan			( $obSpnListaEmpenhos   					 );
-$obFormulario->defineBarra		( $botoesForm 								 );
+$obFormulario->addSpan      ( $obSpnListaEmpenhos                                  );
+$obFormulario->defineBarra  ( $botoesForm                                          );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

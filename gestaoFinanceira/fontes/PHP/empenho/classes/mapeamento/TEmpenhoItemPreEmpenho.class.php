@@ -33,50 +33,40 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 30668 $
-    $Name$
-    $Autor: $
-    $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+    $Id: TEmpenhoItemPreEmpenho.class.php 64005 2015-11-17 16:49:06Z michel $
 
     * Casos de uso: uc-02.03.03
 */
 
-/*
-$Log$
-Revision 1.7  2006/07/05 20:46:56  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TEmpenhoItemPreEmpenho extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function TEmpenhoItemPreEmpenho()
-{
-    parent::Persistente();
-    $this->setTabela('empenho.item_pre_empenho');
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    function __construct()
+    {
+        parent::Persistente();
+        $this->setTabela('empenho.item_pre_empenho');
 
-    $this->setCampoCod('num_item');
-    $this->setComplementoChave('cod_pre_empenho,exercicio');
+        $this->setCampoCod('num_item');
+        $this->setComplementoChave('cod_pre_empenho,exercicio');
 
-    $this->AddCampo('cod_pre_empenho','integer',true,'',true,true);
-    $this->AddCampo('exercicio'      ,'char'   ,true,'04',true,true);
-    $this->AddCampo('num_item'       ,'integer',true,'',true,false);
-    $this->AddCampo('cod_unidade'    ,'integer',true,'',false,true);
-    $this->AddCampo('cod_grandeza'   ,'integer',true,'',false,true);
-    $this->AddCampo('quantidade'     ,'numeric',true,'14.4',false,false);
-    $this->AddCampo('nom_unidade'    ,'varchar',true,'80',false,false);
-    $this->AddCampo('sigla_unidade'  ,'varchar',true,'20',false,false);
-    $this->AddCampo('vl_total'       ,'numeric',true,'14.2',false,false);
-    $this->AddCampo('nom_item'       ,'varchar',true,'160',false,false);
-    $this->AddCampo('complemento'    ,'text'   ,true,'',false,false);
-    $this->AddCampo('cod_item'       ,'integer',false,'',false,true);
-
-}
+        $this->AddCampo('cod_pre_empenho', 'integer', true , ''     , true , true   );
+        $this->AddCampo('exercicio'      , 'char'   , true , '04'   , true , true   );
+        $this->AddCampo('num_item'       , 'integer', true , ''     , true , false  );
+        $this->AddCampo('cod_unidade'    , 'integer', true , ''     , false, true   );
+        $this->AddCampo('cod_grandeza'   , 'integer', true , ''     , false, true   );
+        $this->AddCampo('quantidade'     , 'numeric', true , '14.4' , false, false  );
+        $this->AddCampo('nom_unidade'    , 'varchar', true , '80'   , false, false  );
+        $this->AddCampo('sigla_unidade'  , 'varchar', true , '20'   , false, false  );
+        $this->AddCampo('vl_total'       , 'numeric', true , '14.2' , false, false  );
+        $this->AddCampo('nom_item'       , 'varchar', true , '160'  , false, false  );
+        $this->AddCampo('complemento'    , 'text'   , true , ''     , false, false  );
+        $this->AddCampo('cod_item'       , 'integer', false, ''     , false, true   );
+        $this->AddCampo('cod_centro'     , 'integer', false, ''     , false, true   );
+    }
 }

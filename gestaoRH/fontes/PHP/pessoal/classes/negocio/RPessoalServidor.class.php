@@ -31,7 +31,7 @@
 
     * Caso de uso: uc-04.04.07
 
-    $Id: RPessoalServidor.class.php 61570 2015-02-09 13:24:30Z franver $
+    $Id: RPessoalServidor.class.php 63818 2015-10-19 20:02:07Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1431,6 +1431,16 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
 
         $obErro = $obTPessoalServidor->recuperaRegistrosServidor( $rsRecordset, $stFiltro, $boTransacao );
 
+        return $obErro;
+    }
+
+    public function recuperaCgmDoRegistro(&$rsRecordset , $stFiltro = '', $stOrdem = '', $boTransacao = '')
+    {
+        include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
+        $obTPessoalContrato = new TPessoalContrato();
+        $stFiltro  = " AND numcgm = ".$this->obRCGMPessoaFisica->getNumCGM();
+        $stFiltro .= " AND situacao = 'Ativo' ";
+        $obErro = $obTPessoalContrato->recuperaCgmDoRegistro($rsRecordset,$stFiltro, $stOrdem,$boTransacao);
         return $obErro;
     }
 

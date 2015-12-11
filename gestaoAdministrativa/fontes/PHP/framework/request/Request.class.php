@@ -79,6 +79,16 @@ class Request
         }
     } // Fim do método get
 
+    /**
+     * Retorna todos os elementos do formulário.
+     *
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->array;
+    }
+
     /*
      * Método set
      * Seta variável no request se $key for string

@@ -70,7 +70,6 @@ switch ($_REQUEST['stAcao']) {
              if($rsCgmTipoCredor->getNumLinhas()>0){
               
               foreach( $rsCgmTipoCredor->getElementos() AS $arCredor ){
-                SistemaLegado::mostraVar($arCredor);
                 $obTTCEPECgmTipoCredor->setDado("exercicio" ,$arCredor['exercicio']);
                 $obTTCEPECgmTipoCredor->setDado("cgm_credor",$arCredor['cgm_credor']);
                 $obErro = $obTTCEPECgmTipoCredor->exclusao($boTransacao);

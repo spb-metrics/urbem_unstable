@@ -193,7 +193,6 @@ class TEmpenhoResponsavelAdiantamento extends Persistente
         if(trim($stOrdem))
             $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
         $stSql = $this->montaConsultaEmpenhosFornecedor().$stCondicao.$stOrdem;
-//sistemaLegado::mostravar($stSql);
         $this->setDebug( $stSql );
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 

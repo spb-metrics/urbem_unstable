@@ -58,8 +58,9 @@ $jsOnload = "executaFuncaoAjax('preencherDadosAgencia');";
 //**************************************************************************************************************************//
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
 
+$stAcao = $request->get('stAcao');
+ 
 $obHdnAcao =  new Hidden;
 $obHdnAcao->setName( "stAcao");
 $obHdnAcao->setValue( $stAcao );
@@ -77,7 +78,8 @@ $obForm->setTarget      ( "oculto" );
 $obTxtCodigoConvenio = new TextBox;
 $obTxtCodigoConvenio->setRotulo          ( "Código Convênio com Banco"		);
 $obTxtCodigoConvenio->setName            ( "stCodConvenio"					);
-$obTxtCodigoConvenio->setValue           ( $stCodConvenio                     );
+$obTxtCodigoConvenio->setID              ( "stCodConvenio"                  );
+$obTxtCodigoConvenio->setValue           ( $stCodConvenio                   );
 $obTxtCodigoConvenio->setTitle           ( "Informe o Código do Convênio firmado entre a Prefeitura e o Banco." );
 $obTxtCodigoConvenio->setSize            ( 12                                              					    );
 $obTxtCodigoConvenio->setMaxLength       ( 10                                                                   );
@@ -106,6 +108,7 @@ $obIMontaAgencia->obTextBoxSelectAgencia->setNull(false);
 $obCmbContaCorrente = new Select;
 $obCmbContaCorrente->setRotulo       ( "Conta-Corrente"	    );
 $obCmbContaCorrente->setName         ( "inTxtContaCorrente" );
+$obCmbContaCorrente->setID           ( "inTxtContaCorrente" );
 $obCmbContaCorrente->setStyle        ( "width: 200px"		);
 $obCmbContaCorrente->setTitle        ( "Selecione a Conta-Corrente do Convênio (conta para débito)."	    );
 $obCmbContaCorrente->setCampoID      ( "cod_conta" 	        );
@@ -113,6 +116,20 @@ $obCmbContaCorrente->setCampoDesc    ( "nom_conta" 	        );
 $obCmbContaCorrente->addOption       ( "", "Selecione" 	    );
 $obCmbContaCorrente->setValue        ( $inCodConta    	    );
 $obCmbContaCorrente->setNull         ( false 			    );
+
+//*Tipo de convênio/Layout
+$obCmbConvenioLayout = new Select;
+$obCmbConvenioLayout->setRotulo       ( "Tipo de convênio/Layout"                    );
+$obCmbConvenioLayout->setName         ( "inTipoConvenioLayout"                       );
+$obCmbConvenioLayout->setID           ( "inTipoConvenioLayout"                       );
+$obCmbConvenioLayout->setStyle        ( "width: 200px"                               );
+$obCmbConvenioLayout->setTitle        ( "Selecione o tipo de Convênio para o Layout" );
+$obCmbConvenioLayout->setCampoID      ( "cod_convenio_Layout"                        );
+$obCmbConvenioLayout->setCampoDesc    ( "nom_convenio_Layout"                        );
+$obCmbConvenioLayout->addOption       ( "", "Selecione"                              );
+$obCmbConvenioLayout->addOption       ( 1 , "SIACC 150"                              );
+$obCmbConvenioLayout->addOption       ( 2 , "SICOV 150 - PADRAO 150 FEBRABAN"        );
+$obCmbConvenioLayout->setNull         ( false                                        );
 
 //Envia codigo do banco para processamento
 Sessao::write('BANCO', $inCodBanco);
@@ -126,8 +143,9 @@ $obFormulario->addHidden                        	( $obHdnAcao                   
 $obFormulario->addHidden                        	( $obHdnCtrl                                                            );
 $obFormulario->addTitulo 							( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() , "right" 	);
 $obFormulario->addTitulo             				( "Configuração da Exportação Bancária" 								);
-$obFormulario->addTitulo             				( "Caixa Econ&ocirc;mica Federal"                     		);
+$obFormulario->addTitulo             				( "Caixa Econ&ocirc;mica Federal"                     		            );
 $obFormulario->addComponente         				( $obTxtCodigoConvenio             									    );
+$obFormulario->addComponente                        ( $obCmbConvenioLayout                                                  );
 $obIMontaAgencia->geraFormulario     				( $obFormulario															);
 $obFormulario->addComponente         				( $obCmbContaCorrente              								        );
 

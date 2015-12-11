@@ -566,37 +566,55 @@ class TTCEMGExportacaoARC extends Persistente
 	$stSql = "
 	
 	SELECT tipo_registro
-	     , '20'||cod_correcao AS cod_estorno
-	     , cod_orgao
-	     , deducao_receita
-	     , indentificador_deducao_reduzida AS identificador_deducao
-	     , natureza_receita_reduzida AS natureza_receita_estornada
-	     ,( SELECT sem_acentos(descricao) as descricao
-		  FROM orcamento.conta_receita
-		 WHERE REPLACE(conta_receita.cod_estrutural, '.', '')::TEXT = RPAD(natureza_receita_reduzida::TEXT, 14, '0')::TEXT
-		   AND exercicio = '".$this->getDado('exercicio')."'
-	       ) AS especificacao_estornada
+		 , '20'||cod_correcao AS cod_estorno
+		 , cod_orgao
+		 , deducao_receita
+		 , indentificador_deducao_reduzida AS identificador_deducao
+		 , natureza_receita_reduzida AS natureza_receita_estornada
+		 , ( SELECT sem_acentos(descricao) as descricao
+				FROM orcamento.conta_receita
+				WHERE REPLACE(conta_receita.cod_estrutural, '.', '')::TEXT = RPAD(natureza_receita_reduzida::TEXT, 14, '0')::TEXT
+				  AND exercicio = '".$this->getDado('exercicio')."'
+	        ) AS especificacao_estornada
 	     , SUM(vl_reduzido_acrescido) AS vl_estornado
 	     , cod_correcao
-	
 	 FROM (
 		SELECT 20 AS tipo_registro
 		    , receita.cod_receita
 		    , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
-		    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
-			   THEN 1
-			   ELSE 2
+		    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9' THEN 1
+				   ELSE 2
 		      END AS deducao_receita
 		    , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-		    , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
-			   THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
-			   ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
-		       END AS natureza_receita_reduzida
+			, CASE
+				WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+					THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+                ELSE
+					CASE
+						WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+							OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+							OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+							OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+								THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+						WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+							THEN '24210101'
+                    ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+                    END
+              END AS natureza_receita_reduzida   
 		    , SUM(arrecadacao_receita.vl_arrecadacao) AS vl_reduzido_acrescido
-		    , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
-			   THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
-			   ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
-		       END AS cod_correcao
+		    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer 
+					ELSE CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN receita.exercicio||'24210101'
+							ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+							END
+               END AS cod_correcao
 	
 		 FROM orcamento.receita
 	
@@ -644,20 +662,39 @@ class TTCEMGExportacaoARC extends Persistente
 		  SELECT 20 AS tipo_registro
 		       , receita.cod_receita
 		       , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
-		       , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
-			      THEN 1
-			      ELSE 2
-			 END AS deducao_receita
+		       , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9' THEN 1
+					  ELSE 2
+				 END AS deducao_receita
 		       , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-		       , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
-			      THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
-			      ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
-			  END AS natureza_receita_reduzida
+		       , CASE
+					WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+					ELSE
+						CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN '24210101'
+						ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+						END
+				 END AS natureza_receita_reduzida  
 		       , SUM(arrecadacao_estornada_receita.vl_estornado) AS vl_reduzido_acrescido
-		       , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
-			      THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
-			      ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
-			  END AS cod_correcao
+		       , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer 
+					ELSE CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN receita.exercicio||'24210101'
+							ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+							END
+				 END AS cod_correcao
 	
 		    FROM orcamento.receita
 	
@@ -707,53 +744,56 @@ class TTCEMGExportacaoARC extends Persistente
 		 SELECT 20 AS tipo_registro
 		      , receita.cod_receita
 		      , LPAD(configuracao_entidade.valor::VARCHAR,2,'0') AS cod_orgao
-		      , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
-			     THEN 1
-			     ELSE 2
-			END AS deducao_receita
+		      , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9' THEN 1
+					 ELSE 2
+				END AS deducao_receita
 		      , valores_identificadores.cod_identificador AS indentificador_deducao_reduzida
-		      , SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 2, 9)::INTEGER AS natureza_receita_reduzida
+		      , CASE
+					WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer
+					ELSE
+						CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+							THEN '24210101'
+						ELSE SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+						END
+				END AS natureza_receita_reduzida  
 		      , SUM(redutora.vl_deducao) AS vl_reduzido_acrescido
-		      , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9) AS cod_correcao
-	
+		      , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer 
+					ELSE CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN receita.exercicio||'24210101'
+							ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+							END
+               END AS cod_correcao
 		   FROM orcamento.receita
-	
-		INNER JOIN (SELECT tabela.cod_receita_dedutora
-				 , tabela.exercicio
-				 , SUM(tabela.vl_arrecadacao) AS vl_deducao
-			     FROM (
-				    /*
-				    SELECT arrecadacao_receita.cod_arrecadacao
-					 , arrecadacao_receita.cod_receita AS cod_receita_dedutora
-					 , arrecadacao_receita.exercicio
-					 , arrecadacao_receita.vl_arrecadacao
-				   
-				   FROM tesouraria.arrecadacao_receita
-			     
-			     INNER JOIN tesouraria.arrecadacao
-				     ON arrecadacao.cod_arrecadacao=arrecadacao_receita.cod_arrecadacao
-				    AND arrecadacao.exercicio             = arrecadacao_receita.exercicio
-				    AND arrecadacao.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
-				    AND arrecadacao.devolucao             = false
-				   
-				 WHERE arrecadacao_receita.timestamp_arrecadacao::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
-       
-				UNION 
-                                */
-				   SELECT arrecadacao_receita_dedutora_estornada.cod_arrecadacao
-					, arrecadacao_receita_dedutora_estornada.cod_receita_dedutora
-					, arrecadacao_receita_dedutora_estornada.exercicio
-					, arrecadacao_receita_dedutora_estornada.vl_estornado AS vl_arrecadacao               
-				   
-				   FROM tesouraria.arrecadacao_receita_dedutora_estornada
-				   
-				  WHERE arrecadacao_receita_dedutora_estornada.timestamp_dedutora_estornada::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
-				  
-				    ) AS tabela
-		 
+		INNER JOIN (
+					SELECT tabela.cod_receita_dedutora
+						 , tabela.exercicio
+						 , SUM(tabela.vl_arrecadacao) AS vl_deducao
+					 FROM (
+						SELECT arrecadacao_receita_dedutora_estornada.cod_arrecadacao
+							 , arrecadacao_receita_dedutora_estornada.cod_receita_dedutora
+							 , arrecadacao_receita_dedutora_estornada.exercicio
+							 , arrecadacao_receita_dedutora_estornada.vl_estornado AS vl_arrecadacao               
+						 FROM tesouraria.arrecadacao_receita_dedutora_estornada
+				        WHERE arrecadacao_receita_dedutora_estornada.timestamp_dedutora_estornada::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )
+							AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
+					    ) AS tabela
 			    GROUP BY tabela.cod_receita_dedutora
-				   , tabela.exercicio
-				   , tabela.vl_arrecadacao
+						, tabela.exercicio
+						, tabela.vl_arrecadacao
 		      ) AS redutora
 			ON redutora.cod_receita_dedutora = receita.cod_receita
 		       AND redutora.exercicio            = receita.exercicio
@@ -837,10 +877,19 @@ class TTCEMGExportacaoARC extends Persistente
 		    , receita.cod_receita
 		    , receita.cod_recurso AS cod_fonte_reduzida
 		    , SUM(valor_lancamento.vl_lancamento) AS vl_reduzido_acrescido
-		    , CASE WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8) = '17240101'
-		           THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
-		           ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
-		       END AS cod_correcao
+		    , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer 
+					ELSE CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN receita.exercicio||'24210101'
+							ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+							END
+               END AS cod_correcao
 		       
 		 FROM contabilidade.lancamento_receita
     
@@ -895,51 +944,40 @@ class TTCEMGExportacaoARC extends Persistente
 		     , receita.cod_receita
 		     , receita.cod_recurso AS cod_fonte_reduzida
 		     , SUM(redutora.vl_deducao) AS vl_reduzido_acrescido
-		     , receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9) AS cod_correcao
-	
+		     , CASE WHEN SUBSTR(conta_receita.cod_estrutural, 1, 1) = '9'
+						THEN receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 9)::integer 
+					ELSE CASE
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240101
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17240102
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 17219903
+								OR SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 19319902
+									THEN receita.exercicio||RPAD(SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 6), 8, '0')::INTEGER
+							WHEN SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER = 24210100
+								THEN receita.exercicio||'24210101'
+							ELSE receita.exercicio||SUBSTR(REPLACE(conta_receita.cod_estrutural, '.', ''), 1, 8)::INTEGER
+							END
+               END AS cod_correcao
 		FROM orcamento.receita
 	
-	  INNER JOIN ( SELECT tabela.cod_receita_dedutora
-			    , tabela.exercicio
-			    , SUM(tabela.vl_arrecadacao) AS vl_deducao
-			
-			FROM(
-				/*
-				SELECT arrecadacao_receita.cod_arrecadacao
-				     , arrecadacao_receita.cod_receita AS cod_receita_dedutora
-				     , arrecadacao_receita.exercicio
-				     , arrecadacao_receita.vl_arrecadacao
-				  
-				  FROM tesouraria.arrecadacao_receita
-				
-			    INNER JOIN tesouraria.arrecadacao
-			 	    ON arrecadacao.cod_arrecadacao       = arrecadacao_receita.cod_arrecadacao
-				   AND arrecadacao.exercicio             = arrecadacao_receita.exercicio
-				   AND arrecadacao.timestamp_arrecadacao = arrecadacao_receita.timestamp_arrecadacao
-				   AND arrecadacao.devolucao             = false
-				
-				WHERE arrecadacao_receita.timestamp_arrecadacao::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
-    
-				UNION 
-                                */
-				SELECT arrecadacao_receita_dedutora_estornada.cod_arrecadacao
-				     , arrecadacao_receita_dedutora_estornada.cod_receita_dedutora
-				     , arrecadacao_receita_dedutora_estornada.exercicio
-				     , arrecadacao_receita_dedutora_estornada.vl_estornado AS vl_arrecadacao               
-				
-				FROM tesouraria.arrecadacao_receita_dedutora_estornada
-				
-				WHERE arrecadacao_receita_dedutora_estornada.timestamp_dedutora_estornada::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' ) AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
-			
-			) AS tabela
-		 
-		 GROUP BY tabela.cod_receita_dedutora
-			, tabela.exercicio
-			, tabela.vl_arrecadacao
-			
-		) AS redutora
-		  ON redutora.cod_receita_dedutora=receita.cod_receita
-		 AND redutora.exercicio=receita.exercicio
+	  INNER JOIN (
+				SELECT tabela.cod_receita_dedutora
+					 , tabela.exercicio
+					 , SUM(tabela.vl_arrecadacao) AS vl_deducao
+      			 FROM (
+					SELECT arrecadacao_receita_dedutora_estornada.cod_arrecadacao
+						, arrecadacao_receita_dedutora_estornada.cod_receita_dedutora
+						, arrecadacao_receita_dedutora_estornada.exercicio
+						, arrecadacao_receita_dedutora_estornada.vl_estornado AS vl_arrecadacao               
+				    FROM tesouraria.arrecadacao_receita_dedutora_estornada
+				   WHERE arrecadacao_receita_dedutora_estornada.timestamp_dedutora_estornada::date BETWEEN TO_DATE( '01/".$this->getDado('mes')."/".$this->getDado('exercicio')."', 'dd/mm/yyyy' )
+						AND last_day(TO_DATE('".$this->getDado('exercicio')."' || '-' || '".$this->getDado('mes')."' || '-' || '01','yyyy-mm-dd'))
+			        ) AS tabela
+			 GROUP BY tabela.cod_receita_dedutora
+					, tabela.exercicio
+					, tabela.vl_arrecadacao
+		     ) AS redutora
+		    ON redutora.cod_receita_dedutora=receita.cod_receita
+		   AND redutora.exercicio=receita.exercicio
 		
 	  INNER JOIN administracao.configuracao_entidade
 		  ON configuracao_entidade.cod_entidade = receita.cod_entidade

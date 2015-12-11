@@ -25,50 +25,61 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_consulta_endereco_mata_saojoao.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_consulta_endereco_mata_saojoao.plsql 63867 2015-10-27 17:25:14Z evandro $
 *
 * Caso de uso: uc-05.03.11
 */
 
-CREATE OR REPLACE FUNCTION arrecadacao.fn_consulta_endereco_mata_saojoao( INTEGER )  RETURNS varchar AS '
+CREATE OR REPLACE FUNCTION arrecadacao.fn_consulta_endereco_mata_saojoao( INTEGER , VARCHAR )  RETURNS varchar AS $$
 DECLARE
-    inImovel    ALIAS FOR $1;
-    stRetorno   VARCHAR;
+    inImovel                        ALIAS FOR $1;
+    stExercicio                     ALIAS FOR $2;
+    stRetorno                       VARCHAR:='';
+    arOrdemEntrega                  VARCHAR[];     
+    stCodOrdem                      VARCHAR:='';
+    stEnderecoCorrespondenciaImovel VARCHAR:='';
+    stEnderecoImovel                VARCHAR:='';
+    stEnderecoCgm                   VARCHAR:='';
     
 BEGIN
+    --BUSCANDO A ORDEM E SEU CODIGO PARA DEFINIR QUAL CONSULTA SERA EXECUTADA
+    SELECT   ordem as cod_ordem_entrega
+            
+    INTO arOrdemEntrega
+    
+    FROM (  SELECT string_to_array(REPLACE(regexp_replace(valor,'({|}|")','','gi'),',','~'),'~') as ordem
+              FROM administracao.configuracao 
+             WHERE parametro = 'ordem_entrega' 
+               AND exercicio = stExercicio
+    )as foo;
+
     --imcc => endereco correspondencia do imovel
     --imv => endereco do imovel
     --ip => endereco do cgm
-    SELECT
-        CASE WHEN (ip.cod_municipio = 251 AND ip.cod_uf = 5) OR ( ip.cod_municipio = 0 AND ip.cod_uf = 0 ) THEN
-            CASE WHEN imcc.cod_municipio = 251 AND imcc.cod_uf = 5 THEN
-                imcc.endereco
-            ELSE
-                imv.endereco
-            END
-        ELSE
-            ip.endereco
-        END AS endereco
-
-    INTO
-        stRetorno
-
+    SELECT  
+            imcc.endereco AS endereco_correspondencia_imovel
+            ,imv.endereco AS endereco_imovel
+            ,ip.endereco  AS endereco_cgm
+    
+    INTO    stEnderecoCorrespondenciaImovel
+            ,stEnderecoImovel
+            ,stEnderecoCgm
     FROM
         imobiliario.imovel AS ii
      
     LEFT JOIN (
         SELECT
             IMC.inscricao_municipal,
-            TL.nom_tipo||''§''||
-            IMC.cod_logradouro||''§''||
-            LOGRN.nom_logradouro||''§''||
-            IMC.numero||''§''||
-            IMC.complemento||''§''||
-            BAIRRO.nom_bairro||''§''||
-            IMC.cep||''§''||
-            MUN.cod_municipio||''§''||
-            MUN.nom_municipio||''§''||
-            UF.cod_uf||''§''||
+            TL.nom_tipo||'§'||
+            IMC.cod_logradouro||'§'||
+            LOGRN.nom_logradouro||'§'||
+            IMC.numero||'§'||
+            IMC.complemento||'§'||
+            BAIRRO.nom_bairro||'§'||
+            IMC.cep||'§'||
+            MUN.cod_municipio||'§'||
+            MUN.nom_municipio||'§'||
+            UF.cod_uf||'§'||
             UF.sigla_uf
             AS endereco,
             MUN.cod_municipio,
@@ -120,19 +131,18 @@ BEGIN
     LEFT JOIN (
         SELECT
             i.inscricao_municipal,
-            TL.nom_tipo||''§''||
-            l.cod_logradouro||''§''||
-            nl.nom_logradouro||''§''||
-            i.numero||''§''||
-            i.complemento||''§''||
-            bairro.nom_bairro||''§''||
-            i.cep||''§''||
-            mun.cod_municipio||''§''||
-            mun.nom_municipio||''§''||
-            uf.cod_uf||''§''||
+            TL.nom_tipo||'§'||
+            l.cod_logradouro||'§'||
+            nl.nom_logradouro||'§'||
+            i.numero||'§'||
+            i.complemento||'§'||
+            bairro.nom_bairro||'§'||
+            i.cep||'§'||
+            mun.cod_municipio||'§'||
+            mun.nom_municipio||'§'||
+            uf.cod_uf||'§'||
             uf.sigla_uf
             AS endereco,
-            --TL.nom_tipo||''§''||l.cod_logradouro||''§''||nl.nom_logradouro||''§''||i.numero||''§''||i.complemento||''§''||i.cep||''§''||''''||''§''||bairro.nom_bairro||''§''||mun.cod_municipio||''§''||mun.nom_municipio||''§''||uf.cod_uf||''§''||uf.sigla_uf||''§''||i.inscricao_municipal AS endereco,
             uf.cod_uf,
             mun.cod_municipio
     
@@ -202,16 +212,16 @@ BEGIN
     LEFT JOIN (
         SELECT
             ip.inscricao_municipal,
-            cgm.tipo_logradouro_corresp||''§''||
-            ''0''||''§''||
-            cgm.logradouro_corresp||''§''||
-            cgm.numero_corresp||''§''||
-            cgm.complemento_corresp||''§''||
-            cgm.bairro_corresp||''§''||
-            cgm.cep_corresp||''§''||
-            MUN.cod_municipio||''§''||
-            MUN.nom_municipio||''§''||
-            UF.cod_uf||''§''||
+            cgm.tipo_logradouro_corresp||'§'||
+            sw_cgm_logradouro_correspondencia.cod_logradouro||'§'||
+            cgm.logradouro_corresp||'§'||
+            cgm.numero_corresp||'§'||
+            cgm.complemento_corresp||'§'||
+            cgm.bairro_corresp||'§'||
+            cgm.cep_corresp||'§'||
+            MUN.cod_municipio||'§'||
+            MUN.nom_municipio||'§'||
+            UF.cod_uf||'§'||
             UF.sigla_uf
             AS endereco,
             UF.cod_uf,
@@ -236,7 +246,10 @@ BEGIN
         ON 
             MUN.cod_uf = UF.cod_uf
             AND MUN.cod_municipio = cgm.cod_municipio_corresp
-    
+        
+        LEFT JOIN sw_cgm_logradouro_correspondencia
+            ON sw_cgm_logradouro_correspondencia.numcgm = cgm.numcgm
+
     ) as ip
     ON
         ip.inscricao_municipal = ii.inscricao_municipal
@@ -248,6 +261,18 @@ BEGIN
         imcc.timestamp desc
     LIMIT 1;
 
+    --Loop para atribuir o valor do endereco de acordo com a ordem setada na configuracao
+    FOREACH stCodOrdem IN ARRAY arOrdemEntrega
+    LOOP
+        CASE stCodOrdem
+            WHEN '4' THEN stRetorno:= stEnderecoCorrespondenciaImovel;
+            WHEN '3' THEN stRetorno:= stEnderecoImovel;
+            WHEN '2','1' THEN stRetorno:= stEnderecoCgm;
+            ELSE
+        END CASE;
+        EXIT WHEN stRetorno <> '';
+    END LOOP;
+
     RETURN stRetorno;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

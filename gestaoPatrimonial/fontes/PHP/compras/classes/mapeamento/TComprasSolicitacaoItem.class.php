@@ -35,7 +35,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: TComprasSolicitacaoItem.class.php 62979 2015-07-14 16:18:54Z michel $
+ $Id: TComprasSolicitacaoItem.class.php 63962 2015-11-11 18:32:34Z franver $
 
  */
 
@@ -1040,10 +1040,10 @@ function montaRecuperaSolicitacaoItemReserva()
                           ON  pao.exercicio = despesa.exercicio
                          AND  pao.num_pao   = despesa.num_pao
 
-                        JOIN  orcamento.pao_ppa_acao
+                   LEFT JOIN  orcamento.pao_ppa_acao
               ON  pao_ppa_acao.num_pao = orcamento.pao.num_pao
              AND  pao_ppa_acao.exercicio = orcamento.pao.exercicio
-            JOIN  ppa.acao
+       LEFT JOIN  ppa.acao
               ON  ppa.acao.cod_acao = pao_ppa_acao.cod_acao
                    -- FIM HINTS
 

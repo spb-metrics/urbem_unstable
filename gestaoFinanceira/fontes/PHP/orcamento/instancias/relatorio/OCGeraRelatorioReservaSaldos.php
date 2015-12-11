@@ -91,7 +91,6 @@ $obPDF->addFiltro( 'Periodicidade', $stPeriodicidade );
 $obPDF->addFiltro( 'Órgão', $arFiltro['inNumOrgao'].$arNomFiltro['orgao'][$arFiltro['inNumOrgao']] );
 $obPDF->addFiltro( 'Unidade', $arFiltro['inNumUnidade'].$arNomFiltro['unidade'][$arFiltro['inNumUnidade']] );
 
-//sistemaLegado::mostravar(//sessao->filtro) ;
 if (!$arFiltro['stDtInicial']) {
     $stSubTitulo = "Periodicidade: Não informada";
 } else {

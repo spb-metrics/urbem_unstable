@@ -161,7 +161,6 @@ function RecuperaRelatorio(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTran
 
     $stSql = $this->montaRecuperaRelatorio($stFiltro);
     $this->setDebug($stSql);    
-    //SistemaLegado::mostravar($stSql); exit();
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;

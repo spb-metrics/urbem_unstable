@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaBoletim.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RTesourariaBoletim.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     $Revision: 32021 $
     $Name$
@@ -449,7 +449,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                     // Verifica qual o cod_recurso que possui conta contabil vinculada
                     $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                     $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
                     } else {
                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
@@ -464,7 +464,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                     $obTContabilidadePlanoBanco = new TContabilidadePlanoBanco;
                     $obTContabilidadePlanoBanco->setDado('cod_recurso',$inCodRecurso);
                     $obTContabilidadePlanoBanco->setDado('exercicio',Sessao::getExercicio());
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         $obTContabilidadePlanoBanco->setDado('cod_estrutural', "7.2.1.1.1.%");
                     } else {
                         $obTContabilidadePlanoBanco->setDado('cod_estrutural', "1.9.3.2.0.00.00.%");
@@ -481,7 +481,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                     }
                     
                     if ( !$obErro->ocorreu() ) {
-                        if ( SistemaLegado::is_tcems($boTransacao) ) {
+                        if ( Sessao::getExercicio() > '2012' ) {
                             $obTContabilidadePlanoBanco->setDado('cod_estrutural', "8.2.1.1.1.%");
                         } else {
                             $obTContabilidadePlanoBanco->setDado('cod_estrutural', "2.9.3.2.0.00.00.%");
@@ -540,7 +540,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                 $nuSomatorioReceita   = bcadd( $nuSomatorioReceita  , $nuValorParcela, 4 );
                 $nuVlReceitaPrincipal = bcsub( $nuVlReceitaPrincipal, $nuValorParcela, 4 );
 
-                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     if ($boCreditoTributario == "t") {
                         $stCodPlanoEstruturalDebito  = $rsArrecadacao->getCampo('conta_debito'); //código da conta de banco/caixa da arrecadação
                         
@@ -576,7 +576,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                 }
                 
                 if ( !$obErro->ocorreu() ) {
-                    if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         if ($boCreditoTributario != "t") {
                             $stClasReceita = str_replace( ".", "", $rsLista->getCampo( "cod_estrutural" ));
                             $stCodPlanoClasReceita = $rsLista->getCampo("cod_plano"); 
@@ -610,7 +610,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                         $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
                         $inCodHistoricoDesdobramento = 907;
                     }
-                    if (SistemaLegado::is_tcems($boTransacao)) {
+                    if (Sessao::getExercicio() > '2012') {
                         $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalDebito                        );
                         $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_clas_receita"     , $stCodPlanoClasReceita                             );
                     }
@@ -649,7 +649,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                                 // Verifica qual o cod_recurso que possui conta contabil vinculada
                                 $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                 $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                                if ( Sessao::getExercicio() > '2012' ) {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
                                 } else {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
@@ -712,7 +712,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                            if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                            if ( Sessao::getExercicio() > '2012' ) {
                                 $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_despesa"          , ''                                          );
                                 $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , ''                                          );
                             } else {
@@ -732,7 +732,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
 
             $stEstruturalCredito = str_replace( '.', '', $rsArrecadacao->getCampo( "cod_estrutural_credito" ) );
 
-            if ( SistemaLegado::is_tcems($boTransacao) ) {
+            if ( Sessao::getExercicio() > '2012' ) {
                 if ($boCreditoTributario == "t") {
                     $stCodPlanoEstruturalDebito  = $rsArrecadacao->getCampo('conta_debito'); //código da conta de banco/caixa da arrecadação
 
@@ -793,7 +793,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                 $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
                 $inCodHistorico = 907;
             }
-            if (SistemaLegado::is_tcems($boTransacao)) {
+            if (Sessao::getExercicio() > '2012') {
                 $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalDebito                        );
                 $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_clas_receita"     , $stCodPlanoEstruturalCredito                       );
             }
@@ -862,7 +862,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                        if ( Sessao::getExercicio() > '2012' ) {
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_despesa"          ,  ''                                         );
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_disponibilidades" ,  ''                                         );
                         } else {
@@ -902,7 +902,7 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                         $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                        if ( Sessao::getExercicio() > '2012' ) {
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_despesa"          , ''                                          );
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , ''                                          );
                         } else {
@@ -997,7 +997,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                     // Verifica qual o cod_recurso que possui conta contabil vinculada
                     $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                     $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
                     } else {
                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
@@ -1045,7 +1045,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                 $nuSomatorioReceita   = bcadd( $nuSomatorioReceita  , $nuValorParcela, 4 );
                 $nuVlReceitaPrincipal = bcsub( $nuVlReceitaPrincipal, $nuValorParcela, 4 );
 
-                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     if ($boCreditoTributario == "t") {
                         $stCodPlanoClasReceita  = $rsArrecadacao->getCampo('conta_credito'); //código da conta de banco/caixa da arrecadação
                         
@@ -1084,7 +1084,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                 }
 
                 if ( !$obErro->ocorreu() ) {
-                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                    if ( Sessao::getExercicio() > '2012' ) {
                         if ($boCreditoTributario != "t") {
                             $stClasReceita = str_replace( ".", "", $rsLista->getCampo( "cod_estrutural" ));
                             $stCodPlanoClasReceita = $rsArrecadacao->getCampo('conta_credito');
@@ -1125,7 +1125,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , null );
                         $inCodHistoricoDesdobramento = 914;
                     }
-                    if (SistemaLegado::is_tcems($boTransacao)) {
+                    if (Sessao::getExercicio() > '2012') {
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalCredito                       );
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_plano_clas_receita"     , $stCodPlanoClasReceita                        );
                     }
@@ -1166,7 +1166,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                                 // Verifica qual o cod_recurso que possui conta contabil vinculada
                                 $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                 $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                                if ( Sessao::getExercicio() > '2012' ) {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
                                 } else {
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
@@ -1227,7 +1227,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                            if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                            if ( Sessao::getExercicio() > '2012' ) {
                                 $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_despesa"          , ''                                          );
                                 $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , ''                                          );
                             } else {
@@ -1249,7 +1249,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                 $stCodPlanoEstruturalCredito = str_replace( '.', '', $rsArrecadacao->getCampo( "conta_credito" ) );
                 $stEstruturalDebito  = str_replace( '.', '', $rsArrecadacao->getCampo( "cod_estrutural_debito"  ) );
 
-                if ( SistemaLegado::is_tcems($boTransacao) ) {
+                if ( Sessao::getExercicio() > '2012' ) {
                     if ($boCreditoTributario == "t") {
                         $stCodPlanoEstruturalCredito  = $rsArrecadacao->getCampo('conta_credito'); //código da conta de banco/caixa da arrecadação
                         
@@ -1312,7 +1312,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $inCodHistorico = 914;
                     }
                     
-                    if (SistemaLegado::is_tcems($boTransacao)) {
+                    if (Sessao::getExercicio() > '2012') {
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento"     , $stCodPlanoEstruturalDebito );
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_plano_clas_receita"     , $stCodPlanoEstruturalCredito     );
                     }
@@ -1387,7 +1387,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                        if ( Sessao::getExercicio() > '2012' ) {
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_despesa"          , ''                                          );
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , ''                                          );
                         } else {
@@ -1427,7 +1427,7 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "tipo_lote"              , "A"                                         );
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "dt_lote"                , $this->stDataBoletim                        );
                         $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_entidade"           , $rsArrecadacao->getCampo( "cod_entidade"  ) );
-                        if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                        if ( Sessao::getExercicio() > '2012' ) {
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_despesa"          , ''                                          );
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , ''                                          );
                         } else {

@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: LSManterEspecie.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterEspecie.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.09
 */
@@ -164,7 +164,6 @@ $obLista->ultimaAcao->addCampo("&inCodNatureza", "cod_natureza" );
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[cod_especie]-[nom_especie]");
 if ($_REQUEST['stAcao'] == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
- //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRReterFonte.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRReterFonte.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.22
 */
@@ -80,10 +80,6 @@ $pgFilt = "FL".$stPrograma.".php?stAcao=$stAcao";
 $pgList = "LS".$stPrograma.".php?stAcao=$stAcao";
 $pgForm = "FM".$stPrograma.".php?stAcao=$stAcao";
 
-//[boEmissaoCarne]
-//[stCodDocumentoTxt]
-
-//sistemalegado::mostravar($stAcao);die();
 switch ($stAcao) {
     case "incluir":
         if ($_REQUEST["boEmissaoCarne"] && !$_REQUEST["cmbModelo"]) {

@@ -26,18 +26,16 @@
 /**
     * Página de Include Oculta - Exportação Arquivos GF
 
-    * Data de Criação   : 19/10/2007
+    * Data de Criação   : 03/09/2015
 
-    * @author Analista: Gelson Wolvowski Gonçalves
-    * @author Desenvolvedor: Henrique Girardi dos Santos
+    * @author Analista: Valtair Santos
+    * @author Desenvolvedor: Jean Silva
 
     $Id $
-
-    * Casos de uso: uc-06.05.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TTCMBAEditalEndereco extends Persistente
     {
@@ -70,25 +68,25 @@ class TTCMBAEditalEndereco extends Persistente
         $stSql = " SELECT 1 AS tipo_registro
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , edital.num_edital
-                        , CASE WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 1 THEN 1
-                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 2 THEN 2
-                               WHEN edital.cod_modalidade = 3 AND licitacao.registro_precos = TRUE THEN 3
-                               WHEN edital.cod_modalidade = 5 THEN 4
-                               WHEN edital.cod_modalidade = 1 AND tipo_objeto.cod_tipo_objeto = 1 THEN 5
-                               WHEN edital.cod_modalidade = 1 AND tipo_objeto.cod_tipo_objeto = 2 THEN 6
-                               WHEN edital.cod_modalidade = 4 THEN 7
-                               WHEN edital.cod_modalidade = 2 AND tipo_objeto.cod_tipo_objeto = 1 THEN 10
-                               WHEN edital.cod_modalidade = 2 AND tipo_objeto.cod_tipo_objeto = 2 THEN 12
+                        , CASE WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 1   THEN 1
+                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 2   THEN 2
+                               WHEN edital.cod_modalidade = 3 AND licitacao.registro_precos = TRUE  THEN 3
+                               WHEN edital.cod_modalidade = 5                                       THEN 4
+                               WHEN edital.cod_modalidade = 1 AND tipo_objeto.cod_tipo_objeto = 1   THEN 5
+                               WHEN edital.cod_modalidade = 1 AND tipo_objeto.cod_tipo_objeto = 2   THEN 6
+                               WHEN edital.cod_modalidade = 4                                       THEN 7
+                               WHEN edital.cod_modalidade = 2 AND tipo_objeto.cod_tipo_objeto = 1   THEN 10
+                               WHEN edital.cod_modalidade = 2 AND tipo_objeto.cod_tipo_objeto = 2   THEN 12
                                WHEN edital.cod_modalidade = 6 AND licitacao.registro_precos = FALSE THEN 14
                                WHEN edital.cod_modalidade = 7 AND licitacao.registro_precos = FALSE THEN 15
-                               WHEN edital.cod_modalidade = 1 AND licitacao.registro_precos = TRUE THEN 16
-                               WHEN edital.cod_modalidade = 2 AND licitacao.registro_precos = TRUE THEN 17
-                               WHEN edital.cod_modalidade = 6 AND licitacao.registro_precos = TRUE THEN 18
-                               WHEN edital.cod_modalidade = 7 AND licitacao.registro_precos = TRUE THEN 19
-                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 4 THEN 22
-                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 3 THEN 23
+                               WHEN edital.cod_modalidade = 1 AND licitacao.registro_precos = TRUE  THEN 16
+                               WHEN edital.cod_modalidade = 2 AND licitacao.registro_precos = TRUE  THEN 17
+                               WHEN edital.cod_modalidade = 6 AND licitacao.registro_precos = TRUE  THEN 18
+                               WHEN edital.cod_modalidade = 7 AND licitacao.registro_precos = TRUE  THEN 19
+                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 4   THEN 22
+                               WHEN edital.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 3   THEN 23
                         END AS modalidade
-                        , edital.local_entrega_propostas
+                        , edital.local_entrega_propostas AS logradouro
                         , '' AS endereco
                         , '' AS complemento
                         , '' AS bairro
@@ -96,7 +94,7 @@ class TTCMBAEditalEndereco extends Persistente
                         , (SELECT valor
                              FROM administracao.configuracao
                             WHERE cod_modulo = 2 AND exercicio = edital.exercicio AND parametro = 'cod_municipio_ibge'
-                        ) AS municipio_ibge
+                          ) AS municipio_ibge
                         , 1 AS finalidade
                         , TO_CHAR(edital.dt_aprovacao_juridico,'yyyymm') AS competencia
 
@@ -115,6 +113,7 @@ class TTCMBAEditalEndereco extends Persistente
                       AND edital.cod_entidade IN (".$this->getDado('entidades').")
                       AND edital.dt_aprovacao_juridico BETWEEN TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy')
                                                            AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+                      AND edital.cod_modalidade NOT IN (8,9)
             ";
         return $stSql;
     }

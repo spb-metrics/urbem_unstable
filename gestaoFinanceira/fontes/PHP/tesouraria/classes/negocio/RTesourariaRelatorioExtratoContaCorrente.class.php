@@ -224,8 +224,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     include_once( CAM_GF_TES_MAPEAMENTO."FTesourariaExtratoContaCorrente.class.php");
     $obFTesourariaExtratoContaCorrente = new FTesourariaExtratoContaCorrente;
 
-    $boTCEMS = SistemaLegado::is_tcems();
-
     $codPlano = $this->getCodPlano()  ;
 
     $obFTesourariaExtratoContaCorrente->setDado("inCodPlanoInicial" , $codPlano[0] );
@@ -264,7 +262,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             
             $obFTesourariaExtratoContaCorrente->setDado( "botcems", "false" );
             
-            if (SistemaLegado::is_tcems()) {
+            if (Sessao::getExercicio() > '2012') {
                 $obFTesourariaExtratoContaCorrente->setDado( "botcems", "true" );
             }
             if($this->boDemonstrarCredor){

@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TDATModalidade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TDATModalidade.class.php 63839 2015-10-22 18:08:07Z franver $
 
 * Casos de uso: uc-05.04.07
 */
@@ -149,8 +149,6 @@ class TDATModalidade extends Persistente
 
         $stSql = $this->montaRecuperaInfoModalidade().$stCondicao.$stOrdem;
         $this->setDebug( $stSql );
-//sistemaLegado::mostravar( $stSql ); exit;
-        //$this->debug();
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;

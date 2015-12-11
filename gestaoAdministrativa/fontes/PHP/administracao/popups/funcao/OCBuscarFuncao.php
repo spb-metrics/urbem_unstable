@@ -57,15 +57,12 @@ function preencherBiblioteca($stExtencao="")
         $obTAdminsitracaoBiblioteca->recuperaTodos($rsBiblioteca,$stFiltro,"cod_biblioteca");
     }
 
-    $stJs .= "jQuery('#inCodBiblioteca').removeOption(/./);            \n";
-    $stJs .= "jQuery('#inCodBiblioteca').addOption('', 'Selecione');   \n";
-
-    while (!$rsBiblioteca->eof()) {
-        $stJs .= "jQuery('#inCodBiblioteca').addOption('".$rsBiblioteca->getCampo("cod_biblioteca")."', '".$rsBiblioteca->getCampo("nom_biblioteca")."'); \n";
-        $rsBiblioteca->proximo();
+    $stJs .= " jQuery(\"#inCodBiblioteca\").empty().append(new Option(\"Selecione\",\"\")); \n";
+    
+    foreach($rsBiblioteca->getElementos() as $value ) {
+        $stJs .= "jQuery(\"#inCodBiblioteca\").append( new Option(\"".$value["nom_biblioteca"]."\", \"".$value["cod_biblioteca"]."\") ); \n";
     }
-
-    $stJs .= "jQuery('#inCodBiblioteca option:first').attr('selected', 'selected'); \n";
+    $stJs .= " jQuery(\"#inCodBiblioteca\").val(\"".$_REQUEST['inCodBiblioteca']."\"); \n";
 
     return $stJs;
 }

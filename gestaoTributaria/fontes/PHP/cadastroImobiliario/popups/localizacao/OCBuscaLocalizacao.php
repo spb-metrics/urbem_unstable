@@ -32,65 +32,62 @@
 
     * @ignore
 
-    * $Id: OCBuscaLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCBuscaLocalizacao.php 63781 2015-10-09 20:50:07Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
 
-/*
-$Log$
-Revision 1.7  2006/09/15 15:04:13  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once( CAM_GT_CIM_NEGOCIO."RCIMLocalizacao.class.php");
 include_once ( CAM_GT_CIM_COMPONENTES."MontaLocalizacaoCombos.class.php" );
-if ($_REQUEST["stCtrl"]) {
+
+if ($request->get('stCtrl')) {
     $obMontaLocalizacao = new MontaLocalizacaoCombos;
     $obMontaLocalizacao->setCadastroLocalizacao( false );
     $obMontaLocalizacao->setPopup( true );
-    switch ($_REQUEST["stCtrl"]) {
+    
+    switch ($request->get('stCtrl')) {
         case "preencheProxCombo":
-            $stNomeComboLocalizacao = "inCodLocalizacao_".( $_REQUEST["inPosicao"] - 1);
-            $stChaveLocal = $_REQUEST[$stNomeComboLocalizacao];
-            $inPosicao = $_REQUEST["inPosicao"];
-            if ( empty( $stChaveLocal ) and $_REQUEST["inPosicao"] > 2 ) {
-                $stNomeComboLocalizacao = "inCodLocalizacao_".( $_REQUEST["inPosicao"] - 2);
-                $stChaveLocal = $_REQUEST[$stNomeComboLocalizacao];
-                $inPosicao = $_REQUEST["inPosicao"] - 1;
+            $stNomeComboLocalizacao = "inCodLocalizacao_".( $request->get('inPosicao') - 1);
+            $stChaveLocal = $request->get($stNomeComboLocalizacao);
+            $inPosicao = $request->get('inPosicao');
+            if ( empty( $stChaveLocal ) and $request->get('inPosicao') > 2 ) {
+                $stNomeComboLocalizacao = "inCodLocalizacao_".( $request->get('inPosicao') - 2);
+                $stChaveLocal = $request->get($stNomeComboLocalizacao);
+                $inPosicao = $request->get('inPosicao') - 1;
             }
             $arChaveLocal = explode("-" , $stChaveLocal );
-            $obMontaLocalizacao->setCodigoVigencia    ( $_REQUEST["inCodigoVigencia"] );
+            $obMontaLocalizacao->setCodigoVigencia    ( $request->get('inCodigoVigencia') );
             $obMontaLocalizacao->setCodigoNivel       ( $arChaveLocal[0] );
             $obMontaLocalizacao->setCodigoLocalizacao ( $arChaveLocal[1] );
             $obMontaLocalizacao->setValorReduzido     ( $arChaveLocal[3] );
-            $obMontaLocalizacao->preencheProxCombo( $inPosicao , $_REQUEST["inNumNiveis"] );
+            $obMontaLocalizacao->preencheProxCombo( $inPosicao , $request->get('inNumNiveis') );
         break;
         case "preencheCombos":
-            $obMontaLocalizacao->setCodigoVigencia( $_REQUEST["inCodigoVigencia"]   );
-            $obMontaLocalizacao->setCodigoNivel   ( $_REQUEST["inCodigoNivel"]      );
-            $obMontaLocalizacao->setValorReduzido ( $_REQUEST["stChaveLocalizacao"] );
+            $obMontaLocalizacao->setCodigoVigencia( $request->get('inCodigoVigencia')   );
+            $obMontaLocalizacao->setCodigoNivel   ( $request->get('inCodigoNivel')      );
+            $obMontaLocalizacao->setValorReduzido ( $request->get('stChaveLocalizacao') );
             $obMontaLocalizacao->preencheCombos();
         break;
     }
 }
-    if ($_GET['stTipoBusca'] == "nomLocalizacao") {
+    if ($request->get('stTipoBusca') == "nomLocalizacao") {
         $obRCIMLocalizacao = new RCIMLocalizacao;
-        $obRCIMLocalizacao->setValorComposto( $_REQUEST['stChaveLocalizacao'] );
-        if ( $_REQUEST['stChaveLocalizacaoLoteamento'] )
-            $obRCIMLocalizacao->setValorComposto( $_REQUEST['stChaveLocalizacaoLoteamento'] );
+        $obRCIMLocalizacao->setValorComposto( $request->get('stChaveLocalizacao') );
+        if ( $request->get('stChaveLocalizacaoLoteamento') )
+            $obRCIMLocalizacao->setValorComposto( $request->get('stChaveLocalizacaoLoteamento') );
         $obRCIMLocalizacao->listarNomLocalizacao( $rsLocalizacao );
         $stDescricao = $rsLocalizacao->getCampo("nom_localizacao");
         $stCodigo = $rsLocalizacao->getCampo("cod_localizacao");
-        SistemaLegado::executaFrameOculto("retornaValorBscInner( '".$_GET['stNomCampoCod']."', '".$_GET['stIdCampoDesc']."', '".$_GET['stNomForm']."', '".$stDescricao."')");
-    } elseif ($_GET['stTipoBusca'] == "buscaReduzido") {
+        SistemaLegado::executaFrameOculto("retornaValorBscInner( '".$request->get('stNomCampoCod')."', '".$request->get('stIdCampoDesc')."', '".$request->get('stNomForm')."', '".$stDescricao."')");
+    } elseif ($request->get('stTipoBusca') == "buscaReduzido") {
         $obRCIMLocalizacao = new RCIMLocalizacao;
-        $obRCIMLocalizacao->setValorReduzido( $_REQUEST['stChaveLocalizacao'] );
-        $obRCIMLocalizacao->setCodigoNivel  ( $_REQUEST["inCodigoNivel"]-1);
+        $obRCIMLocalizacao->setValorReduzido( $request->get('stChaveLocalizacao') );
+        $obRCIMLocalizacao->setCodigoNivel  ( $request->get('inCodigoNivel')-1);
         $obRCIMLocalizacao->listarNomLocalizacao( $rsLocalizacao );
         $stDescricao = $rsLocalizacao->getCampo("nom_localizacao");
-        SistemaLegado::executaFrameOculto("retornaValorBscInner( '".$_GET['stNomCampoCod']."', '".$_GET['stIdCampoDesc']."', '".$_GET['stNomForm']."', '".$stDescricao."')");
+        SistemaLegado::executaFrameOculto("retornaValorBscInner( '".$request->get('stNomCampoCod')."', '".$request->get('stIdCampoDesc')."', '".$request->get('stNomForm')."', '".$stDescricao."')");
     }
+
+?>

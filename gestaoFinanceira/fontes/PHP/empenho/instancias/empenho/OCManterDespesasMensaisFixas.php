@@ -434,8 +434,6 @@ switch ($_REQUEST['stCtrl']) {
                 $stJs .= "d.getElementById('stDtVencimento').innerHTML = '".$stDtVencimento."';\n";
                 $stJs .= "f.dtVencimento.value = '".$stDtVencimento."';\n";
             }
-//			$obTEmpenhoDespesasFixas->debug();
-//			sistemaLegado::mostraVar($rsDespesasFixas);
         } else {
             $stJs = limparTudo();
         }
@@ -448,7 +446,6 @@ switch ($_REQUEST['stCtrl']) {
 
     case "incluirListaItens":
         $inCount = sizeof(Sessao::read('arItens'));
-    //	sistemaLegado::mostravar($_REQUEST);
         $inConsumo = number_format(str_replace(',','.',str_replace('.','',$_REQUEST['stConsumo'])),2,'.','');
         $inValor   = number_format(str_replace(',','.',str_replace('.','',$_REQUEST['flValor'  ])),2,'.','');
         $inValorTotal = $inConsumo * $inValor;

@@ -73,9 +73,11 @@ class  IMontaQuantidadeValores extends Objeto
         $this->obValorUnitario = new ValorUnitario();
         $this->obValorUnitario->setValue('0,0000');
 
-        $this->obQuantidade    = new Quantidade();
+        $this->obQuantidade = new Quantidade();
         $this->obQuantidade->setValue('0,0000');
-        $this->obQuantidade->setSize (23);
+        $this->obQuantidade->setSize (14);
+        $this->obQuantidade->setMaxLength(13);
+        $this->obQuantidade->setDefinicao('NUMERIC');
 
         $this->obValorTotal    = new ValorTotal();
         $this->obValorTotal->setValue('0,0000');

@@ -26,10 +26,10 @@
 /**
     * Página de Include Oculta - Exportação Arquivos GF
 
-    * Data de Criação   : 19/10/2007
+    * Data de Criação: 02/10/2015
 
-    * @author Analista: Gelson Wolvowski Gonçalves
-    * @author Desenvolvedor: Henrique Girardi dos Santos
+    * @author Analista: Valtair Santos
+    * @author Desenvolvedor: Carlos Adriano
 
     * @ignore
 
@@ -44,9 +44,9 @@ $obTTBAFiscalCadastro = new TTBAFiscalCadastro();
 $obTTBAFiscalCadastro->setDado('mes'       , $inMes);
 $obTTBAFiscalCadastro->setDado('entidades' , $stEntidades);
 $obTTBAFiscalCadastro->setDado('unidade_gestora', $inCodUnidadeGestora);
-$obTTBAFiscalCadastro->setDado('exercicio' , Sessao::getExercicio());
+$obTTBAFiscalCadastro->setDado('exercicio'  , Sessao::getExercicio());
 $obTTBAFiscalCadastro->setDado('dt_inicial' , $stDataInicial);
-$obTTBAFiscalCadastro->setDado('dt_final' , $stDataFinal);
+$obTTBAFiscalCadastro->setDado('dt_final'   , $stDataFinal);
 $obTTBAFiscalCadastro->recuperaDadosTribunal($rsFiscalCadastro);
 
 $obExportador->roUltimoArquivo->addBloco($rsFiscalCadastro);
@@ -78,6 +78,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("competencia");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-
 unset($obTTBAFiscalCadastro);
 unset($rsFiscalCadastro);
+
+?>

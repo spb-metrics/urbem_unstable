@@ -30,26 +30,16 @@
     * @author Analista:
     * @author Desenvolvedor: Leandro André Zis
 
+    $Id: FLManterCentroCusto.php 64005 2015-11-17 16:49:06Z michel $
+
     * @ignore
 
     * Casos de uso: uc-03.03.07
 */
 
-/*
-$Log$
-Revision 1.9  2006/07/18 17:50:05  fernando
-alteração de hints
-
-Revision 1.8  2006/07/06 14:05:39  diego
-Retirada tag de log com erro.
-
-Revision 1.7  2006/07/06 12:10:10  diego
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GP_ALM_NEGOCIO . "RAlmoxarifadoCentroDeCustos.class.php");
+include_once CAM_GP_ALM_NEGOCIO.'RAlmoxarifadoCentroDeCustos.class.php';
 
 $stPrograma = "ManterCentroCusto";
 $pgFilt = "FL".$stPrograma.".php";
@@ -64,10 +54,7 @@ $obRegra->roUltimaEntidade->setExercicio ( Sessao::getExercicio() );
 $obRegra->roUltimaEntidade->listar( $rsEntidade );
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if ( empty( $stAcao ) ) {
-    $stAcao = "alterar";
-}
+$stAcao = $request->get('stAcao', 'alterar');
 
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
@@ -76,23 +63,23 @@ $obHdnAcao->setValue  ( $stAcao  );
 
 $obHdnForm = new Hidden;
 $obHdnForm->setName( "nomForm" );
-$obHdnForm->setValue( $_REQUEST['nomForm'] );
+$obHdnForm->setValue( $request->get('nomForm') );
 
 $obHdnCampoNum = new Hidden;
 $obHdnCampoNum->setName( "campoNum" );
-$obHdnCampoNum->setValue( $_REQUEST['campoNum'] );
+$obHdnCampoNum->setValue( $request->get('campoNum') );
 
 //Define HIDDEN com o o nome do campo texto
 $obHdnCampoNom = new Hidden;
 $obHdnCampoNom->setName( "campoNom" );
-$obHdnCampoNom->setValue( $_REQUEST['campoNom'] );
+$obHdnCampoNom->setValue( $request->get('campoNom') );
 
 $obHdnUsuario = new Hidden;
 $obHdnUsuario->setName( "usuario" );
-$obHdnUsuario->setValue( $_REQUEST['usuario'] );
+$obHdnUsuario->setValue( $request->get('usuario', FALSE) );
 
 $obForm = new Form;
-$obForm->setAction                  ( $pgList );
+$obForm->setAction( $pgList );
 // Define SELECT multiplo para codigo da entidade
 $obCmbEntidade = new SelectMultiplo();
 $obCmbEntidade->setName       ( 'inCodEntidade'          );
@@ -110,25 +97,25 @@ $obCmbEntidade->setCampoDesc2 ( 'nom_cgm'                );
 $obCmbEntidade->SetRecord2    ( new Recordset()          );
 
 $obTxtDescricao = new TextBox;
-$obTxtDescricao->setRotulo ( "Descrição"  );
-$obTxtDescricao->setName   ( "stDescricao" );
-$obTxtDescricao->setSize ( 50 );
-$obTxtDescricao->setMaxLength ( 160 );
-$obTxtDescricao->setTitle ( "Informe a descrição do nível" );
-$obTxtDescricao->setValue  ( isset($stDescricao) ? $stDescricao : null );
+$obTxtDescricao->setRotulo      ( "Descrição"  );
+$obTxtDescricao->setName        ( "stDescricao" );
+$obTxtDescricao->setSize        ( 50 );
+$obTxtDescricao->setMaxLength   ( 160 );
+$obTxtDescricao->setTitle       ( "Informe a descrição do nível" );
+$obTxtDescricao->setValue       ( isset($stDescricao) ? $stDescricao : null );
 
 $obCmpTipoBusca = new TipoBusca( $obTxtDescricao );
 
 $obFormulario = new Formulario;
-$obFormulario->addTitulo                 ( "Dados Para o Filtro" );
-$obFormulario->addForm                   ( $obForm               );
-$obFormulario->addHidden                 ( $obHdnAcao            );
-$obFormulario->addHidden                 ( $obHdnUsuario         );
-$obFormulario->addHidden( $obHdnForm              );
-$obFormulario->addHidden( $obHdnCampoNum          );
-$obFormulario->addHidden( $obHdnCampoNom          );
-$obFormulario->addComponente             ( $obCmbEntidade        );
-$obFormulario->addComponente             ( $obCmpTipoBusca       );
+$obFormulario->addTitulo( "Dados Para o Filtro" );
+$obFormulario->addForm  ( $obForm               );
+$obFormulario->addHidden( $obHdnAcao            );
+$obFormulario->addHidden( $obHdnUsuario         );
+$obFormulario->addHidden( $obHdnForm            );
+$obFormulario->addHidden( $obHdnCampoNum        );
+$obFormulario->addHidden( $obHdnCampoNom        );
+$obFormulario->addComponente( $obCmbEntidade    );
+$obFormulario->addComponente( $obCmpTipoBusca   );
 
 $obFormulario->OK();
 $obFormulario->show();

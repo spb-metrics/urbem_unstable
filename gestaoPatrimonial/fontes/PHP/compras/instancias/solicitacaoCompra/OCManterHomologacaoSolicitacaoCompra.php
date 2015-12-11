@@ -30,7 +30,7 @@
 * @author Analista     : Cleisson
 * @author Desenvolvedor: Bruce Cruz de Sena
 
-  $Id: OCManterHomologacaoSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
+  $Id: OCManterHomologacaoSolicitacaoCompra.php 63865 2015-10-27 13:55:57Z franver $
 
 * Casos de uso: uc-03.04.02
 */
@@ -79,13 +79,13 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-    $obLista->ultimoCabecalho->setWidth(5 );
+    $obLista->ultimoCabecalho->setWidth( 3 );
     $obLista->ultimoCabecalho->setRowSpan( 2 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo('Item');
-    $obLista->ultimoCabecalho->setWidth( 17 );
+    $obLista->ultimoCabecalho->setWidth( 24 );
     $obLista->ultimoCabecalho->setRowSpan( 2 );
     $obLista->commitCabecalho();
 
@@ -97,20 +97,20 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo('Centro de Custo');
-    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->ultimoCabecalho->setWidth( 13 );
     $obLista->ultimoCabecalho->setRowSpan( 2 );
     $obLista->commitCabecalho();
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Saldo da Solicitação");
-    $obLista->ultimoCabecalho->setWidth( 32 );
+    $obLista->ultimoCabecalho->setWidth( 28 );
     $obLista->ultimoCabecalho->setColSpan( 3 );
     $obLista->commitCabecalho();
 
     if($registro_precos=='f' && $stReserva=='reserva_rigida'){
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo("Reserva Saldos");
-        $obLista->ultimoCabecalho->setWidth( 27 );
+        $obLista->ultimoCabecalho->setWidth( 26 );
         $obLista->ultimoCabecalho->setColSpan( 4 );
         $obLista->commitCabecalho();
     }
@@ -133,12 +133,12 @@ function montaSpanItens($exercicio, $cod_entidade, $cod_solicitacao, $registro_p
     if($registro_precos=='f' && $stReserva=='reserva_rigida'){
         $obLista->addCabecalho( );
         $obLista->ultimoCabecalho->addConteudo("Dotação");
-        $obLista->ultimoCabecalho->setWidth( 6 );
+        $obLista->ultimoCabecalho->setWidth( 5 );
         $obLista->commitCabecalho();
     
         $obLista->addCabecalho( );
         $obLista->ultimoCabecalho->addConteudo("Desdobramento");
-        $obLista->ultimoCabecalho->setWidth( 12 );
+        $obLista->ultimoCabecalho->setWidth( 10 );
         $obLista->commitCabecalho();
     
         $obLista->addCabecalho( );

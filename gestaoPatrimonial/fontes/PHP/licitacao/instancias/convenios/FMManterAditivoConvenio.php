@@ -125,8 +125,6 @@ $obSpanLista = new Span;
 $obSpanLista->setId("obSpanLista");
 $obSpanLista->setValue($table->getHtml());
 
-//SistemaLegado::mostraVar($_REQUEST);
-
 // monta informações dos dados dos aditivos
 if ($stAcao != "incluir") {
     $obNumeroAditivo = new Label;

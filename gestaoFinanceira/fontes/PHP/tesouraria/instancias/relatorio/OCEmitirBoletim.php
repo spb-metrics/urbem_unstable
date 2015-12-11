@@ -132,7 +132,7 @@ switch ($stCtrl) {
         $obRTesourariaRelatorioEmitirBoletim->setCgmUsuario  ( $arFiltro['inNumCgm']          );
         $obRTesourariaRelatorioEmitirBoletim->setExercicio   ( Sessao::getExercicio()         );
         $obRTesourariaRelatorioEmitirBoletim->obFTesourariaEmitirBoletim->setDado('botcems', 'false' );
-        if (SistemaLegado::is_tcems()) {
+        if (Sessao::getExercicio() > '2012') {
             $obRTesourariaRelatorioEmitirBoletim->obFTesourariaEmitirBoletim->setDado('botcems', 'true' );
         }
 

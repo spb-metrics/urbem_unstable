@@ -346,6 +346,7 @@ CREATE TABLE tcmba.obra_medicao(
     nro_nota_fiscal     VARCHAR(20)     NOT NULL,
     data_nota_fiscal    DATE            NOT NULL,
     numcgm              INTEGER         NOT NULL,
+    data_medicao        DATE            NOT NULL,
     CONSTRAINT pk_tcmba_obra_medicao    PRIMARY KEY                     (cod_obra, cod_entidade, exercicio, cod_tipo, cod_medicao),
     CONSTRAINT fk_tcmba_obra_medicao_1  FOREIGN KEY                     (cod_obra, cod_entidade, exercicio, cod_tipo)
                                         REFERENCES tcmba.obra           (cod_obra, cod_entidade, exercicio, cod_tipo),
@@ -544,7 +545,7 @@ INSERT
 VALUES
      ( 3089
      , 390
-     , 'FMManterConfiguracaoParcSubvOSCIP.php'
+     , 'FLManterConfiguracaoParcSubvOSCIP.php'
      , 'configurar'
      , 17
      , 'Parceria/Subvenção/OSCIP.'
@@ -563,12 +564,14 @@ CREATE TABLE tcmba.termo_parceria (
     dt_inicio            DATE         NOT NULL,
     dt_termino           DATE         NOT NULL,
     numcgm               INTEGER      NOT NULL,
-    processo_licitatorio VARCHAR(36),
-    processo_dispensa    VARCHAR(16),
+    processo_licitatorio VARCHAR(36)          ,
+    processo_dispensa    VARCHAR(16)          ,
     objeto               VARCHAR(400) NOT NULL,
-    nro_processo_mj      VARCHAR(36),
-    dt_processo_mj       DATE,
-    dt_publicacao_mj     DATE,
+    nro_processo_mj      VARCHAR(36)          ,
+    dt_processo_mj       DATE                 ,
+    dt_publicacao_mj     DATE                 ,
+    vl_parceiro_publico  NUMERIC(14,2)        ,
+    vl_termo_parceria    NUMERIC(14,2)        ,
     CONSTRAINT pk_tcmba_termo_parceria   PRIMARY KEY          (exercicio,cod_entidade,nro_processo),
     CONSTRAINT fk_tcmba_termo_parceria_1 FOREIGN KEY                      (exercicio, cod_entidade)
                                          REFERENCES orcamento.entidade    (exercicio, cod_entidade),
@@ -584,14 +587,14 @@ CREATE TABLE tcmba.termo_parceria_dotacao (
     nro_processo           VARCHAR(16)   NOT NULL,
     exercicio_despesa      VARCHAR(4)    NOT NULL,
     cod_despesa            INTEGER       NOT NULL,
-    CONSTRAINT pk_tcmba_termo_parceria_dotacao   PRIMARY KEY                     (exercicio, cod_entidade, nro_processo),
+    CONSTRAINT pk_tcmba_termo_parceria_dotacao   PRIMARY KEY                     (exercicio, cod_entidade, nro_processo, exercicio_despesa, cod_despesa),
     CONSTRAINT fk_tcmba_termo_parceria_dotacao_1 FOREIGN KEY                     (exercicio, cod_entidade, nro_processo)
                                                  REFERENCES tcmba.termo_parceria (exercicio, cod_entidade, nro_processo),
     CONSTRAINT fk_tcmba_termo_parceria_dotacao_2 FOREIGN KEY                     (exercicio_despesa, cod_despesa)
                                                  REFERENCES orcamento.despesa    (exercicio, cod_despesa)
 
 );
-GRANT ALL ON tcmba.termo_parceria TO urbem;
+GRANT ALL ON tcmba.termo_parceria_dotacao TO urbem;
 
 CREATE TABLE tcmba.termo_parceria_prorrogacao (
     exercicio              VARCHAR(4)    NOT NULL,

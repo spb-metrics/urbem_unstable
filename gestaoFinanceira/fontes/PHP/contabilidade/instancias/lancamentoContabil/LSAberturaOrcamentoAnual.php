@@ -46,7 +46,6 @@ $pgJS   = "JS".$stPrograma.".js";
 
 include_once ( $pgJS );
 
-//Sistemalegado::mostravar($_REQUEST);
 $boTransacao = new Transacao();
 $stFiltro = "";
 $stJs = "jQuery('#nuValor_2').hide();";

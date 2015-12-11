@@ -25,11 +25,11 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-* $Id: FTCEMGArquivoEXTRegistro20.plsql 63691 2015-09-30 13:12:31Z franver $
-* $Revision: 63691 $
+* $Id: FTCEMGArquivoEXTRegistro20.plsql 64096 2015-12-02 15:56:02Z franver $
+* $Revision: 64096 $
 * $Name$
 * $Author: franver $
-* $Date: 2015-09-30 10:12:31 -0300 (Qua, 30 Set 2015) $
+* $Date: 2015-12-02 13:56:02 -0200 (Qua, 02 Dez 2015) $
 *
 */
 
@@ -249,8 +249,18 @@ BEGIN
                      , 0.00::NUMERIC as vl_saldo_debitos
                      , 0.00::NUMERIC as vl_saldo_creditos
                      , 0.00::NUMERIC as vl_saldo_atual
-                     , '' ''::CHAR AS nat_saldo_anterior_fonte
-                     , '' ''::CHAR AS nat_saldo_atual_fonte
+                     , CASE WHEN substr(cod_estrutural,1,3) = ''3.5'' --D
+                            THEN ''D''::CHAR
+                            WHEN substr(cod_estrutural,1,3) = ''4.5'' --C
+                            THEN ''C''::CHAR
+                            ELSE '' ''::CHAR
+                        END AS nat_saldo_anterior_fonte
+                     , CASE WHEN substr(cod_estrutural,1,3) = ''3.5'' --D
+                            THEN ''D''::CHAR
+                            WHEN substr(cod_estrutural,1,3) = ''4.5'' --C
+                            THEN ''C''::CHAR
+                            ELSE '' ''::CHAR
+                        END AS nat_saldo_atual_fonte
                   FROM ( SELECT pc.cod_estrutural
                               , 20 AS tipo_registro
                               , LPAD(configuracao_entidade.valor::VARCHAR,2,''0'')::VARCHAR AS cod_orgao
@@ -258,25 +268,25 @@ BEGIN
                               , LPAD(t_be.tipo_lancamento::VARCHAR,2,''0'') as tipo_lancamento
                               , LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'') AS sub_tipo
                               , CASE  WHEN (t_be.tipo_lancamento = 1)
-                                          THEN CASE WHEN t_be.sub_tipo_lancamento = 1
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          WHEN t_be.sub_tipo_lancamento = 2
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          WHEN t_be.sub_tipo_lancamento = 3
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          WHEN t_be.sub_tipo_lancamento = 4
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          ELSE ''''
-                                     END
-                                        WHEN (t_be.tipo_lancamento = 4)
-                                        THEN CASE WHEN t_be.sub_tipo_lancamento = 1
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          WHEN t_be.sub_tipo_lancamento = 2
-                                          THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
-                                          ELSE ''''
-                                     END
-                                ELSE ''''
-                                END AS desdobra_sub_tipo                                                            
+                                      THEN CASE WHEN t_be.sub_tipo_lancamento = 1
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                WHEN t_be.sub_tipo_lancamento = 2
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                WHEN t_be.sub_tipo_lancamento = 3
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                WHEN t_be.sub_tipo_lancamento = 4
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                ELSE ''''
+                                            END
+                                      WHEN (t_be.tipo_lancamento = 4)
+                                      THEN CASE WHEN t_be.sub_tipo_lancamento = 1
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                WHEN t_be.sub_tipo_lancamento = 2
+                                                THEN LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')
+                                                ELSE ''''
+                                            END
+                                      ELSE ''''
+                                 END AS desdobra_sub_tipo                                                            
                               , CASE  WHEN (t_be.tipo_lancamento = 1)
                                           THEN CASE WHEN t_be.sub_tipo_lancamento = 1
                                           THEN LPAD(t_be.tipo_lancamento::VARCHAR,2,''0'')||LPAD(t_be.sub_tipo_lancamento::VARCHAR,4,''0'')

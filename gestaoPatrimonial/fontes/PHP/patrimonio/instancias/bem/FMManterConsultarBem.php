@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.01.06
 
-    $Id: FMManterConsultarBem.php 61776 2015-03-03 17:41:03Z carlos.silva $
+    $Id: FMManterConsultarBem.php 63945 2015-11-10 18:53:13Z arthur $
 
     */
 
@@ -46,6 +46,7 @@ include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemAtributoEspecie.class.php";
 include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
 include_once CAM_FW_HTML."MontaAtributos.class.php";
 include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemProcesso.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioReavaliacao.class.php";
 
 $stPrograma = "ManterConsultarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -61,11 +62,16 @@ $stAcao = $request->get('stAcao');
 
 //recupera os dados do bem
 $obTPatrimonioBem = new TPatrimonioBem();
-$obTPatrimonioBem->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
+$obTPatrimonioBem->setDado( 'cod_bem', $request->get('inCodBem') );
 $obTPatrimonioBem->recuperaRelacionamentoAnalitico( $rsBem );
+$obTPatrimonioBem->recuperaValorDepreciacao( $rsDepreciacao );
+
+$obTPatrimonioReavaliacao = new TPatrimonioReavaliacao();
+$obTPatrimonioReavaliacao->setDado( 'cod_bem', $request->get('inCodBem') );
+$obTPatrimonioReavaliacao->recuperaUltimaReavaliacao ( $rsUltimaReavaliacao );
 
 $obTPatrimonioBemProcesso = new TPatrimonioBemProcesso();
-$obTPatrimonioBemProcesso->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
+$obTPatrimonioBemProcesso->setDado( 'cod_bem', $request->get('inCodBem') );
 $obTPatrimonioBemProcesso->recuperaPorChave( $rsBemProcesso );
 
 //cria um novo formulario
@@ -128,15 +134,20 @@ $obLblValorBem = new Label();
 $obLblValorBem->setRotulo( 'Valor do Bem' );
 $obLblValorBem->setValue( number_format($rsBem->getCampo('vl_bem'),2,',','.') );
 
-//label para o valor da depreciacao
-$obLblValorDepreciacao = new Label();
-$obLblValorDepreciacao->setRotulo( 'Valor da Depreciação' );
-$obLblValorDepreciacao->setValue( number_format($rsBem->getCampo('vl_depreciacao'),2,',','.') );
+//label para o valor da depreciacao Inicial
+$obLblValorDepreciacaoInicial = new Label();
+$obLblValorDepreciacaoInicial->setRotulo( 'Valor da Depreciação Inicial' );
+$obLblValorDepreciacaoInicial->setValue( $rsBem->getCampo( 'vl_depreciacao' ) != '' ? number_format($rsBem->getCampo( 'vl_depreciacao' ),2,',','.') : '0,00' );
+
+//label para o valor da depreciacao Acumulada
+$obLblDepreciacaoAcumuladaExercicio = new Label();
+$obLblDepreciacaoAcumuladaExercicio->setRotulo( 'Depreciação Acumulada' );
+$obLblDepreciacaoAcumuladaExercicio->setValue( $rsDepreciacao->getCampo('vl_acumulado') != '' ? number_format($rsDepreciacao->getCampo('vl_acumulado'),2,',','.') : '0,00');
 
 //label para a data da depreciação
 $obLblDataDepreciacao = new Label();
 $obLblDataDepreciacao->setRotulo( 'Data da Depreciação' );
-$obLblDataDepreciacao->setValue( $rsBem->getCampo('dt_depreciacao') );
+$obLblDataDepreciacao->setValue( $rsDepreciacao->getCampo('dt_depreciacao') );
 
 //label para a data da aquisicao
 $obLblDataAquisicao = new Label();
@@ -264,6 +275,14 @@ $obLblMotivoBaixa = new Label();
 $obLblMotivoBaixa->setRotulo( 'Motivo' );
 $obLblMotivoBaixa->setValue( $rsBem->getCampo('motivo') );
 
+$obLblDataUltimaReavaliacao = new Label();
+$obLblDataUltimaReavaliacao->setRotulo ( 'Data Última Reavaliação' );
+$obLblDataUltimaReavaliacao->setValue  ( $rsUltimaReavaliacao->getCampo('dt_reavaliacao') );
+
+$obLblValorltimaReavaliacao = new Label();
+$obLblValorltimaReavaliacao->setRotulo ( 'Valor Última Reavaliação' );
+$obLblValorltimaReavaliacao->setValue  ( $rsUltimaReavaliacao->getCampo('vl_reavaliacao') != '' ? number_format($rsUltimaReavaliacao->getCampo('vl_reavaliacao'),2,',','.') : '0,00');
+
 //cria um button para a acao voltar
 $obBtnVoltar = new Button;
 $obBtnVoltar->setName              ( "btnVoltar" );
@@ -317,8 +336,6 @@ $obFormulario->addComponente( $obProcessoLicitatorio );
 $obFormulario->addComponente( $obLblDetalhamentoBem );
 $obFormulario->addComponente( $obLblFornecedor );
 $obFormulario->addComponente( $obLblValorBem );
-$obFormulario->addComponente( $obLblValorDepreciacao );
-$obFormulario->addComponente( $obLblDataDepreciacao );
 $obFormulario->addComponente( $obLblDataAquisicao );
 $obFormulario->addComponente( $obLblVencimentoGarantia );
 $obFormulario->addComponente( $obLblNumeroPlaca );
@@ -340,6 +357,13 @@ switch (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio())) {
         $obFormulario->addComponente($obLblTipoDocumentoFiscal      );
     break;
 }
+
+$obFormulario->addTitulo     ( 'Depreciação Inicial / Última Reavaliação' );
+$obFormulario->addComponente ( $obLblValorDepreciacaoInicial );
+$obFormulario->addComponente ( $obLblDepreciacaoAcumuladaExercicio );
+$obFormulario->addComponente ( $obLblDataDepreciacao );
+$obFormulario->addComponente ( $obLblDataUltimaReavaliacao );
+$obFormulario->addComponente ( $obLblValorltimaReavaliacao );
 
 $obFormulario->addTitulo	( 'Responsável' );
 $obFormulario->addComponente( $obLblResponsavel );

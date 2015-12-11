@@ -210,6 +210,8 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CODNOTA || '
                        AND nota_liquidacao.exercicio = '''||EXERCICIOLIQUIDACAO||'''
+                       AND nota_liquidacao.cod_empenho::TEXT =  split_part(''' || COMPLEMENTO || ''',''/'', 1)
+                       AND nota_liquidacao.exercicio_empenho::TEXT =  split_part(''' || COMPLEMENTO || ''',''/'', 2);
             ';
     ELSE
         SqlContaPg := '

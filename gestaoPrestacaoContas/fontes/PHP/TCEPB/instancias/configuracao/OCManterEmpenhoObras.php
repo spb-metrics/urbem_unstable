@@ -72,7 +72,6 @@ switch ($stCtrl) {
         $stJs .= "f.".$stNomeCombo.".options[0] = new Option('Selecione','', 'selected');\n";
         $inContador = 1;
         while ( !$rsRecordSet->eof() ) {
-            //SistemaLegado::mostravar( $rsRecordSet );
             $stCodigo = $rsRecordSet->getCampo( "num_obra" );
             $stDescr  = $rsRecordSet->getCampo( "num_obra" )." - ";
             $stDescr .= $rsRecordSet->getCampo( "descricao");

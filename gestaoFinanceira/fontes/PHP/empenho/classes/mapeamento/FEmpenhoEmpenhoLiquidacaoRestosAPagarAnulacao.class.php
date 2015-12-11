@@ -143,7 +143,7 @@ function executaFuncao(&$rsRecordSet, $boTransacao = "")
         }
     }
     if ( !$obErro->ocorreu() ) {
-        if (SistemaLegado::is_tcems($boTransacao)) {
+        if (Sessao::getExercicio() > '2012') {
             $stSql = $this->montaExecutaFuncaoTCEMS();
         } else {
             $stSql = $this->montaExecutaFuncao();

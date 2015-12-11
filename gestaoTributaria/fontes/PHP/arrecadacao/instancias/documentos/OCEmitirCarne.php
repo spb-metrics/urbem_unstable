@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Tonismar R. Bernardo
 
-  * $Id: OCEmitirCarne.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+  * $Id: OCEmitirCarne.php 63867 2015-10-27 17:25:14Z evandro $
 
   Caso de uso: uc-05.03.11
 
@@ -417,6 +417,7 @@ function montaAtributoImobiliario()
     $obCmbOrdemAtributoLote->setRotulo( "Ordem dos Atributos do Lote" );
     $obCmbOrdemAtributoLote->setNull  ( true );
     $obCmbOrdemAtributoLote->setTitle ( 'Ordem para emissão dos dados.' );
+    $obCmbOrdemAtributoLote->setOrdenacao('selecao');
 
     $obRCIMConfiguracao = new RCIMConfiguracao;
     $obRCIMConfiguracao->setCodigoModulo( 12 );
@@ -457,6 +458,7 @@ function montaAtributoImobiliario()
     $obCmbOrdemAtributoImovel->setRotulo( "Ordem dos Atributos do Imovel" );
     $obCmbOrdemAtributoImovel->setNull  ( true );
     $obCmbOrdemAtributoImovel->setTitle ( 'Ordem para emissão dos dados.' );
+    $obCmbOrdemAtributoImovel->setOrdenacao('selecao');
 
     $rsOrdemAtributoImovelS = new RecordSet;
     $obRRegra = new RCadastroDinamico ( $obRCIMConfiguracao );
@@ -493,6 +495,7 @@ function montaAtributoImobiliario()
     $obCmbOrdemAtributoEdificacao->setRotulo( "Ordem dos Atributos do Edificação" );
     $obCmbOrdemAtributoEdificacao->setNull  ( true );
     $obCmbOrdemAtributoEdificacao->setTitle ( 'Ordem para emissão dos dados.' );
+    $obCmbOrdemAtributoEdificacao->setOrdenacao('selecao');
 
     $rsOrdemAtributoEdificacaoS = new RecordSet;
     $obRRegra = new RCadastroDinamico ( $obRCIMConfiguracao );
@@ -1083,6 +1086,7 @@ switch ($_REQUEST['stCtrl']) {
         $obCmbOrdemEmissao->setRotulo( "*Ordem de Emissão" );
         $obCmbOrdemEmissao->setNull  ( true );
         $obCmbOrdemEmissao->setTitle ( 'Ordem para emissão dos dados.' );
+        $obCmbOrdemEmissao->setOrdenacao('selecao');
 
         $arOrdem = array(
             array("inTipoOrdem" => "aic2.exercicio", "stTipoOrdem" => 'Exercício'),

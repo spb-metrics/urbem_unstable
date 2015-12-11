@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCMonta2RelatorioDivida.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCMonta2RelatorioDivida.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.04.10
 */
@@ -114,7 +114,6 @@ while ( !$rsDadosRelatorio->eof() ) {
             break;
         }
     }
-//sistemaLegado::mostravar($rsDadosRelatorio );exit;
     if ($boInserir) {
         for ( $inX=0; $inX<count($arTMP); $inX++ ) {
             if ( $arTMP[$inX]["num_parcelamento"] == $rsDadosRelatorio->getCampo('num_parcelamento') ) {
@@ -136,8 +135,6 @@ while ( !$rsDadosRelatorio->eof() ) {
         $inContNum++;
         $stFiltro = " WHERE dp.num_parcelamento = ". $rsDadosRelatorio->getCampo('num_parcelamento');
         $obTDATDividaAtiva->recuperaListaDadosRelatorioDivida( $rsDadosCobranca, $stFiltro );
-//echo "num_parcelameto = ".$rsDadosRelatorio->getCampo('num_parcelamento');
-//sistemaLegado::mostravar( $rsDadosCobranca );exit;
 
         $arCobranca = array();
         $nuTotalAberto = $nuTotalPago = $nuTotalCancelado = 0.00;

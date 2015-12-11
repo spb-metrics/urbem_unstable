@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRExportarRemessaBanrisul.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRExportarRemessaBanrisul.php 63836 2015-10-22 14:06:51Z franver $
 
     * Casos de uso: uc-04.08.17
 */
@@ -105,7 +105,6 @@ while (!$rsContasConvenio->eof()) {
             $stCodOrgaos .= $rsOrgaos->getCampo("cod_orgao").",";
             $rsOrgaos->proximo();
         }
-    //sistemaLegado::mostraVar();
         $stCodOrgaos = substr($stCodOrgaos,0,strlen($stCodOrgaos)-1);
 
         $obTIMAConfiguracaoBanrisulLocal->setDado("cod_convenio"      , $rsContasConvenio->getCampo("cod_convenio"));

@@ -32,12 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenho.php 63332 2015-08-18 19:54:17Z franver $
-
-    $Revision: 32828 $
-    $Name$
-    $Autor:$
-    $Date: 2008-01-02 08:44:54 -0200 (Qua, 02 Jan 2008) $
+    $Id: PRManterEmpenho.php 64081 2015-11-30 15:36:50Z michel $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -47,7 +42,7 @@
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php" );
+include CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php";
 include CAM_GP_LIC_MAPEAMENTO.'TLicitacaoParticipanteDocumentos.class.php';
 
 //Define o nome dos arquivos PHP
@@ -65,7 +60,7 @@ $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
 $obREmpenhoEmpenhoAutorizacao = new REmpenhoEmpenhoAutorizacao;
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 //Trecho de código do filtro
 $stFiltro = '';
 if ( Sessao::read('filtro') ) {
@@ -78,7 +73,7 @@ if ( Sessao::read('filtro') ) {
 }
 
 //valida a utilização da rotina de encerramento do mês contábil
-$arDtAutorizacao = explode('/', $_POST['stDtEmpenho']);
+$arDtAutorizacao = explode('/', $request->get('stDtEmpenho'));
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9, "", $boTransacao);
 include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
@@ -97,31 +92,39 @@ switch ($stAcao) {
     $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao);
 
     if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
-        if (!$_REQUEST["inModalidadeLicitacao"] || $_REQUEST["inModalidadeLicitacao"] == '') {
+        if (!$request->get('inModalidadeLicitacao') || $request->get('inModalidadeLicitacao') == '') {
             SistemaLegado::exibeAviso("Modalidade TCMGO não informada!","n_incluir","erro");
             SistemaLegado::LiberaFrames(true,False);
             break;
         }
 
-        if ($_REQUEST['inModalidadeLicitacao'] == '10' || $_REQUEST['inModalidadeLicitacao'] == '11') {
+        if ($request->get('inModalidadeLicitacao') == '10' || $request->get('inModalidadeLicitacao') == '11') {
         
-            if (!$_REQUEST["inFundamentacaoLegal"] || $_REQUEST["inFundamentacaoLegal"] == '') {
+            if (!$request->get('inFundamentacaoLegal') || $request->get('inFundamentacaoLegal') == '') {
                 SistemaLegado::exibeAviso("Fundamentação legal não informada!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,False);
                 break;
             }
         
-            if (!$_REQUEST["stJustificativa"] || $_REQUEST["stJustificativa"] == '') {
+            if (!$request->get('stJustificativa') || $request->get('stJustificativa') == '') {
                 SistemaLegado::exibeAviso("Justificativa não informada!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,False);
                 break;
             }
         
-            if (!$_REQUEST["stRazao"] || $_REQUEST["stRazao"] == '') {
+            if (!$request->get('stRazao') || $request->get('stRazao') == '') {
                 SistemaLegado::exibeAviso("Razão da escolha não informada!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,False);
                 break;
             }
+        }
+    }
+
+    if($request->get('inNumContrato')){
+        if (sistemaLegado::comparaDatas($request->get('dtContrato'), $request->get('stDtEmpenho'), true)) {
+            SistemaLegado::exibeAviso("Data do empenho deve ser maior ou igual a data do Contrato!","n_incluir","erro");
+            SistemaLegado::LiberaFrames(true,false);
+            break;
         }
     }
 
@@ -139,26 +142,28 @@ switch ($stAcao) {
         $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
     }
 
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $_POST['inCodAutorizacao'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setCodReserva( $_POST['inCodReserva'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( $_POST['inCodTipo'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setVlReserva( $_POST['nuVlReserva'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoReservaSaldos->setVlReserva( $_POST['nuVlReserva'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $_POST['stCodClassificacao'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDescricao( $_POST['stNomEmpenho'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoHistorico->setCodHistorico( $_POST['inCodHistorico'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->setCodDespesa( $_POST['inCodDespesa'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->obROrcamentoDespesa->setCodDespesa( $_POST['inCodDespesa'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obRCGM->setNumCGM( $_POST['inCodFornecedor'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( $_POST['inCodTipo'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $_POST['inCodPreEmpenho'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodCategoria( $_REQUEST['inCodCategoria'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_POST['inCodEntidade'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtEmpenho( $_POST['stDtEmpenho'] );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtVencimento( $_POST['stDtVencimento'] );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $request->get('inCodAutorizacao') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setCodReserva( $request->get('inCodReserva') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( $request->get('inCodTipo') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setVlReserva( $request->get('nuVlReserva') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoReservaSaldos->setVlReserva( $request->get('nuVlReserva') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $request->get('stCodClassificacao') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDescricao( $request->get('stNomEmpenho') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoHistorico->setCodHistorico( $request->get('inCodHistorico') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesa') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesa') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obRCGM->setNumCGM( $request->get('inCodFornecedor') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( $request->get('inCodTipo') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodCategoria( $request->get('inCodCategoria') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtEmpenho( $request->get('stDtEmpenho') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setDtVencimento( $request->get('stDtVencimento') );
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( Sessao::getExercicio() );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodCategoria( $_REQUEST['inCodCategoria']);
-
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodCategoria( $request->get('inCodCategoria'));
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setdataEmpenho($request->get('stDtEmpenho'));
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEntidade($request->get('inCodEntidade') );
+    
     $obErro = $obREmpenhoEmpenhoAutorizacao->autorizarEmpenho($boTransacao);
 
     $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(), $boTransacao);
@@ -167,43 +172,43 @@ switch ($stAcao) {
         include_once CAM_GPC_TGO_MAPEAMENTO.'TTCMGOEmpenhoModalidade.class.php';
         $obTEmpenhoModalidade = new TTCMGOEmpenhoModalidade();
 
-        if ($_REQUEST['inModalidadeLicitacao'] == '10' || $_REQUEST['inModalidadeLicitacao'] == '11') {
+        if ($request->get('inModalidadeLicitacao') == '10' || $request->get('inModalidadeLicitacao') == '11') {
 
-            $obTEmpenhoModalidade->setDado( 'cod_entidade'      , $_REQUEST['inCodEntidade']);
+            $obTEmpenhoModalidade->setDado( 'cod_entidade'      , $request->get('inCodEntidade'));
             $obTEmpenhoModalidade->setDado( 'cod_empenho'       , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho());
             $obTEmpenhoModalidade->setDado( 'exercicio'         , Sessao::getExercicio());
-            $obTEmpenhoModalidade->setDado( 'cod_modalidade'    , $_REQUEST['inModalidadeLicitacao']);
-            $obTEmpenhoModalidade->setDado( 'cod_fundamentacao' , $_REQUEST['inFundamentacaoLegal']);
-            $obTEmpenhoModalidade->setDado( 'justificativa'     , $_REQUEST['stJustificativa']);
-            $obTEmpenhoModalidade->setDado( 'razao_escolha'     , $_REQUEST['stRazao']);
+            $obTEmpenhoModalidade->setDado( 'cod_modalidade'    , $request->get('inModalidadeLicitacao'));
+            $obTEmpenhoModalidade->setDado( 'cod_fundamentacao' , $request->get('inFundamentacaoLegal'));
+            $obTEmpenhoModalidade->setDado( 'justificativa'     , $request->get('stJustificativa'));
+            $obTEmpenhoModalidade->setDado( 'razao_escolha'     , $request->get('stRazao'));
             $obErro = $obTEmpenhoModalidade->inclusao($boTransacao);
 
         } else {
 
-            $obTEmpenhoModalidade->setDado( 'cod_entidade'      , $_REQUEST['inCodEntidade']);
+            $obTEmpenhoModalidade->setDado( 'cod_entidade'      , $request->get('inCodEntidade'));
             $obTEmpenhoModalidade->setDado( 'cod_empenho'       , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho());
             $obTEmpenhoModalidade->setDado( 'exercicio'         , Sessao::getExercicio());
-            $obTEmpenhoModalidade->setDado( 'cod_modalidade'    , $_REQUEST['inModalidadeLicitacao']);
+            $obTEmpenhoModalidade->setDado( 'cod_modalidade'    , $request->get('inModalidadeLicitacao'));
             $obErro = $obTEmpenhoModalidade->inclusao($boTransacao);
         }
 
         //Informações sobre a licitação
-        if ($_REQUEST['stProcessoLicitacao'] || $_REQUEST['stExercicioLicitacao'] || $_REQUEST['stProcessoAdministrativo']) {
+        if ($request->get('stProcessoLicitacao') || $request->get('stExercicioLicitacao') || $request->get('stProcessoAdministrativo')) {
             include_once CAM_GPC_TGO_MAPEAMENTO.'TTCMGOProcessos.class.php';
             $obTTCMGOProcessos = new TTCMGOProcessos();
             $obTTCMGOProcessos->setDado( 'cod_empenho', $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho() );
             $obTTCMGOProcessos->setDado( 'cod_entidade', $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->getCodigoEntidade() );
             $obTTCMGOProcessos->setDado( 'exercicio', $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getExercicio() );
-            $obTTCMGOProcessos->setDado( 'numero_processo', $_REQUEST['stProcessoLicitacao'] );
-            $obTTCMGOProcessos->setDado( 'exercicio_processo', $_REQUEST['stExercicioLicitacao'] );
-            $obTTCMGOProcessos->setDado( 'processo_administrativo', $_REQUEST['stProcessoAdministrativo'] );
+            $obTTCMGOProcessos->setDado( 'numero_processo', $request->get('stProcessoLicitacao') );
+            $obTTCMGOProcessos->setDado( 'exercicio_processo', $request->get('stExercicioLicitacao') );
+            $obTTCMGOProcessos->setDado( 'processo_administrativo', $request->get('stProcessoAdministrativo') );
             $obErro = $obTTCMGOProcessos->inclusao($boTransacao);
         }
     }
 
     if ( !$obErro->ocorreu() ) {
         // Adiantamentos: Faz inclusao em empenho.contrapartida_empenho
-        if ($_REQUEST['inCodCategoria'] == 2 || $_REQUEST['inCodCategoria'] == 3) {
+        if ($request->get('inCodCategoria') == 2 || $request->get('inCodCategoria') == 3) {
             include_once( TEMP."TEmpenhoContrapartidaEmpenho.class.php" );
             $obTEmpenhoContrapartidaEmpenho = new TEmpenhoContrapartidaEmpenho();
             $obTEmpenhoContrapartidaEmpenho->setDado( 'cod_empenho'         , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho() );
@@ -222,7 +227,7 @@ switch ($stAcao) {
             $obTTCERNFundebEmpenho->setDado( 'cod_empenho'         , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho() );
             $obTTCERNFundebEmpenho->setDado( 'cod_entidade'        , $_POST['inCodEntidade']             );
             $obTTCERNFundebEmpenho->setDado( 'exercicio'           , Sessao::getExercicio()                  );
-            $obTTCERNFundebEmpenho->setDado( 'cod_fundeb'          , $_REQUEST['inCodFundeb'] );
+            $obTTCERNFundebEmpenho->setDado( 'cod_fundeb'          , $request->get('inCodFundeb') );
             $obErro = $obTTCERNFundebEmpenho->inclusao($boTransacao);
 
             // Relaciona o empenho com o royalties
@@ -231,8 +236,21 @@ switch ($stAcao) {
             $obTTCERNRoyaltiesEmpenho->setDado( 'cod_empenho'         , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho() );
             $obTTCERNRoyaltiesEmpenho->setDado( 'cod_entidade'        , $_POST['inCodEntidade']             );
             $obTTCERNRoyaltiesEmpenho->setDado( 'exercicio'           , Sessao::getExercicio()                  );
-            $obTTCERNRoyaltiesEmpenho->setDado( 'cod_royalties'       , $_REQUEST['inCodRoyalties'] );
+            $obTTCERNRoyaltiesEmpenho->setDado( 'cod_royalties'       , $request->get('inCodRoyalties') );
             $obErro = $obTTCERNRoyaltiesEmpenho->inclusao($boTransacao);
+        }
+    }
+
+    if ( !$obErro->ocorreu() ) {
+        // Relaciona o empenho a contrato
+        if($request->get('inNumContrato')){
+            include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
+            $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato();
+            $obTEmpenhoEmpenhoContrato->setDado( "exercicio"    , Sessao::getExercicio());
+            $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade" , $request->get('inCodEntidade'));
+            $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"  , $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho());
+            $obTEmpenhoEmpenhoContrato->setDado( "num_contrato" , $request->get('inNumContrato'));
+            $obErro = $obTEmpenhoEmpenhoContrato->inclusao($boTransacao);
         }
     }
 
@@ -298,7 +316,7 @@ switch ($stAcao) {
     }
     $obTransacao->fechaTransacao($boFlagTransacao,$boTransacao,$obErro,$obREmpenhoEmpenhoAutorizacao->obTEmpenhoEmpenhoAutorizacao);
     if ( !$obErro->ocorreu() ) {
-        if ($_REQUEST['boEmitirLiquidacao'] == "S") {
+        if ($request->get('boEmitirLiquidacao') == "S") {
             $pgProx = CAM_GF_EMP_INSTANCIAS."liquidacao/FMManterLiquidacao.php";
             $stFiltroLiquidacao  = "&inCodEmpenho=".$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getCodEmpenho();
             $stFiltroLiquidacao .= "&inCodPreEmpenho=".$_POST['inCodPreEmpenho'];

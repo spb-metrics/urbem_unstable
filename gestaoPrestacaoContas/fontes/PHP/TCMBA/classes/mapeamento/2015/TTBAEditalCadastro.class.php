@@ -89,7 +89,7 @@ class TTBAEditalCadastro extends Persistente
                                 WHEN modalidade.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 4 THEN 22
                                 WHEN modalidade.cod_modalidade = 3 AND tipo_objeto.cod_tipo_objeto = 3 THEN 23
                            END AS edital_modalidade
-                         , licitacao.cod_processo
+                         , LPAD(licitacao.cod_processo::VARCHAR,8,'0')||licitacao.exercicio_processo AS cod_administrativo
                          , TO_CHAR(publicacao_edital.data_publicacao, 'DDMMYYYY') AS data_publicacao
                          , objeto.descricao AS objeto
                          , edital.observacao_validade_proposta AS observacao_objeto
@@ -126,12 +126,13 @@ class TTBAEditalCadastro extends Persistente
             
                      WHERE edital.exercicio = '".$this->getDado('stExercicio')."'
                        AND edital.cod_entidade IN (".$this->getDado('stEntidade').")
+                       AND modalidade.cod_modalidade NOT IN (9,8)
                        AND edital.dt_abertura_propostas BETWEEN TO_DATE('".$this->getDado('dtInicio')."', 'DD/MM/YYYY')
                                                             AND TO_DATE('".$this->getDado('dtFim')."', 'DD/MM/YYYY')
                   
                   GROUP BY edital.num_edital
                          , edital_modalidade
-                         , licitacao.cod_processo
+                         , cod_administrativo
                          , data_publicacao
                          , objeto
                          , observacao_objeto

@@ -29,7 +29,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TARRCarne.class.php 63415 2015-08-25 21:17:03Z arthur $
+    $Id: TARRCarne.class.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.11
 */
@@ -6730,7 +6730,6 @@ function recuperaDadosISSEstimativaMata(&$rsRecordSet, $stFiltro = "", $inCodPar
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaRecuperaDadosISSEstimativaMata( $stFiltro, $inCodParcela );
     $this->stDebug = $stSql;
-//sistemaLegado::mostravar($stSql);exit;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
 
     return $obErro;

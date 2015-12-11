@@ -169,7 +169,6 @@ $conn->vaiPrimeiro();
 
 //Inclusão, alteração ou exclusão de dados
 case 1:
-    //mostraVar($HTTP_POST_VARS);
     $js = "";
     $ok = true;
     $cse = new cse();

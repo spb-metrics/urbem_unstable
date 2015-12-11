@@ -458,7 +458,6 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $rsRecordSet = new RecordSet;
     $rsRecordSet->preenche( $arRecord );
 
-    //sistemaLegado::mostravar($rsRecordSet);
     return $obErro;
 }
 

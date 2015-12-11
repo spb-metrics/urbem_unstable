@@ -27,7 +27,7 @@
     * Extensão da Classe de mapeamento
     * Data de Criação: 02/10/2015
 
-    * @author Analista: Carlos Adriano
+    * @author Analista: Valtair Santos
     * @author Desenvolvedor: Carlos Adriano
 
     * @package URBEM
@@ -36,14 +36,6 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once ( CLA_PERSISTENTE );
 
-/**
-  *
-  * Data de Criação: 02/10/2015
-
-  * @author Analista: Carlos Adriano
-  * @author Desenvolvedor: Carlos Adriano
-
-*/
 class TTBAFiscalCadastro extends Persistente
 {
 /**
@@ -86,17 +78,21 @@ public function montaRecuperaDadosTribunal()
                   
            INNER JOIN sw_cgm
                    ON sw_cgm.numcgm = obra_fiscal.numcgm
+            
             LEFT JOIN sw_cgm_pessoa_fisica
                    ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+            
             LEFT JOIN sw_cgm_pessoa_juridica
                    ON sw_cgm_pessoa_juridica.numcgm = sw_cgm.numcgm
                     
                 WHERE obra_fiscal.exercicio     = '".$this->getDado('exercicio')."'
                   AND obra_fiscal.cod_entidade IN ( ".$this->getDado('entidades')." )
-                  AND obra_fiscal.data_inicio  <= TO_DATE('".$this->getDado('dt_inicial')."', 'dd/mm/yyyy')
-                  AND obra_fiscal.data_final   >= TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy') ";
+                  AND TO_CHAR( obra_fiscal.data_inicio, 'MM/YYYY') <= TO_CHAR( TO_DATE('".$this->getDado('dt_final')."', 'DD/MM/YYYY'), 'MM/YYYY')
+                  AND TO_CHAR( obra_fiscal.data_final, 'MM/YYYY')  >= TO_CHAR( TO_DATE('".$this->getDado('dt_inicial')."', 'DD/MM/YYYY'), 'MM/YYYY') ";
                     
            return $stSql;
 }
 
 }
+
+?>

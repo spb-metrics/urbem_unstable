@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCConsultaArrecadacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConsultaArrecadacao.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.01.18
 */
@@ -176,11 +176,6 @@ $obRARRCarne->obRARRParcela->setCodParcela                      ( $inCodParcela 
 $obRARRCarne->setDataPagamento                                  ( $dtPagamento      );
 $obRARRCarne->listarConsulta    ( $rsDetalheParcela, '', $dtDataUS, $dtVencimentoPR );
 
-//sistemaLegado::mostravar ( $rsDetalheParcela );
-//exit;
-
-//echo "data us = ".$dtDataUS."<br>";
-//echo "venc = ".$dtVencimentoPR."<br>";
 //$dtDataUS = $rsDetalheParcela->getCampo("parcela_vencimento_us"); //comentado 03_06
 
 $obSpnQuebra = new Span;
@@ -200,7 +195,6 @@ $obButtonAtualizarData->setTitle ( "Atualizar" );
 $obButtonAtualizarData->setNull  ( true );
 $obButtonAtualizarData->setCaminho (CAM_FW_TEMAS."/imagens/btnRefresh.png");
 
-//sistemaLegado::mostravar(Sessao::Read('stIdCarregamento'));
 //$stIdCarregamento = $_REQUEST['stIdCarregamento'];
 
 if ( $rsDetalheParcela->getCampo ('pagamento_data') ) {
@@ -221,8 +215,6 @@ $obLblNumeracao->setRotulo      ( "Ultima Numeração"   );
 $obRARRParcela = new RARRParcela ( new RARRLancamento (new RARRCalculo) );
 $obRARRParcela->setCodParcela ( $inCodParcela );
 $obRARRParcela->listarReemissaoConsulta( $rsNumeracoes );
-
-#sistemaLegado::mostravar( $rsNumeracoes );
 
 $obCmbNumeracao = new Select;
 $obCmbNumeracao->setName         ( "cmbNumeracao"               );
@@ -398,7 +390,7 @@ $stTipoBaixa = $rsDetalheParcela->getCampo("cod_lote");
 // antes de form , apresentar lista de pagamentos duplicados
 $obRARRCarne->listarPagamentosConsulta( $rsPagDuplicados );
 $rsPagDuplicados->addFormatacao("valor","NUMERIC_BR");
-#sistemaLegado::mostravar( $rsPagDuplicados );
+
 $inContPagamentos =  $rsPagDuplicados->getNumLinhas();
 $arParcelasDuplicadas = array();
 if ($inContPagamentos > 1) {
@@ -424,7 +416,6 @@ if ($inContPagamentos > 1) {
 if ( $rsPagDuplicados->getNumLinhas() > 0 ) {
 
     ########################### TABELA DOM
-    #sistemaLegado::mostravar( $rsPagDuplicados );
     $table = new Table();
     $table->setRecordset( $rsPagDuplicados );
     $table->setSummary('Pagamentos Duplicados');
@@ -661,7 +652,6 @@ $table = new Table();
 $table->setRecordset( $rsListaDetalheCreditos );
 $table->setSummary('Detalhamento por Crédio');
 
-#sistemaLegado::nmostravar( $rsListaDetalheCreditos );
 // lista zebrada
 //$table->setConditional( true , "#efefef" );
 

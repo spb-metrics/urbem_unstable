@@ -58,8 +58,6 @@ switch ($stCtrl) {
             $obRegra->obRVariavel->listar( $rsParametros );
 /*          rsFuncao nome da funcao e tipo de retorno,
             rsParametros, nome e tipo de parametros que serao passados no array da trata_erro()
-//            SistemaLegado::mostravar($rsParametros);
-//            SistemaLegado::mostravar($rsFuncao);
             */
             $prCount = 0;
             $VariaveisTipo  = Sessao::read('VariaveisTipo');
@@ -75,8 +73,6 @@ switch ($stCtrl) {
                 $stParametro    = 'stParametro_'. $_POST['stFuncao'].'_'.$rsParametros->getCorrente();
                 $$stParametro   = $_POST[ $stParametro ];
                 if ($$stParametro == '') {
-//                    SistemaLegado::mostravar("!vazia");
-
                       $arParametros = Sessao::read('arParametros');
                       $$stParametro = $arParametros[$prCount];
                 }

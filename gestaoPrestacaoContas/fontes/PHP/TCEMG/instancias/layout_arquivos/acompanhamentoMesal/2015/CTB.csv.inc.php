@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisiane Morais
   *
   * @ignore
-  * $Id: CTB.csv.inc.php 62371 2015-04-29 16:38:50Z michel $
+  * $Id: CTB.csv.inc.php 64060 2015-11-25 18:30:12Z lisiane $
   * $Date:$
   * $Author:$
   * $Rev:$
@@ -47,7 +47,6 @@ $rsRecordSet10 = new RecordSet();
 $rsRecordSet20 = new RecordSet();
 $rsRecordSet21 = new RecordSet();
 $rsRecordSet22 = new RecordSet();
-$obTTCEMGArquivoCTB = new TTCEMGArquivoCTB();
 
 $obTTCEMGCTB = new TTCEMGCTB();
 $obTTCEMGCTB->setDado('exercicio', Sessao::getExercicio());

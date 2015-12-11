@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCExportarRemessaCaixaEconomicaFederal.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportarRemessaCaixaEconomicaFederal.php 64088 2015-12-01 17:45:02Z evandro $
 
     * Casos de uso: uc-04.08.11
 */
@@ -59,7 +59,7 @@ $pgJS   = "JS".$stPrograma.".js";
 function limparSpans()
 {
     #Cadastro
-    $stJs .= "d.getElementById('spnCadastro').innerHTML = '';\n";
+    $stJs .= "jq('#spnCadastro').html('');\n";
 
     #Ativos / Aposentados / Pensionistas
     $stJs .= gerarSpanAtivosAposentadosPensionistas(false);
@@ -69,10 +69,8 @@ function limparSpans()
 
 ###########################ATIVOS / APOSENTADOS#####################################
 
-function gerarSpanAtivosAposentados()
+function gerarSpanAtivosAposentados($stSituacao)
 {
-    $stSituacao = $_GET["stSituacao"];
-
     $stJs .= limparSpans();
 
     include_once(CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php");
@@ -112,7 +110,7 @@ function gerarSpanAtivosAposentados()
     $obIFiltroComponentes->geraFormulario($obFormulario);
     $obFormulario->montaInnerHTML();
     $stHtml = $obFormulario->getHTML();
-    $stJs .= "d.getElementById('spnCadastro').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnCadastro').html('".$stHtml."'); \n";
     $stJs .= gerarSpanAtivosAposentadosPensionistas(true);
 
     return $stJs;
@@ -122,8 +120,6 @@ function gerarSpanAtivosAposentados()
 
 function gerarSpanPensionistas()
 {
-    $stSituacao = $_GET["stSituacao"];
-
     $stJs .= limparSpans();
 
     include_once(CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php");
@@ -140,7 +136,7 @@ function gerarSpanPensionistas()
     $obIFiltroComponentes->geraFormulario($obFormulario);
     $obFormulario->montaInnerHTML();
     $stHtml = $obFormulario->getHTML();
-    $stJs .= "d.getElementById('spnCadastro').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnCadastro').html('".$stHtml."'); \n";
     $stJs .= gerarSpanAtivosAposentadosPensionistas(true);
 
     return $stJs;
@@ -150,8 +146,6 @@ function gerarSpanPensionistas()
 
 function gerarSpanEstagiarios()
 {
-    $stSituacao = $_GET["stSituacao"];
-
     $stJs .= limparSpans();
 
     include_once(CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php");
@@ -167,7 +161,7 @@ function gerarSpanEstagiarios()
     $obIFiltroComponentes->geraFormulario($obFormulario);
     $obFormulario->montaInnerHTML();
     $stHtml = $obFormulario->getHTML();
-    $stJs .= "d.getElementById('spnCadastro').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnCadastro').html('".$stHtml."'); \n";
 
     return $stJs;
 }
@@ -191,111 +185,112 @@ function gerarSpanAtivosAposentadosPensionistas($boGerar = true)
         $obFormulario->montaInnerHTML();
         $stHtml = $obFormulario->getHTML();
     }
-    $stJs .= "d.getElementById('spnAtivosAposentadosPensionistas').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnAtivosAposentadosPensionistas').html('".$stHtml."'); \n";
 
     return $stJs;
 }
 
 ###########################UTILS##########################
 
-function submeter()
+function submeter(Request $request)
 {
     $obErro = new Erro();
 
-    if ($_GET["stSituacao"] == "") {
+    if ($request->get('stSituacao') == "") {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Cadastro inválido!()");
     }
 
-    if ($_GET["inTipoMovimento"] == "") {
+    if ($request->get('inTipoMovimento') == "") {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de movimento inválido!()");
     }
 
-    if ($_GET['stSituacao'] == 'ativos' or
-        $_GET['stSituacao'] == 'aposentados' or
-        $_GET["stSituacao"] == 'pensionistas' or
-        $_GET["stSituacao"] == 'todos' or
-        $_GET["stSituacao"] == 'pensao_judicial' or
-        $_GET['stSituacao'] == 'rescindidos') {
-        if ( empty($_GET["inCodMes"]) ) {
-              $obErro->setDescricao($obErro->getDescricao()."@Campo Mês da Competência inválido!()");
-        } else {
-            if ( empty($_GET["inAno"]) ) {
-                $obErro->setDescricao($obErro->getDescricao()."@Campo Ano da Competência inválido!()");
+    if ($request->get('stSituacao') == 'ativos' or
+        $request->get('stSituacao') == 'aposentados' or
+        $request->get('stSituacao') == 'pensionistas' or
+        $request->get('stSituacao') == 'todos' or
+        $request->get('stSituacao') == 'pensao_judicial' or
+        $request->get('stSituacao') == 'rescindidos') {
+            
+            if ( $request->get('inCodMes') == '' ) {
+                $obErro->setDescricao($obErro->getDescricao()."@Campo Mês da Competência inválido!()");
+            } else {
+                if ( $request->get('inAno') == '' ) {
+                    $obErro->setDescricao($obErro->getDescricao()."@Campo Ano da Competência inválido!()");
+                }
             }
-        }
 
-        //Tipo Folha
-        if ($_GET["inCodConfiguracao"] == '') {
-            $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Cálculo inválido!()");
-        } else {
-        if ($_GET["inCodConfiguracao"] == 0) {
-            if ( empty($_GET["inCodComplementar"]) ) {
-            $obErro->setDescricao($obErro->getDescricao()."@Campo Folha Complementar inválido!()");
+            //Tipo Folha
+            if ($request->get('inCodConfiguracao') == '') {
+                $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Cálculo inválido!()");
+            } else {
+                if ($request->get('inCodConfiguracao') == 0) {
+                    if ( $request->get('inCodComplementar') == '' ) {
+                        $obErro->setDescricao($obErro->getDescricao()."@Campo Folha Complementar inválido!()");
+                    }
+                } elseif ($request->get('inCodConfiguracao') == 3) {
+                    if ( $request->get('stDesdobramento') == '' ) {
+                        $obErro->setDescricao($obErro->getDescricao()."@Campo Desdobramento inválido!()");
+                    }
+                }
             }
-        } elseif ($_GET["inCodConfiguracao"] == 3) {
-            if ( empty($_GET["stDesdobramento"]) ) {
-            $obErro->setDescricao($obErro->getDescricao()."@Campo Desdobramento inválido!()");
-            }
-        }
-        }
     }
 
-    if ($_GET["stSituacao"] == "pensao_judicial" or $_GET["stSituacao"] == "todos") {
-    if (trim($_GET["stTipoFiltro"])=="") {
+    if ( ($request->get('stSituacao') == 'pensao_judicial') || ($request->get('stSituacao') == 'todos') ) {
+    if ( trim($request->get('stTipoFiltro')) == '' ) {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Filtro inválido!()");
     }
-    if ( trim($_GET["inCodConfiguracao"]) == "" ) {
+    if ( trim($request->get('inCodConfiguracao')) == '' ) {
         $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Cálculo inválido!()");
     }
     }
 
-    if ($_GET["stSituacao"] == 'ativos' or
-        $_GET["stSituacao"] == 'aposentados' or
-        $_GET["stSituacao"] == 'pensionistas' or
-        $_GET["stSituacao"] == 'rescindidos') {
-        switch ($_GET["stTipoFiltro"]) {
-            case "":
+    if ($request->get('stSituacao') == 'ativos' or
+        $request->get('stSituacao') == 'aposentados' or
+        $request->get('stSituacao') == 'pensionistas' or
+        $request->get('stSituacao') == 'rescindidos') {
+        switch ($request->get('stTipoFiltro')) {
+            case '':
                 $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Filtro do Ativos/Aposentados inválido!()");
                 break;
-            case "contrato":
-            case "contrato_rescisao":
-            case "cgm_contrato":
-            case "cgm_contrato_rescisao":
+            case 'contrato':
+            case 'contrato_rescisao':
+            case 'cgm_contrato':
+            case 'cgm_contrato_rescisao':
                 if ( count(Sessao::read("arContratos")) == 0 ) {
                     $obErro->setDescricao($obErro->getDescricao()."@A lista de contratos deve possuir pelo menos um contrato!()");
                 }
                 break;
-            case "contrato_pensionista":
-            case "cgm_contrato_pensionista":
+            case 'contrato_pensionista':
+            case 'cgm_contrato_pensionista':
                 if ( count(Sessao::read("arPensionistas")) == 0 ) {
                     $obErro->setDescricao($obErro->getDescricao()."@A lista de contratos deve possuir pelo menos um contrato!()");
                 }
                 break;
-            case "atributo_servidor":
-                if ($_GET["inCodAtributo"] == "") {
+            case 'atributo_servidor':
+                if ($request->get('inCodAtributo') == '') {
                     $obErro->setDescricao($obErro->getDescricao()."@Campo Atributo Dinâmico do Ativos/Aposentados inválido!()");
                 }
                 break;
-            case "atributo_pensionista":
-                if ($_GET["inCodAtributo"] == "") {
+            case 'atributo_pensionista':
+                if ($request->get('inCodAtributo') == '') {
                     $obErro->setDescricao($obErro->getDescricao()."@Campo Atributo Dinâmico do Pensionista inválido!()");
                 }
                 break;
         }
     }
 
-    if ($_GET["stSituacao"] == 'estagiarios') {
-        switch ($_GET["stTipoFiltro"]) {
-            case "":
+    if ($request->get('stSituacao') == 'estagiarios') {
+        switch ($request->get('stTipoFiltro')) {
+            case '':
                 $obErro->setDescricao($obErro->getDescricao()."@Campo Tipo de Filtro do Estagiário inválido!()");
                 break;
-            case "cgm_codigo_estagio":
+            case 'cgm_codigo_estagio':
                 if ( count(Sessao::read("arEstagios")) == 0 ) {
                     $obErro->setDescricao($obErro->getDescricao()."@A lista de estagiários deve possuir pelo menos um estágio!()");
                 }
                 break;
-            case "atributo_estagiario":
-                if ($_GET["inCodAtributo"] == "") {
+            case 'atributo_estagiario':
+                if ($request->get('inCodAtributo') == '') {
                     $obErro->setDescricao($obErro->getDescricao()."@Campo Atributo Dinâmico do Estagiário inválido!()");
                 }
                 break;
@@ -325,25 +320,25 @@ function limparForm()
     return $stJs;
 }
 
-function validarValores()
+function validarValores(Request $request)
 {
-    if ( !($_GET['nuValorLiquidoInicial'] === 0 and $_GET['nuValorLiquidoFinal'] === 0) ) {
-        if ($_GET['nuValorLiquidoFinal'] === 0) {
-            $_GET['nuValorLiquidoFinal'] = "";
-            $stJs .= "f.nuValorLiquidoFinal.value = '';\n";
-            if ($_GET['nuValorLiquidoInicial'] >= 0) {
+    if ( !( ($request->get('nuValorLiquidoInicial') === 0) && ($request->get('nuValorLiquidoFinal') === 0) ) ) {
+        if ($request->get('nuValorLiquidoFinal') === 0) {
+            $request->set('nuValorLiquidoFinal','');
+            $stJs .= "jq('#nuValorLiquidoFinal').val(''); \n";
+            if ($request->get('nuValorLiquidoInicial') >= 0) {
                 $stJs .= "alertaAviso('@O valor líquido final deve ser maior que o valor líquido inicial!()','form','aviso','".Sessao::getId()."');";
             }
         }
-        if ($_GET['nuValorLiquidoInicial'] != "" and $_GET['nuValorLiquidoFinal'] != "") {
-            $nuValorLiquidoInicial = str_replace('.','',$_GET['nuValorLiquidoInicial']);
+        if ( ($request->get('nuValorLiquidoInicial') != '') && ($request->get('nuValorLiquidoFinal') != '') ) {
+            $nuValorLiquidoInicial = str_replace('.','',$request->get('nuValorLiquidoInicial'));
             $nuValorLiquidoInicial = str_replace(',','.',$nuValorLiquidoInicial);
 
-            $nuValorLiquidoFinal = str_replace('.','',$_GET['nuValorLiquidoFinal']);
+            $nuValorLiquidoFinal = str_replace('.','',$request->get('nuValorLiquidoFinal'));
             $nuValorLiquidoFinal = str_replace(',','.',$nuValorLiquidoFinal);
             if ($nuValorLiquidoInicial > $nuValorLiquidoFinal) {
-                $stJs .= "f.nuValorLiquidoInicial.value = '';\n";
-                $stJs .= "f.nuValorLiquidoFinal.value = '';\n";
+                $stJs .= "jq('#nuValorLiquidoInicial').val(''); \n";
+                $stJs .= "jq('#nuValorLiquidoFinal.val(''); \n";
                 $stJs .= "alertaAviso('@O valor líquido inicial deve ser menos que o valor líquido final!()','form','aviso','".Sessao::getId()."');";
             }
         }
@@ -352,11 +347,11 @@ function validarValores()
     return $stJs;
 }
 
-function validarDataPagamento()
+function validarDataPagamento($stDtPagamento,$stDtGeracaoArquivo)
 {
     $obErro = new Erro();
-    $arDtPagamento = explode("/",$_GET["dtPagamento"]);
-    $arDtGeracaoArquivo = explode("/",$_GET["dtGeracaoArquivo"]);
+    $arDtPagamento = explode("/",$stDtPagamento);
+    $arDtGeracaoArquivo = explode("/",$stDtGeracaoArquivo);
     $dtPagamento = $arDtPagamento[2]."-".$arDtPagamento[1]."-".$arDtPagamento[0];
     $dtGeracaoArquivo = $arDtGeracaoArquivo[2]."-".$arDtGeracaoArquivo[1]."-".$arDtGeracaoArquivo[0];
     if ($dtPagamento<$dtGeracaoArquivo) {
@@ -364,15 +359,14 @@ function validarDataPagamento()
     }
     if ($obErro->ocorreu()) {
         $stJs  = "alertaAviso('@".$obErro->getDescricao()."!()','form','aviso','".Sessao::getId()."');";
-        $stJs .= "f.dtPagamento.value = '';\n";
+        $stJs .= "jq('#dtPagamento').val(''); \n";
     }
 
     return $stJs;
 }
 
 function gerarSpanPensaoJudicial()
-{
-    $stSituacao = $_GET["stSituacao"];
+{    
     $stJs .= limparSpans();
 
     include_once(CAM_GRH_PES_COMPONENTES."IFiltroComponentesDependentes.class.php");
@@ -387,7 +381,7 @@ function gerarSpanPensaoJudicial()
     $obIFiltroComponentesDependentes->geraFormulario($obFormulario);
     $obFormulario->montaInnerHTML();
     $stHtml = $obFormulario->getHTML();
-    $stJs .= "d.getElementById('spnCadastro').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnCadastro').html('".$stHtml."'); \n";
     $stJs .= gerarSpanComplementar(true);
 
     return $stJs;
@@ -410,27 +404,27 @@ function gerarSpanComplementar($boGerar = true)
     $obFormulario->montaInnerHTML();
         $stHtml = $obFormulario->getHTML();
     }
-    $stJs .= "d.getElementById('spnAtivosAposentadosPensionistas').innerHTML = '$stHtml';\n";
+    $stJs .= "jq('#spnAtivosAposentadosPensionistas').html('".$stHtml."'); \n";
 
     return $stJs;
 }
 
-function gerarSpan()
+function gerarSpan(Request $request)
 {
-    switch ($_REQUEST['stSituacao']) {
-    case "ativos":
-    case "aposentados":
-    case "rescindidos":
-    case "todos":
-        $stJs .= gerarSpanAtivosAposentados();
+    switch ($request->get('stSituacao')) {
+    case 'ativos':
+    case 'aposentados':
+    case 'rescindidos':
+    case 'todos':
+        $stJs .= gerarSpanAtivosAposentados($request->get('stSituacao'));
         break;
-    case "pensionistas":
+    case 'pensionistas':
         $stJs .= gerarSpanPensionistas();
             break;
-    case "estagiarios":
+    case 'estagiarios':
         $stJs .= gerarSpanEstagiarios();
             break;
-    case "pensao_judicial":
+    case 'pensao_judicial':
         $stJs .= gerarSpanPensaoJudicial();
         break;
     }
@@ -438,27 +432,27 @@ function gerarSpan()
     return $stJs;
 }
 
-switch ($_GET['stCtrl']) {
-    case "gerarSpan":
-    $stJs .= gerarSpan();
+switch ( $request->get('stCtrl') ) {
+    case 'gerarSpan':
+    $stJs .= gerarSpan($request);
     break;
-    case "gerarSpanAtivosAposentadosPensionistas":
-        $stJs .= gerarSpanAtivosAposentadosPensionistas();
+    case 'gerarSpanAtivosAposentadosPensionistas':
+        $stJs .= gerarSpanAtivosAposentadosPensionistas($boGerar);
         break;
-    case "limparSpans":
+    case 'limparSpans':
         $stJs .= limparSpans();
         break;
-    case "limparForm":
+    case 'limparForm':
         $stJs .= limparForm();
         break;
-    case "submeter":
-        $stJs .= submeter();
+    case 'submeter':
+        $stJs .= submeter($request);
         break;
-    case "validarValores":
-        $stJs .= validarValores();
+    case 'validarValores':
+        $stJs .= validarValores($request);
         break;
-    case "validarDataPagamento":
-        $stJs .= validarDataPagamento();
+    case 'validarDataPagamento':
+        $stJs .= validarDataPagamento($request->get('dtPagamento'),$request->get('dtGeracaoArquivo'));
         break;
 }
 

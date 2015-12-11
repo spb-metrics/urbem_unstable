@@ -32,23 +32,9 @@
 
     * @ignore
 
-    * $Id: FLBuscaLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLBuscaLocalizacao.php 63781 2015-10-09 20:50:07Z arthur $
 
     * Casos de uso: uc-05.01.03
-*/
-
-/*
-$Log$
-Revision 1.10  2007/02/06 17:47:40  cercato
-Bug #8220#
-
-Revision 1.9  2006/12/11 14:54:31  cercato
-Bug #7780#
-
-Revision 1.8  2006/09/15 15:04:13  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -143,8 +129,8 @@ $obFormulario->addHidden            ( $obHdnTipoBusca   );
 $obFormulario->addHidden            ( $obHdnCodigoVigencia );
 $obFormulario->addComponente        ( $obTxtNome        );
 $obMontaLocalizacaoCombos->geraFormulario ( $obFormulario   );
-$obFormulario->OK                ();
-$obFormulario->show            ();
+$obFormulario->OK();
+$obFormulario->show();
 $obIFrame->show();
 
 ?>

@@ -24,41 +24,22 @@
 *
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-*
-* $Id: fn_carne_parcela.plsql 59612 2014-09-02 12:00:51Z gelson $
-*
-* Caso de uso: uc-5.3.19
-* Caso de uso: uc-05.03.19
+* $Id: fn_carne_parcela.plsql 63884 2015-10-29 12:01:23Z evandro $
 */
 
-/*
-$Log$
-Revision 1.2  2006/09/15 10:20:09  fabio
-correção do cabeçalho,
-adicionado trecho de log do CVS
-
-*/
-
-CREATE OR REPLACE FUNCTION arrecadacao.fn_carne_parcela( INTEGER )  RETURNS SETOF RECORD AS '
+CREATE OR REPLACE FUNCTION arrecadacao.fn_carne_parcela( INTEGER )  RETURNS VARCHAR AS $$
 DECLARE
-    inCodParcela    ALIAS FOR $1;   
-    inRetorno       integer;
-    reRegistro      RECORD;
-    stSql           VARCHAR;
+    inCodParcela    ALIAS FOR $1;
+    stRetorno       VARCHAR:='';
 BEGIN
-    stSql := '' SELECT 
-                    numeracao 
-                FROM 
-                    arrecadacao.carne
-                WHERE 
-                    cod_parcela = ''||inCodParcela||''
-                ORDER BY timestamp desc limit 1;
-            '';
     
-    FOR reRegistro IN EXECUTE stSql LOOP
-        return next reRegistro;
-    END LOOP;
-
-    return;
+    SELECT numeracao 
+      INTO stRetorno
+      FROM arrecadacao.carne
+     WHERE cod_parcela = inCodParcela       
+     ORDER BY timestamp DESC
+     LIMIT 1;
+            
+    RETURN stRetorno;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

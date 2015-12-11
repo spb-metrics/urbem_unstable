@@ -33,7 +33,7 @@
     * @author Desenvolvedor: Fernando Piccini Cercato
     * @ignore
 
-    * $Id: FMManterResponsavelAlteracao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterResponsavelAlteracao.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.02.04
 */
@@ -238,7 +238,6 @@ $obForm->setAction( $pgProc  );
 $obForm->setTarget( "oculto" );
 
 //DEFINICAO DO FORMULARIO
-//mostravar($_REQUEST);
 $obFormulario = new Formulario;
 $obFormulario->addForm ( $obForm );
 $obFormulario->setAjuda ( "UC-05.02.04" );

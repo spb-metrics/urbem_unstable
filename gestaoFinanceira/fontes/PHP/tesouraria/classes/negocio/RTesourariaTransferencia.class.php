@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaTransferencia.class.php 60831 2014-11-18 13:21:44Z carlos.silva $
+    $Id: RTesourariaTransferencia.class.php 64153 2015-12-09 19:16:02Z evandro $
 
     $Revision: 30668 $
     $Name: $
@@ -534,7 +534,7 @@ function transferir($boTransacao = "")
                                     // Verifica qual o cod_recurso que possui conta contabil vinculada
                                     $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                    if ( SistemaLegado::is_tcems($boTransacao) ) {
+                                    if ( Sessao::getExercicio() > '2012' ) {
                                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
                                     } else {
                                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");
@@ -672,7 +672,7 @@ function estornar($boTransacao = "")
                                     // Verifica qual o cod_recurso que possui conta contabil vinculada
                                     $obTOrcamentoRecursoDestinacao->setDado('exercicio', Sessao::getExercicio());
                                     $obTOrcamentoRecursoDestinacao->setDado('cod_especificacao', $inCodEspecificacao);
-                                    if ( SistemaLegado::is_tcems( $boTransacao ) ) {
+                                    if ( Sessao::getExercicio() > '2012' ) {
                                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'8.2.1.1.1.%'");
                                     } else {
                                         $obTOrcamentoRecursoDestinacao->setDado('cod_estrutural', "'2.9.3.2.0.00.00.%'");

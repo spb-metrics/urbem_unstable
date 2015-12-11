@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCConcederRemissao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCConcederRemissao.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.04.11
 */
@@ -47,7 +47,7 @@ include_once CAM_FW_COMPONENTES.'Table/TableTree.class.php';
 function montaListaGrupoCredito(&$rsLista)
 {
     $rsLista->setPrimeiroElemento();
-    // SistemaLegado::mostravar($rsLista); exit;
+
     if ( !$rsLista->eof() ) {
         $obTableTree = new TableTree;
         $obTableTree->setRecordset            ($rsLista);

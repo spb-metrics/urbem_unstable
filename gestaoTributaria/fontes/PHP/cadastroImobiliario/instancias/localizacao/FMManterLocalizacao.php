@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterLocalizacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterLocalizacao.php 63826 2015-10-21 16:39:23Z arthur $
 
     * Casos de uso: uc-05.01.03
 */
@@ -54,9 +54,11 @@ $pgJS   = "JS".$stPrograma.".js";
 
 include_once ($pgJS);
 
+$stAcao = $request->get('stAcao');
+
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-if ( empty( $_REQUEST['stAcao'] ) ) {
-    $_REQUEST['stAcao'] = "incluir";
+if ( empty( $stAcao ) ) {
+    $stAcao = "incluir";
 }
 
 $obRCIMNivel = new RCIMNivel;
@@ -74,7 +76,7 @@ $obRCIMLocalizacao->listarNiveis( $rsNivel );
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
 $obHdnAcao->setName   ( "stAcao" );
-$obHdnAcao->setValue  ( $_REQUEST['stAcao']  );
+$obHdnAcao->setValue  ( $stAcao  );
 
 $obHdnCtrl =  new Hidden;
 $obHdnCtrl->setName   ( "stCtrl" );
@@ -117,4 +119,5 @@ $obFormulario->addComponente ( $obCmbNivel );
 $obFormulario->OK();
 $obFormulario->setFormFocus  ( $obCmbNivel->getId() );
 $obFormulario->show();
+
 ?>

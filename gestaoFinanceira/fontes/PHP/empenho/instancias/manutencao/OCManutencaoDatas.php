@@ -62,7 +62,7 @@ $pgPror = "PO".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
 $stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
-//mostraVar(//sessao);
+
 $obREmpenhoManutencaoDatas = new REmpenhoManutencaoDatas;
 $obREmpenhoManutencaoDatas->setCodEntidade      ( Sessao::read('inCodEntidade') );
 $obREmpenhoManutencaoDatas->setCodEmpenho       ( Sessao::read('inCodEmpenho') );

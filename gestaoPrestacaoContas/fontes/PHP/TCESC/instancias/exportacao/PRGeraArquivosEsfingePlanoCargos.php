@@ -149,7 +149,6 @@ function geraArquivosPlanoCargos(&$obExportador , $stDataInicial, $stDataFinal)
     $obTFlolhaPagamentoPadrao->setDado( 'dt_inicial'  , $stDataInicial );
     $obTFlolhaPagamentoPadrao->setDado( 'dt_final'  , $stDataFinal );
     $obTFlolhaPagamentoPadrao->recuperaAtualizacaoNivelEsfinge( $rsAtualizacaoNivel );
-//    sistemaLegado::mostravar( $rsAtualizacaoNivel );
 
     $obExportador->addArquivo("atualizacaocargogruporeferencianivel.txt");
     $obExportador->roUltimoArquivo->addBloco($rsAtualizacaoNivel);

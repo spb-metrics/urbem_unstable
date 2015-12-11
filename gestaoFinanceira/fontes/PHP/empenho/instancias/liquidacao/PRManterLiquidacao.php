@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterLiquidacao.php 63657 2015-09-24 21:19:41Z michel $
+    $Id: PRManterLiquidacao.php 63864 2015-10-27 13:26:11Z michel $
 
     $Revision: 32142 $
     $Name$
@@ -549,93 +549,114 @@ switch ($stAcao) {
                 if ($_REQUEST['inCodTipoDocumento'] != "") {
                     include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMDocumento.class.php';
                     $obTTCEAMDocumento = new TTCEAMDocumento;
-                    $obTTCEAMDocumento->proximoCod($inCodDocumento);
-                    $obTTCEAMDocumento->setDado('cod_documento'  , $inCodDocumento);
-                    $obTTCEAMDocumento->setDado('cod_tipo'       , $_REQUEST['inCodTipoDocumento']);
-                    $obTTCEAMDocumento->setDado('exercicio'      , Sessao::getExercicio());
-                    $obTTCEAMDocumento->setDado('cod_entidade'   , $_REQUEST['inCodEntidade']);
-                    $obTTCEAMDocumento->setDado('cod_nota'       , $obREmpenhoNotaLiquidacao->getCodNota());
-                    $obTTCEAMDocumento->setDado('vl_comprometido', $_REQUEST['nuValorComprometido']);
-                    $obTTCEAMDocumento->setDado('vl_total'       , $_REQUEST['nuValorTotal']);
-                    $obErro = $obTTCEAMDocumento->inclusao( $boTransacao );
+                    $obErro =  $obTTCEAMDocumento->proximoCod($inCodDocumento, $boTransacao);
+
+                    if (!$obErro->ocorreu()) {
+                        $obTTCEAMDocumento->setDado('cod_documento'  , $inCodDocumento);
+                        $obTTCEAMDocumento->setDado('cod_tipo'       , $_REQUEST['inCodTipoDocumento']);
+                        $obTTCEAMDocumento->setDado('exercicio'      , Sessao::getExercicio());
+                        $obTTCEAMDocumento->setDado('cod_entidade'   , $_REQUEST['inCodEntidade']);
+                        $obTTCEAMDocumento->setDado('cod_nota'       , $obREmpenhoNotaLiquidacao->getCodNota());
+                        $obTTCEAMDocumento->setDado('vl_comprometido', $_REQUEST['nuValorComprometido']);
+                        $obTTCEAMDocumento->setDado('vl_total'       , $_REQUEST['nuValorTotal']);
+                        $obErro = $obTTCEAMDocumento->inclusao( $boTransacao );
+                    }
 
                     if ( $_REQUEST['inCodTipoDocumento'] == 1 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoBilhete.class.php';
                         $obTTCEAMTipoDocumentoBilhete = new TTCEAMTipoDocumentoBilhete;
-                        $obTTCEAMTipoDocumentoBilhete->proximoCod($inCodTipoDocumentoBilhete);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('cod_tipo_documento_bilhete', $inCodTipoDocumentoBilhete);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('cod_documento'             , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('numero'                    , $_REQUEST['stNumero']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('dt_emissao'                , $_REQUEST['dtEmissao']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('dt_saida'                  , $_REQUEST['dtSaida']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('hora_saida'                , $_REQUEST['hrSaida']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('destino'                   , $_REQUEST['stDestino']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('dt_chegada'                , $_REQUEST['dtChegada']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('hora_chegada'              , $_REQUEST['hrChegada']);
-                        $obTTCEAMTipoDocumentoBilhete->setDado('motivo'                    , $_REQUEST['stMotivo']);
-                        $obErro = $obTTCEAMTipoDocumentoBilhete->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoBilhete->proximoCod($inCodTipoDocumentoBilhete, $boTransacao);
+                        
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoBilhete->setDado('cod_tipo_documento_bilhete', $inCodTipoDocumentoBilhete);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('cod_documento'             , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('numero'                    , $_REQUEST['stNumero']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('dt_emissao'                , $_REQUEST['dtEmissao']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('dt_saida'                  , $_REQUEST['dtSaida']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('hora_saida'                , $_REQUEST['hrSaida']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('destino'                   , $_REQUEST['stDestino']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('dt_chegada'                , $_REQUEST['dtChegada']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('hora_chegada'              , $_REQUEST['hrChegada']);
+                            $obTTCEAMTipoDocumentoBilhete->setDado('motivo'                    , $_REQUEST['stMotivo']);
+                            $obErro = $obTTCEAMTipoDocumentoBilhete->inclusao( $boTransacao );
+                        }
 
                     } elseif ( $_REQUEST['inCodTipoDocumento'] == 2 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoDiaria.class.php';
                         $obTTCEAMTipoDocumentoDiaria = new TTCEAMTipoDocumentoDiaria;
-                        $obTTCEAMTipoDocumentoDiaria->proximoCod($inCodTipoDocumentoDiaria);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('cod_tipo_documento_diaria', $inCodTipoDocumentoDiaria);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('cod_documento'            , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('funcionario'              , $_REQUEST['stFuncionario']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('matricula'                , $_REQUEST['stMatricula']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('dt_saida'                 , $_REQUEST['dtSaida']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('hora_saida'               , $_REQUEST['hrSaida']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('destino'                  , $_REQUEST['stDestino']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('dt_retorno'               , $_REQUEST['dtRetorno']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('hora_retorno'             , $_REQUEST['hrRetorno']);
-                        $obTTCEAMTipoDocumentoDiaria->setDado('motivo'                   , $_REQUEST['stMotivo']);
-                        $obErro = $obTTCEAMTipoDocumentoDiaria->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoDiaria->proximoCod($inCodTipoDocumentoDiaria, $boTransacao);
+                        
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoDiaria->setDado('cod_tipo_documento_diaria', $inCodTipoDocumentoDiaria);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('cod_documento'            , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('funcionario'              , $_REQUEST['stFuncionario']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('matricula'                , $_REQUEST['stMatricula']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('dt_saida'                 , $_REQUEST['dtSaida']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('hora_saida'               , $_REQUEST['hrSaida']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('destino'                  , $_REQUEST['stDestino']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('dt_retorno'               , $_REQUEST['dtRetorno']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('hora_retorno'             , $_REQUEST['hrRetorno']);
+                            $obTTCEAMTipoDocumentoDiaria->setDado('motivo'                   , $_REQUEST['stMotivo']);
+                            $obErro = $obTTCEAMTipoDocumentoDiaria->inclusao( $boTransacao );
+                        }
 
                     } elseif ( $_REQUEST['inCodTipoDocumento'] == 3 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoDiverso.class.php';
                         $obTTCEAMTipoDocumentoDiverso = new TTCEAMTipoDocumentoDiverso;
-                        $obTTCEAMTipoDocumentoDiverso->proximoCod($inCodTipoDocumentoDiverso);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('cod_tipo_documento_diverso', $inCodTipoDocumentoDiverso);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('cod_documento'             , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('numero'                    , $_REQUEST['stNumero']);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('data'                      , $_REQUEST['dtDiverso']);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('descricao'                 , $_REQUEST['stDescricao']);
-                        $obTTCEAMTipoDocumentoDiverso->setDado('nome_documento'            , $_REQUEST['stNomeDocumento']);
-                        $obErro = $obTTCEAMTipoDocumentoDiverso->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoDiverso->proximoCod($inCodTipoDocumentoDiverso, $boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoDiverso->setDado('cod_tipo_documento_diverso', $inCodTipoDocumentoDiverso);
+                            $obTTCEAMTipoDocumentoDiverso->setDado('cod_documento'             , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoDiverso->setDado('numero'                    , $_REQUEST['stNumero']);
+                            $obTTCEAMTipoDocumentoDiverso->setDado('data'                      , $_REQUEST['dtDiverso']);
+                            $obTTCEAMTipoDocumentoDiverso->setDado('descricao'                 , $_REQUEST['stDescricao']);
+                            $obTTCEAMTipoDocumentoDiverso->setDado('nome_documento'            , $_REQUEST['stNomeDocumento']);
+                            $obErro = $obTTCEAMTipoDocumentoDiverso->inclusao( $boTransacao );
+                        }
 
                     } elseif ( $_REQUEST['inCodTipoDocumento'] == 4 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoFolha.class.php';
                         $obTTCEAMTipoDocumentoFolha = new TTCEAMTipoDocumentoFolha;
-                        $obTTCEAMTipoDocumentoFolha->proximoCod($inCodTipoDocumentoFolha);
-                        $obTTCEAMTipoDocumentoFolha->setDado('cod_tipo_documento_folha', $inCodTipoDocumentoFolha);
-                        $obTTCEAMTipoDocumentoFolha->setDado('cod_documento'           , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoFolha->setDado('mes'                     , $_REQUEST['inMes']);
-                        $obTTCEAMTipoDocumentoFolha->setDado('exercicio'               , $_REQUEST['stExercicio']);
-                        $obErro = $obTTCEAMTipoDocumentoFolha->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoFolha->proximoCod($inCodTipoDocumentoFolha, $boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoFolha->setDado('cod_tipo_documento_folha', $inCodTipoDocumentoFolha);
+                            $obTTCEAMTipoDocumentoFolha->setDado('cod_documento'           , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoFolha->setDado('mes'                     , $_REQUEST['inMes']);
+                            $obTTCEAMTipoDocumentoFolha->setDado('exercicio'               , $_REQUEST['stExercicio']);
+                            $obErro = $obTTCEAMTipoDocumentoFolha->inclusao( $boTransacao );
+                        }
 
                     } elseif ( $_REQUEST['inCodTipoDocumento'] == 5 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoNota.class.php';
                         $obTTCEAMTipoDocumentoNota = new TTCEAMTipoDocumentoNota;
-                        $obTTCEAMTipoDocumentoNota->proximoCod($inCodTipoDocumentoNota);
-                        $obTTCEAMTipoDocumentoNota->setDado('cod_tipo_documento_nota', $inCodTipoDocumentoNota);
-                        $obTTCEAMTipoDocumentoNota->setDado('cod_documento'          , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoNota->setDado('numero_nota_fiscal'     , $_REQUEST['stNumeroNotaFiscal']);
-                        $obTTCEAMTipoDocumentoNota->setDado('numero_serie'           , $_REQUEST['stNumeroSerie']);
-                        $obTTCEAMTipoDocumentoNota->setDado('numero_subserie'        , $_REQUEST['stNumeroSubserie']);
-                        $obTTCEAMTipoDocumentoNota->setDado('data'                   , $_REQUEST['dtNota']);
-                        $obErro = $obTTCEAMTipoDocumentoNota->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoNota->proximoCod($inCodTipoDocumentoNota, $boTransacao);
+                        
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoNota->setDado('cod_tipo_documento_nota', $inCodTipoDocumentoNota);
+                            $obTTCEAMTipoDocumentoNota->setDado('cod_documento'          , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoNota->setDado('numero_nota_fiscal'     , $_REQUEST['stNumeroNotaFiscal']);
+                            $obTTCEAMTipoDocumentoNota->setDado('numero_serie'           , $_REQUEST['stNumeroSerie']);
+                            $obTTCEAMTipoDocumentoNota->setDado('numero_subserie'        , $_REQUEST['stNumeroSubserie']);
+                            $obTTCEAMTipoDocumentoNota->setDado('data'                   , $_REQUEST['dtNota']);
+                            $obErro = $obTTCEAMTipoDocumentoNota->inclusao( $boTransacao );
+                        }
 
                     } elseif ( $_REQUEST['inCodTipoDocumento'] == 6 && !$obErro->ocorreu() ) {
                         include_once CAM_GPC_TCEAM_MAPEAMENTO.'TTCEAMTipoDocumentoRecibo.class.php';
                         $obTTCEAMTipoDocumentoRecibo = new TTCEAMTipoDocumentoRecibo;
-                        $obTTCEAMTipoDocumentoRecibo->proximoCod($inCodTipoDocumentoRecibo);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('cod_tipo_documento_recibo', $inCodTipoDocumentoRecibo);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('cod_documento'            , $inCodDocumento);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('cod_tipo_recibo'          , $_REQUEST['inCodTipoRecibo']);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('numero'                   , $_REQUEST['stNumero']);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('valor'                    , $_REQUEST['nuValor']);
-                        $obTTCEAMTipoDocumentoRecibo->setDado('data'                     , $_REQUEST['dtRecibo']);
-                        $obErro =  $obTTCEAMTipoDocumentoRecibo->inclusao( $boTransacao );
+                        $obErro =  $obTTCEAMTipoDocumentoRecibo->proximoCod($inCodTipoDocumentoRecibo, $boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEAMTipoDocumentoRecibo->setDado('cod_tipo_documento_recibo', $inCodTipoDocumentoRecibo);
+                            $obTTCEAMTipoDocumentoRecibo->setDado('cod_documento'            , $inCodDocumento);
+                            $obTTCEAMTipoDocumentoRecibo->setDado('cod_tipo_recibo'          , $_REQUEST['inCodTipoRecibo']);
+                            $obTTCEAMTipoDocumentoRecibo->setDado('numero'                   , $_REQUEST['stNumero']);
+                            $obTTCEAMTipoDocumentoRecibo->setDado('valor'                    , $_REQUEST['nuValor']);
+                            $obTTCEAMTipoDocumentoRecibo->setDado('data'                     , $_REQUEST['dtRecibo']);
+                            $obErro =  $obTTCEAMTipoDocumentoRecibo->inclusao( $boTransacao );
+                        }
 
                     }
                 }
@@ -675,61 +696,63 @@ switch ($stAcao) {
                 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGNotaFiscalEmpenhoLiquidacao.class.php";
 
                 $obTTCEMGNotaFiscal = new TTCEMGNotaFiscal;
-                $obTTCEMGNotaFiscal->setDado( 'exercicio'                   , $_REQUEST['stExercicioNF']       	    );
-                $obTTCEMGNotaFiscal->proximoCod($inCodNota);
-
-                $obTTCEMGNotaFiscal->setDado( 'cod_nota'                    , $inCodNota                            );
-                $obTTCEMGNotaFiscal->setDado( 'cod_entidade'                , $_REQUEST['inCodEntidade']            );
-                $obTTCEMGNotaFiscal->setDado( 'data_emissao'                , $_REQUEST['dtEmissaoNF']              );
-                $obTTCEMGNotaFiscal->setDado( 'cod_tipo'                    , $_REQUEST['inCodTipoNota']            );
-                if ($_REQUEST['inNumeroNF'] != '') {
-                    $obTTCEMGNotaFiscal->setDado('nro_nota'                 , $_REQUEST['inNumeroNF']               );
-                }
-                if ($_REQUEST['inNumSerie'] != '') {
-                    $obTTCEMGNotaFiscal->setDado('nro_serie'                , $_REQUEST['inNumSerie']               );
-                }
-                if ($_REQUEST['stAIFD'] != '') {
-                    $obTTCEMGNotaFiscal->setDado('aidf'                     , $_REQUEST['stAIFD']                   );
-                }
-                if ($_REQUEST['inNumInscricaoMunicipal'] != '') {
-                    $obTTCEMGNotaFiscal->setDado('inscricao_municipal'      , $_REQUEST['inNumInscricaoMunicipal']  );
-                }
-                if ($_REQUEST['inNumInscricaoEstadual'] != '') {
-                    $obTTCEMGNotaFiscal->setDado('inscricao_estadual'       , $_REQUEST['inNumInscricaoEstadual']   );
-                }
-                if ($_REQUEST['inChave']) {
-                    $obTTCEMGNotaFiscal->setDado ( 'chave_acesso'           , $_REQUEST['inChave']                  );
-                }
-                if ($_REQUEST['inChaveMunicipal']) {
-                    $obTTCEMGNotaFiscal->setDado ( 'chave_acesso_municipal' , $_REQUEST['inChaveMunicipal']         );
-                }
-
-                $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
-                $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
-
-                $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
-                $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
-
-                $obTTCEMGNotaFiscal->setDado( 'vl_total'        , (float)$nuVlTotalDoctoFiscal);
-                $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , (float)$nuVlDescontoDoctoFiscal);
-                $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
-
-                $obErro = $obTTCEMGNotaFiscal->inclusao( $boTransacao );
+                $obTTCEMGNotaFiscal->setDado( 'exercicio'                       , $_REQUEST['stExercicioNF']            );
+                $obErro = $obTTCEMGNotaFiscal->proximoCod($inCodNota, $boTransacao);
 
                 if (!$obErro->ocorreu()) {
-                    $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
+                    $obTTCEMGNotaFiscal->setDado( 'cod_nota'                    , $inCodNota                            );
+                    $obTTCEMGNotaFiscal->setDado( 'cod_entidade'                , $_REQUEST['inCodEntidade']            );
+                    $obTTCEMGNotaFiscal->setDado( 'data_emissao'                , $_REQUEST['dtEmissaoNF']              );
+                    $obTTCEMGNotaFiscal->setDado( 'cod_tipo'                    , $_REQUEST['inCodTipoNota']            );
+                    if ($_REQUEST['inNumeroNF'] != '') {
+                        $obTTCEMGNotaFiscal->setDado('nro_nota'                 , $_REQUEST['inNumeroNF']               );
+                    }
+                    if ($_REQUEST['inNumSerie'] != '') {
+                        $obTTCEMGNotaFiscal->setDado('nro_serie'                , $_REQUEST['inNumSerie']               );
+                    }
+                    if ($_REQUEST['stAIFD'] != '') {
+                        $obTTCEMGNotaFiscal->setDado('aidf'                     , $_REQUEST['stAIFD']                   );
+                    }
+                    if ($_REQUEST['inNumInscricaoMunicipal'] != '') {
+                        $obTTCEMGNotaFiscal->setDado('inscricao_municipal'      , $_REQUEST['inNumInscricaoMunicipal']  );
+                    }
+                    if ($_REQUEST['inNumInscricaoEstadual'] != '') {
+                        $obTTCEMGNotaFiscal->setDado('inscricao_estadual'       , $_REQUEST['inNumInscricaoEstadual']   );
+                    }
+                    if ($_REQUEST['inChave']) {
+                        $obTTCEMGNotaFiscal->setDado ( 'chave_acesso'           , $_REQUEST['inChave']                  );
+                    }
+                    if ($_REQUEST['inChaveMunicipal']) {
+                        $obTTCEMGNotaFiscal->setDado ( 'chave_acesso_municipal' , $_REQUEST['inChaveMunicipal']         );
+                    }
     
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'             , $inCodNota                    );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'            , $_REQUEST['stExercicioNF']    );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'         , $_REQUEST['inCodEntidade']    );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $_REQUEST['inCodEmpenho']     );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $_REQUEST['dtExercicioEmpenho']           );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $obREmpenhoNotaLiquidacao->getCodNota()   );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , Sessao::getExercicio()        );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $nuVlTotalDoctoFiscal         );
-                    $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $nuVlTotalDoctoFiscal         );
+                    $nuVlTotalDoctoFiscal = str_replace('.', '' , $_REQUEST['nuTotalNf']);
+                    $nuVlTotalDoctoFiscal = str_replace(',', '.', $nuVlTotalDoctoFiscal);
 
-                    $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao($boTransacao);
+                    $nuVlDescontoDoctoFiscal = str_replace('.', '' , $_REQUEST['nuVlDesconto']);
+                    $nuVlDescontoDoctoFiscal = str_replace(',', '.', $nuVlDescontoDoctoFiscal);
+
+                    $obTTCEMGNotaFiscal->setDado( 'vl_total'        , (float)$nuVlTotalDoctoFiscal);
+                    $obTTCEMGNotaFiscal->setDado( 'vl_desconto'     , (float)$nuVlDescontoDoctoFiscal);
+                    $obTTCEMGNotaFiscal->setDado( 'vl_total_liquido', (float)$nuVlTotalDoctoFiscal - (float)$nuVlDescontoDoctoFiscal );
+
+                    $obErro = $obTTCEMGNotaFiscal->inclusao( $boTransacao );
+
+                    if (!$obErro->ocorreu()) {
+                        $obTTCEMGNotaFiscalEmpenho = new TTCEMGNotaFiscalEmpenhoLiquidacao;
+
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota'             , $inCodNota                    );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio'            , $_REQUEST['stExercicioNF']    );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_entidade'         , $_REQUEST['inCodEntidade']    );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_empenho'          , $_REQUEST['inCodEmpenho']     );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_empenho'    , $_REQUEST['dtExercicioEmpenho']           );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'cod_nota_liquidacao'  , $obREmpenhoNotaLiquidacao->getCodNota()   );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'exercicio_liquidacao' , Sessao::getExercicio()        );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_associado'         , $nuVlTotalDoctoFiscal         );
+                        $obTTCEMGNotaFiscalEmpenho->setDado( 'vl_liquidacao'        , $nuVlTotalDoctoFiscal         );
+
+                        $obErro = $obTTCEMGNotaFiscalEmpenho->inclusao($boTransacao);
+                    }
                 }
             }
         }
@@ -765,7 +788,7 @@ switch ($stAcao) {
                 $obTTCMBANotaFiscalLiquidacao->setDado('descricao', $request->get('stObjetoNF') );                
             }
             if ( $request->get('stUFUnidadeFederacao') ) {
-                $inCodUF = SistemaLegado::pegaDado("cod_uf","sw_uf"," WHERE sigla_uf = '".$request->get('stUFUnidadeFederacao')."'");
+                $inCodUF = SistemaLegado::pegaDado("cod_uf","sw_uf"," WHERE sigla_uf = '".$request->get('stUFUnidadeFederacao')."'", $boTransacao);
                 $obTTCMBANotaFiscalLiquidacao->setDado('cod_uf', $inCodUF );                
             }
 

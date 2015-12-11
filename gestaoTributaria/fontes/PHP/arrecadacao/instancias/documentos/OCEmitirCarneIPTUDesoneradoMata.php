@@ -821,7 +821,6 @@ switch ($_REQUEST['stCtrl']) {
         }
 
         $obRARRGrupo->listarCreditos( $rsCreditos );
-        //sistemaLegado::mostravar($rsCreditos);
 
     break;
 

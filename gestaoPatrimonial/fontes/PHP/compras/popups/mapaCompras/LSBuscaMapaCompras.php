@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: LSBuscaMapaCompras.php 63094 2015-07-24 16:57:15Z franver $
+    $Id: LSBuscaMapaCompras.php 63859 2015-10-26 17:39:34Z franver $
 
     * Casos de uso: uc-03.04.05
 */
@@ -191,60 +191,63 @@ $obTComprasMapa = new TComprasMapa;
 
 switch ($_REQUEST['stTipoBusca']) {
 
-case 'processoLicitatorio':
-    if ( $stFiltro ) $stFiltro = " and  $stFiltro ";
+    case 'verificaMapaComprasDireta':
+        if ( $stFiltro ) $stFiltro = " and  $stFiltro ";
+            $obTComprasMapa->recuperaMapaProcessoLicitatorio( $rsMapas, $stFiltro, $stOrdem );
+        break;
 
-    $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio( $rsMapas, $stFiltro, $stOrdem );
+    case 'processoLicitatorio':
+        if ( $stFiltro ) $stFiltro = " and  $stFiltro ";
+            $obTComprasMapa->recuperaMapaSemReservaProcessoLicitatorio( $rsMapas, $stFiltro, $stOrdem );
+        break;
 
-    break;
-
-case "manterContrato":
-
-    $stFiltroContrato .= "
-        EXISTS (SELECT 1
-                FROM licitacao.licitacao
-
-                INNER JOIN licitacao.contrato_licitacao
-                        ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
-                    AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
-                    AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
-                    AND contrato_licitacao.exercicio = licitacao.exercicio
-
-                INNER JOIN licitacao.contrato
-                        ON contrato_licitacao.num_contrato = contrato.num_contrato
-                    AND contrato_licitacao.cod_entidade = contrato.cod_entidade
-                    AND contrato_licitacao.exercicio = contrato.exercicio
-
-                WHERE licitacao.cod_mapa = mapa.cod_mapa
-                AND licitacao.exercicio_mapa = mapa.exercicio)
-
-        AND NOT EXISTS (
-                     SELECT 1
-                     FROM licitacao.licitacao
-
-                INNER JOIN licitacao.contrato_licitacao
-                        ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
-                    AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
-                    AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
-                    AND contrato_licitacao.exercicio = licitacao.exercicio
-
-                INNER JOIN licitacao.contrato
-                        ON contrato_licitacao.num_contrato = contrato.num_contrato
-                    AND contrato_licitacao.cod_entidade = contrato.cod_entidade
-                    AND contrato_licitacao.exercicio = contrato.exercicio
-
-                    INNER JOIN licitacao.rescisao_contrato
-                            ON contrato.exercicio = rescisao_contrato.exercicio_contrato
-                           AND contrato.cod_entidade = rescisao_contrato.cod_entidade
-                           AND contrato.num_contrato = rescisao_contrato.num_contrato
-
-                     WHERE licitacao.cod_mapa = mapa.cod_mapa
-                        AND licitacao.exercicio_mapa = mapa.exercicio
-
-                    )
+    case "manterContrato":
+    
+        $stFiltroContrato .= "
+            EXISTS (SELECT 1
+                    FROM licitacao.licitacao
+    
+                    INNER JOIN licitacao.contrato_licitacao
+                            ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
+                        AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
+                        AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
+                        AND contrato_licitacao.exercicio = licitacao.exercicio
+    
+                    INNER JOIN licitacao.contrato
+                            ON contrato_licitacao.num_contrato = contrato.num_contrato
+                        AND contrato_licitacao.cod_entidade = contrato.cod_entidade
+                        AND contrato_licitacao.exercicio = contrato.exercicio
+    
+                    WHERE licitacao.cod_mapa = mapa.cod_mapa
+                    AND licitacao.exercicio_mapa = mapa.exercicio)
+    
+            AND NOT EXISTS (
+                         SELECT 1
+                         FROM licitacao.licitacao
+    
+                    INNER JOIN licitacao.contrato_licitacao
+                            ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
+                        AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
+                        AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
+                        AND contrato_licitacao.exercicio = licitacao.exercicio
+    
+                    INNER JOIN licitacao.contrato
+                            ON contrato_licitacao.num_contrato = contrato.num_contrato
+                        AND contrato_licitacao.cod_entidade = contrato.cod_entidade
+                        AND contrato_licitacao.exercicio = contrato.exercicio
+    
+                        INNER JOIN licitacao.rescisao_contrato
+                                ON contrato.exercicio = rescisao_contrato.exercicio_contrato
+                               AND contrato.cod_entidade = rescisao_contrato.cod_entidade
+                               AND contrato.num_contrato = rescisao_contrato.num_contrato
+    
+                         WHERE licitacao.cod_mapa = mapa.cod_mapa
+                            AND licitacao.exercicio_mapa = mapa.exercicio
+    
+                        )
         ";
-    $stFiltro = $stFiltro != "" ? "where".$stFiltro."\nAND ".$stFiltroContrato : "where".$stFiltroContrato;
-    $obTComprasMapa->recuperaTodos ( $rsMapas, $stFiltro, $stOrdem );
+        $stFiltro = $stFiltro != "" ? "where".$stFiltro."\nAND ".$stFiltroContrato : "where".$stFiltroContrato;
+        $obTComprasMapa->recuperaTodos ( $rsMapas, $stFiltro, $stOrdem );
     break;
 
     case 'manterContratoCompraDireta':

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCEstornarBaixaManual.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCEstornarBaixaManual.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.10
 */
@@ -130,7 +130,6 @@ switch ($_REQUEST["stCtrl"]) {
             $js = "d.getElementById('stInscricaoEconomica').innerHTML= '&nbsp;';\n";
         }
 
-//sistemaLegado::mostravar( $js );
         SistemaLegado::executaFrameOculto($js);
         break;
 
@@ -142,7 +141,7 @@ switch ($_REQUEST["stCtrl"]) {
         if ($_REQUEST['inNumbanco']) {
             $obRMONAgencia->obRMONBanco->setNumBanco( $_REQUEST["inNumbanco"] );
             $obRMONAgencia->listarAgencia( $rsAgencia );
-            //sistemaLegado::mostravar($rsAgencia);
+
             $inContador = 1;
             while ( !$rsAgencia->eof() ) {
                 $inNumAgencia = $rsAgencia->getCampo( "num_agencia" );

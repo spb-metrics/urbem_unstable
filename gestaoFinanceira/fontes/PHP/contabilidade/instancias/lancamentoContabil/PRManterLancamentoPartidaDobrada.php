@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterLancamentoPartidaDobrada.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterLancamentoPartidaDobrada.php 63831 2015-10-22 12:51:00Z franver $
 
     * Casos de uso: uc-02.02.33
 */
@@ -53,10 +53,6 @@ $pgJs      = "JS".$stPrograma.".js";
 
 $arValoresDebito  = Sessao::read('arValoresDebito');
 $arValoresCredito = Sessao::read('arValoresCredito');
-
-//sistemaLegado::mostravar($_REQUEST);
-//sistemaLegado::mostravar($arValoresCredito);
-//sistemaLegado::mostravar($arValoresDebito);die;
 
 $rsValoresDebito  = new RecordSet;
 $rsValoresCredito = new RecordSet;

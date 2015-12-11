@@ -528,7 +528,7 @@ $obFormulario->addComponente( $obLblHistorico     );
 
 $obMontaAtributos->geraFormulario ( $obFormulario );
 
-if ( strlen($obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano()) > 0 && SistemaLegado::is_tcems()) {
+if ( strlen($obREmpenhoNotaLiquidacao->obRContabilidadePlanoContaAnaliticaDebito->getCodPlano()) > 0 && Sessao::getExercicio() > '2012') {
     $obFormulario->addTitulo( "Dados dos lançamentos contábeis" );
     $obFormulario->addTitulo( "Incorporação Patrimonial/Amortização" );
     $obFormulario->addComponente( $obILabelContaAnaliticaDeb );

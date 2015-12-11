@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Regra
 
-    * $Id: RCIMLocalizacao.class.php 63688 2015-09-29 20:32:47Z arthur $
+    * $Id: RCIMLocalizacao.class.php 64014 2015-11-18 17:13:21Z evandro $
 
      * Casos de uso: uc-05.01.03
 */
@@ -102,8 +102,14 @@ var $stValorComposto;//valor de todos os niveis da localizacao concateneados
 var $stValorReduzido;//valor de todos os niveis que possuem localizacao
 /**
     * @access Private
+    * @var boolean
+*/
+var $boLocalizacaoAutomatica;
+/**
+    * @access Private
     * @var Object
 */
+
 var $obTCIMLocalizacaoNivel;
 /**
     * @access Private
@@ -176,7 +182,11 @@ function setValorComposto($valor) { $this->stValorComposto     = $valor; }
     * @param String $valor
 */
 function setValorReduzido($valor) { $this->stValorReduzido     = $valor; }
-
+/**
+    * @access Public
+    * @param String $valor
+*/
+function setLocalizacaoAutomatica($valor) { $this->boLocalizacaoAutomatica = $valor; }
 /**
     * @access Public
     * @return Integer
@@ -219,8 +229,12 @@ function getValorComposto() { return $this->stValorComposto;    }
     * @return String
 */
 function getValorReduzido() { return $this->stValorReduzido;    }
-
-/**?
+/**
+    * @access Public
+    * @return boolean
+*/
+function getLocalizacaoAutomatica() { return $this->boLocalizacaoAutomatica; }
+/**
      * Método construtor
      * @access Private
 */
@@ -245,35 +259,42 @@ function incluirLocalizacao($boTransacao = "")
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     if ( !$obErro->ocorreu() ) {
+        
         $obErro = $this->obTCIMLocalizacao->proximoCod( $this->inCodigoLocalizacao, $boTransacao );
+        
         if ( !$obErro->ocorreu() ) {
             //MONTA O CODIGO COMPOSTO
             $obErro = $this->recuperaMascaraNiveis( $rsMascaraNivel, $boTransacao );
             $rsMascaraNivel->ordena("cod_nivel");
-            $obErro = $this->consultarNivel( $boTransacao );
-            $stCodigoMascara  = $this->arChaveLocalizacao[ count($this->arChaveLocalizacao) - 1 ][3].".";
-            $stCodigoMascara .= str_pad( $this->stValor, strlen($this->stMascara), "0", STR_PAD_LEFT );
+            $obErro = $this->consultarNivel( $boTransacao );            
+            
+            if ( empty($this->arChaveLocalizacao) ) {
+                $stCodigoMascara  = $this->stValor.".";                
+            }else{
+                $stCodigoMascara  = $this->arChaveLocalizacao[ count($this->arChaveLocalizacao) - 1 ][3].".";
+                $stCodigoMascara .= str_pad( $this->stValor, strlen($this->stMascara), "0", STR_PAD_LEFT );
+            }
+
             $stMascaraComposta = '';
             $rsMascaraNivel->setPrimeiroElemento();
             $i = 1;
-
             $stCodigoComposto = '';
             while ( !$rsMascaraNivel->eof() ) {
-                $stMascaraComposta .= $rsMascaraNivel->getCampo("mascara").".";
                 $stMascaraNivel = str_replace( "9", "0", $rsMascaraNivel->getCampo("mascara") );
                 $stMascaraNivel = preg_replace("/[A-Za-z]/","0",$stMascaraNivel);
-                $stCodigoComposto .= $rsMascaraNivel->getCampo("cod_nivel") == $this->getCodigoNivel() ? $stCodigoMascara."." : $stMascaraNivel.".";
+                $stCodigoComposto .= str_pad( $stMascaraNivel, strlen($stMascaraNivel), "0", STR_PAD_LEFT ).".";
                 $rsMascaraNivel->proximo();
             }
-            $stMascaraComposta = substr( $stMascaraComposta, 0, (-1*strlen($this->stMascara)) );
-            $stCodigoComposto = substr( $stCodigoComposto, 0,   (-1*strlen($this->stMascara)) );
 
-            $corteMascara = strlen($stCodigoComposto) - strlen($stMascaraComposta);
-            $stCodigoComposto = substr( $stCodigoComposto, $corteMascara);
+            //Retira o '.' no final
+            $stCodigoComposto = substr( $stCodigoComposto , 0, -1 );
+            $stCodigoComposto = substr( $stCodigoComposto , strlen($stCodigoMascara) );
+            $stCodigoComposto = $stCodigoMascara.$stCodigoComposto;
 
             //EXECUTA A INCLUSAO NA TABELA LOCALIZACAO
             $this->setValorComposto ( $stCodigoComposto );
             $obErro = $this->verificaNomeLocalizacao( $boTransacao );
+            
             if ( !$obErro->ocorreu() )
                 $obErro = $this->verificaCodigoComposto ( $boTransacao );
 
@@ -282,6 +303,7 @@ function incluirLocalizacao($boTransacao = "")
                 $this->obTCIMLocalizacao->setDado( "nom_localizacao", $this->stNomeLocalizacao   );
                 $this->obTCIMLocalizacao->setDado( "codigo_composto", $stCodigoComposto          );
                 $obErro = $this->obTCIMLocalizacao->inclusao( $boTransacao );
+
                 if ( !$obErro->ocorreu() ) {
                     if ($this->dtAliquotaVigencia) {
                         $obTCIMLocalizacaoAliquota = new TCIMLocalizacaoAliquota;
@@ -318,9 +340,9 @@ function incluirLocalizacao($boTransacao = "")
                             //[0] = cod_nivel | [1] = cod_localizacao | [2] = valor
                             $this->obTCIMLocalizacaoNivel->setDado( "cod_nivel"      , $arChaveLocalizacao[0] );
                             $this->obTCIMLocalizacaoNivel->setDado( "cod_localizacao", $this->inCodigoLocalizacao );
-                            //MASCARA O VALOR CONFORME O MASCARA DO NIVEL
-                            $stValor = $arChaveLocalizacao[2];
-                            $this->obTCIMLocalizacaoNivel->setDado( "valor"          , $arChaveLocalizacao[2] );
+                            //Manda o valor sem mascara para o banco
+                            $stValor = preg_replace( "/0/", "", trim( $arChaveLocalizacao[2] ) );
+                            $this->obTCIMLocalizacaoNivel->setDado( "valor"          , $stValor );
                             $obErro = $this->obTCIMLocalizacaoNivel->inclusao( $boTransacao );
                             if ( $obErro->ocorreu() ) {
                                 break;
@@ -364,12 +386,6 @@ function incluirLocalizacao($boTransacao = "")
                             $this->obRCadastroDinamico->setChavePersistenteValores( $arChavePersistenteValores );
                             $obErro = $this->obRCadastroDinamico->salvarValores( $boTransacao );
                         }
-                        //UPDATE PARA ATUALIZAR OS CÓDIGO COMPOSTOS
-/*                        if ( !$obErro->ocorreu() ) {
-                            $this->obTCIMLocalizacao->setDado( "valor" , $this->getValorComposto() );
-                            $obErro = $this->obTCIMLocalizacao->atualizaLocalizacao( $boTransacao );
-                        }
-*/
                     }
                 }
             }
@@ -727,7 +743,7 @@ function listarLocalizacao(&$rsRecordSet , $boTransacao = "")
     }
     if ($stFiltro) { $stFiltro = " WHERE ".SUBSTR( $stFiltro, 0, STRLEN( $stFiltro ) - 4 ); }
     $stOrdem = " ORDER BY valor_composto";
-    //$obErro = $this->obTCIMLocalizacao->recuperaLocalizacaoAtiva( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
+    
     $obErro = $this->obVCIMLocalizacaoAtiva->recuperaTodos( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
     
     return $obErro;
@@ -903,7 +919,6 @@ function listarNomLocalizacao(&$rsRecordSet , $boTransacao = "")
 {
     $stFiltro = "";
     if ($this->stValorReduzido) {
-//        $stFiltro .= " codigo_composto like '".$this->stValorReduzido."%' AND";
         $stFiltro .= " publico.fn_mascarareduzida(codigo_composto)='".$this->stValorReduzido."' AND";
     }
     if ($this->inCodigoNivel) {
@@ -1033,12 +1048,13 @@ function verificaNomeLocalizacao($boTransacao = "", $inCodLocalizacao = "")
 //verifica se o codigo composto já existe;
 function verificaCodigoComposto($boTransacao = "")
 {
+    global $request;
     $obErro = new Erro;
     if ( $this->getValorComposto() ) {
         $obErro = $this->listarNomLocalizacao($rsLoc, $boTransacao);
 
         if ( $rsLoc->getNumLinhas() > 0 ) {
-        $obErro->setDescricao("Localização já existe com o código [ ".$_REQUEST['inValorLocalizacao']." ] para este nível!");
+            $obErro->setDescricao("Localização já existe com o código [ ".$request->get("inValorLocalizacao")." ] para este nível!");
         }
 
     }
@@ -1046,5 +1062,38 @@ function verificaCodigoComposto($boTransacao = "")
     return $obErro;
 }
 
+/**
+    * Retorna o valor do último codigo conforme filtros setados
+    * @access Public
+    * @param  Object $rsRecordSet Objeto RecordSet preenchido com os dados selecionados
+    * @param  Object $obTransacao Parâmetro Transação
+    * @return Object Objeto Erro
+*/
+function ultimorValorComposto(&$rsRecordSet , $boTransacao = "")
+{
+    $stFiltro = "";
+    $stOrdem = "";
+    
+    if ($this->inCodigoVigencia) {
+        $stFiltro .= " cod_vigencia = ".$this->inCodigoVigencia." AND";
+    }
+    
+    if ($this->inCodigoNivel) {
+        $this->obVCIMLocalizacaoAtiva->setDado("cod_nivel", $this->inCodigoNivel );
+        $stFiltro .= " cod_nivel = ".$this->inCodigoNivel." AND";
+    }
+    
+    if ($this->stValorReduzido && $this->inCodigoNivel != 1) {
+        $stFiltro .= " valor_reduzido like '".$this->stValorReduzido."%' AND";
+    }
+    
+    if ($stFiltro) { $stFiltro = " WHERE ".SUBSTR( $stFiltro, 0, STRLEN( $stFiltro ) - 4 ); }
+
+    $obErro = $this->obVCIMLocalizacaoAtiva->recuperaUltimoValorComposto( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
+        
+    return $obErro;
 }
+
+}
+
 ?>

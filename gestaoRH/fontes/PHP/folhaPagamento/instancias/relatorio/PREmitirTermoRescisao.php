@@ -358,7 +358,7 @@ function preencheTermoRescisao(&$obPDF,$arDados,$arEventos,$boPageBreak)
     $obPDF->Text   ( 18,88+$inIncremento,  $arDados["num_causa"]."-".substr($arDados["descricao"],0,45) );
     $obPDF->Text   ( 101,88+$inIncremento, $arDados["num_sefip"] );
     $obTPessoalPensao = new TPessoalPensao();
-    //SistemaLegado::mostraVar($arDados["registro"]);
+
     $rsPensao = new RecordSet();
     $stFiltroPensao = " WHERE cod_servidor = ".$arDados["cod_servidor"];
     $obTPessoalPensao->recuperaRelacionamento($rsPensao,$stFiltroPensao);

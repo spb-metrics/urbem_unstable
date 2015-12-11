@@ -165,8 +165,6 @@ class TTGOTRB extends PERSISTENTE
                               transferencia.exercicio,
                               recurso_credito.cod_fonte";*/
 //        $stSql .= "    AND LTRIM(split_part(num_conta_corrente,'-',1),'0') <> LTRIM(split_part(conta_corrente_debito.num_conta_corrente_debito,'-',1),'0') \n";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
         return $stSql;
     }
 
@@ -382,8 +380,6 @@ class TTGOTRB extends PERSISTENTE
                               transferencia.exercicio,
                               recurso_debito.cod_fonte";*/
 //        $stSql .= "    AND LTRIM(split_part(num_conta_corrente,'-',1),'0') <> LTRIM(split_part(conta_corrente_credito.num_conta_corrente_credito,'-',1),'0') \n";
-    //sistemaLegado::mostravar($stSql);
-    //die('Fim');
         return $stSql;
     }
 }

@@ -64,10 +64,13 @@ DECLARE
     stDataFinal                         VARCHAR;
     stDataInicial                       VARCHAR;
     stFormula                           VARCHAR;
+    stSqlEventoFixos                    VARCHAR;
+    stSqlAux                            VARCHAR;
     stTimestamp                         TIMESTAMP;
     reRegistro                          RECORD;
     reSalario                           RECORD;
     reFerias                            RECORD;
+    reEventosConfigurados               RECORD;
     nuQuantidade                        NUMERIC;
     nuHorasMensais                      NUMERIC;
     nuHorasMensaisPadrao                NUMERIC;
@@ -83,6 +86,7 @@ DECLARE
     boParcelaFerias                     BOOLEAN;
     boProporcional                      BOOLEAN;
     inMesCarencia                       INTEGER;
+    inCodContrato                       INTEGER;
     crCursor                            REFCURSOR;
 BEGIN
     boRetorno := removerTodosBuffers();
@@ -108,12 +112,15 @@ BEGIN
     --FIM######################################
 
     --INÍCIO###################################
+    
+
     --Processo de cópia dos eventos para o novo periodo de movimentacao
     inCodRegistro := selectIntoInteger('SELECT max(cod_registro)+1 FROM folhapagamento'|| stEntidade ||'.registro_evento_periodo');
     stSql := '   SELECT registro_evento.*
                       , registro_evento_periodo.cod_contrato
                       , registro_evento_parcela.parcela
                       , registro_evento_parcela.mes_carencia
+                      , evento.fixado
                    FROM folhapagamento'|| stEntidade ||'.registro_evento
                       , folhapagamento'|| stEntidade ||'.registro_evento_periodo
                       , folhapagamento'|| stEntidade ||'.ultimo_registro_evento
@@ -130,8 +137,10 @@ BEGIN
                     AND (parcela is null or pega0MaiorParcela(registro_evento.quantidade,registro_evento_periodo.cod_contrato,registro_evento_periodo.cod_periodo_movimentacao,registro_evento.cod_evento) < registro_evento_parcela.parcela)
                     AND NOT EXISTS (SELECT 1
                                       FROM pessoal'|| stEntidade ||'.contrato_servidor_caso_causa
-                                     WHERE registro_evento_periodo.cod_contrato = contrato_servidor_caso_causa.cod_contrato)';
+                                     WHERE registro_evento_periodo.cod_contrato = contrato_servidor_caso_causa.cod_contrato)
+                    ORDER BY registro_evento_periodo.cod_contrato';
     stTimestamp := now()::text::timestamp(3);
+    inCodContrato := 0;
     FOR reRegistro IN EXECUTE stSql
     LOOP
         inMesCarencia := reRegistro.mes_carencia;
@@ -306,7 +315,191 @@ BEGIN
             EXECUTE stSql;
             inCodRegistro := inCodRegistro + 1;
         END IF;
-    END LOOP;
+
+
+        --Valida contrato para inserir apenas 1 vez em cada contrado os eventos automaticos
+        --Busca dados na configuracao de eventos automaticos
+        --Gestão Recursos Humanos :: Folha de Pagamento :: Configuração :: Configurar Eventos Automáticos
+        IF inCodContrato != reRegistro.cod_contrato THEN
+            stSqlEventoFixos := '
+                    SELECT  evento_evento.cod_evento
+                            ,evento_evento.valor_quantidade  
+                    FROM( SELECT evento_evento.*
+                          FROM folhapagamento.evento_evento
+                          INNER JOIN( SELECT cod_evento
+                                             ,MAX(timestamp) as timestamp
+                                        FROM folhapagamento.evento_evento as max
+                                        GROUP BY cod_evento
+                                ) as max
+                            ON evento_evento.cod_evento = max.cod_evento
+                            AND evento_evento.timestamp = max.timestamp         
+                    ) as evento_evento
+                    
+                    INNER JOIN (SELECT regexp_split_to_table(valor,'','')::integer as cod_evento 
+                                    FROM administracao.configuracao 
+                                    WHERE cod_modulo = 27 
+                                    AND exercicio = '''||stExercicio||'''
+                                    AND parametro = ''evento_automatico''
+                    ) as evento_fixo_configurado    
+                        ON evento_evento.cod_evento = evento_fixo_configurado.cod_evento';
+            FOR reEventosConfigurados IN EXECUTE stSqlEventoFixos
+            LOOP
+                /*
+                    INSERE OS EVENTOS AUTOMATICOS CONFIGURADOS
+                    SE folhapagamento.evento.fixado = Q ENTAO
+                        Gravar na coluna registro_evento.quantidade com o valor de folhapagamento.evento_evento.valor_quantidade
+                    SENAO folhapagamento.evento.fixado = V
+                        Gravar na coluna registro_evento.valor com o valor de folhapagamento.evento_evento.valor_quantidade
+                */
+
+                IF reRegistro.fixado = 'Q' THEN        
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_periodo 
+                                    (   
+                                        cod_registro
+                                        ,cod_periodo_movimentacao
+                                        ,cod_contrato
+                                    )
+                                    VALUES 
+                                    (   
+                                        '|| inCodRegistro ||'
+                                        ,'|| inCodPeriodoMovimentacaoAberta ||'
+                                        ,'|| reRegistro.cod_contrato ||'
+                                    )';
+                    EXECUTE stSqlAux;
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento 
+                                    (   
+                                        cod_registro
+                                        ,cod_evento
+                                        ,timestamp
+                                        ,valor
+                                        ,quantidade
+                                        ,proporcional
+                                        ,automatico
+                                    )
+                                    VALUES 
+                                    (
+                                        '|| inCodRegistro ||'
+                                        ,'|| reEventosConfigurados.cod_evento ||'
+                                        ,'|| quote_literal(stTimestamp) ||'
+                                        , 0.00 
+                                        ,'|| reEventosConfigurados.valor_quantidade ||'
+                                        ,false
+                                        ,false
+                                    )';
+                    EXECUTE stSqlAux;
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.ultimo_registro_evento 
+                                    (
+                                        cod_registro
+                                        ,cod_evento
+                                        ,timestamp
+                                    )
+                                    VALUES 
+                                    (
+                                        '|| inCodRegistro ||'
+                                        ,'|| reEventosConfigurados.cod_evento ||'
+                                        ,'|| quote_literal(stTimestamp) ||'
+                                    )';
+                    EXECUTE stSqlAux;
+
+                    IF reRegistro.parcela IS NOT NULL THEN
+                        stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_parcela 
+                                            (cod_registro
+                                                ,cod_evento
+                                                ,timestamp
+                                                ,parcela
+                                                ,mes_carencia
+                                            )
+                                            VALUES 
+                                            (
+                                                '|| inCodRegistro ||'
+                                                ,'|| reEventosConfigurados.cod_evento ||'
+                                                ,'|| quote_literal(stTimestamp) ||'
+                                                ,'|| reRegistro.parcela ||'
+                                                ,'|| inMesCarencia ||'
+                                            )';
+                        EXECUTE stSqlAux;
+                    END IF;
+            
+                ELSEIF reRegistro.fixado = 'V' THEN
+    
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_periodo 
+                                    (
+                                        cod_registro
+                                        ,cod_periodo_movimentacao
+                                        ,cod_contrato
+                                    )
+                                    VALUES 
+                                    (
+                                        '|| inCodRegistro ||'
+                                        ,'|| inCodPeriodoMovimentacaoAberta ||'
+                                        ,'|| reRegistro.cod_contrato ||'
+                                    )';
+                    EXECUTE stSqlAux;
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento 
+                                    (
+                                        cod_registro
+                                        ,cod_evento
+                                        ,timestamp
+                                        ,valor
+                                        ,quantidade
+                                        ,proporcional
+                                        ,automatico
+                                    )
+                                    VALUES 
+                                    (
+                                        '|| inCodRegistro ||'
+                                        ,'|| reEventosConfigurados.cod_evento ||'
+                                        ,'|| quote_literal(stTimestamp) ||'
+                                        ,'|| reEventosConfigurados.valor_quantidade ||'
+                                        , 0.00 
+                                        ,false
+                                        ,false
+                                    )';
+                    EXECUTE stSqlAux;
+                    stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.ultimo_registro_evento 
+                                    (
+                                        cod_registro
+                                        ,cod_evento
+                                        ,timestamp
+                                    )
+                                    VALUES 
+                                    (
+                                        '|| inCodRegistro ||'
+                                        ,'|| reEventosConfigurados.cod_evento ||'
+                                        ,'|| quote_literal(stTimestamp) ||'
+                                    )';
+                    EXECUTE stSqlAux;
+                    
+                    IF reRegistro.parcela IS NOT NULL THEN
+                        stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_parcela 
+                                            (cod_registro
+                                                ,cod_evento
+                                                ,timestamp
+                                                ,parcela
+                                                ,mes_carencia
+                                            )
+                                            VALUES 
+                                            (
+                                                '|| inCodRegistro ||'
+                                                ,'|| reEventosConfigurados.cod_evento ||'
+                                                ,'|| quote_literal(stTimestamp) ||'
+                                                ,'|| reRegistro.parcela ||'
+                                                ,'|| inMesCarencia ||'
+                                            )';
+                        EXECUTE stSqlAux;
+                    END IF;
+
+                END IF;        
+            
+            inCodRegistro := inCodRegistro + 1;
+    
+            END LOOP; --END LOOP EVENTOS AUTOMATICOS CONFIGURADOS
+        END IF; --IF cod contrato
+
+        --Atribuindo o contrato para a validacao dos eventos automaticos
+        inCodContrato := reRegistro.cod_contrato;
+        
+    END LOOP;-- END LOOP FINAL
     --FIM######################################
 
     --INÍCIO###################################

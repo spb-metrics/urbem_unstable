@@ -142,7 +142,6 @@ if ($_REQUEST['stMostrarDescricaoRecurso'] == 'S') {
 }
 
 $preview->addAssinaturas(Sessao::read('assinaturas'));
-//SistemaLegado::mostravar($preview->arParametros);
 $preview->preview();
 
 ?>

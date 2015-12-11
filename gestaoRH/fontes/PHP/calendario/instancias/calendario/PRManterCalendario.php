@@ -86,9 +86,6 @@ switch ($stAcao) {
             }
         }
 
-        //SistemaLegado::mostravar($obRegra->getDescricao());
-        //die;
-
         $obErro = $obRegra->Salvar();
         if ( !$obErro->ocorreu() ) {
             sistemaLegado::alertaAviso($pgForm,"Calendário inserido com sucesso!".$request->get('inCodFeriado'),"inserir","aviso", Sessao::getId(), "../");

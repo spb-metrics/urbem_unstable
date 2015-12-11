@@ -44,16 +44,6 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  EMPENHO.PRE_EMPENHO
-  * Data de Criação: 30/11/2004
-
-  * @author Analista: Jorge B. Ribarr
-  * @author Desenvolvedor: Eduardo Martins
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TEmpenhoPreEmpenho extends Persistente
 {
     /**
@@ -275,7 +265,6 @@ class TEmpenhoPreEmpenho extends Persistente
         $stSql .= "                               '".$this->getDado( "exercicio" )."'  \n";
         $stSql .= "                               ,".$this->getDado( "cod_despesa" )." \n";
         $stSql .= "                               ) AS saldo_anterior                  \n";
-    
         return $stSql;
     }
 
@@ -339,6 +328,86 @@ class TEmpenhoPreEmpenho extends Persistente
         $stSql .= "                               ,'".Sessao::read('data_reserva_saldo_GF')."' \n";
         $stSql .= "                               ) AS saldo_anterior                  \n";
     
+        return $stSql;
+    }
+    
+     /**
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function recuperaSaldoAnteriorDataEmpenho(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
+        $stSql = $this->montaRecuperaSaldoAnteriorDataEmpenho();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+    /**
+        * Seta os dados pra fazer o montaRecuperaSaldoAnteriorDataEmpenho
+        * @access Private
+        * @return $stSql
+    */
+    public function montaRecuperaSaldoAnteriorDataEmpenho()
+    {
+        $stSql  = "SELECT empenho.fn_saldo_dotacao_data_empenho ( '".$this->getDado( "exercicio" )."'
+                                                                 , ".$this->getDado( "cod_despesa" )."
+                                                                 ,'".$this->getDado( "dt_empenho" )."'
+                                                                 , ".$this->getDado( "entidade" )."
+                                                                 , '".$this->getDado( "tipo_emissao" )."'
+                                                                ) AS saldo_anterior ";
+    
+        return $stSql;
+    }
+    
+     /**
+        * @access Public
+        * @param  Object  $rsRecordSet Objeto RecordSet
+        * @param  String  $stOrdem     String de Ordenação do SQL (ORDER BY)
+        * @param  Boolean $boTransacao
+        * @return Object  Objeto Erro
+    */
+    public function recuperaSaldoAnteriorDataAtualEmpenho(&$rsRecordSet, $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    
+        $stSql = $this->montaRecuperaSaldoAnteriorDataAtualEmpenho();
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+
+    /**
+        * Seta os dados pra fazer o recuperaSaldoAnteriorDataAtualEmpenho
+        * @access Private
+        * @return $stSql
+    */
+    public function montaRecuperaSaldoAnteriorDataAtualEmpenho()
+    {
+        $stSql  = "SELECT empenho.fn_saldo_dotacao_data_atual_empenho (  '".$this->getDado( "exercicio" )."'  
+                                                                       , ".$this->getDado( "cod_despesa" )." 
+                                                                       , '".Sessao::read('data_reserva_saldo_GF')."'
+                                                                       , '".$this->getDado( "dt_empenho" )."'
+                                                                       ,  ".$this->getDado( "entidade" )."
+                                                                       ,  '".$this->getDado( "tipo_emissao" )."'
+                                                                      ) AS saldo_anterior ";
         return $stSql;
     }
 

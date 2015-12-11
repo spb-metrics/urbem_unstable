@@ -99,7 +99,6 @@ if ($boUtilizarEncerramentoMes == 'false') {
         }
     }
 
-    // SistemaLegado::mostravar($arTmp); exit;
     //*****************************************************//
     // Define COMPONENTES DO FORMULARIO
     //*****************************************************//

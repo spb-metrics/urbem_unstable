@@ -245,6 +245,7 @@ class IBscEvento
         $this->obBscInnerEvento->obCampoCod->setPreencheComZeros ( "E"     );
         $this->obBscInnerEvento->obCampoCod->setMascara ( $stMascaraEvento );
         $this->obBscInnerEvento->obCampoDescrHidden->setName( "hdnDescEvento" );
+        $this->obBscInnerEvento->obCampoDescrHidden->setId  ( "hdnDescEvento" );
 
         $this->obTxtValor = new Numerico;
         $this->obTxtValor->setName      ( "nuValorEvento"                  );

@@ -37,6 +37,8 @@ CREATE TYPE depreciacao_automatica AS (
     , dt_reavaliacao                    DATE
     , vida_util                         INTEGER
     , motivo                            VARCHAR
+    , exercicio_aquisicao               VARCHAR
+    , mes_aquisicao                     INTEGER
 );
 */
 
@@ -125,6 +127,8 @@ stQuery := '   SELECT  bem.cod_bem
                     ,  reavaliacao.dt_reavaliacao
                     ,  reavaliacao.vida_util
                     ,  reavaliacao.motivo
+                    ,  to_char(bem.dt_aquisicao, ''YYYY'')::VARCHAR AS exercicio_aquisicao
+                    ,  to_char(bem.dt_aquisicao, ''MM'')::INTEGER AS mes_aquisicao
                     
                  FROM patrimonio.bem
 
@@ -220,7 +224,7 @@ FOR rcBens IN EXECUTE stQuery LOOP
     IF inCodContaAnalitica IS NULL THEN
        RAISE EXCEPTION 'Conta Contábil de Depreciação Acumulada % do bem % não é analítica ou não está cadastrada no plano de contas.',rcBens.cod_plano, rcBens.cod_bem;
     END IF;
-        
+
     -- Calcula o valor da quota, para a primeira inserção e dos proximos meses
     -- Caso o bem tenha depreciação acelerada, soma junto ao calculo de depreciação.
     IF (rcBens.depreciacao_acelerada IS TRUE) THEN
@@ -230,7 +234,7 @@ FOR rcBens IN EXECUTE stQuery LOOP
         vlQuota := TRUNC((rcBens.quota_depreciacao_anual/12),2);
         vlQuotaPrimeira := vlQuota + (rcBens.quota_depreciacao_anual - (vlQuota * 12));
     END IF;
-    
+
     stQueryDepreciacao :=  'SELECT    vl_bem
                                     , vl_atualizado
                                     , vl_acumulado

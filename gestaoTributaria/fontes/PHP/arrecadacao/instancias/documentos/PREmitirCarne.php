@@ -27,7 +27,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: tonismar R. Bernardo
 
-  * $Id: PREmitirCarne.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+  * $Id: PREmitirCarne.php 64141 2015-12-08 16:23:59Z evandro $
 
   Caso de uso: uc-05.03.11
 
@@ -323,9 +323,17 @@ switch ($stAcao) {
                             //pegar novo vencimento 
                             $arTmp = explode("_",$valor);
                             $stTmp = "dtNovoVencimento_".$arTmp[1];
-
-                            if ($_REQUEST[$stTmp] && preg_match("/vboReemitir_[0-9]/",$valor) ) {
-                                $dtNovoVencimento = $_REQUEST[$stTmp];
+                            
+                            //Caso usuario não passe data de vencimento 
+                            //e for marcada para reemissao será executada apenas a reemissao sem calculo de juros ou multa algum
+                            $boApenasReemitir = false;  
+                            if ( preg_match("/vboReemitir_[0-9]/",$valor) ) {
+                                if ( $_REQUEST[$stTmp] == '' ) {
+                                    $boApenasReemitir = true;
+                                    $dtNovoVencimento = $dtVencimento;
+                                }else{
+                                    $dtNovoVencimento = $_REQUEST[$stTmp];
+                                }
                             } else {
                                 $dtNovoVencimento = $dtVencimento;
 
@@ -407,16 +415,17 @@ switch ($stAcao) {
                                 $obRARRCarne->obRMONConvenio->setCodigoConvenio( $inCodConvenioAtual);
                                 $obRARRCarne->obRMONCarteira->setCodigoCarteira( $inCodCarteiraAtual );
 
-                                $arReemissao = array(   "cod_convenio"   => $inCodConvenio,
-                                                        "cod_carteira"   => $inCodCarteira,
-                                                        "cod_lancamento" => $inLancamento,
-                                                        "info_parcela"   => $nrParcela,
-                                                        "cod_parcela"    => $inParcela,
-                                                        "vencimento"     => $dtVencimento,
-                                                        "valor_anterior" => $flValorAnterior,
-                                                        "valor"          => $flValor,
-                                                        "numeracao"      => $numeracao,
-                                                        "numcgm"         => $inNumCgm );
+                                $arReemissao = array(   "cod_convenio"     => $inCodConvenio,
+                                                        "cod_carteira"     => $inCodCarteira,
+                                                        "cod_lancamento"   => $inLancamento,
+                                                        "info_parcela"     => $nrParcela,
+                                                        "cod_parcela"      => $inParcela,
+                                                        "vencimento"       => $dtVencimento,
+                                                        "valor_anterior"   => $flValorAnterior,
+                                                        "valor"            => $flValor,
+                                                        "numeracao"        => $numeracao,
+                                                        "numcgm"           => $inNumCgm,
+                                                         );
                                 
                                 $obErro = $obRARRCarne->efetuaReemitirCarne( $arReemissao, $boTransacao );
 
@@ -429,7 +438,8 @@ switch ($stAcao) {
                                                                                             "exercicio"   => $stExercicio,
                                                                                             "numcgm"      => $inNumCgm,
                                                                                             "numeracao"   => $inNumeracao,
-                                                                                            "inscricao"   => $inInscricao
+                                                                                            "inscricao"   => $inInscricao,
+                                                                                            "boApenasReemitir" => $boApenasReemitir
                                                                                             );
                             }
                         } else {
@@ -439,14 +449,16 @@ switch ($stAcao) {
                                                                                         "exercicio"   => $stExercicio,
                                                                                         "numcgm"      => $inNumCgm,
                                                                                         "numeracao"   => $numeracao,
-                                                                                        "inscricao"   => $inInscricao
+                                                                                        "inscricao"   => $inInscricao,
+                                                                                        "boApenasReemitir" => $boApenasReemitir
                                                                                         );
 
                             $arNaoImpressas[] = array( "numeracao"     => $numeracao,
                                                                         "cod_convenio"  => $inCodConvenio,
                                                                         "cod_parcela"   => $inParcela,
                                                                         "exercicio"     => $stExercicio,
-                                                                        "inscricao"     => $inInscricao
+                                                                        "inscricao"     => $inInscricao,
+                                                                        "boApenasReemitir" => $boApenasReemitir
                                                                         );
                         }
 
@@ -787,7 +799,14 @@ switch ($stAcao) {
                         SistemaLegado::LiberaFrames();
                         exit;
                 } else {
-                    $stOrdemEmissao   = implode(",",$_REQUEST["inCodOrdemSelecionados"]);
+                    if ($stVinculo == 'imobiliario') {
+                        $arCodOrdem = $_REQUEST["inCodOrdemSelecionados"];
+                        foreach ( $arCodOrdem as $value) {
+                            $arTmp[] = substr($value, 5);
+                        }
+                        $stOrdemEmissaoFuncao = implode(",",$arTmp);
+                    }
+                    $stOrdemEmissao = implode(",",$_REQUEST["inCodOrdemSelecionados"]);
                 }
                 
                 $stPadraoCodBarra = $_REQUEST['stPadraoCodBarra'];
@@ -868,8 +887,9 @@ switch ($stAcao) {
                 Sessao::write('inscricoes_lista', $arTMP );
                 Sessao::write('total_listar', count($arTMP) );
                 
-                Sessao::write("TipoEmissao"     , $stTipoEmissao );
-                Sessao::write("OrdemEmissao"    , $stOrdemEmissao );
+                Sessao::write("TipoEmissao"       , $stTipoEmissao );
+                Sessao::write("OrdemEmissao"      , $stOrdemEmissao );
+                Sessao::write("OrdemEmissaoFuncao", $stOrdemEmissaoFuncao );
 
                 Sessao::write("OrdemLote"       , $stCodOrdemLoteSelecionados );
                 Sessao::write("OrdemImovel"     , $stCodOrdemImovelSelecionados );
@@ -919,8 +939,9 @@ switch ($stAcao) {
             $obListaEmissao->inCodGrupo    = 0;
         }
 
-        $obListaEmissao->stTipoEmissao  = Sessao::read("TipoEmissao");
-        $obListaEmissao->stOrdemEmissao = Sessao::read("OrdemEmissao");
+        $obListaEmissao->stTipoEmissao        = Sessao::read("TipoEmissao");
+        $obListaEmissao->stOrdemEmissao       = Sessao::read("OrdemEmissao");
+        $obListaEmissao->stOrdemEmissaoFuncao = Sessao::read("OrdemEmissaoFuncao");
 
         if ($stVinculo == 'imobiliario') {
             $obListaEmissao->stOrdemLote       = Sessao::read("OrdemLote");
@@ -1012,7 +1033,7 @@ switch ($stAcao) {
         $contArEmissao = $contInscricao = 0;
 
         $rsEmissaoCarne->setPrimeiroElemento();
-
+        
         while (!$rsEmissaoCarne->eof()) {
             $inInscricaoAtual         = $rsEmissaoCarne->getCampo('inscricao');
             $inCodLancamentoAtual     = $rsEmissaoCarne->getCampo('cod_lancamento');
@@ -1037,14 +1058,15 @@ switch ($stAcao) {
                     $obRCIMLote->obRCadastroDinamico->setCodCadastro (2);
                     $contAtributo = 0;
 
-                    while ($contAtributo < count($arOrdemLote) -1) {
+                    while ($contAtributo < count($arOrdemLote) ) {
                         $arChaveAtributoLote = array(
                             "cod_lote" => $inCodLoteAtual,
                             "cod_atributo" => $arOrdemLote[$contAtributo]
                         );
 
                         $obRCIMLote->obRCadastroDinamico->setChavePersistenteValores($arChaveAtributoLote);
-                        $obRCIMLote->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
+                        $obRCIMLote->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos,"","",$boTransacao );
+                        
                         if ( $rsAtributos->getCampo('nom_tipo') == 'Lista' ) {
                             $arValores = explode ('[][][]',$rsAtributos->getCampo('valor_padrao_desc'));
                             $arValorPadrao = explode (',', $rsAtributos->getCampo('valor_padrao'));
@@ -1063,7 +1085,23 @@ switch ($stAcao) {
                             $valorDoAtributo = $rsAtributos->getCampo('valor');
                         }
 
-                        $rsEmissaoCarne->setCampo ('atributo_'.$contagemAtributos, $valorDoAtributo );
+                        switch ( $rsAtributos->getCampo('cod_atributo') ) {
+                            //Quadra
+                            case 5:
+                                $rsEmissaoCarne->setCampo ('atributo_1', $valorDoAtributo );
+                                break;
+                            //Lote
+                            case 7:
+                                $rsEmissaoCarne->setCampo ('atributo_2', $valorDoAtributo );
+                                break;
+                            default:
+                                if ($contagemAtributos < 5) {
+                                    $contagemAtributos = 5;
+                                }
+                                $rsEmissaoCarne->setCampo ('atributo_'.$contagemAtributos, $valorDoAtributo );
+                                break;
+                        }
+                        
                         $contagemAtributos++;
                         $contAtributo++;
                     }
@@ -1073,7 +1111,7 @@ switch ($stAcao) {
                     $obRCIMImovel->obRCadastroDinamico->obRModulo->setCodModulo( 12 );
                     $obRCIMImovel->obRCadastroDinamico->setCodCadastro ( 4 );
                     $contAtributo = 0;
-                    while ( $contAtributo < count ( $arOrdemImovel ) -1 ) {
+                    while ( $contAtributo < count ( $arOrdemImovel ) ) {
                         $arChaveAtributoLote = array(
                             "cod_lote" => $inCodLoteAtual,
                             "inscricao_municipal" => $inInscricaoAtual,
@@ -1081,7 +1119,7 @@ switch ($stAcao) {
                         );
 
                         $obRCIMImovel->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoLote );
-                        $obRCIMImovel->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
+                        $obRCIMImovel->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos,"","",$boTransacao );
 
                         #$arValores = $arValorPadrao = $valorDoAtributo = null;
                         if ( $rsAtributos->getCampo('nom_tipo') == 'Lista' ) {
@@ -1102,7 +1140,23 @@ switch ($stAcao) {
                             $valorDoAtributo = $rsAtributos->getCampo('valor');
                         }
 
-                        $rsEmissaoCarne->setCampo ('atributo_'.$contagemAtributos, $valorDoAtributo );
+                        switch ( $rsAtributos->getCampo('cod_atributo') ) {
+                            //Zona
+                            case 106:
+                                $rsEmissaoCarne->setCampo ('atributo_3', $valorDoAtributo );
+                                break;
+                            //Uso do solo
+                            case 8:
+                                $rsEmissaoCarne->setCampo ('atributo_4', $valorDoAtributo );
+                                break;
+                            default:
+                                if ($contagemAtributos < 5) {
+                                    $contagemAtributos = 5;
+                                }
+                                $rsEmissaoCarne->setCampo ('atributo_'.$contagemAtributos, $valorDoAtributo );
+                                break;
+                        }
+                        
                         $contagemAtributos++;
                         $contAtributo++;
                     }
@@ -1113,7 +1167,7 @@ switch ($stAcao) {
                     $obRCIMEdificacao->obRCadastroDinamico->obRModulo->setCodModulo( 12 );
                     $obRCIMEdificacao->obRCadastroDinamico->setCodCadastro ( 5 );
                     $contAtributo = 0;
-                    while ( $contAtributo < count ( $arOrdemEdificacao ) - 1 ) {
+                    while ( $contAtributo < count ( $arOrdemEdificacao ) ) {
                         $arChaveAtributoLote = array (
                             "cod_lote" => $inCodLoteAtual,
                             "cod_construcao" => $inCodConstrucaoAtual,
@@ -1122,7 +1176,7 @@ switch ($stAcao) {
                         );
 
                         $obRCIMEdificacao->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributoLote );
-                        $obRCIMEdificacao->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
+                        $obRCIMEdificacao->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos,"","",$boTransacao );
 
                         if ( $rsAtributos->getCampo('nom_tipo') == 'Lista' ) {
                             $arValores = explode ('[][][]', $rsAtributos->getCampo('valor_padrao_desc') );
@@ -1140,6 +1194,10 @@ switch ($stAcao) {
                             $valorDoAtributo = $arValores[$contTMP];
                         } else {
                             $valorDoAtributo = $rsAtributos->getCampo('valor');
+                        }
+
+                        if ($contagemAtributos < 5) {
+                            $contagemAtributos = 5;
                         }
 
                         $rsEmissaoCarne->setCampo ('atributo_'.$contagemAtributos, $valorDoAtributo );

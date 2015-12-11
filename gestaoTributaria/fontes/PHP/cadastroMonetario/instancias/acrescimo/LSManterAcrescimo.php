@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: LSManterAcrescimo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterAcrescimo.php 63839 2015-10-22 18:08:07Z franver $
 
     *Casos de uso: uc-05.05.11
 */
@@ -112,7 +112,7 @@ if ($_REQUEST['stDescAcrescimo']) {
 }
 
 $obRMONAcrescimo->ListarAcrescimos ( $rsLista );
-//sistemaLegado::mostraVar( $rsLista );
+
 $obLista = new Lista;
 $obLista->setRecordSet ( $rsLista );
 
@@ -176,7 +176,6 @@ $obLista->ultimaAcao->addCampo("&dtInicioVigencia", "inicio_vigencia" );
 $obLista->ultimaAcao->addCampo("&stDescQuestao","[cod_acrescimo]-[descricao_acrescimo]");
 if ($_REQUEST['stAcao'] == "excluir") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink );
-    //   mostravar(Sessao::getId().$stLink);
 } else {
     $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 }

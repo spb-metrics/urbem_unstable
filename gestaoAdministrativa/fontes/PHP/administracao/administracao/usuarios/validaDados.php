@@ -104,7 +104,7 @@ case 1:
     $js = "";
     $ok = true;
     $setor = validaSetor($chave,$exercicio);
-    mostraVar($setor);
+
     if ($setor) {
         $js .= "f.nomSetor.value = '".$setor[nomSetor]."'; \n";
     } else {

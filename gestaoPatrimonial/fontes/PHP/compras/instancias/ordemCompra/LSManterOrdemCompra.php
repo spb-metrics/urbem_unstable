@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
+    * $Id: LSManterOrdemCompra.php 64086 2015-12-01 11:48:08Z diogo.zarpelon $
 
     * Casos de uso: uc-03.04.24
 */
@@ -52,7 +52,7 @@ $pgJs   = "JS".$stPrograma.".js";
 
 $stCaminho = CAM_GP_COM_INSTANCIAS."ordemCompra/";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 $stTipoOrdem = ( strpos($stAcao,'OS')===false ) ? 'C' : 'S';
 
@@ -209,7 +209,7 @@ if ( strpos($stAcao,'incluir') !== false ) {
 $stFiltro = "";
 $stLink   = "";
 
-$stLink .= "&stAcao=".$_REQUEST['stAcao'];
+$stLink .= "&stAcao=".$stAcao;
 
 $obLista = new Lista;
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
@@ -312,7 +312,6 @@ $obLista->ultimaAcao->addCampo("&stEntidade", "entidade");
 $obLista->ultimaAcao->addCampo("&inCodigo", "codigo");
 $obLista->ultimaAcao->addCampo("&stExercicio", "exercicio");
 $obLista->ultimaAcao->addCampo("&inCodObjeto", "cod_objeto");
-$obLista->ultimaAcao->addCampo("&stObjeto", "descricao_objeto");
 $obLista->ultimaAcao->addCampo("&inCodModalidade", "cod_modalidade");
 $obLista->ultimaAcao->addCampo("&stModalidade", "descricao_modalidade");
 $obLista->ultimaAcao->addCampo("&inCodFornecedor", "cgm_fornecedor");

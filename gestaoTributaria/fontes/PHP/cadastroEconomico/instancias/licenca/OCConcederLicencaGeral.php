@@ -31,7 +31,7 @@
 
     * @ignore
 
-    * $Id: OCConcederLicencaGeral.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: OCConcederLicencaGeral.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.02.12
 
@@ -114,8 +114,6 @@ function excluirElemento($inLinha)
 
 function montaListaElementos(&$rsListaElementos)
 {
-    #sistemaLegado::mostravar ( $rsListaElementos );
-
     global $request;
     $stAcao = $request->get('stAcao');
     $rsListaElementos->setPrimeiroElemento();
@@ -188,7 +186,6 @@ function montaListaElementos(&$rsListaElementos)
      return $stJs;
 }
 
-//sistemaLegado::mostravar($stCtrl);
 switch ($stCtrl) {
     case "LimparSessao":
          Sessao::write( "lsElementos", array() );
@@ -309,8 +306,6 @@ switch ($stCtrl) {
         $arAtribElem        = explode(",",$stNomAtribElem)          ;
 
         $arAtribElemValor[$stCodElemento] = array()                 ;
-        #sistemaLegado::mostravar( $arAtribElemValor );
-        #echo '<hr>';
         // array de indice =  a cod_elemento criado com valores dos atributos.
         for ( $inCount =0; $inCount < count($arAtribElem); $inCount++) {
             #$arAtribElemValor[$stCodElemento][substr( $arAtribElem[$inCount],-3,1)] = $_REQUEST[$arAtribElem[$inCount]] ;

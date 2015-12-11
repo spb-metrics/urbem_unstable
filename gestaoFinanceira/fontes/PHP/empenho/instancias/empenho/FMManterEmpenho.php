@@ -32,12 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
-
-    $Revision: 32188 $
-    $Name$
-    $Autor:$
-    $Date: 2008-01-31 08:45:15 -0200 (Qui, 31 Jan 2008) $
+    $Id: FMManterEmpenho.php 64114 2015-12-03 18:49:51Z michel $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -46,13 +41,14 @@
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php" );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php" );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
 include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNFundeb.class.php';
 include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNRoyalties.class.php';
-include_once ( CAM_FW_HTML."MontaAtributos.class.php"       );
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaAutorizacao.class.php" );
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaAutorizacao.class.php";
+include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterEmpenho";
@@ -66,23 +62,24 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once ($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) {
-    $obTTCERNRoyalties            = new TTCERNRoyalties;
-    $obTTCERNFundeb               = new TTCERNFundeb;
+Sessao::remove('arBuscaContrato');
+
+$inCodUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
+
+if ($inCodUf == 20) {
+    $obTTCERNRoyalties  = new TTCERNRoyalties;
+    $obTTCERNFundeb     = new TTCERNFundeb;
 
     $obTTCERNRoyalties->recuperaTodos($rsRoyalties, '', 'codigo');
     $obTTCERNFundeb->recuperaTodos($rsFundeb, '', 'codigo');
 }
 
-$obREmpenhoConfiguracao       = new REmpenhoConfiguracao;
+$obREmpenhoConfiguracao = new REmpenhoConfiguracao;
 $obREmpenhoConfiguracao->consultar();
 
-$boLiquidacaoAutomatica   = $obREmpenhoConfiguracao->getLiquidacaoAutomatica();
+$boLiquidacaoAutomatica = $obREmpenhoConfiguracao->getLiquidacaoAutomatica();
 
 $rsClassificacao = new RecordSet;
 $obREmpenhoEmpenhoAutorizacao = new REmpenhoEmpenhoAutorizacao;
@@ -93,21 +90,20 @@ $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidad
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->listar( $rsTipo, "cod_tipo <> 0" );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->listar( $rsHistorico );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->listarUnidadeMedida( $rsUnidade );
-
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setExercicio( Sessao::getExercicio() );
 $stMascaraRubrica = $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->recuperaMascara();
 
 Sessao::remove('arItens');
 Sessao::remove('link');
-$inCodEntidade = $_REQUEST['inCodEntidade'];
-$inCodPreEmpenho = $_REQUEST['inCodPreEmpenho'];
-$inCodAutorizacao = $_REQUEST['inCodAutorizacao'];
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $_REQUEST['inCodAutorizacao'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho( $_REQUEST['inCodPreEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
+$inCodEntidade = $request->get('inCodEntidade');
+$inCodPreEmpenho = $request->get('inCodPreEmpenho');
+$inCodAutorizacao = $request->get('inCodAutorizacao');
 
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setCodReserva( $_REQUEST['inCodReserva'] );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $request->get('inCodAutorizacao') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoReservaSaldos->setCodReserva( $request->get('inCodReserva') );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->consultar();
 
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->checarFormaExecucaoOrcamento( $stFormaExecucao );
@@ -137,8 +133,8 @@ $stNomCategoria     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenh
 
 if ($inCodCategoria == 2 || $inCodCategoria == 3) {
     $obTEmpenhoContrapartidaAutorizacao = new TEmpenhoContrapartidaAutorizacao;
-    $obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_autorizacao', $_REQUEST['inCodAutorizacao'] );
-    $obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_entidade'   , $_REQUEST['inCodEntidade']    );
+    $obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_autorizacao', $request->get('inCodAutorizacao') );
+    $obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_entidade'   , $request->get('inCodEntidade')    );
     $obTEmpenhoContrapartidaAutorizacao->setDado( 'exercicio'      , Sessao::getExercicio()            );
     $obTEmpenhoContrapartidaAutorizacao->recuperaContrapartidaLancamento( $rsContrapartida );
 
@@ -159,19 +155,19 @@ foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['cod_grandeza'] = $obItemPreEmpenho->obRUnidadeMedida->obRGrandeza->getCodGrandeza();
     $arItens[$inCount]['nom_unidade']  = $obItemPreEmpenho->getNomUnidade();
     $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
-    $arItens[$inCount]['vl_unitario']  = $nuVlUnitario ;
+    $arItens[$inCount]['vl_unitario']  = $nuVlUnitario;
     if($obItemPreEmpenho->getCodItemPreEmp()!='')
         $arItens[$inCount]['cod_item']     = $obItemPreEmpenho->getCodItemPreEmp();
     Sessao::write('arItens', $arItens);
 }
-$arChaveAtributo =  array( "cod_pre_empenho" => $_REQUEST["inCodPreEmpenho"],
+$arChaveAtributo =  array( "cod_pre_empenho" => $request->get('inCodPreEmpenho'),
                            "exercicio"       => Sessao::getExercicio()         );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 
-if ($inCodDespesa) {
+if ($inCodDespesa)
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior( $nuSaldoAnterior );
-}
+
 $nuSaldoAnterior = number_format( $nuSaldoAnterior, 2, ',', '.');
 
 if ( Sessao::read('filtro') ) {
@@ -185,7 +181,7 @@ if ( Sessao::read('filtro') ) {
 
 $obHdnUltimaDataEmpenho = new Hidden;
 $obHdnUltimaDataEmpenho->setName ( "dtUltimaDataEmpenho" );
-$obHdnUltimaDataEmpenho->setValue( '');
+$obHdnUltimaDataEmpenho->setValue( '' );
 
 //*****************************************************//
 // Define COMPONENTES DO FORMULARIO
@@ -229,7 +225,7 @@ $obHdnCodEntidade->setValue( $inCodEntidade );
 // Define objeto Hidden para Codigo da Reserva
 $obHdnCodReserva = new Hidden;
 $obHdnCodReserva->setName  ( "inCodReserva" );
-$obHdnCodReserva->setValue ( $_REQUEST['inCodReserva']  );
+$obHdnCodReserva->setValue ( $request->get('inCodReserva') );
 
 // Define objeto Hidden para Codigo da Classificacao
 $obHdnCodClassificacao = new Hidden;
@@ -291,6 +287,12 @@ $obHdnBoAutorizacao->setName ( "obHdnBoAutorizacao" );
 $obHdnBoAutorizacao->setId   ( "obHdnBoAutorizacao" );
 $obHdnBoAutorizacao->setValue( 'false' );
 
+//Define o nome da ação para controle no oculto para o mostrar o calcúlo do saldo anterior na label
+$obHdnEmitirEmpenhoAutorizacao = new Hidden;
+$obHdnEmitirEmpenhoAutorizacao->setName ( "hdnNomeAcao" );
+$obHdnEmitirEmpenhoAutorizacao->setId   ( "hdnNomeAcao" );
+$obHdnEmitirEmpenhoAutorizacao->setValue( "stEmitirEmpenhoAutorizacao" );
+
 //Define o objeto TextArea para Descrição do Empenho
 $obTxtNomEmpenho = new TextArea;
 $obTxtNomEmpenho->setName   ( "stNomEmpenho"         );
@@ -332,7 +334,7 @@ $obDtEmpenho->setRotulo   ( "Data de Empenho"                        );
 $obDtEmpenho->setTitle    ( 'Informe a data do empenho'              );
 $obDtEmpenho->setNull     ( false                                    );
 $obDtEmpenho->obEvento->setOnBlur( "validaDataEmpenho('autorizacao');" );
-$obDtEmpenho->obEvento->setOnChange( "montaParametrosGET('verificaFornecedor');" );
+$obDtEmpenho->obEvento->setOnChange( "montaParametrosGET('verificaFornecedor'); buscaDado('montaLabelSaldoAnterior');" );
 
 // Define objeto Data para Data de Vencimento
 $obDtVencimento = new Data;
@@ -346,6 +348,7 @@ $obDtVencimento->obEvento->setOnChange( "validaVencimento();" );
 // Define objeto Label para saldo anterior
 $obLblSaldoAnterior = new Label;
 $obLblSaldoAnterior->setId    ( "nuSaldoAnterior" );
+$obLblSaldoAnterior->setName  ( "nuSaldoAnterior" );
 $obLblSaldoAnterior->setValue ( $nuSaldoAnterior  );
 $obLblSaldoAnterior->setRotulo( "Saldo Anterior"  );
 
@@ -360,7 +363,6 @@ if ($inCodDespesa) {
     $obLblDespesa->setRotulo ( "Dotação Orcamentária" );
     $obLblDespesa->setId     ( "stNomDespesa"  );
     $obLblDespesa->setValue  ( $inCodDespesa.' - '.$stNomDespesa );
-
 } else {
     // Define Objeto BuscaInner para Despesa
     $obBscDespesa = new BuscaInner;
@@ -380,15 +382,12 @@ if ($inCodDespesa) {
 }
 
 if ($stCodClassificacao != null) {
-
     // Define Objeto Label para Classificacao da Despesa
     $obLblClassificacao = new Label;
     $obLblClassificacao->setRotulo ( "Rubrica de Despesa" );
     $obLblClassificacao->setId     ( "stNomClassificacao" );
     $obLblClassificacao->setValue  ( $stCodClassificacao.' - '.$stNomClassificacao );
-
 } else {
-
     // Define Objeto Select para Classificacao da Despesa
     $obCmbClassificacao = new Select;
     $obCmbClassificacao->setRotulo               ( "Desdobramento" );
@@ -408,7 +407,6 @@ if ($stCodClassificacao != null) {
     $obCmbClassificacao->setCampoId              ( "cod_estrutural" );
     $obCmbClassificacao->setCampoDesc            ( "cod_estrutural" );
     $obCmbClassificacao->preencheCombo           ( $rsClassificacao);
-
 }
 
 // Define Objeto Label para Orgao
@@ -444,7 +442,7 @@ $obLblHistorico->setRotulo    ( "Histórico"      );
 $obLblHistorico->setId        ( "stNomHistorico" );
 $obLblHistorico->setValue     ( $inCodHistorico.' - '.$stNomHistorico  );
 
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) {
+if ($inCodUf == 20) {
     $obCmbFundeb = new Select;
     $obCmbFundeb->setName      ('inCodFundeb');
     $obCmbFundeb->setRotulo    ('Fundeb');
@@ -466,7 +464,7 @@ if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) 
     $obCmbRoyalties->setNull      (false);
 }
 
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 9 && Sessao::getExercicio() >= 2012) {
+if ($inCodUf == 9 && Sessao::getExercicio() >= 2012) {
     $obTxtProcessoLicitacao = new TextBox;
     $obTxtProcessoLicitacao->setName            ('stProcessoLicitacao');
     $obTxtProcessoLicitacao->setId              ('stProcessoLicitacao');
@@ -501,15 +499,14 @@ while (!$rsAtributos->EOF()) {
     include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenhoJulgamento.class.php';
     $obTEmpenhoItemPreEmpenhoJulgamento = new TEmpenhoItemPreEmpenhoJulgamento;
 
-    $stFiltro  = " WHERE cod_pre_empenho = ".$_REQUEST['inCodPreEmpenho'];
+    $stFiltro  = " WHERE cod_pre_empenho = ".$request->get('inCodPreEmpenho');
     $stFiltro .= "   AND exercicio = '".Sessao::getExercicio()."'";
     $obTEmpenhoItemPreEmpenhoJulgamento->recuperaTodos($rsPreEmpenhoItemJulgamento, $stFiltro, '', $boTransacao);
 
-    if ($rsAtributos->getCampo('nom_atributo') == 'Característica Peculiar' ||  $rsAtributos->getCampo('nom_atributo') == 'Número da Licitação') {
+    if ($rsAtributos->getCampo('nom_atributo') == 'Característica Peculiar' ||  $rsAtributos->getCampo('nom_atributo') == 'Número da Licitação')
         $rsAtributos->setCampo('label', false);
-    } else {
+    else
         $rsAtributos->setCampo('label', true);
-    }
 
     $rsAtributos->proximo();
 }
@@ -542,14 +539,12 @@ $obSimNaoEmitirLiquidacao->setName   ( 'boEmitirLiquidacao'      );
 $obSimNaoEmitirLiquidacao->setNull   ( true                      );
 $obSimNaoEmitirLiquidacao->setChecked( $stLiquidacaoAutomatica   );
 
-include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
+include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
 $obMontaAssinaturas = new IMontaAssinaturas(null, 'nota_empenho_autorizacao');
 $obMontaAssinaturas->definePapeisDisponiveis('nota_empenho_autorizacao');
 $obMontaAssinaturas->setOpcaoAssinaturas( false );
 
-$inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
-if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
-
+if ($inCodUf == 9 && Sessao::getExercicio() >= 2012) {
     include_once CAM_GPC_TGO_MAPEAMENTO.'TTCMGOModalidade.php';
 
     /* Monta combo com modalidades de licitação */
@@ -573,6 +568,18 @@ if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
     $obSpanFundamentacaoLegal->setId('spnFundamentacaoLegal');
 }
 
+//Define o objeto para validacao da data do contrato
+$obHdnDtContrato = new Hidden;
+$obHdnDtContrato->setName ('dtContrato');
+$obHdnDtContrato->setId   ('dtContrato');
+$obHdnDtContrato->setValue('');
+    
+$obContrato = new IPopUpContrato( $obForm );
+$obContrato->obHdnBoFornecedor->setValue(TRUE);
+$obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+$obContrato->obBuscaInner->setValoresBusca('', '', '');
+$obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
+
 //****************************************//
 // Monta FORMULARIO
 //****************************************//
@@ -583,7 +590,7 @@ $obFormulario->addTitulo( "Dados do empenho" );
 $obFormulario->addHidden( $obHdnCtrl );
 $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addHidden( $obHdnCodAutorizacao   );
-$obFormulario->addHidden( $obHdnDtAutorizacao   );
+$obFormulario->addHidden( $obHdnDtAutorizacao    );
 $obFormulario->addHidden( $obHdnCodPreEmpenho    );
 $obFormulario->addHidden( $obHdnCodEntidade      );
 $obFormulario->addHidden( $obHdnCodReserva       );
@@ -596,12 +603,13 @@ $obFormulario->addHidden( $obHdnCodHistorico     );
 $obFormulario->addHidden( $obHdnVlReserva        );
 $obFormulario->addHidden( $obHdnTrava, true      );
 $obFormulario->addHidden( $obHdnUltimaDataEmpenho );
-$obFormulario->addHidden( $obHdnValidaFornecedor );
+$obFormulario->addHidden( $obHdnValidaFornecedor  );
 $obFormulario->addHidden( $obHdnBoAutorizacao    );
+$obFormulario->addHidden( $obHdnEmitirEmpenhoAutorizacao );
 
 $obFormulario->addComponente( $obLblEntidade      );
 if ($inCodDespesa) {
-    $obFormulario->addHidden( $obHdnCodDespesa        );
+    $obFormulario->addHidden( $obHdnCodDespesa       );
     $obFormulario->addHidden( $obHdnCodClassificacao );
     $obFormulario->addComponente( $obLblDespesa       );
     $obFormulario->addComponente( $obLblClassificacao );
@@ -615,9 +623,8 @@ $obFormulario->addComponente( $obLblUnidade       );
 $obFormulario->addComponente( $obLblFornecedor    );
 $obFormulario->addComponente( $obLblCategoriaEmpenho   );
 
-if ($inCodCategoria == 2 || $inCodCategoria == 3) {
+if ($inCodCategoria == 2 || $inCodCategoria == 3)
     $obFormulario->addComponente( $obLblContrapartida );
-}
 
 $obFormulario->addComponente( $obTxtNomEmpenho    );
 $obFormulario->addComponente( $obDtEmpenho );
@@ -625,7 +632,7 @@ $obFormulario->addComponente( $obDtVencimento     );
 $obFormulario->addComponenteComposto( $obTxtCodTipo, $obCmbNomTipo );
 $obFormulario->addComponente( $obLblHistorico     );
 
-if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 20) {
+if ($inCodUf == 20) {
     $obFormulario->addComponente($obCmbFundeb);
     $obFormulario->addComponente($obCmbRoyalties);
 }
@@ -642,7 +649,11 @@ if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
 }
 
 $obMontaAtributos->geraFormulario ( $obFormulario );
-
+/*
+$obFormulario->addTitulo('Contrato');
+$obFormulario->addHidden( $obHdnDtContrato );
+$obContrato->geraFormulario($obFormulario);
+*/
 $obFormulario->addTitulo( "Itens do empenho" );
 $obFormulario->addSpan( $obSpan );
 $obFormulario->addComponente( $obLblVlTotal         );

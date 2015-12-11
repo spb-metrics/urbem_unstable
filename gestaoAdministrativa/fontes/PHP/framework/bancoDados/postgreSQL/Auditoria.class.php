@@ -30,7 +30,7 @@
  * @package bancoDados
  * @subpackage postgreSQL
  *
- * $Id: Auditoria.class.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: Auditoria.class.php 63894 2015-11-03 17:42:57Z jean $
  *
  * Casos de uso: uc-01.01.00
 */
@@ -381,7 +381,12 @@ class Auditoria
                         foreach ($arEstrutura as $count => $key) {
 
                             if ($key->getConteudo() != '' OR $key->getConteudo() != NULL) {
-                                $arValores[$key->getNomeCampo()] = str_replace('"','\"',$key->getConteudo());
+                                //Fora colocado essa verificação porque na classe $request é feito um addslashes e está adicionando \ 
+                                //assim ao adicionar o \, o str_replace está adicionando novamente a \, então esse str_count verifica
+                                //se já existem \" para não replicar mais
+                                if (substr_count($key->getConteudo(), '\"') <= 0) {
+                                    $arValores[$key->getNomeCampo()] = str_replace('"','\"',$key->getConteudo());
+                                }
                             }
                         }
                     }

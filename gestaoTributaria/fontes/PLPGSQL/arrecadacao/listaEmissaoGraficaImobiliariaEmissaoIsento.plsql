@@ -1889,7 +1889,7 @@ FROM
 
         , imobiliario.fn_busca_endereco_imovel ( aic.inscricao_municipal ) as endereco
 --        , imobiliario.fn_busca_endereco_correspondencia ( aic.inscricao_municipal ) as endereco_c
-        , arrecadacao.fn_consulta_endereco_mata_saojoao ( aic.inscricao_municipal ) as endereco_c
+        , arrecadacao.fn_consulta_endereco_mata_saojoao ( aic.inscricao_municipal, aic2.exercicio::varchar ) as endereco_c
 
         , arrecadacao.fn_lista_parcelas_unicas( al.cod_lancamento ) as lista_parcelas_unicas
         , arrecadacao.fn_lista_parcelas_normais( al.cod_lancamento ) as lista_parcelas_normais

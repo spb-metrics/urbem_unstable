@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: PRManterRequisicao.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: PRManterRequisicao.php 63833 2015-10-22 13:05:17Z franver $
 
  **/
 
@@ -285,7 +285,7 @@ switch ($stAcao) {
                 AND homologada = true";
         $obTAlmoxarifadoRequisicaoHomologada = new TAlmoxarifadoRequisicaoHomologada;
         $obTAlmoxarifadoRequisicaoHomologada->recuperaTodos($rsRequisicaoHomologada, $stFiltro);
-        //sistemaLegado::mostraVar($rsRequisicaoHomologada);die;
+
         if ($rsRequisicaoHomologada->getNumLinhas() > 0) {
             SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao, "Não é possível excluir a requisição, pois está homologada!", "n_excluir", "erro", Sessao::getId(), "../");
         } else {

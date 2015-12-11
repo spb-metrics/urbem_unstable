@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Revision: 62965 $
+    $Revision: 64083 $
     $Name$
     $Author: hboaventura $
     $Date: 2008-08-21 11:36:17 -0300 (Qui, 21 Ago 2008) $
@@ -49,7 +49,12 @@
     $obTTCMBAPatrimonio->setDado('dt_inicio', $arFiltro['stDataInicial']);
     $obTTCMBAPatrimonio->setDado('dt_fim'   , $arFiltro['stDataFinal']);
     $obTTCMBAPatrimonio->setDado('inCodGestora', $inCodUnidadeGestora );
-    
+
+    if ($stTipoPeriodicidade == "aquisicao" || $stTipoPeriodicidade == "") {
+        $obTTCMBAPatrimonio->setDado('tipoPeriodo', "dt_aquisicao" );
+    } else {
+        $obTTCMBAPatrimonio->setDado('tipoPeriodo', "dt_incorporacao" );
+    }
     $obTTCMBAPatrimonio->recuperaDadosTribunal($rsPatrimonio);
     
     $inCount = 1;

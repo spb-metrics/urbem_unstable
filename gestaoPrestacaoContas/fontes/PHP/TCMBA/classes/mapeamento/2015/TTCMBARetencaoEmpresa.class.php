@@ -29,7 +29,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBARetencaoEmpresa.class.php 63716 2015-10-01 19:03:03Z carlos.silva $
+    * $Id: TTCMBARetencaoEmpresa.class.php 64041 2015-11-23 17:09:34Z lisiane $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -68,7 +68,7 @@ class TTCMBARetencaoEmpresa extends Persistente {
                        , empenho.exercicio AS ano_criacao
                        , to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy') AS dt_pagamento_empenho    
                        , REPLACE(plano_conta.cod_estrutural,'.','') AS conta_contabil
-                       , COALESCE(SUM(ordem_pagamento_retencao.vl_retencao),0.00) AS vl_retencao
+                       , COALESCE(ordem_pagamento_retencao.vl_retencao,0.00) AS vl_retencao
                        , '".$this->getDado('competencia')."' AS competencia
                        , '' AS reservado_tcm
 
@@ -88,28 +88,64 @@ class TTCMBARetencaoEmpresa extends Persistente {
                   AND empenho.cod_empenho = nota_liquidacao.cod_empenho  
 
            INNER JOIN empenho.pagamento_liquidacao
-                   ON nota_liquidacao.exercicio = pagamento_liquidacao.exercicio    
+                   ON nota_liquidacao.exercicio = pagamento_liquidacao.exercicio_liquidacao
                   AND nota_liquidacao.cod_entidade = pagamento_liquidacao.cod_entidade    
-                  AND nota_liquidacao.cod_nota = pagamento_liquidacao.cod_nota 
+                  AND nota_liquidacao.cod_nota = pagamento_liquidacao.cod_nota
+
+           INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
+                   ON pagamento_liquidacao_nota_liquidacao_paga.exercicio = pagamento_liquidacao.exercicio
+                  AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade = pagamento_liquidacao.cod_entidade
+                  AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem = pagamento_liquidacao.cod_ordem
+                  AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = pagamento_liquidacao.exercicio_liquidacao
+                  AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota = pagamento_liquidacao.cod_nota
+
+           INNER JOIN empenho.nota_liquidacao_paga
+                   ON pagamento_liquidacao_nota_liquidacao_paga.cod_entidade = nota_liquidacao_paga.cod_entidade
+                  AND pagamento_liquidacao_nota_liquidacao_paga.timestamp = nota_liquidacao_paga.timestamp
+                  AND pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                  AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota = nota_liquidacao_paga.cod_nota
+
+           INNER JOIN empenho.nota_liquidacao_conta_pagadora
+                   ON nota_liquidacao_conta_pagadora.cod_entidade = nota_liquidacao_paga.cod_entidade
+                  AND nota_liquidacao_conta_pagadora.cod_nota = nota_liquidacao_paga.cod_nota
+                  AND nota_liquidacao_conta_pagadora.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                  AND nota_liquidacao_conta_pagadora.timestamp = nota_liquidacao_paga.timestamp
+
+           INNER JOIN ( 
+                        SELECT plano_analitica.exercicio   
+                             , plano_analitica.cod_plano                        
+                             , plano_conta.nom_conta                        
+                             , recurso.cod_recurso                     
+                             , recurso.nom_recurso
+                             , plano_conta.cod_estrutural
+                          FROM contabilidade.plano_analitica
+                    INNER JOIN contabilidade.plano_conta
+                            ON plano_conta.cod_conta = plano_analitica.cod_conta
+                           AND plano_conta.exercicio = plano_analitica.exercicio
+                    INNER JOIN contabilidade.plano_recurso
+                            ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                           AND plano_recurso.exercicio = plano_analitica.exercicio
+                    INNER JOIN orcamento.recurso
+                            ON recurso.exercicio = plano_recurso.exercicio
+                           AND recurso.cod_recurso = plano_recurso.cod_recurso
+                     ) AS conta
+                   ON conta.cod_plano = nota_liquidacao_conta_pagadora.cod_plano            
+                  AND conta.exercicio = nota_liquidacao_conta_pagadora.exercicio
+                  AND conta.cod_estrutural ilike '1.1.1.1.1.01%'
 
            INNER JOIN empenho.ordem_pagamento
                    ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio    
                   AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade    
-                  AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem 
+                  AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
 
            INNER JOIN empenho.ordem_pagamento_retencao
                    ON ordem_pagamento.exercicio = ordem_pagamento_retencao.exercicio    
                   AND ordem_pagamento.cod_entidade = ordem_pagamento_retencao.cod_entidade    
-                  AND ordem_pagamento.cod_ordem = ordem_pagamento_retencao.cod_ordem 
-
-           INNER JOIN empenho.nota_liquidacao_paga
-                   ON nota_liquidacao.exercicio = nota_liquidacao_paga.exercicio    
-                  AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade    
-                  AND nota_liquidacao.cod_nota = nota_liquidacao_paga.cod_nota  
+                  AND ordem_pagamento.cod_ordem = ordem_pagamento_retencao.cod_ordem
 
            INNER JOIN contabilidade.plano_analitica
                    ON ordem_pagamento_retencao.exercicio = plano_analitica.exercicio    
-                  AND ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano 
+                  AND ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
 
            INNER JOIN contabilidade.plano_conta
                    ON plano_analitica.exercicio = plano_conta.exercicio    
@@ -123,12 +159,12 @@ class TTCMBARetencaoEmpresa extends Persistente {
                    ON pre_empenho_despesa.cod_conta = conta_despesa.cod_conta
                   AND pre_empenho_despesa.exercicio = conta_despesa.exercicio
                      
-                 WHERE to_char(nota_liquidacao_paga.timestamp,'yyyy') = '".$this->getDado('exercicio')."'
-                   AND to_date(to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
-                                                                                                      AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-                   AND nota_liquidacao.cod_entidade IN (".$this->getDado('cod_entidade').")
-                   --EXCETO FOLHA DE PAGAMENTO
-                   AND conta_despesa.cod_estrutural NOT LIKE ('3.1%')
+                WHERE to_char(nota_liquidacao_paga.timestamp,'yyyy') = '".$this->getDado('exercicio')."'
+                  AND to_date(to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                                                                     AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
+                  AND nota_liquidacao.cod_entidade IN (".$this->getDado('cod_entidade').")
+                  --EXCETO FOLHA DE PAGAMENTO
+                  AND conta_despesa.cod_estrutural NOT LIKE ('3.1%')
 
               GROUP BY to_char(nota_liquidacao_paga.timestamp,'dd/mm/yyyy')
                      , to_char(nota_liquidacao_paga.timestamp,'yyyy')
@@ -137,11 +173,11 @@ class TTCMBARetencaoEmpresa extends Persistente {
                      , plano_conta.cod_estrutural
                      , conta_despesa.cod_estrutural
                      , pagamento_liquidacao.cod_ordem
+                     , ordem_pagamento_retencao.vl_retencao
 
               ORDER BY pagamento_liquidacao.cod_ordem
                      , empenho.cod_empenho
                      , dt_pagamento_empenho ";
-                     
         return $stSql;
     }
     

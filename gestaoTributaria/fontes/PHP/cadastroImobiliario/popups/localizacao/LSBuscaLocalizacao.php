@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSBuscaLocalizacao.php 63688 2015-09-29 20:32:47Z arthur $
+    * $Id: LSBuscaLocalizacao.php 63967 2015-11-12 16:42:16Z evandro $
 
     * Casos de uso: uc-05.01.03
 */
@@ -94,7 +94,8 @@ if ( $request->get('inCodigoVigencia') ) {
     $obRCIMLocalizacao->setCodigoVigencia ( $request->get('inCodigoVigencia') );
 }
 
-if ( Sessao::read('inCodigoNivel') > 0 ) {
+$inCodigoNivel = Sessao::read('inCodigoNivel');
+if ( $inCodigoNivel > 0 ) {
    $obRCIMLocalizacao->setCodigoNivel ( Sessao::read('inCodigoNivel')-1 );
 } else {
     $obRCIMLocalizacao->recuperaUltimoNivel( $rsListaNivel );
@@ -130,7 +131,12 @@ $obLista->ultimoCabecalho->setWidth( 5 );
 $obLista->commitCabecalho();
 
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "valor_composto" );
+if ( $inCodigoNivel > 0 ) {
+    $obLista->ultimoDado->setCampo( "valor_reduzido" );
+}else{
+    $obLista->ultimoDado->setCampo( "valor_composto" );
+}
+
 $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
 $obLista->commitDado();
 $obLista->addDado();

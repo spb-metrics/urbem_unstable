@@ -33,7 +33,7 @@
 
     Casos de uso: uc-01.03.94
 
-    $Id: relatorioPermissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: relatorioPermissao.php 63829 2015-10-22 12:06:07Z franver $
 
     */
 
@@ -47,9 +47,6 @@ setAjuda("UC-01.03.94");
 
 $pagina   = $_REQUEST['pagina'];
 $controle = $_REQUEST['controle'];
-
-#SistemaLegado::mostravar($_REQUEST);
-#die();
 
 if (isset($pagina)) {
     $controle = 1;

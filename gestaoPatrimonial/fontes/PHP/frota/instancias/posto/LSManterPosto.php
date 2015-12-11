@@ -52,8 +52,6 @@ $stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
 //seta o caminho para a popup de exclusao
 $stCaminho = CAM_GP_FRO_INSTANCIAS."posto/";
 
-//SistemaLegado::mostravar( $_REQUEST );
-
 //seta o filtro na sessao e vice-versa
 if ( !Sessao::read('paginando') ) {
     foreach ($_POST as $stCampo => $stValor) {

@@ -27,17 +27,13 @@
     * Arquivo JS utilizado na Duplicação de Autorização
     * Data de Criação   : 01/12/2004
 
-
     * @author Analista Jorge B. Ribarr
     * @author Desenvolvedor Anderson R. M. Buzo
 
     * @ignore
 
-    $Revision: 30668 $
-    $Name$
-    $Autor: $
-    $Date: 2007-02-23 13:15:05 -0200 (Sex, 23 Fev 2007) $
-    
+    $Id: JSManterAutorizacao.js 64051 2015-11-24 17:55:39Z franver $
+
     * Casos de uso: uc-02.03.02
                     uc-02.01.08 
 */
@@ -92,14 +88,14 @@ function incluirItem() {
     nuQuantidade = nuQuantidade.replace( "," ,'.');
     if( nuQuantidade <= 0 )
         mensagem += "@Campo Quantidade com valor inválido!( o valor deve ser maior que 0 (zero) )";
-    
 
     if(!document.frm.inCodUnidade.value)
         mensagem += '@Campo Unidade inválido!()';
+
     if(!document.frm.nuVlUnitario.value)
         mensagem += '@Campo Valor Unitário inválido!()';
 
-    nuUnitario = nuUnitario.replace( new  RegExp("[.]","g") ,'');
+    nuUnitario = nuUnitario.replace( new RegExp("[.]","g") ,'');
     nuUnitario = nuUnitario.replace( "," ,'.');
     if( nuUnitario <= 0 )
         mensagem += "@Campo Valor Unitário com valor inválido!(o valor deve ser maior que 0 (zero) )";
@@ -117,7 +113,6 @@ function incluirItem() {
         return false;
     } else {
         return true;
-        limparItem();
     }
 }
 
@@ -167,25 +162,16 @@ function alterarItem()
 
     if( mensagem ) {
         alertaAviso(mensagem,'form','erro','<?=Sessao::getId();?>');
+        return false;
     } else {
         document.frm.Ok.disabled = true;
-        document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
-        document.frm.stCtrl.value = 'alteradoItemPreEmpenho';
-        document.frm.submit();
-        document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
-        document.frm.btnIncluir.value='Incluir';
-        document.frm.stCtrl.value = 'incluiItemPreEmpenho';
-        limparItem();
+        return true;
     }
 }
 
 function excluirItem(stControle, inNumItem ){
-    document.frm.stCtrl.value = stControle;
-    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&inNumItem=' + inNumItem;
-    document.frm.submit();
-    document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
-    
     limparItem();
+    ajaxJavaScript('<?=$pgOcul."?".Sessao::getExercicio()?>&inNumItem='+inNumItem,stControle);
 }
 
 function limparItem() {
@@ -197,15 +183,23 @@ function limparItem() {
     document.frm.stNomItem.value = '';
     document.frm.stNomItem.readOnly = false;
     document.frm.stComplemento.value = '';
+    document.frm.inCodCentroCusto.value = '';
     document.frm.nuQuantidade.value = '';
     document.frm.inCodUnidade.value = document.frm.inCodUnidadePadrao.value;
     document.frm.nuVlUnitario.value = '';
     document.frm.nuVlTotal.value = '';
-    document.frm.inCodUnidadeMedida.value = '';
-    document.frm.stNomUnidade.value = '';
+    if (document.frm.inCodUnidadeMedida)
+        document.frm.inCodUnidadeMedida.value = '';
+    if (document.frm.stNomUnidade)
+        document.frm.stNomUnidade.value = '';
     document.frm.inCodItem.value = '';
+    if (document.frm.stNomItemCatalogo)
+        document.frm.stNomItemCatalogo.value = '';
     document.getElementById('stNomItemCatalogo').innerHTML = '';
     document.getElementById('stUnidadeMedida').innerHTML = '&nbsp;';
+    document.getElementById('stNomCentroCusto').innerHTML = '&nbsp;';
+    jQuery("#btnIncluir").val('Incluir');
+    jQuery("#btnIncluir").attr('onclick',"if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}");
 }
 
 function gerarValorTotal() {
@@ -219,7 +213,7 @@ function gerarValorTotal() {
         nuQuantidade = nuQuantidade.replace( "," ,'.');
         nuVlTotal = nuVlUnidade * nuQuantidade;
         nuVlTotal = Math.round(nuVlTotal*Math.pow(10,2))/Math.pow(10,2);
-        nuVlTotal = new String(nuVlTotal);
+        nuVlTotal = new String(nuVlTotal.toFixed(2));
         arVlTotal = nuVlTotal.split(".") ;
         if( !arVlTotal[1] )
             arVlTotal[1] = '00';
@@ -249,17 +243,11 @@ function limparCampos() {
 }
 
 function limparItens() {
-    BloqueiaFrames(true,false);
-    document.frm.stCtrl.value = 'limpar';
-    document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>';
-    document.frm.submit();
-    document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
-    LiberaFrames( true, false );
+    ajaxJavaScript('<?=$pgOcul."?".Sessao::getExercicio()?>','limpar');
 }
 
 function limparTodos() {
     limparCampos();
-    limparItens();
     document.getElementById('stTipoItemRadio1').disabled = false;
     document.getElementById('stTipoItemRadio2').disabled = false;
     var d = document;
@@ -281,6 +269,7 @@ function limparTodos() {
         d.frm.inCodOrgao.options[0] = new Option('Selecione','', 'selected');
     }
     document.frm.inCodEntidade.focus();
+    limparItens();
 }
 
 function proximoFoco(valor) {
@@ -308,7 +297,7 @@ function unidadeItem(ent){
 }
 function habilitaCampos(ent) {
     var f = document.frm;
-    
+
     //habilita campos para Catalogo
     if( ent == 'Catalogo' ){
         jQuery("#stTipoItem").val(ent);
@@ -341,21 +330,22 @@ function bloqueiaTipoItem(ent){
         var ent2=document.getElementById('stTipoItem').value;
     }else{
         var ent2=ent;
+        document.frm.stTipoItem.value=ent;
     }
     habilitaCampos(ent2);
-    
+
     jq('#stTipoItemRadio1').attr('disabled',true);
     jq('#stTipoItemRadio2').attr('disabled',true);
-    
+
     if (ent=='Catalogo') {
         jq('#stTipoItemRadio1').attr('checked',true);
         jq('#stTipoItemRadio2').attr('checked',false);
     }
-    
+
     if (ent=='Descricao') {
         jq('#stTipoItemRadio1').attr('checked',false);
         jq('#stTipoItemRadio2').attr('checked',true);
     }
 }
 </script>
-                
+

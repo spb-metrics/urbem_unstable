@@ -537,7 +537,7 @@ case 4:
         $nomCidadao = "";
     }
     $js .= 'f.nomCidadao.value = "'.$nomCidadao.'" ';
-    //mostraVar($js);
+
     break;
 }//fim switch
 

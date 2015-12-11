@@ -34,12 +34,12 @@
 
     * Casos de uso: uc-03.03.07
 
-    $Id: LSManterCentroCusto.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterCentroCusto.php 64005 2015-11-17 16:49:06Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GP_ALM_NEGOCIO . "RAlmoxarifadoCentroDeCustos.class.php");
+include_once CAM_GP_ALM_NEGOCIO.'RAlmoxarifadoCentroDeCustos.class.php';
 
 $stPrograma = "ManterCentroCusto";
 $pgFilt = "FL".$stPrograma.".php";
@@ -49,35 +49,31 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
-  $stFncJavaScript  = " function insereCentroDeCustos(num,nom) {  \n";
-  $stFncJavaScript .= " var sNum;                  \n";
-  $stFncJavaScript .= " var sNom;                  \n";
-  $stFncJavaScript .= " sNum = num;                \n";
-  $stFncJavaScript .= " sNom = nom;                \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom; \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNom"  ].".value = sNom; \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"  ].".value = sNum; \n";
-  $stFncJavaScript .= " window.opener.parent.frames['telaPrincipal'].document.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"  ].".focus(); \n";
-  $stFncJavaScript .= " window.close();            \n";
-  $stFncJavaScript .= " }                          \n";
+$stFncJavaScript  = " function insereCentroDeCustos(num,nom) {  \n";
+$stFncJavaScript .= "   var sNum;                               \n";
+$stFncJavaScript .= "   var sNom;                               \n";
+$stFncJavaScript .= "   sNum = num;                             \n";
+$stFncJavaScript .= "   sNom = nom;                             \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get('campoNom')."').innerHTML = sNom;         \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNom').".value = sNom;  \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".value = sNum;  \n";
+$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".focus();       \n";
+$stFncJavaScript .= "   window.close();                         \n";
+$stFncJavaScript .= " }                                         \n";
 
 $stCaminho = CAM_GP_ALM_INSTANCIAS."centroCusto/";
 
-$stAcao = $request->get("stAcao");
-
-if (empty( $stAcao )) {
-    $stAcao = "alterar";
-}
+$stAcao = $request->get('stAcao', 'alterar');
 
 if ( $request->get('inCodigo')) {
-    foreach ($_REQUEST as $key => $value) {
+    foreach ($request->getAll() as $key => $value) {
         $filtro[$key] = $value;
     }
     Sessao::write('filtro', $filtro);
 } else {
     if ( Sessao::read('filtro') ) {
         foreach ( Sessao::read('filtro') as $key => $value ) {
-            $_REQUEST[$key] = $value;
+            $request->set($key, $value);
         }
     }
     Sessao::write('paginando', true);
@@ -86,10 +82,10 @@ if ( $request->get('inCodigo')) {
 $obRegra = new RAlmoxarifadoCentroDeCustos;
 
 if ($request->get('stHdnDescricao')) {
-   $obRegra->setDescricao($_REQUEST['stHdnDescricao']);
+   $obRegra->setDescricao($request->get('stHdnDescricao'));
 }
 if ( $request->get('inCodEntidade') ) {
-   foreach ($_REQUEST['inCodEntidade'] as $inCodEntidade) {
+   foreach ($request->get('inCodEntidade') as $inCodEntidade) {
       $obRegra->addEntidade();
       $obRegra->roUltimaEntidade->setCodigoEntidade($inCodEntidade);
    }
@@ -100,13 +96,13 @@ $stLink   = "";
 
 $stLink .= '&inCodigo='.$request->get('inCodigo');
 $stLink .= "&stAcao=".$stAcao;
-$stLink .= "&nomForm=".$_REQUEST["nomForm"]."&campoNom=".$_REQUEST["campoNom"]."&campoNum=".$_REQUEST["campoNum"];
+$stLink .= "&nomForm=".$request->get('nomForm')."&campoNom=".$request->get('campoNom')."&campoNum=".$request->get('campoNum');
 
 $rsLista = new RecordSet;
 
 $stOrder = " ORDER BY centro_custo.descricao ";
 
-if (isset($usuario))
+if ($request->get('usuario')==TRUE)
   $obRegra->listarPermissaoUsuario( $rsLista, $stOrder );
 else
   $obRegra->listar( $rsLista, $stOrder );

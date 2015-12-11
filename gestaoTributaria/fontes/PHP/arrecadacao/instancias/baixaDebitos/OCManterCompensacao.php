@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: OCManterCompensacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCManterCompensacao.php 63839 2015-10-22 18:08:07Z franver $
 
   Caso de uso: uc-05.03.10
 **/
@@ -43,8 +43,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
 $stCtrl = $_REQUEST['stCtrl'];
-
-//sistemaLegado::mostravar ( $_REQUEST );exit;
 
 switch ($_REQUEST['stCtrl']) {
     case "SomaParcelasPagas":

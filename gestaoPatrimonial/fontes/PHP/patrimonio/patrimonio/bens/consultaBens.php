@@ -583,7 +583,6 @@ switch ($ctrl) {
                                 administracao.orgao
                             ORDER
                                 by nom_orgao";
-                    //mostravar($sSQL);
                     $dbEmp = new dataBaseLegado;
                     $dbEmp->abreBD();
                     $dbEmp->abreSelecao($sSQL);
@@ -921,8 +920,6 @@ switch ($ctrl) {
             }
         }
 
-        //mostravar($aVarWhere);
-
         function MontaWhere()
         {
             global $aVarWhere;
@@ -1126,7 +1123,7 @@ $sSQLs .= $sWhere.$whCgm.$whData.$whEntidade;
         $sessao->transf3 = "";
         $sessao->transf3 = "b.cod_bem";
         $sessao->transf5 = "";
-        //mostravar($sSQLs);
+
         $botoesPDF = new botoesPdfLegado;
         $paginacao = new paginacaoLegada;
         $paginacao->pegaDados( $sSQLs, "10" );
@@ -1135,7 +1132,6 @@ $sSQLs .= $sWhere.$whCgm.$whData.$whEntidade;
         $paginacao->pegaOrder("b.cod_bem","ASC");
         $sSQL = $paginacao->geraSQL();
 
-        //mostraVar($_POST);
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);

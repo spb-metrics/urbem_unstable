@@ -27,7 +27,7 @@
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Michel Teixeira
     * 
-    * $Id: TTCMBAObraMedicao.class.php 63632 2015-09-22 17:42:03Z michel $
+    * $Id: TTCMBAObraMedicao.class.php 63809 2015-10-19 16:52:56Z lisiane $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_PERSISTENTE;
@@ -52,9 +52,11 @@ class TTCMBAObraMedicao extends Persistente
         $this->AddCampo('cod_medida'            , 'integer' , true  , ''    , false, true );
         $this->AddCampo('data_inicio'           , 'date'    , true  , ''    , false, false);
         $this->AddCampo('data_final'            , 'date'    , true  , ''    , false, false);
+        $this->AddCampo('data_medicao'          , 'date'    , true  , ''    , false, false);
         $this->AddCampo('vl_medicao'            , 'numeric' , true  , '16,2', false, false);
         $this->AddCampo('nro_nota_fiscal'       , 'varchar' , true  , '20'  , false, false);
         $this->AddCampo('data_nota_fiscal'      , 'date'    , true  , ''    , false, false);
         $this->AddCampo('numcgm'                , 'integer' , true  , ''    , false, true );
     }
 }
+

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterFechamentoBaixaManual.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterFechamentoBaixaManual.php 63839 2015-10-22 18:08:07Z franver $
 
     * Casos de uso: uc-05.03.10
 */
@@ -50,7 +50,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once ( CAM_GT_MON_NEGOCIO."RMONAgencia.class.php" );
 include_once ( CAM_GT_ARR_NEGOCIO."RARRPagamento.class.php" );
 
-//SistemaLegado::mostravar($sessao->transf2);
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterBaixaManual";
 $pgFilt = "FL".$stPrograma.".php";

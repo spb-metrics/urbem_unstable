@@ -44,7 +44,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
 $link = Sessao::read("link");
-$stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 $stLink = "&pg=".$link["pg"]."&pos=".$link["pos"];
 
 //Define o nome dos arquivos PHP
