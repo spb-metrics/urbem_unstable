@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.04
 
- * $Id: PRManterGrupo.php 63400 2015-08-25 13:49:35Z arthur $
+ * $Id: PRManterGrupo.php 64184 2015-12-11 14:09:44Z arthur $
 
  */
 
@@ -77,13 +77,18 @@ switch ($stAcao) {
         $obTPatrimonioGrupo->recuperaGrupo( $rsPatrimonioGrupo, $stFiltro );
         
         if ($rsPatrimonioGrupo->getNumLinhas() <= 0) {
+
+            if($request->get('inCodConta') == "" && ($request->get('inCodContaDoacao') != "" || $request->get('inCodContaPerdaInvoluntaria') != "" || $request->get('inCodContaTransferencia') != "") ){
+                SistemaLegado::exibeAviso(urlencode('Necessário Informar a Conta Contábil.'),"n_incluir","erro");
+                Sessao::encerraExcecao(); die;
+            }
+
             $obTPatrimonioGrupo->setDado( 'cod_natureza', $request->get('inCodNatureza') );
             $obTPatrimonioGrupo->proximoCod( $inCodGrupo );
             $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $inCodGrupo );
             $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $request->get('stDescricaoGrupo') );
             
             $inDepreciacao = $request->get('inDepreciacao');
-            
             $inDepreciacao = ($inDepreciacao != "" && $inDepreciacao > 0) ? number_format(str_replace(',','.',$inDepreciacao),2,'.','') : '0.00';
             
             if($request->get('inCodContaDepreciacao') != ""){
@@ -96,7 +101,6 @@ switch ($stAcao) {
             }
             
             $obTPatrimonioGrupo->setDado( 'depreciacao', $inDepreciacao );
-            
             $obTPatrimonioGrupo->inclusao();
             
             if($request->get('inCodConta') != ""){
@@ -104,6 +108,9 @@ switch ($stAcao) {
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza', $request->get('inCodNatureza') );
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'   , Sessao::getExercicio() );
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'   , $request->get('inCodConta') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_doacao'            , $request->get('inCodContaDoacao') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_perda_involuntaria', $request->get('inCodContaPerdaInvoluntaria') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_transferencia'     , $request->get('inCodContaTransferencia') );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
             
@@ -133,6 +140,11 @@ switch ($stAcao) {
         
         if ($rsPatrimonioGrupo->getNumLinhas() <= 0) {
             
+            if($request->get('inCodConta') == "" && ($request->get('inCodContaDoacao') != "" || $request->get('inCodContaPerdaInvoluntaria') != "" || $request->get('inCodContaTransferencia') != "") ){
+                SistemaLegado::exibeAviso(urlencode('Necessário Informar a Conta Contábil.'),"n_incluir","erro");
+                Sessao::encerraExcecao(); die;
+            }
+
             $obTPatrimonioGrupo->setDado('cod_plano_grupo' , $request->get('inCodPlanoDepreciacao'));
             $obTPatrimonioGrupo->setDado('cod_grupo'       , $request->get('inCodGrupo'));
             $obTPatrimonioGrupo->setDado('cod_natureza'    , $request->get('inCodNatureza'));
@@ -185,12 +197,15 @@ switch ($stAcao) {
             $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_grupo'    , $request->get('inCodGrupo') );
             $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'    , Sessao::getExercicio() );
             $obTPatrimonioGrupoPlanoAnalitica->exclusao();
-
-            //inclui na table grupo_plano_analitica
+            
+            // se os campos de doacao estiverm preenchidos, o campo de conta contabil deve ser preenchido tbm
             if($request->get('inCodConta') != ""){
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'exercicio'    , Sessao::getExercicio() );
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_natureza' , $request->get('inCodNatureza') );
                 $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano'    , $request->get('inCodConta') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_doacao'            , $request->get('inCodContaDoacao') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_perda_involuntaria', $request->get('inCodContaPerdaInvoluntaria') );
+                $obTPatrimonioGrupoPlanoAnalitica->setDado( 'cod_plano_transferencia'     , $request->get('inCodContaTransferencia') );
                 $obTPatrimonioGrupoPlanoAnalitica->inclusao();
             }
             

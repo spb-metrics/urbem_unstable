@@ -1087,5 +1087,5 @@ DROP TABLE fluxo_caixa_despesa;
 DROP TABLE fluxo_caixa_saldo;
 
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

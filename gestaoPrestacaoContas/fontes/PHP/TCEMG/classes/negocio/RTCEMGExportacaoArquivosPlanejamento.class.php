@@ -174,7 +174,7 @@ class RTCEMGExportacaoArquivosPlanejamento
             
             
             $this->obTTCEMGAMP->setDado('entidades', $this->getCodEntidades());
-            //$this->obTTCEMGAMP->setDado('cod_orgao',$rsAdminConfigEntidade->getCampo('valor'));
+            $this->obTTCEMGAMP->setDado('cod_orgao',$rsAdminConfigEntidade->getCampo('valor'));
             $this->obTTCEMGAMP->recuperaDadosExportacaoTipo12($rsRecordSet12);
 
             $arRecordSetArquivos["AMP12"] = $rsRecordSet12;

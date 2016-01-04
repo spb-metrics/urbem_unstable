@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: ROrcamentoDespesa.class.php 63613 2015-09-17 19:40:48Z arthur $
+    $Id: ROrcamentoDespesa.class.php 64263 2015-12-23 13:32:01Z evandro $
 
     $Revision: 30824 $
     $Name$
@@ -148,6 +148,8 @@ var $nuSaldoDotacao;
 */
 var $stDescricao;
 
+var $boDotacaoAnalitica;
+
 /**
      * @access Public
      * @param Object $valor
@@ -229,6 +231,8 @@ function setSaldoDotacao($valor) { $this->nuSaldoDotacao           = $valor; }
 */
 function setDescricao($valor) { $this->stDescricao              = $valor; }
 
+function setDotacaoAnalitica($valor) { $this->boDotacaoAnalitica = $valor; }
+
 /**
      * @access Public
      * @return Object
@@ -309,6 +313,8 @@ function getSaldoDotacao() { return $this->nuSaldoDotacao;          }
      * @return String
 */
 function getDescricao() { return $this->stDescricao;             }
+
+function getDotacaoAnalitica() { return $this->boDotacaoAnalitica; }
 
 /**
     * Método Construtor
@@ -898,6 +904,13 @@ function listarCodEstruturalDespesa(&$rsRecordSet, $stOrder = "", $boTransacao =
     if( $this->obROrcamentoClassificacaoDespesa->getDescricao() )
         $stFiltro .= " lower(conta_despesa.descricao) like lower('%".$this->obROrcamentoClassificacaoDespesa->getDescricao()."%') AND\n";
 
+    if ( $this->getDotacaoAnalitica() ) {
+        $stFiltro .= " NOT EXISTS ( SELECT 1 
+                                        FROM orcamento.despesa
+                                        WHERE despesa.cod_conta = conta_despesa.cod_conta
+                                          AND despesa.exercicio = conta_despesa.exercicio ) AND\n";        
+    }
+
     $stFiltro = ( $stFiltro ) ? substr($stFiltro,0,strlen($stFiltro)-4) : '';
     $stOrder  = ( $stOrder  ) ? $stOrder : "conta_despesa.cod_estrutural,conta_despesa.cod_conta";
     $obErro = $obTContaDespesa->recuperaCodEstrutural( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
@@ -918,6 +931,7 @@ function listarDespesaUsuario(&$rsRecordSet, $stOrder = "", $boTransacao = "")
 {
     include_once( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoDespesa.class.php"             );
     $obTOrcamentoDespesa         = new TOrcamentoDespesa;
+    $rsRecordSet = new RecordSet();
 
     $obTOrcamentoDespesa->setDado( "numcgm"   , $this->obROrcamentoEntidade->obRUsuario->obRCGM->getNumCGM() );
     $obTOrcamentoDespesa->setDado( "exercicio", $this->stExercicio );
@@ -926,8 +940,12 @@ function listarDespesaUsuario(&$rsRecordSet, $stOrder = "", $boTransacao = "")
         $obTOrcamentoDespesa->setDado( 'cod_centro', $this->getCodCentroCusto() );
         $obTOrcamentoDespesa->setDado( 'cod_entidade', $this->obROrcamentoEntidade->getCodigoEntidade() );
         $obTOrcamentoDespesa->setDado( 'cod_despesa', $this->getCodDespesa() );
-        $obErro = $obTOrcamentoDespesa->recuperaDespesaCentroCusto( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-    } else {
+        $obErro = $obTOrcamentoDespesa->recuperaDespesaCentroCusto( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );        
+    }
+    
+    //Caso nao tenha cod de centro de custo ou não existir dotacoes configuradas para tal
+    //buscar as dotacoes na configuracoes empenho.permissao_autorizacao
+    if ($rsRecordSet->getNumLinhas() < 0 ) {
         if( $this->getExercicio() )
             $stFiltro .= " O.exercicio = '".$this->stExercicio ."' AND ";
 

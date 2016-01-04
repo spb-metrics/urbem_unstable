@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacao.php 64132 2015-12-07 13:18:15Z arthur $
+    $Id: PRManterAutorizacao.php 64192 2015-12-14 15:51:03Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -139,7 +139,7 @@ switch ($stAcao) {
                     $obREmpenhoAutorizacaoEmpenho->addItemPreEmpenho();
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNumItem    ( $arItemPreEmpenho[ 'num_item' ]                                      );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setQuantidade ( $arItemPreEmpenho[ 'quantidade' ]                                    );
-                    $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNomUnidade ( $arItemPreEmpenho[ 'nom_unidad' ]                                    );
+                    $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNomUnidade ( $arItemPreEmpenho[ 'nom_unidade' ]                                   );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setValorTotal ( $arItemPreEmpenho[ 'vl_total' ]                                      );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setNomItem    ( $arItemPreEmpenho[ 'nom_item' ]                                      );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setComplemento( $arItemPreEmpenho[ 'complemento' ]                                   );

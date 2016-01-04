@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: FMManterEdital.php 61893 2015-03-12 17:33:33Z carlos.silva $
+    $Id: FMManterEdital.php 64262 2015-12-23 12:48:09Z jean $
 
     * Casos de uso: uc-03.05.16
 */
@@ -97,11 +97,12 @@ if ($_REQUEST['inNumEdital'] && $_REQUEST['stExercicio']) {
     $stLocalMaterial       = $rsEdital->getCampo( 'local_entrega_material' );
     $inCodProcesso         = $rsEdital->getCampo( 'cod_processo' );
     $stExercicioProcesso   = $rsEdital->getCampo( 'exercicio_processo' );
-
     $dtAprovacao           = $rsEdital->getCampo( 'dt_aprovacao_juridico' );
     $stLocalEntrega        = $rsEdital->getCampo( 'local_entrega_propostas' );
     $dtEntrega             = $rsEdital->getCampo( 'dt_entrega_propostas'   );
+    $dtEntregaFinal        = $rsEdital->getCampo( 'dt_final_entrega_propostas'   );
     $stHoraEntrega         = $rsEdital->getCampo( 'hora_entrega_propostas' );
+    $stHoraEntregaFinal    = $rsEdital->getCampo( 'hora_final_entrega_propostas' );
     $stLocalAbertura       = $rsEdital->getCampo( 'local_abertura_propostas' );
     $dtAbertura            = $rsEdital->getCampo( 'dt_abertura_propostas' );
     $dtValidade            = $rsEdital->getCampo( 'dt_validade_proposta' );
@@ -161,25 +162,25 @@ $obMontaLicitacao->setSelecionaAutomaticamenteLicitacao(true);
 $obMontaLicitacao->setEntidadeUsuario( true );
 
 if ($stAcao == 'alterar') {
-        $obExercicio = new Exercicio();
-        $obExercicio->setName( 'stExercicioLicitacao' );
+    $obExercicio = new Exercicio();
+    $obExercicio->setName( 'stExercicioLicitacao' );
 
-        # Define label Entidade.
-        $obLblEntidade = new Label;
-        $obLblEntidade->setRotulo('Entidade');
-        $obLblEntidade->setValue($inCodEntidade." - ".$stNomEntidade  );
+    # Define label Entidade.
+    $obLblEntidade = new Label;
+    $obLblEntidade->setRotulo('Entidade');
+    $obLblEntidade->setValue($inCodEntidade." - ".$stNomEntidade  );
 
-        # Define o Label de Modalidade
-        $obLblModalidade = new Label;
-        $obLblModalidade->setRotulo('Modalidade');
-        $obLblModalidade->setValue($inCodModalidade." - ".$stNomModalidade);
+    # Define o Label de Modalidade
+    $obLblModalidade = new Label;
+    $obLblModalidade->setRotulo('Modalidade');
+    $obLblModalidade->setValue($inCodModalidade." - ".$stNomModalidade);
 
-        # Define o Label Licitacao
-        $obLblLicitacao = new Label;
-        $obLblLicitacao->setRotulo('Número da Licitação');
-        $obLblLicitacao->setValue($inCodLicitacao);
+    # Define o Label Licitacao
+    $obLblLicitacao = new Label;
+    $obLblLicitacao->setRotulo('Número da Licitação');
+    $obLblLicitacao->setValue($inCodLicitacao);
 
-        $obProcessoLicitatorio = new Label();
+    $obProcessoLicitatorio = new Label();
     $obProcessoLicitatorio->setId( 'stProcesso' );
     $obProcessoLicitatorio->setValue( $inCodProcesso."/".$stExercicioProcesso);
     $obProcessoLicitatorio->setRotulo( 'Processo Administrativo' );
@@ -210,16 +211,30 @@ $obLocalEntrega->setNull ( false );
 $obDataEntrega = new Data;
 $obDataEntrega->setName  ( "dtEntrega" );
 $obDataEntrega->setRotulo( "Data da Entrega" );
-$obDataEntrega->setTitle ( "Informe a data limite para entrega das propostas." );
+$obDataEntrega->setTitle ( "Informe a data inicial para entrega das propostas." );
 $obDataEntrega->setValue ( $dtEntrega  );
 $obDataEntrega->setNull  ( false );
 
 $obHoraEntrega = new Hora;
 $obHoraEntrega->setName ( "stHoraEntrega" );
 $obHoraEntrega->setRotulo( "Hora da Entrega" );
-$obHoraEntrega->setTitle( "Informe a hora limite para entrega das propostas." );
+$obHoraEntrega->setTitle( "Informe a hora inicial para entrega das propostas." );
 $obHoraEntrega->setValue( $stHoraEntrega  );
 $obHoraEntrega->setNull ( false );
+
+$obDataEntregaFinal = new Data;
+$obDataEntregaFinal->setName  ( "dtEntregaFinal" );
+$obDataEntregaFinal->setRotulo( "Data Final da Entrega" );
+$obDataEntregaFinal->setTitle ( "Informe a data limite para entrega das propostas." );
+$obDataEntregaFinal->setValue ( $dtEntregaFinal  );
+$obDataEntregaFinal->setNull  ( true );
+
+$obHoraEntregaFinal = new Hora;
+$obHoraEntregaFinal->setName ( "stHoraEntregaFinal" );
+$obHoraEntregaFinal->setRotulo( "Hora Final da Entrega" );
+$obHoraEntregaFinal->setTitle( "Informe a hora limite para entrega das propostas." );
+$obHoraEntregaFinal->setValue( $stHoraEntregaFinal  );
+$obHoraEntregaFinal->setNull ( true );
 
 $obLocalAbertura = new TextBox;
 $obLocalAbertura->setName( 'stLocalAbertura' );
@@ -324,7 +339,9 @@ $obFormulario->addComponente( $obDataAprovacao );
 $obFormulario->addTitulo( 'Sobre as Propostas' );
 $obFormulario->addComponente( $obLocalEntrega );
 $obFormulario->addComponente( $obDataEntrega );
+$obFormulario->addComponente( $obDataEntregaFinal );
 $obFormulario->addComponente( $obHoraEntrega );
+$obFormulario->addComponente( $obHoraEntregaFinal );
 $obFormulario->addComponente( $obLocalAbertura );
 $obFormulario->addComponente( $obDataAbertura );
 $obFormulario->addComponente( $obHoraAbertura );

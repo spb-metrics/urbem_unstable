@@ -29,13 +29,7 @@
 
     * Casos de uso : uc-03.05.31
 
-*/
-
-/*
-$Log$
-Revision 1.1  2007/09/19 14:56:49  bruce
-Ticket#10105#
-
+    $Id: OCRelatorioContrato.php 64212 2015-12-17 12:38:12Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -48,48 +42,46 @@ $preview->setVersaoBirt( '2.5.0' );
 
 $preview->setNomeArquivo('contrato');
 
-$stEntidade = '';
-if ( is_array( $_POST['inNumCGM'] ) ) {
-    $stEntidade = implode ( ' , ' ,  $_POST['inNumCGM'] ) ;
-}
+$stEntidade = $request->get('inNumCGM', '');
+if ( is_array( $stEntidade ) )
+    $stEntidade = implode ( ' , ', $stEntidade );
 
-$preview->addParametro ( 'inNumContrato'  , $_POST['inNumContrato'  ] );
-$preview->addParametro ( 'stObjeto'       , $_POST['stObjeto'       ] );
-$preview->addParametro ( 'stDtInicial'    , $_POST['stDtInicial'    ] );
-$preview->addParametro ( 'stDtFinal'      , $_POST['stDtFinal'      ] );
-$preview->addParametro ( 'inCodFornecedor', $_POST['inCodFornecedor'] );
-$preview->addParametro ( 'stEntidades'    , $stEntidade               );
-$preview->addParametro ( 'stAnulados'     , $_POST['snAnulados']      );
-$preview->addParametro ( 'tipoContrato'     , $_POST['tipoContrato']      );
+$preview->addParametro ( 'inNumContrato'  , $request->get('inNumContrato')   );
+$preview->addParametro ( 'stObjeto'       , $request->get('stObjeto')        );
+$preview->addParametro ( 'stDtInicial'    , $request->get('stDtInicial')     );
+$preview->addParametro ( 'stDtFinal'      , $request->get('stDtFinal')       );
+$preview->addParametro ( 'inCodFornecedor', $request->get('inCodFornecedor') );
+$preview->addParametro ( 'stEntidades'    , $stEntidade                      );
+$preview->addParametro ( 'stAnulados'     , $request->get('snAnulados')      );
+$preview->addParametro ( 'tipoContrato'   , $request->get('tipoContrato')    );
 
-if ($_POST['dtVlPagos']) {
-    $preview->addParametro ( 'dtPagosAte', $_POST['dtVlPagos'] );
-} else {
+if ($request->get('dtVlPagos'))
+    $preview->addParametro ( 'dtPagosAte' , $request->get('dtVlPagos') );
+else
     $preview->addParametro ( 'dtPagosAte', date );
-}
 
-if ( count( $_POST['inCodOrgaoSelecionados'] ) > 0 ) {
-    $stOrgaosSel = implode ( ' , ' , $_POST['inCodOrgaoSelecionados'] );
-}
+$stOrgaosSel = $request->get('inCodOrgaoSelecionados', '');
+if ( is_array( $stOrgaosSel ) && count( $stOrgaosSel ) > 0 )
+    $stOrgaosSel = implode ( ' , ', $stOrgaosSel );
 
-if (!( ($_REQUEST['stDtInicialAssinatura']=="") && ($_REQUEST['stDtFinalAssinatura']=="") ) ) {
-    $dtIni = $_REQUEST['stDtInicialAssinatura'];
-    $dtFim = $_REQUEST['stDtFinalAssinatura'];
-    $periodo = "AND to_char(contrato.dt_assinatura,'DD/MM/YYYY') BETWEEN '".$dtIni."' AND '".$dtFim."'";
+if ( !( ( $request->get('stDtInicialAssinatura', '')=='' ) && ( $request->get('stDtFinalAssinatura', '')=='' ) ) ) {
+    $dtIni = $request->get('stDtInicialAssinatura');
+    $dtFim = $request->get('stDtFinalAssinatura');
+    $periodo = "AND contrato.dt_assinatura BETWEEN to_date('".$dtIni."','dd/mm/yyyy') AND to_date('".$dtFim."','dd/mm/yyyy')";
     $preview->addParametro ( 'periodoAssinatura', $periodo);
 }
 
-if (!( ($_REQUEST['stDtInicialInicioExec']=="") && ($_REQUEST['stDtFinalInicioExec']=="") ) ) {
-    $dtIni = $_REQUEST['stDtInicialInicioExec'];
-    $dtFim = $_REQUEST['stDtFinalInicioExec'];
-    $periodo = "AND to_char(contrato.inicio_execucao,'DD/MM/YYYY') BETWEEN '".$dtIni."' AND '".$dtFim."'";
+if (!( ($request->get('stDtInicialInicioExec', '')=='') && ($request->get('stDtFinalInicioExec', '')=='') ) ) {
+    $dtIni = $request->get('stDtInicialInicioExec');
+    $dtFim = $request->get('stDtFinalInicioExec');
+    $periodo = "AND contrato.inicio_execucao BETWEEN to_date('".$dtIni."','dd/mm/yyyy') AND to_date('".$dtFim."','dd/mm/yyyy')";
     $preview->addParametro ( 'periodoInicioExec', $periodo);
 }
 
-if (!( ($_REQUEST['stDtInicialFimExec']=="") && ($_REQUEST['stDtFinalFimExec']=="") ) ) {
-    $dtIni = $_REQUEST['stDtInicialFimExec'];
-    $dtFim = $_REQUEST['stDtFinalFimExec'];
-    $periodo = "AND to_char(contrato.fim_execucao,'DD/MM/YYYY') BETWEEN '".$dtIni."' AND '".$dtFim."'";
+if (!( ($request->get('stDtInicialFimExec', '')=='') && ($request->get('stDtFinalFimExec', '')=='') ) ) {
+    $dtIni = $request->get('stDtInicialFimExec');
+    $dtFim = $request->get('stDtFinalFimExec');
+    $periodo = "AND contrato.fim_execucao BETWEEN to_date('".$dtIni."','dd/mm/yyyy') AND to_date('".$dtFim."','dd/mm/yyyy')";
     $preview->addParametro ( 'periodoFimExec', $periodo);
 }
 

@@ -42,7 +42,7 @@ DECLARE
 BEGIN
     -- select recuperar todos os servidores
     stSelect := '
-        SELECT 
+        SELECT
              cadastro.cod_contrato
             ,cadastro.registro
             ,cadastro.nom_cgm
@@ -97,7 +97,7 @@ BEGIN
         ORDER BY cadastro.cod_contrato';
 
     -- para cada servidor calcula o evento em questão em todas as folhas (0 a 4)
-    FOR reServidores IN EXECUTE stSelect 
+    FOR reServidores IN EXECUTE stSelect
     LOOP
         -- recupera todos os períodos de movimentação no exercício
         stSelect := 'SELECT *
@@ -122,10 +122,10 @@ BEGIN
             vlPlanoSaude2 := vlPlanoSaude2 + (SELECT * from recupera_evento_calculado_dirf(2, rePeriodos.cod_periodo_movimentacao, reServidores.cod_contrato, inCodEvento, stEntidade));
             vlPlanoSaude3 := vlPlanoSaude3 + (SELECT * from recupera_evento_calculado_dirf(3, rePeriodos.cod_periodo_movimentacao, reServidores.cod_contrato, inCodEvento, stEntidade));
         END LOOP;
-        
+
         vlPlanoSaudeServidor := vlPlanoSaude0 + vlPlanoSaude1 + vlPlanoSaude2 +  vlPlanoSaude3;
 
-        
+
         rwPlanoSaude.registro     := reServidores.registro;
         rwPlanoSaude.cod_contrato := reServidores.cod_contrato;
         rwPlanoSaude.nom_cgm      := reServidores.nom_cgm;
@@ -140,8 +140,8 @@ BEGIN
         vlPlanoSaudeServidor := 0;
 
         RETURN NEXT rwPlanoSaude;
-         
-    END LOOP;        
+
+    END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

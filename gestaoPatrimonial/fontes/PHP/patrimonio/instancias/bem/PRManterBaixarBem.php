@@ -39,30 +39,11 @@
 
     * Casos de uso: uc-03.01.06
 */
-
-/*
-$Log$
-Revision 1.4  2007/10/17 13:27:03  hboaventura
-correção dos arquivos
-
-Revision 1.3  2007/10/05 15:24:32  hboaventura
-inclusão dos arquivos
-
-Revision 1.2  2007/10/05 12:59:35  hboaventura
-inclusão dos arquivos
-
-Revision 1.1  2007/09/27 12:57:24  hboaventura
-adicionando arquivos
-
-Revision 1.1  2007/09/18 15:11:04  hboaventura
-Adicionando ao repositório
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemBaixado.class.php" );
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php" );
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBemBaixado.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoBaixaPatrimonio.class.php";
 
 $stPrograma = "ManterBaixarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -72,66 +53,172 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$obErro          = new Erro();
+$boFlagTransacao = false;
+$obTransacao     = new Transacao();
+$stAcao          = $request->get('stAcao');
 
 $obTPatrimonioBemBaixado = new TPatrimonioBemBaixado();
-$obTPatrimonioBem = new TPatrimonioBem();
-
-Sessao::setTrataExcecao( true );
-Sessao::getTransacao()->setMapeamento( $obTPatrimonioBemBaixado );;
+$obTPatrimonioBem        = new TPatrimonioBem();
+$obTContabilidadeLancamentoBaixaPatrimonio = new TContabilidadeLancamentoBaixaPatrimonio();
 
 switch ($stAcao) {
     case 'incluir':
-        //verifica se existe pelo menos um bem a ser baixado
-        $arBem = Sessao::read('bens');
-        if ( count( $arBem ) == 0 ) {
-            $stMensagem = "Você precisa baixar pelo menos 1 bem.";
-        } else {
-            if ( implode('',array_reverse(explode('/',$_REQUEST['dtBaixa']))) > date('Ymd') ) {
-                $stMensagem = "A data de baixa deve ser menor ou igual a data de hoje";
+        
+        $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+        
+        if (!$obErro->ocorreu()) {
+            
+            //verifica se existe pelo menos um bem a ser baixado
+            $arBem = Sessao::read('bens');
+
+            if ( count( $arBem ) == 0 ) {
+                $obErro->setDescricao("Você precisa baixar pelo menos 1 bem");
             } else {
-                foreach ($arBem as $arTEMP) {
-                    $obTPatrimonioBem->setDado( 'cod_bem', $arTEMP['cod_bem'] );
-                    $obTPatrimonioBem->recuperaPorChave( $rsBem );
-                    if ( implode('',array_reverse(explode('/',$rsBem->getCampo('dt_aquisicao')))) >  implode('',array_reverse(explode('/',$_REQUEST['dtBaixa']))) ) {
-                        $arBensInvalidos[] = $rsBem->getCampo('cod_bem');
+                if ( implode('',array_reverse(explode('/',$request->get('dtBaixa')))) > date('Ymd') ) {
+                    $obErro->setDescricao("A data de baixa deve ser menor ou igual a data de hoje");
+                } else {
+                    foreach ($arBem as $arTEMP) {
+                        $obTPatrimonioBem->setDado( 'cod_bem', $arTEMP['cod_bem'] );
+                        $obTPatrimonioBem->recuperaPorChave( $rsBem );
+                        if ( implode('',array_reverse(explode('/',$rsBem->getCampo('dt_aquisicao')))) >  implode('',array_reverse(explode('/',$request->get('dtBaixa')))) ) {
+                            $arBensInvalidos[] = $rsBem->getCampo('cod_bem');
+                        }
+                        
+                        // Monta a string de bens a serem baixados.
+                        $stCodBem .= $rsBem->getCampo('cod_bem').",";
+                    }
+                    if ( count( $arBensInvalidos ) > 1 ) {
+                        $obErro->setDescricao("O(s) Bem(s) '.implode(',',$arBensInvalidos).' não foram baixados porque a data de aquisição é superior a data de baixa");
+                    } elseif ( count( $arBensInvalidos ) == 1 ) {
+                        $obErro->setDescricao("O Bem '.implode(',',$arBensInvalidos).' não foi baixado porque a data de aquisição é superior a data de baixa");
                     }
                 }
-                if ( count( $arBensInvalidos ) > 1 ) {
-                    $stMensagem = 'O(s) Bem(s) '.implode(',',$arBensInvalidos).' não foram baixados porque a data de aquisição é superior a data de baixa';
-                } elseif ( count( $arBensInvalidos ) == 1 ) {
-                    $stMensagem = 'O Bem '.implode(',',$arBensInvalidos).' não foi baixado porque a data de aquisição é superior a data de baixa';
-                }
             }
-        }
-        if (!$stMensagem) {
-            //seta os dados e inclui
-            $obTPatrimonioBemBaixado->setDado( 'dt_baixa', $_REQUEST['dtBaixa'] );
-            $obTPatrimonioBemBaixado->setDado( 'motivo', $_REQUEST['stMotivo'] );
-            foreach ($arBem as $arTEMP) {
-                $obTPatrimonioBemBaixado->setDado( 'cod_bem', $arTEMP['cod_bem'] );
-                $obTPatrimonioBemBaixado->inclusao();
-                $arBens[] = $arTEMP['cod_bem'];
-            }
-            $stMsg = ( count( $arBens ) > 1 ) ? 'Bens: ' : 'Bem ';
-            $stMsg.= implode( ',',$arBens );
+            
+            if (!$obErro->ocorreu()) {
+                
+                // Faz lançamento autómatico somente para bens configurados como móveis ou imóveis.
+                if ( $request->get('inTipoBaixa') != 0) {
+                    
+                    $stCodBem = substr($stCodBem,0,-1);
+                    $obTPatrimonioBem->setDado('exercicio', Sessao::getExercicio());
+                    $stGrupo = " GROUP BY grupo_plano_analitica.cod_plano
+                                        , grupo_plano_analitica.cod_plano_doacao
+                                        , grupo_plano_analitica.cod_plano_perda_involuntaria
+                                        , grupo_plano_analitica.cod_plano_transferencia
+                                        , natureza.cod_tipo
+                                        , natureza.cod_natureza                 
+                                        , natureza.nom_natureza
+                                        , grupo.cod_grupo
+                                        , grupo.nom_grupo ";
+                    
+                    $obTPatrimonioBem->recuperaContaContabil($rsContaContabil, " WHERE bem.cod_bem IN (".$stCodBem.") \n ", $stGrupo);
+                    
+                    // Verifica se está configurada um tipo de natureza para a natureza do Grupo
+                    if ($rsContaContabil->getCampo('cod_tipo') == 0 || ($rsContaContabil->getCampo('cod_tipo') != 1 && $rsContaContabil->getCampo('cod_tipo') != 2) ) {
+                        $obErro->setDescricao("Necessário configurar um Tipo de Natureza ( 1 - Bens móveis ou 2 - Bens imóveis ) para a Natureza: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza'));
+                    
+                    // Verifica se está configurado um cod_plano contabil para o grupo
+                    } else if ( is_null($rsContaContabil->getCampo('cod_plano')) ) {
+                        $obErro->setDescricao("Necessário configurar uma Conta Contábil para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+                    
+                    // Verifica se está configurado um cod_plano contabil de baixa por doação para o grupo
+                    } else if ( ($request->get('inTipoBaixa') == 1 || $request->get('inTipoBaixa') == 2) && is_null($rsContaContabil->getCampo('cod_plano_doacao') )) {
+                        $obErro->setDescricao("Necessário configurar uma Conta Contábil de Baixa por Doação para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+                    
+                    // Verifica se está configurado um cod_plano contabil de baixa por transferência para o grupo
+                    }else if ( ($request->get('inTipoBaixa') == 3 || $request->get('inTipoBaixa') == 4) && is_null($rsContaContabil->getCampo('cod_plano_transferencia') )) {
+                        $obErro->setDescricao("Necessário configurar uma Conta Contábil de Baixa por Transferência para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+                    
+                    // Verifica se está configurado um cod_plano contabil de baixa por perda involuntária para o grupo
+                    }else if ( ($request->get('inTipoBaixa') == 5 || $request->get('inTipoBaixa') == 6) && is_null($rsContaContabil->getCampo('cod_plano_perda_involuntaria') )) {
+                        $obErro->setDescricao("Necessário configurar uma Conta Contábil de Baixa por Perda Involuntária para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+                    }
 
-            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,$stMsg,"incluir","aviso", Sessao::getId(), "../");
+                    if (!$obErro->ocorreu()){
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stExercicio'   , Sessao::getExercicio());
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stCodBem'      , $stCodBem);
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'inTipoBaixa'   , $request->get('inTipoBaixa'));
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stDataBaixa'   , implode('-', array_reverse(explode('/',$request->get('dtBaixa')))));
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'inCodHistorico', 966);
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stTipo'        , 'B');
+                        $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'boEstorno'     , 'false');
+                        
+                        $obErro = $obTContabilidadeLancamentoBaixaPatrimonio->insereLancamentosBaixaPatrimonio($rsLancamentoBaixa, $boTransacao);
+                    } else {
+                        SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+                    }
+                }
+                
+                if (!$obErro->ocorreu()){
+                    //seta os dados e inclui
+                    $obTPatrimonioBemBaixado->setDado( 'dt_baixa'   , $request->get('dtBaixa') );
+                    $obTPatrimonioBemBaixado->setDado( 'motivo'     , $request->get('stMotivo') );
+                    $obTPatrimonioBemBaixado->setDado( 'tipo_baixa' , $request->get('inTipoBaixa') );
+                    
+                    foreach ($arBem as $arTEMP) {
+                        $obTPatrimonioBemBaixado->setDado( 'cod_bem', $arTEMP['cod_bem'] );
+                        $obTPatrimonioBemBaixado->inclusao($boTransacao);
+                        $arBens[] = $arTEMP['cod_bem'];
+                    }
+                    $stMsg = ( count( $arBens ) > 1 ) ? 'Bens: ' : 'Bem ';
+                    $stMsg.= implode( ',',$arBens );
+                    
+                    $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $obTPatrimonioBemBaixado);
+                    SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,$stMsg,"incluir","aviso", Sessao::getId(), "../");
+                }
+                
+            } else {
+                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()).'!',"n_incluir","erro");
+            }
+        
         } else {
-            SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
 
         break;
 
     case 'excluir' :
+        $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+        
+        if (!$obErro->ocorreu()) {
+        
+            $obTPatrimonioBemBaixado->recuperaRelacionamentoLancamento($rsBaixaLancamento, " WHERE bem.cod_bem = ".$request->get('inCodBem'));
 
-        $obTPatrimonioBemBaixado->setDado( 'cod_bem', $_REQUEST['inCodBem'] );
-        $obTPatrimonioBemBaixado->exclusao();
+            // Caso o bem pertença a há um dos tipos configurados como movél ou imóvel, mas não tenha sofrido um lançamento de baixa identificado pelo tipo de baixa, é necessário fazer o lançamento de forma manual
+            if ( $rsBaixaLancamento->getCampo("tipo_baixa") == 0 && ($rsBaixaLancamento->getCampo("cod_tipo") == 1 || $rsBaixaLancamento->getCampo("cod_tipo") == 2)) {
+                $obErro->setDescricao("O sistema não possui lançamento contábil vinculado ao bem ".$request->get('inCodBem').". Efetue lançamento contábil manual de estorno para este bem.");
+            
+            // Se o bem possuir um lancamento contábil, realiza o estorno, com os dados do exercicio que está fazendo o estorno.
+            } else if ( $rsBaixaLancamento->getCampo("tipo_baixa") != 0 && $rsBaixaLancamento->getCampo("estorno") == "f" && ($rsBaixaLancamento->getCampo("cod_tipo") == 1 || $rsBaixaLancamento->getCampo("cod_tipo") == 2)) {
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stExercicio'   , Sessao::getExercicio());
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stCodBem'      , $rsBaixaLancamento->getCampo("cod_bem"));
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'inTipoBaixa'   , $rsBaixaLancamento->getCampo("tipo_baixa"));
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stDataBaixa'   , $rsBaixaLancamento->getCampo("dt_baixa"));
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'inCodHistorico', 967);
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'stTipo'        , 'B');
+                $obTContabilidadeLancamentoBaixaPatrimonio->setDado( 'boEstorno'     , 'true');
+                $obErro = $obTContabilidadeLancamentoBaixaPatrimonio->insereLancamentosBaixaPatrimonio($rsEstornoBaixa, $boTransacao);
+            }
 
-        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Bem ".$_REQUEST['inCodBem'],"excluir","aviso", Sessao::getId(), "../");
+            if ( !$obErro->ocorreu() ){
+                
+                $obTPatrimonioBemBaixado->setDado( 'cod_bem', $request->get('inCodBem') );
+                $obTPatrimonioBemBaixado->exclusao($boTransacao);
+                
+                $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $obTPatrimonioBemBaixado);
+                SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Bem ".$request->get('inCodBem'),"excluir","aviso", Sessao::getId(), "../");
+                
+            } else {
+                SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,urlencode($obErro->getDescricao()),"excluir","aviso", Sessao::getId(), "../");
+            }
+
+        } else {
+            SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
+        }
 
         break;
-
 }
 
-Sessao::encerraExcecao();
+?>

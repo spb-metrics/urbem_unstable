@@ -335,7 +335,7 @@ BEGIN
                             AND evento_evento.timestamp = max.timestamp         
                     ) as evento_evento
                     
-                    INNER JOIN (SELECT regexp_split_to_table(valor,'','')::integer as cod_evento 
+                    INNER JOIN (SELECT regexp_split_to_table(NULLIF(valor,''''),'','')::integer as cod_evento 
                                     FROM administracao.configuracao 
                                     WHERE cod_modulo = 27 
                                     AND exercicio = '''||stExercicio||'''

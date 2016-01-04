@@ -18,7 +18,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
         <structure>
-            <property name="fileName">/var/www/urbem/gestaoAdministrativa/fontes/RPT/framework/library/urbem_250.rptlibrary</property>
+            <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_250.rptlibrary</property>
             <property name="namespace">urbem_250</property>
         </structure>
     </list-property>
@@ -259,8 +259,7 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="contribuicaoPrevidenciaria" id="1541">
@@ -1364,14 +1363,7 @@ INNER JOIN sw_municipio
             <property name="bottomMargin">20mm</property>
             <property name="rightMargin">10mm</property>
             <page-footer>
-                <grid name="rodape" id="1159" extends="urbem_250.rodape">
-                    <overridden-values>
-                        <ref-entry baseId="180" id="180"/>
-                        <ref-entry baseId="181" id="181"/>
-                        <ref-entry baseId="182" id="182"/>
-                        <ref-entry baseId="183" name="NewText2" id="183"/>
-                    </overridden-values>
-                </grid>
+                <grid name="rodape" id="1159" extends="urbem_250.rodape"/>
             </page-footer>
         </simple-master-page>
     </page-setup>

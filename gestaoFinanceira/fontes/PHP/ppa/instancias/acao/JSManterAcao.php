@@ -31,7 +31,7 @@
  * @author Desenvolvedor : Pedro Vaz de Mello de Medeiros
  * @ignore
 
- $Id: JSManterAcao.php 39850 2009-04-22 20:28:42Z fellipe.santos $
+ $Id: JSManterAcao.php 64234 2015-12-21 17:24:45Z michel $
 
  * Casos de uso: uc-02.09.04
  */
@@ -219,52 +219,9 @@ function incluirRecurso()
     montaParametrosGET('incluirRecurso', null, true);
 }
 
-function excluirRecurso(objeto)
+function excluirRecurso(stCodAcao, stCodRecurso)
 {
-    inRecurso = parseInt(jq(objeto).parent().parent().attr('id').replace('obTblRecursos_row_', '')) - 1;
-
-    var arCodRecurso = [];
-    jq('#spnListaRecurso input[id^=\'arCodRecurso\']').each(function () {
-        arCodRecurso[arCodRecurso.length] = this.value;
-    });
-    var stCodRecurso = arCodRecurso.join(',');
-
-    var stJsonValorAno = '[';
-    var inCount = 1;
-    var arId;
-    jq('#spnListaRecurso input[id^=\'arValorAno\']').each(function () {
-        // Quebra o Id do elemento para poder saber qual input ele é
-        // Não pode entrar no 'if' se o elemento for um totalizador da linha (arValorAno5)
-        // Ou for um totalizador da coluna (arValorAno_totalizador)
-        arId = this.id.split('_');
-        arId[0] = arId[0].replace('arValorAno', '');
-        if (arId[0] != 5 && arId[1] != 'totalizador') {
-            if ((inCount % 4) == 1) {
-                if (inCount > 1) {
-                    stJsonValorAno += ',';
-                }
-                stJsonValorAno += '{';
-            } else {
-                stJsonValorAno += ',';
-            }
-
-            arId = this.id.split('_');
-            stJsonValorAno += '"'+arId[0].replace('arValorAno', '')+'":"'+this.value+'"';
-            if ((inCount % 4) == 0) {
-                stJsonValorAno += '}';
-            }
-            inCount++;
-        }
-    });
-    stJsonValorAno += ']';
-
-    var arNomRecurso = [];
-    jq('#spnListaRecurso input[id^=\'arNomRecurso\']').each(function () {
-        arNomRecurso[arNomRecurso.length] = this.value;
-    });
-    var stNomRecurso = arNomRecurso.join(',');
-
-    jq.post('OCManterAcao.php', {'stCtrl':'excluirRecurso', 'inRecurso':inRecurso, 'arCodRecurso':stCodRecurso, 'arNomRecurso':stNomRecurso, 'arValorAno':stJsonValorAno}, '', 'script');
+    jq.post('OCManterAcao.php', {'stCtrl':'excluirRecurso', 'cod_acao':stCodAcao, 'cod_recurso':stCodRecurso}, '', 'script');
 }
 
 function limparUnidade()
@@ -806,7 +763,6 @@ function formatAnosAcaoValidada(jsonAcaoValidada)
     // percorre o objeto
     for (chave in arCodRecurso) {
         if (!isNaN(parseInt(chave))) {
-
             // um array para representar os 4 anos
             var arAnos = [1,2,3,4];
 
@@ -835,14 +791,7 @@ function formatAnosAcaoValidada(jsonAcaoValidada)
                 }
             }
 
-            // Aqui realiza a verificação para ver se algum dos campos continua bloqueado (se a contagem estiver 4, quer dizer que os 4 campos estão
-            // liberados para recber valores, então não há nenhum campo bloqueado, ou seja, validado na LDO). Caso algum valor esteja, então não
-            // poderá liberar a exclusão desse recurso
-            if (inCount != 4) {
-                jq('img', jq('#obTblRecursos_row_'+inLinha+'_Action_8')).each(function () {
-                    jq(this).css('display', 'none');
-                });
-            }
+            // Regra atualizada no arquivo VPPAManterAcao.class.php
         }
     }
 }

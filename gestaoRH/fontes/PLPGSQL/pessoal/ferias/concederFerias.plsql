@@ -302,4 +302,4 @@ BEGIN
         
     END LOOP;
 END 
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

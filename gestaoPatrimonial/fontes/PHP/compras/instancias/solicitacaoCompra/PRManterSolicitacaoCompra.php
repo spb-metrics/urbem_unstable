@@ -27,7 +27,7 @@
  * Página de Processamento Manter Solicitação de Compra
  * Data de Criação   : 21/09/2006
 
- $Id: PRManterSolicitacaoCompra.php 63962 2015-11-11 18:32:34Z franver $
+ $Id: PRManterSolicitacaoCompra.php 64213 2015-12-17 12:54:03Z evandro $
 
  * @ignore
 
@@ -896,6 +896,7 @@ switch ($stAcao) {
         Sessao::getTransacao()->setMapeamento( $obTComprasSolicitacao );
 
         //pega as configurações do sistema
+        $inCodUf = SistemaLegado::pegaConfiguracao('cod_uf', 2);
         $boHomologaAutomatico = SistemaLegado::pegaConfiguracao ('homologacao_automatica', 35);
         $boReservaRigida = SistemaLegado::pegaConfiguracao		('reserva_rigida'        , 35);
         $boDotacaoObrigatoria = SistemaLegado::pegaConfiguracao	('dotacao_obrigatoria_solicitacao', 35);
@@ -905,7 +906,7 @@ switch ($stAcao) {
         $boHomologaAutomatico = ( $boHomologaAutomatico == 'true' ) ? true : false;
         
         //Se a Solicitação for Registro de Preço, Não efetua Reserva de Saldo e Dotação Orçamentária Não é Obrigatória
-        $boRegistroPreco = $_REQUEST['boRegistroPreco'];
+        $boRegistroPreco = $request->get('boRegistroPreco');
         if($boRegistroPreco=='true'){
             $boReservaRigida = false;
             $boDotacaoObrigatoria = false;
@@ -914,11 +915,11 @@ switch ($stAcao) {
         # Valida a data da solicitação que deve ser informada obrigatoriamente.
         if ( !empty($_REQUEST['stDtSolicitacao']) ) {
             # Não pode ser menor que a data da Ultima autorização.
-            if (!SistemaLegado::comparaDatas($_REQUEST['stDtSolicitacao'], $_REQUEST['HdnDtSolicitacao'], true)) {
+            if (!SistemaLegado::comparaDatas($request->get('stDtSolicitacao'), $request->get('HdnDtSolicitacao'), true)) {
                 $stMensagem = "A data da solicitação não pode ser menor que a data da última autorização (".$_REQUEST['HdnDtSolicitacao'].")";
             }
             # Não pode ser maior que a data corrente.
-            if (!SistemaLegado::comparaDatas(date('d/m/Y'), $_REQUEST['stDtSolicitacao'], true)) {
+            if (!SistemaLegado::comparaDatas(date('d/m/Y'), $request->get('stDtSolicitacao'), true)) {
                 $stMensagem = "A data da solicitação não pode ser maior que a data atual.";
             }
         } else {
@@ -931,19 +932,19 @@ switch ($stAcao) {
         }
 
         # Verifica se o Objeto foi preenchido e cadastra o objeto se necessário
-        if ($_REQUEST['txtObjeto'] == "") {
+        if ($request->get('txtObjeto') == "") {
             $stMensagem = "Campo objeto obrigatório.";
         } else {
             //Se está preenchido a descrição do objeto mas não tem o código, deve ser inserido no banco o novo objeto
             //Se tiver código informado verificar se é valido
 
-            if (trim($_REQUEST['stObjeto']) == "") {
+            if (trim($request->get('stObjeto')) == "") {
                 //Se somente a descrição foi informada procura se já existe um objeto com esta descrição se não, incluiu um novo
-                $obTComprasObjeto->setDado( 'descricao',trim($_REQUEST['txtObjeto']) );
+                $obTComprasObjeto->setDado( 'descricao',trim($request->get('txtObjeto')) );
                 $obTComprasObjeto->recuperaObjeto($rsObjeto);
                 if ($rsObjeto->EOF()) {
                     $obNovoTComprasObjeto = new TComprasObjeto();
-                    $obNovoTComprasObjeto->setDado( 'descricao', trim($_REQUEST['txtObjeto']) );
+                    $obNovoTComprasObjeto->setDado( 'descricao', trim($request->get('txtObjeto')) );
                     $obNovoTComprasObjeto->inclusao();
                     $obInObjeto = $obNovoTComprasObjeto->getDado( 'cod_objeto' );
                 } else {
@@ -951,12 +952,12 @@ switch ($stAcao) {
                 }
             } else {
                 //Valida o código do objeto informado
-                $obTComprasObjeto->setDado( 'cod_objeto',$_REQUEST['stObjeto'] );
+                $obTComprasObjeto->setDado( 'cod_objeto',$request->get('stObjeto') );
                 $obTComprasObjeto->recuperaObjeto($rsObjeto);
                 if ( $rsObjeto->EOF() ) {
                     $stMensagem = 'O objeto informado não existe!';
                 } else {
-                    $obInObjeto = $_REQUEST['stObjeto'];
+                    $obInObjeto = $request->get('stObjeto');
                 }
             }
         }
@@ -975,6 +976,7 @@ switch ($stAcao) {
                 break;
             }
 
+           
             if ($boReservaRigida) {
                 if ( !isset($arDadosDespesa[$arItens['inCodDespesa']]) ) {
                     $obTOrcamentoDespesa = new TOrcamentoDespesa;
@@ -989,28 +991,30 @@ switch ($stAcao) {
                 }
 
                 $arDadosDespesa[$arItens['inCodDespesa']] -= str_replace( ',', '.', str_replace( '.', '', $arItens['nuVlTotal'] ) );
+
                 if ($arDadosDespesa[$arItens['inCodDespesa']] < 0) {
                     $stMensagem = "Valor da Reserva é Superior ao Saldo da Dotação (".$arItens['inCodDespesa'].").";
                     break;
                 }
             }
+            
         }
 
         if (!$stMensagem) {
             // Trata a data da Solicitação para ser inserida como Timestamp.
-            list($dia, $mes, $ano) = explode("/", $_REQUEST['stDtSolicitacao']);
+            list($dia, $mes, $ano) = explode("/", $request->get('stDtSolicitacao'));
             $stDtSolicitacao   = $ano."-".$mes."-".$dia;
             $stHoraSolicitacao = date('H:i:s.ms');
 
             //inclui a solicitação
             $obTComprasSolicitacao->setDado('exercicio'         , Sessao::getExercicio());
-            $obTComprasSolicitacao->setDado('cod_entidade'      , $_REQUEST['HdnCodEntidade']);
-            $obTComprasSolicitacao->setDado('cod_almoxarifado'  , $_REQUEST['inCodAlmoxarifado']);
-            $obTComprasSolicitacao->setDado('cgm_solicitante'   , $_REQUEST['inCGM']);
+            $obTComprasSolicitacao->setDado('cod_entidade'      , $request->get('HdnCodEntidade'));
+            $obTComprasSolicitacao->setDado('cod_almoxarifado'  , $request->get('inCodAlmoxarifado'));
+            $obTComprasSolicitacao->setDado('cgm_solicitante'   , $request->get('inCGM'));
             $obTComprasSolicitacao->setDado('cgm_requisitante'  , Sessao::read('numCgm'));
             $obTComprasSolicitacao->setDado('cod_objeto'        , $obInObjeto);
-            $obTComprasSolicitacao->setDado('observacao'        , $_REQUEST['stObservacao']);
-            $obTComprasSolicitacao->setDado('prazo_entrega'     , $_REQUEST['stPrazoEntrega']);
+            $obTComprasSolicitacao->setDado('observacao'        , $request->get('stObservacao'));
+            $obTComprasSolicitacao->setDado('prazo_entrega'     , $request->get('stPrazoEntrega'));
             $obTComprasSolicitacao->setDado('timestamp'         , $stDtSolicitacao." ".$stHoraSolicitacao);
             $obTComprasSolicitacao->setDado('registro_precos'   , $boRegistroPreco);
             $obTComprasSolicitacao->inclusao();
@@ -1023,14 +1027,14 @@ switch ($stAcao) {
 
             $inSolicitacao = $obTComprasSolicitacao->getDado("cod_solicitacao");
 
-            if ($_REQUEST['inCodConvenio']) {
+            if ($request->get('inCodConvenio')) {
                 //inclui na tabela compra.solicitacao_convenio se for selecionado na combo
-                $stConvenio = explode ("-", $_REQUEST['inCodConvenio']);
+                $stConvenio = explode ("-", $request->get('inCodConvenio'));
                 $exercicio_convenio = $stConvenio[0];
                 $num_convenio = $stConvenio[1];
 
                 $obTComprasSolicitacaoConvenio->setDado( 'exercicio'         , Sessao::getExercicio()         );
-                $obTComprasSolicitacaoConvenio->setDado( 'cod_entidade'      , $_REQUEST['HdnCodEntidade']    );
+                $obTComprasSolicitacaoConvenio->setDado( 'cod_entidade'      , $request->get('HdnCodEntidade')    );
                 $obTComprasSolicitacaoConvenio->setDado( 'cod_solicitacao'   , $inSolicitacao                 );
                 $obTComprasSolicitacaoConvenio->setDado( 'num_convenio'      , $num_convenio                 );
                 $obTComprasSolicitacaoConvenio->setDado( 'exercicio_convenio', $exercicio_convenio            );
@@ -1039,9 +1043,9 @@ switch ($stAcao) {
 
             //inclui na tabela solicitacao_entrega
             $obTComprasSolicitacaoEntrega->setDado( 'exercicio'      ,Sessao::getExercicio()         );
-            $obTComprasSolicitacaoEntrega->setDado( 'cod_entidade'   ,$_REQUEST['HdnCodEntidade'] );
+            $obTComprasSolicitacaoEntrega->setDado( 'cod_entidade'   ,$request->get('HdnCodEntidade') );
             $obTComprasSolicitacaoEntrega->setDado( 'cod_solicitacao',$inSolicitacao             );
-            $obTComprasSolicitacaoEntrega->setDado( 'numcgm'         ,$_REQUEST['inEntrega']     );
+            $obTComprasSolicitacaoEntrega->setDado( 'numcgm'         ,$request->get('inEntrega')     );
             $obTComprasSolicitacaoEntrega->inclusao();
 
             $arValoresAux = $arValores;
@@ -1075,7 +1079,7 @@ switch ($stAcao) {
 
                 //inclui os itens da solicitação
                 $obTComprasSolicitacaoItem->setDado('exercicio'      , Sessao::getExercicio());
-                $obTComprasSolicitacaoItem->setDado('cod_entidade'   , $_REQUEST['HdnCodEntidade']);
+                $obTComprasSolicitacaoItem->setDado('cod_entidade'   , $request->get('HdnCodEntidade'));
                 $obTComprasSolicitacaoItem->setDado('cod_solicitacao', $inSolicitacao);
                 $obTComprasSolicitacaoItem->setDado('cod_centro'     , $inCodCentroCusto);
                 $obTComprasSolicitacaoItem->setDado('cod_item'       , $inCodItem);
@@ -1088,7 +1092,7 @@ switch ($stAcao) {
 
             $nroItensReservaSaldo = 0;
 
-            foreach( $arValores as $key => $arItens ) :
+            foreach( $arValores as $key => $arItens ) {
                 //inclui a dotação caso tenha sido selecionado uma
                 if ($arItens['inCodDespesa'] != '') {
                     $stFiltro = " AND D.cod_despesa     = ".$arItens['inCodDespesa']."\n";
@@ -1096,7 +1100,7 @@ switch ($stAcao) {
 
                     $obTOrcamentoContaDespesa->recuperaRelacionamento( $rsContaDespesa , $stFiltro );
 
-                    $stSql =" WHERE solicitacao_item_dotacao.cod_entidade =".$_REQUEST['HdnCodEntidade']."                                \n";
+                    $stSql =" WHERE solicitacao_item_dotacao.cod_entidade =".$request->get('HdnCodEntidade')."                                \n";
                     $stSql.=" AND solicitacao_item_dotacao.cod_solicitacao=".$inSolicitacao."    \n";
                     $stSql.=" AND solicitacao_item_dotacao.cod_centro=".$arItens['inCodCentroCusto']."\n";
                     $stSql.=" AND solicitacao_item_dotacao.cod_item  =".$arItens['inCodItem']."       \n";
@@ -1104,7 +1108,7 @@ switch ($stAcao) {
                     $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItem,$stSql);
 
                     $obTComprasSolicitacaoItemDotacao->setDado('exercicio'      ,Sessao::getExercicio()		       );
-                    $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'   ,$_REQUEST['HdnCodEntidade']   		       );
+                    $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'   ,$request->get('HdnCodEntidade')   		       );
                     $obTComprasSolicitacaoItemDotacao->setDado('cod_solicitacao',$inSolicitacao            );
                     $obTComprasSolicitacaoItemDotacao->setDado('cod_centro'     ,$arItens['inCodCentroCusto']  );
                     $obTComprasSolicitacaoItemDotacao->setDado('cod_item'       ,$arItens['inCodItem']         );
@@ -1132,14 +1136,20 @@ switch ($stAcao) {
                         $obTOrcamentoReservaSaldo->setDado( 'exercicio'          , Sessao::getExercicio()	        );
                         $obTOrcamentoReservaSaldo->setDado( 'cod_reserva',         $inCodReserva                    );
                         $obTOrcamentoReservaSaldo->setDado( 'cod_despesa'        , $arItens['inCodDespesa']         );
-                        $obTOrcamentoReservaSaldo->setDado( 'dt_validade_inicial', $_REQUEST['stDtSolicitacao']     );
+                        $obTOrcamentoReservaSaldo->setDado( 'dt_validade_inicial', $request->get('stDtSolicitacao')     );
                         $obTOrcamentoReservaSaldo->setDado( 'tipo'               , 'A'                              );
-                        $obTOrcamentoReservaSaldo->setDado( 'dt_inclusao'        , $_REQUEST['stDtSolicitacao']     );
-                        $obTOrcamentoReservaSaldo->setDado( 'motivo'             , "Entidade: ".$_REQUEST['HdnCodEntidade']." - ".$nomEntidade.", solicitação de compras: ".$inSolicitacao."/".Sessao::getExercicio().', Item:'.$arItens['inCodItem']);
+                        $obTOrcamentoReservaSaldo->setDado( 'dt_inclusao'        , $request->get('stDtSolicitacao')     );
+                        $obTOrcamentoReservaSaldo->setDado( 'motivo'             , "Entidade: ".$request->get('HdnCodEntidade')." - ".$nomEntidade.", solicitação de compras: ".$inSolicitacao."/".Sessao::getExercicio().', Item:'.$arItens['inCodItem']);
                         $obTOrcamentoReservaSaldo->setDado( 'vl_reserva'         ,  $nuVlReserva	                );
                         $obTOrcamentoReservaSaldo->setDado( 'dt_validade_final'  , '31/12/'.Sessao::getExercicio()  );
+                        
+                        //Caso for estado de MG não deve validar a homologacao automatica já que lá é tudo manual
+                        //Atribuindo o valor de true na variavel de homolagacao para nao afetar outros estados
+                        if ( $inCodUf == 11 ) {
+                            $boHomologaAutomatico = true;
+                        }
 
-                        if ($boHomologaAutomatico&&$boReservaRigida) {
+                        if ($boHomologaAutomatico && $boReservaRigida) {                            
                             if ( $obTOrcamentoReservaSaldo->incluiReservaSaldo() ) {
                                 $arValores[$key]['inCodReserva'] = $inCodReserva;
                                 $nroItensReservaSaldo++;
@@ -1151,7 +1161,7 @@ switch ($stAcao) {
                         }
                     }
                 }
-            endforeach;
+            }
 
             $boIncluiHomologacaoReserva = false;
 
@@ -1159,7 +1169,7 @@ switch ($stAcao) {
                 if ($boHomologaAutomatico) {
                     if ($nroItensReservaSaldo == count($arValores)) {
                         $obTComprasSolicitacaoHomologacao->setDado( 'exercicio'		 	,Sessao::getExercicio() 		);
-                        $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$_REQUEST['HdnCodEntidade'] );
+                        $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$request->get('HdnCodEntidade') );
                         $obTComprasSolicitacaoHomologacao->setDado( 'cod_solicitacao'	,$inSolicitacao 			);
                         $obTComprasSolicitacaoHomologacao->setDado( 'numcgm'			,Sessao::read('numCgm') 			);
                         $obTComprasSolicitacaoHomologacao->inclusao();
@@ -1172,7 +1182,7 @@ switch ($stAcao) {
             } else {
                 if ($boHomologaAutomatico) {
                     $obTComprasSolicitacaoHomologacao->setDado( 'exercicio'		 	,Sessao::getExercicio() 		);
-                    $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$_REQUEST['HdnCodEntidade'] );
+                    $obTComprasSolicitacaoHomologacao->setDado( 'cod_entidade'	 	,$request->get('HdnCodEntidade') );
                     $obTComprasSolicitacaoHomologacao->setDado( 'cod_solicitacao'	,$inSolicitacao 			);
                     $obTComprasSolicitacaoHomologacao->setDado( 'numcgm'			,Sessao::read('numCgm') 			);
                     $obTComprasSolicitacaoHomologacao->inclusao();
@@ -1189,7 +1199,7 @@ switch ($stAcao) {
                             // inclusão na tabela compras.solicitacao_homologada_reserva
                             $obTSolicitacaoHomologadaReserva = new TComprasSolicitacaoHomologadaReserva;
                             $obTSolicitacaoHomologadaReserva->setDado ( 'exercicio'       , Sessao::getExercicio()       );
-                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_entidade'    , $_REQUEST['HdnCodEntidade']  );
+                            $obTSolicitacaoHomologadaReserva->setDado ( 'cod_entidade'    , $request->get('HdnCodEntidade')  );
                             $obTSolicitacaoHomologadaReserva->setDado ( 'cod_solicitacao' , $inSolicitacao               );
                             $obTSolicitacaoHomologadaReserva->setDado ( 'cod_item'        , $arItens['inCodItem']        );
                             $obTSolicitacaoHomologadaReserva->setDado ( 'cod_centro'      , $arItens['inCodCentroCusto'] );
@@ -1204,7 +1214,7 @@ switch ($stAcao) {
             }
 
             $pgAux = ($_REQUEST['boRelatorio']) ? $pgRel : $pgForm;
-            SistemaLegado::alertaAviso($pgAux."&dtSolicitacao=".$_REQUEST['stDtSolicitacao']."&stHoraSolicitacao=".$stHoraSolicitacao."&inSolicitacao=".$inSolicitacao."&inEntidade=".$obTComprasSolicitacao->getDado('cod_entidade')."&dtSolicitacao=".$_REQUEST['stDtSolicitacao'],"Número da solicitação: ".$inSolicitacao." ".$mensagemHomologacao,"incluir", "aviso", Sessao::getId(),"");
+            SistemaLegado::alertaAviso($pgAux."&dtSolicitacao=".$request->get('stDtSolicitacao')."&stHoraSolicitacao=".$stHoraSolicitacao."&inSolicitacao=".$inSolicitacao."&inEntidade=".$obTComprasSolicitacao->getDado('cod_entidade')."&dtSolicitacao=".$request->get('stDtSolicitacao'),"Número da solicitação: ".$inSolicitacao." ".$mensagemHomologacao,"incluir", "aviso", Sessao::getId(),"");
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem), "n_incluir", "erro" );
             SistemaLegado::LiberaFrames(true,true);

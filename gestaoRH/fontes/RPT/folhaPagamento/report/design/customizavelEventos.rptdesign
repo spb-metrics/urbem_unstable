@@ -321,8 +321,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481" extends="urbem.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="481"
+ extends="urbem.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="principal" id="494">
@@ -350,31 +350,49 @@ if(params["cod_evento6"] != '0'){
 this.queryText  = "SELECT                                                                                   \n";
 this.queryText += "    cod_contrato, registro, nom_cgm, desc_orgao, desc_local, desc_funcao, desc_cargo     \n";
 this.queryText += "    , desc_especialidade_cargo, desc_especialidade_funcao, desc_padrao                   \n";
-this.queryText += "    , valor1, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade1Parcela IS NOT NULL THEN (trim(both from to_char(quantidade1, '999999999')) || '/'|| trim(both from to_char(quantidade1Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade1)                                        \n";
-this.queryText += "      END AS quantidade1                                                                 \n";
-this.queryText += "    , valor2, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade2Parcela IS NOT NULL THEN (trim(both from to_char(quantidade2, '999999999')) || '/'|| trim(both from to_char(quantidade2Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade2)                                        \n";
-this.queryText += "      END AS quantidade2                                                                 \n";
-this.queryText += "    , valor3, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade3Parcela IS NOT NULL THEN (trim(both from to_char(quantidade3, '999999999')) || '/'|| trim(both from to_char(quantidade3Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade3)                                        \n";
-this.queryText += "      END AS quantidade3                                                                 \n";
-this.queryText += "    , valor4, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade4Parcela IS NOT NULL THEN (trim(both from to_char(quantidade4, '999999999')) || '/'|| trim(both from to_char(quantidade4Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade4)                                        \n";
-this.queryText += "      END AS quantidade4                                                                 \n";
-this.queryText += "    , valor5, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade5Parcela IS NOT NULL THEN (trim(both from to_char(quantidade5, '999999999')) || '/'|| trim(both from to_char(quantidade5Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade5)                                        \n";
-this.queryText += "      END AS quantidade5                                                                 \n";
-this.queryText += "    , valor6, CASE                                                                       \n";
-this.queryText += "          WHEN quantidade6Parcela IS NOT NULL THEN (trim(both from to_char(quantidade6, '999999999')) || '/'|| trim(both from to_char(quantidade6Parcela, '999999999')))   \n";
-this.queryText += "          ELSE publico.fn_numeric_br(quantidade6)                                        \n";
-this.queryText += "      END AS quantidade6                                                                 \n";
-this.queryText += "       ,(SELECT publico.mascara_cpf_cnpj(cpf,\'CPF\')) as cpf_formatado                  \n";
+this.queryText += " , COALESCE(valor1,0.00) as valor1 \n";
+this.queryText += "    , CASE WHEN quantidade1Parcela IS NOT NULL \n";
+this.queryText += "        THEN              \n";
+this.queryText += "            (trim(to_char(quantidade1, '999999999')) || '/'|| trim(to_char(quantidade1Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "        ELSE              \n";
+this.queryText += "            COALESCE(quantidade1,0.00)::VARCHAR \n"; 
+this.queryText += "    END AS quantidade1 \n";
+this.queryText += "    , COALESCE(valor2,0.00) as valor2  \n";
+this.queryText += "    , CASE WHEN quantidade2Parcela IS NOT NULL \n";
+this.queryText += "        THEN \n";
+this.queryText += "            (trim(to_char(quantidade2, '999999999')) || '/'|| trim(to_char(quantidade2Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "        ELSE             \n";
+this.queryText += "            COALESCE(quantidade2,0.00)::VARCHAR \n";
+this.queryText += "    END AS quantidade2 \n";
+this.queryText += "    , COALESCE(valor3,0.00) as valor3 \n";
+this.queryText += "    , CASE WHEN quantidade3Parcela IS NOT NULL \n";
+this.queryText += "            THEN \n";
+this.queryText += "                (trim(to_char(quantidade3, '999999999')) || '/'|| trim(to_char(quantidade3Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "            ELSE \n";
+this.queryText += "                COALESCE(quantidade3,0.00)::VARCHAR \n";
+this.queryText += "      END AS quantidade3 \n";
+this.queryText += "    , COALESCE(valor4,0.00) as valor4 \n";
+this.queryText += "    , CASE WHEN quantidade4Parcela IS NOT NULL \n";
+this.queryText += "            THEN \n";
+this.queryText += "                (trim(to_char(quantidade4, '999999999')) || '/'|| trim(to_char(quantidade4Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "            ELSE \n";
+this.queryText += "                COALESCE(quantidade4,0.00)::VARCHAR \n";
+this.queryText += "      END AS quantidade4 \n";
+this.queryText += "    , COALESCE(valor5,0.00) as valor5 \n";
+this.queryText += "    , CASE WHEN quantidade5Parcela IS NOT NULL \n";
+this.queryText += "            THEN \n";
+this.queryText += "                (trim(to_char(quantidade5, '999999999')) || '/'|| trim(to_char(quantidade5Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "            ELSE \n";
+this.queryText += "                COALESCE(quantidade5,0.00)::VARCHAR \n";
+this.queryText += "      END AS quantidade5 \n";
+this.queryText += "    , COALESCE(valor6,0.00) as valor6 \n";
+this.queryText += "    , CASE WHEN quantidade6Parcela IS NOT NULL \n";
+this.queryText += "            THEN \n";
+this.queryText += "                (trim(to_char(quantidade6, '999999999')) || '/'|| trim(to_char(quantidade6Parcela, '999999999')))::VARCHAR \n";
+this.queryText += "            ELSE \n";
+this.queryText += "                COALESCE(quantidade6,0.00)::VARCHAR \n";
+this.queryText += "      END AS quantidade6 \n";
+this.queryText += "    ,(SELECT publico.mascara_cpf_cnpj(cpf,'CPF')) as cpf_formatado \n";
 if(params["boAgrupar"] == "true"){
 	if(params["stTipoFiltro"] == "lotacao_grupo"){
 		this.queryText += " , desc_orgao AS agrupamento";

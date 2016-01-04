@@ -437,4 +437,4 @@ END LOOP;
     RETURN;
     
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

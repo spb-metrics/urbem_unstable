@@ -33,7 +33,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioBancoRecurso.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCGeraRelatorioBancoRecurso.php 64186 2015-12-11 20:36:20Z franver $
 
     * Casos de uso: uc-02.02.18
 */
@@ -52,6 +52,8 @@ if ( count( $arFiltro['inCodEntidade'] ) == 1 ) {
     $obRRelatorio->setExercicioEntidade ( Sessao::getExercicio() );
 }
 
+$rsBancoRecurso = Sessao::read('rsBancoRecurso');
+
 $obRRelatorio->setExercicio     ( Sessao::getExercicio() );
 $obRRelatorio->recuperaCabecalho( $arConfiguracao );
 $obPDF->setModulo               ( "Relatorio" );
@@ -59,7 +61,7 @@ $obPDF->setTitulo               ( "Plano de Contas Banco/Recurso" );
 $obPDF->setSubTitulo            ( "Exercicio - ".Sessao::getExercicio() );
 $obPDF->setUsuario              ( Sessao::getUsername() );
 $obPDF->setEnderecoPrefeitura   ( $arConfiguracao );
-$obPDF->addRecordSet            ( Sessao::read('rsBancoRecurso') );
+$obPDF->addRecordSet            ( $rsBancoRecurso );
 
 //$obPDF->setAlinhamento          ( "L" );
 //$obPDF->addCabecalho            ( "ESTRUTURAL", 10, 10);

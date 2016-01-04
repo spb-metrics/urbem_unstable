@@ -69,11 +69,150 @@ VALUES
      , 'evento_automatico'
      , ''
      );
+INSERT
+  INTO administracao.configuracao
+     ( cod_modulo
+     , exercicio
+     , parametro
+     , valor
+     )
+VALUES
+     ( 27
+     , '2016'
+     , 'evento_automatico'
+     , ''
+     );
 
 
 ----------------
 -- Ticket #23355
 ----------------
 
-SELECT atualizarConfiguracao(27, 'adiantamento_13_salario', 'false');
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+    stSQL       VARCHAR;
+    reRecord    RECORD;
+BEGIN
+    INSERT
+      INTO administracao.configuracao
+         ( cod_modulo
+         , exercicio
+         , parametro
+         , valor
+         )
+    VALUES
+         ( 27
+         , '2015'
+         , 'adiantamento_13_salario'
+         , ''
+         );
+    INSERT
+      INTO administracao.configuracao
+         ( cod_modulo
+         , exercicio
+         , parametro
+         , valor
+         )
+    VALUES
+         ( 27
+         , '2016'
+         , 'adiantamento_13_salario'
+         , ''
+         );
+
+    stSQL := '
+                 SELECT cod_entidade
+                   FROM orcamento.entidade
+               GROUP BY cod_entidade
+                      ;
+             ';
+    FOR reRecord IN EXECUTE stSQL LOOP
+        INSERT
+          INTO administracao.configuracao_entidade
+             ( exercicio
+             , cod_entidade
+             , cod_modulo
+             , parametro
+             , valor
+             )
+        SELECT '2015'
+             , reRecord.cod_entidade
+             , 27
+             , 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+             , ''
+         WHERE 0 = (
+                     SELECT COUNT(1)
+                       FROM administracao.configuracao_entidade
+                      WHERE exercicio    = '2015'
+                        AND cod_entidade = reRecord.cod_entidade
+                        AND cod_modulo   = 27
+                        AND parametro    = 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+                   )
+             ;
+        INSERT
+          INTO administracao.configuracao
+             ( exercicio
+             , cod_modulo
+             , parametro
+             , valor
+             )
+        SELECT '2015'
+             , 27
+             , 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+             , ''
+         WHERE 0 = (
+                     SELECT COUNT(1)
+                       FROM administracao.configuracao
+                      WHERE exercicio    = '2015'
+                        AND cod_modulo   = 27
+                        AND parametro    = 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+                   )
+             ;
+        INSERT
+          INTO administracao.configuracao_entidade
+             ( exercicio
+             , cod_entidade
+             , cod_modulo
+             , parametro
+             , valor
+             )
+        SELECT '2016'
+             , reRecord.cod_entidade
+             , 27
+             , 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+             , ''
+         WHERE 0 = (
+                     SELECT COUNT(1)
+                       FROM administracao.configuracao_entidade
+                      WHERE exercicio    = '2016'
+                        AND cod_entidade = reRecord.cod_entidade
+                        AND cod_modulo   = 27
+                        AND parametro    = 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+                   )
+             ;
+        INSERT
+          INTO administracao.configuracao
+             ( exercicio
+             , cod_modulo
+             , parametro
+             , valor
+             )
+        SELECT '2016'
+             , 27
+             , 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+             , ''
+         WHERE 0 = (
+                     SELECT COUNT(1)
+                       FROM administracao.configuracao
+                      WHERE exercicio    = '2016'
+                        AND cod_modulo   = 27
+                        AND parametro    = 'adiantamento_13_salario_'||reRecord.cod_entidade::VARCHAR
+                   )
+             ;
+    END LOOP;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
 

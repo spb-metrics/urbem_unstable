@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OPS.inc.php 60758 2014-11-13 13:57:10Z franver $
+    $Id: OPS.inc.php 64230 2015-12-21 13:22:11Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -88,7 +88,6 @@
         }
 
     	$stChave2 = $arOrdemPagamento['codprograma'].
-    				//$arOrdemPagamento['numeroliquidacao'].
     				$arOrdemPagamento['codunidade'].
     				$arOrdemPagamento['codfuncao'].
     				$arOrdemPagamento['codsubfuncao'].
@@ -102,7 +101,6 @@
     				$arOrdemPagamento['nrdocumento'];
 
     	$stChave = $arOrdemPagamento['codprograma'].
-    			   //$arOrdemPagamento['numeroliquidacao'].
     			   $arOrdemPagamento['codunidade'].
     			   $arOrdemPagamento['codfuncao'].
     			   $arOrdemPagamento['codsubfuncao'].
@@ -115,7 +113,6 @@
     			   $arOrdemPagamento['nroop'];
 
         $stChaveSemDocumentoLiquidacao =    $arOrdemPagamento['codprograma'].
-    										//$arOrdemPagamento['numeroliquidacao'].
     										$arOrdemPagamento['codunidade'].
     										$arOrdemPagamento['codfuncao'].
     										$arOrdemPagamento['codsubfuncao'].
@@ -244,7 +241,6 @@
             //loop do tipo 11 -- 2008
             foreach ($rsOrdemPagamentoMovimentacao->arElementos as $arOPMovimentacao) {
 				$stChaveMovimentacao = $arOPMovimentacao['codprograma'].
-				//$arOPMovimentacao['numeroliquidacao'].
 				$arOPMovimentacao['codunidade'].
 				$arOPMovimentacao['codfuncao'].
 				$arOPMovimentacao['codsubfuncao'].
@@ -478,7 +474,6 @@
                 $arOPMovimentacao['nrdocumento'] = $stcomplemento;
 
                 $stChaveMovimentacao =  $arOPMovimentacao['codprograma'].
-    									//$arOPMovimentacao['numeroliquidacao'].
     									$arOPMovimentacao['codunidade'].
     									$arOPMovimentacao['codfuncao'].
     									$arOPMovimentacao['codsubfuncao'].
@@ -489,13 +484,9 @@
     									$arOPMovimentacao['dotorigp2001'].
     									$arOPMovimentacao['nroempenho'].
     									$arOPMovimentacao['nroop'];
-    									// $arOPMovimentacao['nrdocumento'];
 
-                $stChave13 = $stChaveMovimentacao.$arOPMovimentacao['banco'].$arOPMovimentacao['agencia'].$arOPMovimentacao['contacorrente'].$arOPMovimentacao['vldocumento'];
-                // $stChave13 = $stChave2.$arOPMovimentacao['banco'].$arOPMovimentacao['agencia'].$arOPMovimentacao['contacorrente'].$arOPMovimentacao['vlretencao'];
-                // $stChave13b = $stChave.$arOPMovimentacao['banco'].$arOPMovimentacao['agencia'].$arOPMovimentacao['contacorrente'].$arOPMovimentacao['vlretencao'];
+                $stChave13 = $stChaveMovimentacao.$arOPMovimentacao['banco'].$arOPMovimentacao['agencia'].$arOPMovimentacao['contacorrente']; //.$arOPMovimentacao['vldocumento'];
 
-                // if ($stChave2 === $stChaveMovimentacao) {
                 if ($stChaveSemDocumentoLiquidacao === $stChaveMovimentacao) {
                     if ($arOPMovimentacao['valor_total'] == '') {
                         $arOPMovimentacao['valor_total'] = $arOPMovimentacao['vldocumento'];
@@ -663,9 +654,8 @@
                                         $arOPFonteRecursos['dotorigp2001'].
                                         $arOPFonteRecursos['nroempenho'].
                                         $arOPFonteRecursos['nroop'];
-                                        // $arOPFonteRecursos['nrdocumento'];
 
-                            $stChaveFonteRecursos .= $arOPFonteRecursos['banco'].$arOPFonteRecursos['agencia'].$arOPFonteRecursos['contacorrente'].$arOPFonteRecursos['vl_retencao'];
+                            $stChaveFonteRecursos .= $arOPFonteRecursos['banco'].$arOPFonteRecursos['agencia'].$arOPFonteRecursos['contacorrente']; //.$arOPFonteRecursos['vl_retencao'];
 
                             if ($stChave13 === $stChaveFonteRecursos) {
                                 if ( $arOPFonteRecursos["banco"] == 999 AND $arOPFonteRecursos["agencia"] == 999999 AND $arOPFonteRecursos["contacorrente"] == 999999999999 AND $arOPFonteRecursos["nrdocumento"] == 999999999999999 ) {
@@ -794,7 +784,6 @@
                     $arOPFonteRecursos['nrdocumento'] = $stcomplemento;
 
                     $stChaveFonteRecursos = $arOPFonteRecursos['codprograma'].
-                                //$arOPFonteRecursos['numeroliquidacao'].
                                 $arOPFonteRecursos['codunidade'].
                                 $arOPFonteRecursos['codfuncao'].
                                 $arOPFonteRecursos['codsubfuncao'].
@@ -911,7 +900,6 @@
             //loop do tipo até 2011 = 12, maior que 2010 = 14
             foreach ($rsOrdemPagamentoRetencao->arElementos as $arOPRetencao) {
                 $stChaveRetencao = $arOPRetencao['codprograma'].
-                           //$arOPRetencao['numeroliquidacao'].
                            $arOPRetencao['codunidade'].
                            $arOPRetencao['codfuncao'].
                            $arOPRetencao['codsubfuncao'].

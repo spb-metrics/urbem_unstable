@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   * @ignore
   *
-  * $Id: PRManterConfiguracaoParcSubvOSCIP.php 64124 2015-12-04 13:39:37Z evandro $
-  * $Revision: 64124 $
-  * $Author: evandro $
-  * $Date: 2015-12-04 11:39:37 -0200 (Sex, 04 Dez 2015) $
+  * $Id: PRManterConfiguracaoParcSubvOSCIP.php 64268 2015-12-23 18:06:11Z jean $
+  * $Revision: 64268 $
+  * $Author: jean $
+  * $Date: 2015-12-23 16:06:11 -0200 (Qua, 23 Dez 2015) $
 */
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBATermoParceria.class.php';
@@ -92,9 +92,9 @@ if($request->get('stAcao') == 'configurar'){
     }
 
     if( !$obErro->ocorreu() ){
+        $obTTCMBATermoParceria = new TTCMBATermoParceria();
         //Verificando se houve alteração na chave nro_processo
         if ( trim($request->get('stHdnNumeroProcessoAnterior')) != trim($request->get('stNumeroProcesso')) ) {
-            $obTTCMBATermoParceria = new TTCMBATermoParceria();
             $obTTCMBATermoParceria->setDado('exercicio'    , $stExercicioProcesso );
             $obTTCMBATermoParceria->setDado('cod_entidade' , $request->get('inCodEntidade') );
             $obTTCMBATermoParceria->setDado('nro_processo' , trim($request->get('stHdnNumeroProcessoAnterior')) );
@@ -128,7 +128,9 @@ if($request->get('stAcao') == 'configurar'){
 
             if( $rsTermoParcerias->getNumLinhas() < 0 && !$obErro->ocorreu() ){
                 $obErro = $obTTCMBATermoParceria->inclusao($boTransacao);        
-            } 
+            } else {
+                $obErro = $obTTCMBATermoParceria->alteracao($boTransacao);    
+            }
         }
     }
 

@@ -21,15 +21,15 @@
     **********************************************************************************
 */
 /* recuperarContratoServidor
- * 
+ *
  * Data de Criação : 03/04/2009
 
  * @copyright CNM - Confederação Nacional de Municípios
- * @link http://www.cnm.org.br CNM 
+ * @link http://www.cnm.org.br CNM
 
  * @author Analista : Dagiane Vieira
  * @author Desenvolvedor : Diego Lemos de Souza
- 
+
  */
 
 CREATE OR REPLACE FUNCTION recuperaAuditoriaFolha(VARCHAR,INTEGER,INTEGER,VARCHAR,VARCHAR,VARCHAR,INTEGER) RETURNS SETOF RECORD AS $$
@@ -94,24 +94,24 @@ END IF;
         	JOIN folhapagamento'|| stEntidade ||'.registro_evento_periodo
           	  ON registro_evento_periodo.cod_registro = evento_calculado.cod_registro
          	 AND registro_evento_periodo.cod_periodo_movimentacao = '|| inCodPeriodoMovimentacaoAnalise ||'
-                 AND registro_evento_periodo.cod_contrato = ' || inCodContrato || ' 
+                 AND registro_evento_periodo.cod_contrato = ' || inCodContrato || '
         	JOIN folhapagamento'|| stEntidade ||'.evento
           	  ON evento.cod_evento = evento_calculado.cod_evento
         	JOIN folhapagamento'|| stEntidade ||'.ultimo_registro_evento
           	  ON ultimo_registro_evento.cod_registro = evento_calculado.cod_registro
          	 AND ultimo_registro_evento.timestamp = evento_calculado.timestamp_registro
          	 AND ultimo_registro_evento.cod_evento = evento_calculado.cod_evento';
-                 
+
     IF stNaturezaFiltro <> '' THEN
         stSql := stSql || '
                WHERE evento.natureza IN (' || stFiltroNatureza || ') ';
     END IF;
-    
+
     IF stTipoFiltro = 'evento' THEN
-        stSql := stSql || '             
+        stSql := stSql || '
                 AND evento.cod_evento IN ( ' || stValoresFiltro || ') ';
     END IF;
-    
+
     stSql := stSql || '
             )';
 
@@ -141,21 +141,21 @@ END IF;
         	JOIN folhapagamento'|| stEntidade ||'.registro_evento_periodo
           	  ON registro_evento_periodo.cod_registro = evento_calculado.cod_registro
          	 AND registro_evento_periodo.cod_periodo_movimentacao = '|| inCodPeriodoMovimentacaoComparacao ||'
-         	 AND registro_evento_periodo.cod_contrato = ' || inCodContrato || ' 
+         	 AND registro_evento_periodo.cod_contrato = ' || inCodContrato || '
         	JOIN folhapagamento'|| stEntidade ||'.evento
           	  ON evento.cod_evento = evento_calculado.cod_evento
         	JOIN folhapagamento'|| stEntidade ||'.ultimo_registro_evento
           	  ON ultimo_registro_evento.cod_registro = evento_calculado.cod_registro
          	 AND ultimo_registro_evento.timestamp = evento_calculado.timestamp_registro
          	 AND ultimo_registro_evento.cod_evento = evento_calculado.cod_evento';
-                 
+
     IF stNaturezaFiltro <> '' THEN
         stSelect := stSelect || '
                WHERE evento.natureza IN ('|| stFiltroNatureza ||')';
     END IF;
-        
+
     IF stTipoFiltro = 'evento' THEN
-        stSelect := stSelect || '             
+        stSelect := stSelect || '
                  AND evento.cod_evento IN ( ' || stValoresFiltro || ') ';
     END IF;
 
@@ -163,7 +163,7 @@ END IF;
     LOOP
         FETCH crCursor INTO reRegistroAux;
         EXIT WHEN NOT FOUND;
-        
+
         stSql := 'SELECT    cod_evento,
                             cod_contrato,
                             desdobramento,
@@ -177,9 +177,9 @@ END IF;
                     WHERE '|| reRegistroAux.cod_evento   ||' = cod_evento
                       AND '|| reRegistroAux.cod_contrato ||' = cod_contrato
                       AND '|| quote_literal(reRegistroAux.desdobramento) ||' = desdobramento';
-                      
+
         EXECUTE stSql INTO reRegistro;
-        
+
         IF reRegistro.cod_evento IS NULL THEN
             stSql := 'INSERT INTO retorno (
                                             cod_periodo_movimentacao,
@@ -208,17 +208,17 @@ END IF;
                                                     '|| quote_literal(reRegistroAux.desdobramento_2) ||',
                                                     '||COALESCE ((0.00 - reRegistroAux.valor_comparacao), 0.00)||'
                                                 )';
-                                                
+
             EXECUTE stSql;
         ELSE
             stSql := 'UPDATE retorno SET
                                             periodo_comparacao = '||reRegistroAux.periodo_comparacao||',
                                             valor_comparacao = '||reRegistroAux.valor_comparacao||',
-                                            dif = '||COALESCE (reRegistro.valor_analise - reRegistroAux.valor_comparacao, 0.00)||'               
+                                            dif = '||COALESCE (reRegistro.valor_analise - reRegistroAux.valor_comparacao, 0.00)||'
                         WHERE retorno.cod_contrato = ' || reRegistro.cod_contrato || '
                         AND retorno.cod_evento = ' || reRegistro.cod_evento || '
                         AND retorno.desdobramento = '|| quote_literal(reRegistro.desdobramento) ||' ' ;
-                        
+
             EXECUTE stSql;
         END IF;
     END LOOP;
@@ -240,4 +240,4 @@ RETURN;
 
 END;
 
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

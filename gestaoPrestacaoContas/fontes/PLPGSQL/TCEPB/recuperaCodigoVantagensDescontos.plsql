@@ -122,4 +122,4 @@ BEGIN
     EXECUTE 'DROP TABLE tmp_retorno_'||inIdentificador;
     
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

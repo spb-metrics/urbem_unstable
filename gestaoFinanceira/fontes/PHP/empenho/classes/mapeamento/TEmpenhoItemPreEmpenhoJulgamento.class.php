@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoItemPreEmpenhoJulgamento.class.php 64023 2015-11-19 19:40:11Z carlos.silva $
+    $Id: TEmpenhoItemPreEmpenhoJulgamento.class.php 64194 2015-12-14 18:20:21Z jean $
 
     * Casos de uso: uc-02.03.03, uc-02.03.02, uc-03.05.21
 */
@@ -65,7 +65,7 @@ class TEmpenhoItemPreEmpenhoJulgamento extends Persistente
         $this->AddCampo('cgm_fornecedor'        , 'integer' , true, ''  , false , true  );
     }
 
-    function recuperaCentroCustoMapaItem(&$rsRecordSet, $stFiltro = '')
+    function recuperaCentroCustoMapaItem(&$rsRecordSet, $stFiltro = '', $boTransacao = '')
     {
         $obErro      = new Erro;
         $obConexao   = new Conexao;
@@ -87,7 +87,7 @@ class TEmpenhoItemPreEmpenhoJulgamento extends Persistente
 
         $stSql = $this->montaRecuperaCentroCustoMapaItem().$stFiltro.$stOrder;
         $this->stDebug = $stSql;
-        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
         return $obErro;
     }

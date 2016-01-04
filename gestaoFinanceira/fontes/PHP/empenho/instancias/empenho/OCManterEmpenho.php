@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterEmpenho.php 64102 2015-12-02 18:29:32Z michel $
+    $Id: OCManterEmpenho.php 64256 2015-12-22 16:06:28Z michel $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -469,85 +469,86 @@ function validaDataFornecedor($inCodFornecedor)
     }
 }
 
-function validaContrato($inCodEntidade=null, $inCodFornecedor=null, $inNumContrato=null){
-    $stHTML='';
-    $stObjeto='&nbsp;';
-    $codContrato='';
-    $dtContrato='';
-    $stJs='';
+function validaContrato($inCodEntidade=null, $inCodFornecedor=null, $inNumContrato=null, $stExercicioContrato=null){
+    $stHTML      = '';
+    $stObjeto    = '&nbsp;';
+    $codContrato = '';
+    $dtContrato  = '';
+    $stJs        = '';
 
     if( $inNumContrato ){
-        if($inCodEntidade&&$inCodFornecedor){
-            include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoContrato.class.php';
-            $obTLicitacaoContrato = new TLicitacaoContrato;
-            $rsContrato = new RecordSet;
-            $stFiltro  = " AND contrato.num_contrato    = ".$inNumContrato;
-            $stFiltro .= " AND contrato.cgm_contratado  = ".$inCodFornecedor;
-            $stFiltro .= " AND contrato.cod_entidade    = ".$inCodEntidade;
-            $stFiltro .= " AND contrato.exercicio       = '".Sessao::getExercicio()."'";
-            $obTLicitacaoContrato->recuperaContrato($rsContrato, $stFiltro);
+        if( $stExercicioContrato ){
+            if( $stExercicioContrato <= Sessao::getExercicio() ){
+                if( $inCodEntidade && $inCodFornecedor ){
+                    include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoContrato.class.php';
+                    $obTLicitacaoContrato = new TLicitacaoContrato;
+                    $rsContrato = new RecordSet;
+                    $stFiltro  = " AND contrato.num_contrato    = ".$inNumContrato;
+                    $stFiltro .= " AND contrato.exercicio       = '".$stExercicioContrato."'";
+                    $stFiltro .= " AND contrato.cgm_contratado  = ".$inCodFornecedor;
+                    $stFiltro .= " AND contrato.cod_entidade    = ".$inCodEntidade;
+                    $obTLicitacaoContrato->recuperaContrato($rsContratoObjeto, $stFiltro);
 
-            $stObjeto = $rsContrato->getCampo('descricao');
-            $stObjeto = str_replace("\n", ' ', $stObjeto);
-            $stObjeto = str_replace("\r", ' ', $stObjeto);
-            $stObjeto = str_replace('  ', ' ', $stObjeto);
+                    $obTLicitacaoContrato->recuperaDadosContrato($rsContrato, $stFiltro);
 
-            $obTLicitacaoContrato->recuperaDadosContrato($rsContrato, $stFiltro);
+                    if($rsContrato->getNumLinhas()<1){
+                        $stObjeto = '&nbsp;';
+                        $stJs .= "alertaAviso('@Código do Contrato(".$inNumContrato.") não encontrado.', 'form','erro','".Sessao::getId()."'); \n";
+                    }else{
+                        $stObjeto = $rsContratoObjeto->getCampo('descricao');
+                        $stObjeto = str_replace("\n", ' ', $stObjeto);
+                        $stObjeto = str_replace("\r", ' ', $stObjeto);
+                        $stObjeto = str_replace('  ', ' ', $stObjeto);
 
-            if (!$stObjeto){
-                $stObjeto = '&nbsp;';
-                $stJs .= "alertaAviso('@Código do Contrato(".$inNumContrato.") não encontrado.', 'form','erro','".Sessao::getId()."'); \n";
-            }else{
-                $obLblEntidade = new Label;
-                $obLblEntidade->setRotulo('Entidade');
-                $obLblEntidade->setValue($rsContrato->getCampo('nom_entidade'));
-
-                $obLblData = new Label;
-                $obLblData->setRotulo('Data do Contrato');
-                $obLblData->setValue($rsContrato->getCampo('dt_assinatura'));
-
-                $dtContrato = $rsContrato->getCampo('dt_assinatura');
-
-                $obLblCredor = new Label;
-                $obLblCredor->setRotulo('Credor');
-                $obLblCredor->setValue($rsContrato->getCampo('nom_credor'));
-
-                $obLblValor = new Label;
-                $obLblValor->setRotulo('Valor');
-                $obLblValor->setValue(number_format($rsContrato->getCampo('valor_contratado'),2,',','.'));
-
-                $obForm = new Form;
-                $obForm->setName("frm2");
-
-                $obFormulario = new Formulario;
-                $obFormulario->addForm  ($obForm);
-                $obFormulario->addComponente($obLblEntidade);
-                $obFormulario->addComponente($obLblData);
-                $obFormulario->addComponente($obLblCredor);
-                $obFormulario->addComponente($obLblValor);
-                $obFormulario->montaInnerHTML();
-
-                if($rsContrato->getNumLinhas()==1){
-                    $stHTML = $obFormulario->getHTML();
-                    $stHTML = str_replace( "\n"     , ""    , $stHTML );
-                    $stHTML = str_replace( chr(13)  , "<br>", $stHTML );
-                    $stHTML = str_replace( "  "     , ""    , $stHTML );
-                    $stHTML = str_replace( "'"      , "\\'" , $stHTML );
-                    $stHTML = str_replace( "\\\'"   , "\\'" , $stHTML );
+                        $obLblData = new Label;
+                        $obLblData->setRotulo('Data do Contrato');
+                        $obLblData->setValue($rsContrato->getCampo('dt_assinatura'));
+    
+                        $dtContrato = $rsContrato->getCampo('dt_assinatura');
+    
+                        $obLblValor = new Label;
+                        $obLblValor->setRotulo('Valor');
+                        $obLblValor->setValue(number_format($rsContrato->getCampo('valor_contratado'),2,',','.'));
+    
+                        $obForm = new Form;
+                        $obForm->setName("frm2");
+    
+                        $obFormulario = new Formulario;
+                        $obFormulario->addForm  ($obForm);
+                        $obFormulario->addComponente($obLblData);
+                        $obFormulario->addComponente($obLblValor);
+                        $obFormulario->montaInnerHTML();
+    
+                        if($rsContrato->getNumLinhas()==1){
+                            $stHTML = $obFormulario->getHTML();
+                            $stHTML = str_replace( "\n"     , ""    , $stHTML );
+                            $stHTML = str_replace( chr(13)  , "<br>", $stHTML );
+                            $stHTML = str_replace( "  "     , ""    , $stHTML );
+                            $stHTML = str_replace( "'"      , "\\'" , $stHTML );
+                            $stHTML = str_replace( "\\\'"   , "\\'" , $stHTML );
+                        }
+                        $codContrato=$inNumContrato;
+                    }
+                }else{
+                    if(!$inCodEntidade)
+                        $stJs .= "alertaAviso('@Selecione a Entidade do Empenho.', 'form','erro','".Sessao::getId()."');    \n";
+                    else
+                        $stJs .= "alertaAviso('@Selecione o Fornecedor do Empenho.', 'form','erro','".Sessao::getId()."');  \n";
                 }
-                $codContrato=$inNumContrato;
+            }else{
+                $stJs .= "alertaAviso('@O Exercício do Contrato não pode ser superior ao Exercício do Empenho.', 'form','erro','".Sessao::getId()."');  \n";
             }
         }else{
-            if(!$inCodEntidade)
-                $stJs .= "alertaAviso('@Selecione a Entidade do Empenho.', 'form','erro','".Sessao::getId()."');    \n";
-            else
-                $stJs .= "alertaAviso('@Selecione o Fornecedor do Empenho.', 'form','erro','".Sessao::getId()."');  \n";
+            $stJs .= "alertaAviso('@Informe o Exercício do Contrato.', 'form','erro','".Sessao::getId()."');  \n";
         }
     }
-    $stJs .= "d.getElementById('inNumContrato').value = '".$codContrato."';     \n";
-    $stJs .= "d.getElementById('txtContrato').innerHTML = \"".$stObjeto."\";    \n";
-    $stJs .= "d.getElementById('dtContrato').value = '".$dtContrato."';         \n";
-    $stJs .= "d.getElementById('spnInfoAdicional').innerHTML = '".$stHTML."';   \n";
+
+    $stJs .= "if(d.getElementById('inCodContrato')){                               \n";
+    $stJs .= "  d.getElementById('inCodContrato').value = '".$codContrato."';      \n";
+    $stJs .= "  d.getElementById('txtContrato').innerHTML = '".$stObjeto."';       \n";
+    $stJs .= "  d.getElementById('dtContrato').value = '".$dtContrato."';          \n";
+    $stJs .= "  d.getElementById('spnInfoAdicional').innerHTML = '".$stHTML."';    \n";
+    $stJs .= "}                                                                    \n";
 
     return $stJs;
 }
@@ -587,8 +588,8 @@ switch ($stCtrl) {
         }
 
         if($request->get('stDtEmpenho')){
-            $js  = "if(d.getElementById('inNumContrato')){                        \n";
-            $js .= "    d.getElementById('inNumContrato').value='';               \n";
+            $js  = "if(d.getElementById('inCodContrato')){                        \n";
+            $js .= "    d.getElementById('inCodContrato').value='';               \n";
             $js .= "    d.getElementById('txtContrato').innerHTML = '&nbsp;';     \n";
             $js .= "    d.getElementById('dtContrato').value = '';                \n";
             $js .= "    d.getElementById('spnInfoAdicional').innerHTML = '';      \n";
@@ -764,12 +765,7 @@ switch ($stCtrl) {
             }
         }
 
-        $js .= "if(d.getElementById('inNumContrato')){                     \n";
-        $js .= "    d.getElementById('inNumContrato').value='';            \n";
-        $js .= "    d.getElementById('txtContrato').innerHTML = '&nbsp;';  \n";
-        $js .= "    d.getElementById('dtContrato').value = '';             \n";
-        $js .= "    d.getElementById('spnInfoAdicional').innerHTML = '';   \n";
-        $js .= "}                                                          \n";
+        $js .= validaContrato($request->get('inCodEntidade'), $request->get('inCodFornecedor'), $request->get('inCodContrato'), $request->get('stExercicioContrato'));
 
         echo $js;
     break;
@@ -1381,22 +1377,30 @@ switch ($stCtrl) {
                 $obFormulario->montaInnerHTML();
                 $stHtml = $obFormulario->getHTML();
 
-                $js .= "d.getElementById('spnEmpenho').innerHTML = '".$stHtml."';";
-                $js .= "montaParametrosGET('buscaDtEmpenho');";
-                $js .= "d.getElementById('spnLista').innerHTML = '';";
+                $js .= "jQuery('#spnEmpenho').html('".$stHtml."');                           \n";
+                $js .= "montaParametrosGET('buscaDtEmpenho');                                \n";
+                $js .= "jQuery('#spnLista').html('');                                        \n";
             } else {
-                $js .= "f.inCodigoEmpenho.value='';";
-                $js .= "d.getElementById( 'stNomFornecedor' ).innerHTML = '&nbsp;';";
-                $js .= "d.getElementById( 'spnEmpenho' ).innerHTML = '';";
+                $js .= "jQuery('#inCodigoEmpenho').val('');                                  \n";
+                $js .= "jQuery('#stNomFornecedor').html('&nbsp;');                           \n";
+                $js .= "jQuery('#spnEmpenho').html('');                                      \n";
+                $js .= "jQuery('#inCodContrato').val('');                                    \n";
+                $js .= "jQuery('#txtContrato').html('&nbsp;');                               \n";
+                $js .= "jQuery('#dtContrato').val('');                                       \n";
+                $js .= "jQuery('#spnInfoAdicional').html('');                                \n";
                 $js .= "alertaAviso('Empenho informado está anulado ou não existe.','frm','erro','".Sessao::getId()."'); \n";
             }
         } else {
             Sessao::remove('arItens');
-            $js .= "f.inCodigoEmpenho.value='';";
-            $js .= "d.getElementById('stNomFornecedor').innerHTML='&nbsp;';";
-            $js .= "d.getElementById( 'spnEmpenho' ).innerHTML = '';";
-            $js .= "d.getElementById('spnLista').innerHTML = '';";
-            $js .= "alertaAviso('É necessário informar uma entidade.','frm','erro','".Sessao::getId()."');";
+            $js .= "jQuery('#inCodigoEmpenho').val('');                                  \n";
+            $js .= "jQuery('#stNomFornecedor').html('&nbsp;');                           \n";
+            $js .= "jQuery('#spnEmpenho').html('');                                      \n";
+            $js .= "jQuery('#spnLista').html('');                                        \n";
+            $js .= "jQuery('#inCodContrato').val('');                                    \n";
+            $js .= "jQuery('#txtContrato').html('&nbsp;');                               \n";
+            $js .= "jQuery('#dtContrato').val('');                                       \n";
+            $js .= "jQuery('#spnInfoAdicional').html('');                                \n";
+            $js .= "alertaAviso('É necessário informar uma entidade.','frm','erro','".Sessao::getId()."'); \n";
         }
 
         echo $js;
@@ -1520,18 +1524,16 @@ switch ($stCtrl) {
     break;
 
     case "validaContrato":
-        echo (validaContrato($request->get('inCodEntidade'), $request->get('inCodFornecedor'), $request->get('inNumContrato')));
+        echo (validaContrato($request->get('inCodEntidade'), $request->get('inCodFornecedor'), $request->get('inCodContrato'), $request->get('stExercicioContrato')));
     break;
 
     case "montaBuscaContrato":
         $arFiltroBuscaContrato = array('inCodEntidade'=>$request->get('inCodEntidade'), 'inCodFornecedor'=>$request->get('inCodFornecedor'));
-
         Sessao::write('arFiltroBuscaContrato', $arFiltroBuscaContrato);
 
-        if($request->get('inCodEntidade', '') == '' || $request->get('inCodFornecedor', '') == ''){
-            $js = "alertaAviso('Informe os campos Entidade e Fornecedor, para buscar Contrato!','unica','erro', '".Sessao::getId()."');";
-            echo ($js);
-        }
+        $js .= validaContrato($request->get('inCodEntidade'), $request->get('inCodFornecedor'), $request->get('inCodContrato'), $request->get('stExercicioContrato'));
+
+        echo ($js);
     break;
 }
 

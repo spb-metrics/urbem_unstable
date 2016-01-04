@@ -1207,9 +1207,5 @@ DROP TABLE contra_cheque_dependentes;
 
 
 END;
-$$ LANGUAGE 'PLPGSQL';
-
-
-
-
+$$ LANGUAGE 'plpgsql';
 

@@ -42,3 +42,57 @@ ALTER TABLE empenho.empenho_contrato DROP CONSTRAINT fk_empenho_contrato_2;
 
 ALTER TABLE empenho.empenho_contrato ADD CONSTRAINT fk_empenho_contrato_2 FOREIGN KEY                   (exercicio_contrato, cod_entidade, num_contrato)
                                                                           REFERENCES licitacao.contrato (exercicio         , cod_entidade, num_contrato);
+
+
+----------------
+-- Ticket #23427
+----------------
+
+INSERT
+  INTO administracao.acao
+     ( cod_acao
+     , cod_funcionalidade
+     , nom_arquivo
+     , parametro
+     , ordem
+     , complemento_acao
+     , nom_acao
+     , ativo
+     )
+SELECT 3099
+     , 63
+     , 'FLRelatorioApuracaoSuperavitDeficit.php'
+     , 'gerar'
+     , 60
+     , ''
+     , 'Relatório Apuração Superavit/Deficit Financeiro'
+     , TRUE
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.acao
+              WHERE cod_acao = 3099
+           )
+     ;
+
+INSERT
+  INTO administracao.relatorio
+     ( cod_gestao
+     , cod_modulo
+     , cod_relatorio
+     , nom_relatorio
+     , arquivo
+     )
+SELECT 2
+     , 9
+     , 20
+     , 'Apuração Superavit/Deficit Financeiro'
+     , 'LHApuracaoSuperavitDeficitFinanceiro.php'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 2
+                AND cod_modulo    = 9
+                AND cod_relatorio = 20
+           )
+     ;
+

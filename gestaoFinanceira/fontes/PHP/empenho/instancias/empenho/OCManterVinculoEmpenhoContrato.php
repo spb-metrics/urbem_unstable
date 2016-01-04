@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: OCManterVinculoEmpenhoContrato.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: OCManterVinculoEmpenhoContrato.php 64212 2015-12-17 12:38:12Z michel $
 
 */
 
@@ -50,9 +50,7 @@ $pgJS   = "JS".$stPrograma.".js";
 $stCtrl = $request->get('stCtrl');
 
 switch ($stCtrl) {
-
     case "incluirEmpenho":
-
         $rsRecordSet = new Recordset;
         $rsEmpenhos  = new Recordset;
         $arElementos = array();
@@ -61,49 +59,67 @@ switch ($stCtrl) {
         $inCount     = count($arElementos);
         $boExecuta   = false;
 
-        $arEmpenho = explode('/', $request->get('numEmpenho'));
-        if ($arEmpenho[0] && strlen($arEmpenho[1]) == 4) {
-            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
-            $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
-            $stFiltro .= " AND e.cod_empenho	   =  ".$arEmpenho[0];
-            $stFiltro .= " AND e.exercicio  	   =  '".$arEmpenho[1]."'";
-            $stFiltro .= " AND pe.cgm_beneficiario =  ".$request->get('cgm_credor');
-            $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
+        list($inCodEmpenho, $stExercicioEmpenho) = explode('/', $request->get('numEmpenho'));
+        if ($inCodEmpenho && strlen($stExercicioEmpenho) == 4) {
+            if( $request->get('inExercicio') <= $stExercicioEmpenho ){
+                include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+                $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+                $stFiltro  = " AND e.cod_empenho       =  ".$inCodEmpenho;
+                $stFiltro .= " AND e.exercicio         =  '".$stExercicioEmpenho."'";
+                $stFiltro .= " AND pe.cgm_beneficiario =  ".$request->get('cgm_credor');
+                $obTEmpenhoEmpenho->recuperaEmpenhoPreEmpenho($rsRecordSet, $stFiltro);
 
-            if ($rsRecordSet->getNumLinhas() > 0) {
-                if (Sessao::read('elementos') != "") {
-                    //Define proximo ID
-                    $rsEmpenhos->preenche(Sessao::read('elementos'));
-                    $rsEmpenhos->setUltimoElemento();
-                    $inUltimoId = $rsEmpenhos->getCampo("inId");
-                    $inProxId = $inUltimoId + 1;
-                    //Verifica a existencia do empenho na lista
-                    $rsEmpenhos->setPrimeiroElemento();
-                    while (!$rsEmpenhos->eof()) {
-                        $cod_empenho = $rsRecordSet->getCampo('cod_empenho');
-                        if ($cod_empenho == $rsEmpenhos->getCampo('cod_empenho')) {
-                            $boExecuta = true;
-                            $stJs .= "alertaAviso('Empenho já incluso na lista.','form','erro','".Sessao::getId()."');";
+                include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
+                $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato;
+                $stFiltro  = " AND e.cod_empenho       =  ".$inCodEmpenho;
+                $stFiltro .= " AND e.exercicio         =  '".$stExercicioEmpenho."'";
+                $stFiltro .= " AND ec.cod_entidade     =  ".$request->get('inCodEntidade');
+                $stFiltro .= " AND ec.num_contrato||'/'||ec.exercicio_contrato <> '".$request->get('inNumContrato').'/'.$request->get('inExercicio')."'";
+                $obTEmpenhoEmpenhoContrato->recuperaRelacionamentoEmpenhoContrato($rsEmpenhoContrato, $stFiltro, "");
+
+                if ($rsRecordSet->getNumLinhas() > 0) {
+                    if ($rsEmpenhoContrato->getNumLinhas() <= 0) {
+                        if (Sessao::read('elementos') != "") {
+                            //Define proximo ID
+                            $rsEmpenhos->preenche(Sessao::read('elementos'));
+                            $rsEmpenhos->setUltimoElemento();
+                            $inUltimoId = $rsEmpenhos->getCampo("inId");
+                            $inProxId = $inUltimoId + 1;
+                            //Verifica a existencia do empenho na lista
+                            $rsEmpenhos->setPrimeiroElemento();
+                            while (!$rsEmpenhos->eof()) {
+                                $cod_empenho = $rsRecordSet->getCampo('cod_empenho');
+                                $exercicio_empenho = $rsRecordSet->getCampo('exercicio');
+                                if ($cod_empenho == $rsEmpenhos->getCampo('cod_empenho') && $exercicio_empenho == $rsEmpenhos->getCampo('exercicio')) {
+                                    $boExecuta = true;
+                                    $stJs .= "alertaAviso('Empenho já incluso na lista.','form','erro','".Sessao::getId()."');";
+                                }
+                                $rsEmpenhos->proximo();
+                            }
                         }
-                        $rsEmpenhos->proximo();
-                    }
-                }
-                if (!$boExecuta) {
-                    while (!$rsRecordSet->eof()) {
-                        $arElementos[$inCount]['inId']				= $inProxId;
-                        $arElementos[$inCount]['cod_empenho'] 		= $rsRecordSet->getCampo('cod_empenho');
-                        $arElementos[$inCount]['exercicio']   		= $rsRecordSet->getCampo('exercicio');
-                        $arElementos[$inCount]['dt_empenho']  		= $rsRecordSet->getCampo('dt_empenho');
-                        $arElementos[$inCount]['vl_saldo_anterior'] = number_format($rsRecordSet->getCampo('vl_saldo_anterior'), 2,',','.');
-                            Sessao::write('elementos', $arElementos);
+                        if (!$boExecuta) {
+                            while (!$rsRecordSet->eof()) {
+                                $arElementos[$inCount]['inId']              = $inProxId;
+                                $arElementos[$inCount]['cod_empenho']       = $rsRecordSet->getCampo('cod_empenho');
+                                $arElementos[$inCount]['exercicio']         = $rsRecordSet->getCampo('exercicio');
+                                $arElementos[$inCount]['dt_empenho']        = $rsRecordSet->getCampo('dt_empenho');
+                                $arElementos[$inCount]['vl_saldo_anterior'] = number_format($rsRecordSet->getCampo('vl_saldo_anterior'), 2,',','.');
+                                Sessao::write('elementos', $arElementos);
 
-                        $inCount= $inCount + 1;
-                        $rsRecordSet->proximo();
+                                $inCount= $inCount + 1;
+                                $rsRecordSet->proximo();
+                            }
+                            $stJs .= listarEmpenho();
+                        }
+                    }else{
+                        $stContrato = $rsEmpenhoContrato->getCampo('num_contrato').'/'.$rsEmpenhoContrato->getCampo('exercicio_contrato');
+                        $stJs .= "alertaAviso('Empenho já está vinculado ao contrato ".$stContrato."!','form','erro','".Sessao::getId()."');";
                     }
-                    $stJs .= listarEmpenho();
+                } else {
+                    $stJs .= "alertaAviso('Empenho inexistente para o credor selecionado! ','form','erro','".Sessao::getId()."');";
                 }
-            } else {
-                $stJs .= "alertaAviso('Empenho inexistente para o credor selecionado! ','form','erro','".Sessao::getId()."');";
+            }else{
+                $stJs .= "alertaAviso('Exercício do Empenho precisa ser igual ou superior ao exercício do contrato! ','form','erro','".Sessao::getId()."');";
             }
         } else {
             $stJs .= "alertaAviso('Informe o código de empenho no formato: \'Número do empenho/Exercício do empenho\'.','form','erro','".Sessao::getId()."');";
@@ -113,10 +129,9 @@ switch ($stCtrl) {
         $stJs .= "f.numEmpenho.focus();";
 
         echo $stJs;
-        break;
+    break;
 
     case "excluirEmpenho":
-
         $arElementosSessao = Sessao::read('elementos');
         $arExcluidosSessao = Sessao::read('elementos_excluidos');
 
@@ -135,7 +150,7 @@ switch ($stCtrl) {
             } else {
                 $arExcluidosSessao[$inCountExcluidos]['inId']        = $inCount;
                 $arExcluidosSessao[$inCountExcluidos]['cod_empenho'] = $arElementosTMP["cod_empenho"];
-                $arExcluidosSessao[$inCountExcluidos]['exercicio']	  = $arElementosTMP["exercicio"];
+                $arExcluidosSessao[$inCountExcluidos]['exercicio']   = $arElementosTMP["exercicio"];
                 $arExcluidosSessao[$inCountExcluidos]['dt_empenho']  = $arElementosTMP["dt_empenho"];
                 $arExcluidosSessao[$inCountExcluidos]['vl_saldo_anterior'] = $arElementosTMP["vl_saldo_anterior"];
                 $inCountExcluidos = $inCountExcluidos + 1;
@@ -146,10 +161,9 @@ switch ($stCtrl) {
 
         $stJs .= listarEmpenho();
         echo $stJs;
-        break;
+    break;
 
     case "consultaContratoEmpenho":
-
         $rsEmpenhos  = new Recordset;
         $arElementos = array();
         $inCount     = 0;
@@ -158,17 +172,17 @@ switch ($stCtrl) {
 
         include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
         $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato;
-        $stFiltro .= "   AND ec.exercicio    = '".$request->get('inExercicio')."'";
+        $stFiltro .= "   AND ec.exercicio_contrato = '".$request->get('inExercicio')."'";
         $stFiltro .= "   AND ec.cod_entidade =  ".$request->get('inCodEntidade');
         $stFiltro .= "   AND ec.num_contrato =  ".$request->get('inNumContrato');
         $obTEmpenhoEmpenhoContrato->recuperaRelacionamentoEmpenhoContrato($rsEmpenhos, $stFiltro, "");
 
         if ($rsEmpenhos->getNumLinhas() > 0) {
             while (!$rsEmpenhos->eof()) {
-                $arElementos['inId']				= $inCount;
-                $arElementos['cod_empenho'] 		= $rsEmpenhos->getCampo('cod_empenho');
-                $arElementos['exercicio']   		= $rsEmpenhos->getCampo('exercicio');
-                $arElementos['dt_empenho']  		= $rsEmpenhos->getCampo('dt_empenho');
+                $arElementos['inId']                = $inCount;
+                $arElementos['cod_empenho']         = $rsEmpenhos->getCampo('cod_empenho');
+                $arElementos['exercicio']           = $rsEmpenhos->getCampo('exercicio');
+                $arElementos['dt_empenho']          = $rsEmpenhos->getCampo('dt_empenho');
                 $arElementos['vl_saldo_anterior']   = number_format($rsEmpenhos->getCampo('vl_saldo_anterior'), 2,',','.');
                 $arTMP[] = $arElementos;
 
@@ -183,27 +197,24 @@ switch ($stCtrl) {
             Sessao::remove('elementos');
         }
         echo $stJs;
-        break;
+    break;
 
     case "limpar":
-
         $stJs .= "f.numEmpenho.value = '';";
         $stJs .= "f.numEmpenho.focus();";
 
         echo $stJs;
-        break;
+    break;
 }
 
 function listarEmpenho()
 {
     $rsRecordSet = new RecordSet;
 
-    if (Sessao::read('elementos') != "") {
+    if (Sessao::read('elementos') != "")
         $rsRecordSet->preenche(Sessao::read('elementos'));
-    }
 
     if ($rsRecordSet->getNumLinhas() > 0) {
-
         $obLista = new Lista;
         $obLista->setMostraPaginacao( false );
         $obLista->setTitulo( "Empenhos do Contrato" );
@@ -253,13 +264,13 @@ function listarEmpenho()
 
         $obLista->montaHTML();
         $stHtml = $obLista->getHTML();
-        $stHtml = str_replace( "\n" ,"" ,$stHtml );
-        $stHtml = str_replace( chr(13) ,"<br>" ,$stHtml );
-        $stHtml = str_replace( "  " ,"" ,$stHtml );
-        $stHtml = str_replace( "'","\\'",$stHtml );
-        $stHtml = str_replace( "\\\'","\\'",$stHtml );
-
+        $stHtml = str_replace( "\n"    , ""     , $stHtml );
+        $stHtml = str_replace( chr(13) , "<br>" , $stHtml );
+        $stHtml = str_replace( "  "    , ""     , $stHtml );
+        $stHtml = str_replace( "'"     , "\\'"  , $stHtml );
+        $stHtml = str_replace( "\\\'"  , "\\'"  , $stHtml );
     }
+
     // preenche a lista com innerHTML
     $stJs .= "d.getElementById('spnListaEmpenhos').innerHTML = '".$stHtml."';";
 

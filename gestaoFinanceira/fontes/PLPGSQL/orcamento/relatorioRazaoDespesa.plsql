@@ -52,7 +52,19 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION orcamento.fn_razao_despesa( VARCHAR ,INT , CHARACTER, CHARACTER , CHARACTER , CHARACTER , CHARACTER , CHARACTER , CHARACTER, INT, VARCHAR,VARCHAR) RETURNS SETOF RECORD AS '
+CREATE OR REPLACE FUNCTION orcamento.fn_razao_despesa(  VARCHAR 
+                                                        ,INT 
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,CHARACTER
+                                                        ,INT
+                                                        ,VARCHAR
+                                                        ,VARCHAR
+                                                    ) RETURNS SETOF RECORD AS $$
 DECLARE
     stExercicio             ALIAS FOR $1;
     inCodEntidade           ALIAS FOR $2;
@@ -67,14 +79,14 @@ DECLARE
     stDestinacaoRecurso     ALIAS FOR $11;
     inCodDetalhamento       ALIAS FOR $12;
 
-    stSubSql                VARCHAR := '''';
-    stSubSql2               VARCHAR := '''';
-    stSql                   VARCHAR := '''';
+    stSubSql                VARCHAR := '';
+    stSubSql2               VARCHAR := '';
+    stSql                   VARCHAR := '';
     reRegistro              RECORD;
     
 BEGIN
 
-stSql := ''
+stSql := '
 create temporary table tmp_lancamento AS
 
 --SELECT PARA TABELA DE CREDITO
@@ -107,29 +119,30 @@ from
     ,contabilidade.conta_credito as ccc
 
 where
-    cle.tipo in (''''E'''',''''L'''',''''P'''')
-    and cle.exercicio = ''''''||stExercicio||''''''
-    and cle.cod_entidade = ''||inCodEntidade||'''';
-    if stDataFim is not null and stDataFim <> '''' then
-        stSql := stSql || '' and clt.dt_lote <= to_date(''''''||stDataFim||'''''',''''dd-mm-yyyy'''')'';
+    cle.tipo in (''E'',''L'',''P'')
+    and cle.exercicio = '''||stExercicio||'''
+    and cle.cod_entidade = '||inCodEntidade||'
+    ';
+    if stDataFim is not null and stDataFim <> '' then
+        stSql := stSql || ' and clt.dt_lote <= to_date('''||stDataFim||''',''dd-mm-yyyy'') ';
     end if;
     if stDataInicio is not null and stDataInicio <> '''' then
-        stSql := stSql || '' and clt.dt_lote >= to_date(''''''||stDataInicio||'''''',''''dd-mm-yyyy'''')'';
+        stSql := stSql || ' and clt.dt_lote >= to_date('''||stDataInicio||''',''dd-mm-yyyy'') ';
     end if;
-    if boEmpenho = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''E'''''';
+    if boEmpenho = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''E'' ';
     end if;
-    if boLiquidacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''L'''''';
+    if boLiquidacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''L'' ';
     end if;
-    if boPagamento = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''P'''''';
+    if boPagamento = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''P'' ';
     end if;
-    if boSuplementacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''S'''''';
+    if boSuplementacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''S'' ';
     end if;
 
-stSql := stSql || ''
+stSql := stSql || '
 
     and cle.cod_lote = cl.cod_lote
     and cle.tipo = cl.tipo
@@ -196,30 +209,30 @@ from
     ,contabilidade.plano_conta as cpc
     ,contabilidade.conta_debito as ccd
 where
-    cle.tipo = ''''P''''
-    and cle.exercicio = ''''''||stExercicio||''''''
-    and cle.cod_entidade = ''||inCodEntidade||'''';
+    cle.tipo = ''P''
+    and cle.exercicio = '''||stExercicio||'''
+    and cle.cod_entidade = '||inCodEntidade||' ';
 
-    if stDataFim is not null and stDataFim <> '''' then
-        stSql := stSql || '' and clt.dt_lote <= to_date(''''''||stDataFim||'''''',''''dd-mm-yyyy'''')'';
+    if stDataFim is not null and stDataFim <> '' then
+        stSql := stSql || ' and clt.dt_lote <= to_date('''||stDataFim||''',''dd-mm-yyyy'') ';
     end if;
-    if stDataInicio is not null and stDataInicio <> '''' then
-        stSql := stSql || '' and clt.dt_lote >= to_date(''''''||stDataInicio||'''''',''''dd-mm-yyyy'''')'';
+    if stDataInicio is not null and stDataInicio <> '' then
+        stSql := stSql || ' and clt.dt_lote >= to_date('''||stDataInicio||''',''dd-mm-yyyy'') ';
     end if;
-    if boEmpenho = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''E'''''';
+    if boEmpenho = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''E'' ';
     end if;
-    if boLiquidacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''L'''''';
+    if boLiquidacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''L'' ';
     end if;
-    if boPagamento = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''P'''''';
+    if boPagamento = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''P'' ';
     end if;
-    if boSuplementacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''S'''''';
+    if boSuplementacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''S'' ';
     end if;
 
-stSql := stSql || ''
+stSql := stSql || '
 
     and cle.cod_lote = cl.cod_lote
     and cle.tipo = cl.tipo
@@ -285,32 +298,32 @@ from
     ,orcamento.suplementacao os
     ,orcamento.suplementacao_reducao osr
 where
-    cl.tipo in (''''S'''',''''T'''')
+    cl.tipo in (''S'',''T'')
     and os.cod_tipo <> 16
-    and cl.exercicio = ''''''||stExercicio||''''''
-    and cl.cod_entidade = ''||inCodEntidade||''
-    and osr.cod_despesa = ''||inCodDotacao||'''';
+    and cl.exercicio = '''||stExercicio||'''
+    and cl.cod_entidade = '||inCodEntidade||'
+    and osr.cod_despesa = '||inCodDotacao||' ';
 
-    if stDataFim is not null and stDataFim <> '''' then
-        stSql := stSql || '' and clt.dt_lote <= to_date(''''''||stDataFim||'''''',''''dd-mm-yyyy'''')'';
+    if stDataFim is not null and stDataFim <> '' then
+        stSql := stSql || ' and clt.dt_lote <= to_date('''||stDataFim||''',''dd-mm-yyyy'')';
     end if;
-    if stDataInicio is not null and stDataInicio <> '''' then
-        stSql := stSql || '' and clt.dt_lote >= to_date(''''''||stDataInicio||'''''',''''dd-mm-yyyy'''')'';
+    if stDataInicio is not null and stDataInicio <> '' then
+        stSql := stSql || ' and clt.dt_lote >= to_date('''||stDataInicio||''',''dd-mm-yyyy'') ';
     end if;
-    if boEmpenho = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''E'''''';
+    if boEmpenho = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''E'' ';
     end if;
-    if boLiquidacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''L'''''';
+    if boLiquidacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''L'' ';
     end if;
-    if boPagamento = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''P'''''';
+    if boPagamento = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''P'' ';
     end if;
-    if boSuplementacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''S'''''';
+    if boSuplementacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''S'' ';
     end if;
 
-stSql := stSql || ''
+stSql := stSql || '
     and cl.cod_lote = cvl.cod_lote
     and cl.tipo = cvl.tipo
     and cl.sequencia = cvl.sequencia
@@ -348,12 +361,12 @@ stSql := stSql || ''
     AND NOT EXISTS ( SELECT 1
                        FROM orcamento.suplementacao_anulada osa
                       WHERE cod_suplementacao = osr.cod_suplementacao
-                        AND osa.exercicio = ''''''||stExercicio||''''''
+                        AND osa.exercicio = '''||stExercicio||'''
     )
     AND NOT EXISTS ( SELECT 1
                        FROM orcamento.suplementacao_anulada osa
                       WHERE osa.cod_suplementacao_anulacao = osr.cod_suplementacao
-                        AND osa.exercicio = ''''''||stExercicio||''''''
+                        AND osa.exercicio = '''||stExercicio||'''
     )
 union
 
@@ -382,31 +395,32 @@ from
     ,orcamento.suplementacao os
     ,orcamento.suplementacao_reducao oss
 where
-    cl.tipo in (''''S'''',''''T'''')
-    and cl.exercicio = ''''''||stExercicio||''''''
-    and cl.cod_entidade = ''||inCodEntidade||''
-    and oss.cod_despesa = ''||inCodDotacao||'''';
+    cl.tipo in (''S'',''T'')
+    and cl.exercicio = '''||stExercicio||'''
+    and cl.cod_entidade = '||inCodEntidade||'
+    and oss.cod_despesa = '||inCodDotacao||' 
+    ';
 
-    if stDataFim is not null and stDataFim <> '''' then
-        stSql := stSql || '' and clt.dt_lote <= to_date(''''''||stDataFim||'''''',''''dd-mm-yyyy'''')'';
+    if stDataFim is not null and stDataFim <> '' then
+        stSql := stSql || ' and clt.dt_lote <= to_date('''||stDataFim||''',''dd-mm-yyyy'') ';
     end if;
-    if stDataInicio is not null and stDataInicio <> '''' then
-        stSql := stSql || '' and clt.dt_lote >= to_date(''''''||stDataInicio||'''''',''''dd-mm-yyyy'''')'';
+    if stDataInicio is not null and stDataInicio <> '' then
+        stSql := stSql || ' and clt.dt_lote >= to_date('''||stDataInicio||''',''dd-mm-yyyy'')';
     end if;
-    if boEmpenho = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''E'''''';
+    if boEmpenho = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''E'' ';
     end if;
-    if boLiquidacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''L'''''';
+    if boLiquidacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''L'' ';
     end if;
-    if boPagamento = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''P'''''';
+    if boPagamento = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''P'' ';
     end if;
-    if boSuplementacao = ''N'' then
-        stSql := stSql || '' and cl.tipo <> ''''S'''''';
+    if boSuplementacao = 'N' then
+        stSql := stSql || ' and cl.tipo <> ''S'' ';
     end if;
 
-stSql := stSql || ''
+stSql := stSql || '
     and cl.cod_lote = cvl.cod_lote
     and cl.tipo = cvl.tipo
     and cl.sequencia = cvl.sequencia
@@ -444,19 +458,19 @@ stSql := stSql || ''
     AND NOT EXISTS ( SELECT 1
                        FROM orcamento.suplementacao_anulada osa
                       WHERE osa.cod_suplementacao = oss.cod_suplementacao
-                        AND osa.exercicio = ''''''||stExercicio||''''''
+                        AND osa.exercicio = '''||stExercicio||'''
                    )
     AND NOT EXISTS ( SELECT 1
                        FROM orcamento.suplementacao_anulada osa
                       WHERE osa.cod_suplementacao_anulacao = oss.cod_suplementacao
-                        AND osa.exercicio = ''''''||stExercicio||''''''
+                        AND osa.exercicio = '''||stExercicio||'''
                    )
-'';
+';
 EXECUTE stSql;
 
 create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exercicio,cod_entidade);
 
-        stSubSql := ''
+        stSubSql := '
         create temporary table tmp_lancamento_sub as
         select
              tmp.dt_lote
@@ -486,15 +500,16 @@ create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exerci
             ,sw_cgm as cgm
             ,tmp_lancamento as tmp
         where
-            tmp.exercicio = ''''''||stExercicio||''''''
-            and tmp.cod_entidade = ''||inCodEntidade||'''';
+            tmp.exercicio = '''||stExercicio||'''
+            and tmp.cod_entidade = '||inCodEntidade||'
+            ';
 
-            if inCodDotacao is not null and inCodDotacao <> '''' then
-                stSubSql := stSubSql || '' and eped.cod_despesa = ''||inCodDotacao||'''';
+            if inCodDotacao is not null and inCodDotacao <> '' then
+                stSubSql := stSubSql || ' and eped.cod_despesa = '||inCodDotacao||' ';
             end if;
-            stSubSql := stSubSql || '' and eped.cod_conta = ''||inCodConta||'''';
+            stSubSql := stSubSql || ' and eped.cod_conta = '||inCodConta||' ';
 
-        stSubSql := stSubSql || ''
+        stSubSql := stSubSql || '
             and ce.cod_empenho = ee.cod_empenho
             and ce.exercicio = ee.exercicio
             and ce.cod_entidade = ee.cod_entidade
@@ -542,15 +557,16 @@ create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exerci
             ,sw_cgm as cgm
             ,tmp_lancamento as tmp
         where
-            tmp.exercicio = ''''''||stExercicio||''''''
-            and tmp.cod_entidade = ''||inCodEntidade||'''';
+            tmp.exercicio = '''||stExercicio||'''
+            and tmp.cod_entidade = '||inCodEntidade||' 
+            ';
 
-            if inCodDotacao is not null and inCodDotacao <> '''' then
-                stSubSql := stSubSql || '' and eped.cod_despesa = ''||inCodDotacao||'''';
+            if inCodDotacao is not null and inCodDotacao <> '' then
+                stSubSql := stSubSql || ' and eped.cod_despesa = '||inCodDotacao||' ';
             end if;
-            stSubSql := stSubSql || '' and eped.cod_conta = ''||inCodConta||'''';
+            stSubSql := stSubSql || ' and eped.cod_conta = '||inCodConta||' ';
     
-        stSubSql := stSubSql || ''
+        stSubSql := stSubSql || '
             and ee.cod_pre_empenho = epe.cod_pre_empenho
             and ee.exercicio = epe.exercicio
 
@@ -583,7 +599,6 @@ create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exerci
             ,tmp.tipo_valor
             ,tmp.nom_historico
             ,tmp.vl_lancamento
---
             ,cp.exercicio
             ,cp.tipo
             ,cp.cod_lote
@@ -602,15 +617,16 @@ create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exerci
             ,sw_cgm as cgm
             ,tmp_lancamento as tmp
         where
-            tmp.cod_entidade = ''||inCodEntidade||''
-            and tmp.exercicio = ''''''||stExercicio||'''''''';
+            tmp.cod_entidade = '||inCodEntidade||'
+            and tmp.exercicio = '''||stExercicio||'''
+            ';
 
-            if inCodDotacao is not null and inCodDotacao <> '''' then
-                stSubSql := stSubSql || '' and eped.cod_despesa = ''||inCodDotacao||'''';
+            if inCodDotacao is not null and inCodDotacao <> '' then
+                stSubSql := stSubSql || ' and eped.cod_despesa = '||inCodDotacao||' ';
             end if;
-            stSubSql := stSubSql || '' and eped.cod_conta = ''||inCodConta||'''';
+            stSubSql := stSubSql || ' and eped.cod_conta = '||inCodConta||' ';
         
-        stSubSql := stSubSql || ''
+        stSubSql := stSubSql || '
             and ee.cod_pre_empenho = epe.cod_pre_empenho
             and ee.exercicio = epe.exercicio
 
@@ -637,25 +653,14 @@ create index idx_tmp_lancamento on tmp_lancamento(cod_lote,tipo,sequencia,exerci
             and tmp.tipo = cp.tipo
             and tmp.cod_lote = cp.cod_lote 
             and tmp.cod_entidade = cp.cod_entidade 
-        '';
+        ';
 
 EXECUTE stSubSql;
 -----------------------------------------------------SUPLEMENTACOES---REDUCAO-----------------------------------------------------------------------
 --        UNION
 
-        stSubSql2 := ''
+        stSubSql2 := '
         select distinct
---             tmp.dt_lote
---            ,tmp.boo
---            ,tmp.complemento
---            ,tmp.estorno
---            ,tmp.cod_plano
---            ,tmp.sequencia
---            ,tmp.cod_estrutural
---            ,tmp.tipo_valor
---            ,tmp.nom_historico
---            ,tmp.vl_lancamento
-        
             os.exercicio 
             ,ctd.tipo
             ,clt.cod_lote
@@ -679,16 +684,15 @@ EXECUTE stSubSql;
             ,contabilidade.lancamento cl
             ,contabilidade.historico_contabil chc
             ,contabilidade.transferencia_despesa ctd
-  --          ,tmp_lancamento tmp
             ,orcamento.despesa od
-             JOIN orcamento.recurso(''''''|| stExercicio ||'''''') as rec
+             JOIN orcamento.recurso('''|| stExercicio ||''') as rec
                 ON (    rec.cod_recurso = od.cod_recurso
                     AND rec.exercicio   = od.exercicio   )
 
         where
-                clt.exercicio = ''''''||stExercicio||''''''
-            and clt.cod_entidade = ''||inCodEntidade||''
-            and clt.tipo in (''''S'''')
+                clt.exercicio = '''||stExercicio||'''
+            and clt.cod_entidade = '||inCodEntidade||'
+            and clt.tipo in (''S'')
             and os.cod_tipo <> 16
             and clt.cod_entidade = ctd.cod_entidade
             and clt.cod_tipo = ctd.cod_tipo
@@ -718,42 +722,26 @@ EXECUTE stSubSql;
             AND NOT EXISTS ( SELECT 1
                                FROM orcamento.suplementacao_anulada osa
                               WHERE cod_suplementacao = osr.cod_suplementacao
-                                AND osa.exercicio = ''''''||stExercicio||''''''
+                                AND osa.exercicio = '''||stExercicio||'''
             )
-            AND NOT EXISTS ( SELECT 1
-                               FROM orcamento.suplementacao_anulada osa
-                              WHERE osa.cod_suplementacao_anulacao = osr.cod_suplementacao
-                                AND osa.exercicio = ''''''||stExercicio||''''''
-            )
-        '';
-              if inCodDotacao is not null and inCodDotacao <> '''' then
-                  stSubSql2 := stSubSql2 || '' and osr.cod_despesa = ''||inCodDotacao||'''';
+        ';
+              if inCodDotacao is not null and inCodDotacao <> '' then
+                  stSubSql2 := stSubSql2 || ' and osr.cod_despesa = '||inCodDotacao||' ';
               end if;
 
-              if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '''') then
-                  stSql := stSql || '' AND rec.masc_recurso_red like ''''''|| stDestinacaoRecurso||''%''||'''''' '';
+              if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '') then
+                  stSql := stSql || ' AND rec.masc_recurso_red like '''||stDestinacaoRecurso||'%'' ';
               end if;
 
-              if (inCodDetalhamento is not null and inCodDetalhamento <> '''') then
-                  stSql := stSql || '' AND rec.cod_detalhamento = ''|| inCodDetalhamento ||'' '';
+              if (inCodDetalhamento is not null and inCodDetalhamento <> '') then
+                  stSql := stSql || ' AND rec.cod_detalhamento = '|| inCodDetalhamento ||' ';
               end if;
 
-         stSubSql2 := stSubSql2 || '' and od.cod_conta = ''||inCodConta||'''';   
+         stSubSql2 := stSubSql2 || ' and od.cod_conta = '||inCodConta||' ';
 -------------------------------------------------------SUPLEMENTACOES---SUPLEMENTADA-----------------------------------------------------------------
-        stSubSql2 := stSubSql2 || ''
+        stSubSql2 := stSubSql2 || '
         UNION
         select distinct
---             tmp.dt_lote
---            ,tmp.boo
---            ,tmp.complemento
---            ,tmp.estorno
---            ,tmp.cod_plano
---            ,tmp.sequencia
---            ,tmp.cod_estrutural
---            ,tmp.tipo_valor
---            ,tmp.nom_historico
---            ,tmp.vl_lancamento
-        
             os.exercicio 
             ,ctd.tipo
             ,clt.cod_lote
@@ -777,15 +765,14 @@ EXECUTE stSubSql;
             ,contabilidade.lancamento cl
             ,contabilidade.historico_contabil chc
             ,contabilidade.transferencia_despesa ctd
---            ,tmp_lancamento tmp
             ,orcamento.despesa od
-             JOIN orcamento.recurso(''''''|| stExercicio ||'''''') as rec
+             JOIN orcamento.recurso('''|| stExercicio ||''') as rec
                 ON (    rec.cod_recurso = od.cod_recurso
                     AND rec.exercicio   = od.exercicio   )
         where
-                clt.exercicio = ''''''||stExercicio||''''''
-            and clt.cod_entidade = ''||inCodEntidade||''
-            and clt.tipo in (''''S'''')
+                clt.exercicio = '''||stExercicio||'''
+            and clt.cod_entidade = '||inCodEntidade||'
+            and clt.tipo in (''S'')
             and clt.cod_entidade = ctd.cod_entidade
             and clt.cod_tipo = ctd.cod_tipo
             and clt.exercicio = ctd.exercicio
@@ -814,28 +801,23 @@ EXECUTE stSubSql;
             AND NOT EXISTS ( SELECT 1
                                FROM orcamento.suplementacao_anulada osa
                               WHERE cod_suplementacao = oss.cod_suplementacao
-                                AND osa.exercicio = ''''''||stExercicio||''''''
+                                AND osa.exercicio = '''||stExercicio||'''
             )
-            AND NOT EXISTS ( SELECT 1
-                               FROM orcamento.suplementacao_anulada osa
-                              WHERE osa.cod_suplementacao_anulacao = oss.cod_suplementacao
-                                AND osa.exercicio = ''''''||stExercicio||''''''
-            )
-        
-    '';
-            if inCodDotacao is not null and inCodDotacao <> '''' then
-                stSubSql2 := stSubSql2 || '' and oss.cod_despesa = ''||inCodDotacao||'''';
+    ';
+
+            if inCodDotacao is not null and inCodDotacao <> '' then
+                stSubSql2 := stSubSql2 || ' and oss.cod_despesa = '||inCodDotacao||' ';
             end if;
 
-            if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '''') then
-                stSql := stSql || '' AND rec.masc_recurso_red like ''''''|| stDestinacaoRecurso||''%''||'''''' '';
+            if (stDestinacaoRecurso is not null and stDestinacaoRecurso <> '') then
+                stSql := stSql || ' AND rec.masc_recurso_red like '''||stDestinacaoRecurso||'%'' ';
             end if;
 
-            if (inCodDetalhamento is not null and inCodDetalhamento <> '''') then
-                stSql := stSql || '' AND rec.cod_detalhamento = ''|| inCodDetalhamento ||'' '';
+            if (inCodDetalhamento is not null and inCodDetalhamento <> '') then
+                stSql := stSql || ' AND rec.cod_detalhamento = '|| inCodDetalhamento ||' ';
             end if;
 
-            stSubSql2 := stSubSql2 || '' and od.cod_conta = ''||inCodConta||''''; 
+            stSubSql2 := stSubSql2 || ' and od.cod_conta = '||inCodConta||' '; 
 -----------------------------------------------------------FIM SUPLEMENTACOES---------------------------------------------------------------------
 --        '';
     
@@ -847,7 +829,7 @@ EXECUTE stSubSql;
 
     END LOOP;
 
-    stSubSql := '' select * from tmp_lancamento_sub '';
+    stSubSql := ' select * from tmp_lancamento_sub ';
 
     FOR reRegistro IN EXECUTE stSubSql
     LOOP
@@ -861,4 +843,4 @@ EXECUTE stSubSql;
     RETURN;
 
 END;
-'language 'plpgsql';
+$$ language 'plpgsql';

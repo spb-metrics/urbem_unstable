@@ -226,5 +226,5 @@ DROP TABLE tmp_recurso_lancamento_negativo;
 
 
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

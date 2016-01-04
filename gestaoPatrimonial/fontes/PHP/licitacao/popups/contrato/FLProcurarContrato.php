@@ -30,7 +30,7 @@
 * @author Analista: Lucas Teixeira Stephanou
 * @author Desenvolvedor: Lucas Teixeira Stephanou
 
-  $Id: FLProcurarContrato.php 64081 2015-11-30 15:36:50Z michel $
+  $Id: FLProcurarContrato.php 64256 2015-12-22 16:06:28Z michel $
 
 * Casos de uso :uc-03.04.07, uc-03.04.05,
 */
@@ -76,6 +76,9 @@ $obITextBoxSelectEntidadeGeral = new ITextBoxSelectEntidadeGeral;
 $obPeriodicidade               = new Periodicidade;
 $obPeriodicidade->setExercicio ( Sessao::getExercicio());
 
+$obHdnTipoBusca = new Hidden;
+$obHdnTipoBusca->setName( "stTipoBusca" );
+
 $obHdnBoFornecedor = new Hidden;
 $obHdnBoFornecedor->setName( "boFornecedor" );
 $obHdnBoFornecedor->setValue( $request->get('boFornecedor') );
@@ -83,10 +86,10 @@ $obHdnBoFornecedor->setValue( $request->get('boFornecedor') );
 if($request->get('boFornecedor')){
     $arFiltroBuscaContrato = Sessao::read('arFiltroBuscaContrato');
     $arFiltroBuscaContrato = (is_array($arFiltroBuscaContrato)) ? $arFiltroBuscaContrato : array();
-
     $inCodEntidade = $arFiltroBuscaContrato['inCodEntidade'];
     $inCodFornecedor = $arFiltroBuscaContrato['inCodFornecedor'];
     $stNomFornecedor = '';
+
     if(!empty($inCodFornecedor))
         $stNomFornecedor = sistemalegado::pegaDado("nom_cgm","sw_cgm","WHERE numcgm = '".$inCodFornecedor."' ");
 
@@ -95,11 +98,11 @@ if($request->get('boFornecedor')){
 
     $obITextBoxSelectEntidadeGeral->setCodEntidade($inCodEntidade);
     $obITextBoxSelectEntidadeGeral->setLabel(true);
-
+    
     $obHdnCodFornecedor = new Hidden;
     $obHdnCodFornecedor->setName( "inCodFornecedor" );
     $obHdnCodFornecedor->setValue( $inCodFornecedor );
-
+    
     $obLblFornecedor = new Label;
     $obLblFornecedor->setId    ('inCodFornecedor');
     $obLblFornecedor->setRotulo('Fornecedor');
@@ -110,11 +113,7 @@ if($request->get('boFornecedor')){
     $obTxtExercicio->setId     ('stExercicio');
     $obTxtExercicio->setValue  (Sessao::getExercicio());
     $obTxtExercicio->setRotulo ('Exercício');
-    $obTxtExercicio->setReadOnly(true);
 }
-
-$obHdnTipoBusca = new Hidden;
-$obHdnTipoBusca->setName( "stTipoBusca" );
 
 //DEFINICAO DO FORM
 $obForm = new Form;

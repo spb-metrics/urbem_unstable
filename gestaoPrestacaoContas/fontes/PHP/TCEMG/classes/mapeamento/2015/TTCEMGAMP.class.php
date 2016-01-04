@@ -122,7 +122,7 @@ class TTCEMGAMP extends Persistente
     public function montaRecuperaDadosExportacaoTipo12($stFiltro, $stOrdem)
     {
         $stSql = "   SELECT 12 AS tipo_registro
-                          , TRIM(configuracao_entidade.valor) AS cod_orgao
+                          ,'".$this->getDado('cod_orgao')."' as cod_orgao
                           , CASE WHEN acao.num_acao = 9 OR acao.num_acao = 2137
                                  THEN '09999'
                                  ELSE lpad(lpad(acao_unidade_executora.num_orgao::VARCHAR, 2, '0')||lpad(acao_unidade_executora.num_unidade::VARCHAR, 2, '0'),5,'0')
@@ -161,41 +161,6 @@ class TTCEMGAMP extends Persistente
                         AND acao_unidade_executora.timestamp_acao_dados = acao.ultimo_timestamp_acao_dados
                        JOIN ppa.programa
                          ON programa.cod_programa = acao.cod_programa
-                         
-
-                       JOIN (  SELECT despesa.exercicio
-                                     , despesa.cod_entidade
-                                     , programa.cod_programa
-                                  FROM ppa.programa
-                
-                                  JOIN orcamento.programa_ppa_programa
-                                    ON programa_ppa_programa.cod_programa_ppa = programa.cod_programa
-                
-                                  JOIN orcamento.programa AS o_p
-                                    ON o_p.exercicio = programa_ppa_programa.exercicio
-                                   AND o_p.cod_programa = programa_ppa_programa.cod_programa
-                
-                                  JOIN orcamento.despesa
-                                    ON despesa.cod_programa = o_p.cod_programa
-                                   AND despesa.exercicio = o_p.exercicio
-                                 
-                                 WHERE despesa.exercicio = '".Sessao::getExercicio()."'
-                                   AND despesa.cod_entidade IN (".$this->getDado('entidades').")
-                
-                                 GROUP BY despesa.exercicio
-                                    , despesa.cod_entidade
-                                    , programa.cod_programa
-                    
-                              ) AS despesa
-                 
-                        ON despesa.cod_programa = programa.cod_programa 
-                
-                      JOIN administracao.configuracao_entidade
-                        ON configuracao_entidade.cod_entidade = despesa.cod_entidade
-                       AND configuracao_entidade.exercicio    = despesa.exercicio
-                       AND configuracao_entidade.cod_modulo   = 55
-                       AND configuracao_entidade.parametro    = 'tcemg_codigo_orgao_entidade_sicom'
-                       
                        
                     GROUP BY acao.num_acao
                            , acao.cod_acao
@@ -203,8 +168,7 @@ class TTCEMGAMP extends Persistente
                            , acao_unidade_executora.num_orgao
                            , acao_unidade_executora.num_unidade
                            , acao_dados.cod_funcao
-                           , acao_dados.cod_subfuncao
-                           , TRIM(configuracao_entidade.valor)
+                           , acao_dados.cod_subfuncao                           
                     ORDER BY acao.num_acao
          ";
          

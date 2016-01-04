@@ -69,4 +69,4 @@ BEGIN
     END IF;
     RETURN nuParcela;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

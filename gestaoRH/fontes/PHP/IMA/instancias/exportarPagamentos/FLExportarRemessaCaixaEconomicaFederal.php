@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FLExportarRemessaCaixaEconomicaFederal.php 64088 2015-12-01 17:45:02Z evandro $
+    $Id: FLExportarRemessaCaixaEconomicaFederal.php 64228 2015-12-21 12:14:25Z evandro $
 
     * Casos de uso: uc-04.08.11
 */
@@ -92,7 +92,7 @@ $obComboCadastro->addOption( "ativos", "Ativos" );
 $obComboCadastro->addOption( "aposentados", "Aposentados" );
 $obComboCadastro->addOption( "pensionistas", "Pensionistas" );
 $obComboCadastro->addOption( "estagiarios", "Estagiários" );
-$obComboCadastro->addOption( "resdincidos", "Rescindidos" );
+$obComboCadastro->addOption( "rescindidos", "Rescindidos" );
 $obComboCadastro->addOption( "pensao_judicial", "Pensão Judicial");
 $obComboCadastro->addOption( "todos", "Todos" );
 $obComboCadastro->setNull  ( false );

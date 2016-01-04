@@ -33,53 +33,61 @@
     * @package URBEM
     * @subpackage
 
-    $Id: IPopUpContrato.class.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: IPopUpContrato.class.php 64256 2015-12-22 16:06:28Z michel $
 
     * Casos de uso: uc-03.05.23
 */
 
-require_once CAM_GF_ORC_COMPONENTES . "ITextBoxSelectEntidadeGeral.class.php";
+require_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php";
 
 class IPopUpContrato extends Objeto
 {
-    public $obBuscaInner;
     public $obHdnBoFornecedor;
+    public $obTxtExercicioContrato;
+    public $obBuscaInner;
     public $obSpanInfoAdicional;
 
-    public function IPopUpContrato(&$obForm)
+    public function IPopUpContrato( &$obForm )
     {
         parent::Objeto();
 
-        // Define Objeto Label para Fornecedor
         $this->obHdnBoFornecedor = new Hidden;
-        $this->obHdnBoFornecedor->setName   ( "boFornecedor" );
-        $this->obHdnBoFornecedor->setId     ( "boFornecedor" );
-        $this->obHdnBoFornecedor->setValue  ( FALSE  );
+        $this->obHdnBoFornecedor->setName ( "boFornecedor" );
+        $this->obHdnBoFornecedor->setId   ( "boFornecedor" );
+        $this->obHdnBoFornecedor->setValue( FALSE );
+
+        $this->obTxtExercicioContrato = new TextBox;
+        $this->obTxtExercicioContrato->setRotulo ( 'Exercício do Contrato' );
+        $this->obTxtExercicioContrato->setName   ( 'stExercicioContrato'   );
+        $this->obTxtExercicioContrato->setId     ( 'stExercicioContrato'   );
+        $this->obTxtExercicioContrato->setValue  ( Sessao::getExercicio()  );
+        $this->obTxtExercicioContrato->setInteiro( true );
 
         $this->obBuscaInner = new BuscaInner;
         $this->obBuscaInner->obForm = &$obForm;
-
-        $this->obBuscaInner->setRotulo                ( 'Número do Contrato'                     );
-        $this->obBuscaInner->setTitle                 ( 'Selecione o contrato na PopUp de busca' );
-        $this->obBuscaInner->obCampoCod->setName      ( 'inNumContrato'                          );
-        $this->obBuscaInner->obCampoCod->setId        ( 'inNumContrato'                          );
-        $this->obBuscaInner->obCampoCod->setAlign     ( "left"                                   );
-        $this->obBuscaInner->setId                    ( 'txtContrato'                            );
-        $this->obBuscaInner->setNull                  ( true );
+        $this->obBuscaInner->setRotulo           ( 'Número do Contrato'                     );
+        $this->obBuscaInner->setTitle            ( 'Selecione o contrato na PopUp de busca' );
+        $this->obBuscaInner->obCampoCod->setName ( 'inCodContrato'                          );
+        $this->obBuscaInner->obCampoCod->setId   ( 'inCodContrato'                          );
+        $this->obBuscaInner->obCampoCod->setAlign( "left"                                   );
+        $this->obBuscaInner->setId               ( 'txtContrato'                            );
+        $this->obBuscaInner->setNull             ( true );
         $this->obBuscaInner->stTipoBusca = 'popup';
         $this->obBuscaInner->setFuncaoBusca("abrePopUp('".CAM_GP_LIC_POPUPS."contrato/FLProcurarContrato.php','".$this->obBuscaInner->obForm->getName()."','".$this->obBuscaInner->obCampoCod->getName()."','".$this->obBuscaInner->getId()."','".$this->obBuscaInner->stTipoBusca."','".Sessao::getId()."&boFornecedor='+jQuery('#boFornecedor').val(),'800','550');");
-        $this->obBuscaInner->setValoresBusca( CAM_GP_LIC_POPUPS.'contrato/OCProcuraContrato.php?' .Sessao::getId(), $this->obBuscaInner->obForm->getName() );
+        $this->obBuscaInner->setValoresBusca( CAM_GP_LIC_POPUPS.'contrato/OCProcuraContrato.php?'.Sessao::getId(), $this->obBuscaInner->obForm->getName() );
 
         $this->obSpanInfoAdicional = new Span;
         $this->obSpanInfoAdicional->setId('spnInfoAdicional');
-
     }
 
     public function geraFormulario($obFormulario)
     {
-        $obFormulario->addHidden        ( $this->obHdnBoFornecedor );
-        $obFormulario->addComponente    ( $this->obBuscaInner );
-        $obFormulario->addSpan          ( $this->obSpanInfoAdicional );
+        $this->obTxtExercicioContrato->obEvento->setOnChange( "jQuery('#".$this->obBuscaInner->obCampoCod->getId()."').val(''); jQuery('#".$this->obBuscaInner->getId()."').html('&nbsp;'); jQuery('#spnInfoAdicional').html('');" );
+
+        $obFormulario->addHidden    ( $this->obHdnBoFornecedor );
+        $obFormulario->addComponente( $this->obTxtExercicioContrato );
+        $obFormulario->addComponente( $this->obBuscaInner );
+        $obFormulario->addSpan      ( $this->obSpanInfoAdicional );
     }
 
 }

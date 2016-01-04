@@ -421,7 +421,9 @@ FROM (
              ,it.vl_total  as valor_total
              ,(it.vl_total/it.quantidade) as valor_unitario                                               
              ,it.num_item
-             ,it.cod_item                                                                                  
+             ,it.cod_item
+             ,it.cod_centro
+             ,centro_custo.descricao AS nom_centro
              ,it.quantidade
              ,it.nom_unidade                                                                              
              ,it.sigla_unidade as simbolo                                                                 
@@ -471,7 +473,10 @@ FROM (
                       empenho.pre_empenho_despesa as pd                                                   
                    ON (     pe.cod_pre_empenho   = pd.cod_pre_empenho                                     
                         AND pe.exercicio        = pd.exercicio      )                                     
-             ,empenho.item_pre_empenho     as it                                                          
+             ,empenho.item_pre_empenho     as it
+             LEFT JOIN
+              almoxarifado.centro_custo
+             ON centro_custo.cod_centro = it.cod_centro
              ,orcamento.unidade            as ou                                                          
              ,orcamento.orgao              as oo                                                          
              ,orcamento.entidade           as oe                                                          
@@ -3116,24 +3121,39 @@ FROM (
                         </structure>
                     </list-property>
                 </structure>
+                <structure>
+                    <property name="name">cod_centro</property>
+                    <expression name="expression" type="javascript">dataSetRow["cod_centro"]</expression>
+                    <property name="dataType">integer</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">nom_centro</property>
+                    <expression name="expression" type="javascript">dataSetRow["nom_centro"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
             </list-property>
             <column id="1372">
-                <property name="width">10mm</property>
+                <property name="width">8mm</property>
             </column>
             <column id="1373">
-                <property name="width">30mm</property>
+                <property name="width">25mm</property>
+            </column>
+            <column id="6671">
+                <property name="width">18mm</property>
             </column>
             <column id="1374">
-                <property name="width">20mm</property>
+                <property name="width">18mm</property>
             </column>
             <column id="1375">
-                <property name="width">75mm</property>
+                <property name="width">71mm</property>
             </column>
             <column id="1376">
-                <property name="width">27mm</property>
+                <property name="width">25mm</property>
             </column>
             <column id="1377">
-                <property name="width">28mm</property>
+                <property name="width">25mm</property>
             </column>
             <header>
                 <row id="1351">
@@ -3165,6 +3185,18 @@ FROM (
                         <label id="1386">
                             <property name="fontSize">6pt</property>
                             <text-property name="text">Quantidade</text-property>
+                        </label>
+                    </cell>
+                    <cell id="6667">
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="6672">
+                            <property name="fontSize">6pt</property>
+                            <text-property name="text">Centro de Custo</text-property>
                         </label>
                     </cell>
                     <cell id="1354">
@@ -3247,6 +3279,18 @@ FROM (
                             <property name="resultSetColumn">quantidade</property>
                         </data>
                     </cell>
+                    <cell id="6668">
+                        <property name="borderLeftColor">#000000</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <data id="6675">
+                            <structure name="numberFormat">
+                                <property name="category">Unformatted</property>
+                            </structure>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">cod_centro</property>
+                        </data>
+                    </cell>
                     <cell id="1361">
                         <property name="borderLeftColor">#000000</property>
                         <property name="borderLeftStyle">solid</property>
@@ -3309,6 +3353,12 @@ FROM (
                         <property name="paddingBottom">0pt</property>
                         <property name="paddingRight">0pt</property>
                     </cell>
+                    <cell id="6669">
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                    </cell>
                     <cell id="1381">
                         <property name="paddingTop">0pt</property>
                         <property name="paddingLeft">0pt</property>
@@ -3336,7 +3386,7 @@ FROM (
                 </row>
                 <row id="1365">
                     <cell id="1366">
-                        <property name="colSpan">5</property>
+                        <property name="colSpan">6</property>
                         <property name="rowSpan">1</property>
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>

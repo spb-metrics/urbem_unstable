@@ -61,12 +61,12 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once($pgJS);
 
 $obTPessoalAdidoCedido = new TPessoalAdidoCedido();
-$stFiltro = " AND contrato.cod_contrato = ".$_GET['inCodContrato'];
+$stFiltro = " AND contrato.cod_contrato = ".$request->get('inCodContrato');
 $obTPessoalAdidoCedido->recuperaRelacionamento($rsAdidoCedido,$stFiltro);
 
-$stAcao = ( $_POST['stAcao'] != "" ) ? $_POST['stAcao'] : $_GET['stAcao'];
+$stAcao = $request->get('stAcao');
 $stLink = "";
-foreach ($_GET as $stCampo=>$stValor) {
+foreach ($request->getAll() as $stCampo=>$stValor) {
     if ($stCampo != 'PHPSESSID' and $stCampo != 'iURLRandomica' and $stCampo != 'stAcao') {
         $stLink .= "&".$stCampo."=".$stValor;
     }
@@ -93,20 +93,20 @@ if( ($rsAdidoCedido->getCampo("tipo_cedencia") == "a" and $rsAdidoCedido->getCam
     $obFormulario->defineBarra(array($obBtnVoltar),"","");
     $obFormulario->show();
 } else {
-    $inContrato          = ( $_REQUEST['inContrato']          != "" ) ? $_REQUEST['inContrato']          : Sessao::read('inContrato');
-    $inNumCGM            = ( $_REQUEST['inNumCGM']            != "" ) ? $_REQUEST['inNumCGM']            : Sessao::read('inNumCGM');
-    $stServidor          = ( $_REQUEST['stNomCGM']            != "" ) ? $_REQUEST['stNomCGM']            : Sessao::read('stNomCGM');
-    $inCodFuncao         = ( $_REQUEST['inCodFuncao']         != "" ) ? $_REQUEST['inCodFuncao']         : Sessao::read('inCodFuncao');
-    $inCodContrato       = ( $_REQUEST['inCodContrato']       != "" ) ? $_REQUEST['inCodContrato']       : Sessao::read('inCodContrato');
-    $stAcao              = ( $_REQUEST['stAcao']              != "" ) ? $_REQUEST['stAcao']              : Sessao::read('stAcao');
-    $inCodigo            = ( $_REQUEST['inCodigo']            != "" ) ? $_REQUEST['inCodigo']            : Sessao::read('inCodigo');
-    $stDescricao         = ( $_REQUEST['stDescricao']         != "" ) ? $_REQUEST['stDescricao']         : Sessao::read('stDescricaoEvento');
-    $stTextoComplementar = ( $_REQUEST['stTextoComplementar'] != "" ) ? $_REQUEST['stTextoComplementar'] : Sessao::read('stTextoComplementar');
-    $stTipo              = ( $_REQUEST['stTipo']              != "" ) ? $_REQUEST['stTipo']              : Sessao::read('stTipo');
-    $stFixado            = ( $_REQUEST['stFixado']            != "" ) ? $_REQUEST['stFixado']            : Sessao::read('stFixado');
-    $nuValor             = ( $_REQUEST['nuValor']             != "" ) ? $_REQUEST['nuValor']             : Sessao::read('nuValor');
-    $boLimiteCalculo     = ( $_REQUEST['boLimiteCalculo']     != "" ) ? $_REQUEST['boLimiteCalculo']     : Sessao::read('boLimiteCalculo');
-    $stProventosDescontos= ( $_REQUEST['stProventosDescontos']!= "" ) ? $_REQUEST['stProventosDescontos']: Sessao::read('stProventosDescontos');
+    $inContrato          = ( $request->get('inContrato')          != "" ) ? $request->get('inContrato')          : Sessao::read('inContrato');
+    $inNumCGM            = ( $request->get('inNumCGM')            != "" ) ? $request->get('inNumCGM')            : Sessao::read('inNumCGM');
+    $stServidor          = ( $request->get('stNomCGM')            != "" ) ? $request->get('stNomCGM')            : Sessao::read('stNomCGM');
+    $inCodFuncao         = ( $request->get('inCodFuncao')         != "" ) ? $request->get('inCodFuncao')         : Sessao::read('inCodFuncao');
+    $inCodContrato       = ( $request->get('inCodContrato')       != "" ) ? $request->get('inCodContrato')       : Sessao::read('inCodContrato');
+    $stAcao              = ( $request->get('stAcao')              != "" ) ? $request->get('stAcao')              : Sessao::read('stAcao');
+    $inCodigo            = ( $request->get('inCodigo')            != "" ) ? $request->get('inCodigo')            : Sessao::read('inCodigo');
+    $stDescricao         = ( $request->get('stDescricao')         != "" ) ? $request->get('stDescricao')         : Sessao::read('stDescricaoEvento');
+    $stTextoComplementar = ( $request->get('stTextoComplementar') != "" ) ? $request->get('stTextoComplementar') : Sessao::read('stTextoComplementar');
+    $stTipo              = ( $request->get('stTipo')              != "" ) ? $request->get('stTipo')              : Sessao::read('stTipo');
+    $stFixado            = ( $request->get('stFixado')            != "" ) ? $request->get('stFixado')            : Sessao::read('stFixado');
+    $nuValor             = ( $request->get('nuValor')             != "" ) ? $request->get('nuValor')             : Sessao::read('nuValor');
+    $boLimiteCalculo     = ( $request->get('boLimiteCalculo')     != "" ) ? $request->get('boLimiteCalculo')     : Sessao::read('boLimiteCalculo');
+    $stProventosDescontos= ( $request->get('stProventosDescontos')!= "" ) ? $request->get('stProventosDescontos'): Sessao::read('stProventosDescontos');
 
     $obRFolhaPagamentoPeriodoContratoServidor->setCodContrato( $inCodContrato );
     $obRFolhaPagamentoPeriodoContratoServidor->consultarContratoServidorSubDivisaoFuncao($rsSubDivisao);
@@ -118,7 +118,7 @@ if( ($rsAdidoCedido->getCampo("tipo_cedencia") == "a" and $rsAdidoCedido->getCam
     Sessao::write('inCodSubDivisao',$rsSubDivisao->getCampo('cod_sub_divisao'));
     Sessao::write('inCodEspecialidade',$rsEspecialidade->getCampo('cod_especialidade'));
     Sessao::write('inCodFuncao',$inCodFuncao);
-
+    
     if ($stAcao == 'alterar') {
         $stMensagem = "Matrícula: ".Sessao::read('inContrato');
         Sessao::write('eventosFixos',array());
@@ -135,7 +135,7 @@ if( ($rsAdidoCedido->getCampo("tipo_cedencia") == "a" and $rsAdidoCedido->getCam
         $stFiltro  = " AND contrato.cod_contrato = ".$inCodContrato;
         $stFiltro .= " AND cod_periodo_movimentacao = ".$rsMovimentacao->getCampo("cod_periodo_movimentacao");
         $stFiltro .= " AND evento_calculado.desdobramento is null";
-        $obTFolhaPagamentoRegistroEvento->recuperaRegistrosDeEventos($rsRegistroEvento,$stFiltro);
+        $obTFolhaPagamentoRegistroEvento->recuperaRegistrosDeEventos($rsRegistroEvento,$stFiltro);        
         
         if ( $rsRegistroEvento->getNumLinhas() > 0 ) {
             Sessao::write('status',"alterar");
@@ -189,7 +189,10 @@ if( ($rsAdidoCedido->getCampo("tipo_cedencia") == "a" and $rsAdidoCedido->getCam
                     $arElementos['boAutomatico']        = $stAutomatico;
                     $arElementos['inCodRegistro']       = $rsRegistroEvento->getCampo('cod_registro');
                     $arEventosVariaveis[] = $arElementos;
-                } elseif ( $rsRegistroEvento->getCampo('evento_sistema') == 'f' and $rsRegistroEvento->getCampo('natureza') != 'B' ) {
+                } elseif ( $rsRegistroEvento->getCampo('evento_sistema') == 'f' 
+                           && $rsRegistroEvento->getCampo('natureza') != 'B' 
+                           && $rsRegistroEvento->getCampo('automatico') != 't' 
+                         ) {
                     //Registro de eventos fixos
                     $arElementos = array();
                     $arElementos['inId']                = count($arEventosFixos);

@@ -573,7 +573,9 @@ class TTCEMGExportacaoARC extends Persistente
 		 , natureza_receita_reduzida AS natureza_receita_estornada
 		 , ( SELECT sem_acentos(descricao) as descricao
 				FROM orcamento.conta_receita
-				WHERE REPLACE(conta_receita.cod_estrutural, '.', '')::TEXT = RPAD(natureza_receita_reduzida::TEXT, 14, '0')::TEXT
+			   WHERE REPLACE(conta_receita.cod_estrutural, '.', '')::TEXT = CASE 
+										WHEN SUBSTR(natureza_receita_reduzida::TEXT, 1, 1) = '9' THEN RPAD(natureza_receita_reduzida::TEXT, 15, '0')
+										ELSE RPAD(natureza_receita_reduzida::TEXT, 14, '0') END
 				  AND exercicio = '".$this->getDado('exercicio')."'
 	        ) AS especificacao_estornada
 	     , SUM(vl_reduzido_acrescido) AS vl_estornado

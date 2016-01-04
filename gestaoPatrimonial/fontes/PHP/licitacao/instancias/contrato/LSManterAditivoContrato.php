@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: LSManterAditivoContrato.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterAditivoContrato.php 64214 2015-12-17 16:13:13Z michel $
 
     * Casos de uso : uc-03.05.24
 */
@@ -57,7 +57,7 @@ $stAcao = $request->get('stAcao');
 $stLink = "&stAcao=".$stAcao;
 
 if ($_REQUEST['inNumContrato']) {
-   $stFiltro .= " contrato.num_contrato = ". $_REQUEST['inNumContrato']." and ";
+   $stFiltro .= " contrato.numero_contrato = ". $_REQUEST['inNumContrato']." and ";
 }
 if ($_REQUEST['stExercicioContrato']) {
    $stFiltro .= " contrato.exercicio = ". $_REQUEST['stExercicioContrato']." and ";
@@ -157,7 +157,7 @@ $obLista->commitCabecalho();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("DIREITA");
-$obLista->ultimoDado->setCampo( "[num_contrato]/[exercicio_contrato]" );
+$obLista->ultimoDado->setCampo( "[numero_contrato]/[exercicio_contrato]" );
 $obLista->commitDado();
 
 if ($stAcao == "incluir") {

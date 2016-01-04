@@ -396,7 +396,7 @@ class RFolhaPagamentoPeriodoMovimentacao
             $obTFolhaPagamentoConcessaoDecimo->setDado("cod_contrato",$rsContratos->getCampo("cod_contrato"));
             $obTFolhaPagamentoConcessaoDecimo->setDado("desdobramento",'A');
             $obTFolhaPagamentoConcessaoDecimo->setDado("cod_periodo_movimentacao",$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao"));
-            $obTFolhaPagamentoConcessaoDecimo->setDado("folha_salario",false);
+            $obTFolhaPagamentoConcessaoDecimo->setDado("folha_salario",true);
 
             $stFiltro  = " WHERE cod_contrato = ".$rsContratos->getCampo("cod_contrato");
             $stFiltro .= "   AND cod_periodo_movimentacao <= ".$rsUltimaMovimentacao->getCampo("cod_periodo_movimentacao");

@@ -140,11 +140,8 @@ BEGIN
                        AND corrente.cod_ctb_anterior = aplicacao.cod_ctb_anterior_aplicacao 
                   ORDER BY cod_ctb_anterior
             ';
-        EXECUTE stSql;
-     
-      CREATE UNIQUE INDEX unq_corrente              ON tmp_corrente           (exercicio, cod_conta);
-      CREATE UNIQUE INDEX unq_conta_unica           ON tmp_conta_unica        (exercicio, cod_conta);
 
+        EXECUTE stSql;
 
  ---TIPO DE CONTA: APLICACAO
     stSql := 'CREATE TEMPORARY TABLE tmp_aplicacao AS
@@ -174,8 +171,6 @@ BEGIN
                 ';
     EXECUTE stSql;
 
-    CREATE UNIQUE INDEX unq_aplicacao             ON tmp_aplicacao          (exercicio, cod_conta );
-
 stSql := 'SELECT *
             FROM tmp_corrente
        UNION ALL
@@ -188,10 +183,6 @@ stSql := 'SELECT *
         RETURN NEXT reRegistro;
     END LOOP;
 
-    DROP INDEX unq_corrente ;
-    DROP INDEX unq_aplicacao;
-    DROP INDEX unq_conta_unica;
-    
     DROP TABLE tmp_contas;
     DROP TABLE tmp_corrente;
     DROP TABLE tmp_aplicacao;

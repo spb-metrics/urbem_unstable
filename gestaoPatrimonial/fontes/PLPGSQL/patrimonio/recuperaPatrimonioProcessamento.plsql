@@ -67,4 +67,4 @@ BEGIN
   RETURN 1;
  
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

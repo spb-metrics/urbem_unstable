@@ -71,5 +71,5 @@ BEGIN
 
     RETURN inRetorno;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

@@ -301,7 +301,7 @@ BEGIN
     EXECUTE 'DROP TABLE tmp_valores_'||inIdentificador;
     
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 SELECT * FROM atualizaArquivoCargos('');
 DROP FUNCTION atualizaArquivoCargos(VARCHAR);

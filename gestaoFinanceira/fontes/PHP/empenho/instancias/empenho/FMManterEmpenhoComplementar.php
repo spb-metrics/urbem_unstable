@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoComplementar.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: FMManterEmpenhoComplementar.php 64256 2015-12-22 16:06:28Z michel $
 
     * Casos de uso: uc-02.03.36
 */
@@ -198,6 +198,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscEmpenho->setValue  ( $stNomFornecedor  );
     $obBscEmpenho->setNull   ( true );
     $obBscEmpenho->obCampoCod->setName ( "inCodigoEmpenho" );
+    $obBscEmpenho->obCampoCod->setId   ( "inCodigoEmpenho" );
     $obBscEmpenho->obCampoCod->setSize ( 8 );
     $obBscEmpenho->obCampoCod->setNull   ( true );
     $obBscEmpenho->obCampoCod->setInteiro  ( true );
@@ -399,12 +400,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obHdnDtContrato->setName ('dtContrato');
     $obHdnDtContrato->setId   ('dtContrato');
     $obHdnDtContrato->setValue('');
-
+    
     $obContrato = new IPopUpContrato( $obForm );
     $obContrato->obHdnBoFornecedor->setValue(TRUE);
-    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');");
     $obContrato->obBuscaInner->setValoresBusca('', '', '');
-    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
+    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');".$obContrato->obBuscaInner->getFuncaoBusca());
 
     //****************************************//
     // Monta FORMULARIO

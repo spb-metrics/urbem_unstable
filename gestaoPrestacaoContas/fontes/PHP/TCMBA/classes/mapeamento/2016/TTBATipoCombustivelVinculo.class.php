@@ -1,3 +1,4 @@
+<?php
 /*
     **********************************************************************************
     *                                                                                *
@@ -20,43 +21,63 @@
     *                                                                                *
     **********************************************************************************
 */
+?>
+<?php
+/**
+    * Data de Criação: 20/08/2008
 
-/*
-* Script de DDL e DML
-*
-* $id: $
+    * @author Analista      : Tonismar Régis Bernardo
+    * @author Desenvolvedor : Henrique Boaventura
+
+    * @ignore
+
+    * $Id: TTBATipoCombustivelVinculo.class.php 62823 2015-06-24 17:22:01Z evandro $
+
+    * Casos de uso: uc-06.05.00
 */
 
-   --
-   -- Função que atribui sequencial para uma nota_liquidacao
-   --
-   CREATE OR REPLACE FUNCTION TCEMG.numero_nota_liquidacao( varExercicio         VARCHAR
-                                                          , intCodEntidade       INTEGER
-                                                          , intCodNota           INTEGER
-                                                          , varExercicioEmpenho  VARCHAR
-                                                          , intCodEmpenho        INTEGER ) RETURNS INTEGER AS $$
-   DECLARE
-      recRegistro       RECORD;
-      intRetorno        INTEGER;
-   BEGIN
-      ALTER SEQUENCE tcemg.seqLiquidacao RESTART WITH 1;
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once ( CLA_PERSISTENTE );
 
-      FOR recRegistro
-       IN SELECT cod_nota
-            FROM empenho.nota_liquidacao
-           WHERE nota_liquidacao.exercicio_empenho   = varExercicioEmpenho
-             AND nota_liquidacao.cod_empenho         = intCodEmpenho
-             AND nota_liquidacao.cod_entidade        = intCodEntidade
-           ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota
-      LOOP
-         intRetorno := nextval('tcemg.seqLiquidacao');
-         IF recRegistro.cod_nota = intCodNota THEN
-            EXIT;
-         END IF;
-      END LOOP;
+class TTBATipoCombustivelVinculo extends Persistente
+{
+/**
+    * Método Construtor
+    * @access Private
+*/
+function TTBATipoCombustivelVinculo()
+{
+    parent::Persistente();
+    $this->setTabela('tcmba.tipo_combustivel_vinculo');
 
-      RETURN intRetorno;
-   END;
-   $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+    $this->setCampoCod('cod_tipo_tcm');
+    $this->setComplementoChave('cod_combustivel');
 
+    $this->AddCampo('cod_tipo_tcm','integer',true,'',true,'TTBATipoVeiculo');
+    $this->AddCampo('cod_combustivel','integer',true,'',true,'TFrotaCombustivel');
+}
 
+function recuperaTipoCombustivelVinculo(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+{
+    return $this->executaRecupera("montaRecuperaTipoCombustivelVinculo",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+}
+function montaRecuperaTipoCombustivelVinculo()
+{
+    $stSql = "
+        SELECT tipo_combustivel.cod_tipo_tcm
+             , tipo_combustivel.descricao AS nom_tipo_tcm
+             , combustivel.cod_combustivel AS cod_tipo_sw
+             , combustivel.nom_combustivel AS nom_tipo_sw
+          FROM tcmba.tipo_combustivel_vinculo
+    INNER JOIN tcmba.tipo_combustivel
+            ON tipo_combustivel.cod_tipo_tcm = tipo_combustivel_vinculo.cod_tipo_tcm
+    INNER JOIN frota.combustivel
+            ON combustivel.cod_combustivel = tipo_combustivel_vinculo.cod_combustivel
+    ";
+
+    return $stSql;
+
+}
+
+}
+?>

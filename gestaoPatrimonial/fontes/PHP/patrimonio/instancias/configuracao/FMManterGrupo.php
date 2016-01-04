@@ -61,14 +61,20 @@ if ($stAcao == 'alterar') {
 
     $stFiltro = "
           WHERE grupo.cod_natureza = ".$_REQUEST['inCodNatureza']."
-            AND grupo.cod_grupo      = ".$_REQUEST['inCodGrupo'];
+            AND grupo.cod_grupo    = ".$_REQUEST['inCodGrupo'];
 
     $obTPatrimonioGrupo->recuperaGrupo( $rsGrupo, $stFiltro );
         
-    $inCodNatureza         = $rsGrupo->getCampo( 'cod_natureza' );
-    $inCodPlano            = $rsGrupo->getCampo( 'cod_plano' );
-    $stNomConta            = $rsGrupo->getCampo( 'nom_conta' );
-    $stNomGrupo            = $rsGrupo->getCampo( 'nom_grupo' );
+    $inCodNatureza    = $rsGrupo->getCampo( 'cod_natureza' );
+    $inCodPlano       = $rsGrupo->getCampo( 'cod_plano' );
+    $stNomConta       = $rsGrupo->getCampo( 'nom_conta' );
+    $stNomGrupo       = $rsGrupo->getCampo( 'nom_grupo' );
+    $inCodPlanoDoacao = $rsGrupo->getCampo( 'cod_plano_doacao' );
+    $stNomContaDoacao = $rsGrupo->getCampo( 'nom_conta_doacao' );
+    $inCodPlanoPerdaInvoluntaria = $rsGrupo->getCampo( 'cod_plano_perda_involuntaria' );
+    $stNomContaPerdaInvoluntaria = $rsGrupo->getCampo( 'nom_conta_perda' );
+    $inCodPlanoTransferencia     = $rsGrupo->getCampo( 'cod_plano_transferencia' );
+    $stNomContaTransferencia     = $rsGrupo->getCampo( 'nom_conta_transferencia' );
     $inCodPlanoDepreciacao = $rsGrupo->getCampo( 'cod_plano_depreciacao' );
     $stNomContaDepreciacao = $rsGrupo->getCampo( 'nom_conta_depreciacao' );
 
@@ -100,6 +106,19 @@ if ($stAcao == 'alterar') {
     $obLblCodGrupo = new Label();
     $obLblCodGrupo->setRotulo( 'Código do Grupo' );
     $obLblCodGrupo->setValue( $rsGrupo->getCampo('cod_grupo') );
+} else {
+    $inCodNatureza         = "";
+    $inCodPlano            = "";
+    $stNomConta            = "";
+    $stNomGrupo            = "";
+    $inCodPlanoDepreciacao = "";
+    $stNomContaDepreciacao = "";
+    $stNomContaDoacao      = "";
+    $inCodPlanoDoacao      = "";
+    $stNomContaPerdaInvoluntaria = "";
+    $inCodPlanoPerdaInvoluntaria = "";
+    $stNomContaTransferencia = "";
+    $inCodPlanoTransferencia = "";
 }
 
 //cria um novo formulario
@@ -137,29 +156,65 @@ $obTxtDescricaoGrupo->setValue ( $stNomGrupo );
 //cria um busca inner para retornar uma conta contábil
 $obBscContaContabil = new BuscaInner;
 $obBscContaContabil->setRotulo               ( "Conta Contábil"                       );
-$obBscContaContabil->setTitle                ( "Informe a conta do plano de contas."            );
+$obBscContaContabil->setTitle                ( "Informe a conta do plano de contas."     );
 $obBscContaContabil->setId                   ( "stDescricaoConta"                        );
 $obBscContaContabil->obCampoCod->setName     ( "inCodConta"                              );
-$obBscContaContabil->obCampoCod->setSize     ( 10              );
-$obBscContaContabil->obCampoCod->setAlign    ("left"                                       );
+$obBscContaContabil->obCampoCod->setSize     ( 10    );
+$obBscContaContabil->obCampoCod->setAlign    ("left" );
 $obBscContaContabil->setValoresBusca	     ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaSinteticaAtivoPermanente");
-$obBscContaContabil->setFuncaoBusca 		 ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodConta','stDescricaoConta','contaSinteticaAtivoPermanente','".Sessao::getId()."','800','550');" );
-$obBscContaContabil->setValue( $stNomConta );
-$obBscContaContabil->obCampoCod->setValue( $inCodPlano );
+$obBscContaContabil->setFuncaoBusca 	     ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodConta','stDescricaoConta','contaSinteticaAtivoPermanente','".Sessao::getId()."','800','550');" );
+$obBscContaContabil->setValue                ( $stNomConta );
+$obBscContaContabil->obCampoCod->setValue    ( $inCodPlano );
+
+$obBscContaContabilDoacao = new BuscaInner;
+$obBscContaContabilDoacao->setRotulo               ( "Conta Contábil de Baixa por Doação"  );
+$obBscContaContabilDoacao->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Doação." );
+$obBscContaContabilDoacao->setId                   ( "stDescricaoContaDoacao"              );
+$obBscContaContabilDoacao->obCampoCod->setName     ( "inCodContaDoacao"                    );
+$obBscContaContabilDoacao->obCampoCod->setSize     ( 10    );
+$obBscContaContabilDoacao->obCampoCod->setAlign    ("left" );
+$obBscContaContabilDoacao->setValoresBusca	   ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilBaixaBem");
+$obBscContaContabilDoacao->setFuncaoBusca 	   ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaDoacao','stDescricaoContaDoacao','contaContabilBaixaBem','".Sessao::getId()."','800','550');" );///////alterar
+$obBscContaContabilDoacao->setValue                ( $stNomContaDoacao );
+$obBscContaContabilDoacao->obCampoCod->setValue    ( $inCodPlanoDoacao );
+
+$obBscContaContabilPerdaInvoluntaria = new BuscaInner;
+$obBscContaContabilPerdaInvoluntaria->setRotulo               ( "Conta Contábil de Baixa por Perda Involuntária"  );
+$obBscContaContabilPerdaInvoluntaria->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Perda Involuntária." );
+$obBscContaContabilPerdaInvoluntaria->setId                   ( "stDescricaoPerdaInvoluntaria"                    );
+$obBscContaContabilPerdaInvoluntaria->obCampoCod->setName     ( "inCodContaPerdaInvoluntaria"                     );
+$obBscContaContabilPerdaInvoluntaria->obCampoCod->setSize     ( 10    );
+$obBscContaContabilPerdaInvoluntaria->obCampoCod->setAlign    ("left" );
+$obBscContaContabilPerdaInvoluntaria->setValoresBusca	      ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilBaixaBem");
+$obBscContaContabilPerdaInvoluntaria->setFuncaoBusca 	      ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaPerdaInvoluntaria','stDescricaoPerdaInvoluntaria','contaContabilBaixaBem','".Sessao::getId()."','800','550');" );///////alterar
+$obBscContaContabilPerdaInvoluntaria->setValue                ( $stNomContaPerdaInvoluntaria );
+$obBscContaContabilPerdaInvoluntaria->obCampoCod->setValue    ( $inCodPlanoPerdaInvoluntaria );
+
+$obBscContaContabilTransferencia = new BuscaInner;
+$obBscContaContabilTransferencia->setRotulo               ( "Conta Contábil de Baixa por Transferência" );
+$obBscContaContabilTransferencia->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Transferência." );
+$obBscContaContabilTransferencia->setId                   ( "stDescricaoTransferencia"                  );
+$obBscContaContabilTransferencia->obCampoCod->setName     ( "inCodContaTransferencia"                   );
+$obBscContaContabilTransferencia->obCampoCod->setSize     ( 10    );
+$obBscContaContabilTransferencia->obCampoCod->setAlign    ("left" );
+$obBscContaContabilTransferencia->setValoresBusca	  ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilBaixaBem");
+$obBscContaContabilTransferencia->setFuncaoBusca 	  ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaTransferencia','stDescricaoTransferencia','contaContabilBaixaBem','".Sessao::getId()."','800','550');" );///////alterar
+$obBscContaContabilTransferencia->setValue                ( $stNomContaTransferencia );
+$obBscContaContabilTransferencia->obCampoCod->setValue    ( $inCodPlanoTransferencia ); 
 
 //cria um busca inner para retornar uma Conta Contábil de Depreciação Acumulada
 $obBscContaContabilDepreciacao = new BuscaInner;
 $obBscContaContabilDepreciacao->setRotulo               ( "Conta Contábil de Depreciação Acumulada"     );
 $obBscContaContabilDepreciacao->setTitle                ( "Informe a conta do plano de contas."         );
-$obBscContaContabilDepreciacao->setId                   ( "stDescricaoContaDepreciacao"                       	 );
-$obBscContaContabilDepreciacao->obCampoCod->setName     ( "inCodContaDepreciacao"                              	 );
-$obBscContaContabilDepreciacao->obCampoCod->setSize     ( 10  );
+$obBscContaContabilDepreciacao->setId                   ( "stDescricaoContaDepreciacao"                 );
+$obBscContaContabilDepreciacao->obCampoCod->setName     ( "inCodContaDepreciacao"                       );
+$obBscContaContabilDepreciacao->obCampoCod->setSize     ( 10    );
 $obBscContaContabilDepreciacao->obCampoCod->setAlign    ("left" );
-$obBscContaContabilDepreciacao->setValoresBusca	     ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilDepreciacaoAcumulada");
-$obBscContaContabilDepreciacao->setFuncaoBusca 		 ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaDepreciacao','stDescricaoContaDepreciacao','contaContabilDepreciacaoAcumulada','".Sessao::getId()."','800','550');" );
-$obBscContaContabilDepreciacao->setNull				 ( true );
-$obBscContaContabilDepreciacao->setValue( $stNomContaDepreciacao );
-$obBscContaContabilDepreciacao->obCampoCod->setValue( $inCodPlanoDepreciacao );
+$obBscContaContabilDepreciacao->setValoresBusca	        ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilDepreciacaoAcumulada");
+$obBscContaContabilDepreciacao->setFuncaoBusca 		( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaDepreciacao','stDescricaoContaDepreciacao','contaContabilDepreciacaoAcumulada','".Sessao::getId()."','800','550');" );
+$obBscContaContabilDepreciacao->setNull			( true );
+$obBscContaContabilDepreciacao->setValue                ( $stNomContaDepreciacao );
+$obBscContaContabilDepreciacao->obCampoCod->setValue    ( $inCodPlanoDepreciacao );
 
 //cria um numerico para o valor da depreciacao
 $obIntDepreciacao = new Porcentagem();
@@ -190,6 +245,9 @@ if ($stAcao == 'alterar') {
 
 $obFormulario->addComponente( $obTxtDescricaoGrupo );
 $obFormulario->addComponente( $obBscContaContabil );
+$obFormulario->addComponente( $obBscContaContabilDoacao );
+$obFormulario->addComponente( $obBscContaContabilPerdaInvoluntaria );
+$obFormulario->addComponente( $obBscContaContabilTransferencia );
 $obFormulario->addComponente( $obBscContaContabilDepreciacao);
 $obFormulario->addComponente( $obIntDepreciacao );
 
@@ -200,3 +258,5 @@ if ($stAcao == 'alterar') {
 }
 
 $obFormulario->show();
+
+?>

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMConsultarEmpenho.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: FMConsultarEmpenho.php 64212 2015-12-17 12:38:12Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -562,7 +562,7 @@ if ($rsEmpenhoContrato->getNumLinhas() > 0) {
     $obLblContrato = new Label;
     $obLblContrato->setRotulo( "Número do Contrato"  );
     $obLblContrato->setId    ( "inCodContrato" );
-    $obLblContrato->setValue ( $rsEmpenhoContrato->getCampo('num_contrato').'/'.$rsEmpenhoContrato->getCampo('exercicio')  );
+    $obLblContrato->setValue ( $rsEmpenhoContrato->getCampo('num_contrato').'/'.$rsEmpenhoContrato->getCampo('exercicio_contrato')  );
 }
 
 // Saldos

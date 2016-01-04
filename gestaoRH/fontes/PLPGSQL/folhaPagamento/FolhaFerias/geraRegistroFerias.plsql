@@ -112,6 +112,7 @@ inContador                       INTEGER := 0;
 
 nuDiasAbono                      NUMERIC := 0.00;
 nuProporcaoForma                 NUMERIC := 0.00;
+nuProporcaoDivisao               NUMERIC := 0.00;
 
 inGeraGozo                       INTEGER;
 inGeraAbono                      INTEGER;
@@ -764,9 +765,18 @@ BEGIN
                     -- dias de ferias do contrato.
                     nuProporcaoForma := 1;
         
-           
+                    --CRIAR IF PARA NAO ENTRAR NESSA PROPORCAO CASO FOR cod_forma 3 ou 4
+                    --Deve ser armazenada no banco a quantidade do registro do evento como 30 sempre
+                    IF inCodForma = 3 THEN
+                        nuProporcaoDivisao := 10;
+                    ELSEIF inCodForma = 4 THEN 
+                        nuProporcaoDivisao := 15;
+                    ELSE 
+                        nuProporcaoDivisao := 30;
+                    END IF;
+
                     IF inDiasGozo + inDiasAbono != 30 AND (dtFinalAquisitivo-dtInicialAquisitivo+1) >= 365 THEN
-                       nuProporcaoForma := ((inDiasGozo + inDiasAbono)/30) ;
+                       nuProporcaoForma := ((inDiasGozo + inDiasAbono)/nuProporcaoDivisao) ;
                     END IF;
                     --**************************** fim proporcao forma
     

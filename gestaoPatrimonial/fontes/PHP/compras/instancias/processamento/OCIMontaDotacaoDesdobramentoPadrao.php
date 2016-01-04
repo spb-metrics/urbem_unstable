@@ -41,8 +41,9 @@ include_once(  CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php"        
 include_once(  CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php"                                      );
 include_once(  CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php"                                );
 
-$stCtrl        = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
-$inCodEntidade = $_POST["inCodEntidade"];
+$stCtrl        = $request->get('stCtrl');
+$inCodEntidade = $request->get('inCodEntidade');
+
 $obREmpenhoAutorizacaoEmpenho = new REmpenhoPreEmpenho;
 $obREmpenhoEmpenho            = new REmpenhoEmpenho;
 $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
@@ -53,13 +54,13 @@ if (isset($_REQUEST['HdnCodEntidade'])) {
     $_REQUEST['inCodEntidade'] = $_REQUEST['HdnCodEntidade'];
 }
 
-switch ($_REQUEST['stCtrl']) {
+switch ($request->get('stCtrl')) {
 
     case 'buscaDespesaDiverso':
         if ($_REQUEST['inCodDespesaPadrao'] != '') {
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $_REQUEST["inCodDespesaPadrao"] );
-        //	$obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $_REQUEST["inCodCentroCusto"] );
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesaPadrao') );
+        //	$obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $request->get('inCodCentroCusto') );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
 
@@ -68,8 +69,16 @@ switch ($_REQUEST['stCtrl']) {
 
                 $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
                 $obTEmpenhoPreEmpenho->setDado( 'exercicio'  ,Sessao::getExercicio() );
-                $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$_REQUEST["inCodDespesaPadrao"] );
-                $obTEmpenhoPreEmpenho->recuperaSaldoAnterior( $rsSaldoAnterior );
+                $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$request->get('inCodDespesaPadrao') );
+                
+                if ( $request->get('boConsideraReserva') == true ) {
+                    $obTEmpenhoPreEmpenho->setDado( "entidade"     , $request->get('HdnCodEntidade')   );
+                    $obTEmpenhoPreEmpenho->setDado( "dt_empenho"   , $request->get('HdnDtSolicitacao') );
+                    $obTEmpenhoPreEmpenho->setDado( "tipo_emissao" , "R" );
+                    $obTEmpenhoPreEmpenho->recuperaSaldoAnteriorDataEmpenho( $rsSaldoAnterior );
+                } else {
+                    $obTEmpenhoPreEmpenho->recuperaSaldoAnterior( $rsSaldoAnterior );
+                }
 
                 $nuSaldoDotacaoPadrao = $rsSaldoAnterior->getCampo('saldo_anterior');
 
@@ -80,7 +89,7 @@ switch ($_REQUEST['stCtrl']) {
                 $js .= montaComboDiverso();
 
             } else {
-                $js .= "alertaAviso('@Dotação inválida. (".$_REQUEST["inCodDespesaPadrao"].")','form','erro','".Sessao::getId()."');";
+                $js .= "alertaAviso('@Dotação inválida. (".$request->get('inCodDespesaPadrao').")','form','erro','".Sessao::getId()."');";
                 $js .= 'd.getElementById("stNomDespesaPadrao").innerHTML = "&nbsp;";';
                 $js .= 'd.getElementById("inCodDespesaPadrao").value = "";';
                 $js .= 'd.getElementById("nuSaldoDotacaoPadrao").innerHTML= "&nbsp;" ;';
@@ -180,3 +189,5 @@ function montaComboDiverso()
 
     return $js;
 }
+
+?>

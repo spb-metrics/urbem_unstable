@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisiane Morais
   *
   * @ignore
-  * $Id: CTB.csv.inc.php 64060 2015-11-25 18:30:12Z lisiane $
+  * $Id: CTB.csv.inc.php 64257 2015-12-22 16:26:04Z evandro $
   * $Date:$
   * $Author:$
   * $Rev:$
@@ -323,7 +323,7 @@ if (count($rsRecordSet10->arElementos) > 0) {
                                             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_fonte_ctb_transf");
                                             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
                                             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(3);
+                                            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
                                             
                                             $stChaveComp21 = $stChave21.$arCTB21['tipo_entr_saida'].$arCTB21['tipo_movimentacao'] ;
                                             if($arCTB21['tipo_entr_saida'] == '01' OR $arCTB21['tipo_entr_saida'] == '02' OR $arCTB21['tipo_entr_saida'] == '03' OR $arCTB21['tipo_entr_saida'] == '04' OR $arCTB21['tipo_entr_saida'] == '15' OR $arCTB21['tipo_entr_saida'] == '16'){

@@ -23,7 +23,7 @@
 /* Script de função PLPGSQL
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-$Id: balancoFinanceiro.plsql 63822 2015-10-20 18:24:23Z lisiane $
+$Id: balancoFinanceiro.plsql 64232 2015-12-21 17:21:16Z fabio $
 */
 
 
@@ -1122,5 +1122,5 @@ DROP TABLE tmp_calculo_despesas;
 DROP TABLE fluxo_caixa_saldo;
 
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

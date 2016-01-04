@@ -23,10 +23,10 @@
 --/**
 --    * PLPGSQL para retorno dos dados da conferência da sefip
 --    * Data de Criação: 10/12/2007
---    
+--
 --
 --    * @author Diego Lemos de Souza
---       
+--
 --    $Id: dirf.sql 31697 2008-08-04 19:33:31Z souzadl $
 --*/
 CREATE OR REPLACE FUNCTION conferenciaSefip(VARCHAR,VARCHAR,INTEGER,INTEGER,INTEGER,VARCHAR) RETURNS SETOF colulasConferenciaSefip AS $$
@@ -64,29 +64,29 @@ DECLARE
     nuValorTemp                 NUMERIC:=0.00;
 BEGIN
     --Evento de base de FGTS
-    stSql := 'SELECT fgts_evento.cod_evento 
-                FROM folhapagamento'|| stEntidade ||'.fgts_evento 
-                   , (  SELECT cod_fgts 
-                             , max(timestamp) as timestamp 
-                          FROM folhapagamento'|| stEntidade ||'.fgts_evento 
-                      GROUP BY cod_fgts) as max_fgts_evento 
-                   , folhapagamento'|| stEntidade ||'.evento 
-               WHERE fgts_evento.cod_evento = evento.cod_evento 
-                 AND fgts_evento.cod_fgts   = max_fgts_evento.cod_fgts 
-                 AND fgts_evento.timestamp  = max_fgts_evento.timestamp 
+    stSql := 'SELECT fgts_evento.cod_evento
+                FROM folhapagamento'|| stEntidade ||'.fgts_evento
+                   , (  SELECT cod_fgts
+                             , max(timestamp) as timestamp
+                          FROM folhapagamento'|| stEntidade ||'.fgts_evento
+                      GROUP BY cod_fgts) as max_fgts_evento
+                   , folhapagamento'|| stEntidade ||'.evento
+               WHERE fgts_evento.cod_evento = evento.cod_evento
+                 AND fgts_evento.cod_fgts   = max_fgts_evento.cod_fgts
+                 AND fgts_evento.timestamp  = max_fgts_evento.timestamp
                  AND cod_tipo = 3';
     inCodEventoBaseFGTS := selectIntoInteger(stSql);
 
     --Evento de salário família
-    stSql := 'SELECT cod_evento                                      
-                FROM folhapagamento'|| stEntidade ||'.salario_familia_evento  
-                   , (SELECT cod_regime_previdencia 
-                           , max(timestamp) as timestamp 
-                        FROM folhapagamento'|| stEntidade ||'.salario_familia_evento 
-                      GROUP BY cod_regime_previdencia) as max_salario_familia_evento 
-               WHERE salario_familia_evento.cod_regime_previdencia = max_salario_familia_evento.cod_regime_previdencia 
-                 AND salario_familia_evento.timestamp = max_salario_familia_evento.timestamp 
-                 AND salario_familia_evento.cod_regime_previdencia = 1 
+    stSql := 'SELECT cod_evento
+                FROM folhapagamento'|| stEntidade ||'.salario_familia_evento
+                   , (SELECT cod_regime_previdencia
+                           , max(timestamp) as timestamp
+                        FROM folhapagamento'|| stEntidade ||'.salario_familia_evento
+                      GROUP BY cod_regime_previdencia) as max_salario_familia_evento
+               WHERE salario_familia_evento.cod_regime_previdencia = max_salario_familia_evento.cod_regime_previdencia
+                 AND salario_familia_evento.timestamp = max_salario_familia_evento.timestamp
+                 AND salario_familia_evento.cod_regime_previdencia = 1
                  AND salario_familia_evento.cod_tipo = 1';
     inCodEventoSalFamilia := selectIntoInteger(stSql);
 
@@ -103,13 +103,13 @@ BEGIN
                   AND assentamento.cod_assentamento = max_assentamento.cod_assentamento
                   AND assentamento.timestamp = max_assentamento.timestamp
                   AND assentamento.cod_assentamento = assentamento_evento.cod_assentamento
-                  AND assentamento.timestamp = assentamento_evento.timestamp   
+                  AND assentamento.timestamp = assentamento_evento.timestamp
                   AND assentamento_assentamento.cod_motivo = 7';
     inCodEventoSalMaternidade := selectIntoInteger(stSql);
 
     stSql := '    SELECT contrato.*
                        , sw_cgm.nom_cgm
-                       , trim(sw_cgm_pessoa_fisica.servidor_pis_pasep) as servidor_pis_pasep 
+                       , trim(sw_cgm_pessoa_fisica.servidor_pis_pasep) as servidor_pis_pasep
                        , lpad(cod_categoria::varchar,2,''0'') as cod_categoria
                        , lpad(ocorrencia.num_ocorrencia::varchar,2,''0'') as num_ocorrencia
                     FROM pessoal'|| stEntidade ||'.contrato
@@ -123,15 +123,15 @@ BEGIN
                       ON sw_cgm_pessoa_fisica.numcgm = servidor.numcgm
               INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor
                       ON contrato_servidor.cod_contrato = contrato.cod_contrato
-              INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_ocorrencia                                                             
+              INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_ocorrencia
                       ON contrato_servidor_ocorrencia.cod_contrato = contrato.cod_contrato
-              INNER JOIN (  SELECT cod_contrato                                                                             
-                                 , max(timestamp) as timestamp                                                              
-                              FROM pessoal'|| stEntidade ||'.contrato_servidor_ocorrencia                                                     
-                          GROUP BY cod_contrato) as max_contrato_servidor_ocorrencia                                      
+              INNER JOIN (  SELECT cod_contrato
+                                 , max(timestamp) as timestamp
+                              FROM pessoal'|| stEntidade ||'.contrato_servidor_ocorrencia
+                          GROUP BY cod_contrato) as max_contrato_servidor_ocorrencia
                       ON max_contrato_servidor_ocorrencia.cod_contrato = contrato_servidor_ocorrencia.cod_contrato
                      AND max_contrato_servidor_ocorrencia.timestamp = contrato_servidor_ocorrencia.timestamp
-              INNER JOIN pessoal'|| stEntidade ||'.ocorrencia 
+              INNER JOIN pessoal'|| stEntidade ||'.ocorrencia
                       ON ocorrencia.cod_ocorrencia = contrato_servidor_ocorrencia.cod_ocorrencia
               INNER JOIN (SELECT contrato_servidor_previdencia.cod_contrato
                                , contrato_servidor_previdencia.cod_previdencia
@@ -148,24 +148,24 @@ BEGIN
                             AND folhapagamento.previdencia.cod_regime_previdencia = 1 ) as contrato_servidor_previdencia
                         ON contrato_servidor_previdencia.cod_contrato = contrato.cod_contrato';
     IF stTipoFiltro = 'lotacao' THEN
-        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_orgao                                                             
+        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_orgao
                                     ON contrato_servidor_orgao.cod_contrato = contrato.cod_contrato
                                    AND contrato_servidor_orgao.cod_orgao IN ('|| stCodigos ||')
-                            INNER JOIN (  SELECT cod_contrato                                                                             
-                                               , max(timestamp) as timestamp                                                              
-                                            FROM pessoal'|| stEntidade ||'.contrato_servidor_orgao                                                     
-                                        GROUP BY cod_contrato) as max_contrato_servidor_orgao                                      
+                            INNER JOIN (  SELECT cod_contrato
+                                               , max(timestamp) as timestamp
+                                            FROM pessoal'|| stEntidade ||'.contrato_servidor_orgao
+                                        GROUP BY cod_contrato) as max_contrato_servidor_orgao
                                     ON max_contrato_servidor_orgao.cod_contrato = contrato_servidor_orgao.cod_contrato
                                    AND max_contrato_servidor_orgao.timestamp = contrato_servidor_orgao.timestamp ';
     END IF;
     IF stTipoFiltro = 'local' THEN
-        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_local                                                             
+        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.contrato_servidor_local
                                     ON contrato_servidor_local.cod_contrato = contrato.cod_contrato
                                    AND contrato_servidor_local.cod_local IN ('|| stCodigos ||')
-                            INNER JOIN (  SELECT cod_contrato                                                                             
-                                               , max(timestamp) as timestamp                                                              
-                                            FROM pessoal'|| stEntidade ||'.contrato_servidor_local                                                     
-                                        GROUP BY cod_contrato) as max_contrato_servidor_local                                      
+                            INNER JOIN (  SELECT cod_contrato
+                                               , max(timestamp) as timestamp
+                                            FROM pessoal'|| stEntidade ||'.contrato_servidor_local
+                                        GROUP BY cod_contrato) as max_contrato_servidor_local
                                     ON max_contrato_servidor_local.cod_contrato = contrato_servidor_local.cod_contrato
                                    AND max_contrato_servidor_local.timestamp = contrato_servidor_local.timestamp ';
     END IF;
@@ -173,7 +173,7 @@ BEGIN
         stSql := stSql || ' WHERE contrato.cod_contrato IN ('|| stCodigos ||')';
     END IF;
     IF stTipoFiltro = 'atributo_servidor' THEN
-        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.atributo_contrato_servidor_valor                                                             
+        stSql := stSql || ' INNER JOIN pessoal'|| stEntidade ||'.atributo_contrato_servidor_valor
                                     ON atributo_contrato_servidor_valor.cod_contrato = contrato.cod_contrato
                                    AND atributo_contrato_servidor_valor.cod_atributo = '|| inCodAtributo;
         IF inCodTipoAtributo = 4 OR inCodTipoAtributo = 3 THEN
@@ -181,40 +181,40 @@ BEGIN
         ELSE
             stSql := stSql || ' AND atributo_contrato_servidor_valor.valor = '|| quote_literal(stCodigos) ||' ';
         END IF;
-        stSql := stSql || ' INNER JOIN (  SELECT cod_contrato                                                                             
-                                               , max(timestamp) as timestamp                                                              
-                                            FROM pessoal'|| stEntidade ||'.atributo_contrato_servidor_valor                                                     
-                                        GROUP BY cod_contrato) as max_atributo_contrato_servidor_valor                                      
+        stSql := stSql || ' INNER JOIN (  SELECT cod_contrato
+                                               , max(timestamp) as timestamp
+                                            FROM pessoal'|| stEntidade ||'.atributo_contrato_servidor_valor
+                                        GROUP BY cod_contrato) as max_atributo_contrato_servidor_valor
                                     ON max_atributo_contrato_servidor_valor.cod_contrato = atributo_contrato_servidor_valor.cod_contrato
                                    AND max_atributo_contrato_servidor_valor.timestamp = atributo_contrato_servidor_valor.timestamp ';
     END IF;
-    
+
     stSql := stSql || ' ORDER BY nom_cgm';
 
     FOR reRegistro IN EXECUTE stSql LOOP
-        --Evento de base de Previdência        
-        stSql := 'SELECT previdencia_evento.cod_evento                                     
-                    FROM folhapagamento'|| stEntidade ||'.previdencia_evento                 
-                       , folhapagamento'|| stEntidade ||'.previdencia_previdencia            
-                       , (  SELECT cod_previdencia                         
-                                 , max(timestamp) as timestamp            
-                              FROM folhapagamento'|| stEntidade ||'.previdencia_previdencia   
-                          GROUP BY cod_previdencia) as max_previdencia_previdencia  
-                       , folhapagamento'|| stEntidade ||'.previdencia                       
-                       , pessoal'|| stEntidade ||'.contrato_servidor_previdencia            
-                       , (  SELECT cod_contrato                           
-                                 , max(timestamp) as timestamp            
-                              FROM pessoal'|| stEntidade ||'.contrato_servidor_previdencia  
-                          GROUP BY cod_contrato) as max_contrato_servidor_previdencia  
-                   WHERE previdencia_evento.cod_previdencia = previdencia_previdencia.cod_previdencia 
-                     AND previdencia_evento.timestamp       = previdencia_previdencia.timestamp       
-                     AND previdencia_previdencia.cod_previdencia = previdencia.cod_previdencia        
+        --Evento de base de Previdência
+        stSql := 'SELECT previdencia_evento.cod_evento
+                    FROM folhapagamento'|| stEntidade ||'.previdencia_evento
+                       , folhapagamento'|| stEntidade ||'.previdencia_previdencia
+                       , (  SELECT cod_previdencia
+                                 , max(timestamp) as timestamp
+                              FROM folhapagamento'|| stEntidade ||'.previdencia_previdencia
+                          GROUP BY cod_previdencia) as max_previdencia_previdencia
+                       , folhapagamento'|| stEntidade ||'.previdencia
+                       , pessoal'|| stEntidade ||'.contrato_servidor_previdencia
+                       , (  SELECT cod_contrato
+                                 , max(timestamp) as timestamp
+                              FROM pessoal'|| stEntidade ||'.contrato_servidor_previdencia
+                          GROUP BY cod_contrato) as max_contrato_servidor_previdencia
+                   WHERE previdencia_evento.cod_previdencia = previdencia_previdencia.cod_previdencia
+                     AND previdencia_evento.timestamp       = previdencia_previdencia.timestamp
+                     AND previdencia_previdencia.cod_previdencia = previdencia.cod_previdencia
                      AND previdencia_previdencia.cod_previdencia = max_previdencia_previdencia.cod_previdencia
                      AND previdencia_previdencia.timestamp       = max_previdencia_previdencia.timestamp
                      AND previdencia.cod_previdencia             = contrato_servidor_previdencia.cod_previdencia
                      AND contrato_servidor_previdencia.cod_contrato = max_contrato_servidor_previdencia.cod_contrato
                      AND contrato_servidor_previdencia.timestamp    = max_contrato_servidor_previdencia.timestamp
-                     AND tipo_previdencia = ''o'' 
+                     AND tipo_previdencia = ''o''
 					 AND previdencia.cod_regime_previdencia = 1
                      AND contrato_servidor_previdencia.cod_contrato = '|| reRegistro.cod_contrato ||'
                      AND cod_tipo = ';
@@ -239,41 +239,41 @@ BEGIN
         stSqlSalario := '    SELECT sum(evento_calculado.valor) as valor
                                FROM folhapagamento'|| stEntidade ||'.evento_calculado
                          INNER JOIN folhapagamento'|| stEntidade ||'.registro_evento_periodo
-                                 ON registro_evento_periodo.cod_registro = evento_calculado.cod_registro								 
+                                 ON registro_evento_periodo.cod_registro = evento_calculado.cod_registro								
                               WHERE (evento_calculado.desdobramento is null OR evento_calculado.desdobramento != ''D'')
 							    AND registro_evento_periodo.cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||'
                                 AND registro_evento_periodo.cod_contrato = '|| reRegistro.cod_contrato;
         --###BASE FGTS
         IF inCodEventoBaseFGTS IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoBaseFGTS);        
+            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoBaseFGTS);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBaseFGTS := nuValorBaseFGTS + nuValorTemp;
             END IF;
         END IF;
         --###BASE PREVIDÊNCIA
         IF inCodEventoBasePrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoBasePrev);        
+            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoBasePrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBasePrev := nuValorBasePrev + nuValorTemp;
             END IF;
         END IF;
         --###DESCONTO PREVIDÊNCIA
         IF inCodEventoDescPrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoDescPrev);        
+            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoDescPrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorDescPrev := nuValorDescPrev + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO FAMÍLIA
         IF inCodEventoSalFamilia IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoSalFamilia);        
+            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoSalFamilia);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalFamilia := nuValorSalFamilia + nuValorTemp;
             END IF;
-        END IF;    
+        END IF;
         --###SALÁRIO MATERNIDADE
         IF inCodEventoSalMaternidade IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoSalMaternidade);        
+            nuValorTemp := selectIntoNumeric(stSqlSalario ||' AND evento_calculado.cod_evento = '|| inCodEventoSalMaternidade);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalMaternidade := nuValorSalMaternidade + nuValorTemp;
             END IF;
@@ -299,28 +299,28 @@ BEGIN
         END IF;
         --###BASE PREVIDÊNCIA
         IF inCodEventoBasePrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoBasePrev);        
+            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoBasePrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBasePrev := nuValorBasePrev + nuValorTemp;
             END IF;
         END IF;
         --###DESCONTO PREVIDÊNCIA
         IF inCodEventoDescPrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoDescPrev);        
+            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoDescPrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorDescPrev := nuValorDescPrev + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO FAMÍLIA
         IF inCodEventoSalFamilia IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoSalFamilia);        
+            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoSalFamilia);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalFamilia := nuValorSalFamilia + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO MATERNIDADE
         IF inCodEventoSalMaternidade IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoSalMaternidade);        
+            nuValorTemp := selectIntoNumeric(stSqlComplementar ||' AND evento_complementar_calculado.cod_evento = '|| inCodEventoSalMaternidade);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalMaternidade := nuValorSalMaternidade + nuValorTemp;
             END IF;
@@ -346,28 +346,28 @@ BEGIN
         END IF;
         --###BASE PREVIDÊNCIA
         IF inCodEventoBasePrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoBasePrev);        
+            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoBasePrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBasePrev := nuValorBasePrev + nuValorTemp;
             END IF;
         END IF;
         --###DESCONTO PREVIDÊNCIA
         IF inCodEventoDescPrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoDescPrev);        
+            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoDescPrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorDescPrev := nuValorDescPrev + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO FAMÍLIA
         IF inCodEventoSalFamilia IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoSalFamilia);        
+            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoSalFamilia);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalFamilia := nuValorSalFamilia + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO MATERNIDADE
         IF inCodEventoSalMaternidade IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoSalMaternidade);        
+            nuValorTemp := selectIntoNumeric(stSqlFerias ||' AND evento_ferias_calculado.cod_evento = '|| inCodEventoSalMaternidade);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalMaternidade := nuValorSalMaternidade + nuValorTemp;
             END IF;
@@ -393,28 +393,28 @@ BEGIN
         END IF;
         --###BASE PREVIDÊNCIA
         IF inCodEventoBasePrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoBasePrev);        
+            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoBasePrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBasePrev := nuValorBasePrev + nuValorTemp;
             END IF;
         END IF;
         --###DESCONTO PREVIDÊNCIA
         IF inCodEventoDescPrev IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoDescPrev);        
+            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoDescPrev);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorDescPrev := nuValorDescPrev + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO FAMÍLIA
         IF inCodEventoSalFamilia IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoSalFamilia);        
+            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoSalFamilia);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalFamilia := nuValorSalFamilia + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO MATERNIDADE
         IF inCodEventoSalMaternidade IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoSalMaternidade);        
+            nuValorTemp := selectIntoNumeric(stSqlRescisao ||' AND evento_rescisao_calculado.cod_evento = '|| inCodEventoSalMaternidade);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalMaternidade := nuValorSalMaternidade + nuValorTemp;
             END IF;
@@ -433,7 +433,7 @@ BEGIN
         --###BASE FGTS DÉCIMO
         IF inCodEventoBaseFGTS IS NOT NULL THEN
             nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoBaseFGTS ||'
-                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');        
+                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBaseFGTSDecimo := nuValorBaseFGTSDecimo + nuValorTemp;
             END IF;
@@ -441,7 +441,7 @@ BEGIN
         --###BASE PREVIDÊNCIA DÉCIMO
         IF inCodEventoBasePrev IS NOT NULL THEN
             nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoBasePrev ||'
-                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');        
+                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');
             IF nuValorTemp IS NOT NULL THEN
                 nuValorBasePrevDecimo := nuValorBasePrevDecimo + nuValorTemp;
             END IF;
@@ -449,70 +449,70 @@ BEGIN
         --###DESCONTO PREVIDÊNCIA DÉCIMO
         IF inCodEventoDescPrev IS NOT NULL THEN
             nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoDescPrev ||'
-                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');        
+                                                            AND evento_decimo_calculado.desdobramento = ''A'' ');
             IF nuValorTemp IS NOT NULL THEN
                 nuValorDescPrevDecimo := nuValorDescPrevDecimo + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO FAMÍLIA
         IF inCodEventoSalFamilia IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoSalFamilia);        
+            nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoSalFamilia);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalFamilia := nuValorSalFamilia + nuValorTemp;
             END IF;
         END IF;
         --###SALÁRIO MATERNIDADE
         IF inCodEventoSalMaternidade IS NOT NULL THEN
-            nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoSalMaternidade);        
+            nuValorTemp := selectIntoNumeric(stSqlDecimo ||' AND evento_decimo_calculado.cod_evento = '|| inCodEventoSalMaternidade);
             IF nuValorTemp IS NOT NULL THEN
                 nuValorSalMaternidade := nuValorSalMaternidade + nuValorTemp;
             END IF;
         END IF;
-    
-        IF nuValorBaseFGTS       > 0 OR 
-           nuValorBaseFGTSDecimo > 0 OR 
+
+        IF nuValorBaseFGTS       > 0 OR
+           nuValorBaseFGTSDecimo > 0 OR
            nuValorBasePrev       > 0 OR
            nuValorBasePrevDecimo > 0 OR
            nuValorDescPrev       > 0 OR
            nuValorDescPrevDecimo > 0 OR
            nuValorSalFamilia     > 0 OR
            nuValorSalMaternidade > 0 THEN
-            
-            stSql := '    SELECT (SELECT trim(num_sefip) FROM pessoal'|| stEntidade ||'.sefip WHERE cod_sefip = assentamento_mov_sefip_saida.cod_sefip_saida) as num_sefip                           
+
+            stSql := '    SELECT (SELECT trim(num_sefip) FROM pessoal'|| stEntidade ||'.sefip WHERE cod_sefip = assentamento_mov_sefip_saida.cod_sefip_saida) as num_sefip
                                , to_char(periodo_inicial,''dd/mm/yyyy'')|| '' a ''||  to_char(periodo_final,''dd/mm/yyyy'') as periodo
-                            FROM pessoal'|| stEntidade ||'.assentamento_gerado_contrato_servidor                                                                                               
-                               , pessoal'|| stEntidade ||'.assentamento_gerado                                                                                                                 
-                               , (SELECT cod_assentamento_gerado                                                                                                             
-                                       , max(timestamp) as timestamp                                                                                                         
-                                    FROM pessoal'|| stEntidade ||'.assentamento_gerado                                                                                                         
-                                 GROUP BY cod_assentamento_gerado) as max_assentamento_gerado                                                                                
-                               , pessoal'|| stEntidade ||'.assentamento                                                                                                                        
-                               , (SELECT cod_assentamento                                                                                                                    
-                                       , max(timestamp) as timestamp                                                                                                         
-                                    FROM pessoal'|| stEntidade ||'.assentamento                                                                                                                
-                                 GROUP BY cod_assentamento) as max_assentamento                                                                                              
-                               , pessoal'|| stEntidade ||'.assentamento_mov_sefip_saida                                                                                                        
-                               , pessoal'|| stEntidade ||'.assentamento_assentamento                                                                                                           
-                               , pessoal'|| stEntidade ||'.classificacao_assentamento                                                                                                          
-                           WHERE assentamento_gerado_contrato_servidor.cod_assentamento_gerado = assentamento_gerado.cod_assentamento_gerado                                 
-                             AND assentamento_gerado.cod_assentamento_gerado = max_assentamento_gerado.cod_assentamento_gerado                                               
-                             AND assentamento_gerado.timestamp = max_assentamento_gerado.timestamp                                                                           
-                             AND assentamento_gerado.cod_assentamento = assentamento.cod_assentamento                                                                        
-                             AND assentamento.cod_assentamento = max_assentamento.cod_assentamento                                                                           
-                             AND assentamento.timestamp = max_assentamento.timestamp                                                                                         
-                             AND assentamento.cod_assentamento = assentamento_mov_sefip_saida.cod_assentamento                                                               
-                             AND assentamento.timestamp = assentamento_mov_sefip_saida.timestamp                                                                             
-                             AND assentamento.cod_assentamento = assentamento_assentamento.cod_assentamento                                                                  
-                             AND assentamento_assentamento.cod_classificacao = classificacao_assentamento.cod_classificacao 
-                             AND (cod_tipo = 2 OR cod_tipo = 3)    
-                             AND (to_char(periodo_inicial,''yyyy-mm'') = (SELECT to_char(dt_final,''yyyy-mm'') FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||') 
-                               OR to_char(periodo_final,''yyyy-mm'')   = (SELECT to_char(dt_final,''yyyy-mm'') FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||') )                                                     
-                             AND NOT EXISTS (SELECT *                                                                                                                        
-                                               FROM pessoal'|| stEntidade ||'.assentamento_gerado_excluido                                                                                     
-                                              WHERE assentamento_gerado_excluido.cod_assentamento_gerado = assentamento_gerado.cod_assentamento_gerado                       
-                                                AND assentamento_gerado_excluido.timestamp = assentamento_gerado.timestamp)                                                      
-                             AND NOT EXISTS (SELECT *                                                                                                                        
-                                               FROM pessoal'|| stEntidade ||'.contrato_servidor_caso_causa                                                                                     
+                            FROM pessoal'|| stEntidade ||'.assentamento_gerado_contrato_servidor
+                               , pessoal'|| stEntidade ||'.assentamento_gerado
+                               , (SELECT cod_assentamento_gerado
+                                       , max(timestamp) as timestamp
+                                    FROM pessoal'|| stEntidade ||'.assentamento_gerado
+                                 GROUP BY cod_assentamento_gerado) as max_assentamento_gerado
+                               , pessoal'|| stEntidade ||'.assentamento
+                               , (SELECT cod_assentamento
+                                       , max(timestamp) as timestamp
+                                    FROM pessoal'|| stEntidade ||'.assentamento
+                                 GROUP BY cod_assentamento) as max_assentamento
+                               , pessoal'|| stEntidade ||'.assentamento_mov_sefip_saida
+                               , pessoal'|| stEntidade ||'.assentamento_assentamento
+                               , pessoal'|| stEntidade ||'.classificacao_assentamento
+                           WHERE assentamento_gerado_contrato_servidor.cod_assentamento_gerado = assentamento_gerado.cod_assentamento_gerado
+                             AND assentamento_gerado.cod_assentamento_gerado = max_assentamento_gerado.cod_assentamento_gerado
+                             AND assentamento_gerado.timestamp = max_assentamento_gerado.timestamp
+                             AND assentamento_gerado.cod_assentamento = assentamento.cod_assentamento
+                             AND assentamento.cod_assentamento = max_assentamento.cod_assentamento
+                             AND assentamento.timestamp = max_assentamento.timestamp
+                             AND assentamento.cod_assentamento = assentamento_mov_sefip_saida.cod_assentamento
+                             AND assentamento.timestamp = assentamento_mov_sefip_saida.timestamp
+                             AND assentamento.cod_assentamento = assentamento_assentamento.cod_assentamento
+                             AND assentamento_assentamento.cod_classificacao = classificacao_assentamento.cod_classificacao
+                             AND (cod_tipo = 2 OR cod_tipo = 3)
+                             AND (to_char(periodo_inicial,''yyyy-mm'') = (SELECT to_char(dt_final,''yyyy-mm'') FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||')
+                               OR to_char(periodo_final,''yyyy-mm'')   = (SELECT to_char(dt_final,''yyyy-mm'') FROM folhapagamento'|| stEntidade ||'.periodo_movimentacao WHERE cod_periodo_movimentacao = '|| inCodPeriodoMovimentacao ||') )
+                             AND NOT EXISTS (SELECT *
+                                               FROM pessoal'|| stEntidade ||'.assentamento_gerado_excluido
+                                              WHERE assentamento_gerado_excluido.cod_assentamento_gerado = assentamento_gerado.cod_assentamento_gerado
+                                                AND assentamento_gerado_excluido.timestamp = assentamento_gerado.timestamp)
+                             AND NOT EXISTS (SELECT *
+                                               FROM pessoal'|| stEntidade ||'.contrato_servidor_caso_causa
                                               WHERE contrato_servidor_caso_causa.cod_contrato = assentamento_gerado_contrato_servidor.cod_contrato)
                              AND assentamento_gerado_contrato_servidor.cod_contrato = '|| reRegistro.cod_contrato;
             OPEN crCursor FOR EXECUTE stSql;
@@ -538,6 +538,6 @@ BEGIN
         END IF;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
-               
-                                                                           
+$$ LANGUAGE 'plpgsql';
+
+

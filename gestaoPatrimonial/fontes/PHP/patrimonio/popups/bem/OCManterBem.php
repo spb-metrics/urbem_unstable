@@ -32,31 +32,30 @@
   * @package URBEM
   * @subpackage
 
-  * $Id: OCManterBem.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: OCManterBem.php 64184 2015-12-11 14:09:44Z arthur $
 
   * Casos de uso: uc-03.01.06
-
-  */
+*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO.'TPatrimonioBem.class.php';
 
-switch ($_REQUEST['stCtrl']) {
+switch ($request->get('stCtrl')) {
+    
     case 'buscaPopup':
-
         $stMsgErro = "";
-        $inCodigo  = str_replace(".","",$_REQUEST['inCodigo']);
+        $inCodigo  = str_replace(".","",$request->get('inCodigo'));
 
         //se for vazio, limpa os campos
         if (trim($inCodigo) != '') {
             //instancia o mapeamento e procura pelo codigo passado
             $obTPatrimonioBem = new TPatrimonioBem;
-            $boMostrarDescricao = $_REQUEST['boMostrarDescricao'];
+            $boMostrarDescricao = $request->get('boMostrarDescricao');
 
             # Validação para verificar se o item existe e não está baixado.
             if (empty($stMsgErro)) {
-                if ($_REQUEST['boBemBaixado'] == 'false') {
+                if ($request->get('boBemBaixado') == 'false') {
                     $stFiltro .= ' AND NOT EXISTS
                                        (
                                             SELECT  1
@@ -75,22 +74,22 @@ switch ($_REQUEST['stCtrl']) {
 
             # Caso não encontre nenhum erro, preenche os campos com os dados.
             if (empty($stMsgErro)) {
-                $stJs .= "$('".$_REQUEST['stNomCampoCod']."').value = '".$rsBem->getCampo('cod_bem')."';";
-                $stJs .= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '".addslashes(trim($rsBem->getCampo('descricao')))."';";
+                $stJs .= "$('".$request->get('stNomCampoCod')."').value = '".$rsBem->getCampo('cod_bem')."';";
+                $stJs .= "$('".$request->get('stIdCampoDesc')."').innerHTML = '".addslashes(trim($rsBem->getCampo('descricao')))."';";
             } else {
                 $stJs .= "alertaAviso('@".$stMsgErro.".','form','erro','".Sessao::getId()."');";
-                $stJs .= "$('".$_REQUEST['stNomCampoCod']."').value = '';";
-                $stJs .= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '&nbsp;';";
+                $stJs .= "$('".$request->get('stNomCampoCod')."').value = '';";
+                $stJs .= "$('".$request->get('stIdCampoDesc')."').innerHTML = '&nbsp;';";
             }
         } else {
-            $stJs .= "$('".$_REQUEST['stNomCampoCod']."').value = '';";
-            $stJs .= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '&nbsp;';";
+            $stJs .= "$('".$request->get('stNomCampoCod')."').value = '';";
+            $stJs .= "$('".$request->get('stIdCampoDesc')."').innerHTML = '&nbsp;';";
         }
 
     break;
 
     case 'montaPlacaIdentificacaoFiltro':
-        if ($_REQUEST['stPlacaIdentificacao'] == 'sim') {
+        if ($request->get('stPlacaIdentificacao') == 'sim') {
             $obTxtNumeroPlaca = new TextBox();
             $obTxtNumeroPlaca->setRotulo( 'Número da Placa' );
             $obTxtNumeroPlaca->setTitle( 'Informe o número da placa do bem.' );
@@ -107,23 +106,23 @@ switch ($_REQUEST['stCtrl']) {
 
             //se existe um bem para o código passado, preenche o componente
             if ( $rsBem->getNumLinhas() > 0 ) {
-                $stJs.= "$('".$_REQUEST['stNomCampoCod']."').value = '".$rsBem->getCampo('cod_bem')."';";
+                $stJs.= "$('".$request->get('stNomCampoCod')."').value = '".$rsBem->getCampo('cod_bem')."';";
                 if ($boMostrarDescricao == true) {
-                    $stJs.= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '".addslashes(trim($rsBem->getCampo('descricao')))."';";
+                    $stJs.= "$('".$request->get('stIdCampoDesc')."').innerHTML = '".addslashes(trim($rsBem->getCampo('descricao')))."';";
                 }
             } else {
                 $stJs.= "$('spnNumeroPlaca').innerHTML = '';";
                 $stJs.= "alertaAviso('@Código do Bem inválido!','form','erro','".Sessao::getId()."');";
-                $stJs.= "$('".$_REQUEST['stNomCampoCod']."').value = '';";
+                $stJs.= "$('".$request->get('stNomCampoCod')."').value = '';";
                 if ($boMostrarDescricao == true) {
-                    $stJs.= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '&nbsp;';";
+                    $stJs.= "$('".$request->get('stIdCampoDesc')."').innerHTML = '&nbsp;';";
                 }
             }
 
         } else {
-            $stJs.= "$('".$_REQUEST['stNomCampoCod']."').value = '';";
+            $stJs.= "$('".$request->get('stNomCampoCod')."').value = '';";
             if ($boMostrarDescricao == true) {
-                $stJs.= "$('".$_REQUEST['stIdCampoDesc']."').innerHTML = '&nbsp;';";
+                $stJs.= "$('".$request->get('stIdCampoDesc')."').innerHTML = '&nbsp;';";
             }
         }
 

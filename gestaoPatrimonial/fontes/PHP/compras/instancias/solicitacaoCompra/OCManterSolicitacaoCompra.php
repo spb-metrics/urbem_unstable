@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCManterSolicitacaoCompra.php 64051 2015-11-24 17:55:39Z franver $
+ $Id: OCManterSolicitacaoCompra.php 64220 2015-12-18 15:34:57Z evandro $
 
  */
 
@@ -60,6 +60,7 @@ include_once CAM_GP_COM_MAPEAMENTO."TComprasMapaItemDotacao.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasConfiguracao.class.php";
 
 # Includes da GF.
+include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoReservaSaldos.class.php';
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoDespesa.class.php";
 include_once CAM_GF_ORC_MAPEAMENTO.'TOrcamentoContaDespesa.class.php';
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php";
@@ -347,16 +348,33 @@ function calculaValorReservadoDotacao()
     $stJs .= "    jQuery('#inVlTotal_label').html('0,00');                                                          \n";
 
     if($_REQUEST['nuVlTotal']&&$_REQUEST['inCodDespesa']){
-        $nuTotalReservadoDotacao = mascaraValorBD($_REQUEST['nuVlTotal']);
-        foreach ($arValores as $chave => $valor) {
-            if( $valor['inCodDespesa']==$_REQUEST['inCodDespesa'] && $valor['id'] != $_REQUEST['HdnCodItem'] ){
-                $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
+        if ( count($arValores) > 0 ){
+            $nuTotalReservadoDotacao = mascaraValorBD($_REQUEST['nuVlTotal']);
+            foreach ($arValores as $chave => $valor) {
+                if( $valor['inCodDespesa']==$_REQUEST['inCodDespesa'] && $valor['id'] != $_REQUEST['HdnCodItem'] ){
+                    $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
+                }
             }
+            $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuTotalReservadoDotacao,true);
+            $stJs .= "jQuery('#inVlTotal').val('".mascaraValorBD($nuTotalReservadoDotacao,true)."');                    \n";
+            $stJs .= "if(jQuery('#inVlTotal_label'))                                                                    \n";
+            $stJs .= "    jQuery('#inVlTotal_label').html('".$_REQUEST['nuVlTotal']."');                                \n";
+        }else{
+            $stQuery = "SELECT SUM(vl_reserva) as saldo_reserva 
+                        FROM orcamento.reserva_saldos 
+                        WHERE exercicio = '".Sessao::getExercicio()."'
+                          AND cod_despesa = ".$_REQUEST['inCodDespesa'];
+            
+            $nuValorReserva = SistemaLegado::pegaValor($stQuery,'saldo_reserva');                       
+            $nuValorReserva = $nuValorReserva == '' ? 0.00 : $nuValorReserva;
+            $nuValorTotal = ($nuValorTotal) - ($nuValorReserva);                                    
+            $nuValorReserva = number_format(mascaraValorBD($nuValorReserva),2,',','.');
+
+            $stJs .= "jQuery('#inVlTotal').val('".$nuValorTotal."'); \n";
+            $stJs .= "if(jQuery('#inVlTotal_label')) \n";
+            $stJs .= "    jQuery('#inVlTotal_label').html('".$nuValorReserva."'); \n";
         }
-        $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuTotalReservadoDotacao,true);
-        $stJs .= "jQuery('#inVlTotal').val('".mascaraValorBD($nuTotalReservadoDotacao,true)."');                    \n";
-        $stJs .= "if(jQuery('#inVlTotal_label'))                                                                    \n";
-        $stJs .= "    jQuery('#inVlTotal_label').html('".$_REQUEST['nuVlTotal']."');                                \n";
+
     }else{
         $obTConfiguracao = new TAdministracaoConfiguracao();
         $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());

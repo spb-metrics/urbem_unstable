@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCAIXA.class.php 63912 2015-11-05 18:10:02Z lisiane $
+    * $Id: TTCEMGCAIXA.class.php 64261 2015-12-23 12:21:21Z lisiane $
 
 */
 
@@ -321,7 +321,7 @@ class TTCEMGCAIXA extends Persistente
                         , tipo_movimentacao
                         , tipo_entr_saida
                         , descr_movimentacao
-                        , valor_entr_saida
+                        , SUM(valor_entr_saida) AS valor_entr_saida
                         , cod_estrutural
                         , cod_orgao
                         , exercicio
@@ -493,11 +493,13 @@ class TTCEMGCAIXA extends Persistente
                                          WHEN conta_credito.tipo_valor = 'C' THEN
                                          2::integer
                                   END AS tipo_movimentacao
-                                , CASE WHEN lote.tipo = 'A' THEN '01'
+                                , CASE WHEN lote.tipo = 'A' AND lancamento_receita.estorno != 't' THEN '01'
                                WHEN lote.tipo ='T' AND transferencia.cod_tipo =5 AND conta_credito.tipo_valor = 'D' THEN '03'
                                WHEN lote.tipo ='T' AND transferencia.cod_tipo =5 AND conta_credito.tipo_valor = 'C' THEN '04'
                                        WHEN lote.tipo ='P' AND conta_credito.tipo_valor = 'C'   THEN '06'
-                                       WHEN lancamento_empenho.estorno = true OR (conta_credito.cod_lote = transferencia_estornada.cod_lote_estorno) THEN '08'
+                                       WHEN lancamento_empenho.estorno = true
+                                         OR (conta_credito.cod_lote = transferencia_estornada.cod_lote_estorno)
+                                         OR (lancamento_receita.estorno = 't') THEN '08'
                                        WHEN lote.tipo = 'T' AND transferencia.cod_tipo = 2 AND conta_credito.tipo_valor = 'D' THEN '10' 
                                        WHEN lote.tipo = 'T' AND transferencia.cod_tipo = 1 AND conta_credito.tipo_valor = 'C' THEN '10' 
                                   END AS tipo_entr_saida
@@ -639,7 +641,18 @@ class TTCEMGCAIXA extends Persistente
                                , cod_fonte_ctb_transf
                                , lote.tipo
                                
-                    ) as tabela     ";
+                    ) as tabela
+                    
+            GROUP BY tipo_registro
+                   , cod_fonte_caixa
+                   , tipo_movimentacao
+                   , tipo_entr_saida
+                   , descr_movimentacao
+                   , cod_estrutural
+                   , cod_orgao
+                   , exercicio
+                   , cod_ctb_transf
+                   , cod_fonte_ctb_transf";
      return $stSql;
     }
     

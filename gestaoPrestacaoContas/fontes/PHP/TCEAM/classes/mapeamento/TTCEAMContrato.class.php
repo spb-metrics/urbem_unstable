@@ -29,7 +29,7 @@
     *
     * @author: Eduardo Paculski Schitz
     *
-    $Id: TTCEAMContrato.class.php 60026 2014-09-25 18:20:04Z lisiane $
+    $Id: TTCEAMContrato.class.php 64212 2015-12-17 12:38:12Z michel $
     *
     * @package URBEM
     *
@@ -79,9 +79,9 @@ class TTCEAMContrato extends Persistente
                  , (SELECT array_to_string( ARRAY( SELECT empenho_contrato.cod_empenho
                                                         ||empenho_contrato.exercicio
                                                      FROM empenho.empenho_contrato
-                                                    WHERE empenho_contrato.num_contrato = num_contrato_empenho
-                                                      AND empenho_contrato.cod_entidade = cod_entidade
-                                                      AND empenho_contrato.exercicio    = exercicio
+                                                    WHERE empenho_contrato.num_contrato       = num_contrato_empenho
+                                                      AND empenho_contrato.cod_entidade       = cod_entidade
+                                                      AND empenho_contrato.exercicio_contrato = exercicio
                                                     LIMIT 1), '' ) ) AS empenho_1
                  , arquivo_texto
                  , ajuste_contrato
@@ -89,9 +89,9 @@ class TTCEAMContrato extends Persistente
                  , (SELECT array_to_string( ARRAY( SELECT RPAD(empenho_contrato.cod_empenho
                                                         ||empenho_contrato.exercicio, 10, '')
                                                      FROM empenho.empenho_contrato
-                                                    WHERE empenho_contrato.num_contrato = num_contrato_empenho
-                                                      AND empenho_contrato.cod_entidade = cod_entidade
-                                                      AND empenho_contrato.exercicio    = exercicio
+                                                    WHERE empenho_contrato.num_contrato       = num_contrato_empenho
+                                                      AND empenho_contrato.cod_entidade       = cod_entidade
+                                                      AND empenho_contrato.exercicio_contrato = exercicio
                                                    OFFSET 1
                                                     LIMIT 5), '' ) ) AS empenho_2_ate_6
 
@@ -107,9 +107,9 @@ class TTCEAMContrato extends Persistente
                  , (SELECT array_to_string( ARRAY( SELECT RPAD(empenho_contrato.cod_empenho
                                                         ||empenho_contrato.exercicio, 10, '')
                                                      FROM empenho.empenho_contrato
-                                                    WHERE empenho_contrato.num_contrato = num_contrato_empenho
-                                                      AND empenho_contrato.cod_entidade = cod_entidade
-                                                      AND empenho_contrato.exercicio    = exercicio
+                                                    WHERE empenho_contrato.num_contrato       = num_contrato_empenho
+                                                      AND empenho_contrato.cod_entidade       = cod_entidade
+                                                      AND empenho_contrato.exercicio_contrato = exercicio
                                                    OFFSET 7
                                                     LIMIT 6), '' ) ) AS empenho_7_ate_12
 
@@ -823,7 +823,7 @@ class TTCEAMContrato extends Persistente
                     INNER JOIN licitacao.contrato AS LC
                     ON LC.num_contrato=EEC.num_contrato
                     AND LC.cod_entidade=EEC.cod_entidade
-                    AND LC.exercicio=EEC.exercicio
+                    AND LC.exercicio=EEC.exercicio_contrato
                     INNER JOIN empenho.empenho
                     ON empenho.cod_empenho=EEC.cod_empenho
                     AND empenho.exercicio=EEC.exercicio
@@ -834,7 +834,7 @@ class TTCEAMContrato extends Persistente
                     ON despesa.exercicio=EMPDESP.exercicio
                     AND despesa.cod_despesa=EMPDESP.cod_despesa
                     
-                    WHERE EEC.exercicio='".$this->getDado('exercicio')."'
+                    WHERE EEC.exercicio_contrato='".$this->getDado('exercicio')."'
                     AND to_char(LC.dt_assinatura,'mm') = '".$this->getDado('mes')."'
                     AND EEC.cod_entidade IN (".$this->getDado('cod_entidade').")";
 

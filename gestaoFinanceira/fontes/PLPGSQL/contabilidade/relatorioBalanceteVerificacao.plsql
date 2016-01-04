@@ -34,28 +34,6 @@
 * Casos de uso: uc-02.02.22
                 uc-02.08.07
 */
-
-/*
-$Log$
-Revision 1.14  2006/11/09 15:34:45  cako
-Bug #6787#
-
-Revision 1.13  2006/10/27 17:28:23  cako
-Bug #6787#
-
-Revision 1.12  2006/07/18 20:02:10  eduardo
-Bug #6556#
-
-Revision 1.11  2006/07/14 17:58:30  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.10  2006/07/05 20:37:31  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 CREATE OR REPLACE FUNCTION contabilidade.fn_rl_balancete_verificacao(VARCHAR, VARCHAR, VARCHAR, VARCHAR, CHAR) RETURNS SETOF RECORD AS $$ 
 DECLARE
     stExercicio         ALIAS FOR $1;

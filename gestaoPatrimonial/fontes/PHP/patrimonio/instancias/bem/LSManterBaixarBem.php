@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.01.06
 
-  $Id: LSManterBaixarBem.php 59612 2014-09-02 12:00:51Z gelson $
+  $Id: LSManterBaixarBem.php 64184 2015-12-11 14:09:44Z arthur $
 
   */
 
@@ -62,12 +62,12 @@ if (!Sessao::read('paginando')) {
     foreach ($_POST as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;
     }
-    Sessao::write('pg',($_GET['pg'] ? $_GET['pg'] : 0));
-    Sessao::write('pos',($_GET['pos']? $_GET['pos'] : 0));
+    Sessao::write('pg',($request->get('pg') ? $request->get('pg') : 0));
+    Sessao::write('pos',($request->get('pos') ? $request->get('pos') : 0));
     Sessao::write('paginando',true);
 } else {
-    Sessao::write('pg',$_GET['pg']);
-    Sessao::write('pos',$_GET['pos']);
+    Sessao::write('pg' ,$request->get('pg'));
+    Sessao::write('pos',$request->get('pos'));
 }
 
 if ($arFiltro) {
@@ -81,16 +81,16 @@ Sessao::write('filtro',$arFiltro);
 
 //seta os filtros
 
-if ($_REQUEST['inCodBemInicio'] != '' AND $_REQUEST['inCodBemFinal'] == '') {
-    $stFiltro .= " bem.cod_bem = ".$_REQUEST['inCodBemInicio']." AND ";
+if ($request->get('inCodBemInicio') != '' AND $request->get('inCodBemFinal') == '') {
+    $stFiltro .= " bem.cod_bem = ".$request->get('inCodBemInicio')." AND ";
 }
 
-if ($_REQUEST['inCodBemInicio'] != '' AND $_REQUEST['inCodBemFinal'] != '') {
-    $stFiltro .= " bem.cod_bem BETWEEN ".$_REQUEST['inCodBemInicio']." AND ".$_REQUEST['inCodBemFinal']." AND ";
+if ($request->get('inCodBemInicio') != '' AND $request->get('inCodBemFinal') != '') {
+    $stFiltro .= " bem.cod_bem BETWEEN ".$request->get('inCodBemInicio')." AND ".$request->get('inCodBemFinal')." AND ";
 }
 
-if ($_REQUEST['stDataInicial'] != '' AND $_REQUEST['stDataFinal']) {
-    $stFiltro .= " bem_baixado.dt_baixa BETWEEN TO_DATE('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') AND TO_DATE('".$_REQUEST['stDataFinal']."','dd/mm/yyyy') AND ";
+if ($request->get('stDataInicial') != '' AND $request->get('stDataFinal')) {
+    $stFiltro .= " bem_baixado.dt_baixa BETWEEN TO_DATE('".$request->get('stDataInicial')."','dd/mm/yyyy') AND TO_DATE('".$request->get('stDataFinal')."','dd/mm/yyyy') AND ";
 }
 
 if ($stAcao == 'excluir') {
@@ -110,13 +110,13 @@ $stOrder = ' ORDER BY  bem.cod_bem ';
 
 $obTPatrimonioBemBaixado = new TPatrimonioBemBaixado();
 $obTPatrimonioBemBaixado->recuperaRelacionamento( $rsBem, $stFiltro, $stOrder );
+
 //instancia uma nova lista
 $obLista = new Lista;
 $obLista->setAjuda('UC-03.01.06');
 $stLink .= "&stAcao=".$stAcao;
 
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
-
 $obLista->setRecordSet( $rsBem );
 
 $obLista->addCabecalho();

@@ -28,7 +28,7 @@
   * Página que abre o preview do relatório desenvolvido no Birt.
   * Data de criação : 12/08/2008
 
-  $Id: OCGeratermoResponsabilidade.php 61409 2015-01-14 18:21:07Z diogo.zarpelon $
+  $Id: OCGeratermoResponsabilidade.php 64188 2015-12-14 12:52:21Z evandro $
 
   */
 
@@ -75,6 +75,7 @@ if ($rsBemResponsavel->getNumLinhas() > 0) {
         $preview->addParametro( 'cpf', 'CPF: '.$cpf );
 
     } else {
+        //gestaoPatrimonial/fontes/RPT/patrimonio/report/design/termoResponsabilidade.rptdesign        
         $preview = new PreviewBirt(3,6,2);
     }
 

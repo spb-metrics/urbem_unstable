@@ -72,4 +72,4 @@ BEGIN
     arTurnos[2] = arSegundaTurno;
     return arTurnos;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

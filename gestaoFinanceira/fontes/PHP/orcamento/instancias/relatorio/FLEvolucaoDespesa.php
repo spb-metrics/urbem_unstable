@@ -168,7 +168,7 @@ $obFormulario->addComponente( $obBscRubricaDespesaFinal );
 
 $obIMontaRecursoDestinacao = new IMontaRecursoDestinacao;
 $obIMontaRecursoDestinacao->setFiltro ( true );
-$obIMontaRecursoDestinacao->geraFormulario ( &$obFormulario );
+$obIMontaRecursoDestinacao->geraFormulario($obFormulario);
 
 // Componente Lista de Assinaturas
 

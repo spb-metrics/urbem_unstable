@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.51
 
-    $Id: PRRelatorioCustomizavelEvento.php 62661 2015-06-01 20:57:46Z evandro $
+    $Id: PRRelatorioCustomizavelEvento.php 64221 2015-12-18 16:59:18Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -49,16 +49,16 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
-$obTFolhaPagamentoPeriodoMovimentacao->setDado("mes", $_REQUEST['inCodMes']);
-$obTFolhaPagamentoPeriodoMovimentacao->setDado("ano", $_REQUEST['inAno']);
+$obTFolhaPagamentoPeriodoMovimentacao->setDado("mes", $request->get('inCodMes'));
+$obTFolhaPagamentoPeriodoMovimentacao->setDado("ano", $request->get('inAno'));
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaPeriodoMovimentacaoDaCompetencia($rsPeriodoMovimentacao);
 
 //competência
-if ($_REQUEST['inCodMes'] && $_REQUEST['inAno']) {
-    $stCompetencia = str_pad($_REQUEST['inCodMes'], 2, "0", STR_PAD_LEFT)."/".$_REQUEST['inAno'];
+if ($request->get('inCodMes') && $request->get('inAno')) {
+    $stCompetencia = str_pad($request->get('inCodMes'), 2, "0", STR_PAD_LEFT)."/".$request->get('inAno');
 }
 $stValoresFiltro = "";
-switch ($_REQUEST['stTipoFiltro']) {
+switch ($request->get('stTipoFiltro')) {
     case "contrato_todos":
     case "cgm_contrato_todos":
         $stValoresFiltro = "";
@@ -69,62 +69,62 @@ switch ($_REQUEST['stTipoFiltro']) {
         $stValoresFiltro = substr($stValoresFiltro,0,strlen($stValoresFiltro)-1);
         break;
     case "lotacao_grupo":        
-        $stValoresFiltro = implode(",",$_REQUEST["inCodLotacaoSelecionados"]);
+        $stValoresFiltro = implode(",",$request->get("inCodLotacaoSelecionados"));
         break;
     case "local_grupo":
-        $stValoresFiltro = implode(",",$_REQUEST["inCodLocalSelecionados"]);
+        $stValoresFiltro = implode(",",$request->get("inCodLocalSelecionados"));
         break;
     case "padrao_grupo":
-        $stValoresFiltro = implode(",",$_REQUEST["inCodPadraoSelecionados"]);
+        $stValoresFiltro = implode(",",$request->get("inCodPadraoSelecionados"));
         break;
     case "reg_sub_fun_esp_grupo":
-        $stValoresFiltro  = implode(",",$_REQUEST["inCodRegimeSelecionadosFunc"])."#";
-        $stValoresFiltro .= implode(",",$_REQUEST["inCodSubDivisaoSelecionadosFunc"])."#";
-        $stValoresFiltro .= implode(",",$_REQUEST["inCodFuncaoSelecionados"])."#";
-        if (is_array($_REQUEST["inCodEspecialidadeSelecionadosFunc"])) {
-            $stValoresFiltro .= implode(",",$_REQUEST["inCodEspecialidadeSelecionadosFunc"]);
+        $stValoresFiltro  = implode(",",$request->get("inCodRegimeSelecionadosFunc"))."#";
+        $stValoresFiltro .= implode(",",$request->get("inCodSubDivisaoSelecionadosFunc"))."#";
+        $stValoresFiltro .= implode(",",$request->get("inCodFuncaoSelecionados"))."#";
+        if (is_array($request->get("inCodEspecialidadeSelecionadosFunc"))) {
+            $stValoresFiltro .= implode(",",$request->get("inCodEspecialidadeSelecionadosFunc"));
         }
         break;
     case "reg_sub_car_esp_grupo":
-        $stValoresFiltro  = implode(",",$_REQUEST["inCodRegimeSelecionados"])."#";
-        $stValoresFiltro .= implode(",",$_REQUEST["inCodSubDivisaoSelecionados"])."#";
-        $stValoresFiltro .= implode(",",$_REQUEST["inCodCargoSelecionados"])."#";
-        if (is_array($_REQUEST["inCodEspecialidadeSelecionados"])) {
-            $stValoresFiltro .= implode(",",$_REQUEST["inCodEspecialidadeSelecionados"]);
+        $stValoresFiltro  = implode(",",$request->get("inCodRegimeSelecionados"))."#";
+        $stValoresFiltro .= implode(",",$request->get("inCodSubDivisaoSelecionados"))."#";
+        $stValoresFiltro .= implode(",",$request->get("inCodCargoSelecionados"))."#";
+        if (is_array($request->get("inCodEspecialidadeSelecionados"))) {
+            $stValoresFiltro .= implode(",",$request->get("inCodEspecialidadeSelecionados"));
         }
         break;
 }
 
+//gestaoRH/fontes/RPT/folhaPagamento/report/design/customizavelEventos.rptdesign
 $preview = new PreviewBirt(4,27,8);
-$preview->setFormato("pdf");
-$preview->setVersaoBirt("2.5.0");
 $preview->setReturnURL( CAM_GRH_FOL_INSTANCIAS."relatorio/FLRelatorioCustomizavelEvento.php");
 $preview->addParametro('stCompetencia', $stCompetencia);
-$preview->addParametro('cod_complementar', ($_REQUEST['inCodComplementar']) ? $_REQUEST['inCodComplementar'] : 0);
+$preview->addParametro('cod_complementar', ($request->get('inCodComplementar')) ? $request->get('inCodComplementar') : 0);
 $preview->addParametro('dt_inicial', $rsPeriodoMovimentacao->getCampo('dt_inicial'));
 $preview->addParametro('dt_final', $rsPeriodoMovimentacao->getCampo('dt_final'));
 $preview->addParametro('cod_periodo_movimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
-$preview->addParametro("stApresentarPorMatricula", $_REQUEST['boApresentarPorMatricula']);
-$preview->addParametro("inApresentaValor", ($_REQUEST['boValor']) ? 1 : 0);
-$preview->addParametro("inApresentaQuantidade", ($_REQUEST['boQuantidade']) ? 1 : 0);
-$preview->addParametro("count_eventos", count($_REQUEST['inCodEventoSelecionados']));
+$preview->addParametro("stApresentarPorMatricula", $request->get('boApresentarPorMatricula'));
+$preview->addParametro("inApresentaValor", ($request->get('boValor')) ? 1 : 0);
+$preview->addParametro("inApresentaQuantidade", ($request->get('boQuantidade')) ? 1 : 0);
+$preview->addParametro("count_eventos", count($request->get('inCodEventoSelecionados')));
 for ($inIndex = 1; $inIndex <= 7; $inIndex++) {
-    $inCodEvento = $_REQUEST["inCodEventoSelecionados"][$inIndex-1];
+    $inCodEvento = $request->get("inCodEventoSelecionados");
+    $inCodEvento = $inCodEvento[$inIndex-1];
     $inCodEvento = ($inCodEvento != "") ? $inCodEvento : 0;
     if ($inCodEvento != "0") {
         $preview->addParametro("cod_evento$inIndex", $inCodEvento );
     }
 }
-$preview->addParametro("stTipoFiltro", $_POST["stTipoFiltro"]);
+$preview->addParametro("stTipoFiltro", $request->get("stTipoFiltro"));
 $preview->addParametro("stValoresFiltro",$stValoresFiltro);
-$preview->addParametro("cod_configuracao", $_REQUEST["stConfiguracao"]);
-$preview->addParametro("stSituacao", $_REQUEST["stSituacao"]);
+$preview->addParametro("cod_configuracao", $request->get("stConfiguracao"));
+$preview->addParametro("stSituacao", $request->get("stSituacao"));
 $preview->addParametro("entidade", Sessao::getCodEntidade());
 $preview->addParametro("stEntidade", Sessao::getEntidade());
-$preview->addParametro("stOrdem", $_REQUEST["stOrdenacao"]);
+$preview->addParametro("stOrdem", $request->get("stOrdenacao"));
 $preview->addParametro("dtPeriodoInicial",$rsPeriodoMovimentacao->getCampo("dt_inicial"));
 $preview->addParametro("dtPeriodoFinal",$rsPeriodoMovimentacao->getCampo("dt_final"));
-$preview->addParametro("boAgrupar",$_POST["boAgrupar"]);
-$preview->addParametro("boQuebrar",$_POST["boQuebrar"]);
+$preview->addParametro("boAgrupar",$request->get("boAgrupar"));
+$preview->addParametro("boQuebrar",$request->get("boQuebrar"));
 $preview->preview();
 ?>

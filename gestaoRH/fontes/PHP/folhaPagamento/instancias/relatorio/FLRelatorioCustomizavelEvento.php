@@ -69,7 +69,7 @@ $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPag
 //DEFINICAO DO FORM
 $obForm = new Form;
 $obForm->setAction                              ( $pgProc                				    );
-$obForm->setTarget                              ( "oculto"                                                  );
+$obForm->setTarget                              ( "telaPrincipal" );
 
 $obHdnCtrl =  new Hidden;
 $obHdnCtrl->setName                             ( "stCtrl"                                                  );

@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: TLicitacaoContrato.class.php 64214 2015-12-17 16:13:13Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -146,7 +146,7 @@ function recuperaContrato(&$rsRecordSet, $stFiltro = "",$boTransacao = "")
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    $stSql = $this->montaRecuperaContrato($stFiltro);
+    $stSql = $this->montaRecuperaContrato().$stFiltro;
     $this->stDebug = $stSql;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -154,40 +154,40 @@ function recuperaContrato(&$rsRecordSet, $stFiltro = "",$boTransacao = "")
 }
 
 ///arrumar
-function montaRecuperaContrato($stFiltro)
+function montaRecuperaContrato()
 {
-    $stSql = "SELECT objeto.cod_objeto                                                          \n";
-    $stSql.= "      ,objeto.descricao                                                           \n";
-    $stSql.= "  FROM licitacao.contrato                                                         \n";
+    $stSql = "    SELECT objeto.cod_objeto
+                       , objeto.descricao
+                       , contrato.exercicio
 
-    $stSql.= " LEFT JOIN licitacao.contrato_licitacao                                           \n";
-    $stSql.= "        ON (contrato.num_contrato = contrato_licitacao.num_contrato               \n";
-    $stSql.= "       AND contrato.exercicio = contrato_licitacao.exercicio                      \n";
-    $stSql.= "       AND contrato.cod_entidade = contrato_licitacao.cod_entidade)               \n";
+                    FROM licitacao.contrato
 
-    $stSql.= " LEFT JOIN licitacao.contrato_compra_direta                                       \n";
-    $stSql.= "        ON (contrato.num_contrato = contrato_compra_direta.num_contrato           \n";
-    $stSql.= "       AND contrato.exercicio = contrato_compra_direta.exercicio                  \n";
-    $stSql.= "       AND contrato.cod_entidade = contrato_compra_direta.cod_entidade)           \n";
+               LEFT JOIN licitacao.contrato_licitacao
+                      ON (contrato.num_contrato = contrato_licitacao.num_contrato
+                     AND contrato.exercicio     = contrato_licitacao.exercicio
+                     AND contrato.cod_entidade  = contrato_licitacao.cod_entidade)
 
-    $stSql.= " LEFT JOIN licitacao.licitacao                                                    \n";
-    $stSql.= "        ON (licitacao.cod_licitacao = contrato_licitacao.cod_licitacao            \n";
-    $stSql.= "       AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade           \n";
-    $stSql.= "       AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao            \n";
-    $stSql.= "       AND licitacao.cod_entidade = contrato_licitacao.cod_entidade)              \n";
+               LEFT JOIN licitacao.contrato_compra_direta
+                      ON (contrato.num_contrato = contrato_compra_direta.num_contrato
+                     AND contrato.exercicio     = contrato_compra_direta.exercicio
+                     AND contrato.cod_entidade  = contrato_compra_direta.cod_entidade)
 
-    $stSql.= " LEFT JOIN compras.compra_direta                                                \n";
-    $stSql.= "        ON (compra_direta.cod_compra_direta = contrato_compra_direta.cod_compra_direta    \n";
-    $stSql.= "       AND compra_direta.cod_modalidade = contrato_compra_direta.cod_modalidade   \n";
-    $stSql.= "       AND compra_direta.exercicio_entidade = contrato_compra_direta.exercicio    \n";
-    $stSql.= "       AND compra_direta.cod_entidade = contrato_compra_direta.cod_entidade)      \n";
+               LEFT JOIN licitacao.licitacao
+                      ON (licitacao.cod_licitacao = contrato_licitacao.cod_licitacao
+                     AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade
+                     AND licitacao.exercicio      = contrato_licitacao.exercicio_licitacao
+                     AND licitacao.cod_entidade   = contrato_licitacao.cod_entidade)
 
-    $stSql.= " LEFT JOIN compras.objeto                                                         \n";
-    $stSql.= "        ON (licitacao.cod_objeto   = objeto.cod_objeto                            \n";
-    $stSql.= "       OR compra_direta.cod_objeto   = objeto.cod_objeto)                         \n";
-    $stSql.= " WHERE objeto.cod_objeto IS NOT NULL                                              \n";
+               LEFT JOIN compras.compra_direta
+                      ON (compra_direta.cod_compra_direta = contrato_compra_direta.cod_compra_direta
+                     AND compra_direta.cod_modalidade     = contrato_compra_direta.cod_modalidade
+                     AND compra_direta.exercicio_entidade = contrato_compra_direta.exercicio
+                     AND compra_direta.cod_entidade       = contrato_compra_direta.cod_entidade)
 
-    $stSql.= $stFiltro;
+               LEFT JOIN compras.objeto
+                      ON (   licitacao.cod_objeto     = objeto.cod_objeto
+                          OR compra_direta.cod_objeto = objeto.cod_objeto)
+                   WHERE objeto.cod_objeto IS NOT NULL \n";
 
     return $stSql;
 }
@@ -662,59 +662,65 @@ function montaRecuperaNaoAnuladosContratado()
     return $stSql;
 }
 
-function recuperaDadosAditivos(&$rsRecordSet, $stFiltro = "",$boTransacao = "")
+function recuperaDadosAditivos(&$rsRecordSet, $stFiltro="", $stOrder="", $boTransacao="")
 {
-    return $this->executaRecupera("montaRecuperaDadosAditivos",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaDadosAditivos().$stFiltro.$stOrder;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
 
 function montaRecuperaDadosAditivos()
 {
-    $stSql = "SELECT contrato.cgm_responsavel_juridico                                        \n";
-    $stSql.= "      ,TO_CHAR(contrato.dt_assinatura,'dd/mm/yyyy') as dt_assinatura            \n";
-    $stSql.= "      ,TO_CHAR(contrato.vencimento,'dd/mm/yyyy') as vencimento                  \n";
-    $stSql.= "      ,contrato.cgm_contratado                                                  \n";
-    $stSql.= "      ,sw_cgm.nom_cgm                                                           \n";
-    $stSql.= "      ,cgm_contratado.nom_cgm as nom_contratado                                 \n";
-    $stSql.= "      ,cgm_entidade.nom_cgm as nom_entidade                                     \n";
-    $stSql.= "      ,objeto.descricao                                                         \n";
-    $stSql.= "      ,contrato.cod_entidade                                                    \n";
-    $stSql.= "      ,contrato.num_contrato                                                    \n";
-    $stSql.= "      ,contrato.cod_documento                                                   \n";
-    $stSql.= "      ,contrato.cod_tipo_documento                                              \n";
-    $stSql.= "      ,contrato.valor_garantia                                                  \n";
-    $stSql.= "      ,contrato.valor_contratado                                                \n";
-    $stSql.= "      ,TO_CHAR( contrato.inicio_execucao,'dd/mm/yyyy') as inicio_execucao       \n";
-    $stSql.= "      ,TO_CHAR( contrato.fim_execucao   ,'dd/mm/yyyy') as fim_execucao          \n";
-    $stSql.= "      ,licitacao.cod_mapa                                                       \n";
-    $stSql.= "  FROM licitacao.contrato                                                       \n";
-    $stSql.= "      ,licitacao.licitacao                                                      \n";
+    $stSql = "SELECT contrato.cgm_responsavel_juridico
+                    ,TO_CHAR(contrato.dt_assinatura,'dd/mm/yyyy') as dt_assinatura
+                    ,TO_CHAR(contrato.vencimento,'dd/mm/yyyy') as vencimento
+                    ,contrato.cgm_contratado
+                    ,sw_cgm.nom_cgm
+                    ,cgm_contratado.nom_cgm as nom_contratado
+                    ,cgm_entidade.nom_cgm as nom_entidade
+                    ,objeto.descricao
+                    ,contrato.cod_entidade
+                    ,contrato.num_contrato
+                    ,contrato.numero_contrato
+                    ,contrato.cod_documento
+                    ,contrato.cod_tipo_documento
+                    ,contrato.valor_garantia
+                    ,contrato.valor_contratado
+                    ,TO_CHAR( contrato.inicio_execucao,'dd/mm/yyyy') as inicio_execucao
+                    ,TO_CHAR( contrato.fim_execucao   ,'dd/mm/yyyy') as fim_execucao
+                    ,licitacao.cod_mapa
 
-    $stSql.= "      ,licitacao.contrato_licitacao                                             \n";
+                FROM licitacao.contrato
+                    ,licitacao.licitacao
+                    ,licitacao.contrato_licitacao
+                    ,compras.objeto
+                    ,sw_cgm
+                    ,sw_cgm as cgm_contratado
+                    ,sw_cgm as cgm_entidade
+                    ,orcamento.entidade
 
-    $stSql.= "      ,compras.objeto                                                           \n";
-    $stSql.= "      ,sw_cgm                                                                   \n";
-    $stSql.= "      ,sw_cgm as cgm_contratado                                                 \n";
-    $stSql.= "      ,sw_cgm as cgm_entidade                                                   \n";
-    $stSql.= "      ,orcamento.entidade                                                       \n";
+               WHERE licitacao.cod_licitacao = contrato_licitacao.cod_licitacao
+                 AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade
+                 AND licitacao.cod_entidade = contrato_licitacao.cod_entidade
+                 AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao
 
-    $stSql.= " WHERE licitacao.cod_licitacao = contrato_licitacao.cod_licitacao               \n";
-    $stSql.= "   AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade             \n";
-    $stSql.= "   AND licitacao.cod_entidade = contrato_licitacao.cod_entidade                 \n";
-    $stSql.= "   AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao             \n";
+                 AND contrato_licitacao.cod_entidade = contrato.cod_entidade
+                 AND contrato_licitacao.exercicio = contrato.exercicio
+                 AND contrato_licitacao.num_contrato = contrato.num_contrato
 
-    $stSql.= "   AND contrato_licitacao.cod_entidade = contrato.cod_entidade                  \n";
-    $stSql.= "   AND contrato_licitacao.exercicio = contrato.exercicio                        \n";
-    $stSql.= "   AND contrato_licitacao.num_contrato = contrato.num_contrato                  \n";
-
-    $stSql.= "   AND licitacao.cod_objeto = objeto.cod_objeto                                 \n";
-    $stSql.= "   AND sw_cgm.numcgm = contrato.cgm_responsavel_juridico                        \n";
-    $stSql.= "   AND cgm_contratado.numcgm = contrato.cgm_contratado                          \n";
-    $stSql.= "   AND entidade.cod_entidade = contrato.cod_entidade                            \n";
-    $stSql.= "   AND entidade.exercicio = contrato.exercicio                                  \n";
-    $stSql.= "   AND entidade.numcgm = cgm_entidade.numcgm                                    \n";
-    $stSql.= "   AND contrato.num_contrato = ".$this->getDado('num_contrato')."               \n";
-    $stSql.= "   and contrato.cod_entidade = ".$this->getDado('cod_entidade')."               \n";
-    $stSql.= "   and contrato.exercicio = '".$this->getDado('exercicio')."'                   \n";
+                 AND licitacao.cod_objeto = objeto.cod_objeto
+                 AND sw_cgm.numcgm = contrato.cgm_responsavel_juridico
+                 AND cgm_contratado.numcgm = contrato.cgm_contratado
+                 AND entidade.cod_entidade = contrato.cod_entidade
+                 AND entidade.exercicio = contrato.exercicio
+                 AND entidade.numcgm = cgm_entidade.numcgm
+                 AND contrato.num_contrato = ".$this->getDado('num_contrato')."
+                 and contrato.cod_entidade = ".$this->getDado('cod_entidade')."
+                 and contrato.exercicio = '".$this->getDado('exercicio')."' \n";
 
     return $stSql;
 }
@@ -859,6 +865,7 @@ function recuperaContratoEmpenho(&$rsRecordSet, $stFiltro = "",$boTransacao = ""
 function montaRecuperaContratoEmpenho()
 {
     $stSql = " SELECT contrato.num_contrato
+                    , contrato.exercicio
                     , objeto.descricao
                     , to_char(contrato.dt_assinatura, 'dd/mm/yyyy') as dt_assinatura
                  FROM licitacao.contrato

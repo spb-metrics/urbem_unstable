@@ -67,7 +67,7 @@ BEGIN
                                ELSE assentamento_gerado.periodo_inicial END AS periodo_inicial
                         , CASE WHEN assentamento_gerado.periodo_final IS NOT NULL THEN
                                     assentamento_gerado.periodo_final
-                               ELSE '|| quote_literal(dtFinalPeriodoMovimentacao) ||', END AS periodo_final
+                               ELSE '|| quote_literal(dtFinalPeriodoMovimentacao) ||' END AS periodo_final
                         , assentamento_gerado.automatico
                         , assentamento_gerado.cod_assentamento
                         , assentamento_validade.dt_inicial as dt_inicial_validade

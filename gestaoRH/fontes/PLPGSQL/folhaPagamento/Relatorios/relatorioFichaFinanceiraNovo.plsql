@@ -21,15 +21,15 @@
     **********************************************************************************
 */
 /* recuperarContratoServidor
- * 
+ *
  * Data de Criação : 03/04/2009
 
 
  * @author Analista : Dagiane Vieira
  * @author Desenvolvedor : Diego Lemos de Souza
- 
+
  * @package URBEM
- * @subpackage 
+ * @subpackage
 
  */
 
@@ -47,14 +47,14 @@ DECLARE
     reRegistro                              RECORD;
     reRegistroAux                           RECORD;
     --rwOcorrenciasCalculoFichaFinanceira     colunasOcorrenciasCalculoRelatorioFichaFinanceira%ROWTYPE;
-    
+
 BEGIN
 
     stSql := '';
 
-    IF inCodConfiguracao IS NULL OR 
+    IF inCodConfiguracao IS NULL OR
        inCodConfiguracao = 0 THEN
-       
+
         stSql := stSql ||'   SELECT cod_periodo_movimentacao
                                  , 0 as cod_configuracao
                                  , cod_complementar
@@ -65,7 +65,7 @@ BEGIN
         IF inCodConfiguracao = 0 THEN
             stSql := stSql ||'  AND cod_complementar = '|| inCodComplementar;
         END IF;
-        
+
         stSql := stSql ||'      AND EXISTS (SELECT 1
                                              FROM folhapagamento'|| stEntidade ||'.evento_complementar_calculado
                                             WHERE evento_complementar_calculado.cod_registro       = registro_evento_complementar.cod_registro
@@ -74,15 +74,15 @@ BEGIN
                                               AND evento_complementar_calculado.timestamp_registro = registro_evento_complementar.timestamp )
                           GROUP BY cod_periodo_movimentacao
                                  , cod_complementar';
-                           
+
         IF inCodConfiguracao IS NULL THEN
             stSql := stSql ||' UNION ';
-        END IF;        
+        END IF;
     END IF;
 
-    IF inCodConfiguracao IS NULL OR 
+    IF inCodConfiguracao IS NULL OR
        inCodConfiguracao = 1 THEN
-       
+
         stSql := stSql ||'   SELECT registro_evento_periodo.cod_periodo_movimentacao
                                  , 1 as cod_configuracao
                                  , null::integer as cod_complementar
@@ -93,39 +93,39 @@ BEGIN
                                              FROM folhapagamento'|| stEntidade ||'.evento_calculado
                                             WHERE evento_calculado.cod_registro = registro_evento_periodo.cod_registro )
                           GROUP BY cod_periodo_movimentacao';
-                           
+
         IF inCodConfiguracao IS NULL THEN
             stSql := stSql ||' UNION ';
-        END IF;        
+        END IF;
     END IF;
 
-    
-    IF inCodConfiguracao IS NULL OR 
+
+    IF inCodConfiguracao IS NULL OR
        inCodConfiguracao = 2 THEN
-       
+
         stSql := stSql ||'   SELECT cod_periodo_movimentacao
                                  , 2 as cod_configuracao
                                  , null::integer as cod_complementar
                               FROM folhapagamento'|| stEntidade ||'.registro_evento_ferias
                              WHERE cod_periodo_movimentacao BETWEEN '|| inCodPeriodoMovimentacaoInicial ||' AND '|| inCodPeriodoMovimentacaoFinal ||'
                                AND cod_contrato = '|| inCodContrato ||'
-                               AND EXISTS ( SELECT 1 
+                               AND EXISTS ( SELECT 1
                                               FROM folhapagamento'|| stEntidade ||'.evento_ferias_calculado
                                              WHERE evento_ferias_calculado.cod_registro       = registro_evento_ferias.cod_registro
                                                AND evento_ferias_calculado.cod_evento         = registro_evento_ferias.cod_evento
                                                AND evento_ferias_calculado.desdobramento      = registro_evento_ferias.desdobramento
                                                AND evento_ferias_calculado.timestamp_registro = registro_evento_ferias.timestamp )
                           GROUP BY cod_periodo_movimentacao';
-                           
+
         IF inCodConfiguracao IS NULL THEN
             stSql := stSql ||' UNION ';
-        END IF;        
+        END IF;
     END IF;
-    
-    
-    IF inCodConfiguracao IS NULL OR 
+
+
+    IF inCodConfiguracao IS NULL OR
        inCodConfiguracao = 3 THEN
-       
+
         stSql := stSql ||'   SELECT cod_periodo_movimentacao
                                  , 3 as cod_configuracao
                                  , null::integer as cod_complementar
@@ -139,15 +139,15 @@ BEGIN
                                                AND evento_decimo_calculado.desdobramento       = registro_evento_decimo.desdobramento
                                                AND evento_decimo_calculado.timestamp_registro  = registro_evento_decimo.timestamp )
                           GROUP BY cod_periodo_movimentacao';
-                           
+
         IF inCodConfiguracao IS NULL THEN
             stSql := stSql ||' UNION ';
-        END IF;        
-    END IF;    
-    
-    IF inCodConfiguracao IS NULL OR 
+        END IF;
+    END IF;
+
+    IF inCodConfiguracao IS NULL OR
        inCodConfiguracao = 4 THEN
-       
+
         stSql := stSql ||'   SELECT cod_periodo_movimentacao::integer AS cod_periodo_movimentacao
                                  , 4 as cod_configuracao
                                  , null::integer as cod_complementar
@@ -159,11 +159,11 @@ BEGIN
                                              WHERE evento_rescisao_calculado.cod_registro        = registro_evento_rescisao.cod_registro
                                                AND evento_rescisao_calculado.cod_evento          = registro_evento_rescisao.cod_evento
                                                AND evento_rescisao_calculado.desdobramento       = registro_evento_rescisao.desdobramento
-                                               AND evento_rescisao_calculado.timestamp_registro  = registro_evento_rescisao.timestamp )    
+                                               AND evento_rescisao_calculado.timestamp_registro  = registro_evento_rescisao.timestamp )
                           GROUP BY cod_periodo_movimentacao';
-    END IF;    
-    
-    
+    END IF;
+
+
     stSql := 'SELECT *
                    , publico.fn_mes_extenso(periodo_movimentacao.dt_final)||''/''|| to_char(periodo_movimentacao.dt_final, ''yyyy'') AS descricao_periodo
                    , CASE WHEN ocorrencias_calculo_periodo.cod_configuracao <> 0 THEN
@@ -179,7 +179,7 @@ BEGIN
             ORDER BY ocorrencias_calculo_periodo.cod_periodo_movimentacao
                    , ocorrencias_calculo_periodo.cod_configuracao
                    , ocorrencias_calculo_periodo.cod_complementar';
-                   
+
     --CREATE TABLE tmp_periodo (
     --    cod_periodo_movimentacao    INTEGER,
     --    cod_configuracao            INTEGER,
@@ -187,11 +187,11 @@ BEGIN
     --    descricao_periodo           VARCHAR,
     --    descricao_configuracao      VARCHAR
     --)
-    
+
     FOR reRegistro IN EXECUTE stSql LOOP
         --INSERT INTO tmp_periodo (cod_periodo_movimentacao, cod_configuracao, cod_complementar, descricao_periodo, descricao_configuracao)
         --    VALUES (reRegistro.cod_periodo_movimentacao, reRegistro.cod_configuracao, reRegistro.cod_complementar, reRegistro.descricao_periodo, reRegistro.descricao_configuracao);
-        
+
             stSqlAux := 'SELECT  codigo as codigo_evento
                                , descricao as descricao_evento
                                , natureza::varchar as natureza_evento
@@ -222,33 +222,33 @@ BEGIN
                                , 0 AS cod_complementar
                                , ''''::varchar AS descricao_periodo
                                , ''''::varchar AS descricao_configuracao
-                           FROM recuperarEventosCalculados('||reRegistro.cod_configuracao||', 
-                                                           '||reRegistro.cod_periodo_movimentacao||', 
+                           FROM recuperarEventosCalculados('||reRegistro.cod_configuracao||',
+                                                           '||reRegistro.cod_periodo_movimentacao||',
                                                            '||inCodContrato||',';
-                                                           
+
                             IF (reRegistro.cod_complementar != NULL) THEN
                                 stSqlAux := stSqlAux||reRegistro.cod_complementar||',';
                             ELSE
                                 stSqlAux := stSqlAux||'NULL,';
                             END IF;
-                            
+
                 stSqlAux := stSqlAux||'
                                                            '''||stEntidade||''',
                                                            '''||stOrdenacaoEventos||''')
                            ORDER BY desdobramento DESC ,ordem_por_natureza,'||stOrdenacaoEventos||'';
-                           
+
         FOR reRegistroAux IN EXECUTE stSqlAux LOOP
             reRegistroAux.cod_periodo_movimentacao  := reRegistro.cod_periodo_movimentacao;
             reRegistroAux.cod_configuracao          := reRegistro.cod_configuracao;
             reRegistroAux.cod_complementar          := reRegistro.cod_complementar;
             reRegistroAux.descricao_periodo         := reRegistro.descricao_periodo;
             reRegistroAux.descricao_configuracao    := reRegistro.descricao_configuracao;
-            
+
             RETURN NEXT reRegistroAux;
         END LOOP;
     END LOOP;
-    
+
     RETURN;
-    
+
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

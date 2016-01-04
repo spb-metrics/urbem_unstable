@@ -29,38 +29,36 @@
 
     * @author Leandro André Zis
 
-    * $Id: FMConsultarContrato.php 64113 2015-12-03 18:24:34Z carlos.silva $
+    * $Id: FMConsultarContrato.php 64214 2015-12-17 16:13:13Z michel $
 
     * Casos de uso : uc-03.05.22
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once (TLIC."TLicitacaoContrato.class.php");
-include_once (TLIC."TLicitacaoTipoContrato.class.php");
-include_once (TLIC."TLicitacaoContratoDocumento.class.php");
-include_once (TLIC."TLicitacaoPublicacaoContrato.class.php");
-include_once (TCOM."TComprasFornecedor.class.php");
-include_once (TLIC."TLicitacaoDocumentosAtributos.class.php");
-include_once (TLIC."TLicitacaoContratoArquivo.class.php");
-include_once (TLIC."TLicitacaoContratoAditivos.class.php");
-include_once (TLIC."TLicitacaoTipoTermoAditivo.class.php");
-include_once (TLIC."TLicitacaoTipoAlteracaoValor.class.php");
-include_once (TLIC."TLicitacaoContratoAditivosAnulacao.class.php");
-include_once (TLIC."TLicitacaoContratoAditivosAnulacao.class.php");
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoContrato.class.php" );
+include_once TLIC."TLicitacaoContrato.class.php";
+include_once TLIC."TLicitacaoTipoContrato.class.php";
+include_once TLIC."TLicitacaoContratoDocumento.class.php";
+include_once TLIC."TLicitacaoPublicacaoContrato.class.php";
+include_once TCOM."TComprasFornecedor.class.php";
+include_once TLIC."TLicitacaoDocumentosAtributos.class.php";
+include_once TLIC."TLicitacaoContratoArquivo.class.php";
+include_once TLIC."TLicitacaoContratoAditivos.class.php";
+include_once TLIC."TLicitacaoTipoTermoAditivo.class.php";
+include_once TLIC."TLicitacaoTipoAlteracaoValor.class.php";
+include_once TLIC."TLicitacaoContratoAditivosAnulacao.class.php";
+include_once TLIC."TLicitacaoContratoAditivosAnulacao.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenhoContrato.class.php";
 
-include_once (CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php");
-include_once (CAM_FW_COMPONENTES.'/Table/Table.class.php');
-include_once (CAM_GP_LIC_COMPONENTES."IPopUpLicitacao.class.php");
-include_once (CAM_GP_LIC_COMPONENTES."ISelectDocumento.class.php");
-include_once (CAM_GA_ADM_COMPONENTES."ITextBoxSelectDocumento.class.php");
-include_once (CAM_GA_NORMAS_COMPONENTES."IPopUpNorma.class.php");
-include_once (CAM_GP_LIC_COMPONENTES."IMontaNumeroLicitacao.class.php");
-include_once (CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
-include_once (CAM_GF_ORC_MAPEAMENTO."TOrcamentoOrgao.class.php");
-include_once (CAM_GP_COM_MAPEAMENTO."TComprasTipoObjeto.class.php");
-
+include_once CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php";
+include_once CAM_FW_COMPONENTES.'/Table/Table.class.php';
+include_once CAM_GP_LIC_COMPONENTES."IPopUpLicitacao.class.php";
+include_once CAM_GP_LIC_COMPONENTES."ISelectDocumento.class.php";
+include_once CAM_GA_ADM_COMPONENTES."ITextBoxSelectDocumento.class.php";
+include_once CAM_GA_NORMAS_COMPONENTES."IPopUpNorma.class.php";
+include_once CAM_GP_LIC_COMPONENTES."IMontaNumeroLicitacao.class.php";
+include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasTipoObjeto.class.php";
 
 $stPrograma = "ManterContrato";
 $pgFilt = "FL".$stPrograma.".php";
@@ -83,7 +81,6 @@ $stExercicio = $request->get('stExercicio');
 $stURL .= "&pos=".Sessao::read('pos');
 $stURL .= "&pg=".Sessao::read('pg');
 $stURL .= "&paginando=".Sessao::read('paginando');
-
 
 $obTLicitacaoTipoContrato = new TLicitacaoTipoContrato();
 $obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE cod_tipo IN (43,38,19,46,20,35,27,23,42,10,12,14,6,1,39,28,16,4,18,26,30,24,45,8,34,31,32,33,3,22) ', ' ORDER BY descricao ' );
@@ -228,10 +225,6 @@ $obHdnAcao->setValue( $stAcao );
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
-
-//Carrega Orgãos
-$obTOrcamentoOrgao = new TOrcamentoOrgao;
-$obTOrcamentoOrgao->recuperaRelacionamento( $rsOrgao, " AND OO.exercicio = '".Sessao::getExercicio()."' ");
 
 $obLabelOrgao = new Label;
 $obLabelOrgao->setRotulo( "Órgão" );
@@ -472,11 +465,6 @@ $jsOnLoad.= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','carregaListaDocum
 $jsOnLoad.= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','carregaListaVeiculos&consultar=1'); \n";
 $jsOnLoad.= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','carregaListaArquivos&num_contrato=".$inNumContrato."&exercicio=".$stExercicioLicitacao."&cod_entidade=".$inCodEntidade."&consultar=1'); \n ";
 
-if($inNumUnidade != '') {
-//$jsOnLoad.= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inNumOrgao=".$inNumOrgao."&inNumUnidade=".$inNumUnidade."', 'MontaUnidade'); \n";
-}
-
-
 //define o formulário
 $obFormulario = new FormularioAbas;
 $obFormulario->addForm          ( $obForm     );
@@ -527,15 +515,14 @@ $obFormulario->addSpan          ( $obSpnListaDocumentos );
 $obFormulario->addSpan          ( $obSpnListaVeiculo );
 $obFormulario->addSpan          ( $obSpnListaArquivo );
 
-
 //////////ADITIVOS
 $obFormulario->addAba    ("Aditivos");
 $obFormulario->addTitulo ( "Lista de Aditivos" );
 
 $obLicitacaoContratoAditivos = new TLicitacaoContratoAditivos;
-$obLicitacaoContratoAditivos->setDado("num_contrato", $request->get('inNumContrato'));
+$obLicitacaoContratoAditivos->setDado("numero_contrato"   , $request->get('inNumContrato')      );
 $obLicitacaoContratoAditivos->setDado("exercicio_contrato", $request->get('stExercicioContrato'));
-$obLicitacaoContratoAditivos->setDado("cod_entidade", $request->get('inCodEntidade'));
+$obLicitacaoContratoAditivos->setDado("cod_entidade"      , $request->get('inCodEntidade')      );
 $obLicitacaoContratoAditivos->recuperaContratosAditivosLicitacao($rsLicitacaoContratoAditivo);
 
 foreach($rsLicitacaoContratoAditivo->getElementos() as $aditivo) {
@@ -685,9 +672,9 @@ $obFormulario->addAba("Empenhos");
 $obFormulario->addTitulo ( "Dados dos Empenhos" );
 
 $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato;
-$obTEmpenhoEmpenhoContrato->setDado('cod_entidade', $request->get('inCodEntidade'));
-$obTEmpenhoEmpenhoContrato->setDado('num_contrato', $request->get('inNumContrato'));
-$obTEmpenhoEmpenhoContrato->setDado('exercicio', $request->get('stExercicio'));
+$obTEmpenhoEmpenhoContrato->setDado('cod_entidade'      , $request->get('inCodEntidade'));
+$obTEmpenhoEmpenhoContrato->setDado('num_contrato'      , $request->get('inNumContrato'));
+$obTEmpenhoEmpenhoContrato->setDado('exercicio_contrato', $request->get('stExercicio')  );
 $obTEmpenhoEmpenhoContrato->recuperaEmpenhoPorContrato($rsEmpenho);
 
 if($rsEmpenho->getNumLinhas() > 0) {
@@ -707,7 +694,7 @@ if($rsEmpenho->getNumLinhas() > 0) {
     $obTable->Head->addCabecalho('Valor Anulado', 5);
     $obTable->Head->addCabecalho('Valor Total', 5);
     
-    $obTable->Body->addCampo('[cod_empenho]', 'C');
+    $obTable->Body->addCampo('[cod_empenho] / [exercicio]', 'C');
     $obTable->Body->addCampo('[numcgm] - [nom_cgm]', 'E');
     $obTable->Body->addCampo('[dt_empenho]', 'C');
     $obTable->Body->addCampo('[valor_empenho]', 'D');
@@ -731,15 +718,14 @@ $obSpnObservacao->setValue("Caso o empenho não tenha sido vinculado na hora do 
 
 $obFormulario->addSpan($obSpnObservacao);
 
-
-foreach ($_REQUEST as $chave =>$valor) {
+foreach ($request->getAll() as $chave =>$valor) {
     $param.= "&".$chave."=".$valor;
 }
 
 $obBtnCancelar = new Button;
-$obBtnCancelar->setName                         ( 'cancelar'                     );
-$obBtnCancelar->setValue                        ( 'Cancelar'                     );
-$obBtnCancelar->obEvento->setOnClick            ( "Cancelar('". $pgList."?".Sessao::getId()."&stAcao=".$stAcao.$stURL."');" );
+$obBtnCancelar->setName             ( 'cancelar' );
+$obBtnCancelar->setValue            ( 'Cancelar' );
+$obBtnCancelar->obEvento->setOnClick( "Cancelar('". $pgList."?".Sessao::getId()."&stAcao=".$stAcao.$stURL."');" );
 
 $obFormulario->defineBarra(array($obBtnCancelar));
 $obFormulario->show();

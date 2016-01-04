@@ -35,7 +35,7 @@
  * @package URBEM
  * @ignore
 
- $Id: FMManterAcao.php 39850 2009-04-22 20:28:42Z fellipe.santos $
+ $Id: FMManterAcao.php 64234 2015-12-21 17:24:45Z michel $
 
  * Caso de Uso: uc-02.09.04
  */
@@ -56,10 +56,7 @@ include_once CAM_GF_PPA_MAPEAMENTO.'TPPATipoAcao.class.php';
 include_once CAM_GF_PPA_MAPEAMENTO.'TPPAAcaoPeriodo.class.php';
 
 // Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ? $_GET['stAcao'] : $_POST['stAcao'];
-if (empty($stAcao)) {
-    $stAcao = 'incluir';
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 $arLink = Sessao::read('link');
 
@@ -70,12 +67,12 @@ Sessao::remove('arParametroPeriodo');
 
 // Define o nome dos arquivos PHP
 $stProjeto = 'ManterAcao';
-$pgFilt = 'FL' . $stProjeto . '.php';
-$pgList = 'LS' . $stProjeto . '.php';
-$pgForm = 'FM' . $stProjeto . '.php';
-$pgProc = 'PR' . $stProjeto . '.php';
-$pgOcul = 'OC' . $stProjeto . '.php';
-$pgJS   = 'JS' . $stProjeto . '.php';
+$pgFilt = 'FL'.$stProjeto.'.php';
+$pgList = 'LS'.$stProjeto.'.php';
+$pgForm = 'FM'.$stProjeto.'.php';
+$pgProc = 'PR'.$stProjeto.'.php';
+$pgOcul = 'OC'.$stProjeto.'.php';
+$pgJS   = 'JS'.$stProjeto.'.php';
 
 include_once $pgJS;
 
@@ -113,7 +110,6 @@ $rsAcaoPeriodo = new RecordSet();
 $rsPAO = new RecordSet();
 $stLstRecursos = '';
 if ($stAcao == 'alterar') {
-
     require_once CAM_GF_LDO_MAPEAMENTO.'TLDOAcaoValidada.class.php';
     $obTLDOAcaoValidada = new TLDOAcaoValidada;
 
@@ -124,9 +120,9 @@ if ($stAcao == 'alterar') {
     // Array responsavel por guardar as informacoes dos anos que ja forma validados na LDO.
     // Os valores desses anos devem aparecer como label na tabletree
     $arAcaoValidada = array();
-    $rsAcao = $obVPPAManterAcao->recuperaAcao($_REQUEST);
+    $rsAcao = $obVPPAManterAcao->recuperaAcao($request->getAll());
     if ($rsAcao->getNumLinhas() == 1) {
-        $rsRecursos = $obVPPAManterAcao->recuperaRecursos($_REQUEST);
+        $rsRecursos = $obVPPAManterAcao->recuperaRecursos($request->getAll());
 
         while (!$rsRecursos->eof()) {
             $arRecursos = $rsRecursos->getElementos();
@@ -145,6 +141,7 @@ if ($stAcao == 'alterar') {
             $rsRecursos->proximo();
         }
 
+        Sessao::write('arRecursos', $arRecursos);
         Sessao::write('arAcaoValidada', $arAcaoValidada);
 
         $obTPPAAcaoPeriodo = new TPPAAcaoPeriodo;
@@ -153,8 +150,8 @@ if ($stAcao == 'alterar') {
         $obTPPAAcaoPeriodo->recuperaPorChave($rsAcaoPeriodo);
     } else {
         $obTOrcamentoPAOPPAAcao = new TOrcamentoPAOPPAAcao;
-        $obTOrcamentoPAOPPAAcao->setDado('num_pao', $_REQUEST['inCodAcao']);
-        $obTOrcamentoPAOPPAAcao->setDado('exercicio', $_REQUEST['stExercicio']);
+        $obTOrcamentoPAOPPAAcao->setDado('num_pao', $request->get('inCodAcao'));
+        $obTOrcamentoPAOPPAAcao->setDado('exercicio', $request->get('stExercicio'));
         $obTOrcamentoPAOPPAAcao->recuperaDadosPao($rsAcao);
     }
 }
@@ -162,7 +159,7 @@ if ($stAcao == 'alterar') {
 // Define código do órgão.
 $obHdnOrgao = new Hidden();
 $obHdnOrgao->setName('inCodOrgao');
-$obHdnOrgao->setValue($_REQUEST['inCodOrgao']);
+$obHdnOrgao->setValue($request->get('inCodOrgao'));
 
 // Define timestamp para ação_dados.
 $obHdnCodDados = new Hidden();
@@ -173,7 +170,7 @@ $obHdnCodDados->setValue($rsAcao->getCampo('ultimo_timestamp_acao_dados'));
 $obHdnHomologado = new Hidden();
 $obHdnHomologado->setID('boHomologado');
 $obHdnHomologado->setName('boHomologado');
-$obHdnHomologado->setValue($_REQUEST['boHomologado']);
+$obHdnHomologado->setValue($request->get('boHomologado'));
 
 // Guarda valores temporariamente
 $obHdnCodPPA = new Hidden();
@@ -326,7 +323,7 @@ if ( ($inCodUf == 2) || ($inCodUf == 27)) {
         if ($stAcao == "alterar") {
             include_once CAM_GF_PPA_MAPEAMENTO.'TTCEALAcaoIdentificadorAcao.class.php';
             $obTTCEALAcaoIdentificadorAcao = new TTCEALAcaoIdentificadorAcao();
-            $stFiltro = " WHERE acao_identificador_acao.cod_acao = ".$_REQUEST['inCodAcao']."";
+            $stFiltro = " WHERE acao_identificador_acao.cod_acao = ".$request->get('inCodAcao')."";
             $obTTCEALAcaoIdentificadorAcao->recuperaAcaoIdentificadorAcao($rsIdentificadorAcao, $stFiltro, "",$boTransacao);
             $jsOnload .=" jQuery('#inCodIdentificadorAcao').val('".$rsIdentificadorAcao->getCampo('cod_identificador')."'); ";
         }
@@ -345,7 +342,7 @@ if ( ($inCodUf == 2) || ($inCodUf == 27)) {
         if ($stAcao == "alterar") {
             include_once CAM_GF_PPA_MAPEAMENTO.'TTCETOAcaoIdentificadorAcao.class.php';
             $obTTCETOAcaoIdentificadorAcao = new TTCETOAcaoIdentificadorAcao();
-            $stFiltro = " WHERE acao_identificador_acao.cod_acao = ".$_REQUEST['inCodAcao']."";
+            $stFiltro = " WHERE acao_identificador_acao.cod_acao = ".$request->get('inCodAcao')."";
             $obTTCETOAcaoIdentificadorAcao->recuperaAcaoIdentificadorAcao($rsIdentificadorAcao, $stFiltro, "",$boTransacao);
             $jsOnload .=" jQuery('#inCodIdentificadorAcao').val('".$rsIdentificadorAcao->getCampo('cod_identificador')."'); ";
         }
@@ -391,7 +388,7 @@ if ($stAcao == 'alterar') {
 $obTxtTituloAcao = new TextArea;
 $obTxtTituloAcao->setName     ('stTitulo');
 $obTxtTituloAcao->setId       ('stTitulo');
-$obTxtTituloAcao->setValue    ($_REQUEST['stTitulo']);
+$obTxtTituloAcao->setValue    ($request->get('stTitulo'));
 $obTxtTituloAcao->setRotulo   ('Título da Ação');
 $obTxtTituloAcao->setTitle    ('Informe o título da Ação.');
 $obTxtTituloAcao->setMaxCaracteres(480);
@@ -452,8 +449,8 @@ $obSpnDescricaoRegiao->setId('spnDescricaoRegiao');
 // Define popup de produto
 $obIPopUpProduto = new IPopUpProduto($obForm);
 $obIPopUpProduto->setNull(true);
-$obIPopUpProduto->obCampoCod->setValue($_REQUEST['inCodProduto']);
-$obIPopUpProduto->setValue($_REQUEST['stDscProduto']);
+$obIPopUpProduto->obCampoCod->setValue($request->get('inCodProduto'));
+$obIPopUpProduto->setValue($request->get('stDscProduto'));
 $obIPopUpProduto->obCampoCod->obEvento->setOnBlur("montaParametrosGET('preencheProduto','inCodProduto');");
 $obIPopUpProduto->obCampoCod->setValue($rsAcao->getCampo('cod_produto'));
 $obIPopUpProduto->setValue($rsAcao->getCampo('nom_produto'));
@@ -522,7 +519,7 @@ $obHdnInCodPrograma->setName('hdnInCodPrograma');
 
 $obHdnRegistro = new Hidden();
 $obHdnRegistro->setID('inRegistro');
-$obHdnRegistro->setValue($_REQUEST['inRegistro']);
+$obHdnRegistro->setValue($request->get('inRegistro'));
 $obHdnRegistro->setName('inRegistro');
 
 $obSpnOrcamentaria = new Span;
@@ -595,7 +592,7 @@ if ($stAcao == 'incluir') {
 }
 $obFormulario->addComponente                ($obSlSubTipoAcao);
 if ( ($inCodUf == 2) || ($inCodUf == 27) )
-    $obFormulario->addComponente                ($obSlIdentificadorAcao);
+    $obFormulario->addComponente            ($obSlIdentificadorAcao);
 $obFormulario->addSpan                      ($obSpnPeriodo);
 $obFormulario->addComponente                ($obTxtCodAcao);
 $obFormulario->addComponente                ($obTxtTituloAcao);

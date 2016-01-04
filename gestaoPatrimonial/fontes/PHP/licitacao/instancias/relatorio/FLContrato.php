@@ -86,7 +86,7 @@ $obFornecedor->setTitle( "Selecione o Fornecedor." );
 
 $obContrato = new IPopUpContrato( $obForm );
 
-$obObjeto = new IPopUpObjeto(&$obForm);
+$obObjeto = new IPopUpObjeto($obForm);
 $obObjeto->setRotulo ("Objeto");
 
 $obPeriodicidade = new Periodicidade;
@@ -177,7 +177,7 @@ $obFormulario->addForm( $obForm );
 $obFormulario->addHidden( $obHdnStCtrl );
 $obFormulario->addHidden( $obHdnAcao );
 
-$obContrato->geraFormulario  ( &$obFormulario                  );
+$obContrato->geraFormulario  ( $obFormulario                   );
 $obFormulario->addComponente ( $obISelectMultiploEntidadeGeral );
 $obFormulario->addComponente ( $obSelOrgao                     );
 $obFormulario->addComponente ( $obFornecedor                   );

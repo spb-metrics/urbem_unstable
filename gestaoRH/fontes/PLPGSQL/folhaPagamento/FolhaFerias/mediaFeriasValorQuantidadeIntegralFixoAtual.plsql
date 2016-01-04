@@ -39,33 +39,33 @@
 --
 --*/
 
-CREATE OR REPLACE FUNCTION mediaFeriasValorQuantidadeIntegralFixoAtual() RETURNS Numeric as '
+CREATE OR REPLACE FUNCTION mediaFeriasValorQuantidadeIntegralFixoAtual() RETURNS Numeric as $$
 
 DECLARE
 
 inCodEvento                 INTEGER := 0;
-stSql                       VARCHAR := '''';
+stSql                       VARCHAR := '';
 crCursor                    REFCURSOR;
 nuValor                     NUMERIC := 0;
 nuQuantidade                NUMERIC := 0;
-stFixado                    VARCHAR := ''V'';
+stFixado                    VARCHAR := 'V';
 nuRetorno                   NUMERIC := 0;
-stLido_de                   VARCHAR := ''fixo_atual'';
+stLido_de                   VARCHAR := 'fixo_atual';
 
 BEGIN
 
-  inCodEvento := recuperarBufferInteiro( ''inCodEvento'' );  
+  inCodEvento := recuperarBufferInteiro( 'inCodEvento' );  
 
-  stSql := '' SELECT valor,quantidade,fixado FROM tmp_registro_evento_ferias 
-                WHERE cod_evento = ''||inCodEvento||''
-                  AND lido_de = ''''''||stLido_de||''''''
-           '';
+  stSql := ' SELECT valor,quantidade,fixado FROM tmp_registro_evento_ferias 
+                WHERE cod_evento = '||inCodEvento||'
+                  AND lido_de = '''||stLido_de||'''
+           ';
 
   OPEN crCursor FOR EXECUTE stSql;
        FETCH crCursor INTO nuValor, nuQuantidade, stFixado ;
   CLOSE crCursor;
 
-  IF stFixado = ''V'' THEN
+  IF stFixado = 'V' THEN
      nuRetorno := nuValor;
   ELSE
      nuRetorno := nuQuantidade;
@@ -73,4 +73,4 @@ BEGIN
 
   RETURN nuRetorno; 
 END;
-'LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';

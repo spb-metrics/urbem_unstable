@@ -32,7 +32,7 @@
 
 * @ignore
 
-* $Id: LSProcurarContrato.php 64081 2015-11-30 15:36:50Z michel $
+* $Id: LSProcurarContrato.php 64256 2015-12-22 16:06:28Z michel $
 
 * Casos de uso :uc-03.04.07, uc-03.04.05
 */
@@ -49,16 +49,15 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
-$stFncJavaScript  = "function insereObjeto(num,nom){                                                                                                    \n";
-$stFncJavaScript .= "   var sNum;                                                                                                                       \n";
-$stFncJavaScript .= "   var sNom;                                                                                                                       \n";
-$stFncJavaScript .= "   sNum = num;                                                                                                                     \n";
-$stFncJavaScript .= "   sNom = nom;                                                                                                                     \n";
-$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get('campoNom')."').innerHTML = sNom;         \n";
-$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".value = sNum;  \n";
-$stFncJavaScript .= "   window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".focus();       \n";
-$stFncJavaScript .= "   window.close();                                                                                                                 \n";
-$stFncJavaScript .= "}                                                                                                                                  \n";
+$stFncJavaScript  = "function insereObjeto(inNumContrato, stDescricao, stExercicio){
+                        window.opener.parent.frames['telaPrincipal'].document.getElementById('".$request->get('campoNom')."').innerHTML = stDescricao;
+                        if(window.opener.parent.frames['telaPrincipal'].document.getElementById('stExercicioContrato')){
+                           window.opener.parent.frames['telaPrincipal'].document.getElementById('stExercicioContrato').value = stExercicio;
+                        }
+                        window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".value = inNumContrato;
+                        window.opener.parent.frames['telaPrincipal'].document.".$request->get('nomForm').".".$request->get('campoNum').".focus();
+                        window.close();
+                     } \n";
 
 $stCaminho = CAM_GP_COM_INSTANCIAS."objeto/";
 
@@ -106,8 +105,9 @@ if( $request->get('boFornecedor') ){
     $inCodFornecedor = $request->get('inCodFornecedor', '');
     $stCodFornecedor = ($inCodFornecedor!='') ? '= '.$inCodFornecedor : 'IS NULL';
     $stFiltro .= " and contrato.cgm_contratado ".$stCodFornecedor;
-
-    $stFiltro .= " and contrato.exercicio = '".$request->get('stExercicio')."'";
+    
+    if($request->get('stExercicio'))
+        $stFiltro .= " and contrato.exercicio = '".$request->get('stExercicio')."'";
 
     $obTLicitacaoContrato->recuperaContratoEmpenho ( $rsLista, $stFiltro );
 }else
@@ -166,6 +166,7 @@ $obLista->ultimaAcao->setFuncao( true );
 $obLista->ultimaAcao->setLink( "JavaScript:insereObjeto();" );
 $obLista->ultimaAcao->addCampo("1","num_contrato");
 $obLista->ultimaAcao->addCampo("2","descricao");
+$obLista->ultimaAcao->addCampo("3","exercicio");
 $obLista->commitAcao();
 $obLista->show();
 

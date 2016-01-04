@@ -34,7 +34,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoDiversos.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: FMManterEmpenhoDiversos.php 64256 2015-12-22 16:06:28Z michel $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -66,10 +66,7 @@ $pgJS          = 'JS'.$stPrograma.'.js';
 SistemaLegado::liberaFrames();
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if (empty($stAcao)) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 include_once ($pgJS);
 
@@ -255,8 +252,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     if ($rsEntidade->getNumLinhas()>1) {
         $obCmbNomEntidade->addOption            ('', 'Selecione');
-        $obCmbNomEntidade->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade');getIMontaAssinaturas();");
-        $obTxtCodEntidade->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade');getIMontaAssinaturas();");
+        $obCmbNomEntidade->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade,inCodContrato,inCodFornecedor,stExercicioContrato');getIMontaAssinaturas();");
+        $obTxtCodEntidade->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade,inCodContrato,inCodFornecedor,stExercicioContrato');getIMontaAssinaturas();");
     }
     $obCmbNomEntidade->setCampoId   ('cod_entidade');
     $obCmbNomEntidade->setCampoDesc ('nom_cgm');
@@ -319,7 +316,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
                                                          montaParametrosGET('buscaContrapartida', 'inCodFornecedor, inCodCategoria');
                                                          montaParametrosGET('verificaFornecedor', 'inCodFornecedor, inCodCategoria, inCodContraPartida, stDtEmpenho');");
     $obBscFornecedor->setFuncaoBusca("window.parent.frames['telaPrincipal'].document.frm.inCodFornecedor.focus(); abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inCodFornecedor','stNomFornecedor','','".Sessao::getId()."','800','550');");
-    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+    $obBscFornecedor->obCampoCod->obEvento->setOnBlur("montaParametrosGET('montaBuscaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');");
 
     // Define Objeto Select para Categoria do Empenho
     include_once TEMP.'TEmpenhoCategoriaEmpenho.class.php';
@@ -370,7 +367,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbHistorico->setCampoDesc ('nom_historico');
     $obCmbHistorico->preencheCombo($rsHistorico);
     $obCmbHistorico->setNull      (true);
-    
+
     $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
 
     if ($inCodUF == 20) {
@@ -615,7 +612,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obSpanFundamentacaoLegal = new Span;
         $obSpanFundamentacaoLegal->setId('spnFundamentacaoLegal');
     }
-    
+
     //Radio para definicao de tipo Item
     $obRdTipoItemC = new Radio;
     $obRdTipoItemC->setTitle      ( "Selecione o tipo de Item" );
@@ -626,7 +623,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRdTipoItemC->setLabel      ( "Sim" );
     $obRdTipoItemC->obEvento->setOnClick( "habilitaCampos('Catalogo');" );
     $obRdTipoItemC->setChecked( false );
- 
+
     $obRdTipoItemD = new Radio;
     $obRdTipoItemD->setRotulo   ( "**Item do Almoxarifado" );
     $obRdTipoItemD->setName     ( "stTipoItemRadio" );
@@ -635,13 +632,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRdTipoItemD->setLabel    ( "Não" );
     $obRdTipoItemD->obEvento->setOnClick( "habilitaCampos('Descricao');" );
     $obRdTipoItemD->setChecked( true );
-    
+
     $obHdnTipoItem = new Hidden;
     $obHdnTipoItem->setName ('stTipoItem');
     $obHdnTipoItem->setValue('Catalogo');
-    
+
     $arRadios = array( $obRdTipoItemC, $obRdTipoItemD );
-         
+
     include_once CAM_GP_ALM_COMPONENTES."IMontaItemUnidade.class.php";
     $obMontaItemUnidade = new IMontaItemUnidade($obForm);
     $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");
@@ -651,7 +648,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaItemUnidade->obIPopUpCatalogoItem->setId( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obIPopUpCatalogoItem->setName( 'stNomItemCatalogo' );
     $obMontaItemUnidade->obSpnInformacoesItem->setStyle('visibility:hidden; display:none');
-
 
     // Define Objeto SimNao para emitir liquidacao
     $obSimNaoEmitirLiquidacao = new SimNao();
@@ -668,9 +664,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $obContrato = new IPopUpContrato( $obForm );
     $obContrato->obHdnBoFornecedor->setValue(TRUE);
-    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+    $obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');");
     $obContrato->obBuscaInner->setValoresBusca('', '', '');
-    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
+    $obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');".$obContrato->obBuscaInner->getFuncaoBusca());
 
     //****************************************//
     // Monta FORMULARIO

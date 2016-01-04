@@ -38,7 +38,7 @@
     $Author: grasiele $
     $Date: 2008-04-08 14:41:54 -0300 (Ter, 08 Abr 2008) $
 
-    $Id: TLicitacaoEdital.class.php 63116 2015-07-27 20:27:08Z franver $
+    $Id: TLicitacaoEdital.class.php 64262 2015-12-23 12:48:09Z jean $
 
     * Casos de uso: uc-03.05.16
 */
@@ -69,26 +69,28 @@ class TLicitacaoEdital extends Persistente
 
     $this->setCampoCod('num_edital');
     $this->setComplementoChave('exercicio');
-    $this->AddCampo('num_edital'              ,'sequence',true  ,''   ,true,false);
-    $this->AddCampo('exercicio'               ,'varchar' ,false ,'4'  ,true,false);
-    $this->AddCampo('exercicio_licitacao'     ,'varchar' ,false ,'4'  ,false,'TLicitacaoLicitacao','exercicio');
-    $this->AddCampo('cod_entidade'            ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
-    $this->AddCampo('cod_modalidade'          ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
-    $this->AddCampo('cod_licitacao'           ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
-    $this->AddCampo('dt_entrega_propostas'    ,'date'    ,false ,''   ,false,false);
-    $this->AddCampo('hora_entrega_propostas'  ,'varchar' ,false ,''   ,false,false);
-    $this->AddCampo('local_entrega_propostas' ,'varchar' ,false ,'100',false,false);
-    $this->AddCampo('local_abertura_propostas','varchar' ,false ,'100',false,false);
-    $this->AddCampo('local_entrega_material'  ,'varchar' ,false ,'100',false,false);
-    $this->AddCampo('dt_validade_proposta'    ,'date'    ,false ,''   ,false,false);
-    $this->AddCampo('observacao_validade_proposta','text',false ,''   ,false,false);
-    $this->AddCampo('condicoes_pagamento'     ,'varchar' ,false ,'80' ,false,false);
-    $this->AddCampo('hora_abertura_propostas' ,'varchar' ,false ,''   ,false,false);
-    $this->AddCampo('dt_abertura_propostas'   ,'date'    ,false ,''   ,false,false);
-    $this->AddCampo('responsavel_juridico'    ,'integer' ,false ,''   ,false,false);
-    $this->AddCampo('dt_aprovacao_juridico'   ,'date'    ,false ,''   ,false,false);
-    $this->AddCampo('cod_tipo_documento'      ,'integer' ,false ,''   ,false,false);
-    $this->AddCampo('cod_documento'           ,'integer' ,false ,''   ,false,false);
+    $this->AddCampo('num_edital'                    ,'sequence',true  ,''   ,true,false);
+    $this->AddCampo('exercicio'                     ,'varchar' ,false ,'4'  ,true,false);
+    $this->AddCampo('exercicio_licitacao'           ,'varchar' ,false ,'4'  ,false,'TLicitacaoLicitacao','exercicio');
+    $this->AddCampo('cod_entidade'                  ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
+    $this->AddCampo('cod_modalidade'                ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
+    $this->AddCampo('cod_licitacao'                 ,'integer' ,false ,''   ,false,'TLicitacaoLicitacao');
+    $this->AddCampo('dt_entrega_propostas'          ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('hora_entrega_propostas'        ,'varchar' ,false ,''   ,false,false);
+    $this->AddCampo('local_entrega_propostas'       ,'varchar' ,false ,'100',false,false);
+    $this->AddCampo('local_abertura_propostas'      ,'varchar' ,false ,'100',false,false);
+    $this->AddCampo('local_entrega_material'        ,'varchar' ,false ,'100',false,false);
+    $this->AddCampo('dt_validade_proposta'          ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('observacao_validade_proposta'  ,'text'    ,false ,''   ,false,false);
+    $this->AddCampo('condicoes_pagamento'           ,'varchar' ,false ,'80' ,false,false);
+    $this->AddCampo('hora_abertura_propostas'       ,'varchar' ,false ,''   ,false,false);
+    $this->AddCampo('dt_abertura_propostas'         ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('responsavel_juridico'          ,'integer' ,false ,''   ,false,false);
+    $this->AddCampo('dt_aprovacao_juridico'         ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('cod_tipo_documento'            ,'integer' ,false ,''   ,false,false);
+    $this->AddCampo('cod_documento'                 ,'integer' ,false ,''   ,false,false);
+    $this->AddCampo('dt_final_entrega_propostas'    ,'date'    ,false ,''   ,false,false);
+    $this->AddCampo('hora_final_entrega_propostas'  ,'varchar' ,false ,''   ,false,false);
   }
 
   public function recuperaListaEdital(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
@@ -350,67 +352,69 @@ class TLicitacaoEdital extends Persistente
 
   public function montaRecuperaEdital()
   {
-    $stSql  = " select                                   \n";
-    $stSql .= "     le.num_edital,                       \n";
-    $stSql .= "     le.exercicio,                        \n";
-    $stSql .= "     le.cod_tipo_documento,               \n";
-    $stSql .= "     le.cod_documento,                    \n";
-    $stSql .= "     le.responsavel_juridico,             \n";
-    $stSql .= "     le.exercicio_licitacao,              \n";
-    $stSql .= "     le.cod_entidade,                     \n";
-    $stSql .= "     le.cod_modalidade,                   \n";
-    $stSql .= "     le.cod_licitacao,                    \n";
-    $stSql .= "     le.local_entrega_propostas,          \n";
-    $stSql .= "     le.cod_documento,                    \n";
-    $stSql .= "     to_char(le.dt_entrega_propostas, 'dd/mm/yyyy') as dt_entrega_propostas,  				   \n";
-    $stSql .= "     le.hora_entrega_propostas,           \n";
-    $stSql .= "     diff_datas_em_dias(now()::date,le.dt_abertura_propostas::date) as dias_abertura_propostas, \n";
-    $stSql .= "     le.local_abertura_propostas,         \n";
-    $stSql .= "     to_char(le.dt_abertura_propostas, 'dd/mm/yyyy') as dt_abertura_propostas, \n";
-    $stSql .= "     le.hora_abertura_propostas,          \n";
-    $stSql .= "     to_char(le.dt_validade_proposta, 'dd/mm/yyyy') as dt_validade_proposta,	           \n";
-    $stSql .= "     le.observacao_validade_proposta,     \n";
-    $stSql .= "     le.condicoes_pagamento,              \n";
-    $stSql .= "     le.local_entrega_material,           \n";
-    $stSql .= "     to_char(le.dt_aprovacao_juridico, 'dd/mm/yyyy') as dt_aprovacao_juridico,					\n";
-    $stSql .= "     cgm.nom_cgm,                         \n";
-    $stSql .= "     ll.cod_processo,	      		     \n";
-    $stSql .= "     ll.exercicio_processo,               \n";
-    $stSql .= "     lh.num_homologacao,                  \n";
-    $stSql .= "     cm.descricao as nom_modalidade,      \n";
-    $stSql .= "     cgm2.nom_cgm as nom_entidade,        \n";
-    $stSql .= "     lea.justificativa                    \n";
-    $stSql .= " from                                     \n";
-    $stSql .= "     licitacao.edital as le               \n";
-    $stSql .= " left join                                \n";
-    $stSql .= "     licitacao.edital_anulado as lea      \n";
-    $stSql .= " on                                       \n";
-    $stSql .= "         le.num_edital = lea.num_edital   \n";
-    $stSql .= "     and le.exercicio = lea.exercicio,    \n";
-    $stSql .= "     sw_cgm as cgm,                       \n";
-    $stSql .= "     sw_cgm as cgm2,                      \n";
-    $stSql .= "     compras.modalidade as cm,            \n";
-    $stSql .= "     orcamento.entidade as oe,            \n";
-    $stSql .= "     licitacao.licitacao as ll            \n";
-    $stSql .= " left join                                      \n";
-    $stSql .= "     licitacao.homologacao as lh                \n";
-    $stSql .= " on                                             \n";
-    $stSql .= "         ll.cod_licitacao = lh.cod_licitacao    \n";
-    $stSql .= "     and ll.cod_modalidade = lh.cod_modalidade  \n";
-    $stSql .= "     and ll.cod_entidade = lh.cod_entidade      \n";
-    $stSql .= "     and ll.exercicio = lh.exercicio_licitacao  \n";
-    $stSql .= " where                                    \n";
-    $stSql .= "     cgm.numcgm = le.responsavel_juridico \n";
-    $stSql .= "     and le.num_edital = ".$this->getDado( 'num_edital' )."   \n";
-    $stSql .= "     and le.exercicio  = '".$this->getDado( 'exercicio'  )."' \n";
-    $stSql .= "     and le.cod_licitacao = ll.cod_licitacao   \n";
-    $stSql .= "     and le.cod_modalidade = ll.cod_modalidade \n";
-    $stSql .= "     and le.cod_entidade = ll.cod_entidade     \n";
-    $stSql .= "     and le.exercicio = ll.exercicio           \n";
-    $stSql .= "     and le.cod_modalidade = cm.cod_modalidade \n";
-    $stSql .= "     and oe.cod_entidade = le.cod_entidade     \n";
-    $stSql .= "     and oe.exercicio = le.exercicio           \n";
-    $stSql .= "     and oe.numcgm = cgm2.numcgm               \n";
+    $stSql  = " select                                   
+                       le.num_edital,                    
+                       le.exercicio,                     
+                       le.cod_tipo_documento,            
+                       le.cod_documento,                 
+                       le.responsavel_juridico,          
+                       le.exercicio_licitacao,           
+                       le.cod_entidade,                  
+                       le.cod_modalidade,                
+                       le.cod_licitacao,                 
+                       le.local_entrega_propostas,       
+                       le.cod_documento,                 
+                       to_char(le.dt_entrega_propostas, 'dd/mm/yyyy') as dt_entrega_propostas,
+                       to_char(le.dt_final_entrega_propostas, 'dd/mm/yyyy') as dt_final_entrega_propostas,
+                       le.hora_entrega_propostas,
+                       le.hora_final_entrega_propostas,
+                       diff_datas_em_dias(now()::date,le.dt_abertura_propostas::date) as dias_abertura_propostas,
+                       le.local_abertura_propostas,
+                       to_char(le.dt_abertura_propostas, 'dd/mm/yyyy') as dt_abertura_propostas,
+                       le.hora_abertura_propostas,
+                       to_char(le.dt_validade_proposta, 'dd/mm/yyyy') as dt_validade_proposta,
+                       le.observacao_validade_proposta,     
+                       le.condicoes_pagamento,              
+                       le.local_entrega_material,           
+                       to_char(le.dt_aprovacao_juridico, 'dd/mm/yyyy') as dt_aprovacao_juridico,
+                       cgm.nom_cgm,
+                       ll.cod_processo,
+                       ll.exercicio_processo,
+                       lh.num_homologacao,   
+                       cm.descricao as nom_modalidade,
+                       cgm2.nom_cgm as nom_entidade,  
+                       lea.justificativa              
+                   from                               
+                       licitacao.edital as le         
+                   left join                          
+                       licitacao.edital_anulado as lea
+                   on                                 
+                           le.num_edital = lea.num_edital
+                       and le.exercicio = lea.exercicio, 
+                       sw_cgm as cgm,                    
+                       sw_cgm as cgm2,                   
+                       compras.modalidade as cm,         
+                       orcamento.entidade as oe,         
+                       licitacao.licitacao as ll         
+                   left join                                    
+                       licitacao.homologacao as lh              
+                   on                                           
+                           ll.cod_licitacao = lh.cod_licitacao  
+                       and ll.cod_modalidade = lh.cod_modalidade
+                       and ll.cod_entidade = lh.cod_entidade    
+                       and ll.exercicio = lh.exercicio_licitacao
+                   where                                    
+                       cgm.numcgm = le.responsavel_juridico 
+                       and le.num_edital = ".$this->getDado( 'num_edital' )."   
+                       and le.exercicio  = '".$this->getDado( 'exercicio'  )."' 
+                       and le.cod_licitacao = ll.cod_licitacao   
+                       and le.cod_modalidade = ll.cod_modalidade 
+                       and le.cod_entidade = ll.cod_entidade     
+                       and le.exercicio = ll.exercicio           
+                       and le.cod_modalidade = cm.cod_modalidade 
+                       and oe.cod_entidade = le.cod_entidade     
+                       and oe.exercicio = le.exercicio           
+                       and oe.numcgm = cgm2.numcgm               \n";
 
     return $stSql;
   }

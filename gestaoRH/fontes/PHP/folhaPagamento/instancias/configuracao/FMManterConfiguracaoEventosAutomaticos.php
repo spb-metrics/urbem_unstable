@@ -67,7 +67,7 @@ $obHdnCtrl->setValue( $stCtrl  );
 
 $obIBscEvento = new IBscEvento("inCodigoEvento","stEvento");
 $obIBscEvento->obBscInnerEvento->setRotulo( "*Evento a lançar" );
-$obIBscEvento->setEventoSistema           ( true  );
+$obIBscEvento->setEventoSistema           ( false  );
 
 //Botão para Incluir / Limpar
 $obBtnIncluir = new Button;

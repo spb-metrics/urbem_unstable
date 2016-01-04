@@ -40,7 +40,11 @@ TD {
 }
 
 .menutitlePenultimoNivel, a.menutitlePenultimoNivel {
-    background: url("../imagens/botao_menu_escuro.png") 0 0 no-repeat;
+    background: -webkit-linear-gradient(#4a6491, #323c5f); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#4a6491, #323c5f); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#4a6491, #323c5f); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#4a6491, #323c5f); /* Standard syntax (must be last) */
+    /*background: url("../imagens/botao_menu_escuro.png") 0 0 no-repeat;*/
     color: #ff9b0a;
     /* display:block;*/
     display: table-cell;
@@ -115,7 +119,12 @@ a:hover{
 
 .menutitle, a.menutitle {
     margin:0px;
-    background: url("../imagens/botao_menu_escuro.png") 0 0 no-repeat;
+    background: -webkit-linear-gradient(#4a6491, #323c5f); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#4a6491, #323c5f); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#4a6491, #323c5f); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#4a6491, #323c5f); /* Standard syntax (must be last) */
+
+    /*background: url("../imagens/botao_menu_escuro.png") 0 0 no-repeat;*/
     color:#FFFFFF;
     display: table-cell;
     height: 31px;
@@ -126,7 +135,12 @@ a:hover{
 }
 
 a:hover.menutitle{
-    background: url("../imagens/botao_menu_escuro.png") 0 -31px no-repeat;
+    background: -webkit-linear-gradient(#323c5f, #4a6491); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#323c5f, #4a6491); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#323c5f, #4a6491); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#323c5f, #4a6491); /* Standard syntax (must be last) */
+
+    /*background: url("../imagens/botao_menu_escuro.png") 0 -31px no-repeat;*/
     color:#fff;
     display: table-cell;
 	padding-left:10px;

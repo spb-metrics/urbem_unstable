@@ -271,4 +271,4 @@ LEFT JOIN ( SELECT
 	--RETURN nuEstornado;
 END;
 
-$$ language 'PLPGSQL';
+$$ language 'plpgsql';

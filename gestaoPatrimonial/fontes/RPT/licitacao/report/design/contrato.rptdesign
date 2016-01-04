@@ -176,6 +176,12 @@
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
@@ -260,9 +266,25 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="query2" id="6667">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234" extends="urbem_221.postgres"/>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Postgres" id="234"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsContratos" id="236">
@@ -289,6 +311,11 @@ if( (params['tipoContrato'] == 'licitacao') || (params['tipoContrato'] == 'todos
 	this.queryText = this.queryText + "   on ( licitacao.cod_modalidade = modalidade.cod_modalidade ) \n";
 	this.queryText = this.queryText + " join compras.objeto \n";
 	this.queryText = this.queryText + "   on ( licitacao.cod_objeto = objeto.cod_objeto ) \n";
+	this.queryText = this.queryText + " join orcamento.entidade \n";
+	this.queryText = this.queryText + "   on contrato.cod_entidade = entidade.cod_entidade \n";
+	this.queryText = this.queryText + "  and contrato.exercicio = entidade.exercicio \n";
+	this.queryText = this.queryText + " join sw_cgm AS cgm_entidade \n";
+	this.queryText = this.queryText + "   on entidade.numcgm = cgm_entidade.numcgm \n";
 	this.queryText = this.queryText + " where contrato_licitacao.cod_licitacao is not null \n";
 	
 	if(params['tipoContrato'] == 'todos') {
@@ -315,6 +342,11 @@ if( (params['tipoContrato'] == 'compraDireta') || (params['tipoContrato'] == 'to
 	this.queryText = this.queryText + "   on ( compra_direta.cod_modalidade = modalidade.cod_modalidade ) \n";
 	this.queryText = this.queryText + " join compras.objeto \n";
 	this.queryText = this.queryText + "   on ( compra_direta.cod_objeto = objeto.cod_objeto ) \n";
+	this.queryText = this.queryText + " join orcamento.entidade \n";
+	this.queryText = this.queryText + "   on contrato.cod_entidade = entidade.cod_entidade \n";
+	this.queryText = this.queryText + "  and contrato.exercicio = entidade.exercicio \n";
+	this.queryText = this.queryText + " join sw_cgm AS cgm_entidade \n";
+	this.queryText = this.queryText + "   on entidade.numcgm = cgm_entidade.numcgm \n";
 	this.queryText = this.queryText + " where contrato_compra_direta.cod_compra_direta is not null \n";
 	
 	if(params['tipoContrato'] == 'todos') {
@@ -441,10 +473,10 @@ if(params['inNumContrato'] != ""){
 	
 	if ( params['stEntidades'] != "" ) {
 		if ( params["tipoContrato"] == "todos" ) {
-			sqlCompraDireta = sqlCompraDireta + " AND contrato.cod_entidade in ( " +params['stEntidades'] + " ) \n";
-			sqlLicitacao = sqlLicitacao + " AND contrato.cod_entidade in ( " +params['stEntidades'] + " ) \n";
+			sqlCompraDireta = sqlCompraDireta + " AND cgm_entidade.numcgm in ( " +params['stEntidades'] + " ) \n";
+			sqlLicitacao = sqlLicitacao + " AND cgm_entidade.numcgm in ( " +params['stEntidades'] + " ) \n";
 		} else {
-			this.queryText = this.queryText + " AND contrato.cod_entidade in ( " +params['stEntidades'] + " ) \n";
+			this.queryText = this.queryText + " AND cgm_entidade.numcgm in ( " +params['stEntidades'] + " ) \n";
 		}
 	}
 	
@@ -502,7 +534,7 @@ if ( params["tipoContrato"] == "todos" ) {
 	this.queryText = this.queryText + sqlCompraDireta;
 }
 
-//params['query'] = this.queryText;]]></method>
+params['query2'] = this.queryText;]]></method>
             <property name="dataSource">Postgres</property>
             <xml-property name="queryText"><![CDATA[select contrato.num_contrato
      , contrato.exercicio
@@ -532,7 +564,7 @@ if ( params["tipoContrato"] == "todos" ) {
              on ( nota_liquidacao_paga.exercicio    = nota_liquidacao.exercicio
             and   nota_liquidacao_paga.cod_entidade = nota_liquidacao.cod_entidade
             and   nota_liquidacao_paga.cod_nota     = nota_liquidacao.cod_nota )
-           where empenho_contrato.exercicio     = contrato.exercicio
+           where empenho_contrato.exercicio_contrato = contrato.exercicio
             and empenho_contrato.cod_entidade  = contrato.cod_entidade
             and empenho_contrato.num_contrato  = contrato.num_contrato
         ) as vl_pago 
@@ -541,7 +573,7 @@ if ( params["tipoContrato"] == "todos" ) {
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dtsOrgao" id="1282">
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[if(params['exercicio'] != " ") {
-	this.queryText = this.queryText + "where empenho_contrato.exercicio = '" +params['exercicio']+"'";
+	this.queryText = this.queryText + "where empenho_contrato.exercicio_contrato = '" +params['exercicio']+"'";
 }
 
 if(params['stEntidades'] !='') {
@@ -553,7 +585,7 @@ if(params['inNumContrato'] !='') {
 }
 
 
-	this.queryText = this.queryText + "       group by empenho_contrato.exercicio";
+	this.queryText = this.queryText + "       group by empenho_contrato.exercicio_contrato";
 	this.queryText = this.queryText + "              , empenho_contrato.cod_entidade";
 	this.queryText = this.queryText + "              , empenho_contrato.num_contrato";
 	this.queryText = this.queryText + "              , a_orgao.num_orgao";
@@ -561,7 +593,7 @@ if(params['inNumContrato'] !='') {
 	
 params['query'] = this.queryText;]]></method>
             <property name="dataSource">Postgres</property>
-            <xml-property name="queryText"><![CDATA[	   select empenho_contrato.exercicio
+            <xml-property name="queryText"><![CDATA[	   select empenho_contrato.exercicio_contrato as exercicio
             , empenho_contrato.cod_entidade
             , empenho_contrato.num_contrato
             , a_orgao.num_orgao as cod_orgao

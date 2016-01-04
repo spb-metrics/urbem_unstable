@@ -192,6 +192,7 @@ function montaPreviaSalario()
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
         $obTPessoalContrato = new TPessoalContrato();
         $stFiltro = " AND numcgm = ".$inNumCGM;
+        $stFiltro .= " AND situacao = 'Ativo'";
         $obErro = $obTPessoalContrato->recuperaCgmDoRegistro($rsCgm,$stFiltro,"",$boTransacao);
 
         if ( !$obErro->ocorreu() ) {
@@ -202,7 +203,7 @@ function montaPreviaSalario()
             $obTFolhaPagamentoEventoCalculado->setDado("cod_configuracao"        ,$inCodConfiguracao);
             $obTFolhaPagamentoEventoCalculado->setDado("cod_complementar"        ,'0');
             $obTFolhaPagamentoEventoCalculado->setDado("ordem"                   ,'codigo');
-            $obErro = $obTFolhaPagamentoEventoCalculado->recuperaEventosCalculadosFichaFinanceira($rsEventoCalculado,"","",$boTransacao);
+            $obErro = $obTFolhaPagamentoEventoCalculado->recuperaEventosCalculadosFichaFinanceira($rsEventoCalculado,"","",$boTransacao);            
 
             if ( !$obErro->ocorreu() ) {
                 $obTFolhaPagamentoEventoCalculado->setDado("cod_contrato"            ,$rsCgm->getCampo("cod_contrato"));

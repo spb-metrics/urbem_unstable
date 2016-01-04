@@ -173,5 +173,5 @@ END IF;
     RETURN nuTotal;
 
 END;
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

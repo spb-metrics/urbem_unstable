@@ -32,35 +32,21 @@
     * @package URBEM
     * @subpackage
 
-    $Revision: 26260 $
-    $Name$
-    $Author: girardi $
-    $Date: 2007-10-22 17:55:43 -0200 (Seg, 22 Out 2007) $
+    $Id: FMManterAditivoContrato.php 64214 2015-12-17 16:13:13Z michel $
 
     * Casos de uso : uc-03.05.24
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/11 21:41:54  girardi
-adicionando ao repositório (rescisão de contrato e aditivos de contrato)
-
-Revision 1.1  2007/10/11 21:31:04  girardi
-adicionando ao repositório (rescisão de contrato e aditivos de contrato)
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(TLIC."TLicitacaoContrato.class.php");
-include_once(TLIC."TLicitacaoContratoAditivos.class.php");
-include_once(TLIC."TLicitacaoTipoTermoAditivo.class.php");
-include_once(TLIC."TLicitacaoTipoAlteracaoValor.class.php");
+include_once TLIC."TLicitacaoContrato.class.php";
+include_once TLIC."TLicitacaoContratoAditivos.class.php";
+include_once TLIC."TLicitacaoTipoTermoAditivo.class.php";
+include_once TLIC."TLicitacaoTipoAlteracaoValor.class.php";
+include_once TLIC."TLicitacaoPublicacaoContratoAditivos.class.php";
+include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
 
-include_once(TLIC."TLicitacaoPublicacaoContratoAditivos.class.php" );
-include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
-
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 // padrão do programa
 $stPrograma = "ManterAditivoContrato";
@@ -86,14 +72,14 @@ $obHdnCtrl->setValue( "" );
 
 // cria o objeto com os dados da licitacaoRescisaoContrato
 $obTLicitacaoContrato = new TLicitacaoContrato;
-$obTLicitacaoContrato->setDado('num_contrato', $request->get("inNumContrato"));
-$obTLicitacaoContrato->setDado('cod_entidade', $request->get("inCodEntidade"));
-$obTLicitacaoContrato->setDado('exercicio', $request->get("stExercicioContrato"));
+$obTLicitacaoContrato->setDado('num_contrato' , $request->get("inNumContrato"));
+$obTLicitacaoContrato->setDado('cod_entidade' , $request->get("inCodEntidade"));
+$obTLicitacaoContrato->setDado('exercicio'    , $request->get("stExercicioContrato"));
 $obTLicitacaoContrato->recuperaDadosAditivos($rsLicitacaoContrato);
 
 $obLblNumeroContrato = new Label;
 $obLblNumeroContrato->setRotulo('Número do Contrato');
-$obLblNumeroContrato->setValue($request->get("inNumContrato")."/".$request->get("stExercicioContrato"));
+$obLblNumeroContrato->setValue($rsLicitacaoContrato->getCampo('numero_contrato')."/".$request->get("stExercicioContrato"));
 
 $obLblEntidade = new Label;
 $obLblEntidade->setRotulo('Entidade');
@@ -130,38 +116,37 @@ if ($stAcao != "incluir") {
     $obNumeroAditivo->setValue($request->get("inNumeroAditivo")."/".$request->get("stExercicioAditivo"));
 }
 
-$dtAssinatura = "";
-$inRespJuridico = "";
-$dtInicioExcucao = "";
-$dtFinalVigencia = "";
-$stObjeto = "";
+$dtAssinatura         = "";
+$inRespJuridico       = "";
+$dtInicioExcucao      = "";
+$dtFinalVigencia      = "";
+$stObjeto             = "";
 $stFundamentacaoLegal = "";
-$vlValorContratado = "";
+$vlValorContratado    = "";
 
 if ($stAcao != "incluir") {
     $obLicitacaoContratoAditivos = new TLicitacaoContratoAditivos;
-    $obLicitacaoContratoAditivos->setDado("num_contrato", $request->get('inNumContrato'));
-    $obLicitacaoContratoAditivos->setDado("exercicio", $request->get('stExercicioAditivo'));
+    $obLicitacaoContratoAditivos->setDado("num_contrato"      , $request->get('inNumContrato'));
+    $obLicitacaoContratoAditivos->setDado("exercicio"         , $request->get('stExercicioAditivo'));
     $obLicitacaoContratoAditivos->setDado("exercicio_contrato", $request->get('stExercicioContrato'));
-    $obLicitacaoContratoAditivos->setDado("cod_entidade", $request->get('inCodEntidade'));
-    $obLicitacaoContratoAditivos->setDado("num_aditivo", $request->get('inNumeroAditivo'));
+    $obLicitacaoContratoAditivos->setDado("cod_entidade"      , $request->get('inCodEntidade'));
+    $obLicitacaoContratoAditivos->setDado("num_aditivo"       , $request->get('inNumeroAditivo'));
     $obLicitacaoContratoAditivos->recuperaContratosAditivosLicitacao($rsLicitacaoContratoAditivo);
 
-    $inCodRespJuridico = $rsLicitacaoContratoAditivo->getCampo("responsavel_juridico");
-    $stRespJuridico = $rsLicitacaoContratoAditivo->getCampo("cgm_responsavel_juridico");
-    $inCodTipoTermo = $rsLicitacaoContratoAditivo->getCampo("tipo_termo_aditivo");
-    $stTermoAditivo = $rsLicitacaoContratoAditivo->getCampo("descricao_termo_aditivo");
+    $inCodRespJuridico       = $rsLicitacaoContratoAditivo->getCampo("responsavel_juridico");
+    $stRespJuridico          = $rsLicitacaoContratoAditivo->getCampo("cgm_responsavel_juridico");
+    $inCodTipoTermo          = $rsLicitacaoContratoAditivo->getCampo("tipo_termo_aditivo");
+    $stTermoAditivo          = $rsLicitacaoContratoAditivo->getCampo("descricao_termo_aditivo");
     $inCodTipoAlteracaoValor = $rsLicitacaoContratoAditivo->getCampo("tipo_valor");
-    $stAlteracaoValor = $rsLicitacaoContratoAditivo->getCampo("descricao_tipo_alteracao_valor");
-    $dtAssinatura = $rsLicitacaoContratoAditivo->getCampo("dt_assinatura");
-    $dtInicioExcucao = $rsLicitacaoContratoAditivo->getCampo("inicio_execucao");
-    $dtFimExecucao = $rsLicitacaoContratoAditivo->getCampo("fim_execucao");
-    $dtFinalVigencia = $rsLicitacaoContratoAditivo->getCampo("dt_vencimento");
-    $stObjeto = $rsLicitacaoContratoAditivo->getCampo("objeto");
-    $stJustificativa = $rsLicitacaoContratoAditivo->getCampo("justificativa");
-    $stFundamentacaoLegal = $rsLicitacaoContratoAditivo->getCampo("fundamentacao");
-    
-    $vlValorContratado = $rsLicitacaoContratoAditivo->getCampo("valor_contratado") != '' ? number_format(str_replace(".", ",", $rsLicitacaoContratoAditivo->getCampo("valor_contratado")), 2, ",", ".") : '';
+    $stAlteracaoValor        = $rsLicitacaoContratoAditivo->getCampo("descricao_tipo_alteracao_valor");
+    $dtAssinatura            = $rsLicitacaoContratoAditivo->getCampo("dt_assinatura");
+    $dtInicioExcucao         = $rsLicitacaoContratoAditivo->getCampo("inicio_execucao");
+    $dtFimExecucao           = $rsLicitacaoContratoAditivo->getCampo("fim_execucao");
+    $dtFinalVigencia         = $rsLicitacaoContratoAditivo->getCampo("dt_vencimento");
+    $stObjeto                = $rsLicitacaoContratoAditivo->getCampo("objeto");
+    $stJustificativa         = $rsLicitacaoContratoAditivo->getCampo("justificativa");
+    $stFundamentacaoLegal    = $rsLicitacaoContratoAditivo->getCampo("fundamentacao");
+    $vlValorContratado       = $rsLicitacaoContratoAditivo->getCampo("valor_contratado") != '' ? number_format(str_replace(".", ",", $rsLicitacaoContratoAditivo->getCampo("valor_contratado")), 2, ",", ".") : '';
 }
 
 if ($stAcao != "anular") {
@@ -365,23 +350,23 @@ $obHdnInCodEntidade->setValue($request->get("inCodEntidade"));
 if ($stAcao == 'alterar' || $stAcao == 'anular') {
     //recupera os veiculos de publicacao, coloca na sessao e manda para o oculto
     $obTLicitacaoPublicacaoContratoAditivo = new TLicitacaoPublicacaoContratoAditivos();
-    $obTLicitacaoPublicacaoContratoAditivo->setDado('num_contrato', $request->get('inNumContrato'));
-    $obTLicitacaoPublicacaoContratoAditivo->setDado('exercicio', Sessao::getExercicio());
+    $obTLicitacaoPublicacaoContratoAditivo->setDado('num_contrato'      , $request->get('inNumContrato')); 
+    $obTLicitacaoPublicacaoContratoAditivo->setDado('exercicio'         , Sessao::getExercicio());
     $obTLicitacaoPublicacaoContratoAditivo->setDado('exercicio_contrato', $request->get('stExercicioContrato'));
-    $obTLicitacaoPublicacaoContratoAditivo->setDado('cod_entidade', $request->get('inCodEntidade'));
-    $obTLicitacaoPublicacaoContratoAditivo->setDado('num_aditivo', $request->get('inNumAditivo'));
+    $obTLicitacaoPublicacaoContratoAditivo->setDado('cod_entidade'      , $request->get('inCodEntidade'));
+    $obTLicitacaoPublicacaoContratoAditivo->setDado('num_aditivo'       , $request->get('inNumAditivo'));
 
     $inCount = 0;
     $arValores = array();
 
     $obTLicitacaoPublicacaoContratoAditivo->recuperaVeiculosPublicacao( $rsVeiculosPublicacao );
     while ( !$rsVeiculosPublicacao->eof() ) {
-        $arValores[$inCount]['id'            ]   = $inCount + 1;
-        $arValores[$inCount]['inVeiculo'     ]   = $rsVeiculosPublicacao->getCampo('num_veiculo' );
-        $arValores[$inCount]['stVeiculo'     ]   = $rsVeiculosPublicacao->getCampo('nom_veiculo');
+        $arValores[$inCount]['id'              ] = $inCount + 1;
+        $arValores[$inCount]['inVeiculo'       ] = $rsVeiculosPublicacao->getCampo('num_veiculo' );
+        $arValores[$inCount]['stVeiculo'       ] = $rsVeiculosPublicacao->getCampo('nom_veiculo');
         $arValores[$inCount]['dtDataPublicacao'] = $rsVeiculosPublicacao->getCampo('dt_publicacao');
-        $arValores[$inCount]['inNumPublicacao']  = $rsVeiculosPublicacao->getCampo('num_publicacao');
-        $arValores[$inCount]['stObservacao'  ]   = $rsVeiculosPublicacao->getCampo('observacao');
+        $arValores[$inCount]['inNumPublicacao' ] = $rsVeiculosPublicacao->getCampo('num_publicacao');
+        $arValores[$inCount]['stObservacao'    ] = $rsVeiculosPublicacao->getCampo('observacao');
         $inCount++;
         $rsVeiculosPublicacao->proximo();
     }
@@ -442,8 +427,8 @@ $obSpnListaVeiculo->setID("spnListaVeiculos");
 
 //Campo Observação da Publicação
 $obTxtObservacao = new TextArea;
-$obTxtObservacao->setId     ( "stObservacao"                               );
-$obTxtObservacao->setName   ( "stObservacao"                               );
+$obTxtObservacao->setId     ( "stObservacao"                                );
+$obTxtObservacao->setName   ( "stObservacao"                                );
 $obTxtObservacao->setValue  ( ""                                            );
 $obTxtObservacao->setRotulo ( "Observação"                                  );
 $obTxtObservacao->setTitle  ( "Informe uma breve observação da publicação." );

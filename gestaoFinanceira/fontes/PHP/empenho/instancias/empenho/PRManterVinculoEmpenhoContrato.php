@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: PRManterVinculoEmpenhoContrato.php 64087 2015-12-01 16:10:15Z jean $
+    $Id: PRManterVinculoEmpenhoContrato.php 64212 2015-12-17 12:38:12Z michel $
 
 */
 
@@ -47,15 +47,14 @@ $pgForm    = "FM".$stPrograma.".php";
 $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 switch ($stAcao) {
     case "incluir":
-
         $obErro = new Erro;
         $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato();
 
-        $inCodEntidade = Sessao::read('inCodEntidade');
+        $inCodEntidade = $request->get('inCodEntidade');
 
         //Exclui os itens que foram retirados da lista
         if (Sessao::read('elementos_excluidos') != "") {
@@ -67,9 +66,9 @@ switch ($stAcao) {
                 $obTEmpenhoEmpenhoContrato->recuperaTodos($rsEmpenhos);
                 if ($rsEmpenhos->getNumLinhas() > 0) {
                     $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade" , $rsEmpenhos->getCampo('cod_entidade'));
-                       $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"  , $rsEmpenhos->getCampo('cod_empenho'));
-                       $obTEmpenhoEmpenhoContrato->setDado( "exercicio"    , $rsEmpenhos->getCampo('exercicio'));
-                       $obErro = $obTEmpenhoEmpenhoContrato->exclusao();
+                    $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"  , $rsEmpenhos->getCampo('cod_empenho'));
+                    $obTEmpenhoEmpenhoContrato->setDado( "exercicio"    , $rsEmpenhos->getCampo('exercicio'));
+                    $obErro = $obTEmpenhoEmpenhoContrato->exclusao();
                 }
             }
         }
@@ -87,25 +86,26 @@ switch ($stAcao) {
 
                 if ($rsEmpenhos->getNumLinhas() < 0) {
                     $dtEmpenho = $arElementosTMP['dt_empenho'];
-                    $dtContrato = Sessao::read('dtContrato');
+                    $dtContrato = $request->get('dtContrato');
                     if (sistemaLegado::comparaDatas($dtContrato, $dtEmpenho)) {
                         $obErro->setDescricao("Data do empenho deve ser maior ou igual a data do Contrato!");
                     } else {
-                           $obTEmpenhoEmpenhoContrato->setDado( "exercicio"    , $arElementosTMP['exercicio']);
-                        $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade" , $inCodEntidade);
-                        $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"  , $arElementosTMP['cod_empenho']);
-                        $obTEmpenhoEmpenhoContrato->setDado( "num_contrato" , Sessao::read('inNumContrato'));
+                        $obTEmpenhoEmpenhoContrato->setDado( "exercicio"          , $arElementosTMP['exercicio']);
+                        $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade"       , $inCodEntidade);
+                        $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"        , $arElementosTMP['cod_empenho']);
+                        $obTEmpenhoEmpenhoContrato->setDado( "num_contrato"       , $request->get('inNumContrato'));
+                        $obTEmpenhoEmpenhoContrato->setDado( "exercicio_contrato" , $request->get('inExercicio'));
                         $obErro = $obTEmpenhoEmpenhoContrato->inclusao();
                     }
                 }
             }
-
         }
+
         if (Sessao::read('elementos_excluidos') == "" and Sessao::read('elementos') == "") {
             $obErro->setDescricao( "Efetue a inclusão e/ou exclusão de empenho referente ao contrato relacionado!" );
         }
         if (!$obErro->ocorreu()) {
-            sistemaLegado::alertaAviso($pgFilt,"Contrato: ".Sessao::read('inNumeroContrato'),"incluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgFilt,"Contrato: ".$request->get('inNumeroContrato').'/'.$request->get('inExercicio'),"incluir","aviso", Sessao::getId(), "../");
         } else {
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenhoDiversos.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: PRManterEmpenhoDiversos.php 64212 2015-12-17 12:38:12Z michel $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -166,7 +166,7 @@ switch ($stAcao) {
             break;
         }
 
-        if($request->get('inNumContrato')){
+        if($request->get('inCodContrato') && $request->get('stExercicioContrato')){
             if (sistemaLegado::comparaDatas($request->get('dtContrato'), $request->get('stDtEmpenho'), true)) {
                 SistemaLegado::exibeAviso("Data do empenho deve ser maior ou igual a data do Contrato!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,false);
@@ -308,13 +308,14 @@ switch ($stAcao) {
 
         if ( !$obErro->ocorreu() ) {
             // Relaciona o empenho a contrato
-            if($request->get('inNumContrato')){
+            if($request->get('inCodContrato') && $request->get('stExercicioContrato')){
                 include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoEmpenhoContrato.class.php';
                 $obTEmpenhoEmpenhoContrato = new TEmpenhoEmpenhoContrato();
-                $obTEmpenhoEmpenhoContrato->setDado( "exercicio"    , Sessao::getExercicio());
-                $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade" , $request->get('inCodEntidade'));
-                $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"  , $obREmpenhoEmpenho->getCodEmpenho());
-                $obTEmpenhoEmpenhoContrato->setDado( "num_contrato" , $request->get('inNumContrato'));
+                $obTEmpenhoEmpenhoContrato->setDado( "exercicio"          , Sessao::getExercicio()              );
+                $obTEmpenhoEmpenhoContrato->setDado( "cod_entidade"       , $request->get('inCodEntidade')      );
+                $obTEmpenhoEmpenhoContrato->setDado( "cod_empenho"        , $obREmpenhoEmpenho->getCodEmpenho() );
+                $obTEmpenhoEmpenhoContrato->setDado( "num_contrato"       , $request->get('inCodContrato')      );
+                $obTEmpenhoEmpenhoContrato->setDado( "exercicio_contrato" , $request->get('stExercicioContrato'));
                 $obErro = $obTEmpenhoEmpenhoContrato->inclusao($boTransacao);
             }
         }

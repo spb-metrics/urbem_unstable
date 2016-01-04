@@ -4,16 +4,6 @@
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
     <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
-    <list-property name="propertyBindings">
-        <structure>
-            <property name="name">queryText</property>
-            <property name="id">1249</property>
-        </structure>
-        <structure>
-            <property name="name">queryTimeOut</property>
-            <property name="id">1249</property>
-        </structure>
-    </list-property>
     <property name="units">in</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
@@ -171,8 +161,8 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150" extends="urbem_250.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="RSdata" id="1310">
@@ -355,12 +345,16 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     	AND parametro = 'cod_uf') AS municipio]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="RStermoResponsabilidade" id="1249">
+            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_numcgm</property>
                     <property name="paramName">numcgm</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">integer</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">1</property>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -382,12 +376,47 @@ if (params['cod_organograma'] != ''){
     this.queryText += " AND vw_orgao_nivel.cod_organograma = "+params['cod_organograma'];
 }
 
+this.queryText += "GROUP BY bem.cod_bem ";
+this.queryText += "        ,bem.cod_especie ";
+this.queryText += "        ,bem.cod_grupo ";
+this.queryText += "        ,bem.cod_natureza ";
+this.queryText += "        ,bem.descricao ";
+this.queryText += "        ,bem.detalhamento ";
+this.queryText += "        ,bem.dt_aquisicao ";
+this.queryText += "        ,bem.dt_depreciacao ";
+this.queryText += "        ,bem.dt_garantia ";
+this.queryText += "        ,bem.identificacao ";
+this.queryText += "        ,bem.num_placa ";
+this.queryText += "        ,bem.numcgm ";
+this.queryText += "        ,bem.vl_bem ";
+this.queryText += "        ,bem.vl_depreciacao ";
+this.queryText += "        ,bem_responsavel.dt_inicio ";
+this.queryText += "        ,bem_responsavel.dt_fim ";
+this.queryText += "        ,responsavel ";
+this.queryText += "        ,local_origem ";
+this.queryText += "        ,local_destino "; 
+this.queryText += "        ,orgao ";
+
 this.queryText += " ORDER BY local_destino, local_origem, bem.descricao";
 
 params["query"] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[  SELECT bem.*
-       , bem_responsavel.*
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[  SELECT DISTINCT
+  		 bem.cod_bem
+        ,bem.cod_especie
+        ,bem.cod_grupo
+        ,bem.cod_natureza
+        ,bem.descricao
+        ,bem.detalhamento
+        ,bem.dt_aquisicao
+        ,bem.dt_depreciacao
+        ,bem.dt_garantia
+        ,bem.identificacao
+        ,bem.num_placa       
+        ,bem.numcgm
+        ,bem.vl_bem
+        ,bem.vl_depreciacao       
        , (SELECT nom_cgm FROM sw_cgm WHERE numcgm = bem_responsavel.numcgm) AS responsavel
        , (CASE WHEN ( SELECT COALESCE(COUNT(cod_bem),1)=1 
                         FROM patrimonio.historico_bem

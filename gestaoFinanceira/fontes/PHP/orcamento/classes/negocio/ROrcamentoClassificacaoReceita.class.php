@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: ROrcamentoClassificacaoReceita.class.php 64153 2015-12-09 19:16:02Z evandro $
+    $Id: ROrcamentoClassificacaoReceita.class.php 64198 2015-12-15 13:29:35Z evandro $
 
     * Casos de uso: uc-02.01.04, uc-02.01.06
 */
@@ -427,7 +427,9 @@ function listar(&$rsLista, $stOrder = "", $obTransacao = "")
                 $stFiltro .= "    WHERE                                         \n";
                 $stFiltro .= "        pc.cod_conta = pa.cod_conta               \n";
                 $stFiltro .= "    AND pc.exercicio = pa.exercicio               \n";
-                $stFiltro .= "    AND pc.cod_estrutural = '4.'||conta_receita.cod_estrutural \n";
+                if ( Sessao::getExercicio() < '2012' ) {
+                    $stFiltro .= "    AND pc.cod_estrutural = '4.'||conta_receita.cod_estrutural \n";
+                }
                 $stFiltro .= "    AND pc.exercicio = conta_receita.exercicio     \n";
                 $stFiltro .= "    AND pa.exercicio = '".$this->getExercicio()."' \n";
                 $stFiltro .= " )                                                 \n"; 

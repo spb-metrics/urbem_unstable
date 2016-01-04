@@ -113,7 +113,7 @@ function montaJavaScriptComboEventosRedutorTeto()
     $obTConfiguracaoTransparencia = new TConfiguracaoTransparencia();
     $eventos= SistemaLegado::pegaConfiguracao('redutor_teto', 8, Sessao::getExercicio() );
 
-    if ($eventos == 'redutor_teto não encontrado para o módulo 8' || $eventos == '') {
+    if ($eventos == 'redutor_teto não encontrado para o módulo 8' || $eventos == '' || $eventos == "''") {
         $eventos='null';
         $stFiltro .= "WHERE cod_evento is ".$eventos."  ";
     } else {
@@ -121,7 +121,7 @@ function montaJavaScriptComboEventosRedutorTeto()
     }
 
     $obTConfiguracaoTransparencia->recuperaValorConfiguracao($rsEventosGravados, $stFiltro);
-
+    
     $stJs .= "limpaSelect(f.inCodEventoSelecionadosRedutorTeto,0);\n";
     $stJs .= "limpaSelect(f.inCodEventoDisponiveisRedutorTeto,0);\n";
 
@@ -158,8 +158,7 @@ function montaJavaScriptComboEventosVerba()
     include_once( CAM_GPC_TRANSPARENCIA_MAPEAMENTO."TConfiguracaoTransparencia.class.php");
     $obTConfiguracaoTransparencia = new TConfiguracaoTransparencia();
     $eventos= SistemaLegado::pegaConfiguracao('verbas_indenizatorias', 8, Sessao::getExercicio() );
-
-    if ($eventos == 'verbas_indenizatorias não encontrado para o módulo 8' || $eventos == '') {
+    if ($eventos == 'verbas_indenizatorias não encontrado para o módulo 8' || $eventos == '' || $eventos = "''") {
         $eventos='null';
         $stFiltro .= "WHERE cod_evento is ".$eventos."  ";
     } else {
@@ -205,7 +204,7 @@ function montaJavaScriptComboEventosDeducoes()
     $obTConfiguracaoTransparencia = new TConfiguracaoTransparencia();
     $eventos= SistemaLegado::pegaConfiguracao('demais_deducoes', 8, Sessao::getExercicio() );
 
-    if ($eventos == 'demais_deducoes não encontrado para o módulo 8' || $eventos == '') {
+    if ($eventos == 'demais_deducoes não encontrado para o módulo 8' || $eventos == '' || $eventos = "''") {
         $eventos='null';
         $stFiltro .= "WHERE cod_evento is  ".$eventos."  ";
     } else {
@@ -251,7 +250,7 @@ function montaJavaScriptComboEventosJetons()
     $obTConfiguracaoTransparencia = new TConfiguracaoTransparencia();
     $eventos= SistemaLegado::pegaConfiguracao('pagamento_jetons', 8, Sessao::getExercicio() );
 
-    if ($eventos == 'pagamento_jetons não encontrado para o módulo 8' || $eventos == '') {
+    if ($eventos == 'pagamento_jetons não encontrado para o módulo 8' || $eventos == '' || $eventos = "''") {
         $eventos='null';
         $stFiltro .= "WHERE cod_evento is ".$eventos."  ";
     } else {

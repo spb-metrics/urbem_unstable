@@ -79,4 +79,4 @@ BEGIN
     RETURN nuTotal;
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

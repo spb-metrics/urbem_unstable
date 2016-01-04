@@ -106,4 +106,4 @@ BEGIN
     END IF;
     RETURN stFiltros;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

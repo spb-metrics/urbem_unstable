@@ -134,7 +134,8 @@ $obFormulario->setAjuda                  ("UC-03.05.15");
 $obFormulario->addHidden     ( $obHdnAcao              );
 $obFormulario->addHidden     ( $obHdnCtrl              );
 $obMontaLicitacao->geraFormulario( $obFormulario );
-$obMontaLicitacao->obExercicio->setReadOnly(true);
+if ($stAcao!='consultar')
+    $obMontaLicitacao->obExercicio->setReadOnly(true);
 $obFormulario->addComponente    ( $obHomologada);
 $obFormulario->addComponente    ( $obPopUpProcesso                 );
 $obFormulario->addComponente    ( $obPopUpMapa                     );

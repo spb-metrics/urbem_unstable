@@ -1887,7 +1887,7 @@ BEGIN
         RETURN NEXT rwContratoServidor;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 
 CREATE OR REPLACE FUNCTION recuperarContratoPensionista(VARCHAR,VARCHAR,INTEGER,VARCHAR,VARCHAR,VARCHAR) RETURNS SETOF colunasContratoPensionista AS $$
@@ -2390,7 +2390,7 @@ BEGIN
         RETURN NEXT rwContratoPensionista;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 
 ----------------

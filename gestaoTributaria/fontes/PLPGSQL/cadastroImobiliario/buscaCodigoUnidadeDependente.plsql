@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: buscaCodigoUnidadeDependente.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: buscaCodigoUnidadeDependente.plsql 64237 2015-12-21 17:43:02Z fabio $
 *
 * Caso de uso: uc-05.03.05
 */
@@ -68,4 +68,4 @@ BEGIN
 RETURN inConstrucao;
 
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';

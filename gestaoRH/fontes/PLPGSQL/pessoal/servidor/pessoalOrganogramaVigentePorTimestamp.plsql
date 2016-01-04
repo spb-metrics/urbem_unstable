@@ -67,4 +67,4 @@ BEGIN
     
     RETURN inCodOrganograma;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

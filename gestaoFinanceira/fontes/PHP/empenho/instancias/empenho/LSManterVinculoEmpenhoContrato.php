@@ -31,13 +31,13 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: LSManterVinculoEmpenhoContrato.php 64100 2015-12-02 17:15:03Z jean $
+    $Id: LSManterVinculoEmpenhoContrato.php 64212 2015-12-17 12:38:12Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoContrato.class.php"									   );
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoContrato.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterVinculoEmpenhoContrato";
@@ -52,14 +52,15 @@ $stAcao = $request->get('stAcao');
 //Prepara o filtro para pesquisa
 $stFiltro .= " AND contrato.exercicio = '".$request->get('inExercicio')."'\n";
 $stFiltro .= " AND contrato.cod_entidade IN (";
-if(is_array($_REQUEST['inCodEntidade'])){
-    foreach ($_REQUEST['inCodEntidade'] as $value) {
+$inCodEntidade = $request->get('inCodEntidade');
+if(is_array($inCodEntidade)){
+    foreach ($inCodEntidade as $value) {
         $stEntidades .= $value.", ";
     }
 }else{
-    $inCodEntidade = explode(",", $request->get('inCodEntidade'));
+    $inCodEntidade = explode(",", $inCodEntidade);
     for($i=0;$i<count($inCodEntidade);$i++){
-        $stEntidades .= $inCodEntidade[$i].", ";    
+        $stEntidades .= $inCodEntidade[$i].", ";
     }
 }
 $stFiltro .= substr($stEntidades,0,strlen($stEntidades)-2).") \n";
@@ -100,18 +101,18 @@ if ( !Sessao::read('paginando') ) {
         $arFiltro[$stCampo] = $stValor;
     }
     Sessao::write('filtro', $arFiltro);
-    Sessao::write('pg', $_GET['pg'] ? $_GET['pg'] : 0);
-    Sessao::write('pos', $_GET['pos']? $_GET['pos'] : 0);
+    Sessao::write('pg', $request->get('pg', '0'));
+    Sessao::write('pos', $request->get('pos', '0'));
     Sessao::write('paginando', true);
 } else {
-    Sessao::write('pg', $_GET['pg']);
-    Sessao::write('pos', $_GET['pos']);
+    Sessao::write('pg', $request->get('pg'));
+    Sessao::write('pos', $request->get('pos'));
 }
 //********************************************************************//
 
 $stLink .= "&stAcao=".$stAcao;
-if ($_GET["pg"] and  $_GET["pos"]) {
-    $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
+if ($request->get('pg') and  $request->get('pos')) {
+    $stLink.= "&pg=".$request->get('pg')."&pos=".$request->get('pos');
 }
 
 //GERA LISTA
@@ -168,6 +169,7 @@ $obLista->ultimaAcao->addCampo( "&cgm_contratado"   , "cgm_contratado"  );
 if ($stAcao == "selecionar") {
     $pgProx = CAM_GF_EMP_INSTANCIAS."empenho/FMManterVinculoEmpenhoContrato.php";
 }
+
 $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
 
 $obLista->commitAcao();

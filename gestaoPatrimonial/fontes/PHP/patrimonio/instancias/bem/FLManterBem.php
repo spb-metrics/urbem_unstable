@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: FLManterBem.php 61613 2015-02-13 18:36:56Z jean $
+    $Id: FLManterBem.php 64184 2015-12-11 14:09:44Z arthur $
 
     * Casos de uso: uc-03.01.06
 */
@@ -356,20 +356,6 @@ $obSelectAtributo->addOption( "", "Selecione" );
 $obSelectAtributo->setNull( true );
 //$obSelectAtributo->obEvento->setOnChange("montaParametrosGET( 'montaListaAtributos', 'stAtributo' );");
 
-// //cria um busca inner para retornar uma Conta Contábil de Depreciação Acumulada
-// $obBscContaContabilDepreciacao = new BuscaInner;
-// $obBscContaContabilDepreciacao->setRotulo               ( "Conta Contábil de Depreciação Acumulada"     );
-// $obBscContaContabilDepreciacao->setTitle                ( "Informe a conta do plano de contas."         );
-// $obBscContaContabilDepreciacao->setId                   ( "stDescricaoContaDepreciacao"                       	 );
-// $obBscContaContabilDepreciacao->obCampoCod->setName     ( "inCodContaDepreciacao"                              	 );
-// $obBscContaContabilDepreciacao->obCampoCod->setSize     ( 10  );
-// $obBscContaContabilDepreciacao->obCampoCod->setAlign    ("left" );
-// $obBscContaContabilDepreciacao->setValoresBusca	     ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilDepreciacaoAcumulada");
-// $obBscContaContabilDepreciacao->setFuncaoBusca 		 ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaDepreciacao','stDescricaoContaDepreciacao','contaContabilDepreciacaoAcumulada','".Sessao::getId()."','800','550');" );
-// $obBscContaContabilDepreciacao->setNull				 ( true );
-// $obBscContaContabilDepreciacao->setValue( $stNomContaDepreciacao );
-// $obBscContaContabilDepreciacao->obCampoCod->setValue( $inCodPlanoDepreciacao );
-
 while (!$obAtributosDinamicos->eof()) {
     $obSelectAtributo->addOption( $obAtributosDinamicos->getCampo('cod_modulo').','.$obAtributosDinamicos->getCampo('cod_cadastro').','.$obAtributosDinamicos->getCampo('cod_atributo'), $obAtributosDinamicos->getCampo('nom_atributo') );
     $obAtributosDinamicos->proximo();
@@ -426,7 +412,6 @@ $obFormulario->addComponente( $obITextBoxSelectEntidadeGeral );
 $obFormulario->addComponente( $obPeriodicidadeIncorporacao );
 $obFormulario->addComponente( $obNumEmpenho );
 $obFormulario->addComponente( $obNumNotaFiscal );
-//$obFormulario->addComponente( $obBscContaContabilDepreciacao );
 
 $obFormulario->addTitulo	( 'Responsável' );
 $obFormulario->addComponente( $obIPopUpCGMVinculadoResponsavel );

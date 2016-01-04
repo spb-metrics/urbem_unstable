@@ -73,7 +73,7 @@ DECLARE
 BEGIN
 
     IF (LENGTH(stDtInicial) <> 10) THEN
-        stSql := 'SELECT DISTINCT exercicio FROM empenho.empenho WHERE empenho.exercicio <> ' || quote_literal(stExercicio) || ' ';
+        stSql := 'SELECT DISTINCT exercicio FROM empenho.empenho WHERE empenho.exercicio < ' || quote_literal(stExercicio) || ' ';
     ELSE
         stSql := 'SELECT DISTINCT exercicio FROM empenho.empenho WHERE empenho.exercicio = ' || quote_literal(stExercicio) || ' ';
     END IF;

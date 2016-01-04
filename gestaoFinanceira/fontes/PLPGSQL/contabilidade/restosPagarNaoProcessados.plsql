@@ -46,6 +46,7 @@ DECLARE
   stExercicioAnterior VARCHAR := ''; 
   stSql               VARCHAR := '';
   stComplemento       VARCHAR := '';
+  stDespesasCorrentes VARCHAR := '';
   reRegistro          RECORD;
   
   arTipo              VARCHAR[];
@@ -210,7 +211,6 @@ BEGIN
              , despesa.dt_criacao
         HAVING (SUM(COALESCE(empenhado.vl_empenhado,0.00)) - SUM(COALESCE(liquidado.vl_liquidado,0.00)) ) > 0
   ';
-  
   EXECUTE stSql;
   
   -- cria a tabela temporaria para o valor nao processado no exercicio anterior
@@ -366,7 +366,7 @@ BEGIN
              , despesa.dt_criacao
         HAVING (SUM(COALESCE(empenhado.vl_empenhado,0.00)) - SUM(COALESCE(liquidado.vl_liquidado,0.00)) ) > 0
   ';
-  
+
   EXECUTE stSql;
 
   --cria a tabela temporaria para o valor nao processado cancelado
@@ -543,7 +543,6 @@ BEGIN
            , despesa.dt_criacao
       HAVING ( SUM(nota_liquidacao_item.vl_total) ) > 0';
    
-         
    EXECUTE stSql;
 
   --cria a tabela temporaria para o valor nao processado pago
@@ -647,7 +646,7 @@ BEGIN
            , despesa.dt_criacao
       HAVING ( SUM(liquidacao_paga.vl_total) ) > 0 
   ';
- 
+
   EXECUTE stSql; 
 
 --consulta para retornar todas os orgaos para nao intra-orcamentarias
@@ -700,7 +699,7 @@ BEGIN
         FROM tmp_nao_processados_liquidado
     
         ORDER BY cod_estrutural ';
-    
+
     EXECUTE stSql;
 
 
@@ -717,35 +716,43 @@ BEGIN
 	FOR indice IN 1..array_upper(arTipo,1) LOOP 
     
       IF indice = 1 THEN
-	       stComplemento := ' ''DESPESAS CORRENTES''::VARCHAR AS descricao, 1::INTEGER AS nivel ';  
+	       stComplemento := ' ''DESPESAS CORRENTES''::VARCHAR AS descricao, 1::INTEGER AS nivel ';
+           stDespesasCorrentes:= 'DESPESAS';
 	  END IF;
       
       IF indice = 2 THEN
-	       stComplemento := ' ''PESSOAS E ENCARGOS SOCIAIS''::VARCHAR AS descricao, 2::INTEGER AS nivel ';  
+	       stComplemento := ' ''PESSOAS E ENCARGOS SOCIAIS''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
       
       IF indice = 3 THEN
-	       stComplemento := ' ''JUROS E ENCARGOS DA DÍVIDA''::VARCHAR AS descricao, 2::INTEGER AS nivel ';  
+	       stComplemento := ' ''JUROS E ENCARGOS DA DÍVIDA''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
       
       IF indice = 4 THEN
-	       stComplemento := ' ''OUTRAS DESPESAS CORRENTES''::VARCHAR AS descricao, 2::INTEGER AS nivel ';  
+	       stComplemento := ' ''OUTRAS DESPESAS CORRENTES''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
       
       IF indice = 5 THEN
 	       stComplemento := ' ''DESPESAS DE CAPITAL''::VARCHAR AS descricao, 1::INTEGER AS nivel ';  
-	  END IF;
+	       stDespesasCorrentes:= '';
+      END IF;
       
       IF indice = 6 THEN
 	       stComplemento := ' ''INVESTIMENTOS''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
       
       IF indice = 7 THEN
 	       stComplemento := ' ''INVERSÕES FINANCEIRAS''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
 
       IF indice = 8 THEN
 	       stComplemento := ' ''AMORTIZAÇÃO DA DÍVIDA''::VARCHAR AS descricao, 2::INTEGER AS nivel ';
+           stDespesasCorrentes:= '';
 	  END IF;
     
       stSql := 'SELECT
@@ -755,7 +762,7 @@ BEGIN
                     (  SELECT COALESCE(SUM(vl_total), 0.00)::numeric(14,2)
                         FROM tmp_restos
                        WHERE tipo = ''tmp_nao_processados_exercicios_anteriores''
-                         AND cod_estrutural LIKE '''||arTipo[indice]||''') AS exercicios_anteriores,
+                         AND '''||stDespesasCorrentes||''' ILIKE ''DESPESAS%'') AS exercicios_anteriores,
                     
                     -- tmp_nao_processados_exercicio_anterior
                     (  SELECT COALESCE(SUM(vl_total), 0.00)::numeric(14,2)
@@ -780,7 +787,6 @@ BEGIN
                         FROM tmp_restos
                        WHERE tipo = ''tmp_nao_processados_liquidado''
                          AND cod_estrutural LIKE '''||arTipo[indice]||''') AS liquidados';
-      
         FOR reRegistro IN EXECUTE stSql LOOP      
             RETURN next reRegistro;
         END LOOP;

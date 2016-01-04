@@ -231,11 +231,10 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres1" id="1696"
- extends="urbem_250.postgres">
-        </oda-data-source>
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="rsJulgamentoProposta" id="1152">
@@ -538,7 +537,7 @@ params['stQuery'] = this.queryText;]]></method>
         <table id="1222">
             <property name="canShrink">false</property>
             <property name="height">1.6145833333in</property>
-            <property name="width">7.8in</property>
+            <property name="width">190mm</property>
             <property name="dataSet">rsJulgamentoProposta</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -653,22 +652,22 @@ params['stQuery'] = this.queryText;]]></method>
             </list-property>
             <property name="pageBreakInterval">50</property>
             <column id="1310">
-                <property name="width">0.90625in</property>
+                <property name="width">13%</property>
             </column>
             <column id="1235">
-                <property name="width">3.0520833333in</property>
+                <property name="width">38%</property>
             </column>
             <column id="1236">
-                <property name="width">1.2916666666666667in</property>
+                <property name="width">12%</property>
             </column>
             <column id="1302">
-                <property name="width">0.8020833333in</property>
+                <property name="width">13%</property>
             </column>
             <column id="1237">
-                <property name="width">0.7708333333in</property>
+                <property name="width">11%</property>
             </column>
             <column id="1274">
-                <property name="width">0.7916666667in</property>
+                <property name="width">13%</property>
             </column>
             <header>
                 <row id="1697">

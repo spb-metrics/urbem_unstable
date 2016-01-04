@@ -24,7 +24,7 @@
     * Script de função PLPGSQL - Relatório Anexo III TCEMG - Despesas Pagas.
     * Data de Criação: 12/08/2014
     * @author Evandro Melos
-    $Id: TCEMGRelatorioAnexoIIIDespesaPaga.plsql 63336 2015-08-19 17:17:13Z lisiane $
+    $Id: TCEMGRelatorioAnexoIIIDespesaPaga.plsql 64243 2015-12-21 18:26:55Z fabio $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_paga(stMascRed VARCHAR
@@ -171,4 +171,4 @@ END IF;
 
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

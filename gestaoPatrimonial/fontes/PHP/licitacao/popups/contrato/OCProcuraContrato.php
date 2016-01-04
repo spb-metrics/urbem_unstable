@@ -30,66 +30,60 @@
 * @author Analista: Diego Barbosa Victoria
 * @author Desenvolvedor: Leandro André Zis
 
+* $Id: OCProcuraContrato.php 64256 2015-12-22 16:06:28Z michel $
+
 * Casos de uso :uc-03.04.07, uc-03.04.05
-*/
-
-/*
-$Log$
-Revision 1.2  2006/11/01 19:57:59  leandro.zis
-atualizado
-
-Revision 1.1  2006/10/11 17:21:12  domluc
-p/ Diegon:
-   O componente de Contrato gera no formulario que o chama um buscainner e um span, o buscainner somente aceita preenchimento via PopUp, ou seja, não é possivel digitar diretamente o numero do contrato.
-   Chamando a popup do buscainner, ele devera poder filtrar por ( em ordem)
-1) Número do Contrato ( inteiro)
-2) Exercicio ( ref a Contrato) ( componente exercicio)
-3) Modalidade ( combo)
-4) Codigo da Licitação  ( inteiro )
-5) Entidade ( componente)
-
-entao o usuario clica em Ok, e o sistema exibe uma lista correspondente ao filtro informado.
-o usuario seleciona um dos contratos na listageme o sistema fecha a popup, retornando ao formulario, onde o sistema preenche o numero do convenio e no span criado pelo componente , exibe as informações recorrentes, que sao:
-- exercicio
-- modalidade
-- licitação
-- entidade
-- cgm contratado
-
-era isso
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GP_LIC_MAPEAMENTO.'TLicitacaoContrato.class.php' );
+include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoContrato.class.php';
 
-$stCampoCod  = $_GET['stNomCampoCod'];
-$stCampoDesc = $_GET['stIdCampoDesc'];
-$inCodigo    = $_REQUEST[ $stCampoCod ];
+$stCampoCod  = $request->get('stNomCampoCod');
+$stCampoDesc = $request->get('stIdCampoDesc');
+$inCodigo    = $request->get( $stCampoCod );
+$stExercicioContrato = $request->get('stExercicioContrato', '');
 
-switch ($_GET['stCtrl']) {
+$boFornecedor = $request->get('boFornecedor');
+$inCodFornecedor = $request->get('inCodFornecedor', '');
+$stCodFornecedor = ($inCodFornecedor!='') ? '= '.$inCodFornecedor : 'IS NULL';
 
+$inCodEntidade = $request->get('inCodEntidade', '');
+$stCodEntidade = ($inCodEntidade!='') ? '= '.$inCodEntidade : 'IS NULL';
+
+switch ($request->get('stCtrl')) {
     case 'buscaPopup':
     default:
-        if ($inCodigo != "") {
-
+        if ($inCodigo != "" && $stExercicioContrato != "") {
             $obTLicitacaoContrato = new TLicitacaoContrato;
             $rsContrato = new RecordSet;
-            $stFiltro = " AND contrato.num_contrato = $inCodigo ";
+            $stFiltro  = " AND contrato.num_contrato = ".$inCodigo;
+            $stFiltro .= " AND contrato.exercicio = '".$stExercicioContrato."'";
+
+            if($boFornecedor){
+                $stFiltro .= " AND contrato.cgm_contratado ".$stCodFornecedor;
+                $stFiltro .= " AND contrato.cod_entidade ".$stCodEntidade;
+            }
+
             $obTLicitacaoContrato->recuperaContrato($rsContrato, $stFiltro);
-            $stObjeto = $rsContrato->getCampo('descricao');
-            $stJs .= "d.getElementById('".$stCampoDesc."').value = '".$stObjeto."';";
-            $stJs .= "retornaValorBscInner( '".$stCampoCod."', '".$stCampoDesc."', '".$_GET['stNomForm']."', '".$stObjeto."');";
-            if (!$stObjeto) {
-                $stJs .= "alertaAviso('@Código do Objeto(". $inCodigo .") não encontrado.', 'form','erro','".Sessao::getId()."');";
+
+            if($rsContrato->getNumLinhas()==1){
+                $stObjeto = $rsContrato->getCampo('descricao');
+                $stObjeto = str_replace("\r\n", '', $stObjeto);
+                $stJs .= "d.getElementById('".$stCampoDesc."').innerHTML = \"".$stObjeto."\";";
+                $stJs .= "d.getElementById('".$stCampoCod."').value = '".$inCodigo."';";
+            }else{
+                $stJs .= "d.getElementById('".$stCampoCod."').value = '';";
+                $stJs .= "d.getElementById('".$stCampoDesc."').innerHTML = '&nbsp;';";
+                $stJs .= "alertaAviso('@Contrato(".$inCodigo.'/'.$stExercicioContrato.") não encontrado.', 'form','erro','".Sessao::getId()."');";
             }
         } else {
+            $stJs .= "d.getElementById('".$stCampoCod."').value = '';";
             $stJs .= "d.getElementById('".$stCampoDesc."').innerHTML = '&nbsp;';";
         }
+
         sistemaLegado::executaFrameOculto( $stJs );
     break;
-
 }
 
 ?>

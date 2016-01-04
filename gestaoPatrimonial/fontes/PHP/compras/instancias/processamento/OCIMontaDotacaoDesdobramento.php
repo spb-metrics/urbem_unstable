@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCIMontaDotacaoDesdobramento.php 62979 2015-07-14 16:18:54Z michel $
+ $Id: OCIMontaDotacaoDesdobramento.php 64263 2015-12-23 13:32:01Z evandro $
 
  */
 
@@ -42,65 +42,62 @@ include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
 include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
 include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php";
 
-$stCtrl        = $_REQUEST['stCtrl'];
-$inCodEntidade = $_REQUEST["inCodEntidade"];
+$stCtrl        = $request->get('stCtrl');
+$inCodEntidade = $request->get('inCodEntidade');
 $obREmpenhoAutorizacaoEmpenho = new REmpenhoPreEmpenho;
 $obREmpenhoEmpenho            = new REmpenhoEmpenho;
 $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
 $obREmpenhoEmpenho->setExercicio( Sessao::getExercicio() );
 
-if (isset($_REQUEST['HdnCodEntidade'])) {
-    $_REQUEST['inCodEntidade'] = $_REQUEST['HdnCodEntidade'];
+if ($request->get('HdnCodEntidade')) {
+    $request->set('inCodEntidade',$request->get('HdnCodEntidade'));
 }
 
-switch ($_REQUEST['stCtrl']) {
-
+switch ($request->get('stCtrl')) {
     case 'buscaDespesaDiverso':
-        if ($_REQUEST['inCodDespesa'] != '') {
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $_REQUEST["inCodDespesa"] );
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $_REQUEST["inCodCentroCusto"] );
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+        if ($request->get('inCodDespesa') != '') {
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get("inCodDespesa") );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $request->get("inCodCentroCusto") );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $request->get("inCodEntidade") );
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
             if ( $rsDespesa->getNumLinhas() > -1 ) {
-                $js .= 'd.getElementById("stNomDespesa").innerHTML = "'.$rsDespesa->getCampo('descricao').'";';
+                $js .= "jq_('#stNomDespesa').html('".$rsDespesa->getCampo('descricao')."');";
 
                 $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
                 $obTEmpenhoPreEmpenho->setDado( 'exercicio'  ,Sessao::getExercicio() );
-                $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$_REQUEST["inCodDespesa"] );
+                $obTEmpenhoPreEmpenho->setDado( 'cod_despesa',$request->get("inCodDespesa") );
                 $obTEmpenhoPreEmpenho->recuperaSaldoDotacaoCompra( $rsSaldoAnterior );
 
                 $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
 
                 $js	.= "var saldoDotacao = '".number_format($nuSaldoDotacao,2,',','.')."';";
-                $js .= "d.getElementById('nuSaldoDotacao').innerHTML=saldoDotacao;";
-                $js .= "d.getElementById('nuHdnSaldoDotacao').value=".number_format($nuSaldoDotacao,2,'.','').";";
+                $js .= "jq_('#nuSaldoDotacao').html(saldoDotacao);";
+                $js .= "jq_('#nuHdnSaldoDotacao').val(".number_format($nuSaldoDotacao,2,'.','').");";
 
-                $js .= montaComboDiverso();
+                $js .= montaComboDiverso($request);
 
             } else {
-                $js .= "alertaAviso('@Dotação inválida. (".$_REQUEST["inCodDespesa"].")','form','erro','".Sessao::getId()."');";
-                $js .= 'd.getElementById("stNomDespesa").innerHTML = "&nbsp;";';
-                $js .= 'd.getElementById("inCodDespesa").value = "";';
-                $js .= 'd.getElementById("nuSaldoDotacao").innerHTML= "&nbsp;" ;';
-                $js .= "limpaSelect(f.stCodClassificacao,0); \n";
-                $js .= "f.stCodClassificacao.options[0] = new Option('Selecione','', 'selected');\n";
+                $js .= "alertaAviso('@Dotação inválida. (".$request->get("inCodDespesa").")','form','erro','".Sessao::getId()."');";
+                $js .= "jq_('#stNomDespesa').html('&nbsp;');";
+                $js .= "jq_('#inCodDespesa').val('');";
+                $js .= "jq_('#nuSaldoDotacao').html('&nbsp;');";
+                $js .= "jq_('#stCodClassificacao').empty().append(new Option('Selecione',''));";
             }
         } else {
-            $js .= 'd.getElementById("stNomDespesa").innerHTML = "&nbsp;";';
-            $js .= 'd.getElementById("inCodDespesa").value= "" ;';
-            $js .= 'd.getElementById("nuSaldoDotacao").innerHTML= "&nbsp;" ;';
-            $js .= "limpaSelect(f.stCodClassificacao,0); \n";
-            $js .= "f.stCodClassificacao.options[0] = new Option('Selecione','', 'selected');\n";
+            $js .= "jq_('#stNomDespesa').html('&nbsp;');";
+            $js .= "jq_('#inCodDespesa').val('');";
+            $js .= "jq_('#nuSaldoDotacao').html('&nbsp;');";
+            $js .= "jq_('#stCodClassificacao').empty().append(new Option('Selecione',''));";            
         }
         SistemaLegado::executaFrameOculto($js);
         break;
 }
 
-function montaComboDiverso()
+function montaComboDiverso(Request $request)
 {
     global $obREmpenhoAutorizacaoEmpenho;
-    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $_REQUEST['inCodDespesa'] );
+    $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesa') );
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarRelacionamentoContaDespesa( $rsConta );
     $stCodClassificacao = $rsConta->getCampo( "cod_estrutural" );
@@ -111,7 +108,7 @@ function montaComboDiverso()
     if ( $rsClassificacao->getNumLinhas() > -1 ) {
         $inContador = 1;
         $js .= "limpaSelect(f.stCodClassificacao,0); \n";
-        if ($_REQUEST['boMostraSintetico'] == 'true') {
+        if ($request->get('boMostraSintetico') == 'true') {
             $js .= "f.stCodClassificacao.options[0] = new Option('".$rsClassificacao->arElementos[0]['cod_estrutural'].' - '.$rsClassificacao->arElementos[0]['descricao']."','".$rsClassificacao->arElementos[0]['cod_conta']."', 'selected');\n";
         } else {
             $js .= "f.stCodClassificacao.options[0] = new Option('Selecione','', 'selected');\n";
@@ -121,7 +118,7 @@ function montaComboDiverso()
             $stMascaraReduzida = $rsClassificacao->getCampo("mascara_reduzida");
             if ($stMascaraReduzidaOld) {
                 if ( $stMascaraReduzidaOld != substr($stMascaraReduzida,0,strlen($stMascaraReduzidaOld)) ) {
-                    if ($inCodContaOld == $_REQUEST["codClassificacao"] or $inCodContaOld == $_REQUEST["stCodClassificacao"]) {
+                    if ($inCodContaOld == $request->get("codClassificacao") or $inCodContaOld == $request->get("stCodClassificacao")) {
                         $selected = "selected";
                     } else {
                         $selected = "";
@@ -139,7 +136,7 @@ function montaComboDiverso()
             $rsClassificacao->proximo();
         }
         if ($stMascaraReduzidaOld) {
-            if ($inCodContaOld == $_REQUEST['codClassificacao']) {
+            if ($inCodContaOld == $request->get('codClassificacao')) {
                 $selected = "selected";
             } else {
                 $selected = "";

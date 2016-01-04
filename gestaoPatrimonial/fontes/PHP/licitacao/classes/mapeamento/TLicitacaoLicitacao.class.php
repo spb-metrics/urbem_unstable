@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 63841 2015-10-22 19:14:30Z michel $
+    $Id: TLicitacaoLicitacao.class.php 64205 2015-12-15 20:31:55Z michel $
 
 */
 
@@ -925,6 +925,9 @@ function montaRecuperaLicitacaoNaoHomologada()
                             , despesa_atual.exercicio
                             , homologacao.cod_cotacao
                             , homologacao.exercicio_cotacao
+                            , cod_despesa_empenho
+                            , cod_conta_empenho
+
                        HAVING coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) > 0 ";
       $stSql = $this->montaRecuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao().$stFiltro.$stGroupBy.$stOrdem;
       $this->stDebug = $stSql;
@@ -971,6 +974,13 @@ function montaRecuperaLicitacaoNaoHomologada()
                 , coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) as quantidade_saldo
                 , homologacao.cod_cotacao
                 , homologacao.exercicio_cotacao
+                , CASE WHEN pre_empenho_despesa.countDespesa = 1
+                            THEN pre_empenho_despesa.cod_despesa[1]
+                  END AS cod_despesa_empenho
+                , CASE WHEN pre_empenho_despesa.countDespesa = 1
+                            THEN pre_empenho_despesa.cod_conta[1]
+                  END AS cod_conta_empenho
+
              FROM licitacao.licitacao
 
              JOIN compras.mapa
@@ -981,7 +991,7 @@ function montaRecuperaLicitacaoNaoHomologada()
                ON mapa_item.cod_mapa = mapa.cod_mapa
               AND mapa_item.exercicio = mapa.exercicio
 
-             JOIN compras.mapa_item_dotacao
+        LEFT JOIN compras.mapa_item_dotacao
                ON mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
               AND mapa_item_dotacao.exercicio             = mapa_item.exercicio
               AND mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
@@ -1027,7 +1037,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND solicitacao_item.cod_centro      = mapa_item.cod_centro
               AND solicitacao_item.cod_item        = mapa_item.cod_item
 
-             JOIN compras.solicitacao_item_dotacao
+        LEFT JOIN compras.solicitacao_item_dotacao
                ON solicitacao_item_dotacao.cod_solicitacao = solicitacao_item.cod_solicitacao
               AND solicitacao_item_dotacao.exercicio       = solicitacao_item.exercicio
               AND solicitacao_item_dotacao.cod_entidade    = solicitacao_item.cod_entidade
@@ -1041,15 +1051,15 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND cotacao_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
               AND cotacao_item.lote        = cotacao_fornecedor_item.lote
 
-             JOIN orcamento.conta_despesa as desdobramento
+        LEFT JOIN orcamento.conta_despesa as desdobramento
                ON desdobramento.cod_conta  = solicitacao_item_dotacao.cod_conta
               AND desdobramento.exercicio  = solicitacao_item_dotacao.exercicio
 
-             JOIN orcamento.despesa
+        LEFT JOIN orcamento.despesa
                ON despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
               AND despesa.exercicio   = solicitacao_item_dotacao.exercicio
 
-             JOIN orcamento.conta_despesa
+        LEFT JOIN orcamento.conta_despesa
                ON conta_despesa.cod_conta  = despesa.cod_conta
               AND conta_despesa.exercicio  = despesa.exercicio
 
@@ -1072,10 +1082,58 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND item_pre_empenho_julgamento.lote                 = cotacao_fornecedor_item.lote
               AND item_pre_empenho_julgamento.cgm_fornecedor       = cotacao_fornecedor_item.cgm_fornecedor
 
+        LEFT JOIN ( SELECT item_pre_empenho_julgamento.exercicio_julgamento
+                         , item_pre_empenho_julgamento.cod_cotacao
+                         , item_pre_empenho_julgamento.cod_item 
+                         , item_pre_empenho_julgamento.lote
+                         , item_pre_empenho_julgamento.cgm_fornecedor
+                         , array_length(publico.concatenar_array( pre_empenho_despesa.cod_despesa ), 1) AS countDespesa
+                         , publico.concatenar_array( pre_empenho_despesa.cod_despesa ) AS cod_despesa
+                         , publico.concatenar_array( pre_empenho_despesa.cod_conta ) AS cod_conta
+                      FROM empenho.item_pre_empenho_julgamento
+                INNER JOIN empenho.pre_empenho_despesa
+                        ON pre_empenho_despesa.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+                       AND pre_empenho_despesa.exercicio       = item_pre_empenho_julgamento.exercicio
+                INNER JOIN empenho.autorizacao_empenho
+                        ON autorizacao_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+                       AND autorizacao_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+                     /*
+                      *ESTÁ COMENTADO, POIS FOI DEFINIDO, POR HORA, QUE OS ITENS DE AUTORIZAÇÕES ANULADAS
+                      *NÃO FICAM DISPONIVEIS NOVAMENTE PARA AUTORIZAÇÃO DE EMPENHO.
+                 LEFT JOIN empenho.autorizacao_anulada
+                        ON autorizacao_anulada.exercicio       = autorizacao_empenho.exercicio
+                       AND autorizacao_anulada.cod_entidade    = autorizacao_empenho.cod_entidade
+                       AND autorizacao_anulada.cod_autorizacao = autorizacao_empenho.cod_autorizacao
+                      WHERE autorizacao_anulada.cod_autorizacao IS NULL
+                     */
+                  GROUP BY item_pre_empenho_julgamento.exercicio_julgamento
+                         , item_pre_empenho_julgamento.cod_cotacao
+                         , item_pre_empenho_julgamento.cod_item 
+                         , item_pre_empenho_julgamento.lote
+                         , item_pre_empenho_julgamento.cgm_fornecedor
+                  ) AS pre_empenho_despesa
+               ON pre_empenho_despesa.exercicio_julgamento = cotacao_fornecedor_item.exercicio
+              AND pre_empenho_despesa.cod_cotacao          = cotacao_fornecedor_item.cod_cotacao
+              AND pre_empenho_despesa.cod_item             = cotacao_fornecedor_item.cod_item
+              AND pre_empenho_despesa.lote                 = cotacao_fornecedor_item.lote
+              AND pre_empenho_despesa.cgm_fornecedor       = cotacao_fornecedor_item.cgm_fornecedor
+
         LEFT JOIN empenho.item_pre_empenho
                ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
               AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
               AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+               /*
+                *ESTÁ COMENTADO, POIS FOI DEFINIDO, POR HORA, QUE OS ITENS DE AUTORIZAÇÕES ANULADAS
+                *NÃO FICAM DISPONIVEIS NOVAMENTE PARA AUTORIZAÇÃO DE EMPENHO.
+        LEFT JOIN empenho.autorizacao_empenho
+               ON autorizacao_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+              AND autorizacao_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+
+        LEFT JOIN empenho.autorizacao_anulada
+               ON autorizacao_anulada.exercicio       = autorizacao_empenho.exercicio
+              AND autorizacao_anulada.cod_entidade    = autorizacao_empenho.cod_entidade
+              AND autorizacao_anulada.cod_autorizacao = autorizacao_empenho.cod_autorizacao
+               */
 
              JOIN almoxarifado.centro_custo
                ON centro_custo.cod_centro = mapa_item.cod_centro
@@ -1115,6 +1173,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND homologacao.cgm_fornecedor        = adjudicacao.cgm_fornecedor
 
             WHERE julgamento_item.ordem = 1
+              --AND autorizacao_anulada.cod_autorizacao IS NULL
       ";
 
       return $stSql;

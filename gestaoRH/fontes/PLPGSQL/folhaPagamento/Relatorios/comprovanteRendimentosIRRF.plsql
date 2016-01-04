@@ -86,7 +86,7 @@ BEGIN
                   FROM folhapagamento'||stEntidade||'.periodo_movimentacao
                  WHERE to_char(periodo_movimentacao.dt_final,''yyyy'') = '||quote_literal(stExercicio)||'
               ORDER BY cod_periodo_movimentacao';
-              
+
     FOR reRegistro IN EXECUTE stSql LOOP
         stCodPeriodoMovimentacao := stCodPeriodoMovimentacao || reRegistro.cod_periodo_movimentacao||',';
         dtFinal                  := reRegistro.dt_final;
@@ -246,7 +246,7 @@ BEGIN
 
     --CONSULTA PRINCIPAL
     stSql := '';
-    IF stSituacaoCadastro = 'pensionista' 
+    IF stSituacaoCadastro = 'pensionista'
     OR stSituacaoCadastro = 'todos' THEN
         stSql := '      SELECT cod_contrato
                              , registro
@@ -266,16 +266,16 @@ BEGIN
                                                         ,'||inCodPeriodoMovimentacao||'
                                                         ,'||quote_literal(stTipoFiltro)||'
                                                         ,'||quote_literal(stValoresFiltro)||'
-                                                        ,'||quote_literal(stExercicio)||') as contrato';    
+                                                        ,'||quote_literal(stExercicio)||') as contrato';
     END IF;
-    IF stSituacaoCadastro = 'todos' THEN 
+    IF stSituacaoCadastro = 'todos' THEN
        stSql := stSql || ' UNION ';
     END IF;
-    IF stSituacaoCadastro = 'ativo'  
+    IF stSituacaoCadastro = 'ativo'
     OR stSituacaoCadastro = 'rescindido'
     OR stSituacaoCadastro = 'aposentado'
     OR stSituacaoCadastro = 'todos' THEN
-        stSql := stSql || '      
+        stSql := stSql || '
                         SELECT cod_contrato
                              , registro
                              , numcgm
@@ -295,7 +295,7 @@ BEGIN
                                                         ,'||quote_literal(stTipoFiltro)||'
                                                         ,'||quote_literal(stValoresFiltro)||'
                                                         ,'||quote_literal(stExercicio)||') as contrato';
-                                                        
+
         IF stSituacaoCadastro = 'ativo' THEN
             stSql := stSql || ' WHERE recuperarSituacaoDoContrato(contrato.cod_contrato,'||inCodPeriodoMovimentacao||','||quote_literal(stEntidade)||') = ''A'' ';
         END IF;
@@ -344,7 +344,7 @@ BEGIN
         nuMolestiaAcidente := 0;
 
         --se zero entao ignora cid e mostra total rendimentos
-        IF reRegistro.cod_cid = 0 THEN 
+        IF reRegistro.cod_cid = 0 THEN
             -- cid nao informado ou nao existente
             nuTotalRendimentos := nuSoma;
             nuMolestiaAcidente := 0;
@@ -370,7 +370,7 @@ BEGIN
                         stCodPeriodoMovimentacaoLaudo := substr(stCodPeriodoMovimentacaoLaudo,0,length(stCodPeriodoMovimentacaoLaudo));
 
                         --busca os valores nao tributaveis a partir da data do laudo
-                        stSql := stEventoCalculadoSalario1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoSalario2 || 
+                        stSql := stEventoCalculadoSalario1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoSalario2 ||
                                 ' AND registro_evento_periodo.cod_contrato = '||reRegistro.cod_contrato||'
                                                 AND evento_calculado.cod_evento = '||inCodEventoMolestia;
                         nuValor := selectIntoNumeric(stSql);
@@ -386,7 +386,7 @@ BEGIN
                             nuMolestiaAcidente := nuMolestiaAcidente + nuValor;
                         END IF;
 
-                        stSql := stEventoCalculadoFerias1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoFerias2 || 
+                        stSql := stEventoCalculadoFerias1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoFerias2 ||
                             ' AND registro_evento_ferias.cod_contrato = '||reRegistro.cod_contrato||'
                               AND evento_ferias_calculado.cod_evento = '||inCodEventoMolestia;
                         nuValor := selectIntoNumeric(stSql);
@@ -394,7 +394,7 @@ BEGIN
                             nuMolestiaAcidente := nuMolestiaAcidente + nuValor;
                         END IF;
 
-                        stSql := stEventoCalculadoRescisao1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoRescisao2 || 
+                        stSql := stEventoCalculadoRescisao1 || stCodPeriodoMovimentacaoLaudo || stEventoCalculadoRescisao2 ||
                             ' AND registro_evento_rescisao.cod_contrato = '||reRegistro.cod_contrato||'
                               AND evento_rescisao_calculado.cod_evento = '||inCodEventoMolestia||'
                               AND evento_rescisao_calculado.desdobramento != ''D'' ';
@@ -426,9 +426,9 @@ BEGIN
                              AND previdencia_evento.timestamp = max_previdencia_evento.timestamp
                            WHERE previdencia_evento.cod_tipo = 1
                              AND previdencia_evento.cod_previdencia = '||reRegistro.cod_previdencia;
-                             
+
             inCodEventoPrevOficial := selectIntoInteger(stSql);
-            
+
             nuPrevidenciaOficial := 0;
             IF inCodEventoPrevOficial IS NOT NULL THEN
                 stSql := stEventoCalculadoSalario || ' AND registro_evento_periodo.cod_contrato = '||reRegistro.cod_contrato||'
@@ -443,7 +443,7 @@ BEGIN
                 IF nuValor IS NOT NULL THEN
                     nuPrevidenciaOficial := nuPrevidenciaOficial + nuValor;
                 END IF;
-                
+
                 stSql := stEventoCalculadoFerias || ' AND registro_evento_ferias.cod_contrato = '||reRegistro.cod_contrato||'
                                                       AND evento_ferias_calculado.cod_evento = '||inCodEventoPrevOficial||'
                                                       AND evento_ferias_calculado.desdobramento != ''D'' ';
@@ -512,7 +512,7 @@ BEGIN
                 IF nuValor IS NOT NULL THEN
                     nuPrevidenciaPrivada := nuPrevidenciaPrivada + nuValor;
                 END IF;
-                
+
                 stSql := stEventoCalculadoFerias || ' AND registro_evento_ferias.cod_contrato = '||reRegistro.cod_contrato||'
                                                       AND evento_ferias_calculado.cod_evento = '||inCodEventoPrevPrivada||'
                                                       AND evento_ferias_calculado.desdobramento != ''D'' ';
@@ -636,7 +636,7 @@ BEGIN
 
 
         --####################################################################
-        --Evento Informativo de isenção (inativos/pensionistas) acima de 65 anos    
+        --Evento Informativo de isenção (inativos/pensionistas) acima de 65 anos
         nuInfAposentadoria := 0;
         IF inCodEvento65Anos IS NOT NULL THEN
             --Folha Salário
@@ -762,9 +762,9 @@ BEGIN
                 nuDecimoTerceiro := nuDecimoTerceiro - nuValor;
             END IF;
         END IF;
-               
-        IF nuTotalRendimentos > 0 OR nuMolestiaAcidente > 0 OR nuPrevidenciaOficial > 0 
-        OR nuPensaoAlimenticia > 0 OR nuIRRFRetido > 0 OR nuInfAposentadoria > 0 
+
+        IF nuTotalRendimentos > 0 OR nuMolestiaAcidente > 0 OR nuPrevidenciaOficial > 0
+        OR nuPensaoAlimenticia > 0 OR nuIRRFRetido > 0 OR nuInfAposentadoria > 0
         OR nuDiariasAjudaCusto > 0 OR nuDecimoTerceiro > 0 THEN
             rwComprovanteRendimentosIRRF.numcgm                                 := reRegistro.numcgm;
             rwComprovanteRendimentosIRRF.nom_cgm                                := reRegistro.nom_cgm;
@@ -801,6 +801,6 @@ BEGIN
             rwComprovanteRendimentosIRRF.decimo_terceiro                        := nuDecimoTerceiro;
             RETURN NEXT rwComprovanteRendimentosIRRF;
         END IF;
-    END LOOP; 
+    END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

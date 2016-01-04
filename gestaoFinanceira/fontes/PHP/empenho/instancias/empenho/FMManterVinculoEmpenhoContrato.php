@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-02.03.37
 
-    $Id: FMManterVinculoEmpenhoContrato.php 64087 2015-12-01 16:10:15Z jean $
+    $Id: FMManterVinculoEmpenhoContrato.php 64212 2015-12-17 12:38:12Z michel $
 
 */
 
@@ -49,12 +49,7 @@ $pgJS   = "JS".$stPrograma.".js";
 
 $jsOnload = "montaParametrosGET('consultaContratoEmpenho', 'inExercicio,inNumContrato,inCodEntidade');";
 
-Sessao::write('dtContrato'       , $request->get('dtAssinatura')     );
-Sessao::write('inCodEntidade'    , $request->get('inCodEntidade')    );
-Sessao::write('inExercicio'      , $request->get('inExercicio')      );
-Sessao::write('inNumeroContrato' , $request->get('inNumeroContrato') );
-Sessao::write('inNumContrato'    , $request->get('inNumContrato')    );
-Sessao::write('elementos'        , ''                                );
+Sessao::write('elementos' , '');
 
 $stAcao = "incluir";
 
@@ -79,6 +74,10 @@ $obHdnNumContrato->setValue( $request->get('inNumContrato') );
 $obHdnNumeroContrato = new Hidden;
 $obHdnNumeroContrato->setName ( "inNumeroContrato" );
 $obHdnNumeroContrato->setValue( $request->get('inNumeroContrato') );
+
+$obHdnDtContrato = new Hidden;
+$obHdnDtContrato->setName ( "dtContrato" );
+$obHdnDtContrato->setValue( $request->get('dtAssinatura') );
 
 $obHdnCodEntidade = new Hidden;
 $obHdnCodEntidade->setName ( "inCodEntidade" );
@@ -122,7 +121,7 @@ $obBtnIncluir = new Button;
 $obBtnIncluir->setValue             ( "Incluir"     );
 $obBtnIncluir->setName              ( "btnIncluir"  );
 $obBtnIncluir->setId                ( "btnIncluir"  );
-$obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET('incluirEmpenho','numEmpenho,cgm_credor');" );
+$obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET('incluirEmpenho');" );
 
 $obBtnLimpar = new Button;
 $obBtnLimpar->setId                 ( "limpar" );
@@ -157,6 +156,7 @@ $obFormulario->addHidden( $obHdnCgmCredor                                       
 $obFormulario->addHidden( $obHdnExercicio                                          );
 $obFormulario->addHidden( $obHdnNumContrato                                        );
 $obFormulario->addHidden( $obHdnNumeroContrato                                     );
+$obFormulario->addHidden( $obHdnDtContrato                                         );
 $obFormulario->addHidden( $obHdnCodEntidade                                        );
 
 $obFormulario->addTitulo( "Dados para Vinculação de Empenhos a um Contrato" );

@@ -39,25 +39,6 @@
 
     * Casos de uso: uc-02.02.02,uc-02.04.09
 */
-
-/*
-$Log$
-Revision 1.20  2007/06/20 18:01:37  bruce
-Bug#9101#
-
-Revision 1.19  2007/05/29 14:13:39  domluc
-Correção na Msg de Erro
-
-Revision 1.18  2007/05/09 01:33:41  diego
-Bug #8914#
-
-Revision 1.17  2006/09/19 09:00:01  jose.eduardo
-Bug #6993#
-
-Revision 1.16  2006/07/05 20:51:41  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php"   );
 include_once( CAM_GF_CONT_NEGOCIO."RContabilidadeLancamentoValor.class.php" );
@@ -250,28 +231,36 @@ switch ($_GET['stCtrl']) {
             if (!$obErro->ocorreu()) {
                 $stDescricao = $rsRecordSet->getCampo( 'nom_conta' );
             }
-        } elseif ($_GET['stTipoBusca'] == 'estrutural') {
-            $obRContabilidadePlanoContaAnalitica->setCodEstrutural( $_POST[$_GET['stNomCampoCod']] );
+        } elseif ($request->get('stTipoBusca') == 'estrutural') {
+            $obRContabilidadePlanoContaAnalitica->setCodEstrutural( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obRContabilidadePlanoContaAnalitica->consultar();
             $stDescricao = $obRContabilidadePlanoContaAnalitica->getNomConta();
-        } elseif ($_GET['stTipoBusca'] == 'contaSinteticaAtivoPermanente') {
-            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$_GET['stNomCampoCod']] );
+        } elseif ($request->get('stTipoBusca') == 'contaSinteticaAtivoPermanente') {
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaAtivoPermanente($rsSinteticaAtivoPermanente);
 
             if ($rsSinteticaAtivoPermanente->getNumLinhas() > 0) {
                 $stDescricao = $rsSinteticaAtivoPermanente->getCampo('nom_conta');
             }
-        } elseif ($_GET['stTipoBusca'] == 'contaContabilDepreciacaoAcumulada') {
-            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$_GET['stNomCampoCod']] );
+        } elseif ($request->get('stTipoBusca') == 'contaContabilDepreciacaoAcumulada') {
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaAtivoPermanente($rsSinteticaDepreciacaoAcumulada);
             if ($rsSinteticaDepreciacaoAcumulada->getNumLinhas() > 0) {
                 $stDescricao = $rsSinteticaDepreciacaoAcumulada->getCampo('nom_conta');
             }
-        } elseif ($_GET['stTipoBusca'] == 'contaSinteticaDepreciacao') {
-            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$_GET['stNomCampoCod']] );
+        } elseif ($request->get('stTipoBusca') == 'contaSinteticaDepreciacao') {
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
+            $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
+            $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaDepreciacao($rsSinteticaDepreciacao);
+
+            if ($rsSinteticaDepreciacao->getNumLinhas() > 0) {
+                $stDescricao = $rsSinteticaDepreciacao->getCampo('nom_conta');
+            }
+        } elseif ($request->get('stTipoBusca') == 'contaContabilBaixaBem') {
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaDepreciacao($rsSinteticaDepreciacao);
 
@@ -279,7 +268,7 @@ switch ($_GET['stCtrl']) {
                 $stDescricao = $rsSinteticaDepreciacao->getCampo('nom_conta');
             }
         } else {
-            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$_GET['stNomCampoCod']] );
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obRContabilidadePlanoContaAnalitica->consultar();
             $stDescricao = $obRContabilidadePlanoContaAnalitica->getNomConta();

@@ -56,4 +56,4 @@ BEGIN
     carga_horaria := selectIntoVarchar('SELECT to_char(INTERVAL '|| quote_literal(carga_horaria) ||' + INTERVAL '|| quote_literal(processaHorasTrabalhadas(arHorarioTrabalhado, arTemp)) ||', ''hh24:mi'') ');
     return carga_horaria;
 END 
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

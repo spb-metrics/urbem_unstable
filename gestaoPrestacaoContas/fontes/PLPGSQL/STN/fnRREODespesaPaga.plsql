@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fnRREODespesaPaga.plsql 61194 2014-12-15 12:55:20Z michel $
+* $Id: fnRREODespesaPaga.plsql 64243 2015-12-21 18:26:55Z fabio $
 *
 * Casos de uso: uc-04.05.28
 */
@@ -175,4 +175,4 @@ BEGIN
 	RETURN nuEstornado;
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

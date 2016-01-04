@@ -81,4 +81,4 @@ BEGIN
     END LOOP;
     return stExtras;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

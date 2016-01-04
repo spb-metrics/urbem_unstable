@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoEmpenhoContrato.class.php 64081 2015-11-30 15:36:50Z michel $
+    $Id: TEmpenhoEmpenhoContrato.class.php 64212 2015-12-17 12:38:12Z michel $
     
     * Casos de uso: uc-02.03.37
 */
@@ -55,32 +55,36 @@ function __construct()
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_entidade,cod_empenho');
 
-    $this->AddCampo('exercicio'     ,'char'   ,true  ,'4'  ,true ,'TLicitacaoContrato'  );
-    $this->AddCampo('cod_entidade'  ,'integer',true  ,''   ,true ,'TLicitacaoContrato'  );
-    $this->AddCampo('cod_empenho'   ,'integer',true  ,''   ,true ,'TEmpenhoEmpenho'     );
-    $this->AddCampo('num_contrato'  ,'integer',true  ,''   ,false,'TLicitacaoContrato'  );
+    $this->AddCampo('exercicio'          , 'char'   , true, '4', true , 'TEmpenhoEmpenho'    );
+    $this->AddCampo('cod_entidade'       , 'integer', true, '' , true , 'TLicitacaoContrato' );
+    $this->AddCampo('cod_empenho'        , 'integer', true, '' , true , 'TEmpenhoEmpenho'    );
+    $this->AddCampo('num_contrato'       , 'integer', true, '' , false, 'TLicitacaoContrato' );
+    $this->AddCampo('exercicio_contrato' , 'char'   , true, '4', false, 'TLicitacaoContrato' );
 }
 
 function montaRecuperaTodos()
 {
-    $stSql  = " SELECT exercicio                        \n";
-    $stSql .= "      , cod_empenho                      \n";
-    $stSql .= "      , cod_entidade                     \n";
-    $stSql .= "      , num_contrato                     \n";
-    $stSql .= "   FROM empenho.empenho_contrato         \n";
-    $stSql .= "   WHERE true                            \n";
-    if ($this->getDado('exercicio')) {
+    $stSql  = " SELECT exercicio
+                     , cod_empenho
+                     , cod_entidade
+                     , num_contrato
+                     , exercicio_contrato
+                  FROM empenho.empenho_contrato
+                 WHERE true                            \n";
+    if ($this->getDado('exercicio'))
         $stSql .= " AND exercicio = '".$this->getDado('exercicio')."' \n";
-    }
-    if ($this->getDado('cod_empenho')) {
+
+    if ($this->getDado('cod_empenho'))
         $stSql .= " AND cod_empenho = ".$this->getDado('cod_empenho')." \n";
-    }
-    if ($this->getDado('cod_entidade')) {
+
+    if ($this->getDado('cod_entidade'))
         $stSql .= " AND cod_entidade = ".$this->getDado('cod_entidade')." \n";
-    }
-    if ($this->getDado('num_contrato')) {
+
+    if ($this->getDado('num_contrato'))
         $stSql .= " AND num_contrato = ".$this->getDado('num_contrato')." \n";
-    }
+
+    if ($this->getDado('exercicio_contrato'))
+        $stSql .= " AND exercicio_contrato = '".$this->getDado('exercicio_contrato')."' \n";
 
     return $stSql;
 }
@@ -90,8 +94,19 @@ function recuperaRelacionamentoEmpenhoContrato(&$rsRecordSet, $stFiltro = "")
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
+    
+    $stGroupBy = ' GROUP BY ec.num_contrato
+                          , ec.exercicio_contrato
+                          , e.cod_empenho
+                          , e.exercicio
+                          , e.cod_entidade
+                          , e.cod_pre_empenho
+                          , e.dt_empenho
+                          , e.dt_vencimento
+                          , e.hora
+                          , e.cod_categoria ';
 
-    $stSql = $this->montaRecuperaRelacionamentoEmpenhoContrato().$stFiltro;
+    $stSql = $this->montaRecuperaRelacionamentoEmpenhoContrato().$stFiltro.$stGroupBy;
     $this->stDebug = $stSql;
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql);
 
@@ -100,29 +115,28 @@ function recuperaRelacionamentoEmpenhoContrato(&$rsRecordSet, $stFiltro = "")
 
 function montaRecuperaRelacionamentoEmpenhoContrato()
 {
-    $stSql  = "SELECT ec.num_contrato   			   \n";
-    $stSql  .= "		, e.cod_empenho      			   \n";
-    $stSql  .= "		, e.exercicio       			   \n";
-    $stSql  .= "		, e.cod_entidade      			   \n";
-    $stSql  .= "		, e.cod_pre_empenho   			   \n";
-    $stSql  .= "		, to_char(e.dt_empenho, 'dd/mm/yyyy') as dt_empenho \n";
-    $stSql  .= "		, e.dt_vencimento     			   \n";
-    $stSql  .= "		, ie.vl_total as vl_saldo_anterior		\n";
-    $stSql  .= "		, e.hora              			   \n";
-    $stSql  .= "		, e.cod_categoria     			   \n";
-    $stSql  .= "  FROM								  	   \n";
-    $stSql  .= "		  empenho.empenho_contrato as ec   \n";
-    $stSql  .= "	    , empenho.empenho		   as e    \n";
-    $stSql  .= "	    , empenho.pre_empenho	   as pe   \n";
-    $stSql  .= "      	, empenho.item_pre_empenho as ie   \n";
-    $stSql  .= " WHERE								       \n";
-    $stSql  .= "       ec.exercicio    = e.exercicio	   \n";
-    $stSql  .= "   AND ec.cod_entidade = e.cod_entidade    \n";
-    $stSql  .= "   AND ec.cod_empenho  = e.cod_empenho     \n";
-    $stSql .= "    AND e.exercicio     = pe.exercicio	   \n";
-    $stSql .= "    AND e.cod_pre_empenho = pe.cod_pre_empenho  \n";
-    $stSql .= "	   AND ie.cod_pre_empenho = pe.cod_pre_empenho \n";
-    $stSql .= "	   AND ie.exercicio       = pe.exercicio   \n";
+    $stSql  = "SELECT ec.num_contrato
+                    , ec.exercicio_contrato
+                    , e.cod_empenho
+                    , e.exercicio
+                    , e.cod_entidade
+                    , e.cod_pre_empenho
+                    , to_char(e.dt_empenho, 'dd/mm/yyyy') as dt_empenho
+                    , e.dt_vencimento
+                    , sum(ie.vl_total) as vl_saldo_anterior
+                    , e.hora
+                    , e.cod_categoria
+                 FROM empenho.empenho_contrato as ec
+                    , empenho.empenho		   as e
+                    , empenho.pre_empenho	   as pe
+                    , empenho.item_pre_empenho as ie
+                WHERE ec.exercicio    = e.exercicio
+                  AND ec.cod_entidade = e.cod_entidade
+                  AND ec.cod_empenho  = e.cod_empenho
+                  AND e.exercicio     = pe.exercicio
+                  AND e.cod_pre_empenho = pe.cod_pre_empenho
+                  AND ie.cod_pre_empenho = pe.cod_pre_empenho
+                  AND ie.exercicio       = pe.exercicio   \n";
 
     return $stSql;
 }
@@ -163,6 +177,7 @@ public function montaRecuperaEmpenhoPorContrato() {
     
     $stSql = "SELECT 
                     empenho.cod_empenho
+                  , empenho.exercicio
                   , sw_cgm.numcgm
                   , sw_cgm.nom_cgm
                   , TO_CHAR(empenho.dt_empenho, 'dd/mm/yyyy') AS dt_empenho
@@ -194,10 +209,12 @@ public function montaRecuperaEmpenhoPorContrato() {
                  ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
          
               WHERE empenho_contrato.cod_entidade = ".$this->getDado('cod_entidade')."
-                AND empenho_contrato.exercicio    = '".$this->getDado('exercicio')."'
+                AND empenho_contrato.exercicio_contrato = '".$this->getDado('exercicio_contrato')."'
                 AND empenho_contrato.num_contrato = ".$this->getDado('num_contrato')."
                   
            GROUP BY empenho.cod_empenho
+                  , empenho.exercicio
+                  , empenho.cod_entidade
                   , sw_cgm.numcgm
                   , sw_cgm.nom_cgm
                   , empenho.dt_empenho

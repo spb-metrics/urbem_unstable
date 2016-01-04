@@ -54,4 +54,4 @@ BEGIN
     END IF;
     RETURN inDias;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

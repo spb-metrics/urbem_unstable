@@ -59,4 +59,4 @@ BEGIN
     
     RETURN stDescricao;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

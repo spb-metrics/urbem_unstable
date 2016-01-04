@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: TLicitacaoHomologacao.class.php 64005 2015-11-17 16:49:06Z michel $
+    $Id: TLicitacaoHomologacao.class.php 64205 2015-12-15 20:31:55Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1395,13 +1395,13 @@ from (
                        , solicitacao_item_dotacao.cod_despesa
                        , solicitacao_item_dotacao.cod_conta
                        , solicitacao_item.exercicio as exercicio_solicitacao
-                       , solicitacao_item_dotacao.cod_entidade
+                       , solicitacao_item.cod_entidade
                        , 0 as historico
                        , 0 as cod_tipo
                        , false as implantado
-                         , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as reserva
-                       , sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0) as qtd_cotacao
-                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as vl_cotacao
+                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as reserva
+                       , sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0) as qtd_cotacao
+                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as vl_cotacao
                        , catalogo_item.descricao_resumida
                        , catalogo_item.descricao as descricao_completa
                        , unidade_medida.cod_unidade
@@ -1485,7 +1485,7 @@ from (
                    and mapa_cotacao.exercicio_mapa= mapa_item.exercicio
                    and mapa_item.cod_item      = cotacao_licitacao.cod_item
                    and mapa_item.lote          = cotacao_licitacao.lote
-            inner join compras.mapa_item_dotacao
+             left join compras.mapa_item_dotacao
                     on mapa_item_dotacao.exercicio             = mapa_item.exercicio
                    and mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
                    and mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
@@ -1542,14 +1542,14 @@ from (
             inner join administracao.unidade_medida
                     on unidade_medida.cod_grandeza = catalogo_item.cod_grandeza
                    and unidade_medida.cod_unidade = catalogo_item.cod_unidade
-            inner join compras.solicitacao_item_dotacao
+             left join compras.solicitacao_item_dotacao
                     on solicitacao_item.exercicio        = solicitacao_item_dotacao.exercicio
                    and solicitacao_item.cod_entidade     = solicitacao_item_dotacao.cod_entidade
                    and solicitacao_item.cod_solicitacao  = solicitacao_item_dotacao.cod_solicitacao
                    and solicitacao_item.cod_centro       = solicitacao_item_dotacao.cod_centro
                    and solicitacao_item.cod_item         = solicitacao_item_dotacao.cod_item
                    and mapa_item_dotacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-            inner join compras.mapa_item_reserva
+             left join compras.mapa_item_reserva
                     on mapa_item_reserva.exercicio_mapa        = mapa_item_dotacao.exercicio
                    and mapa_item_reserva.cod_mapa              = mapa_item_dotacao.cod_mapa
                    and mapa_item_reserva.exercicio_solicitacao = mapa_item_dotacao.exercicio_solicitacao
@@ -1793,13 +1793,13 @@ from (
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
         $stGrupo = " group by cotacao_fornecedor_item.cgm_fornecedor
-                            , solicitacao_item_dotacao.cod_item
+                            , homologacao.cod_item
                             , vw_classificacao_despesa.mascara_classificacao
                             , solicitacao_item_dotacao.cod_despesa
                             , solicitacao_item_dotacao.cod_conta
-                            , solicitacao_item_dotacao.cod_entidade
+                            , homologacao.cod_entidade
                             , licitacao.cod_modalidade
-                               , despesa.num_orgao
+                            , despesa.num_orgao
                             , despesa.num_unidade
                             , objeto.cod_objeto
                             , objeto.descricao
@@ -1844,11 +1844,11 @@ from (
                  , count(cod_item) as qtd_itens_homologados
               FROM (
             select  cotacao_fornecedor_item.cgm_fornecedor as fornecedor
-                  , solicitacao_item_dotacao.cod_item
+                  , homologacao.cod_item
                   , solicitacao_item_dotacao.cod_despesa
                   , solicitacao_item_dotacao.cod_conta
-                  , solicitacao_item_dotacao.cod_entidade
-                  ,	vw_classificacao_despesa.mascara_classificacao
+                  , homologacao.cod_entidade
+                  , vw_classificacao_despesa.mascara_classificacao
                   , licitacao.cod_modalidade
                   , despesa.num_orgao
                   , despesa.num_unidade
@@ -1904,14 +1904,14 @@ from (
                          and cotacao_licitacao.exercicio_cotacao   = adjudicacao.exercicio_cotacao
                          and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                          and cotacao_licitacao.cgm_fornecedor      = adjudicacao.cgm_fornecedor
-                 and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
+                         and cotacao_licitacao.cod_cotacao         = adjudicacao.cod_cotacao
                   inner join licitacao.licitacao
                           on licitacao.cod_licitacao       = cotacao_licitacao.cod_licitacao
                          and licitacao.cod_modalidade      = cotacao_licitacao.cod_modalidade
                          and licitacao.cod_entidade        = cotacao_licitacao.cod_entidade
                          and licitacao.exercicio           = cotacao_licitacao.exercicio_licitacao
                   inner join compras.objeto
-                            on objeto.cod_objeto = licitacao.cod_objeto
+                          on objeto.cod_objeto = licitacao.cod_objeto
                   inner join compras.cotacao_fornecedor_item
                           on cotacao_licitacao.cod_cotacao          = cotacao_fornecedor_item.cod_cotacao
                          and cotacao_licitacao.exercicio_cotacao    = cotacao_fornecedor_item.exercicio
@@ -1934,7 +1934,7 @@ from (
                          and mapa_cotacao.exercicio_mapa= mapa_item.exercicio
                          and mapa_item.cod_item      = cotacao_licitacao.cod_item
                          and mapa_item.lote          = cotacao_licitacao.lote
-                  inner join compras.mapa_item_dotacao
+                   left join compras.mapa_item_dotacao
                           on mapa_item_dotacao.exercicio             = mapa_item.exercicio
                          and mapa_item_dotacao.cod_mapa              = mapa_item.cod_mapa
                          and mapa_item_dotacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
@@ -1966,17 +1966,17 @@ from (
                          and solicitacao_item.exercicio          = solicitacao.exercicio
                          and solicitacao_item.cod_entidade       = solicitacao.cod_entidade
                          and solicitacao_item.cod_solicitacao    = solicitacao.cod_solicitacao
-                  inner join compras.solicitacao_item_dotacao
+                   left join compras.solicitacao_item_dotacao
                           on solicitacao_item.exercicio        = solicitacao_item_dotacao.exercicio
                          and solicitacao_item.cod_entidade     = solicitacao_item_dotacao.cod_entidade
                          and solicitacao_item.cod_solicitacao  = solicitacao_item_dotacao.cod_solicitacao
                          and solicitacao_item.cod_centro       = solicitacao_item_dotacao.cod_centro
                          and solicitacao_item.cod_item         = solicitacao_item_dotacao.cod_item
                          and mapa_item_dotacao.cod_despesa     = solicitacao_item_dotacao.cod_despesa
-                     inner join orcamento.despesa
+                   left join orcamento.despesa
                           on despesa.cod_despesa = solicitacao_item_dotacao.cod_despesa
                          and despesa.exercicio = solicitacao_item_dotacao.exercicio
-                  inner join orcamento.vw_classificacao_despesa
+                   left join orcamento.vw_classificacao_despesa
                           on solicitacao_item_dotacao.cod_conta =  vw_classificacao_despesa.cod_conta
                          and solicitacao_item_dotacao.exercicio =  vw_classificacao_despesa.exercicio
                        where homologacao_anulada.cod_licitacao is null

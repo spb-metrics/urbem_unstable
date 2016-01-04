@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: PRManterCadastroFerias.php 63647 2015-09-23 19:42:55Z carlos.silva $
+    $Id: PRManterCadastroFerias.php 64270 2015-12-23 19:35:29Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -62,7 +62,7 @@ include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalLoteFeriasFuncao.class.php"      
 include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalLoteFeriasLote.class.php"                                );
 
 $arLink = Sessao::read('link');
-$stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 $stLink = "&pg=".$arLink["pg"]."&pos=".$arLink["pos"];
 
 //Define o nome dos arquivos PHP
@@ -98,9 +98,9 @@ switch ($stAcao) {
                             11=>"Novembro",
                             12=>"Dezembro");
 
-        $stCompetencia    = $arMeses[$_POST["inCodMes"]]."/".$_POST["inAno"];
-        $stMesCompetencia = ($_POST["inCodMes"]<10)?"0".$_POST["inCodMes"]:$_POST["inCodMes"];
-        $stAnoCompetencia = $_POST["inAno"];
+        $stCompetencia    = $arMeses[$request->get("inCodMes")]."/".$request->get("inAno");
+        $stMesCompetencia = ($request->get("inCodMes")<10)?"0".$request->get("inCodMes"):$request->get("inCodMes");
+        $stAnoCompetencia = $request->get("inAno");
 
         if (Sessao::read("boConcederFeriasLote")) {
             $rsLoteFeriasContrato = new recordset();
@@ -114,7 +114,7 @@ switch ($stAcao) {
             }
 
             $arContratos = array();
-            foreach ($_REQUEST as $stCampo=>$stValor) {
+            foreach ($request->getAll() as $stCampo=>$stValor) {
                 if (strpos($stCampo,"boLote") === 0) {
                     $arValor = explode("_",$stValor);
                     $arContratos[] = array("cod_contrato"=>$arValor[0],
@@ -130,9 +130,8 @@ switch ($stAcao) {
                 $obTPessoalLoteFeriasLote->obTPessoalLoteFerias = &$obTPessoalLoteFerias;
 
                 $stFiltro  = " WHERE nome ilike '".$stNomeLote."%'
-                                 AND ano_competencia||mes_competencia = '".$stAnoCompetencia.$stMesCompetencia."'
-                                 AND cod_regime = ".$_POST["inCodRegime"];
-
+                                 AND ano_competencia||mes_competencia = '".$stAnoCompetencia.$stMesCompetencia;
+                                 
                 $stNomeLote .= " - Competência ".$stCompetencia;
 
                 $obTPessoalLoteFerias->recuperaRelacionamento($rsLoteFerias,$stFiltro);
@@ -145,12 +144,11 @@ switch ($stAcao) {
 
                 if ($rsLoteFeriasContrato->getNumLinhas() == -1) {
                     $obTPessoalLoteFerias->setDado("nome",$stNomeLote);
-                    $obTPessoalLoteFerias->setDado("cod_regime",$_POST["inCodRegime"]);
                     $obTPessoalLoteFerias->setDado("mes_competencia",$stMesCompetencia);
                     $obTPessoalLoteFerias->setDado("ano_competencia",$stAnoCompetencia);
                     $obTPessoalLoteFerias->inclusao($boTransacao);
 
-                    $stCodigosFiltro = explode(",", $_POST['stCodigos']);
+                    $stCodigosFiltro = explode(",", $request->get('stCodigos'));
 
                     switch ($_POST["stTipoFiltroLote"]) {
                         case 'O':
@@ -187,9 +185,9 @@ switch ($stAcao) {
         } else {
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
             $obTPessoalContrato = new TPessoalContrato();
-            $stFiltro = " AND contrato.cod_contrato = ".$_REQUEST['inCodContrato'];
+            $stFiltro = " AND contrato.cod_contrato = ".$request->get('inCodContrato');
             $obTPessoalContrato->recuperaCgmDoRegistroServidor($rsContrato,$stFiltro);
-            $arContratos[] = array("cod_contrato"=>$_REQUEST['inCodContrato'],"numcgm"=>$rsContrato->getCampo("numcgm"));
+            $arContratos[] = array("cod_contrato"=>$request->get('inCodContrato'),"numcgm"=>$rsContrato->getCampo("numcgm"));
         }
         if (count($arContratos)) {
             include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php");
@@ -210,8 +208,8 @@ switch ($stAcao) {
                 $obFFolhaPagamentoGeraRegistroFerias  = new FFolhaPagamentoGeraRegistroFerias;
                 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao;
 
-                if ($_REQUEST['dtInicial'] != "") {
-                    $dtInicial = $_REQUEST['dtInicial'];
+                if ($request->get('dtInicial') != "") {
+                    $dtInicial = $request->get('dtInicial');
                 } else {
                     $stFiltro = " WHERE cod_contrato = ".$arContrato["cod_contrato"];
                     $obTPessoalFerias->recuperaTodos($rsFeriasContrato,$stFiltro, " ORDER BY cod_ferias DESC LIMIT 1 ",$boTransacao);
@@ -236,8 +234,8 @@ switch ($stAcao) {
                         }
                     }
                 }
-                if ($_REQUEST['dtFinal'] != "") {
-                    $dtFinal = $_REQUEST['dtFinal'];
+                if ($request->get('dtFinal') != "") {
+                    $dtFinal = $request->get('dtFinal');
                 } else {
                     $arInicial = explode("/",$dtInicial);
                     $dtFinal   = date("d/m/Y",mktime(0,0,0,$arInicial[1],$arInicial[0]-1,$arInicial[2]+1));
@@ -250,27 +248,27 @@ switch ($stAcao) {
                 $obTPessoalFerias->recuperaTodos($rsFeriasPeriodo,$stFiltro, " ORDER BY cod_ferias LIMIT 1 ",$boTransacao);
 
                 $stFiltro  = "   AND ferias.cod_contrato = ".$arContrato["cod_contrato"];
-                $stFiltro .= "   AND to_char(dt_inicio,'dd/mm/yyyy') = '".$_REQUEST['dtInicialFerias']."'";
-                $stFiltro .= "   AND to_char(dt_fim,'dd/mm/yyyy') = '".$_REQUEST['dtFinalFerias']."'";
+                $stFiltro .= "   AND to_char(dt_inicio,'dd/mm/yyyy') = '".$request->get('dtInicialFerias')."'";
+                $stFiltro .= "   AND to_char(dt_fim,'dd/mm/yyyy') = '".$request->get('dtFinalFerias')."'";
                 $obTPessoalLancamentoFerias->recuperaLancamentoFerias($rsFeriasGozo,$stFiltro, " ORDER BY cod_ferias LIMIT 1 ");
 
                 if ($rsFeriasPeriodo->getNumLinhas() == -1 and $rsFeriasGozo->getNumLinhas() == -1) {
-                    $inQuantDiasGozo = (trim($_REQUEST['inQuantDiasGozo']) != "") ? $_REQUEST['inQuantDiasGozo'] : $arContrato["dias_ferias"];
-                    $inFaltas  = ($_REQUEST['inQuantFaltas'] == "") ? $arContratos["dias_faltas"] : $_REQUEST['inQuantFaltas'];
+                    $inQuantDiasGozo = (trim($request->get('inQuantDiasGozo')) != "") ? $request->get('inQuantDiasGozo') : $arContrato["dias_ferias"];
+                    $inFaltas  = ($request->get('inQuantFaltas') == "") ? $arContratos["dias_faltas"] : $request->get('inQuantFaltas');
                     $obTPessoalFerias->setDado("cod_contrato"           , $arContrato["cod_contrato"]);
-                    $obTPessoalFerias->setDado("cod_forma"              , $_REQUEST['inCodFormaPagamento']);
+                    $obTPessoalFerias->setDado("cod_forma"              , $request->get('inCodFormaPagamento'));
                     $obTPessoalFerias->setDado("faltas"                 , (trim($inFaltas) != "") ? $inFaltas : 0 );
                     $obTPessoalFerias->setDado("dias_ferias"            , $inQuantDiasGozo);
-                    $obTPessoalFerias->setDado("dias_abono"             , (trim($_REQUEST['inQuantDiasAbono']) != "") ? $_REQUEST['inQuantDiasAbono'] : $arContrato["dias_abono"]);
+                    $obTPessoalFerias->setDado("dias_abono"             , (trim($request->get('inQuantDiasAbono')) != "") ? $request->get('inQuantDiasAbono') : $arContrato["dias_abono"]);
                     $obTPessoalFerias->setDado("dt_inicial_aquisitivo"  , $dtInicial);
                     $obTPessoalFerias->setDado("dt_final_aquisitivo"    , $dtFinal);
-                    $obTPessoalFerias->inclusao($boTransacao);
+                    $obTPessoalFerias->inclusao($boTransacao);                    
 
                     if (Sessao::read("boConcederFeriasLote")) {
 
                         //Insere contrato para lotes de ferias ja cadastrados e atualiza o filtro quando tipo lote = Geral G ou Contratos C
-                        if ($_POST["stTipoFiltroLote"] == 'C' ||
-                           $_POST["stTipoFiltroLote"] == 'G') {
+                        if ($request->get("stTipoFiltroLote") == 'C' ||
+                            $request->get("stTipoFiltroLote") == 'G') {
                             $obTPessoalLoteFeriasFiltro = new TPessoalLoteFeriasContrato();
                             $obTPessoalLoteFeriasFiltro->setDado('cod_lote', $obTPessoalLoteFerias->getDado('cod_lote') );
                             $obTPessoalLoteFeriasFiltro->setDado('cod_contrato', $arContrato["cod_contrato"]);
@@ -290,18 +288,18 @@ switch ($stAcao) {
                         $inCodTipo = $request->get('inCodTipo') ? $request->get('inCodTipo') : 1;
                         $inAnoCompetencia = $request->get('inAno') ? $request->get('inAno') : $request->get('hdninAno');
 
-                        $obTPessoalLancamentoFerias->setDado("dt_inicio"              , $_REQUEST['dtInicialFerias'] );
-                        $obTPessoalLancamentoFerias->setDado("dt_fim"                 , $_REQUEST['dtFinalFerias']   );
-                        $obTPessoalLancamentoFerias->setDado("dt_retorno"             , $_REQUEST['dtRetornoFerias'] );
+                        $obTPessoalLancamentoFerias->setDado("dt_inicio"              , $request->get('dtInicialFerias') );
+                        $obTPessoalLancamentoFerias->setDado("dt_fim"                 , $request->get('dtFinalFerias')   );
+                        $obTPessoalLancamentoFerias->setDado("dt_retorno"             , $request->get('dtRetornoFerias') );
                         $obTPessoalLancamentoFerias->setDado("mes_competencia"        , $inCodMes                    );
                         $obTPessoalLancamentoFerias->setDado("ano_competencia"        , $inAnoCompetencia            );
                         $obTPessoalLancamentoFerias->setDado("pagar_13"               , $boPagar13                   );
                         $obTPessoalLancamentoFerias->setDado("cod_tipo"               , $inCodTipo                   );
-                        $obTPessoalLancamentoFerias->inclusao($boTransacao);
+                        $obTPessoalLancamentoFerias->inclusao($boTransacao);                        
 
                         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsUltimaMovimentacao);
                         $arDataFinal = explode("/",$rsUltimaMovimentacao->getCampo("dt_final"));
- 
+
                         if ($request->get('inCodTipo',null) != null) {
                             if ($inCodMes == $arDataFinal[1] and $_REQUEST['inAno'] == $arDataFinal[2]) {
                                 $obFFolhaPagamentoGeraRegistroFerias->setDado("cod_contrato"            , $arContrato["cod_contrato"]);
@@ -334,21 +332,21 @@ switch ($stAcao) {
                                 $obErro = $obTPessoalAssentamentoGeradoContratoServidor->inclusao( $boTransacao );
                             }
                             if ( !$obErro->ocorreu() ) {
-                                $inCodMes = str_pad($_REQUEST['inCodMes'],2,"0",STR_PAD_LEFT);
+                                $inCodMes = str_pad($request->get('inCodMes'),2,"0",STR_PAD_LEFT);
                                 if (Sessao::read("boConcederFeriasLote")) {
                                     $stObservacao = "Férias do lote ".$stNomeLote;
                                 } else {
-                                    $stObservacao = "Férias de ".$_REQUEST['dtInicial']." a ".$_REQUEST['dtFinal'].",pagas em ".$inCodMes."/".$_REQUEST['inAno'];
+                                    $stObservacao = "Férias de ".$request->get('dtInicial')." a ".$request->get('dtFinal').",pagas em ".$inCodMes."/".$_REQUEST['inAno'];
                                 }
                                 $obTPessoalAssentamentoGerado->setDado( "cod_assentamento_gerado" , $inCodAssentamentoGerado                   );
                                 $obTPessoalAssentamentoGerado->setDado( "cod_assentamento"        , $rsAssentamentoAssentamento->getCampo("cod_assentamento") );
-                                $obTPessoalAssentamentoGerado->setDado( "periodo_inicial"         , $_REQUEST['dtInicialFerias']                          );
-                                $obTPessoalAssentamentoGerado->setDado( "periodo_final"           , $_REQUEST['dtFinalFerias']                            );
+                                $obTPessoalAssentamentoGerado->setDado( "periodo_inicial"         , $request->get('dtInicialFerias') );
+                                $obTPessoalAssentamentoGerado->setDado( "periodo_final"           , $request->get('dtFinalFerias') );
                                 $obTPessoalAssentamentoGerado->setDado( "automatico"              , true                              );
                                 $obTPessoalAssentamentoGerado->setDado( "observacao"              , $stObservacao );
                                 $obErro = $obTPessoalAssentamentoGerado->inclusao( $boTransacao );
                             }
-                            if ( !$obErro->ocorreu() and !$_REQUEST['boPagamento13'] ) {
+                            if ( !$obErro->ocorreu() and !$request->get('boPagamento13') ) {
                                 $obFPessoalRegistrarEventoPorAssentamento->setDado("cod_contrato"       ,$arContrato["cod_contrato"]);
                                 $obFPessoalRegistrarEventoPorAssentamento->setDado("cod_assentamento"   ,$rsAssentamentoAssentamento->getCampo("cod_assentamento"));
                                 $obFPessoalRegistrarEventoPorAssentamento->setDado("acao"               ,"incluir");
@@ -365,7 +363,7 @@ switch ($stAcao) {
                         if (Sessao::read("boConcederFeriasLote")) {
                             $stMensagem = $stNomeLote." cadastradas com sucesso.";
                         } else {
-                            $stMensagem = "Férias de ".$_REQUEST['dtInicialFerias']." a ".$_REQUEST['dtFinalFerias'];
+                            $stMensagem = "Férias de ".$request->get('dtInicialFerias')." a ".$request->get('dtFinalFerias');
                         }
                     } else {
                         $stMensagem = "O servidor não tem direito a gozar férias, em virtude do número de faltas ser superior ao limite legal.";

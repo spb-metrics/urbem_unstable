@@ -33,43 +33,14 @@
     * @package URBEM
     * @subpackage Mapeamento
 
+    $Id: TLicitacaoContratoAditivos.class.php 64214 2015-12-17 16:13:13Z michel $
+
     * Casos de uso: uc-03.05.22
-*/
-/*
-$Log$
-Revision 1.6  2007/10/11 21:30:32  girardi
-adicionando ao repositório (rescisão de contrato e aditivos de contrato)
-
-Revision 1.5  2006/11/27 12:03:30  leandro.zis
-atualizado
-
-Revision 1.4  2006/11/22 21:29:31  leandro.zis
-atualizado
-
-Revision 1.3  2006/11/10 18:35:54  leandro.zis
-atualizado para o caso de uso 03.05.22
-
-Revision 1.2  2006/11/08 10:51:42  larocca
-Inclusão dos Casos de Uso
-
-Revision 1.1  2006/11/01 19:56:38  leandro.zis
-atualizado
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  licitacao.contrato_aditivos
-  * Data de Criação: 15/09/2006
-
-  * @author Analista: Gelson W. Gonçalves
-  * @author Desenvolvedor: Nome do Programador
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TLicitacaoContratoAditivos extends Persistente
 {
 /**
@@ -77,7 +48,7 @@ class TLicitacaoContratoAditivos extends Persistente
     * @access Private
 */
 
-function TLicitacaoContratoAditivos()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela("licitacao.contrato_aditivos");
@@ -125,16 +96,23 @@ function montaRecuperaAditivos()
     return $stSql;
 }
 
-function recuperaContratosAditivosLicitacao(&$rsRecordSet, $stFiltro="",$stOrder="",$boTransacao="")
+function recuperaContratosAditivosLicitacao(&$rsRecordSet, $stFiltro="", $stOrder="", $boTransacao="")
 {
-    return $this->executaRecupera("montaRecuperaContratosAditivosLicitacao",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaContratosAditivosLicitacao().$stFiltro.$stOrder;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
 
 function montaRecuperaContratosAditivosLicitacao()
 {
-    $stSQL = "\n SELECT contrato_aditivos.exercicio_contrato 
+    $stSQL = "   SELECT contrato_aditivos.exercicio_contrato 
                       , contrato_aditivos.cod_entidade 
-                      , contrato_aditivos.num_contrato 
+                      , contrato_aditivos.num_contrato
+                      , contrato.numero_contrato
                       , contrato_aditivos.exercicio as exercicio_aditivo 
                       , contrato_aditivos.num_aditivo 
                       , contrato_aditivos.responsavel_juridico
@@ -153,9 +131,9 @@ function montaRecuperaContratosAditivosLicitacao()
                       , sw_cgm_responsavel_juridico.nom_cgm as cgm_responsavel_juridico
                       , tipo_termo_aditivo.descricao as descricao_termo_aditivo
                       , tipo_alteracao_valor.descricao as descricao_tipo_alteracao_valor
-                      
+
                       FROM licitacao.contrato_aditivos 
-               
+
                 INNER JOIN licitacao.contrato 
                         ON contrato.exercicio = contrato_aditivos.exercicio_contrato 
                        AND contrato.cod_entidade = contrato_aditivos.cod_entidade 
@@ -165,51 +143,51 @@ function montaRecuperaContratosAditivosLicitacao()
                         ON contrato_licitacao.num_contrato  = contrato.num_contrato
                        AND contrato_licitacao.cod_entidade  = contrato.cod_entidade
                        AND contrato_licitacao.exercicio  = contrato.exercicio
-               
+
                 INNER JOIN licitacao.licitacao
                         ON contrato_licitacao.cod_licitacao  = licitacao.cod_licitacao
                        AND contrato_licitacao.cod_entidade  = licitacao.cod_entidade
                        AND contrato_licitacao.exercicio  = licitacao.exercicio
                        AND contrato_licitacao.cod_modalidade  = licitacao.cod_modalidade
-               
+
                 INNER JOIN sw_cgm 
                         ON sw_cgm.numcgm = contrato.cgm_contratado
-               
+
                 INNER JOIN sw_cgm as sw_cgm_responsavel_juridico
                         ON sw_cgm_responsavel_juridico.numcgm = contrato_aditivos.responsavel_juridico
-               
-                INNER JOIN  orcamento.entidade
-                        ON  contrato.cod_entidade = entidade.cod_entidade
+
+                INNER JOIN orcamento.entidade
+                        ON contrato.cod_entidade = entidade.cod_entidade
                        AND contrato.exercicio = entidade.exercicio
-               
+
                 INNER JOIN sw_cgm AS cgm_entidade
                         ON entidade.numcgm = cgm_entidade.numcgm
-                        
+
                  LEFT JOIN licitacao.tipo_termo_aditivo
                         ON tipo_termo_aditivo.cod_tipo = contrato_aditivos.tipo_termo_aditivo
-                 
+
                  LEFT JOIN licitacao.tipo_alteracao_valor
                         ON tipo_alteracao_valor.cod_tipo = contrato_aditivos.tipo_valor  
-               
-                 WHERE ";
 
-    if ($this->getDado("num_aditivo")) {
-        $stSQL .= " contrato_aditivos.num_aditivo = ".$this->getDado("num_aditivo")." AND  ";
-    }
-    if ($this->getDado("cod_entidade")) {
-        $stSQL .= " contrato_aditivos.cod_entidade = ".$this->getDado("cod_entidade")." AND  ";
-    }
-    if ($this->getDado("num_contrato")) {
-        $stSQL .= " contrato_aditivos.num_contrato = ".$this->getDado("num_contrato")." AND  ";
-    }
-    if ($this->getDado("exercicio")) {
-        $stSQL .= " contrato_aditivos.exercicio = '".$this->getDado("exercicio")."' AND  ";
-    }
-    if ($this->getDado("exercicio_contrato")) {
-        $stSQL .= " contrato_aditivos.exercicio_contrato = '".$this->getDado("exercicio_contrato")."' AND  ";
-    }
+                 WHERE contrato_aditivos.num_contrato IS NOT NULL  \n";
 
-    $stSQL = substr($stSQL, 0, strlen($stSQL)-6);
+    if ($this->getDado("num_aditivo"))
+        $stSQL .= " AND contrato_aditivos.num_aditivo = ".$this->getDado("num_aditivo")." \n";
+
+    if ($this->getDado("cod_entidade"))
+        $stSQL .= " AND contrato_aditivos.cod_entidade = ".$this->getDado("cod_entidade")." \n";
+
+    if ($this->getDado("num_contrato"))
+        $stSQL .= " AND contrato_aditivos.num_contrato = ".$this->getDado("num_contrato")." \n";
+
+    if ($this->getDado("numero_contrato"))
+        $stSQL .= " AND contrato.numero_contrato = ".$this->getDado("numero_contrato")." \n";
+
+    if ($this->getDado("exercicio"))
+        $stSQL .= " AND contrato_aditivos.exercicio = '".$this->getDado("exercicio")."' \n";
+
+    if ($this->getDado("exercicio_contrato"))
+        $stSQL .= " AND contrato_aditivos.exercicio_contrato = '".$this->getDado("exercicio_contrato")."' \n";
 
     return $stSQL;
 }

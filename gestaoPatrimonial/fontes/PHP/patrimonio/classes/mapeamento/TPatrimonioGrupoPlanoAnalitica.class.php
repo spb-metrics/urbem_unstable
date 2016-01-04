@@ -50,16 +50,19 @@ class TPatrimonioGrupoPlanoAnalitica extends Persistente
     * @access Private
 */
 function __construct()
-{
+{   
     parent::__construct();
     $this->setTabela('patrimonio.grupo_plano_analitica');
-    $this->setCampoCod('cod_grupo');
+    $this->setCampoCod('cod_grupo');    
     $this->setComplementoChave('cod_natureza,exercicio,cod_plano');
-    $this->AddCampo('cod_grupo','integer',true,'',true,false);
-    $this->AddCampo('cod_natureza','integer',true,'',true,"TPatrimonioNatureza");
-    $this->AddCampo('exercicio','varchar',true,'4',true,false);
-    $this->AddCampo('cod_plano','integer',true,'',true,false);
-
+    
+    $this->AddCampo('cod_grupo'                   ,'integer' ,true ,''  ,true ,false);
+    $this->AddCampo('cod_natureza'                ,'integer' ,true ,''  ,true ,"TPatrimonioNatureza");
+    $this->AddCampo('exercicio'                   ,'varchar' ,true ,'4' ,true ,false);
+    $this->AddCampo('cod_plano'                   ,'integer' ,true ,''  ,true ,false);
+    $this->AddCampo('cod_plano_doacao'            ,'integer' ,false ,'' ,false ,false);
+    $this->AddCampo('cod_plano_perda_involuntaria','integer' ,false ,'' ,false ,false);
+    $this->AddCampo('cod_plano_transferencia'     ,'integer' ,false ,'' ,false ,false);
 }
 
 }

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenho.php 64114 2015-12-03 18:49:51Z michel $
+    $Id: FMManterEmpenho.php 64256 2015-12-22 16:06:28Z michel $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -573,12 +573,12 @@ $obHdnDtContrato = new Hidden;
 $obHdnDtContrato->setName ('dtContrato');
 $obHdnDtContrato->setId   ('dtContrato');
 $obHdnDtContrato->setValue('');
-    
+
 $obContrato = new IPopUpContrato( $obForm );
 $obContrato->obHdnBoFornecedor->setValue(TRUE);
-$obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inNumContrato,inCodEntidade,inCodFornecedor');");
+$obContrato->obBuscaInner->obCampoCod->obEvento->setOnBlur("montaParametrosGET('validaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');");
 $obContrato->obBuscaInner->setValoresBusca('', '', '');
-$obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodEntidade,inCodFornecedor');".$obContrato->obBuscaInner->getFuncaoBusca());
+$obContrato->obBuscaInner->setFuncaoBusca("montaParametrosGET('montaBuscaContrato', 'inCodContrato,inCodEntidade,inCodFornecedor,stExercicioContrato');".$obContrato->obBuscaInner->getFuncaoBusca());
 
 //****************************************//
 // Monta FORMULARIO
@@ -649,11 +649,13 @@ if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
 }
 
 $obMontaAtributos->geraFormulario ( $obFormulario );
+
 /*
 $obFormulario->addTitulo('Contrato');
 $obFormulario->addHidden( $obHdnDtContrato );
 $obContrato->geraFormulario($obFormulario);
 */
+
 $obFormulario->addTitulo( "Itens do empenho" );
 $obFormulario->addSpan( $obSpan );
 $obFormulario->addComponente( $obLblVlTotal         );

@@ -40,19 +40,10 @@
     * Casos de uso: uc-03.01.06
 */
 
-/*
-$Log$
-Revision 1.2  2007/09/27 12:57:24  hboaventura
-adicionando arquivos
-
-Revision 1.1  2007/09/18 15:11:04  hboaventura
-Adicionando ao repositório
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_COMPONENTES."IPopUpBem.class.php");
+include_once CAM_GP_PAT_COMPONENTES.'IPopUpBem.class.php';
+include_once CAM_GP_PAT_MAPEAMENTO.'TPatrimonioTipoBaixa.class.php';
 
 $stPrograma = "ManterBaixarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -62,7 +53,7 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 include_once( $pgJs );
 
@@ -83,33 +74,46 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ("stCtrl" );
 $obHdnCtrl->setValue("");
 
+$obTPatrimonioTipoBaixa = new TPatrimonioTipoBaixa();
+$obTPatrimonioTipoBaixa->recuperaTodos($rsTipoBaixa, " WHERE cod_tipo <> 0"," ORDER BY cod_tipo");
+
+$obCmbTipoBaixa = new Select();
+$obCmbTipoBaixa->setName       ( "inTipoBaixa"   );
+$obCmbTipoBaixa->setRotulo     ( "Tipo da baixa" );
+$obCmbTipoBaixa->setId         ( "inTipoBaixa"   );
+$obCmbTipoBaixa->setCampoId    ( "cod_tipo"      );
+$obCmbTipoBaixa->setCampoDesc  ( "[cod_tipo] - [descricao]"     );
+$obCmbTipoBaixa->setNull       ( false           );
+$obCmbTipoBaixa->addOption     ( '','Selecione'  );
+$obCmbTipoBaixa->preencheCombo ( $rsTipoBaixa    ); 
+
 //instancia um IPopUPBem Inicial
 $obIPopUpBemInicio = new IPopUpBem( $obForm );
-$obIPopUpBemInicio->setId( 'stNomBemInicio' );
+$obIPopUpBemInicio->setId    ( 'stNomBemInicio' );
 $obIPopUpBemInicio->setRotulo( 'Bem Inicial' );
-$obIPopUpBemInicio->setTitle( 'Informe o código inicial do bem.' );
-$obIPopUpBemInicio->setNull( true );
+$obIPopUpBemInicio->setTitle ( 'Informe o código inicial do bem.' );
+$obIPopUpBemInicio->setNull  ( true );
 $obIPopUpBemInicio->setObrigatorioBarra( true );
 $obIPopUpBemInicio->obCampoCod->setName( 'inCodBemInicio' );
-$obIPopUpBemInicio->obCampoCod->setId( 'inCodBemInicio' );
-$obIPopUpBemInicio->setTipoBusca( 'bemNaoBaixado' );
+$obIPopUpBemInicio->obCampoCod->setId  ( 'inCodBemInicio' );
+$obIPopUpBemInicio->setTipoBusca       ( 'bemNaoBaixado' );
 
 //instancia um IPopUpBem Final
 $obIPopUpBemFim = new IPopUpBem( $obForm );
-$obIPopUpBemFim->setId( 'stNomBemFim' );
+$obIPopUpBemFim->setId    ( 'stNomBemFim' );
 $obIPopUpBemFim->setRotulo( 'Bem Final' );
-$obIPopUpBemFim->setTitle( 'Informe o código final do bem.' );
-$obIPopUpBemFim->setNull( true );
+$obIPopUpBemFim->setTitle ( 'Informe o código final do bem.' );
+$obIPopUpBemFim->setNull  ( true );
 $obIPopUpBemFim->obCampoCod->setName( 'inCodBemFim' );
-$obIPopUpBemFim->obCampoCod->setId( 'inCodBemFim' );
-$obIPopUpBemFim->setTipoBusca( 'bemNaoBaixado' );
+$obIPopUpBemFim->obCampoCod->setId  ( 'inCodBemFim' );
+$obIPopUpBemFim->setTipoBusca       ( 'bemNaoBaixado' );
 
 //cria os botões de acoes para os bens
 $obBtnOk = new Ok;
 $obBtnOk->setName ( "btnOk" );
 $obBtnOk->setValue( "Incluir" );
 $obBtnOk->setTipo ( "button" );
-$obBtnOk->obEvento->setOnClick( "montaParametrosGET( 'incluirBaixaBem', 'inCodBemInicio,inCodBemFim' );" );
+$obBtnOk->obEvento->setOnClick( "montaParametrosGET( 'incluirBaixaBem', 'inCodBemInicio,inCodBemFim,inTipoBaixa' );" );
 
 $obBtnLimpar = new Button;
 $obBtnLimpar->setName ( "btnOk" );
@@ -119,18 +123,18 @@ $obBtnLimpar->obEvento->setOnClick( "LimparCodigos();" );
 //instancia componente para a data de baixa
 $obDtBaixa = new Data();
 $obDtBaixa->setRotulo( 'Data de Baixa' );
-$obDtBaixa->setTitle( 'Informe a data de baixa do bem.' );
-$obDtBaixa->setName( 'dtBaixa' );
-$obDtBaixa->setId( 'dtBaixa' );
-$obDtBaixa->setNull( false );
+$obDtBaixa->setTitle ( 'Informe a data de baixa do bem.' );
+$obDtBaixa->setName  ( 'dtBaixa' );
+$obDtBaixa->setId    ( 'dtBaixa' );
+$obDtBaixa->setNull  ( false );
 
 //instancia componente para o motivo
 $obTxtMotivo = new TextArea();
 $obTxtMotivo->setRotulo( 'Motivo' );
-$obTxtMotivo->setTitle( 'Informe o motivo da baixa do bem.' );
-$obTxtMotivo->setName( 'stMotivo' );
-$obTxtMotivo->setId( 'stMotivo' );
-$obTxtMotivo->setNull( false );
+$obTxtMotivo->setTitle ( 'Informe o motivo da baixa do bem.' );
+$obTxtMotivo->setName  ( 'stMotivo' );
+$obTxtMotivo->setId    ( 'stMotivo' );
+$obTxtMotivo->setNull  ( false );
 
 //cria um span para os bens a serem baixados
 $obSpnBem = new Span();
@@ -144,6 +148,7 @@ $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 
 $obFormulario->addTitulo( 'Baixa de Bem' );
+$obFormulario->addComponente( $obCmbTipoBaixa );
 $obFormulario->addComponente( $obIPopUpBemInicio );
 $obFormulario->addComponente( $obIPopUpBemFim );
 
@@ -157,3 +162,5 @@ $obFormulario->OK();
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

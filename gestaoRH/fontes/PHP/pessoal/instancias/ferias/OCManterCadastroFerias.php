@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 64078 2015-11-30 13:14:45Z evandro $
+    $Id: OCManterCadastroFerias.php 64270 2015-12-23 19:35:29Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -1056,21 +1056,6 @@ function alterarPost()
             $stJs .= "f.boConcederFeriasLote.checked = true;";
             $stJs .= "f.stTipoFiltro.value = 'geral';\n";
             $stJs .= "f.stTipoFiltro.disabled = true;\n";
-        } else {
-            include_once(CAM_GRH_PES_COMPONENTES."ISelectRegime.class.php");
-            $obISelectRegime = new ISelectRegime();
-            $obISelectRegime->obTxtRegime->setNull(false);
-            $obISelectRegime->obCmbRegime->setNull(false);
-
-            $obFormulario = new Formulario;
-            $obISelectRegime->geraFormulario($obFormulario);
-            $obFormulario->montaInnerHTML();
-            $obFormulario->obJavaScript->montaJavaScript();
-            $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
-            $stEval = str_replace("\n","",$stEval);
-            $stHtml = $obFormulario->getHTML();
-
-            $stJs = "f.action = '".$pgForm."?".Sessao::getId()."';";
         }
     } else {
         include_once(CAM_GRH_PES_COMPONENTES."IFiltroCompetencia.class.php");

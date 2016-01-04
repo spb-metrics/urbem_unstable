@@ -418,52 +418,52 @@ function alterar($boTransacao = "")
         if ( !$obErro->ocorreu() ) {
             $obRAlmoxarifadoPermissaoCentroDeCustos->addCentroDeCustos();
             $obRAlmoxarifadoPermissaoCentroDeCustos->roUltimoCentro->setCodigo($this->getCodigo());
-
+            $obRAlmoxarifadoPermissaoCentroDeCustos->obRCGMPessoaFisica->setNumCGM($this->obRCGMResponsavel->getNumCGM());
             $obErro = $obRAlmoxarifadoPermissaoCentroDeCustos->excluir( $boTransacao );
         }
 
         if ( !$obErro->ocorreu() ) {
-                $obRAlmoxarifadoPermissaoCentroDeCustos->obRCGMPessoaFisica->setNumCGM($this->obRCGMResponsavel->getNumCGM());
-                $obRAlmoxarifadoPermissaoCentroDeCustos->addCentroDeCustos();
-                $obRAlmoxarifadoPermissaoCentroDeCustos->roUltimoCentro->setCodigo($this->getCodigo());
-            }
+            $obRAlmoxarifadoPermissaoCentroDeCustos->obRCGMPessoaFisica->setNumCGM($this->obRCGMResponsavel->getNumCGM());
+            $obRAlmoxarifadoPermissaoCentroDeCustos->addCentroDeCustos();
+            $obRAlmoxarifadoPermissaoCentroDeCustos->roUltimoCentro->setCodigo($this->getCodigo());
             $obErro = $obRAlmoxarifadoPermissaoCentroDeCustos->salvarResponsavel( $boTransacao );
+        }
 
-            if ( !$obErro->ocorreu() ) {
-                $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_centro" , $this->getCodigo() );
-                $obTAlmoxarifadoCentroCustoDotacao->setDado( "exercicio"  , Sessao::getExercicio() );                
-                $obErro = $obTAlmoxarifadoCentroCustoDotacao->exclusao( $boTransacao );
-            }
+        if ( !$obErro->ocorreu() ) {
+            $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_centro" , $this->getCodigo() );
+            $obTAlmoxarifadoCentroCustoDotacao->setDado( "exercicio"  , Sessao::getExercicio() );                
+            $obErro = $obTAlmoxarifadoCentroCustoDotacao->exclusao( $boTransacao );
+        }
 
-           if ( !$obErro->ocorreu() ) {
-                $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_centro" , $this->getCodigo() );
-                $obTAlmoxarifadoCentroCustoEntidade->setDado( "exercicio"  , Sessao::getExercicio() );
-                $obErro = $obTAlmoxarifadoCentroCustoEntidade->exclusao( $boTransacao );
-            }
+        if ( !$obErro->ocorreu() ) {
+            $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_centro" , $this->getCodigo() );
+            $obTAlmoxarifadoCentroCustoEntidade->setDado( "exercicio"  , Sessao::getExercicio() );
+            $obErro = $obTAlmoxarifadoCentroCustoEntidade->exclusao( $boTransacao );
+        }
 
-            if ( !$obErro->ocorreu () ) {
-                $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_centro", $this->getCodigo());
-                $obTAlmoxarifadoCentroCustoEntidade->setDado( "exercicio", $this->roUltimaEntidade->getExercicio());
-                $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_entidade", $this->roUltimaEntidade->getCodigoEntidade() );
-                $obErro = $obTAlmoxarifadoCentroCustoEntidade->inclusao( $boTransacao );
-            }
+        if ( !$obErro->ocorreu () ) {
+            $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_centro", $this->getCodigo());
+            $obTAlmoxarifadoCentroCustoEntidade->setDado( "exercicio", $this->roUltimaEntidade->getExercicio());
+            $obTAlmoxarifadoCentroCustoEntidade->setDado( "cod_entidade", $this->roUltimaEntidade->getCodigoEntidade() );
+            $obErro = $obTAlmoxarifadoCentroCustoEntidade->inclusao( $boTransacao );
+        }
 
-            if ( !$obErro->ocorreu () ) {
-                for ($inCount=0; $inCount<count($this->arDotacoes); $inCount++) {
-                    $obDotacao = $this->arDotacoes[$inCount];
+        if ( !$obErro->ocorreu () ) {
+            for ($inCount=0; $inCount<count($this->arDotacoes); $inCount++) {
+                $obDotacao = $this->arDotacoes[$inCount];
 
-                    $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_entidade", $this->roUltimaEntidade->getCodigoEntidade());
-                    $obTAlmoxarifadoCentroCustoDotacao->setDado( "exercicio", $this->roUltimaEntidade->getExercicio());
-                    $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_centro", $this->getCodigo());
-                    $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_despesa", $obDotacao->getCodDespesa());
-                    $obErro = $obTAlmoxarifadoCentroCustoDotacao->inclusao( $boTransacao );
-                    if ( $obErro->ocorreu() ) {
-                         break;
-                    }
+                $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_entidade", $this->roUltimaEntidade->getCodigoEntidade());
+                $obTAlmoxarifadoCentroCustoDotacao->setDado( "exercicio", $this->roUltimaEntidade->getExercicio());
+                $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_centro", $this->getCodigo());
+                $obTAlmoxarifadoCentroCustoDotacao->setDado( "cod_despesa", $obDotacao->getCodDespesa());
+                $obErro = $obTAlmoxarifadoCentroCustoDotacao->inclusao( $boTransacao );
+                if ( $obErro->ocorreu() ) {
+                     break;
                 }
             }
-            $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTAlmoxarifadoAlmoxarife );
         }
+        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTAlmoxarifadoAlmoxarife );
+    }
 
         return $obErro;
     }

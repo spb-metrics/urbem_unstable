@@ -100,12 +100,12 @@ function listaEventos() {
     $html = str_replace("  ","",$html);
     $html = str_replace("'","\\'",$html);
 
-    $stJs .= "d.getElementById('spnLista').innerHTML = '';\n";
-    $stJs .= "d.getElementById('spnLista').innerHTML = '".$html."';\n";
+    $stJs .= "jq('#spnLista').html('');\n";
+    $stJs .= "jq('#spnLista').html('".$html."');\n";
     
-    $stJs .= "d.getElementById('inCodigoEvento').value = '';\n";
-    $stJs .= "d.getElementById('stEvento').innerHTML = '&nbsp;';\n";
-    $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '&nbsp;';\n";
+    $stJs .= "jq('#inCodigoEvento').val('');\n";
+    $stJs .= "jq('#stEvento').html('&nbsp;');\n";
+    $stJs .= "jq('#stTextoComplementar').html('&nbsp;');\n";
 
     return $stJs;
 }
@@ -157,9 +157,8 @@ switch ($stCtrl) {
             $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento();
 
             foreach ($arEventosAutomaticos as $registro) {
-                $obRFolhaPagamentoEvento->setCodigo($registro);
+                $obRFolhaPagamentoEvento->setCodEvento($registro);
                 $obRFolhaPagamentoEvento->listarEvento($rsRegistro);
-
                 $arRegistro['codigo'] = $rsRegistro->getCampo('codigo');
                 $arRegistro['cod_evento'] = $rsRegistro->getCampo('cod_evento');
                 $arRegistro['descricao'] = $rsRegistro->getCampo('descricao');

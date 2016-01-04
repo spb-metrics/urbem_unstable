@@ -142,7 +142,7 @@ $obFormulario->addComponente ( $obSimNao );
 // Recurso
 $obIMontaRecursoDestinacao = new IMontaRecursoDestinacao;
 $obIMontaRecursoDestinacao->setFiltro ( true );
-$obIMontaRecursoDestinacao->geraFormulario ( &$obFormulario );
+$obIMontaRecursoDestinacao->geraFormulario ( $obFormulario );
 
 // Componente Lista de Assinaturas
 

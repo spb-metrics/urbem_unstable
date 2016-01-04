@@ -43,12 +43,29 @@ include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php"   				
 
 class  IMontaDotacaoDesdobramentoPadrao extends Objeto
 {
+    /**
+    * @access Public;
+    * @var Reference Object
+    **/
     public $obForm;
+    /**
+    * @access Public;
+    * @var Boolean
+    **/
     public $boMostraSintetico;
+    /**
+    * @access Public;
+    * @var Boolean
+    **/
+    public $boReserva;
+    
 
     public function setMostraSintetico($valor) { $this->boMostraSintetico = $valor; }
-    public function getMostraSintetico() { return $this->boMostraSintetico;}
-
+    public function getMostraSintetico()       { return $this->boMostraSintetico;}
+    
+    public function setConsideraReserva($valor) { $this->boReserva = $valor; }
+    public function getConsideraReserva()       { return $this->boReserva;}
+    
     public function IMontaDotacaoDesdobramentoPadrao()
     {
         include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
@@ -128,27 +145,36 @@ class  IMontaDotacaoDesdobramentoPadrao extends Objeto
 
     public function geraFormulario(&$obFormulario)
     {
+
         $stParams = Sessao::getId();
+        
         if ( $this->getMostraSintetico() ) {
             $stParams .= '&boMostraSintetico=true';
         }
-        $js = " if (this.value!=document.frm.inCodDespesaAnteriorPadrao.value) {                                                 ";
-        $js.= "   document.frm.inCodDespesaAnteriorPadrao.value=this.value;                                                    ";
-        //       $js.= "   BloqueiaFrames(true,false);                                                                            ";
-        $js.= "   var stTarget = document.frm.target;                                                                    ";
-        $js.= "   var stAction = document.frm.action;                                                                    ";
-        $js.= "   document.frm.stCtrl.value = 'buscaDespesaDiverso';                                                     ";
-        $js.= "   document.getElementById('stNomDespesaPadrao').innerHTML = '&nbsp;';                                          ";
-        $js.= "   document.frm.target ='oculto';                                                                         ";
+        
+        if ( $this->getConsideraReserva() == true) {
+            $stParams .= '&boConsideraReserva=true';
+        } else {
+            $stParams .= '&boConsideraReserva=false';
+        }
+        
+        $js = " if (this.value!=document.frm.inCodDespesaAnteriorPadrao.value) {         ";
+        $js.= "   document.frm.inCodDespesaAnteriorPadrao.value=this.value;              ";
+        //       $js.= "   BloqueiaFrames(true,false);                                   ";
+        $js.= "   var stTarget = document.frm.target;                                    ";
+        $js.= "   var stAction = document.frm.action;                                                                     ";
+        $js.= "   document.frm.stCtrl.value = 'buscaDespesaDiverso';                                                      "; 
+        $js.= "   document.getElementById('stNomDespesaPadrao').innerHTML = '&nbsp;';                                     ";
+        $js.= "   document.frm.target ='oculto';                                                                          ";
         $js.= "   document.frm.action ='../../instancias/processamento/OCIMontaDotacaoDesdobramentoPadrao.php?".$stParams."';";
-        $js.= "   document.frm.submit();                                                                                 ";
-        $js.= "   document.frm.action = '".$pgOcul."?".Sessao::getId()."';                                                   ";
-        $js.= "   document.frm.action = stAction;                                                                        ";
-        $js.= "   document.frm.target = stTarget;                                                                        ";
+        $js.= "   document.frm.submit();                                                                                  ";
+        $js.= "   document.frm.action = '".$pgOcul."?".Sessao::getId()."';                                                ";
+        $js.= "   document.frm.action = stAction;                                                                         ";
+        $js.= "   document.frm.target = stTarget;                                                                         ";
         $js.= " } ";
 
         $this->obBscDespesa->obCampoCod->obEvento->setOnBlur($js);
-
+        
         $obFormulario->addHidden    ( $this->obHdnCodDespesa    );
         $obFormulario->addHidden    ( $this->obHdnSaldoDotacao  );
         $obFormulario->addHidden    ( $this->obHdnCodClassificacao );
@@ -160,4 +186,5 @@ class  IMontaDotacaoDesdobramentoPadrao extends Objeto
         $obFormulario->addSpan      ( $this->obSpanSaldo        );
     }
 }
+
 ?>

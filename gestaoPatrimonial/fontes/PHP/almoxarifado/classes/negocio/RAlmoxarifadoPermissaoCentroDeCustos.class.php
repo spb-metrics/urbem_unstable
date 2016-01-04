@@ -185,6 +185,7 @@ var $obTAlmoxarifadoPermissaoCentroCusto;
   $obTAlmoxarifadoPermissaoCentroCusto = new TAlmoxarifadoPermissaoCentroCusto;
   if ($this->roUltimoCentro->getCodigo()) {
       $obTAlmoxarifadoPermissaoCentroCusto->setDado( "cod_centro" ,$this->roUltimoCentro->getCodigo());
+      $obTAlmoxarifadoPermissaoCentroCusto->setDado("numcgm",$this->obRCGMPessoaFisica->getNumCGM());
   }
   $obErro = $obTAlmoxarifadoPermissaoCentroCusto->exclusao($boTransacao);
 

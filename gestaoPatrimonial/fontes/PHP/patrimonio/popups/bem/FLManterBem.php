@@ -34,18 +34,18 @@
 
     * Casos de uso: uc-03.01.06
 
-    $Id: FLManterBem.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterBem.php 64184 2015-12-11 14:09:44Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioEspecie.class.php");
-include_once( CAM_GP_PAT_MAPEAMENTO."TPatrimonioSituacaoBem.class.php");
-include_once( CAM_GP_PAT_COMPONENTES."IMontaClassificacao.class.php");
-include_once( CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php" );
-include_once( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php" );
-include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
-include_once( CAM_GA_ADM_COMPONENTES."IMontaLocalizacao.class.php" );
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioEspecie.class.php";
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioSituacaoBem.class.php";
+include_once CAM_GP_PAT_COMPONENTES."IMontaClassificacao.class.php";
+include_once CAM_GP_COM_COMPONENTES."IPopUpFornecedor.class.php";
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php";
+include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
+include_once CAM_GA_ADM_COMPONENTES."IMontaLocalizacao.class.php";
 
 $stPrograma = "ManterBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -56,7 +56,7 @@ $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
 Sessao::write('paginando',false);
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //cria um novo formulario
 $obForm = new Form;
@@ -74,16 +74,16 @@ $obHdnCtrl->setValue("");
 
 $obHdnStCampoNum = new Hidden();
 $obHdnStCampoNum->setName( 'stCampoNum' );
-$obHdnStCampoNum->setValue( $_REQUEST['campoNum'] );
+$obHdnStCampoNum->setValue( $request->get('campoNum') );
 
 $obHdnStCampoNom = new Hidden();
 $obHdnStCampoNom->setName( 'stCampoNom' );
-$obHdnStCampoNom->setValue( $_REQUEST['campoNom'] );
+$obHdnStCampoNom->setValue( $request->get('campoNom') );
 
 //cria hiddens para os filtros
 $obHdnBoBemBaixado = new Hidden();
 $obHdnBoBemBaixado->setName( 'boBemBaixado' );
-$obHdnBoBemBaixado->setValue( $_REQUEST['boBemBaixado'] );
+$obHdnBoBemBaixado->setValue( $request->get('boBemBaixado') );
 
 //cria o componente IMontaClassificacao
 $obIMontaClassificacao = new IMontaClassificacao( $obForm );
@@ -103,32 +103,32 @@ $obTipoBuscaDescricaoBem = new TipoBusca( $obTxtDescricaoBem );
 //instancia componente TextBox para o codigo do bem
 $obInCodBem = new Inteiro();
 $obInCodBem->setRotulo( 'Código do Bem' );
-$obInCodBem->setTitle( 'Informe o código do bem.' );
-$obInCodBem->setName( 'inCodBem' );
+$obInCodBem->setTitle ( 'Informe o código do bem.' );
+$obInCodBem->setName  ( 'inCodBem' );
 
 //cria o componente radio para a placa de identificação
 $obRdPlacaIdentificacaoSim = new Radio();
 $obRdPlacaIdentificacaoSim->setRotulo( 'Placa de Identificação' );
-$obRdPlacaIdentificacaoSim->setTitle( 'Informe se o bem possui placa de identificação;' );
-$obRdPlacaIdentificacaoSim->setName( 'stPlacaIdentificacao' );
-$obRdPlacaIdentificacaoSim->setValue( 'sim' );
-$obRdPlacaIdentificacaoSim->setLabel( 'Sim' );
+$obRdPlacaIdentificacaoSim->setTitle ( 'Informe se o bem possui placa de identificação;' );
+$obRdPlacaIdentificacaoSim->setName  ( 'stPlacaIdentificacao' );
+$obRdPlacaIdentificacaoSim->setValue ( 'sim' );
+$obRdPlacaIdentificacaoSim->setLabel ( 'Sim' );
 $obRdPlacaIdentificacaoSim->obEvento->setOnClick( "montaParametrosGET( 'montaPlacaIdentificacaoFiltro', 'stPlacaIdentificacao' );" );
 
 $obRdPlacaIdentificacaoNao = new Radio();
 $obRdPlacaIdentificacaoNao->setRotulo( 'Placa de Identificação' );
-$obRdPlacaIdentificacaoNao->setTitle( 'Informe se o bem possui placa de identificação;' );
-$obRdPlacaIdentificacaoNao->setName( 'stPlacaIdentificacao' );
-$obRdPlacaIdentificacaoNao->setValue( 'nao' );
-$obRdPlacaIdentificacaoNao->setLabel( 'Não' );
+$obRdPlacaIdentificacaoNao->setTitle ( 'Informe se o bem possui placa de identificação;' );
+$obRdPlacaIdentificacaoNao->setName  ( 'stPlacaIdentificacao' );
+$obRdPlacaIdentificacaoNao->setValue ( 'nao' );
+$obRdPlacaIdentificacaoNao->setLabel ( 'Não' );
 $obRdPlacaIdentificacaoNao->obEvento->setOnClick( "montaParametrosGET( 'montaPlacaIdentificacaoFiltro', 'stPlacaIdentificacao' );" );
 
 $obRdPlacaIdentificacaoTodos = new Radio();
 $obRdPlacaIdentificacaoTodos->setRotulo( 'Placa de Identificação' );
-$obRdPlacaIdentificacaoTodos->setTitle( 'Informe se o bem possui placa de identificação.' );
-$obRdPlacaIdentificacaoTodos->setName( 'stPlacaIdentificacao' );
-$obRdPlacaIdentificacaoTodos->setValue( 'todos' );
-$obRdPlacaIdentificacaoTodos->setLabel( 'Todos' );
+$obRdPlacaIdentificacaoTodos->setTitle ( 'Informe se o bem possui placa de identificação.' );
+$obRdPlacaIdentificacaoTodos->setName  ( 'stPlacaIdentificacao' );
+$obRdPlacaIdentificacaoTodos->setValue ( 'todos' );
+$obRdPlacaIdentificacaoTodos->setLabel ( 'Todos' );
 $obRdPlacaIdentificacaoTodos->setChecked( true );
 $obRdPlacaIdentificacaoTodos->obEvento->setOnClick( "montaParametrosGET( 'montaPlacaIdentificacaoFiltro', 'stPlacaIdentificacao' );" );
 
@@ -139,8 +139,8 @@ $obSpnNumeroPlaca->setId( 'spnNumeroPlaca' );
 //instancia componente  Select para a ordenacao
 $obSlOrdenacao = new Select();
 $obSlOrdenacao->setRotulo( 'Ordernar' );
-$obSlOrdenacao->setTitle( 'Seleciona o tipo de ordenação dos bens.' );
-$obSlOrdenacao->setName( 'stOrdenacao' );
+$obSlOrdenacao->setTitle ( 'Seleciona o tipo de ordenação dos bens.' );
+$obSlOrdenacao->setName  ( 'stOrdenacao' );
 $obSlOrdenacao->addOption( 'codigo','Código' );
 $obSlOrdenacao->addOption( 'descricao','Descrição' );
 
@@ -152,7 +152,7 @@ $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addHidden    ( $obHdnStCampoNum );
 $obFormulario->addHidden    ( $obHdnStCampoNom );
 //se for passado os filtros
-if ($_REQUEST['boBemBaixado']) {
+if ($request->get('boBemBaixado')) {
      $obFormulario->addHidden( $obHdnBoBemBaixado );
 }
 
@@ -170,3 +170,5 @@ $obFormulario->show();
 $jsOnLoad = "montaParametrosGET( 'montaPlacaIdentificacaoFiltro', 'stPlacaIdentificacao' );";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

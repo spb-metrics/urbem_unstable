@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompra.php 63367 2015-08-20 21:27:34Z michel $
+ $Id: FMManterSolicitacaoCompra.php 64185 2015-12-11 19:51:48Z arthur $
 
  */
 
@@ -370,6 +370,7 @@ $obHdnConfiguracao->setValue ($rsConfiguracao->getCampo("valor") );
 
 $obDotacaoPadrao = new IMontaDotacaoDesdobramentoPadrao();
 $obDotacaoPadrao->obBscDespesa->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCodEntidade='+document.frm.inCodEntidade.value+'&inCodDespesaPadrao='+document.frm.inCodDespesaPadrao.value,'verificaEntidadeDotacao');");
+$obDotacaoPadrao->setConsideraReserva( true );
 
 $obSpnItensOutraSolicitacao = new Span();
 $obSpnItensOutraSolicitacao->setID ('spnItensOutraSolicitacao');

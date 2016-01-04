@@ -293,7 +293,7 @@ BEGIN
         inIndex := inIndex + 1;
     END LOOP;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- SELECT * FROM recuperaRelatorioEspelhoPonto(156,1,1,'01/10/2008','31/10/2008','');
 -- SELECT * FROM recuperaRelatorioEspelhoPontoResumo(294,4,'2008-10-01','2008-10-31','');

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacaoParcial.php 64133 2015-12-07 16:18:28Z michel $
+    $Id: PRManterAutorizacaoParcial.php 64205 2015-12-15 20:31:55Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -47,6 +47,8 @@ include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenhoAssinatura.class.p
 include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoDespesa.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasMapaItemReserva.class.php";
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoClassificacaoDespesa.class.php";
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoDespesa.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterAutorizacaoParcial";
@@ -80,10 +82,23 @@ foreach ($arItens as $key => $arItem) {
         $arListaExcluidos[] = $arItem['cod_item'];
     else{
         $stChaveDespesaFornecedor = $arItem['inCodDespesa'].'.'.$arItem['stCodClassificacao'].'.'.$arItem['inCgmFornecedor'];
-        if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]))
-            $arListaDespesaFornecedor[$stChaveDespesaFornecedor] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor].','.$arItem['cod_item'];
+
+        if($arItem['boDespesaMapaItem'] == 'TRUE'){
+            if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] ))
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'].','.$arItem['cod_item'];
+            else
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] = $arItem['cod_item'];
+        }else{
+            if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] ))
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'].','.$arItem['cod_item'];
+            else
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] = $arItem['cod_item'];
+        }
+
+        if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] ))
+            $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'].','.$arItem['cod_item'];
         else
-            $arListaDespesaFornecedor[$stChaveDespesaFornecedor] = $arItem['cod_item'];
+            $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arItem['cod_item'];
     }
 }
 $stListaExcluidos = implode(",",$arListaExcluidos);
@@ -105,12 +120,31 @@ if(count($arListaDespesaFornecedor)==0){
         if(count($arListaExcluidos)>0)
             $stFiltroHomologacao .= " AND solicitacao_item_dotacao.cod_item NOT IN (".$stListaExcluidos.")          \n";
 
-        $stFiltroHomologacao .= " AND solicitacao_item_dotacao.cod_despesa      = ".$inCodDespesa."                 \n";
-        $stFiltroHomologacao .= " AND solicitacao_item_dotacao.cod_conta        = ".$inCodConta."                   \n";
-        $stFiltroHomologacao .= " AND cotacao_fornecedor_item.cgm_fornecedor    = ".$inCgmFornecedor."              \n";
-        $stFiltroHomologacao .= " AND solicitacao_item_dotacao.cod_item         IN (".$arItensDespesaFornecedor.")  \n";
+        $stFiltroHomologacao .= " AND (  (    solicitacao_item_dotacao.cod_despesa IS NOT NULL                      \n";
+        $stFiltroHomologacao .= "         AND solicitacao_item_dotacao.cod_despesa = ".$inCodDespesa." )            \n";
+        $stFiltroHomologacao .= "      OR solicitacao_item_dotacao.cod_despesa IS NULL                              \n";
+        $stFiltroHomologacao .= "     )                                                                             \n";
+        $stFiltroHomologacao .= " AND (  (    solicitacao_item_dotacao.cod_conta IS NOT NULL                        \n";
+        $stFiltroHomologacao .= "         AND solicitacao_item_dotacao.cod_conta = ".$inCodConta." )                \n";
+        $stFiltroHomologacao .= "      OR solicitacao_item_dotacao.cod_conta IS NULL                                \n";
+        $stFiltroHomologacao .= "     )                                                                             \n";
 
-        $obTLicHomologacao->recuperaGrupoAutEmpenho( $rsAutEmpenho, $stFiltroHomologacao );
+        $stFiltroHomologacao .= " AND cotacao_fornecedor_item.cgm_fornecedor    = ".$inCgmFornecedor."              \n";
+
+        $stFiltroItens = " AND mapa_item.cod_item                               IN (".$arItensDespesaFornecedor['Itens'].") \n";
+
+        $obTLicHomologacao->recuperaGrupoAutEmpenho( $rsAutEmpenho, $stFiltroHomologacao.$stFiltroItens );
+
+        $obTOrcamentoDespesa = new TOrcamentoDespesa();
+        $stFiltroDespesa  =" \n";
+        $stFiltroDespesa .= "and OD.cod_despesa = ".$inCodDespesa."          \n";
+        $stFiltroDespesa .= "and OD.exercicio = '".Sessao::getExercicio()."' \n";
+        $obTOrcamentoDespesa->recuperaRelacionamento($rsDespesa, $stFiltroDespesa);
+
+        $obTOrcamentoClassificacaoDespesa = new TOrcamentoClassificacaoDespesa();
+        $stFiltroDespesa  = "and cod_conta = ".$inCodConta."                 \n";
+        $stFiltroDespesa .= "and exercicio = '".Sessao::getExercicio()."'    \n";
+        $obTOrcamentoClassificacaoDespesa->recuperaRelacionamento($rsClassificacaoDespesa, $stFiltroDespesa);
 
         // data máxima para a entidade
         $data = $request->get('stDtAutorizacao');
@@ -126,7 +160,7 @@ if(count($arListaDespesaFornecedor)==0){
         $dia1 = substr($data1, 0, 2);
         $dataFormatadaLicitacao = $ano1.$mes1.$dia1;
 
-        $arCountItensAderidos = explode(',',$arItensDespesaFornecedor);
+        $arCountItensAderidos = explode(',',$arItensDespesaFornecedor['Itens']);
 
         if($rsAutEmpenho->eof()){
             foreach ($arItens as $key => $arItem) {
@@ -141,11 +175,23 @@ if(count($arListaDespesaFornecedor)==0){
                     break;
                 }
             }
-            $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para os itens(".$arItensDespesaFornecedor.").");
+            $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para os itens(".$arItensDespesaFornecedor['Itens'].").");
         }elseif($rsAutEmpenho->getCampo('qtd_itens_homologados') <> count($arCountItensAderidos)){
-            $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para todos os itens(".$arItensDespesaFornecedor.").");
+            $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para todos os itens(".$arItensDespesaFornecedor['Itens'].").");
         }
-    
+
+        if ($rsDespesa->eof())
+            $obErro->setDescricao("Dotação Orçamentária dos itens(".$arItensDespesaFornecedor['Itens']."), não localizado no exercício de ".Sessao::getExercicio()."!");
+        else{
+            $inNumOrgao = $rsDespesa->getCampo('num_orgao');
+            $inNumUnidade = $rsDespesa->getCampo('num_unidade');
+        }
+
+        if ($rsClassificacaoDespesa->eof())
+            $obErro->setDescricao("Desdobramento dos itens(".$arItensDespesaFornecedor['Itens']."), não localizado no exercício de ".Sessao::getExercicio()."!");
+        else
+            $stMascaraClassificacao = $rsClassificacaoDespesa->getCampo('mascara_classificacao');
+
         if (($dataFormatadaEntidade-$dataFormatadaLicitacao) < 0) {
             $obErro->setDescricao("Data do Processo Licitatório superior à última autorização da entidade ".$request->get('inCodEntidade').".");
         } elseif ($dataFormatadaEntidade - (date("Y").date("m").date("d")) > 0) {
@@ -182,7 +228,7 @@ if(count($arListaDespesaFornecedor)==0){
                                                              ,  cotacao_item.quantidade
                                                         HAVING  coalesce(cotacao_item.quantidade, 0.00) - coalesce(sum(item_pre_empenho.quantidade), 0.00) = 0
                                                    )            \n";
-    
+
                 $stFiltroHomologacao_item .= " AND NOT EXISTS
                                                    (
                                                         SELECT  1
@@ -190,25 +236,28 @@ if(count($arListaDespesaFornecedor)==0){
                                                          WHERE  cotacao_anulada.cod_cotacao = mapa_cotacao.cod_cotacao
                                                            AND  cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
                                                    )            \n";
-    
+
                 $stOrdem = " ORDER BY catalogo_item.descricao   \n";
-                $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacao( $rsItensAutEmpenho, $stFiltroHomologacao_item, $stOrdem );
-    
+
+                if( isset($arItensDespesaFornecedor['itensDespesa']) ){
+                    $stFiltroHomologacao_item .= " AND mapa_item.cod_item IN (".$arItensDespesaFornecedor['itensDespesa'].") \n";
+                    $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacao( $rsItensAutEmpenho, $stFiltroHomologacao_item, $stOrdem );
+                }else
+                    $rsItensAutEmpenho = new RecordSet();
+
                 $boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
                 $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
-    
+
                 $boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
                 $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
-    
+
                 #Reserva de Saldos por Autorização
-                if( $rsItensAutEmpenho->eof() ){
+                if( $rsItensAutEmpenho->eof() && isset($arItensDespesaFornecedor['itensDespesa']) ){
                     $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacaoMapa($rsSolicitacaoReserva, $stFiltroHomologacao_item, $stOrdem );
-    
+
                     while (!$rsSolicitacaoReserva->eof() && !$obErro->ocorreu()) {
-                        $inCodDespesa   = $rsSolicitacaoReserva->getCampo('cod_despesa');
-                        $vlCotacao      = $rsSolicitacaoReserva->getCampo('vl_cotacao');
-                        $inCodConta     = $rsSolicitacaoReserva->getCampo('cod_conta');
-    
+                        $vlCotacao = $rsSolicitacaoReserva->getCampo('vl_cotacao');
+
                         foreach ($arItens as $key => $arItem) {
                             if ( $arItem['cod_item'] == $rsSolicitacaoReserva->getCampo('cod_item') && $arItem['cod_cotacao'] == $rsSolicitacaoReserva->getCampo('cod_cotacao') ) {
                                 $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
@@ -223,12 +272,12 @@ if(count($arListaDespesaFornecedor)==0){
                                 break;
                             }
                         }
-    
+
                         $obTOrcamentoDespesa = new TOrcamentoDespesa;
                         $obTOrcamentoDespesa->setDado( "cod_despesa", $inCodDespesa );
                         $obTOrcamentoDespesa->setDado( "exercicio"  , Sessao::getExercicio() );
                         $obTOrcamentoDespesa->recuperaSaldoDotacao( $rsSaldoDotacao );
-    
+
                         if(!$rsSaldoDotacao->eof()){
                             if(!isset($arSaldoDotacao[$inCodDespesa])){
                                 $arSaldoDotacao[$inCodDespesa]['saldo_inicial'] = $rsSaldoDotacao->getCampo('saldo_dotacao');
@@ -236,18 +285,18 @@ if(count($arListaDespesaFornecedor)==0){
                             }else
                                 $arSaldoDotacao[$inCodDespesa]['vl_reserva']   += $vlCotacao;
                         }
-    
+
                         # Mensagem do motivo da criação da Reserva de Saldo.
                         $stMsgReserva  = "Entidade: ".$rsSolicitacaoReserva->getCampo('cod_entidade')." - ".ucwords(strtolower($rsSolicitacaoReserva->getCampo('nom_entidade'))).", ";
                         $stMsgReserva .= "Mapa de Compras: ".$rsSolicitacaoReserva->getCampo('cod_mapa')."/".$rsSolicitacaoReserva->getCampo('exercicio_mapa').", ";
                         $stMsgReserva .= "Item: ".$rsSolicitacaoReserva->getCampo('cod_item').", ";
                         $stMsgReserva .= "Centro de Custo: ".$rsSolicitacaoReserva->getCampo('cod_centro')." ";
                         $stMsgReserva .= "(Origem da criação: ".SistemaLegado::pegaDado('nom_acao', 'administracao.acao', 'WHERE cod_acao = '.Sessao::read('acao')).").";
-    
+
                         # Cria uma nova reserva de saldo que será utilizada agora no Mapa de Compras.
                         $obTOrcamentoReservaSaldos->setDado('exercicio' , $rsSolicitacaoReserva->getCampo('exercicio_mapa'));
                         $obTOrcamentoReservaSaldos->proximoCod($inCodReserva);
-    
+
                         $obTOrcamentoReservaSaldos->setDado('cod_reserva'         , $inCodReserva);
                         $obTOrcamentoReservaSaldos->setDado('exercicio'           , $rsSolicitacaoReserva->getCampo('exercicio_mapa'));
                         $obTOrcamentoReservaSaldos->setDado('cod_despesa'         , $inCodDespesa);
@@ -292,6 +341,7 @@ if(count($arListaDespesaFornecedor)==0){
             while (!$rsAutEmpenho->eof() && !$obErro->ocorreu()) {
                 // itens
                 $stFiltroHomologacao_item  = $stFiltroHomologacao;
+                $stFiltroHomologacao_item .= " AND mapa_item.cod_item IN (".$arItensDespesaFornecedor['Itens'].") \n";
                 $stFiltroHomologacao_item .= " AND NOT EXISTS
                                                     (
                                                         SELECT  1
@@ -330,9 +380,6 @@ if(count($arListaDespesaFornecedor)==0){
                 $stOrdem = " ORDER BY catalogo_item.descricao   \n";
                 $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacao( $rsItensAutEmpenho, $stFiltroHomologacao_item, $stOrdem );
 
-                $arItensAutorizacao = array();
-                $arItensAutorizacao[] = $rsItensAutEmpenho->arElementos;
-
                 $obTLicHomologacao = new TLicitacaoHomologacao();
                 $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacaoImp( $rsItensAutEmpenhoImp, $stFiltroHomologacao_item, $stOrdem );
 
@@ -362,7 +409,7 @@ if(count($arListaDespesaFornecedor)==0){
 
                 $rsAutEmpenho->proximo();
             }
-    
+
             if (!$obErro->ocorreu()) {
                 $stFiltroSolicitacaoLicitacao = $stFiltroHomologacao;
                 $stFiltroSolicitacaoLicitacao.= "
@@ -373,7 +420,7 @@ if(count($arListaDespesaFornecedor)==0){
                                      WHERE  cotacao_anulada.cod_cotacao = cotacao.cod_cotacao
                                        AND  cotacao_anulada.exercicio   = cotacao.exercicio
                                 )
-        
+
                             AND NOT EXISTS
                                 (
                                     SELECT  1
@@ -382,7 +429,7 @@ if(count($arListaDespesaFornecedor)==0){
                                        AND  solicitacao_anulacao.exercicio   = solicitacao.exercicio
                                        AND  solicitacao_anulacao.cod_entidade   = solicitacao.cod_entidade
                                 )
-        
+
                                   GROUP BY  solicitacao.cod_solicitacao
                                          ,  solicitacao.observacao
                                          ,  solicitacao.exercicio
@@ -425,10 +472,10 @@ if(count($arListaDespesaFornecedor)==0){
                         }
                     }
 
-                    if(isset($arVlReservaDespesa[$dadosItens['cod_despesa']][$dadosItens['cod_conta']])){
-                        $arVlReservaDespesa[$dadosItens['cod_despesa']][$dadosItens['cod_conta']] += $vlCotacao;
+                    if(isset($arVlReservaDespesa[$inCodDespesa][$dadosItens['cod_conta']])){
+                        $arVlReservaDespesa[$inCodDespesa][$inCodConta] += $vlCotacao;
                     }else{
-                        $arVlReservaDespesa[$dadosItens['cod_despesa']][$dadosItens['cod_conta']]  = $vlCotacao;
+                        $arVlReservaDespesa[$inCodDespesa][$inCodConta]  = $vlCotacao;
                     }
 
                     $inCountAutorizacao++;
@@ -443,8 +490,8 @@ if(count($arListaDespesaFornecedor)==0){
                     $obAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
                     $obAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $rsAutEmpenho->getCampo('cod_entidade') );
                     $obAutorizacaoEmpenho->obREmpenhoTipoEmpenho->setCodTipo( 0 );
-                    $obAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $rsAutEmpenho->getCampo("cod_despesa") );
-                    $obAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $rsAutEmpenho->getCampo("mascara_classificacao") );
+                    $obAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $inCodDespesa );
+                    $obAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->setMascClassificacao( $stMascaraClassificacao );
                     $obAutorizacaoEmpenho->obRCGM->setNumCGM( $rsAutEmpenho->getCampo("fornecedor") );
                     $obAutorizacaoEmpenho->obRUsuario->obRCGM->setNumCGM( Sessao::read('numCgm') );
                     $obAutorizacaoEmpenho->obREmpenhoHistorico->setCodHistorico( 0 );
@@ -453,22 +500,22 @@ if(count($arListaDespesaFornecedor)==0){
                     $obAutorizacaoEmpenho->obROrcamentoReserva->setDtInclusao( $request->get('stDtAutorizacao') );
                     $obAutorizacaoEmpenho->setDescricao( $rsAutEmpenho->getCampo("cod_objeto")." - ".$rsAutEmpenho->getCampo("desc_objeto") );
                     $obAutorizacaoEmpenho->setDtAutorizacao( $request->get('stDtAutorizacao') );
-                    
-                    $vlReserva = $arVlReservaDespesa[$rsAutEmpenho->getCampo("cod_despesa")][$rsAutEmpenho->getCampo("cod_conta")];
+
+                    $vlReserva = $arVlReservaDespesa[$inCodDespesa][$inCodConta];
                     $obAutorizacaoEmpenho->obROrcamentoReserva->setVlReserva( $vlReserva );
-                    $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $rsAutEmpenho->getCampo("num_orgao") );
-                    $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->setNumeroUnidade( $rsAutEmpenho->getCampo("num_unidade") );
+                    $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $inNumOrgao );
+                    $obAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->setNumeroUnidade( $inNumUnidade );
                     $obAutorizacaoEmpenho->setCodCategoria ( 1 );
-        
+
                     // atributo modalidade
                     // array para relação entre modalidade licitacao e atributo modalidade do empenho
                     $arModalidade = array(1 => 2, 2 => 3, 3 => 4, 4 => 0, 5 => 1, 6 => 11, 7 => 12,8 => 5,9 => 6, 10 => 13, 11 => 14);
                     $inAtribModalidade = $arModalidade[$rsAutEmpenho->getCampo("cod_modalidade")];
                     $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '101' , $inAtribModalidade );
-        
+
                     // atributo tipo credor
                     $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '103' , 1 );
-        
+
                     // atributo complementar
                     $obAutorizacaoEmpenho->obRCadastroDinamico->addAtributosDinamicos( '100' , 2 );
 
@@ -486,15 +533,15 @@ if(count($arListaDespesaFornecedor)==0){
                                         break;
                                     }
                                 }
-    
+
                                 $qtdCotacao = $arItem['nuQtdeItem'];
                                 $vlCotacao = $vlUnitarioItem * $qtdCotacao;
                                 $inFornecedor = $arItem['inCgmFornecedor'];
-    
+
                                 break;
                             }
                         }
-    
+
                         // gerar autorização
                         $obAutorizacaoEmpenho->addItemPreEmpenho();
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCompra    ( true                              );
@@ -523,25 +570,25 @@ if(count($arListaDespesaFornecedor)==0){
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $dadosItens['cod_grandeza']   );
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade  ( $dadosItens['simbolo']                                    );
                     }
-        
+
                     $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
-        
+
                     if ($obErro->ocorreu()) {
                         $arErros[] = $dadosItens['cod_item'].': '.$obErro->getDescricao();
                         break;
                     } else {
                         # Salvar Assinaturas configuráveis se houverem
                         $arAssinaturas = Sessao::read('assinaturas');
-        
+
                         if (is_array($arAssinaturas) && count($arAssinaturas['selecionadas']) > 0) {
                             $arAssinatura = $arAssinaturas['selecionadas'];
-        
+
                             $obTEmpenhoAutorizacaoEmpenhoAssinatura = new TEmpenhoAutorizacaoEmpenhoAssinatura;
                             $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('exercicio'       , $obAutorizacaoEmpenho->getExercicio());
                             $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cod_entidade'    , $obAutorizacaoEmpenho->obROrcamentoEntidade->getCodigoEntidade());
                             $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cod_autorizacao' , $obAutorizacaoEmpenho->getCodAutorizacao());
                             $arPapel = $obTEmpenhoAutorizacaoEmpenhoAssinatura->arrayPapel();
-        
+
                             foreach ($arAssinatura as $arAssina) {
                                 if (isset($arAssina['papel'])) {
                                     if (is_numeric($arAssina['papel'])) {
@@ -550,16 +597,16 @@ if(count($arListaDespesaFornecedor)==0){
                                         $inNumAssina = $arPapel[$arAssina['papel']];
                                     }
                                 }
-            
+
                                 $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('num_assinatura', $inNumAssina);
                                 $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('numcgm'        , $arAssina['inCGM']);
                                 $obTEmpenhoAutorizacaoEmpenhoAssinatura->setDado('cargo'         , $arAssina['stCargo']);
                                 $obErro = $obTEmpenhoAutorizacaoEmpenhoAssinatura->inclusao(Sessao::getTransacao());
                             }
-        
+
                             unset($obTEmpenhoAutorizacaoEmpenhoAssinatura);
                         }
-        
+
                         # Armazena os dados da autorização em array para depois ser usado na impressão.
                         $arAutorizacao[$inCont++] = array(
                                                         "inCodAutorizacao"	=> $obAutorizacaoEmpenho->getCodAutorizacao(),
@@ -574,7 +621,7 @@ if(count($arListaDespesaFornecedor)==0){
                 }
             }
         }
-    
+
         if ($obErro->ocorreu())
             break;
     }

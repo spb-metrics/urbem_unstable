@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoOrdemPagamento.class.php 64153 2015-12-09 19:16:02Z evandro $
+    $Id: REmpenhoOrdemPagamento.class.php 64197 2015-12-15 12:56:27Z jean $
 
     * Casos de uso: uc-02.03.03,uc-02.03.05,uc-02.03.20,uc-02.03.23,uc-02.04.05,uc-02.03.28
 */
@@ -1374,7 +1374,7 @@ function listarItensPagamento(&$rsRecordSet, $boTransacao = "")
     $obTEmpenhoOrdemPagamento->setDado( 'groupby', $stOrder );
 
     $obErro = $obTEmpenhoOrdemPagamento->recuperaItensPagamento( $rsRecordSet, '', '', $boTransacao );
-
+//$obTEmpenhoOrdemPagamento->debug();
     return $obErro;
 }
 /**
@@ -1651,7 +1651,7 @@ function consultarValorAPagar($boTransacao = "")
         $obErro = $this->listarItensEstorno  ( $rsRecordSet, $boTransacao );
         $stCampo = "vl_pago";
     }
-
+    
     $nuVlAPagar = 0;
     $nuVlPago   = 0;
     while ( !$rsRecordSet->eof() ) {

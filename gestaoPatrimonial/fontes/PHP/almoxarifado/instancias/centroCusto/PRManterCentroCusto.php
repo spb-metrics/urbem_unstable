@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.03.07
 
-    $Id: PRManterCentroCusto.php 61395 2015-01-13 18:48:04Z evandro $
+    $Id: PRManterCentroCusto.php 64265 2015-12-23 16:17:18Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -52,18 +52,18 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 $stAcao = $request->get('stAcao');
 
 $obRegra = new RAlmoxarifadoCentroDeCustos;
 switch ($stAcao) {
     case "incluir":
 
-        $obRegra->setDescricao      ( $_POST['stDescricao']  );
-        $obRegra->roUltimaEntidade->setCodigoEntidade ( $_POST['inCodEntidade'] );
-        $obRegra->roUltimaEntidade->setExercicio ( Sessao::getExercicio() );
-        $obRegra->obRCGMResponsavel->setNumCGM ( $_POST['inCGMResponsavel'] );
-        $obRegra->setVigencia      ( $_POST['dtDataVigencia']  );
+        $obRegra->setDescricao                        ( $request->get('stDescricao')  );
+        $obRegra->roUltimaEntidade->setCodigoEntidade ( $request->get('inCodEntidade') );
+        $obRegra->roUltimaEntidade->setExercicio      ( Sessao::getExercicio() );
+        $obRegra->obRCGMResponsavel->setNumCGM        ( $request->get('inCGMResponsavel') );
+        $obRegra->setVigencia                         ( $request->get('dtDataVigencia')  );
 
         foreach ( Sessao::read('arDotacoes')  as $arTemp ) {
             $obRegra->addDotacao();
@@ -80,12 +80,12 @@ switch ($stAcao) {
 
     case "alterar":
 
-        $obRegra->setCodigo                           ( $_POST['inCodigo']  );
-        $obRegra->setDescricao                        ( $_POST['stDescricao']  );
-        $obRegra->roUltimaEntidade->setCodigoEntidade ( $_POST['inCodEntidade'] );
+        $obRegra->setCodigo                           ( $request->get('inCodigo')  );
+        $obRegra->setDescricao                        ( $request->get('stDescricao')  );
+        $obRegra->roUltimaEntidade->setCodigoEntidade ( $request->get('inCodEntidade') );
         $obRegra->roUltimaEntidade->setExercicio      ( Sessao::getExercicio() );
-        $obRegra->obRCGMResponsavel->setNumCGM        ( $_POST['inCGMResponsavel'] );
-        $obRegra->setVigencia                         ( $_POST['dtDataVigencia']  );
+        $obRegra->obRCGMResponsavel->setNumCGM        ( $request->get('inCGMResponsavel') );
+        $obRegra->setVigencia                         ( $request->get('dtDataVigencia')  );
 
         if (count(Sessao::read('arDotacoes')) > 0) {
             foreach ( Sessao::read('arDotacoes') as $arTemp ) {
@@ -105,19 +105,19 @@ switch ($stAcao) {
 
    case "excluir":
         $stFiltro = "";
-    $obErro = new Erro;
-    $obTAlmoxarifadoCentroCusto = new TAlmoxarifadoCentroCusto;
-    if (isset($_REQUEST['inCodigo']) != '') {
-        $stFiltro = " AND centro_custo.cod_centro = " . $_REQUEST['inCodigo'] . " \n";
-    }
-    $obErro = $obTAlmoxarifadoCentroCusto->recuperaPermissaoUsuarioExcluir($rsRecordSet, $stFiltro);
+        $obErro = new Erro;
+        $obTAlmoxarifadoCentroCusto = new TAlmoxarifadoCentroCusto;
+        if ($request->get('inCodigo') != '') {
+            $stFiltro = " AND centro_custo.cod_centro = " . $request->get('inCodigo') . " \n";
+        }
+        $obErro = $obTAlmoxarifadoCentroCusto->recuperaPermissaoUsuarioExcluir($rsRecordSet, $stFiltro);
 
-    if ($rsRecordSet->getNumLinhas() < 0) {
-        $obErro->setDescricao('Centro não pode ser excluído!');
-    }
+        if ($rsRecordSet->getNumLinhas() < 0) {
+            $obErro->setDescricao('Centro não pode ser excluído!');
+        }
         if ( !$obErro->ocorreu() ) {
-            $obRegra->setCodigo    ( $_REQUEST['inCodigo'] );
-            $obRegra->setDescricao ( $_REQUEST['stDescricao'] );
+            $obRegra->setCodigo    ( $request->get('inCodigo') );
+            $obRegra->setDescricao ( $request->get('stDescricao') );
             $obErro = $obRegra->excluir();
         }
 

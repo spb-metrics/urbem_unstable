@@ -72,4 +72,4 @@ select sum ( despesa.vl_original
  where despesa.exercicio = $1  
    and conta_despesa.cod_estrutural like ( publico.fn_mascarareduzida ($2) || '%' )
    and despesa.cod_entidade::varchar in ( $3 )
-$$ LANGUAGE 'SQL';
+$$ LANGUAGE 'sql';

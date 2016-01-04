@@ -39,17 +39,9 @@
 
     * Casos de uso: uc-03.01.06
 */
-
-/*
-$Log$
-Revision 1.1  2007/09/27 12:57:24  hboaventura
-adicionando arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GP_PAT_COMPONENTES.'IIntervaloPopUpBem.class.php' );
+include_once CAM_GP_PAT_COMPONENTES.'IIntervaloPopUpBem.class.php';
 
 $stPrograma = "ManterBaixarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -59,7 +51,7 @@ $pgProc   = "PR".$stPrograma.".php";
 $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 //cria um novo formulario
 $obForm = new Form;
@@ -94,3 +86,5 @@ $obFormulario->addComponente( $obIIntervaloPopUpBem );
 $obFormulario->addComponente( $obPeriodicidade );
 $obFormulario->Ok();
 $obFormulario->show();
+
+?>

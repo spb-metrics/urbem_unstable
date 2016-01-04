@@ -40,35 +40,25 @@
     * Casos de uso: uc-03.01.06
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/05 13:00:16  hboaventura
-inclusão dos arquivos
-
-Revision 1.1  2007/09/18 15:10:55  hboaventura
-Adicionando ao repositório
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TPatrimonioBemBaixado extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function TPatrimonioBemBaixado()
-{
-    parent::Persistente();
-    $this->setTabela('patrimonio.bem_baixado');
-    $this->setCampoCod('cod_bem');
-    $this->AddCampo('cod_bem','integer',true,'',true,true);
-    $this->AddCampo('dt_baixa','date',true,'',false,false);
-    $this->AddCampo('motivo','text',true,'',false,false);
-
-}
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    function TPatrimonioBemBaixado()
+    {
+        parent::Persistente();
+        $this->setTabela('patrimonio.bem_baixado');
+        $this->setCampoCod('cod_bem');
+        $this->AddCampo('cod_bem'    ,'integer' ,true ,'' ,true  ,true );
+        $this->AddCampo('dt_baixa'   ,'date'    ,true ,'' ,false ,false);
+        $this->AddCampo('motivo'     ,'text'    ,true ,'' ,false ,false);
+        $this->AddCampo('tipo_baixa' ,'integer' ,true ,'' ,false ,false);
+    }
 
     public function recuperaRelacionamento(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
@@ -89,9 +79,30 @@ function TPatrimonioBemBaixado()
                          THEN 'baixado'
                          ELSE NULL
                     END AS status
+                , natureza.nom_natureza
+                , tipo_natureza.codigo
+                , tipo_natureza.descricao AS descricao_natureza
+              
               FROM  patrimonio.bem
+         
          LEFT JOIN  patrimonio.bem_baixado
                 ON  bem_baixado.cod_bem = bem.cod_bem
+        
+        INNER JOIN patrimonio.especie
+	            ON especie.cod_especie  = bem.cod_especie
+	           AND especie.cod_grupo    = bem.cod_grupo
+	           AND especie.cod_natureza = bem.cod_natureza
+
+        INNER JOIN patrimonio.grupo
+	            ON grupo.cod_grupo    = especie.cod_grupo
+	           AND grupo.cod_natureza = especie.cod_natureza
+       
+        INNER JOIN patrimonio.natureza
+	            ON natureza.cod_natureza = grupo.cod_natureza
+
+	    INNER JOIN patrimonio.tipo_natureza
+                ON tipo_natureza.codigo = natureza.cod_tipo 
+
              WHERE ";
         if ( $this->getDado( 'cod_bem' ) ) {
             $stSql.= " bem.cod_bem = ".$this->getDado('cod_bem')."  AND  ";
@@ -99,5 +110,73 @@ function TPatrimonioBemBaixado()
 
         return substr($stSql,0,-6);
     }
+    
+    public function recuperaRelacionamentoLancamento(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaRelacionamentoLancamento().$stFiltro.$stOrdem;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
+
+        return $obErro;
+    }
+
+    public function montaRecuperaRelacionamentoLancamento()
+    {
+        $stSql = " SELECT bem.cod_bem
+                        , natureza.cod_tipo
+                        , natureza.cod_tipo
+                        , natureza.cod_natureza              
+                        , natureza.nom_natureza
+                        , grupo.cod_grupo
+                        , grupo.nom_grupo
+                        , bem_baixado.tipo_baixa
+                        , bem_baixado.dt_baixa
+                        , lancamento_baixa_patrimonio.exercicio
+                        , lancamento_baixa_patrimonio.estorno
+                     
+                     FROM patrimonio.bem
+           
+               INNER JOIN patrimonio.especie
+                       ON especie.cod_natureza = bem.cod_natureza
+                      AND especie.cod_grupo    = bem.cod_grupo
+                      AND especie.cod_especie  = bem.cod_especie
+           
+               INNER JOIN patrimonio.grupo
+                       ON grupo.cod_natureza = especie.cod_natureza
+                      AND grupo.cod_grupo    = especie.cod_grupo
+           
+               INNER JOIN patrimonio.natureza
+                       ON natureza.cod_natureza = grupo.cod_natureza
+           
+               INNER JOIN patrimonio.bem_baixado
+                       ON bem_baixado.cod_bem = bem.cod_bem
+                
+                LEFT JOIN (
+                            SELECT lancamento_baixa_patrimonio.cod_bem
+                                 , lancamento_baixa_patrimonio.exercicio
+                                 , lancamento_baixa_patrimonio.estorno
+                                 , lancamento_baixa_patrimonio.timestamp
+
+                              FROM contabilidade.lancamento_baixa_patrimonio
+
+                        INNER JOIN patrimonio.bem
+                                ON bem.cod_bem = lancamento_baixa_patrimonio.cod_bem
+
+                             WHERE lancamento_baixa_patrimonio.timestamp = ( 
+                                                                             SELECT MAX(lancamento_baixa.timestamp) AS timestamp
+                                                                               FROM contabilidade.lancamento_baixa_patrimonio AS lancamento_baixa
+                                                                              WHERE lancamento_baixa_patrimonio.cod_bem   = lancamento_baixa.cod_bem
+                                                                                AND lancamento_baixa_patrimonio.exercicio = lancamento_baixa.exercicio
+                                                                            )
+				
+                          ) AS lancamento_baixa_patrimonio
+                       ON lancamento_baixa_patrimonio.cod_bem = bem.cod_bem ";
+        return $stSql;
+    }
 
 }
+
+?>

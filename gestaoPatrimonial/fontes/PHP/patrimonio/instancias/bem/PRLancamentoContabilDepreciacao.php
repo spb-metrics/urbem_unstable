@@ -167,7 +167,7 @@ switch ($stAcao) {
            
             // Quando já foi feito ao menos um estorno, avisa o usário o mês a ser estornado. Deve seguir a seguencia do maior para o menor lançamento.
             if ( $rsUltimoLancamento->getNumLinhas() > 0 && $rsUltimoLancamento->getCampo('estorno') == "t" && ( $inAnoMesCompetencia > $rsUltimoLancamento->getCampo('max_competencia') || $inAnoMesCompetencia < ($rsUltimoLancamento->getCampo('max_competencia') -1))) {
-		$stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != $inExercicio."01") ? substr(($rsUltimoLancamento->getCampo('max_competencia') - 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
+				$stProximaCompetencia = ($rsUltimoLancamento->getCampo('max_competencia') != $inExercicio."01") ? substr(($rsUltimoLancamento->getCampo('max_competencia') - 1), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4) : substr($rsUltimoLancamento->getCampo('max_competencia'), 4, 6)."/".substr($rsUltimoLancamento->getCampo('max_competencia'),0,4);
                 $obErro->setDescricao("A competência selecionada deve ser igual a ".$stProximaCompetencia);
                 
             // Verifica se é o primeiro estorno das competências.
@@ -188,7 +188,7 @@ switch ($stAcao) {
                 $obTContabilidadeLancamentoDepreciacao->setDado("exercicio"	 , $inExercicio       );
                 $obTContabilidadeLancamentoDepreciacao->setDado("competencia"    , $inMesCompetencia  );
                 $obTContabilidadeLancamentoDepreciacao->setDado("cod_entidade"   , $inCodEntidade     );
-                $obTContabilidadeLancamentoDepreciacao->setDado("cod_historico"  , 962                );
+                $obTContabilidadeLancamentoDepreciacao->setDado("cod_historico"  , 963                );
                 $obTContabilidadeLancamentoDepreciacao->setDado("tipo"	         , "D"                );
                 $obTContabilidadeLancamentoDepreciacao->setDado("complemento"    , $inMesCompetencia."/".$inExercicio);
                 $obTContabilidadeLancamentoDepreciacao->setDado("estorno"        , "true"             );

@@ -40,16 +40,6 @@
     * Casos de uso: uc-03.01.04
 */
 
-/*
-$Log$
-Revision 1.2  2007/10/17 13:27:12  hboaventura
-correção dos arquivos
-
-Revision 1.1  2007/09/18 15:11:11  hboaventura
-Adicionando ao repositório
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GP_PAT_COMPONENTES."ISelectNatureza.class.php");
@@ -92,20 +82,6 @@ $obTxtDescricaoGrupo->setSize  ( 50 );
 $obTxtDescricaoGrupo->setNull  ( true );
 $obTxtDescricaoGrupo->setValue ( $stNomGrupo );
 
-// //cria um busca inner para retornar uma Conta Contábil de Depreciação Acumulada
-// $obBscContaContabilDepreciacao = new BuscaInner;
-// $obBscContaContabilDepreciacao->setRotulo               ( "Conta Contábil de Depreciação Acumulada"     );
-// $obBscContaContabilDepreciacao->setTitle                ( "Informe a conta do plano de contas."         );
-// $obBscContaContabilDepreciacao->setId                   ( "stDescricaoContaDepreciacao"                          );
-// $obBscContaContabilDepreciacao->obCampoCod->setName     ( "inCodContaDepreciacao"                                );
-// $obBscContaContabilDepreciacao->obCampoCod->setSize     ( 10  );
-// $obBscContaContabilDepreciacao->obCampoCod->setAlign    ("left" );
-// $obBscContaContabilDepreciacao->setValoresBusca      ( CAM_GF_CONT_POPUPS."planoConta/OCPlanoConta.php?".Sessao::getId(),$obForm->getName(),"contaContabilDepreciacaoAcumulada");
-// $obBscContaContabilDepreciacao->setFuncaoBusca       ( "abrePopUp('".CAM_GF_CONT_POPUPS."planoConta/FLPlanoConta.php','frm','inCodContaDepreciacao','stDescricaoContaDepreciacao','contaContabilDepreciacaoAcumulada','".Sessao::getId()."','800','550');" );
-// $obBscContaContabilDepreciacao->setNull              ( false );
-// $obBscContaContabilDepreciacao->setValue( $stNomContaDepreciacao );
-// $obBscContaContabilDepreciacao->obCampoCod->setValue( $inCodPlanoDepreciacao );
-
 $obTipoBusca = new TipoBusca( $obTxtDescricaoGrupo );
 
 //monta o formulário
@@ -117,6 +93,7 @@ $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addTitulo    ( "Dados para o Filtro" );
 $obFormulario->addComponente( $obISelectNatureza );
 $obFormulario->addComponente( $obTipoBusca );
-//$obFormulario->addComponente( $obBscContaContabilDepreciacao);
 $obFormulario->OK();
 $obFormulario->show();
+
+?>

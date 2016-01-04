@@ -32,7 +32,7 @@
 
     Caso de uso: uc-03.01.04
 
-    $Id: TPatrimonioGrupo.class.php 63222 2015-08-05 14:25:57Z arthur $
+    $Id: TPatrimonioGrupo.class.php 64184 2015-12-11 14:09:44Z arthur $
 
   */
 
@@ -79,7 +79,13 @@ class TPatrimonioGrupo extends Persistente
                  , natureza.cod_natureza
                  , natureza.nom_natureza
                  , grupo_plano_analitica.cod_plano
-                 , plano_conta.nom_conta
+                 , plano_conta_contabil.nom_conta
+                 , grupo_plano_analitica.cod_plano_doacao
+                 , plano_conta_contabil_doacao.nom_conta_doacao
+                 , grupo_plano_analitica.cod_plano_perda_involuntaria
+                 , plano_conta_contabil_perda.nom_conta_perda
+                 , grupo_plano_analitica.cod_plano_transferencia
+                 , plano_conta_contabil_transferencia.nom_conta_transferencia
                  , grupo_depreciacao.nom_conta AS nom_conta_depreciacao
                  , grupo_depreciacao.cod_plano AS cod_plano_depreciacao
 
@@ -93,13 +99,65 @@ class TPatrimonioGrupo extends Persistente
                AND grupo_plano_analitica.cod_grupo    = grupo.cod_grupo
                AND grupo_plano_analitica.exercicio    = '".Sessao::getExercicio()."'
 
-         LEFT JOIN contabilidade.plano_analitica
-                ON plano_analitica.cod_plano = grupo_plano_analitica.cod_plano
-               AND plano_analitica.exercicio = grupo_plano_analitica.exercicio
+               LEFT JOIN ( 
+                     SELECT plano_analitica.cod_plano
+                          , plano_analitica.exercicio 
+                          , plano_conta.nom_conta AS nom_conta
+                          
+		       FROM contabilidade.plano_analitica
 
-         LEFT JOIN contabilidade.plano_conta
-                ON plano_conta.cod_conta = plano_analitica.cod_conta
-               AND plano_conta.exercicio = plano_analitica.exercicio
+		  LEFT JOIN contabilidade.plano_conta
+			 ON plano_conta.cod_conta = plano_analitica.cod_conta
+		        AND plano_conta.exercicio = plano_analitica.exercicio
+		        
+		 ) AS plano_conta_contabil
+		ON plano_conta_contabil.cod_plano = grupo_plano_analitica.cod_plano
+	       AND plano_conta_contabil.exercicio = grupo_plano_analitica.exercicio
+
+	 LEFT JOIN ( 
+	             SELECT plano_analitica.cod_plano
+                          , plano_analitica.exercicio 
+                          , plano_conta.nom_conta AS nom_conta_doacao
+                          
+		       FROM contabilidade.plano_analitica
+
+		  LEFT JOIN contabilidade.plano_conta
+			 ON plano_conta.cod_conta = plano_analitica.cod_conta
+		        AND plano_conta.exercicio = plano_analitica.exercicio
+		        
+		 ) AS plano_conta_contabil_doacao
+		ON plano_conta_contabil_doacao.cod_plano = grupo_plano_analitica.cod_plano_doacao
+	       AND plano_conta_contabil_doacao.exercicio = grupo_plano_analitica.exercicio
+
+	LEFT JOIN ( 
+	             SELECT plano_analitica.cod_plano
+                          , plano_analitica.exercicio 
+                          , plano_conta.nom_conta AS nom_conta_perda
+                          
+		       FROM contabilidade.plano_analitica
+
+		  LEFT JOIN contabilidade.plano_conta
+			 ON plano_conta.cod_conta = plano_analitica.cod_conta
+		        AND plano_conta.exercicio = plano_analitica.exercicio
+		        
+		 ) AS plano_conta_contabil_perda
+		ON plano_conta_contabil_perda.cod_plano = grupo_plano_analitica.cod_plano_perda_involuntaria
+	       AND plano_conta_contabil_perda.exercicio = grupo_plano_analitica.exercicio
+
+       LEFT JOIN ( 
+		     SELECT plano_analitica.cod_plano
+			  , plano_analitica.exercicio 
+			  , plano_conta.nom_conta AS nom_conta_transferencia
+			  
+		       FROM contabilidade.plano_analitica
+
+		  LEFT JOIN contabilidade.plano_conta
+			 ON plano_conta.cod_conta = plano_analitica.cod_conta
+			AND plano_conta.exercicio = plano_analitica.exercicio
+			
+		 ) AS plano_conta_contabil_transferencia
+		ON plano_conta_contabil_transferencia.cod_plano = grupo_plano_analitica.cod_plano_transferencia
+	       AND plano_conta_contabil_transferencia.exercicio = grupo_plano_analitica.exercicio
                
          LEFT JOIN (SELECT grupo_plano_depreciacao.cod_plano AS cod_plano,
                            plano_conta.nom_conta,

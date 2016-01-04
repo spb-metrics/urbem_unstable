@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoItemPreEmpenho.class.php 64005 2015-11-17 16:49:06Z michel $
+    $Id: REmpenhoItemPreEmpenho.class.php 64194 2015-12-14 18:20:21Z jean $
 
     * Casos de uso: uc-02.03.03, uc-02.03.02, uc-02.03.30
 */
@@ -467,7 +467,7 @@ class REmpenhoItemPreEmpenho
         $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "exercicio"       , $this->roPreEmpenho->getExercicio()       );
         $obTEmpenhoItemPreEmpenhoJulgamento->setDado( "num_item"        , $this->getNumItem()                       );
 
-        $obErro = $obTEmpenhoItemPreEmpenhoJulgamento->recuperaCentroCustoMapaItem( $rsCentroCusto, $boTransacao );
+        $obErro = $obTEmpenhoItemPreEmpenhoJulgamento->recuperaCentroCustoMapaItem( $rsCentroCusto, "", $boTransacao );
 
         if ( !$obErro->ocorreu() )
             $this->setCodCentroCusto( $rsCentroCusto->getCampo( "cod_centro" ) );

@@ -899,4 +899,4 @@ BEGIN
         RETURN NEXT rwContratoServidor;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

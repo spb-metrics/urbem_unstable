@@ -75,5 +75,5 @@ BEGIN
 	
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

@@ -72,7 +72,7 @@ BEGIN
         END IF;
     END IF;
 
-    
+
     stSql := '  SELECT eventos_calculados.cod_evento
                      , eventos_calculados.codigo
                      , eventos_calculados.descricao
@@ -92,7 +92,7 @@ BEGIN
     -- SERVIDOR
     -------------
     IF NOT(TRIM(stSituacao) = 'E') OR TRIM(stSituacao) = '' THEN
-        stSql := stSql || 'SELECT cod_contrato  
+        stSql := stSql || 'SELECT cod_contrato
                                 , cod_banco_salario as cod_banco';
         IF boAgruparBanco IS TRUE THEN
             stSql := stSql || '
@@ -100,7 +100,7 @@ BEGIN
         ELSE
             stSql := stSql || ' , ''''::varchar as agrupamento_banco';
         END IF;
-        
+
         IF boAgrupar IS TRUE THEN
             IF stTipoFiltro = 'lotacao_grupo' THEN
                 stSql := stSql || '
@@ -167,7 +167,7 @@ BEGIN
     END IF;
 
     stSql := stSql || ') AS servidor_pensionista';
-    
+
     stSql := stSql || ' INNER JOIN (      SELECT cod_contrato
                                                , cod_evento
                                                , codigo
@@ -184,8 +184,8 @@ BEGIN
                                                               WHERE totais_folha_eventos.cod_evento = eventos_proventos.cod_evento
                                                                 AND totais_folha_eventos.cod_configuracao = '|| inCodConfiguracaoTotais ||')';
     END IF;
-    
-    stSql := stSql || '                                                        
+
+    stSql := stSql || '
                                          GROUP BY eventos_proventos.cod_contrato
                                                , eventos_proventos.cod_evento
                                                , eventos_proventos.codigo
@@ -193,9 +193,9 @@ BEGIN
                                                , eventos_proventos.descricao
                                  ) as eventos_calculados
                               ON servidor_pensionista.cod_contrato = eventos_calculados.cod_contrato';
-                              
+
     stSqlFiltros := '';
-    
+
     IF TRIM(stSituacao) != '' THEN
         stSqlFiltros := stSqlFiltros || ' AND recuperarSituacaoDoContrato(servidor_pensionista.cod_contrato,'|| inCodPeriodoMovimentacao ||','|| quote_literal(stEntidade) ||') IN ('|| stSituacaoFormatado ||')';
     END IF;
@@ -203,11 +203,11 @@ BEGIN
     IF stCodBancos != '' THEN
         stSqlFiltros := stSqlFiltros || ' AND servidor_pensionista.cod_banco IN ('|| stCodBancos ||')';
     END IF;
-    
+
     IF stSqlFiltros != '' THEN
         stSqlFiltros := ' WHERE '|| substring(stSqlFiltros FROM 6);
     END IF;
-    
+
     stSql := stSql || stSqlFiltros;
     stSql := stSql || ' GROUP BY eventos_calculados.cod_evento
                                , eventos_calculados.codigo
@@ -215,10 +215,10 @@ BEGIN
                                , eventos_calculados.natureza
                                , agrupamento_banco
                                , agrupamento';
-                      
-                                                     
-    FOR reRegistro IN EXECUTE stSql LOOP   
-    
+
+
+    FOR reRegistro IN EXECUTE stSql LOOP
+
         IF boElementoDespesa IS TRUE THEN
             stSql := '    SELECT conta_despesa.*
                             FROM folhapagamento'|| stEntidade ||'.configuracao_evento_despesa
@@ -239,7 +239,7 @@ BEGIN
 
                 OPEN crCursor FOR EXECUTE stSql;
                     FETCH crCursor INTO reDespesa;
-                CLOSE crCursor;                
+                CLOSE crCursor;
                 IF reDespesa.cod_estrutural != '' THEN
                     rwTotaisFolha.codigo            := reDespesa.cod_estrutural;
                 ELSE
@@ -254,13 +254,13 @@ BEGIN
             rwTotaisFolha.codigo            := reRegistro.codigo;
             rwTotaisFolha.descricao         := reRegistro.descricao;
         END IF;
-        
+
         rwTotaisFolha.provento          := reRegistro.proventos;
         rwTotaisFolha.desconto          := reRegistro.descontos;
         rwTotaisFolha.agrupamento_banco := reRegistro.agrupamento_banco;
         rwTotaisFolha.agrupamento       := reRegistro.agrupamento;
-        
+
         RETURN NEXT rwTotaisFolha;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

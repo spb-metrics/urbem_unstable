@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacaoParcial.php 64052 2015-11-24 18:26:04Z michel $
+    $Id: OCManterAutorizacaoParcial.php 64205 2015-12-15 20:31:55Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -46,6 +46,8 @@ include_once CAM_GA_CGM_NEGOCIO.'RCGM.class.php';
 include_once CAM_GP_COM_COMPONENTES.'IMontaDotacaoDesdobramento.class.php';
 include_once CAM_GF_ORC_NEGOCIO.'ROrcamentoDespesa.class.php';
 include_once CAM_GA_NORMAS_MAPEAMENTO.'TNorma.class.php';
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoPreEmpenho.class.php";
 
 $stPrograma = "ManterAutorizacaoParcial";
 $pgFilt	= "FL".$stPrograma.".php";
@@ -59,6 +61,8 @@ function alterarItem($inCodItem, $inCodCotacao){
     $stHtml = "";
     $arItens            = Sessao::read('arItens');
     $arLicitacao        = Sessao::read('arLicitacao');
+
+    $boMontaDespesa = false;
 
     if(!empty($inCodItem) && !empty($inCodCotacao)){
         foreach( $arItens as $chaveItem => $arItem) {
@@ -217,6 +221,11 @@ function alterarItem($inCodItem, $inCodCotacao){
 
                     $boMontaDesdobramento = false;
                 }else{
+                    if($rsDetalheItens->getCampo('cod_despesa_empenho') != '' && $rsDetalheItens->getCampo('cod_conta_empenho') != ''){
+                        $inCodDespesa = (empty($inCodDespesa)) ? $rsDetalheItens->getCampo('cod_despesa_empenho') : $inCodDespesa;
+                        $stCodClassificacao = (empty($stCodClassificacao)) ? $rsDetalheItens->getCampo('cod_conta_empenho') : $stCodClassificacao;
+                    }
+
                     $obMontaDotacao = new IMontaDotacaoDesdobramento();
                     $obMontaDotacao->obBscDespesa->setRotulo    ( "**Dotação Orçamentária"  );
                     $obMontaDotacao->obBscDespesa->obCampoCod->setValue ( $inCodDespesa     );
@@ -228,6 +237,8 @@ function alterarItem($inCodItem, $inCodCotacao){
                     $obInCodClassificacao->setName    ( 'codClassificacao' );
                     $obInCodClassificacao->setId      ( 'codClassificacao' );
                     $obInCodClassificacao->setValue   ( $stCodClassificacao );
+
+                    $boMontaDespesa = true;
                 }
 
                 $obHdnIdCodCotacao = new Hidden;
@@ -314,6 +325,15 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $arMontaFornecedor[0]['nuQtdeItem'] = number_format($qtdItem, 4, ",", ".");
 
                 Sessao::write('arMontaFornecedor', $arMontaFornecedor);
+
+                $arMontaDespesa[0]['inCodItem']          = $inCodItem;
+                $arMontaDespesa[0]['inCodCotacao']       = $inCodCotacao;
+                $arMontaDespesa[0]['boMontaDespesa']     = $boMontaDespesa; 
+                $arMontaDespesa[0]['inCodDespesa']       = $inCodDespesa;
+                $arMontaDespesa[0]['stCodClassificacao'] = $stCodClassificacao;
+                $arMontaDespesa[0]['inCodCentro']        = $rsDetalheItens->getCampo('cod_centro');
+
+                Sessao::write('arMontaDespesa', $arMontaDespesa);
 
                 break;
             }
@@ -412,6 +432,17 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     foreach ($arItensDetalhes as $chaveItemDetalhe => $valorItemDetalhe) {
         foreach( $arItens as $chaveItem => $arItem) {
             if ( $arItem["cod_item"] == $valorItemDetalhe['cod_item'] && $arItem["cod_cotacao"] == $valorItemDetalhe['cod_cotacao'] ) {
+                if(empty($valorItemDetalhe['desdobramento']) && !empty($arItem['stCodClassificacao'])){
+                    include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoContaDespesa.class.php";
+                    $obTOrcamentoContaDespesa = new TOrcamentoContaDespesa();
+                    $obTOrcamentoContaDespesa->setDado("cod_conta", $arItem['stCodClassificacao']);
+                    $obTOrcamentoContaDespesa->setDado("exercicio", Sessao::getExercicio());
+                    $obTOrcamentoContaDespesa->recuperaPorChave( $rsOrcamentoContaDespesa );
+
+                    if ( $rsOrcamentoContaDespesa->getNumLinhas() == 1 )
+                        $arItensDetalhes[$chaveItemDetalhe]['desdobramento'] = $rsOrcamentoContaDespesa->getCampo('cod_estrutural');
+                }
+                
                 $vlUnitarioItem = $arItensDetalhes[$chaveItemDetalhe]['vl_unitario'];
 
                 $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
@@ -424,7 +455,7 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
 
                 $arItensDetalhes[$chaveItemDetalhe]['vl_unitario']      = $vlUnitarioItem;
                 $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
-                if($arItem['nuQtdeItem']==0)
+                if($arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo']==0)
                     $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = '0,00';
                 else
                     $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = $vlUnitarioItem*$arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'];
@@ -664,6 +695,108 @@ function montaFornecedor(Request $request){
     return $stJs;
 }
 
+function montaDespesa(Request $request){
+    $stJs = "";
+
+    if($request->get('inCodDespesa')){
+        $obREmpenhoAutorizacaoEmpenho = new REmpenhoPreEmpenho;
+        $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( $request->get('inCodDespesa') );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodCentroCusto( $request->get('inCodCentro') );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
+
+        if ( $rsDespesa->getNumLinhas() > -1 ) {
+            $stJs .= "jQuery('#inCodDespesaAnterior').val('".$request->get('inCodDespesa')."');          \n";
+            $stJs .= "jQuery('#stNomDespesa').html(\"".$rsDespesa->getCampo('descricao')."\");           \n";
+
+            $obTEmpenhoPreEmpenho = new TEmpenhoPreEmpenho();
+            $obTEmpenhoPreEmpenho->setDado( 'exercicio'  , Sessao::getExercicio()        );
+            $obTEmpenhoPreEmpenho->setDado( 'cod_despesa', $request->get('inCodDespesa') );
+            $obTEmpenhoPreEmpenho->recuperaSaldoDotacaoCompra( $rsSaldoAnterior );
+
+            $nuSaldoDotacao = $rsSaldoAnterior->getCampo('saldo_anterior');
+            $stJs .= "jQuery('#nuSaldoDotacao').html(\"".number_format($nuSaldoDotacao,2,',','.')."\");  \n";
+            $stJs .= "jQuery('#nuHdnSaldoDotacao').val(\"".number_format($nuSaldoDotacao,2,'.','')."\"); \n";
+
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarRelacionamentoContaDespesa( $rsConta );
+
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascClassificacao( $rsConta->getCampo( 'cod_estrutural' ) );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa( "" );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarCodEstruturalDespesa( $rsClassificacao );
+
+            if ( $rsClassificacao->getNumLinhas() > -1 ) {
+                $stJs .= "jQuery('#stCodClassificacao').empty().append(new Option('Selecione','') );     \n";
+
+                while ( !$rsClassificacao->eof() ) {
+                    $selected = "";
+                    $stMascaraReduzida = $rsClassificacao->getCampo("mascara_reduzida");
+                    if ($stMascaraReduzidaOld) {
+                        if ( $stMascaraReduzidaOld != substr($stMascaraReduzida,0,strlen($stMascaraReduzidaOld)) ) {
+                            if ( $inCodContaOld == $request->get('stCodClassificacao') )
+                                $selected = "selected";
+
+                            $arOptions[]['reduzido']                  = $stMascaraReduzidaOld;
+                            $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."','".$selected."'";
+                        }
+                    }
+                    $inCodContaOld        = $rsClassificacao->getCampo("cod_conta");
+                    $stCodEstruturalOld   = $rsClassificacao->getCampo("cod_estrutural");
+                    $stDescricaoOld       = $rsClassificacao->getCampo("descricao");
+                    $stMascaraReduzidaOld = $stMascaraReduzida;
+                    $stMascaraReduzida    = "";
+                    $rsClassificacao->proximo();
+                }
+
+                if ($stMascaraReduzidaOld) {
+                    if ($inCodContaOld == $request->get('stCodClassificacao'))
+                        $selected = "selected";
+                    else
+                        $selected = "";
+
+                    $arOptions[]['reduzido'] = $stMascaraReduzidaOld;
+                    $arOptions[count($arOptions)-1]['option'] = "'".$stCodEstruturalOld.' - '.$stDescricaoOld."','".$inCodContaOld."','".$selected."','".$selected."'";
+                }
+
+                // Remove Contas Sintéticas
+                if (is_array($arOptions)) {
+                    $count = 0;
+                    for ( $x=0 ; $x<count($arOptions) ; $x++ ) {
+                        for ( $y=0 ; $y<count($arOptions) ; $y++ ) {
+                            $estruturalX = str_replace( '.', '', $arOptions[$x]['reduzido'] );
+                            $estruturalY = str_replace( '.', '', $arOptions[$y]['reduzido'] );
+
+                            if ((strpos($estruturalY,$estruturalX)!==false) && ($estruturalX !== $estruturalY) )
+                                $count++;
+                        }
+                        if ($count>=1)
+                            unset($arOptions[$x]);
+
+                        $count = 0;
+                    }
+
+                    asort( $arOptions );
+
+                    foreach ($arOptions as $option) {
+                        $stJs .= "jQuery('#stCodClassificacao').append(new Option(".$option['option'].") );                      \n";
+                    }
+                }
+            } else {
+                $stJs .= "jQuery('#stCodClassificacao').empty().append(new Option('Selecione','') );                             \n";
+            }
+        } else {
+            $stJs .= "jQuery('#stNomDespesa').html('&nbsp;');                                                                    \n";
+            $stJs .= "jQuery('#inCodDespesa').val('');                                                                           \n";
+            $stJs .= "jQuery('#nuSaldoDotacao').html('&nbsp;');                                                                  \n";
+            $stJs .= "jQuery('#stCodClassificacao').empty().append(new Option('Selecione','') );                                 \n";
+            $stJs .= "alertaAviso('@Dotação inválida. (".$request->get('inCodDespesa').")','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    return $stJs;
+}
+
 switch ($request->get('stCtrl')) {
     case 'buscaInfoLicitacao':
         $obTLicitacaoHomolgacao = new TLicitacaoHomologacao;
@@ -719,6 +852,7 @@ switch ($request->get('stCtrl')) {
                     $arItens[$inCount]['inCodNorma']            = '';
                     $arItens[$inCount]['stNorma']               = '';
                     $arItens[$inCount]['stJustificativa']       = '';
+                    $arItens[$inCount]['boDespesaMapaItem']     = '';
                     $arItens[$inCount]['arCotacaoItem']         = array();
 
                     $rsDetalheItens->proximo();
@@ -745,6 +879,9 @@ switch ($request->get('stCtrl')) {
     break;
     
     case 'listarDetalheItem':
+        Sessao::write('arMontaFornecedor', array());
+        Sessao::write('arMontaDespesa'   , array());
+
         $idLinhaTableTree = $request->get("linha_table_tree");
         $arLinhaTableTree = explode('_', $idLinhaTableTree);
 
@@ -767,6 +904,12 @@ switch ($request->get('stCtrl')) {
         $request->set('inCodItem'           , $arMontaFornecedor[0]['inCodItem']            );
         $request->set('nuQtdeItem'          , $arMontaFornecedor[0]['nuQtdeItem']           );
 
+        $arMontaDespesa = Sessao::read('arMontaDespesa');
+        $request->set('boMontaDespesa'      , $arMontaDespesa[0]['boMontaDespesa']          );
+        $request->set('inCodDespesa'        , $arMontaDespesa[0]['inCodDespesa']            );
+        $request->set('stCodClassificacao'  , $arMontaDespesa[0]['stCodClassificacao']      );
+        $request->set('inCodCentro'         , $arMontaDespesa[0]['inCodCentro']             );
+
         $stJs .= "<script>";
         $stJs .= "var jQuery = window.parent.frames['telaPrincipal'].jQuery;                \n";
         $stJs .= "jQuery('#".$idLinhaTableTree."_sub_cell_2').html(\"".$stHtmlDetalhe."\"); \n";
@@ -774,6 +917,8 @@ switch ($request->get('stCtrl')) {
         $stJs .= "jQuery('#".$idLinhaTableTree."_mais').hide();                             \n";
         $stJs .= "jQuery('#".$idLinhaTableTree."_menos').show();                            \n";
         $stJs .= montaFornecedor($request);
+        if($request->get('boMontaDespesa'))
+            $stJs .= montaDespesa($request);
         $stJs .= "</script>";
 
         $arItens = Sessao::read('arItens');
@@ -827,6 +972,16 @@ switch ($request->get('stCtrl')) {
         $arItens = Sessao::read('arItens');
         $arItens = (is_array($arItens)) ? $arItens : array();
 
+        $nuQtdeItem = str_replace(",",".",str_replace(".","",$request->get('nuQtdeItem')));
+
+        $codClassificacao = $request->get('codClassificacao', 'FALSE');
+        if( $codClassificacao != 'FALSE' &&  $nuQtdeItem > 0){
+            if( $request->get('inCodDespesa')=='' && !$obErro->ocorreu() )
+                $obErro->setDescricao( "Informe o campo Dotação Orçamentária do item ".$request->get('inCodItem')   );
+            if( $request->get('stCodClassificacao')=='' && !$obErro->ocorreu() )
+                $obErro->setDescricao( "Informe o campo Desdobramento do item ".$request->get('inCodItem')          );
+        }
+
         if( $request->get('inCgmFornecedor')=='' && !$obErro->ocorreu() )
             $obErro->setDescricao( "Informe o campo Fornecedor do item ".$request->get('inCodItem')                 );
 
@@ -866,11 +1021,14 @@ switch ($request->get('stCtrl')) {
                     $arItens[$chaveItem]['inCodNorma']           = $request->get('inCodNorma');
                     $arItens[$chaveItem]['stNorma']              = $stNorma;
                     $arItens[$chaveItem]['stJustificativa']      = $request->get('stJustificativa');
+                    if( $codClassificacao != 'FALSE' &&  $nuQtdeItem > 0)
+                        $arItens[$chaveItem]['boDespesaMapaItem']= 'FALSE';
+                    else
+                        $arItens[$chaveItem]['boDespesaMapaItem']= 'TRUE';
 
-                    if($request->get('nuQtdeItem')==0)
+                    if($nuQtdeItem==0)
                         $arItens[$chaveItem]['vl_cotacao_saldo'] = '0,00';
                     else{
-                        $nuQtdeItem = str_replace(",",".",str_replace(".","",$request->get('nuQtdeItem')));
                         $vlUnitarioItem = $arItem['vl_cotacao'] / $nuQtdeItem;
 
                         $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();

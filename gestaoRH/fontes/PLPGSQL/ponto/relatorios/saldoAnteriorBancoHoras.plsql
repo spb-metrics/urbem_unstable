@@ -99,4 +99,4 @@ BEGIN
 
     RETURN stSaldoAnterior;
 END; 
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

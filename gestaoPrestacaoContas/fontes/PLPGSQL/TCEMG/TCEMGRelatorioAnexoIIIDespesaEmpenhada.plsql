@@ -24,7 +24,7 @@
     * Script de função PLPGSQL - Relatório Anexo III TCEMG - Despesas Empenhadas.
     * Data de Criação: 12/08/2014
     * @author Evandro Melos
-    $Id: TCEMGRelatorioAnexoIIIDespesaEmpenhada.plsql 63336 2015-08-19 17:17:13Z lisiane $
+    $Id: TCEMGRelatorioAnexoIIIDespesaEmpenhada.plsql 64243 2015-12-21 18:26:55Z fabio $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_empenhada(stMascRed VARCHAR
@@ -172,4 +172,4 @@ BEGIN
 	
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

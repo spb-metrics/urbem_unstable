@@ -24,7 +24,7 @@
     * Script de função PLPGSQL - Relatório Anexo III TCEMG - Despesas Liquidadas.
     * Data de Criação: 12/08/2014
     * @author Evandro Melos
-    $Id: TCEMGRelatorioAnexoIIIDespesaLiquidada.plsql 63336 2015-08-19 17:17:13Z lisiane $
+    $Id: TCEMGRelatorioAnexoIIIDespesaLiquidada.plsql 64243 2015-12-21 18:26:55Z fabio $
 */
 
 CREATE OR REPLACE FUNCTION tcemg.relatorio_anexoIII_despesa_liquidada(stMascRed VARCHAR
@@ -166,4 +166,4 @@ END IF;
     RETURN nuTotal;
 
 END;
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

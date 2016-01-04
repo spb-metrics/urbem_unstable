@@ -27,7 +27,7 @@
   * @author Analista:
   * @author Programador: Fernando Zank Correa Evangelista
 
-  $Id: TPatrimonioBem.class.php 63945 2015-11-10 18:53:13Z arthur $
+  $Id: TPatrimonioBem.class.php 64184 2015-12-11 14:09:44Z arthur $
 
   Caso de uso: uc-03.01.09
   Caso de uso: uc-03.01.21
@@ -854,6 +854,9 @@ class TPatrimonioBem extends Persistente
                  , apolice.cod_apolice
                  , apolice.numcgm as num_seguradora
                  , bem_comprado_tipo_documento_fiscal.cod_tipo_documento_fiscal
+                 , natureza.nom_natureza
+                 , tipo_natureza.codigo
+                 , tipo_natureza.descricao AS descricao_natureza
                  
               FROM patrimonio.bem
               
@@ -933,23 +936,38 @@ class TPatrimonioBem extends Persistente
                 ON bem.cod_bem = bem_marca.cod_bem
          
          LEFT JOIN ( SELECT depreciacao.cod_bem
-                         , TO_CHAR(depreciacao.dt_depreciacao, 'DD/MM/YYYY') AS dt_depreciacao
-		      FROM patrimonio.depreciacao
+                          , TO_CHAR(depreciacao.dt_depreciacao, 'DD/MM/YYYY') AS dt_depreciacao
+                       FROM patrimonio.depreciacao
 
-		 LEFT JOIN patrimonio.depreciacao_anulada
-			ON depreciacao.cod_bem         = depreciacao_anulada.cod_bem
-		       AND depreciacao.cod_depreciacao = depreciacao_anulada.cod_depreciacao
-		       AND depreciacao.timestamp       = depreciacao_anulada.timestamp
-			 
-		     WHERE depreciacao_anulada.cod_depreciacao IS NULL
-		       AND depreciacao.timestamp = ( SELECT max(depreciacao_interna.timestamp)
-						       FROM patrimonio.depreciacao AS depreciacao_interna
-						      WHERE depreciacao_interna.cod_bem = depreciacao.cod_bem
-						        AND SUBSTRING(depreciacao_interna.competencia, 1,4) = '".Sessao::getExercicio()."' )
-	           ) AS depreciacao 
-	         ON depreciacao.cod_bem = bem.cod_bem
-                 
-             WHERE ";
+		          LEFT JOIN patrimonio.depreciacao_anulada
+		  	             ON depreciacao.cod_bem         = depreciacao_anulada.cod_bem
+		                AND depreciacao.cod_depreciacao = depreciacao_anulada.cod_depreciacao
+		                AND depreciacao.timestamp       = depreciacao_anulada.timestamp
+		  	        
+		              WHERE depreciacao_anulada.cod_depreciacao IS NULL
+		                AND depreciacao.timestamp = ( SELECT max(depreciacao_interna.timestamp)
+                                                        FROM patrimonio.depreciacao AS depreciacao_interna
+                                                       WHERE depreciacao_interna.cod_bem = depreciacao.cod_bem
+                                                         AND SUBSTRING(depreciacao_interna.competencia, 1,4) = '".Sessao::getExercicio()."' )
+	            ) AS depreciacao 
+	           ON depreciacao.cod_bem = bem.cod_bem
+        
+       INNER JOIN patrimonio.especie
+	           ON especie.cod_especie  = bem.cod_especie
+	          AND especie.cod_grupo    = bem.cod_grupo
+	          AND especie.cod_natureza = bem.cod_natureza
+
+       INNER JOIN patrimonio.grupo
+	           ON grupo.cod_grupo    = especie.cod_grupo
+	          AND grupo.cod_natureza = especie.cod_natureza
+       
+       INNER JOIN patrimonio.natureza
+               ON natureza.cod_natureza = grupo.cod_natureza
+       
+       INNER JOIN patrimonio.tipo_natureza
+	           ON tipo_natureza.codigo = natureza.cod_tipo
+               
+            WHERE ";
         if ( $this->getDado('cod_bem') ) {
             $stSql.= " bem.cod_bem = ".$this->getDado('cod_bem')."   AND ";
         }
@@ -1568,6 +1586,52 @@ class TPatrimonioBem extends Persistente
                                                         WHERE depreciacao_interna.cod_bem = depreciacao.cod_bem
                                                           AND SUBSTRING(depreciacao_interna.competencia, 1,4) = '".Sessao::getExercicio()."' )";
 
+        return $stSql;
+    }
+    
+    public function recuperaContaContabil(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $stGrupo = "",$boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        $stSql = $this->montaRecuperaContaContabil().$stFiltro.$stOrdem.$stGrupo;
+        $this->stDebug = $stSql;
+        $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao);
+
+        return $obErro;
+    }
+
+    public function montaRecuperaContaContabil()
+    {
+        $stSql  = " SELECT grupo_plano_analitica.cod_plano
+                         , grupo_plano_analitica.cod_plano_doacao
+                         , grupo_plano_analitica.cod_plano_perda_involuntaria
+                         , grupo_plano_analitica.cod_plano_transferencia
+                         , natureza.cod_tipo
+                         , natureza.cod_natureza                 
+                         , natureza.nom_natureza
+                         , grupo.cod_grupo
+                         , grupo.nom_grupo
+           
+                     FROM patrimonio.bem
+           
+               INNER JOIN patrimonio.especie
+                       ON especie.cod_natureza = bem.cod_natureza
+                      AND especie.cod_grupo    = bem.cod_grupo
+                      AND especie.cod_especie  = bem.cod_especie
+           
+               INNER JOIN patrimonio.grupo
+                       ON grupo.cod_natureza = especie.cod_natureza
+                      AND grupo.cod_grupo    = especie.cod_grupo
+           
+               INNER JOIN patrimonio.natureza
+                       ON natureza.cod_natureza = grupo.cod_natureza
+           
+                LEFT JOIN patrimonio.grupo_plano_analitica
+                       ON grupo_plano_analitica.cod_grupo    = grupo.cod_grupo
+                      AND grupo_plano_analitica.cod_natureza = grupo.cod_natureza
+                      AND grupo_plano_analitica.exercicio    = '".$this->getDado('exercicio')."'
+                ";
         return $stSql;
     }
     

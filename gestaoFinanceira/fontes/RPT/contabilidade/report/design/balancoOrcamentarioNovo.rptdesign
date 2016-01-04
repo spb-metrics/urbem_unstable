@@ -478,15 +478,17 @@
             <property name="hidden">true</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
-            <property name="dataType">float</property>
+            <property name="dataType">decimal</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">0.00</value>
+                <value type="constant">0,00</value>
             </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
-                <property name="category">Unformatted</property>
+                <property name="category">Fixed</property>
+                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="superavit_no_bi" id="3187">
@@ -647,7 +649,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="deficit_prev_inicial" id="3247">
-            <property name="hidden">true</property>
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
@@ -655,6 +657,7 @@
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -662,7 +665,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="deficit_prev_atualizada" id="3248">
-            <property name="hidden">true</property>
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
@@ -670,6 +673,7 @@
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -692,7 +696,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="deficit_ate_bi" id="3252">
-            <property name="hidden">true</property>
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
@@ -700,6 +704,7 @@
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -707,7 +712,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="deficit_saldo" id="3253">
-            <property name="hidden">true</property>
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">float</property>
@@ -715,6 +720,7 @@
             <simple-property-list name="defaultValue">
                 <value type="constant">0.00</value>
             </simple-property-list>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -819,6 +825,93 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="dotacao_inicial" id="6909">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="dotacao_atualizada" id="6910">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="despesas_empenhada" id="6911">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="despesa_liquidada" id="6912">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="despesas_paga" id="6913">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="despesa_saldo" id="6914">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="sub_emp_ate_bim" id="6924">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">float</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0,00</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4"
@@ -913,6 +1006,7 @@
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ReceitasNovo" id="2527">
+            <list-property name="columnHints"/>
             <list-property name="parameters">
                 <structure>
                     <property name="name">param_1</property>
@@ -920,7 +1014,7 @@
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">params["exercicio"]</expression>
+                    <expression name="defaultValue" type="javascript">params["exercicio"]</expression>
                     <property name="isOptional">false</property>
                     <property name="allowNull">false</property>
                     <property name="isInput">true</property>
@@ -944,7 +1038,7 @@
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                     <property name="position">3</property>
-                    <expression name="defaultValue">params["dt_final"]</expression>
+                    <expression name="defaultValue" type="javascript">params["dt_final"]</expression>
                     <property name="isOptional">false</property>
                     <property name="allowNull">false</property>
                     <property name="isInput">true</property>
@@ -952,9 +1046,56 @@
                 </structure>
                 <structure>
                     <property name="name">param_4</property>
+                    <property name="nativeName"></property>
                     <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
                     <property name="position">4</property>
                     <expression name="defaultValue" type="javascript">params["cod_entidade"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_5</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">5</property>
+                    <expression name="defaultValue" type="javascript">params["exercicio"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_6</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">6</property>
+                    <expression name="defaultValue" type="javascript">params["dt_inicial"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_7</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">7</property>
+                    <expression name="defaultValue" type="javascript">params["dt_final"]</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_8</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">8</property>
+                    <expression name="defaultValue" type="javascript">params["cod_entidade"]</expression>
+                    <property name="isOptional">false</property>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -962,7 +1103,25 @@
             <structure name="cachedMetaData"/>
             <method name="beforeOpen"><![CDATA[params["debug"] = this.queryText;]]></method>
             <property name="dataSource">Data Source</property>
-            <xml-property name="queryText"><![CDATA[select * from contabilidade.fn_relatorio_balanco_orcamentario_receita_novo(?,?,?,?) as
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[SELECT grupo
+     , cod_estrutural
+     , nivel
+     , nom_conta
+     , previsao_inicial
+     , previsao_atualizada
+     , no_bimestre
+     , p_no_bimestre
+     , ate_bimestre
+     , p_ate_bimestre
+     , a_realizar
+     , 0.00 as dotacao_inicial
+     , 0.00 as dotacao_atualizada
+     , 0.00 as vl_empenhado_bimestre
+     , 0.00 as vl_liquidado_bimestre
+     , 0.00 as vl_pago_total
+     , 0.00 AS saldo_liquidar
+ FROM contabilidade.fn_relatorio_balanco_orcamentario_receita_novo(?,?,?,?) as
 retorno (grupo integer     ,          
          cod_estrutural varchar,      
          nivel integer,               
@@ -973,69 +1132,117 @@ retorno (grupo integer     ,
          p_no_bimestre       numeric , 
          ate_bimestre        numeric , 
          p_ate_bimestre      numeric , 
-         a_realizar          numeric )]]></xml-property>
+         a_realizar          numeric )
+
+UNION
+SELECT
+     9 as grupo
+    , '9.9.9.9.9.9.99.99' AS cod_estrutural
+    , 9 as nivel
+    , 'DESPESAS' AS nom_conta
+    , 0.00 AS previsao_inicial
+    , 0.00 AS previsao_atualizada
+    , 0.00 AS no_bimestre
+    , 0.00 AS p_no_bimestre
+    , 0.00 AS ate_bimestre
+    , 0.00 AS p_ate_bimestre
+    , 0.00 AS a_realizar
+	, sum(dotacao_inicial) as dotacao_inicial
+	,sum(dotacao_atualizada) as  dotacao_atualizada
+	,sum(vl_empenhado_bimestre) as vl_empenhado_bimestre
+	,sum(vl_liquidado_bimestre) as vl_liquidado_bimestre
+	,sum(vl_pago_total) as vl_pago_total
+	,sum(saldo_liquidar) as saldo_liquidar
+FROM ( 
+    SELECT * FROM contabilidade.fn_relatorio_balanco_orcamentario_despesa_novo(?,?,?,?) as
+retorno (                                                                                          
+         grupo                   integer ,                                                                  
+         cod_estrutural          varchar ,                                                                  
+         descricao               varchar ,                                                                  
+         nivel                   integer ,                                                                  
+         dotacao_inicial         numeric ,                                                            
+         creditos_adicionais     numeric ,                                                            
+         dotacao_atualizada      numeric ,                                                            
+         vl_empenhado_bimestre   numeric ,                                                            
+         vl_empenhado_total      numeric ,                                                            
+         vl_liquidado_bimestre   numeric ,                                                            
+         vl_liquidado_total      numeric ,                                                            
+         vl_pago_total	        numeric ,       
+         percentual              numeric ,                                                            
+         saldo_liquidar          numeric ) 
+
+    WHERE nivel = 1
+    ) as rreo_anexo1 
+order by cod_estrutural
+]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
-  <Version>1.0</Version>
-  <design:DataSetParameters>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>1</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultValues>
-            <design:values>JS_EXPR</design:values>
-          </design:defaultValues>
-          <design:optional>false</design:optional>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>2</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultValues>
-            <design:values>JS_EXPR</design:values>
-          </design:defaultValues>
-          <design:optional>false</design:optional>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:identifier>
-          <design:name></design:name>
-          <design:position>3</design:position>
-        </design:identifier>
-        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
-        <design:nullability>Unknown</design:nullability>
-      </design:attributes>
-      <design:inputAttributes>
-        <design:elementAttributes>
-          <design:defaultValues>
-            <design:values>JS_EXPR</design:values>
-          </design:defaultValues>
-          <design:optional>false</design:optional>
-        </design:elementAttributes>
-      </design:inputAttributes>
-    </design:parameterDefinitions>
-  </design:DataSetParameters>
+  <Version>2.0</Version>
+  <DataSetParameters>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>1</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+        <design:inputAttributes>
+          <design:elementAttributes>
+            <design:defaultValues>
+              <design:values>CustomData value: params[&amp;quot;exercicio&amp;quot;], displayValue: null</design:values>
+            </design:defaultValues>
+            <design:optional>false</design:optional>
+          </design:elementAttributes>
+        </design:inputAttributes>
+      </design:ParameterDefinition>
+    </parameter>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>2</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+        <design:inputAttributes>
+          <design:elementAttributes>
+            <design:defaultValues>
+              <design:values>CustomData value: params[&amp;quot;dt_inicial&amp;quot;], displayValue: null</design:values>
+            </design:defaultValues>
+            <design:optional>false</design:optional>
+          </design:elementAttributes>
+        </design:inputAttributes>
+      </design:ParameterDefinition>
+    </parameter>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>3</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+        <design:inputAttributes>
+          <design:elementAttributes>
+            <design:defaultValues>
+              <design:values>CustomData value: params[&amp;quot;dt_final&amp;quot;], displayValue: null</design:values>
+            </design:defaultValues>
+            <design:optional>false</design:optional>
+          </design:elementAttributes>
+        </design:inputAttributes>
+      </design:ParameterDefinition>
+    </parameter>
+  </DataSetParameters>
   <design:ResultSets derivedMetaData="true">
     <design:resultSetDefinitions>
       <design:resultSetColumns>
@@ -1634,6 +1841,12 @@ saldo_liquidar          numeric )
             <property name="fontFamily">sans-serif</property>
             <property name="fontSize">6pt</property>
         </style>
+        <style name="decimal" id="6925">
+            <structure name="numberFormat">
+                <property name="category">Fixed</property>
+                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+            </structure>
+        </style>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
@@ -1810,7 +2023,9 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
                 </structure>
                 <structure>
                     <property name="name">nom_conta</property>
-                    <expression name="expression">function UCWords(str){
+                    <expression name="expression" type="javascript">if(dataSetRow["cod_estrutural"] != "9.9.9.9.9.9.99.99") {
+
+function UCWords(str){
     var arString = str.split(" ");
     var stPalavra = "";
     var i = 0;
@@ -1825,6 +2040,7 @@ stDia+"/"+stMes+"/"+obData.getFullYear();
     return stPalavra.substr(0,stPalavra.length - 1);
 }
 
+
 if( dataSetRow["nom_conta"] == "OUTRAS RECEITAS" ){
 	aux = "RECEITAS DE CAPITAL DIVERSAS";
 }else{
@@ -1835,8 +2051,10 @@ if( dataSetRow["nivel"] == 4 ){
 	UCWords(aux.toLowerCase())
 }else{
 	aux
+}
 }</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">previsao_inicial</property>
@@ -1883,9 +2101,12 @@ if( dataSetRow["nivel"] == 4 ){
                 </structure>
                 <structure>
                     <property name="name">sub_inicial</property>
-                    <expression name="expression">params["sub_inicial"] = Total.sum( row["previsao_inicial"], row["nivel"] == 1 )+params["deficit_prev_inicial"].value;
-Total.sum( row["previsao_inicial"], row["nivel"] == 1 );</expression>
+                    <expression name="expression" type="javascript">params["sub_inicial"] = Total.sum( row["previsao_inicial"], row["nivel"] == 1 );
+//Total.sum( row["previsao_inicial"], row["nivel"] == 1 );
+
+params["sub_inicial"] ;</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">sub_no_bim</property>
@@ -1943,9 +2164,10 @@ Total.sum( row["p_ate_bimestre"], row["grupo"] == 3 )+row["corcap_p_ate_bim"]</e
                 </structure>
                 <structure>
                     <property name="name">sub_atualizada</property>
-                    <expression name="expression">params["sub_atualizado"] =Total.sum( row["previsao_atualizada"], row["nivel"] == 1 )+params["deficit_prev_atualizada"].value;
+                    <expression name="expression" type="javascript">params["sub_atualizado"] =Total.sum( row["previsao_atualizada"], row["nivel"] == 1 );
 Total.sum( row["previsao_atualizada"], row["nivel"] == 1 );</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">sub_ref_no_bim</property>
@@ -2069,13 +2291,15 @@ valor</expression>
                 </structure>
                 <structure>
                     <property name="name">total_receita_inicial</property>
-                    <expression name="expression">row["sub_inicial"]</expression>
+                    <expression name="expression" type="javascript">row["sub_inicial"] +row["deficit_ini"];</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_receita_atualizada</property>
-                    <expression name="expression">row["sub_atualizada"]</expression>
+                    <expression name="expression" type="javascript">row["sub_atualizada"] +row["deficit_atualizada"];</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_receita_no_bim</property>
@@ -2084,13 +2308,98 @@ valor</expression>
                 </structure>
                 <structure>
                     <property name="name">total_ate_bim</property>
-                    <expression name="expression">row["sub_ate_bim"]+params["deficit_ate_bi"].value</expression>
+                    <expression name="expression" type="javascript">row["sub_ate_bim"] + row["deficit_ate_bim"];</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_saldo</property>
-                    <expression name="expression">row["data item"]</expression>
+                    <expression name="expression" type="javascript">row["data item"] +row["deficit_saldo"];</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">deficit_ini</property>
+                    <expression name="expression" type="javascript">params["deficit_prev_inicial"].value = params["dotacao_inicial"].value - params["sub_inicial"].value;
+
+if( params["deficit_prev_inicial"].value > 0 ) {
+		params["deficit_prev_inicial"].value;
+} else {
+ 		0,00;
+ }</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">deficit_atualizada</property>
+                    <expression name="expression" type="javascript">params["deficit_prev_atualizada"].value =  params["dotacao_atualizada"].value  -  params["sub_atualizado"].value;
+if ( params["deficit_prev_atualizada"].value > 0 ) {
+		 params["dotacao_atualizada"].value  -  params["sub_atualizado"].value;
+} else {
+		0,00;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">deficit_saldo</property>
+                    <expression name="expression" type="javascript">params["deficit_saldo"].value = params["despesa_saldo"].value - params["sub_saldo"].value ; 
+
+if (params["deficit_saldo"].value > 0){
+	params["deficit_saldo"].value
+}else {
+	0,00;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tot_dotacao_inicial</property>
+                    <expression name="expression" type="javascript">params["dotacao_inicial"].value = Total.sum( dataSetRow["dotacao_inicial"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tot_dotacao_atualizada</property>
+                    <expression name="expression" type="javascript">params["dotacao_atualizada"].value  =  Total.sum( dataSetRow["dotacao_atualizada"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tot_despesas_empenhada</property>
+                    <expression name="expression" type="javascript">params["despesas_empenhada"].value  =  Total.sum( dataSetRow["vl_empenhado_bimestre"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tot_despesas_liquidado</property>
+                    <expression name="expression" type="javascript">params["despesa_liquidada"].value  =  Total.sum( dataSetRow["vl_liquidado_bimestre"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">despesas_paga</property>
+                    <expression name="expression" type="javascript">params["despesas_paga"].value  =  Total.sum( dataSetRow["vl_pago_total"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tot_despesas_saldo</property>
+                    <expression name="expression" type="javascript">params["despesa_saldo"].value  =  Total.sum( dataSetRow["saldo_liquidar"],(dataSetRow["cod_estrutural"] == '9.9.9.9.9.9.99.99' ));</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">deficit_ate_bim</property>
+                    <expression name="expression" type="javascript">if ( params["despesas_empenhada"].value - params["sub_ate_bim"].value > 0) {
+	params["deficit_ate_bi"].value = params["despesas_empenhada"].value - params["sub_ate_bim"].value ;
+}else {
+ 	params["deficit_ate_bi"].value = 0,00;
+}
+
+params["deficit_ate_bi"].value;</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -3326,36 +3635,7 @@ valor</expression>
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
                         <property name="textAlign">center</property>
-                        <label id="3294">
-                            <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
-                    </cell>
-                    <cell id="2480">
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <property name="paddingTop">0pt</property>
-                        <property name="paddingBottom">0pt</property>
-                        <property name="textAlign">center</property>
-                        <label id="3295">
-                            <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
-                    </cell>
-                    <cell id="2486">
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <property name="paddingTop">0pt</property>
-                        <property name="paddingBottom">0pt</property>
-                        <data id="3262">
+                        <data id="6915">
                             <property name="backgroundAttachment">scroll</property>
                             <property name="backgroundPositionX">0%</property>
                             <property name="backgroundPositionY">0%</property>
@@ -3407,14 +3687,139 @@ valor</expression>
                             <property name="pageBreakInside">auto</property>
                             <property name="showIfBlank">false</property>
                             <property name="canShrink">false</property>
-                            <list-property name="boundDataColumns">
-                                <structure>
-                                    <property name="name">deficit_ate_bi</property>
-                                    <expression name="expression">params["deficit_ate_bi"].value</expression>
-                                    <property name="dataType">float</property>
-                                </structure>
-                            </list-property>
-                            <property name="resultSetColumn">deficit_ate_bi</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">deficit_ini</property>
+                        </data>
+                    </cell>
+                    <cell id="2480">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="textAlign">center</property>
+                        <data id="6919">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">deficit_atualizada</property>
+                        </data>
+                    </cell>
+                    <cell id="2486">
+                        <property name="borderRightColor">#000000</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <data id="6946">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">deficit_ate_bim</property>
                         </data>
                     </cell>
                     <cell id="2490">
@@ -3427,10 +3832,61 @@ valor</expression>
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
                         <property name="textAlign">center</property>
-                        <label id="3299">
+                        <data id="6920">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
                             <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">deficit_saldo</property>
+                        </data>
                     </cell>
                 </row>
                 <row id="2492">
@@ -3743,6 +4199,64 @@ valor</expression>
                         <property name="borderTopWidth">thin</property>
                         <property name="paddingTop">0pt</property>
                         <property name="paddingBottom">0pt</property>
+                        <table id="6932">
+                            <property name="dataSet">DespesasNovo</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">deficit_ate_bi</property>
+                                    <expression name="expression" type="javascript">params["despesas_empenhada"].value = row["sub_ref_emp_bim"]</expression>
+                                    <property name="dataType">string</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">sub_ref_emp_bim</property>
+                                    <expression name="expression" type="javascript">var w = Total.sum( row.vl_empenhado_bimestre, row.descricao == "DESPESAS CORRENTES" );
+var x = Total.sum( row.vl_empenhado_bimestre, row.descricao == "DESPESAS DE CAPITAL" );
+var y = Total.sum( row.vl_empenhado_bimestre, row.descricao == "RESERVA DE CONTINGENCIA" );
+var z = Total.sum( row.vl_empenhado_bimestre, row.descricao == "RESERVA DO RPPS" );
+var n = Total.sum( row.vl_empenhado_bimestre, row.descricao == "DESPESAS (INTRA-ORÇAMENTÁRIAS)" );
+
+(w + x + y + z + n);
+Total.sum( row["vl_empenhado_bimestre"], row["nivel"] == 1 );</expression>
+                                    <property name="dataType">decimal</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">vl_empenhado_bimestre</property>
+                                    <expression name="expression" type="javascript">dataSetRow["vl_empenhado_bimestre"]</expression>
+                                    <property name="dataType">decimal</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">descricao</property>
+                                    <expression name="expression" type="javascript">dataSetRow["descricao"];</expression>
+                                    <property name="dataType">string</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">nivel</property>
+                                    <expression name="expression" type="javascript">dataSetRow["nivel"]</expression>
+                                    <property name="dataType">integer</property>
+                                    <property name="allowExport">true</property>
+                                </structure>
+                            </list-property>
+                            <column id="6939"/>
+                            <header>
+                                <row id="6933">
+                                    <cell id="6934"/>
+                                </row>
+                            </header>
+                            <detail>
+                                <row id="6935">
+                                    <cell id="6936"/>
+                                </row>
+                            </detail>
+                            <footer>
+                                <row id="6937">
+                                    <cell id="6938"/>
+                                </row>
+                            </footer>
+                        </table>
                     </cell>
                     <cell id="2513">
                         <property name="borderBottomColor">#000000</property>
@@ -4247,8 +4761,9 @@ Total.sum( row["saldo_liquidar"], row["nivel"] == 1 );</expression>
                 </structure>
                 <structure>
                     <property name="name">refin_liq_bim</property>
-                    <expression name="expression">row["sub_liq_bim"] // +linhas AMORTIZACAO DA DIVIDA que nao foram setadas ainda</expression>
-                    <property name="dataType">float</property>
+                    <expression name="expression" type="javascript">row["sub_liq_bim"] // +linhas AMORTIZACAO DA DIVIDA que nao foram setadas ainda</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">refin_liq_tot</property>
@@ -4352,8 +4867,9 @@ row["refin_atu"]-row["refin_liq_tot"];</expression>
                 </structure>
                 <structure>
                     <property name="name">total_despesa_inicial</property>
-                    <expression name="expression">row["refin_ini"]</expression>
+                    <expression name="expression" type="javascript">row["refin_ini"] + params["superavit_prev_inicial"].value;</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_despesas_creditos</property>
@@ -4362,13 +4878,15 @@ row["refin_atu"]-row["refin_liq_tot"];</expression>
                 </structure>
                 <structure>
                     <property name="name">total_despesas_atulizadas</property>
-                    <expression name="expression">row["refin_atu"]</expression>
+                    <expression name="expression" type="javascript">row["refin_atu"] + params["superavit_prev_atualizada"].value;</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_despesas_emp_bim</property>
-                    <expression name="expression">row["refin_emp_bim"]</expression>
+                    <expression name="expression" type="javascript">row["refin_emp_bim"] + params["superavit_emp_ate_bi"].value;</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">total_despesa_emp_ate_bim</property>
@@ -4387,8 +4905,9 @@ row["refin_atu"]-row["refin_liq_tot"];</expression>
                 </structure>
                 <structure>
                     <property name="name">total_despesa_saldo</property>
-                    <expression name="expression">row["refin_saldo"]</expression>
+                    <expression name="expression" type="javascript">row["sub_refin_saldo"] + row["superavit_saldo"];</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">vl_pago_total</property>
@@ -4411,11 +4930,11 @@ Total.sum( row["vl_pago_total"], row["nivel"] == 1 );</expression>
                 </structure>
                 <structure>
                     <property name="name">superavit_liq_bim</property>
-                    <expression name="expression">//logica para atual forma que o relatorio funciona sem as linhas de AMORTIZACAO DA DIVIDA
-var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
-	if ( Math.sin(valor) >0){
-		valor;
-	}
+                    <expression name="expression" type="javascript">if ((params["sub_ate_bim"].value - row["sub_liq_bim"]) > 0) {
+	params["sub_ate_bim"].value - row["sub_liq_bim"];
+}else {
+	0,00
+}
 
 //Logica que devera ser implementada quando as linhas de AMORTIZACAO DA DIVIDA forem feitas
 //deve ser somada a  row["sub_liq_bim"] junto com todos as linhas das AMORTIZACOES resultando no ["refin_liq_bim"]
@@ -4423,7 +4942,8 @@ var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
 //	if ( Math.sin(valor) >0){
 //		valor;
 //	}</expression>
-                    <property name="dataType">float</property>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">refin_pag_bim</property>
@@ -4432,8 +4952,69 @@ var valor = params["sub_ate_bim"] - row["sub_liq_bim"];
                 </structure>
                 <structure>
                     <property name="name">total_pag_bim</property>
-                    <expression name="expression">row['refin_pag_bim']; // somar + as linhas SUPERAVIT quando foram setadas</expression>
+                    <expression name="expression" type="javascript">row['refin_pag_bim'] + row["superavit_pago"]; // somar + as linhas SUPERAVIT quando foram setadas</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">superavit_empenhada</property>
+                    <expression name="expression" type="javascript">if ( params["deficit_ate_bi"].value &lt; 0 ) {
+ 		params["superavit_emp_ate_bi"].value = params["sub_ate_bim"].value - params["despesas_empenhada"].value ;
+ } else {
+ 	params["superavit_emp_ate_bi"].value = 0,00;
+ }
+ 
+params["superavit_emp_ate_bi"].value;</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">superavit_pago</property>
+                    <expression name="expression" type="javascript">if ((params["sub_ate_bim"].value - row["sub_pag_bim"]) > 0) {
+	params["sub_ate_bim"].value - row["sub_pag_bim"];
+}else {
+	0,00
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">sub_refin_saldo</property>
+                    <expression name="expression" type="javascript">row["sub_saldo"];</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">superavit_saldo</property>
+                    <expression name="expression" type="javascript">if (params["deficit_saldo"].value &lt; 0) {
+	params["superavit_saldo"].value = params["sub_saldo"].value - params["despesa_saldo"].value ;
+}else {
+	0,00
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">superavit_atualizada</property>
+                    <expression name="expression" type="javascript">if ( params["deficit_prev_atualizada"].value &lt; 0 ) {
+ 		params["superavit_prev_atualizada"].value =  params["sub_atualizado"].value - params["dotacao_atualizada"].value ;
+ } else {
+ 	params["superavit_prev_atualizada"].value = 0,00;
+ }
+ 
+params["superavit_prev_atualizada"].value;</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">superavit_dotacao_ini</property>
+                    <expression name="expression" type="javascript">if( params["deficit_prev_inicial"].value &lt; 0 ) {
+		params["superavit_prev_inicial"].value = params["sub_inicial"].value - params["dotacao_inicial"].value ;
+} else {
+ 		0,00;
+ }</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="repeatHeader">false</property>
@@ -5514,6 +6095,7 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <data id="6900">
+                            <property name="style">decimal</property>
                             <property name="fontSize">6pt</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
@@ -5527,14 +6109,60 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
-                        <data id="2701">
+                        <data id="6941">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
                             <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">1pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">1pt</property>
+                            <property name="paddingRight">1pt</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
                                 <property name="pattern">#,##0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">refin_saldo</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">sub_refin_saldo</property>
                         </data>
                     </cell>
                 </row>
@@ -5560,10 +6188,61 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
-                        <label id="3286">
+                        <data id="6945">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
                             <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">superavit_dotacao_ini</property>
+                        </data>
                     </cell>
                     <cell id="2709">
                         <property name="borderRightColor">#000000</property>
@@ -5573,10 +6252,61 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
-                        <label id="3288">
+                        <data id="6944">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
                             <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">superavit_atualizada</property>
+                        </data>
                     </cell>
                     <cell id="2711">
                         <property name="borderRightColor">#000000</property>
@@ -5586,10 +6316,62 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
-                        <label id="3289">
+                        <data id="6921">
+                            <property name="style">decimal</property>
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
                             <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">superavit_empenhada</property>
+                        </data>
                     </cell>
                     <cell id="2715">
                         <property name="borderRightColor">#000000</property>
@@ -5600,12 +6382,14 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
                         <data id="6899">
+                            <property name="style">decimal</property>
                             <property name="fontSize">6pt</property>
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
                                 <property name="pattern">#,##0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
+                            <structure name="toc"/>
                             <property name="resultSetColumn">superavit_liq_bim</property>
                         </data>
                     </cell>
@@ -5617,16 +6401,123 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
+                        <data id="6922">
+                            <property name="style">decimal</property>
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">superavit_pago</property>
+                        </data>
                     </cell>
                     <cell id="2721">
                         <property name="borderTopColor">#000000</property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <property name="textAlign">center</property>
-                        <label id="3293">
+                        <data id="6943">
+                            <property name="backgroundAttachment">scroll</property>
+                            <property name="backgroundPositionX">0%</property>
+                            <property name="backgroundPositionY">0%</property>
+                            <property name="backgroundRepeat">repeat</property>
+                            <property name="fontFamily">sans-serif</property>
+                            <property name="fontSize">6pt</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="fontStyle">normal</property>
+                            <property name="fontVariant">normal</property>
+                            <property name="color">black</property>
+                            <property name="textLineThrough">none</property>
+                            <property name="textOverline">none</property>
+                            <property name="textUnderline">none</property>
+                            <property name="borderBottomColor">black</property>
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftColor">black</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightColor">black</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopColor">black</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="marginTop">0pt</property>
+                            <property name="marginLeft">0pt</property>
+                            <property name="marginBottom">0pt</property>
+                            <property name="marginRight">0pt</property>
+                            <property name="paddingTop">0pt</property>
+                            <property name="paddingLeft">1pt</property>
+                            <property name="paddingBottom">0pt</property>
+                            <property name="paddingRight">1pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00</property>
+                            </structure>
                             <property name="textAlign">right</property>
-                            <text-property name="text">-</text-property>
-                        </label>
+                            <property name="letterSpacing">normal</property>
+                            <property name="lineHeight">normal</property>
+                            <property name="orphans">2</property>
+                            <property name="textTransform">none</property>
+                            <property name="whiteSpace">normal</property>
+                            <property name="widows">2</property>
+                            <property name="wordSpacing">normal</property>
+                            <property name="display">block</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <property name="showIfBlank">false</property>
+                            <property name="canShrink">false</property>
+                            <property name="overflow">hidden</property>
+                            <property name="resultSetColumn">superavit_saldo</property>
+                        </data>
                     </cell>
                 </row>
                 <row id="2723">
@@ -5644,7 +6535,7 @@ REFINANCIAMENTO (VII)]]></text-property>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <label id="2725">
-                            <text-property name="text">TOTAL (V) = (VII + IX)</text-property>
+                            <text-property name="text">TOTAL (x) = (VIII + IX)</text-property>
                         </label>
                     </cell>
                     <cell id="2726">

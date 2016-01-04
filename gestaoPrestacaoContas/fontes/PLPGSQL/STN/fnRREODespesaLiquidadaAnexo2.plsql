@@ -163,4 +163,4 @@ BEGIN
 	RETURN nuEstornado;
 END;
 
-$$ language 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

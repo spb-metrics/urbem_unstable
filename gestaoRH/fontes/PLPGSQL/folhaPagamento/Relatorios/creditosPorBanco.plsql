@@ -29,9 +29,9 @@
 * @author Desenvolvedor Rafael Garbin
 
 * @package URBEM
-* @subpackage 
+* @subpackage
 
-* @ignore 
+* @ignore
 
 $Id:$
 */
@@ -56,7 +56,7 @@ CREATE TYPE colunasCreditosPorBanco AS (
     local               VARCHAR,
     cod_local           INTEGER
 );
-    
+
 CREATE OR REPLACE FUNCTION creditosPorBanco() RETURNS VARCHAR AS $$
 DECLARE
     stTimeStamp   VARCHAR;
@@ -67,21 +67,21 @@ BEGIN
       INTO stTimeStamp;
     stTimeStamp2 := stTimeStamp||'_pk';
     stSql := 'CREATE TABLE '|| stTimeStamp || '(
-                campo VARCHAR CONSTRAINT '||stTimeStamp2||' PRIMARY KEY, 
+                campo VARCHAR CONSTRAINT '||stTimeStamp2||' PRIMARY KEY,
                 valor VARCHAR,
                 parametrosPL BOOLEAN,
                 tipo VARCHAR,
                 ordem INTEGER
                 )';
-    EXECUTE stSql;    
+    EXECUTE stSql;
     RETURN stTimeStamp;
-END;    
+END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION relatorioCreditosPorBanco( VARCHAR ) RETURNS SETOF RECORD AS $$
 DECLARE
     stNomeTabela ALIAS FOR $1;
-    
+
     stConsultaTabelaFiltro VARCHAR := '';
     stConsultaRegistros VARCHAR := '';
     stFiltroRegistros VARCHAR := '';
@@ -89,7 +89,7 @@ DECLARE
     reRegistrosFiltro RECORD;
     reRegistros RECORD;
 BEGIN
-  
+
     stConsultaTabelaFiltro := '
             SELECT campo
                  , valor
@@ -102,18 +102,18 @@ BEGIN
     FOR reRegistrosFiltro IN EXECUTE stConsultaTabelaFiltro
     LOOP
         IF reRegistrosFiltro.parametrosPL = 'true' THEN
-           
+
             --verifica se tipo e varchar
-            IF reRegistrosFiltro.tipo = 'varchar' THEN            
+            IF reRegistrosFiltro.tipo = 'varchar' THEN
                 RAISE NOTICE 'valor filtro varchar: %', stFiltroPL;
                 IF reRegistrosFiltro.valor = '' THEN
                     stFiltroPL := stFiltroPL || ',';
                 ELSE
                     stFiltroPL := stFiltroPL || ',' || reRegistrosFiltro.valor ||' ';
                 END IF;
-                
+
             END IF;
-            --verifica se  tipo e boolean 
+            --verifica se  tipo e boolean
             IF reRegistrosFiltro.tipo = 'boolean' THEN
                 RAISE NOTICE 'valor filtro boolean: %', stFiltroPL;
                 IF reRegistrosFiltro.valor = '' THEN
@@ -122,32 +122,32 @@ BEGIN
                     stFiltroPL := stFiltroPL || ',' || reRegistrosFiltro.valor ||' ';
                 END IF;
             END IF;
-                
-            --verifica se o tipo e integer    
-            IF reRegistrosFiltro.tipo = 'integer' THEN    
+
+            --verifica se o tipo e integer
+            IF reRegistrosFiltro.tipo = 'integer' THEN
                 RAISE NOTICE 'valor filtro integer: %', stFiltroPL;
                     stFiltroPL := stFiltroPL || ',' ||    reRegistrosFiltro.valor ||' ';
             END IF;
-            
+
         ELSE --else IF parametros true ou false
             stFiltroRegistros := stFiltroRegistros || ' AND ' || reRegistrosFiltro.valor || '';
         END IF;
     END LOOP;
-    
+
     stConsultaRegistros := '
         SELECT *
           FROM creditosPorBanco('||SUBSTR(stFiltroPL, 2)||')
          WHERE 1 = 1
     '||stFiltroRegistros;
     RAISE NOTICE '%', stConsultaRegistros;
-    
+
     --EXECUTE 'DROP TABLE ' || stNomeTabela;
-    
+
     FOR reRegistros IN EXECUTE stConsultaRegistros
     LOOP
         RETURN NEXT reRegistros;
     END LOOP;
-    
+
 END;
 $$ language 'plpgsql';
 
@@ -164,7 +164,7 @@ DECLARE
     stEntidade                  ALIAS FOR $9;
     boAgruparOrgao              ALIAS FOR $10;
     boAgruparLocal              ALIAS FOR $11;
-    boAgruparAgencia            ALIAS FOR $12;      
+    boAgruparAgencia            ALIAS FOR $12;
     rwCreditosPorBanco          colunasCreditosPorBanco%ROWTYPE;
     stSql                       VARCHAR := '';
     stSqlPensionistas           VARCHAR := '';
@@ -185,8 +185,8 @@ DECLARE
     boFiltrarOrgao              BOOLEAN;
     boFiltrarLocal              BOOLEAN;
     boFiltrarBanco              BOOLEAN;
-    boFiltrarAgencia            BOOLEAN;    
-BEGIN    
+    boFiltrarAgencia            BOOLEAN;
+BEGIN
 
     stSituacao   := coalesce(trim(stSituacao),'');
     stCodOrgao   := coalesce(trim(stCodOrgao),'');
@@ -202,18 +202,18 @@ BEGIN
     IF LENGTH(stCodOrgao) > 0 THEN
       boFiltrarOrgao := true;
     END IF;
-    
+
     IF LENGTH(stCodLocal) > 0 THEN
       boFiltrarLocal := true;
     END IF;
-    
+
     IF LENGTH(stCodBanco) > 0 THEN
       boFiltrarBanco := true;
     END IF;
 
     IF LENGTH(stCodAgencia) > 0 THEN
       boFiltrarAgencia := true;
-    END IF;    
+    END IF;
 
     IF stSituacao = 'pensionistas' OR stSituacao = 'todos' THEN
         stSql := '    SELECT null::integer as cod_servidor
@@ -253,17 +253,17 @@ BEGIN
                                          AND contrato_servidor_periodo.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao||')';
         IF boFiltrarOrgao THEN
             stSql := stSql ||' AND contrato_pensionista_orgao.cod_orgao IN ('||stCodOrgao||')';
-        END IF; 
+        END IF;
         IF boFiltrarLocal THEN
             stSql := stSql ||' AND contrato_servidor_local.cod_local IN ('||stCodLocal||')';
-        END IF; 
+        END IF;
         IF boFiltrarBanco THEN
             stSql := stSql ||' AND banco.cod_banco IN ('||stCodBanco||')';
-        END IF; 
+        END IF;
         IF boFiltrarAgencia THEN
             stSql := stSql ||' AND agencia.cod_agencia IN ('||stCodAgencia||')';
         END IF;
-        
+
         stSql := stSql ||'
                   GROUP BY cod_servidor
                          , pensionista.numcgm
@@ -281,7 +281,7 @@ BEGIN
             stSql := stSql ||', contrato_servidor_local.cod_local';
         END IF;
     END IF;
-    
+
     stSqlPensionistas := stSql;
     stSql := '';
 
@@ -320,31 +320,31 @@ BEGIN
 
         IF boFiltrarOrgao THEN
             stSql := stSql ||' AND contrato_servidor_orgao.cod_orgao IN ('||stCodOrgao||')';
-        END IF; 
+        END IF;
         IF boFiltrarLocal THEN
             stSql := stSql ||' AND contrato_servidor_local.cod_local IN ('||stCodLocal||')';
-        END IF; 
+        END IF;
         IF boFiltrarBanco THEN
             stSql := stSql ||' AND banco.cod_banco IN ('||stCodBanco||')';
-        END IF; 
+        END IF;
         IF boFiltrarAgencia THEN
             stSql := stSql ||' AND agencia.cod_agencia IN ('||stCodAgencia||')';
-        END IF; 
-        
+        END IF;
+
         IF stSituacao = 'ativos' THEN
             stSql := stSql || ' AND recuperarSituacaoDoContrato(servidor_contrato_servidor.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''A''';
         END IF;
-    
+
         IF stSituacao = 'rescindidos' THEN
             stSql := stSql || ' AND recuperarSituacaoDoContrato(servidor_contrato_servidor.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''R''';
         END IF;
-    
-        IF stSituacao = 'aposentados' THEN
-            stSql := stSql || ' AND recuperarSituacaoDoContrato(servidor_contrato_servidor.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''P''';        
-        END IF;
-                        
 
-        stSql := stSql ||'            
+        IF stSituacao = 'aposentados' THEN
+            stSql := stSql || ' AND recuperarSituacaoDoContrato(servidor_contrato_servidor.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''P''';
+        END IF;
+
+
+        stSql := stSql ||'
                     GROUP BY servidor_contrato_servidor.cod_servidor
                            , numcgm_pensionista
                            , contrato_servidor_conta_salario.nr_conta
@@ -362,11 +362,11 @@ BEGIN
         END IF;
 
     END IF;
-    
+
     stSqlServidores := stSql;
     stSql := '';
-    
-    IF LENGTH(COALESCE(stSqlServidores,'')) > 0 AND 
+
+    IF LENGTH(COALESCE(stSqlServidores,'')) > 0 AND
        LENGTH(COALESCE(stSqlPensionistas,'')) > 0 THEN
         stSql := stSqlServidores||' UNION '||stSqlPensionistas;
     ELSE
@@ -412,7 +412,7 @@ BEGIN
             IF boFiltrarOrgao THEN
                 stSql := stSql ||' AND contrato_servidor_orgao.cod_orgao IN ('||stCodOrgao||')';
             END IF;
-            
+
             IF boAgruparOrgao = 'true' THEN
                 stSql := stSql ||' AND contrato_servidor_orgao.cod_orgao = '||reContaServidor.cod_orgao;
             END IF;
@@ -431,7 +431,7 @@ BEGIN
             IF boAgruparLocal = 'true' THEN
                 stSql := stSql ||' AND contrato_servidor_local.cod_local = '||coalesce(reContaServidor.cod_local,0);
             END IF;
-                        
+
             stSql := stSql ||' WHERE servidor_contrato_servidor.cod_servidor = '||reContaServidor.cod_servidor||'
                                  AND contrato_servidor_conta_salario.cod_agencia = '||reContaServidor.cod_agencia||'
                                  AND contrato_servidor_conta_salario.cod_banco = '||reContaServidor.cod_banco||'
@@ -440,14 +440,14 @@ BEGIN
             IF stSituacao = 'ativos' THEN
                 stSql := stSql || ' AND recuperarSituacaoDoContrato(contrato.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''A''';
             END IF;
-        
+
             IF stSituacao = 'rescindidos' THEN
                 stSql := stSql || ' AND recuperarSituacaoDoContrato(contrato.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''R''';
             END IF;
-        
+
             IF stSituacao = 'aposentados' THEN
-                stSql := stSql || ' AND recuperarSituacaoDoContrato(contrato.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''P''';        
-            END IF;    
+                stSql := stSql || ' AND recuperarSituacaoDoContrato(contrato.cod_contrato, '||inCodPeriodoMovimentacao||', '''||stEntidade||''') = ''P''';
+            END IF;
         END IF;
         stContratos := '';
         nuProventos := 0;
@@ -535,7 +535,7 @@ BEGIN
                                WHERE registro_evento_rescisao.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao||'
                                  AND registro_evento_rescisao.cod_contrato = '||reContrato.cod_contrato;
             END IF;
-            
+
             FOR reRegistro IN EXECUTE stSql LOOP
                 IF reRegistro.natureza = 'P' THEN
                     nuProventos := nuProventos + reRegistro.valor;
@@ -550,7 +550,7 @@ BEGIN
         IF trim(stContratos) != '' THEN
             stContratos := substr(stContratos,1,char_length(stContratos)-1);
         END IF;
-        
+
         IF nuProventos > 0 OR nuDescontos > 0 THEN
             IF reContaServidor.numcgm_pensionista IS NOT NULL THEN
                 inNumCgm := reContaServidor.numcgm_pensionista;
@@ -566,10 +566,10 @@ BEGIN
 
            select max(valor) as exercicio
              into stExercicio
-             from administracao.configuracao 
+             from administracao.configuracao
             where parametro = 'ano_exercicio';
 
-            rwCreditosPorBanco.registro         := stContratos;        
+            rwCreditosPorBanco.registro         := stContratos;
             stSql := 'SELECT nom_cgm
                         FROM sw_cgm
                        WHERE numcgm = '||inNumCgm;
@@ -578,7 +578,7 @@ BEGIN
             IF trim(stCPF) != '' OR stCPF IS NOT NULL THEN
                 rwCreditosPorBanco.cpf              := selectIntoVarchar(stCPF);
             END IF;
-            
+
             rwCreditosPorBanco.nr_conta         := reContaServidor.nr_conta;
             rwCreditosPorBanco.num_agencia      := reContaServidor.num_agencia;
             rwCreditosPorBanco.nom_agencia      := reContaServidor.nom_agencia;
@@ -589,13 +589,13 @@ BEGIN
             rwCreditosPorBanco.valor            := nuProventos-nuDescontos;
             IF boAgruparOrgao = 'true' THEN
                 SELECT recuperaDescricaoOrgao(cod_orgao,(stExercicio||'-01-01')::date) as descricao
-                     , orgao 
+                     , orgao
                   INTO reOrgao
-                  FROM organograma.vw_orgao_nivel 
+                  FROM organograma.vw_orgao_nivel
                  WHERE cod_orgao = reContaServidor.cod_orgao;
 
                 rwCreditosPorBanco.lotacao          := reOrgao.descricao;
-                rwCreditosPorBanco.cod_estrutural   := reOrgao.orgao;                                                          
+                rwCreditosPorBanco.cod_estrutural   := reOrgao.orgao;
                 rwCreditosPorBanco.cod_orgao        := reContaServidor.cod_orgao;
             END IF;
             IF boAgruparLocal = 'true' THEN
@@ -603,12 +603,12 @@ BEGIN
                     stSql := 'SELECT descricao
                                 FROM organograma.local
                             WHERE cod_local = '||reContaServidor.cod_local;
-                    rwCreditosPorBanco.local            := selectIntoVarchar(stSql); 
+                    rwCreditosPorBanco.local            := selectIntoVarchar(stSql);
                 END IF;
                 rwCreditosPorBanco.cod_local        := reContaServidor.cod_local;
             END IF;
             RETURN NEXT rwCreditosPorBanco;
         END IF;
-    END LOOP;         
+    END LOOP;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';

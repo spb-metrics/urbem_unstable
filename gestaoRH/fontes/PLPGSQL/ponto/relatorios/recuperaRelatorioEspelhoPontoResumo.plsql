@@ -239,5 +239,5 @@ BEGIN
     rwCartaoPontoResumo.banco_horas         := stBancoHoras;
     RETURN NEXT rwCartaoPontoResumo;
 END
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 

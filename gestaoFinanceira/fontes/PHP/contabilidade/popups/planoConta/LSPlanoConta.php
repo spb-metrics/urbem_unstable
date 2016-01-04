@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 64153 2015-12-09 19:16:02Z evandro $
+    * $Id: LSPlanoConta.php 64184 2015-12-11 14:09:44Z arthur $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -500,10 +500,6 @@ if ($_REQUEST['tipoBusca']) {
                 $stFiltro .= "\n   pc.cod_estrutural like '1.1.1.%' ) OR ";
                 $stFiltro .= "\n   pc.cod_estrutural like '1.1.5.%' ) AND ";
             }
-
-            /*  if ($_REQUEST['inCodEntidade']) {
-                $stFiltro .= "\n   pb.cod_entidade in ( ".$_REQUEST['inCodEntidade'].") AND ";
-            }*/
         break;
 
         case 'tes_arrecadacao_extra_receita':
@@ -571,8 +567,6 @@ if ($_REQUEST['tipoBusca']) {
         case 'con_conta_lancamento_rp_credito':
 
                 $inExercicio = Sessao::getExercicio();
-
-               // $stFiltro  = "\n pa.cod_plano is not null AND ";
                 $stFiltro .= "\n pc.exercicio = '" . $inExercicio . "' AND ";
 
             if( $_REQUEST['stCodEstrutural'] )
@@ -762,23 +756,33 @@ if ($_REQUEST['tipoBusca']) {
         break;
 
         case "contaDepreciacao":
-            $obRegra->setCodEstrutural('1.2.3');
+            $obRegra->setCodEstrutural('1.2.3.8.1');
             $obRegra->listarContaAnaliticaDepreciacao ($rsLista,"");
         break;
 
         case "contaSinteticaAtivoPermanente":
-            if ($_REQUEST['stCodEstrutural']) {
-                $inCodEstrutural= $_REQUEST['stCodEstrutural'];
+            if ($request->get('stCodEstrutural')) {
+                $inCodEstrutural= $request->get('stCodEstrutural');
             }else{
-                $inCodEstrutural = '1.2';
+                $inCodEstrutural = '1.2.3';
             }
             $obRegra->setCodEstrutural($inCodEstrutural);
             $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");
         break;
 
         case "contaContabilDepreciacaoAcumulada":
-            if ($_REQUEST['stCodEstrutural']) {
-                $inCodEstrutural= $_REQUEST['stCodEstrutural'];
+            if ( $request->get('stCodEstrutural') ) {
+                $inCodEstrutural= $request->get('stCodEstrutural') ;
+            }else{
+                $inCodEstrutural = '1.2.3.8.1';
+            }
+            $obRegra->setCodEstrutural($inCodEstrutural);
+            $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");
+        break;
+    
+        case "contaContabilBaixaBem":
+            if ( $request->get('stCodEstrutural') ) {
+                $inCodEstrutural= $request->get('stCodEstrutural') ;
             }else{
                 $inCodEstrutural = '1.2.3';
             }

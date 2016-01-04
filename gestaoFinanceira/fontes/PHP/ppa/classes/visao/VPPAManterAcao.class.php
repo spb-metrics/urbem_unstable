@@ -35,6 +35,8 @@
  * @package URBEM
  * @subpackage visao
 
+ * $Id: VPPAManterAcao.class.php 64234 2015-12-21 17:24:45Z michel $
+
  * Caso de Uso: uc-02.09.04
  */
 include_once 'VPPAUtils.class.php';
@@ -204,7 +206,8 @@ class VPPAManterAcao extends VPPAUtils
         $obTblRecursos->Body->addComponente($obTxtValor3    , 'D');
         $obTblRecursos->Body->addComponente($obTxtValor4    , 'D');
         $obTblRecursos->Body->addComponente($obTxtValorTotal, 'D');
-        $obTblRecursos->Body->addAcao('excluir', 'excluirRecurso(this)', array(''));
+        $obTblRecursos->Body->addAcao('excluir','excluirRecurso(\'%s\',\'%s\')',array('cod_acao','cod_recurso'));
+
         $obTblRecursos->montaHTML($boJS);
 
         # Gera hidden com número de elementos.
@@ -219,7 +222,7 @@ class VPPAManterAcao extends VPPAUtils
             $stHTML .= $this->geraHidden('arNomRecurso', $arDados['nom_cod_recurso']);
         }
 
-        return $stHTML.$obTblRecursos->getHtml()."<script type=\'text/javascript\'>formataListaRecurso();</script>";
+        return $stHTML.$obTblRecursos->getHtml();
     }
 
     public function arredondarValor(array $arParam)
@@ -451,6 +454,7 @@ class VPPAManterAcao extends VPPAUtils
         }
         // Atualiza o formulário.
         $stJS  = "\n jq('#spnListaRecurso').html('".$this->listaRecursos($arRecursos)."');";
+        $stJS .= "\n formataListaRecurso();";
         $stJS .= "\n formatListaRecurso();";
         $stJS .= $this->limparRecurso();
         $stJS .= "\n jq('#obTblRecursos_row_".count($arParametros['arCodRecurso'])."_mais').trigger('click');";
@@ -461,61 +465,56 @@ class VPPAManterAcao extends VPPAUtils
 
     public function excluirRecurso(array $arParametros)
     {
-        // Verifica se o magic_quotes_gpc esta ligado, caso esteja, precisa-se tirar os escapes inserido no POST
-        if (get_magic_quotes_gpc()) {
-            $arParametros['arValorAno'] = stripslashes($arParametros['arValorAno']);
-        }
+        $stMsg  = '';
+        $stJs = '';
 
-        $arParametros['arCodRecurso'] = explode(',', $arParametros['arCodRecurso']);
-        $arParametros['arNomRecurso'] = explode(',', $arParametros['arNomRecurso']);
-        $arParametros['arValorAno']   = json_decode($arParametros['arValorAno']);
+        $cod_acao = $arParametros['cod_acao'];
+        $cod_recurso = $arParametros['cod_recurso'];
 
-        // Ajusta caracteres com acentuação da descrição
-        foreach ($arParametros['arNomRecurso'] as $inKey => $stValue) {
-            $arParametros['arNomRecurso'][$inKey] = urldecode($stValue);
-        }
+        $arRecursosTemp = array();
+        $arRecursos = Sessao::read('arRecursos');
 
-        for ($i=1; $i<=4; $i++) {
-            $arParametros['arValorAno'.$i] = array();
-        }
-        $arParametros['arValorTotal'] = array();
-        foreach ($arParametros['arValorAno'] as $inKey => $stdData) {
-            $arData = (array) $stdData;
-            foreach ($arData as $inAno => $flValores) {
-                array_push($arParametros['arValorAno'.$inAno], $flValores);
+        $arAcaoValidadaTemp = array();
+        $arAcaoValidada = Sessao::read('arAcaoValidada');
+
+        // Verificação se o Recurso foi validado em LDO.
+        //Se validado, não pode excluir recurso da ação.
+        foreach ($arAcaoValidada as $key => $value) {
+            if( $key == str_pad($cod_recurso, 4, 0, STR_PAD_LEFT) ){
+                $stMsg .= 'O recurso '.$cod_recurso.' não pode ser excluído pois o mesmo está validado na LDO';
+                break;
+            }else{
+                $arAcaoValidadaTemp[$key] = $value;
             }
         }
-        unset($arParametros['arValorAno']);
+        $arAcaoValidada = $arAcaoValidadaTemp;
 
-        // Exclui o Recurso da lista de Recursos.
-        $inRecurso = $arParametros['inRecurso'];
-        $arNomesArrays = array('arCodRecurso', 'arValorAno1', 'arValorAno2', 'arValorAno3', 'arValorAno4', 'arValorTotal', 'arNomRecurso');
+        if($stMsg==''){
+            foreach ($arRecursos as $key => $value) {
+                if( $value['cod_acao'].'.'.$value['cod_recurso'] != $cod_acao.'.'.$cod_recurso ){
+                    $arRecursosTemp[] = $value;
+                }
+            }
 
-        foreach ($arNomesArrays as $stNome) {
-            unset($arParametros[$stNome][$inRecurso]);
-            $arParametros[$stNome] = array_values((array) $arParametros[$stNome]);
+            $arRecursos = $arRecursosTemp;
+            if (is_array($arRecursos) && count($arRecursos) > 0) {
+                $stListaRecurso = $this->listaRecursos($arRecursos);
+            } else {
+                $stListaRecurso = '';
+            }
+
+            // Gera o Javascript para atualizar a tela.
+            $stJs .= "\n jq('#spnListaRecurso').html('".$stListaRecurso."');";
+            $stJs .= "\n formatListaRecurso();";
+            $stJs .= "\n formatAnosAcaoValidada('".json_encode($arAcaoValidada)."');";
+
+            Sessao::write('arRecursos', $arRecursos);
+            Sessao::write('arAcaoValidada', $arAcaoValidada);
+        }else{
+            $stJs .= "\n alertaAviso('".$stMsg."!', 'form', 'erro','".Sessao::getId()."');";
         }
 
-        // Atualiza lista de Recursos na tela.
-        $arRecursos = array();
-
-        if (is_array($arParametros['arCodRecurso']) && count($arParametros['arCodRecurso'])) {
-            $this->montaListaRecursos($arRecursos, $arParametros);
-            $stListaRecurso = $this->listaRecursos($arRecursos);
-        } else {
-            $stListaRecurso = '';
-        }
-
-        $arAcaoValidada = Sessao::read('arAcaoValidada');
-        if (!is_array($arAcaoValidada)) {
-            $arAcaoValidada = array();
-        }
-        // Gera o Javascript para atualizar a tela.
-        $stJS .= "\n jq('#spnListaRecurso').html('".$stListaRecurso."');";
-        $stJS .= "\n formatListaRecurso();";
-        $stJS .= "\n formatAnosAcaoValidada('".json_encode($arAcaoValidada)."');";
-
-        return $stJS;
+        return $stJs;
     }
 
     public function limparRecurso()
@@ -544,6 +543,7 @@ class VPPAManterAcao extends VPPAUtils
         $stHTML = $this->listaRecursos($arRecursos);
 
         $stJS  = "\n jq('#spnListaRecurso').html('".$stHTML."');";
+        $stJS .= "\n formataListaRecurso();";
         $stJS .= "\n formatListaRecurso();";
 
         return $stJS;

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FMManterAutorizacao.php 64051 2015-11-24 17:55:39Z franver $
+    $Id: FMManterAutorizacao.php 64207 2015-12-16 13:09:13Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -133,23 +133,23 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         Sessao::remove('arItens');
         
         $obREmpenhoAutorizacaoEmpenho->setExercicio     (Sessao::getExercicio());
-        $obREmpenhoAutorizacaoEmpenho->setCodAutorizacao($_REQUEST['inCodAutorizacao']);
-        $obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho ($_REQUEST['inCodPreEmpenho']);
-        $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade($_REQUEST['inCodEntidade']);
-        $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setCodReserva($_REQUEST['inCodReserva']);
+        $obREmpenhoAutorizacaoEmpenho->setCodAutorizacao($request->get('inCodAutorizacao'));
+        $obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho ($request->get('inCodPreEmpenho'));
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade($request->get('inCodEntidade'));
+        $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setCodReserva($request->get('inCodReserva'));
         $obREmpenhoAutorizacaoEmpenho->consultar();
         
         $boItemMaterial = $obREmpenhoAutorizacaoEmpenho->consultarItemMaterial();
         
         $stNomEmpenho          = $obREmpenhoAutorizacaoEmpenho->getDescricao();
-        $inCodEntidade         = $_REQUEST['inCodEntidade'];
+        $inCodEntidade         = $request->get('inCodEntidade');
         $stNomEntidade         = $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->getNomCGM();
         $inCodOrgao            = $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao();
         $inCodUnidadeOrcamento = $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNumeroUnidade();
         $inCodTipo             = $obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->getCodTipo();
-        $inCodPreEmpenho       = $_REQUEST['inCodPreEmpenho'];
-        $inCodAutorizacao      = $_REQUEST['inCodAutorizacao'];
-        $inCodReserva          = $_REQUEST['inCodReserva'];
+        $inCodPreEmpenho       = $request->get('inCodPreEmpenho');
+        $inCodAutorizacao      = $request->get('inCodAutorizacao');
+        $inCodReserva          = $request->get('inCodReserva');
         $inCodDespesa          = $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa();
         $stNomDespesa          = $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->getDescricao();
         $stCodClassificacao    = $obREmpenhoAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->getMascClassificacao();
@@ -188,7 +188,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $arItemPreEmpenho = $obREmpenhoAutorizacaoEmpenho->getItemPreEmpenho();
         foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
             $nuVlUnitario = ($obItemPreEmpenho->getValorTotal()/$obItemPreEmpenho->getQuantidade());
-            $nuVlUnitario = number_format($nuVlUnitario,4,',','.');
             $nuVlTotalItens = bcadd( $nuVlTotalItens, $obItemPreEmpenho->getValorTotal(),4);
 
             $arItens = Sessao::read('arItens');
@@ -213,7 +212,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         }
         $nuVlUnitario = '';
 
-        $arChaveAtributo =  array('cod_pre_empenho' => $_REQUEST['inCodPreEmpenho'],
+        $arChaveAtributo =  array('cod_pre_empenho' => $request->get('inCodPreEmpenho'),
                                   'exercicio'       => Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores          ($arChaveAtributo);
         $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores($rsAtributos);
@@ -606,7 +605,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlUnitario->setTitle    ('Informe o valor unitário.');
     $obTxtVlUnitario->setNull     (true);
     $obTxtVlUnitario->setDefinicao('NUMERIC');
-    $obTxtVlUnitario->setDecimais (2);
+    $obTxtVlUnitario->setDecimais (4);
     $obTxtVlUnitario->setSize     (21);
     $obTxtVlUnitario->setMaxLength(21);
     $obTxtVlUnitario->obEvento->setOnChange('gerarValorTotal();');
