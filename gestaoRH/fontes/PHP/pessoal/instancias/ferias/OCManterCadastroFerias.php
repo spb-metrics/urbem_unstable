@@ -31,16 +31,16 @@
 
     * Casos de uso: uc-04.04.22
 
-    $Id: OCManterCadastroFerias.php 64270 2015-12-23 19:35:29Z jean $
+    $Id: OCManterCadastroFerias.php 64319 2016-01-15 13:51:29Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php"                            );
-include_once( CAM_GRH_PES_COMPONENTES."IFiltroCGMContrato.class.php"                                    );
-include_once( CAM_GRH_PES_COMPONENTES."ISelectFuncao.class.php"                                         );
-include_once( CAM_GRH_PES_COMPONENTES."IBuscaInnerLotacao.class.php"                                    );
-include_once( CAM_GRH_PES_COMPONENTES."IBuscaInnerLocal.class.php"                                      );
+include_once CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php";
+include_once CAM_GRH_PES_COMPONENTES."IFiltroCGMContrato.class.php";
+include_once CAM_GRH_PES_COMPONENTES."ISelectFuncao.class.php";
+include_once CAM_GRH_PES_COMPONENTES."IBuscaInnerLotacao.class.php";
+include_once CAM_GRH_PES_COMPONENTES."IBuscaInnerLocal.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterCadastroFerias";
@@ -586,6 +586,7 @@ function gerarQuantDiasGozoAbono($inQuantFaltas,$dtInicial,$dtFinal,$inCodFormaP
     if ($rsConfiguracaoFerias->getNumLinhas() == 1) {
         $inQuantDiasGozo  = round($inQuantDiasGozo*$rsConfiguracaoFerias->getCampo("dias_gozo")/30);
         $inQuantDiasAbono = round(round($rsConfiguracaoFerias->getCampo("dias_gozo")) - $inQuantDiasGozo, 2);
+        $inQuantDiasAbono = ( $inCodFormaPagamento == 2 ) ? $inQuantDiasAbono : 0;
     }
     $inQuantDiasGozo  = ( $inQuantDiasGozo < 0 ) ? 0 : $inQuantDiasGozo;
 
@@ -675,15 +676,23 @@ function preencherQuantDiasGozo()
                 }
 
                 $stFiltroFerias .= "AND ferias.cod_forma = ".$_REQUEST['inCodFormaPagamento']." \n";
-                $obTPessoalFerias->recuperaRelacionamento($rsLancamentoFerias,$stFiltroFerias," ORDER BY ferias.cod_ferias",$boTransacao);
+                if (Sessao::read("boConcederFeriasLote") == FALSE) {
+                    $obTPessoalFerias->recuperaRelacionamento($rsLancamentoFerias,$stFiltroFerias," ORDER BY ferias.cod_ferias",$boTransacao);
+                }else{
+                    $rsLancamentoFerias = new RecordSet();
+                }
+
                 if ($rsLancamentoFerias->getNumLinhas() > 0){
                     $stJs .= gerarSpan2Form(false,"",false);
                     
                     //Atribui os valores para o hidden e desabilita os campos para o usuario
                     $stJs .= " jQuery('#hdninAno').val(jQuery('#inAno').val()); ";
                     $stJs .= " jQuery('#hdninCodMes').val(jQuery('#inCodMes').val()); ";
-                    $stJs .= " jQuery('#inAno').prop('disabled',true); ";
-                    $stJs .= " jQuery('#inCodMes').prop('disabled',true); ";
+
+                    if ($_REQUEST['inCodFormaPagamento'] == 3 || $_REQUEST['inCodFormaPagamento'] == 4) {
+                        $stJs .= " jQuery('#inAno').prop('disabled',true); ";
+                        $stJs .= " jQuery('#inCodMes').prop('disabled',true); ";
+                    }
                 
                 }else{
                     $stJs .= gerarSpan2Form(false,"",true);
@@ -1003,14 +1012,14 @@ function gravaLoteSessao()
     }
 }
 
-function alterarPost()
+function alterarPost(Request $request)
 {
     global $pgForm,$pgList;
-    if ($_GET["boConcederFeriasLote"] == "true") {
-        if ($_GET["stAcao"] == "consultar" or $_GET["stAcao"] == "excluir") {
+    if ($request->get("boConcederFeriasLote") == "true") {
+        if ($request->get("stAcao") == "consultar" OR $request->get("stAcao") == "excluir") {
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalLoteFerias.class.php");
             $obTPessoalLoteFerias = new TPessoalLoteFerias();
-            $obTPessoalLoteFerias->recuperaRelacionamento($rsLote,"","ano_competencia||mes_competencia DESC, cod_regime ASC, nome");
+            $obTPessoalLoteFerias->recuperaRelacionamento($rsLote,"","ano_competencia||mes_competencia , nome ASC");
 
             $obCmbLoteFerias = new Select;
             $obCmbLoteFerias->setRotulo                     ( "Lote de Férias"                                              );
@@ -1018,7 +1027,7 @@ function alterarPost()
             $obCmbLoteFerias->setId                         ( "inCodLote"                                                   );
             $obCmbLoteFerias->setStyle                      ( "width: 450px"                                                );
             $obCmbLoteFerias->setCampoID                    ( "cod_lote"                                                    );
-            $obCmbLoteFerias->setCampoDesc                  ( "[nome] - [regime]"                                           );
+            $obCmbLoteFerias->setCampoDesc                  ( "nome"                                                        );
             $obCmbLoteFerias->addOption                     ( "", "Selecione"                                               );
             $obCmbLoteFerias->setTitle                      ( "Selecione o lote de férias para consultar."                  );
             $obCmbLoteFerias->setNull                       ( false                                                         );
@@ -1046,28 +1055,30 @@ function alterarPost()
             $stEval = str_replace("\n","",$stEval);
             $stHtml = $obFormulario->getHTML();
 
-            if ($_GET["stAcao"] == "consultar") {
+            if ($request->get("stAcao") == "consultar") {
                 $stJs = "f.action = '".$pgList."?".Sessao::getId()."';";
             } else {
                 $stJs = "f.action = '".$pgForm."?".Sessao::getId()."';";
             }
 
-            $stJs .= "limpaFormulario();\n";
-            $stJs .= "f.boConcederFeriasLote.checked = true;";
-            $stJs .= "f.stTipoFiltro.value = 'geral';\n";
-            $stJs .= "f.stTipoFiltro.disabled = true;\n";
+            $stJs .= "limpaFormulario();                           \n";
+            $stJs .= "f.boConcederFeriasLote.checked = true;       \n";
+            $stJs .= "f.stTipoFiltro.value = 'geral';              \n";
+            $stJs .= "f.stTipoFiltro.disabled = true;              \n";
+        } else {
+            $stJs = "f.action = '".$pgForm."?".Sessao::getId()."'; \n";
         }
     } else {
         include_once(CAM_GRH_PES_COMPONENTES."IFiltroCompetencia.class.php");
         Sessao::write('boPossuiEvento', true);
         $obIFiltroCompetencia = new IFiltroCompetencia(true, '', false);
-        if ($_GET["stAcao"] == "consultar") {
+        if ($request->get("stAcao") == "consultar") {
             $obChkFiltarCompetencia = new Checkbox;
             $obChkFiltarCompetencia->setRotulo          ( "Consultar por Competencia de Pagamento"                          );
             $obChkFiltarCompetencia->setTitle           ( "Selecione para consultar férias por competência de pagamento."   );
             $obChkFiltarCompetencia->setName            ( "boConsultarCompetencia"    );
             $obChkFiltarCompetencia->setValue           ( true                        );
-            if(isset($_GET["boConsultarCompetencia"])&&$_GET["boConsultarCompetencia"]=="true")
+            if($request->get("boConsultarCompetencia") == "true" )
                 $obChkFiltarCompetencia->setChecked     ( true                        );
             $obChkFiltarCompetencia->obEvento->setOnChange("if (this.checked == true) {this.value=true;} else {this.value=false;}montaParametrosGET('alterarPost','boConcederFeriasLote,stAcao,boConsultarCompetencia');");
             
@@ -1079,30 +1090,32 @@ function alterarPost()
         $obIFiltroCompetencia->obCmbMes->setTitle       ( "Informe a competência de pagamento."     );
 
         $obFormulario = new Formulario;
-        if ($_GET["stAcao"] == "consultar"){
+        if ($request->get("stAcao") == "consultar"){
             $obFormulario->addComponente                ( $obChkFiltarCompetencia );
-            if(isset($_GET["boConsultarCompetencia"])&&$_GET["boConsultarCompetencia"]=="true")
+            if($request->get("boConsultarCompetencia") == "true")
                 $obIFiltroCompetencia->geraFormulario($obFormulario);
         }else
             $obIFiltroCompetencia->geraFormulario($obFormulario);
         $obFormulario->montaInnerHTML();
         $stHtml = $obFormulario->getHTML();
         $stEval = "";
-        $stJs = "f.action = '".$pgList."?".Sessao::getId()."'; \n";
-        $stJs .= "f.stTipoFiltro.value = 'contrato'; \n";
-        if(!isset($_GET["boConsultarCompetencia"])){
-            $stJs .= "f.stTipoFiltro.value = 'contrato_todos';\n";
-            $stJs .= "f.stTipoFiltro.disabled = false;\n";
+        $stJs  = "f.action = '".$pgList."?".Sessao::getId()."'; \n";
+        $stJs .= "f.stTipoFiltro.value = 'contrato';            \n";
+
+        if(!$request->get("boConsultarCompetencia")){
+            $stJs .= "f.stTipoFiltro.value = 'contrato_todos';  \n";
+            $stJs .= "f.stTipoFiltro.disabled = false;          \n";
             $stJs .= "ajaxJavaScript('".CAM_GRH_PES_PROCESSAMENTO."OCIFiltroComponentes.php?".Sessao::getId()."&stTipoFiltro='+f.stTipoFiltro.value+'&boQuebrarDisabled='+document.frm.boQuebrarDisabled.value,'gerarSpan' ); \n";
         }
-        if ($_GET["stAcao"] == "excluir") {
-            $stJs .= "f.stTipoFiltro.value = 'contrato';\n";
-            $stJs .= "f.stTipoFiltro.disabled = false;\n";
+        if ($request->get("stAcao") == "excluir") {
+            $stJs .= "f.stTipoFiltro.value = 'contrato';        \n";
+            $stJs .= "f.stTipoFiltro.disabled = false;          \n";
         }
     }
-    $stJs .= "d.getElementById('spnConcederFeriasLote').innerHTML = '".$stHtml."';\n";
-    $stJs .= "f.hdnConcederFeriasLote.value = '".$stEval."';\n";
-    $stJs .= "jQuery('#limpar').attr('onClick', 'limpaFormulario(); executaFuncaoAjax(\'alterarPost\');' );\n";
+
+    $stJs .= "d.getElementById('spnConcederFeriasLote').innerHTML = '".$stHtml."';                          \n";
+    $stJs .= "f.hdnConcederFeriasLote.value = '".$stEval."';                                                \n";
+    $stJs .= "jQuery('#limpar').attr('onClick', 'limpaFormulario(); executaFuncaoAjax(\'alterarPost\');' ); \n";
 
     return $stJs;
 }
@@ -1225,25 +1238,18 @@ function montaListaContratos($arContratos)
     return $stJs;
 }
 
-function excluirLote()
+function excluirLote(Request $request)
 {
     global $pgProc;
 
     include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalLoteFerias.class.php");
     $obTPessoalLoteFerias = new TPessoalLoteFerias();
-    $stFiltro = " WHERE cod_lote = ".$_REQUEST["inCodLote"];
+    $stFiltro = " WHERE cod_lote = ".$request->get("inCodLote");
     $obTPessoalLoteFerias->recuperaTodos($rsLoteFeriasContrato,$stFiltro);
     $stLote = $rsLoteFeriasContrato->getCampo("nome");
 
-    include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalRegime.class.php");
-    $obTPessoalRegime = new TPessoalRegime();
-    $obTPessoalRegime->setDado('cod_regime', $rsLoteFeriasContrato->getCampo('cod_regime'));
-    $obTPessoalRegime->recuperaPorChave($rsRegime);
-
-    $stDescricaoRegime = " - ".$rsRegime->getCampo('descricao');
-
-    $stId = str_replace("&","*_*",Sessao::getId())."*_*boConcederFeriasLote=true*_*inCodLote=".$_REQUEST["inCodLote"];
-    $stJs = "alertaQuestao('".CAM_GRH_PES_INSTANCIAS."ferias/".$pgProc."?$stId*_*stAcao=".$_REQUEST["stAcao"]."*_*stDescQuestao=".$stLote.$stDescricaoRegime.".','sn_excluir','".Sessao::getId()."');\n";
+    $stId = str_replace("&","*_*",Sessao::getId())."*_*boConcederFeriasLote=true*_*inCodLote=".$request->get("inCodLote");
+    $stJs = "alertaQuestao('".CAM_GRH_PES_INSTANCIAS."ferias/".$pgProc."?$stId*_*stAcao=".$request->get("stAcao")."*_*stDescQuestao=".$stLote."','sn_excluir','".Sessao::getId()."');\n";
 
     return $stJs;
 }
@@ -1307,7 +1313,7 @@ switch ($_GET['stCtrl']) {
         $stJs .= submeter();
     break;
     case "alterarPost":
-        $stJs = alterarPost();
+        $stJs = alterarPost($request);
         break;
     case "incluirContrato":
         $stJs = incluirContrato();
@@ -1316,7 +1322,7 @@ switch ($_GET['stCtrl']) {
         $stJs = excluirContrato();
         break;
     case "excluirLote":
-        $stJs = excluirLote();
+        $stJs = excluirLote($request);
         break;
     case "preencherQuantidadeFaltas":
         $stJs = preencherQuantidadeFaltas();

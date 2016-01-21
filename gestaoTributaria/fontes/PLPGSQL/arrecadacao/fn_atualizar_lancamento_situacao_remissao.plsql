@@ -54,7 +54,7 @@ BEGIN
     ON
         parcelamento.num_parcelamento = divida_parcelamento.num_parcelamento
         AND parcelamento.numero_parcelamento = -1
-        AND parcelamento.exercicio = -1
+        AND parcelamento.exercicio = '-1'
 
     WHERE
         divida_parcelamento.cod_inscricao = new.cod_inscricao

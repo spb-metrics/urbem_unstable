@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.06.98
 
-    $Id: consultaProcesso.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: consultaProcesso.php 64287 2016-01-08 16:45:40Z diogo.zarpelon $
 
     */
 
@@ -1276,40 +1276,72 @@ FROM(
         Sessao::write('ordem',$_REQUEST["ordem"]);
     }
 
-    $paginacao = new paginacaoLegada;
-    $paginacao->pegaDados(Sessao::read('sSQLs'),"10");
-    $paginacao->pegaPagina($pagina);
-    $paginacao->complemento = "&ctrl=1";
-    $paginacao->geraLinks();
+    $sSQLs = Sessao::read('sSQLs');
 
-    $paginacao->pegaOrder($st_ordenacao[Sessao::read('ordem')],"ASC");
-    $sSQL = $paginacao->geraSQL();
+    # Monta o LIMIT + OFFSET para a consulta.
+    $offset = 0;
 
-    $dbEmp = new dataBaseLegado ;
-    $dbEmp->abreBD();
-    $dbEmp->abreSelecao($sSQL);
-    $dbEmp->fechaBD();
-    $dbEmp->vaiPrimeiro();
+    if ($_REQUEST['pg'] > 1) {
+       $offset = ($_REQUEST['pg'] - 1) * 10;
+    }
 
-    if($dbEmp->numeroDeLinhas==0)
+    $stOrderBy = " ORDER BY ".$st_ordenacao[Sessao::read('ordem')]. " ASC LIMIT 10 OFFSET $offset ";
+    $sSQLs = $sSQLs.$stOrderBy;
+
+    $obConexao = new Conexao;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $sSQLs, $boTransacao);
+    $obErro = $obConexao->executaSQL( $rsRecordSetPaginacao, Sessao::read('sSQLs'), $boTransacao);
+
+    $obPaginacao = new Paginacao;
+    $obPaginacao->setRecordSet( $rsRecordSetPaginacao );
+    $obPaginacao->geraStrLinks();
+    $obPaginacao->geraHrefLinks();
+    $obPaginacao->montaHTML();
+    
+    # Monta a tabela de Paginação 
+    $obTabelaPaginacao = new Tabela;
+    $obTabelaPaginacao->addLinha();
+    $obTabelaPaginacao->ultimaLinha->addCelula();
+
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>".$obPaginacao->getHTML()."</font>" );
+    $obTabelaPaginacao->ultimaLinha->commitCelula();
+    $obTabelaPaginacao->commitLinha();
+    $obTabelaPaginacao->addLinha();
+    $obTabelaPaginacao->ultimaLinha->addCelula();
+
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>Registros encontrados: ".$obPaginacao->getNumeroLinhas()."</font>" );
+    $obTabelaPaginacao->ultimaLinha->commitCelula();
+    $obTabelaPaginacao->commitLinha();
+    $obTabelaPaginacao->montaHTML();
+
+    $stHTMLPaginacao .= $obTabelaPaginacao->getHTML();
+
+    if ($rsRecordSet->getNumLinhas() == 0) {
         $ok = false;
+    }
 
     if ($ok) {
-        $count = $paginacao->contador();
-
+        $count = $obPaginacao->geraContador();
+        
         if ($dataInclusaoUltimo == "//") {
             $dataInclusaoUltimo = "&nbsp;";
             $nomUsuarioUltimo   = "&nbsp;";
         }
 
-        while (!$dbEmp->eof()) {
+        $rsRecordSet->setPrimeiroElemento();
 
-            $codprocesso        = $dbEmp->pegaCampo("cod_processo");
-            $anoprocesso        = $dbEmp->pegaCampo("ano_exercicio");
+        while (!$rsRecordSet->eof()) {
+
+            $codprocesso        = $rsRecordSet->getCampo("cod_processo");
+            $anoprocesso        = $rsRecordSet->getCampo("ano_exercicio");
             $processo           = $codprocesso."/".$anoprocesso;
-            $assunto            = $dbEmp->pegaCampo("nom_assunto");
-            $classificacao      = $dbEmp->pegaCampo("nom_classificacao");
-            $dataInclusao       = $dbEmp->pegaCampo("timestamp");
+            $assunto            = $rsRecordSet->getCampo("nom_assunto");
+            $classificacao      = $rsRecordSet->getCampo("nom_classificacao");
+            $dataInclusao       = $rsRecordSet->getCampo("timestamp");
 
             $arr                = explode(" ", $dataInclusao);
             $arrData            = explode("-", $arr[0]);
@@ -1318,7 +1350,7 @@ FROM(
             $arrData2           = explode("-", $arr2[0]);
             $dataInclusaoUltimo = $arrData2[2]."/".$arrData2[1]."/".$arrData2[0];
 
-            $nomContribuinte    = trim($dbEmp->pegaCampo("nom_cgm"));
+            $nomContribuinte    = trim($rsRecordSet->getCampo("nom_cgm"));
 
             $codProcesso        = explode("/", $processo);
 
@@ -1341,44 +1373,46 @@ FROM(
             href='consultaProcesso.php?".Sessao::getId()."&ctrl=2&pagina=".$pagina."&codProcesso=".$codProcesso[0]."&anoExercicio=".$anoprocesso."&verificador=true'>
             <img src='".CAM_FW_IMAGENS."procuracgm.gif' align='absmiddle' title='Consultar processo' border=0></a></td>\n";
 
-            $dbEmp->vaiProximo();
+            $rsRecordSet->proximo();
         }
 
-             //redireciona!
-            if ($voltar == false) {
-              if ($dbEmp->numeroDeLinhas==1) {
-                 $url =
-                 "consultaProcesso.php?".Sessao::getId()."&ctrl=2&codProcesso=".$codProcesso[0]."&anoExercicio=".$anoprocesso."&verificador=true";
+         //redireciona!
+        if ($voltar == false) {
+            if ($rsRecordSet->numeroDeLinhas==1) {
+                $url =
+                "consultaProcesso.php?".Sessao::getId()."&ctrl=2&codProcesso=".$codProcesso[0]."&anoExercicio=".$anoprocesso."&verificador=true";
                 echo "<script>
                     window.location = \"". $url ."\";
                 </script>";
-              }
             }
-             $html .= "</tr>";
-   }
-    $dbEmp->limpaSelecao();
+        }
+        $html .= "</tr>";
+    }
+    
     $html .= "</table>";
 
-if(!$ok)
+if (!$ok) { 
     echo "<br><b><span class='itemText'>Nenhum registro encontrado!</span></b><br><br>";
-else
+} else {
     echo $html;
-    echo "<table id= 'paginacao' width=450 align=center><tr><td align=center><font size=2>";
-        $paginacao->mostraLinks();
+    echo "<table id='paginacao' width='850' align='center'>
+            <tr>
+            <td align='center'>
+            <font size=2>";
+    echo $stHTMLPaginacao;
     echo "</font></tr></td></table>";
-
-      #  * Caso retorne somente uma linha de registro, redireciona para a página com as informações necessárias.
-
-    if ($dbEmp->numeroDeLinhas == 1) {
+}
+    #  * Caso retorne somente uma linha de registro, redireciona para a página com as informações necessárias.
+    if ($rsRecordSet->getNumLinhas() == 1) {
         ?>
         <script>
             window.location
         </script>
-        <?php
+<?php
     }
-    ?>
-        <script>zebra('processos','zb');</script>
-    <?php
+?>
+    <script>zebra('processos','zb');</script>
+<?php
     break;
     case 2:
 

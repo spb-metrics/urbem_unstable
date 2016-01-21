@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Lisiane, Carlos Adriano  <carlos.silva@cnm.org.br>
- * $Id: OCExportarInclusaoProgramas.php 63549 2015-09-10 14:08:31Z franver $
+ * $Id: OCExportarInclusaoProgramas.php 64340 2016-01-15 19:31:57Z jean $
  */
 
 set_time_limit(0);
@@ -500,6 +500,36 @@ if (in_array("INCPRO.csv",$arFiltro["arArquivosSelecionados"])) {
     
 }
 
+if ( Sessao::getExercicio() == '2016' ) {
+
+    /**
+    * CONSID.csv | Autor : Jean da Silva
+    */
+    if (in_array("CONSID.csv",$arFiltro["arArquivosSelecionados"])) {
+        $obExportador->addArquivo("CONSID.csv");
+        $inCount = 0;
+    
+        if (count($arRecordSetArquivos["CONSID.csv"]->arElementos) > 0) {
+    
+            $obExportador->roUltimoArquivo->addBloco($arRecordSetArquivos["CONSID.csv"]);
+    
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_arquivo");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
+    
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("consideracoes");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4000);
+        }
+    }
+}
 
 if ($arFiltro['stTipoExport'] == 'compactados') {
     $obTTCEMGConfigurarIDE = new TTCEMGConfigurarIDE;

@@ -33,34 +33,21 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 30566 $
-    $Name$
-    $Author: rgarbin $
-    $Date: 2008-03-26 15:10:17 -0300 (Qua, 26 Mar 2008) $
+    $Id: TPessoalFerias.class.php 64319 2016-01-15 13:51:29Z michel $
 
     * Casos de uso: uc-04.04.22
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  pessoal.ferias
-  * Data de Criação: 08/06/2006
-
-  * @author Analista: Vandré Miguel Ramos
-  * @author Desenvolvedor: Diego Lemos de Souza
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TPessoalFerias extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TPessoalFerias()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela("pessoal.ferias");
@@ -436,17 +423,103 @@ function montaRecuperaFerias()
     return $stSql;
 }
 
-function concederFerias(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+
+function concederFerias(&$rsRecordSet, $stFiltro = "", $stOrder = "",$boTransacao = "")
 {
-    return $this->executaRecupera("montaConcederFerias",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    
+    $stGroupBy = " GROUP BY concederFerias.cod_ferias
+                          , concederFerias.numcgm
+                          , concederFerias.nom_cgm
+                          , concederFerias.registro
+                          , concederFerias.cod_contrato
+                          , concederFerias.desc_local
+                          , concederFerias.desc_orgao
+                          , concederFerias.orgao
+                          , concederFerias.dt_posse
+                          , concederFerias.dt_admissao
+                          , concederFerias.dt_nomeacao
+                          , concederFerias.desc_funcao
+                          , concederFerias.desc_regime_funcao
+                          , concederFerias.cod_regime_funcao
+                          , concederFerias.cod_funcao
+                          , concederFerias.cod_local
+                          , concederFerias.cod_orgao
+                          , concederFerias.bo_cadastradas
+                          , concederFerias.situacao
+                          , concederFerias.dt_inicial_aquisitivo
+                          , concederFerias.dt_final_aquisitivo
+                          , concederFerias.dt_inicio
+                          , concederFerias.dt_fim
+                          , concederFerias.mes_competencia
+                          , concederFerias.ano_competencia
+
+                     HAVING CASE WHEN '".$this->getDado("stAcao")."' = 'incluir' THEN
+                                    CASE WHEN SUM(coalesce(ferias.dias_ferias, 0)) + SUM(coalesce(ferias.dias_abono, 0)) < 30 THEN TRUE
+                                    ELSE FALSE
+                                    END
+                           ELSE TRUE
+                           END
+            ";
+    
+    $stSql = $this->montaConcederFerias().$stFiltro.$stGroupBy.$stOrder;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
 
 function montaConcederFerias()
 {
-    $stSql = "SELECT *
-                   , to_char(dt_inicial_aquisitivo,'dd/mm/yyyy') as dt_inicial_aquisitivo_formatado
-                   , to_char(dt_final_aquisitivo,'dd/mm/yyyy') as dt_final_aquisitivo_formatado
-                   , to_char(dt_admissao,'dd/mm/yyyy') as dt_admissao_formatado
+    if(!$this->getDado("boLote")){
+        $stFiltroLote = '';
+        if($this->getDado("stAcao") == 'incluir'){
+            $stFiltroFerias = " AND ferias.cod_forma NOT IN (1,2)
+                                AND ferias.cod_forma IN (3,4)
+                              ";
+        }else
+            $stFiltroFerias = '';
+    }else{
+        $stFiltroLote = "
+
+         INNER JOIN ( SELECT cod_contrato
+                           , min(dt_inicial_aquisitivo) AS dt_inicial_aquisitivo
+                           , min(dt_final_aquisitivo) AS dt_final_aquisitivo
+                        FROM concederFerias('".$this->getDado("stTipoFiltro")."',
+                                            '".$this->getDado("stValoresFiltro")."',
+                                            ".$this->getDado("inCodPeriodoMovimentacao").",
+                                            ".$this->getDado("boFeriasVencidas").",
+                                            '".Sessao::getEntidade()."',
+                                            '".Sessao::getExercicio()."',
+                                            '".$this->getDado("stAcao")."',
+                                            ".$this->getDado("inCodLote").",
+                                            ".(($this->getDado("inCodRegime") != "")?$this->getDado("inCodRegime"):0)."
+                                           ) AS concederFerias
+                    GROUP BY cod_contrato
+                     ) AS min_periodo_ferias
+                  ON min_periodo_ferias.cod_contrato = concederFerias.cod_contrato
+                 AND min_periodo_ferias.dt_inicial_aquisitivo = concederFerias.dt_inicial_aquisitivo
+                 AND min_periodo_ferias.dt_final_aquisitivo = concederFerias.dt_final_aquisitivo
+
+        ";
+        
+        $stFiltroFerias = " AND ferias.cod_forma NOT IN (1,2)
+                            AND ferias.cod_forma IN (".$this->getDado("inCodFormaPagamento").")
+                          ";
+    }
+
+    $stSql = "SELECT concederFerias.*
+                   , CASE WHEN TRIM(concederFerias.mes_competencia) <> '' THEN
+                               CASE WHEN TRIM(concederFerias.mes_competencia)::INTEGER > 0 THEN
+                                         concederFerias.mes_competencia||'/'||concederFerias.ano_competencia
+                               END
+                     END AS competencia
+                   , to_char(concederFerias.dt_inicial_aquisitivo,'dd/mm/yyyy') as dt_inicial_aquisitivo_formatado
+                   , to_char(concederFerias.dt_final_aquisitivo,'dd/mm/yyyy') as dt_final_aquisitivo_formatado
+                   , to_char(concederFerias.dt_admissao,'dd/mm/yyyy') as dt_admissao_formatado
+                   , SUM(coalesce(ferias.dias_ferias, 0)) + SUM(coalesce(ferias.dias_abono, 0)) AS ferias_tiradas
                 FROM concederFerias('".$this->getDado("stTipoFiltro")."',
                                            '".$this->getDado("stValoresFiltro")."',
                                             ".$this->getDado("inCodPeriodoMovimentacao").",
@@ -455,7 +528,20 @@ function montaConcederFerias()
                                            '".Sessao::getExercicio()."',
                                            '".$this->getDado("stAcao")."',
                                             ".$this->getDado("inCodLote").",
-                                            ".(($this->getDado("inCodRegime") != "")?$this->getDado("inCodRegime"):0).")";
+                                            ".(($this->getDado("inCodRegime") != "")?$this->getDado("inCodRegime"):0)."
+                                    ) AS concederFerias
+          ".$stFiltroLote."
+           LEFT JOIN pessoal.ferias
+                  ON ferias.dt_inicial_aquisitivo = concederFerias.dt_inicial_aquisitivo
+                 AND ferias.dt_final_aquisitivo = concederFerias.dt_final_aquisitivo
+                 AND ferias.cod_contrato = concederFerias.cod_contrato
+
+               WHERE (   (    ferias.cod_forma IS NOT NULL
+                          ".$stFiltroFerias."
+                         )
+                      OR ferias.cod_forma IS NULL
+                     )
+        ";
 
     return $stSql;
 }

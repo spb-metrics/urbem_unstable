@@ -30,7 +30,7 @@
   * @author Analista: Fábio Bertoldi
   * @author Programador: Fernando Piccini Cercato
 
-    * $Id: PRConcederRemissao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: PRConcederRemissao.php 64290 2016-01-08 18:28:54Z evandro $
 
   Caso de uso: uc-05.04.11
 **/
@@ -187,7 +187,7 @@ $stFiltro2 = " AND calculo_grupo_credito.ano_exercicio IN ( ";
 for ($inX=0; $inX<$inTotalNaListaGrupoCreditoSessao; $inX++) {
     $arDados = explode( "/", $arListaGrupoCreditoSessao[$inX]["stCodGrupo"] );
     $stFiltro .= $arDados[0].", ";
-    $stFiltro2 .= $arDados[1].", ";
+    $stFiltro2 .= "'".$arDados[1]."', ";
 }
 
 // $stFiltro .= $arDados[0]." ) ";
@@ -601,7 +601,7 @@ $obTransacao = new Transacao;
                             $obTDATParcelamento->setDado( "cod_modalidade"      , $rsModalidade->getCampo("cod_modalidade"));
                             $obTDATParcelamento->setDado( "timestamp_modalidade", $rsModalidade->getCampo("timestamp") );
                             $obTDATParcelamento->setDado( "numero_parcelamento" , -1 );
-                            $obTDATParcelamento->setDado( "exercicio"           , -1 );
+                            $obTDATParcelamento->setDado( "exercicio"           , '-1' );
                             $obTDATParcelamento->inclusao( $boTransacao );
 
                             unset( $obTDATDividaParcelamento );
@@ -726,7 +726,7 @@ $obTransacao = new Transacao;
                             $obTDATParcelamento->setDado( "cod_modalidade"      , $rsModalidade->getCampo("cod_modalidade") );
                             $obTDATParcelamento->setDado( "timestamp_modalidade", $rsModalidade->getCampo("timestamp") );
                             $obTDATParcelamento->setDado( "numero_parcelamento" , -1 );
-                            $obTDATParcelamento->setDado( "exercicio"           , -1 );
+                            $obTDATParcelamento->setDado( "exercicio"           , '-1' );
                             $obTDATParcelamento->inclusao( $boTransacao );
 
                             unset( $obTDATDividaParcelamento );
@@ -860,7 +860,7 @@ $obTransacao = new Transacao;
                             $obTDATParcelamento->setDado( "cod_modalidade"      , $rsModalidade->getCampo( "cod_modalidade" ) );
                             $obTDATParcelamento->setDado( "timestamp_modalidade", $rsModalidade->getCampo( "timestamp" ) );
                             $obTDATParcelamento->setDado( "numero_parcelamento" , -1 );
-                            $obTDATParcelamento->setDado( "exercicio"           , -1 );
+                            $obTDATParcelamento->setDado( "exercicio"           ,'-1' );
                             $obTDATParcelamento->inclusao( $boTransacao );
 
                             unset( $obTDATDividaParcelamento );
@@ -958,7 +958,7 @@ $obTransacao = new Transacao;
                         $obTDATParcelamento->setDado( "cod_modalidade"          , $rsModalidade->getCampo( "cod_modalidade" ) );
                         $obTDATParcelamento->setDado( "timestamp_modalidade"    , $rsModalidade->getCampo( "timestamp" ) );
                         $obTDATParcelamento->setDado( "numero_parcelamento"     , -1 );
-                        $obTDATParcelamento->setDado( "exercicio"               , -1 );
+                        $obTDATParcelamento->setDado( "exercicio"               , '-1' );
                         $obTDATParcelamento->inclusao( $boTransacao );
 
                         unset( $obTDATDividaParcelamento );

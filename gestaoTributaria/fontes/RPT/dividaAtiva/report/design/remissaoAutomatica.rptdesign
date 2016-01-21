@@ -110,8 +110,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ListaRemissao" id="1149">
@@ -506,6 +506,8 @@ params["query"].value = this.queryText;]]></method>
                         <label id="1410">
                             <property name="style">titulos</property>
                             <property name="fontSize">smaller</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="textAlign">left</property>
                             <text-property name="text">Nome</text-property>
                         </label>
                     </cell>
@@ -513,6 +515,8 @@ params["query"].value = this.queryText;]]></method>
                         <label id="1411">
                             <property name="style">titulos</property>
                             <property name="fontSize">smaller</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="textAlign">left</property>
                             <text-property name="text">Inscrição</text-property>
                         </label>
                     </cell>
@@ -520,6 +524,8 @@ params["query"].value = this.queryText;]]></method>
                         <label id="1412">
                             <property name="style">titulos</property>
                             <property name="fontSize">smaller</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="textAlign">left</property>
                             <text-property name="text">Data de Inscrição</text-property>
                         </label>
                     </cell>
@@ -527,6 +533,8 @@ params["query"].value = this.queryText;]]></method>
                         <label id="1413">
                             <property name="style">titulos</property>
                             <property name="fontSize">smaller</property>
+                            <property name="fontWeight">normal</property>
+                            <property name="textAlign">left</property>
                             <text-property name="text">Valor Lançado</text-property>
                         </label>
                     </cell>
@@ -558,6 +566,7 @@ params["query"].value = this.queryText;]]></method>
                         <cell id="1417">
                             <data id="1425">
                                 <property name="fontSize">smaller</property>
+                                <property name="textAlign">left</property>
                                 <property name="resultSetColumn">inscricao</property>
                             </data>
                         </cell>
@@ -597,18 +606,21 @@ params["query"].value = this.queryText;]]></method>
                     <cell id="1396">
                         <data id="1428">
                             <property name="fontSize">smaller</property>
+                            <property name="textAlign">left</property>
                             <property name="resultSetColumn">grupo_credito</property>
                         </data>
                     </cell>
                     <cell id="1397">
                         <data id="1429">
                             <property name="fontSize">smaller</property>
+                            <property name="textAlign">left</property>
                             <property name="resultSetColumn">inscricao_da</property>
                         </data>
                     </cell>
                     <cell id="1398">
                         <data id="1430">
                             <property name="fontSize">smaller</property>
+                            <property name="textAlign">left</property>
                             <property name="resultSetColumn">data_inscricao_da</property>
                         </data>
                     </cell>

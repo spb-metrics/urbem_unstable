@@ -29,7 +29,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRPagamento.class.php 60774 2014-11-14 17:34:51Z carolina $
+    * $Id: TARRPagamento.class.php 64341 2016-01-15 20:11:16Z evandro $
 
 * Casos de uso: uc-05.03.10
 */
@@ -1389,6 +1389,17 @@ function montaRecuperaListaPagamentosLoteDARelatorio($stCodLote)
                                     AND pagamento_acrescimo.cod_tipo = 3
                                     AND pagamento_acrescimo.ocorrencia_pagamento = APC.ocorrencia_pagamento
                         ), 0.00 )::numeric(14,2) AS multa
+                        , COALESCE((
+                                SELECT
+                                    SUM(pagamento_acrescimo.valor)
+                                FROM
+                                    arrecadacao.pagamento_acrescimo
+                                WHERE
+                                    pagamento_acrescimo.cod_calculo = AC.cod_calculo
+                                    AND pagamento_acrescimo.numeracao = APC.numeracao
+                                    AND pagamento_acrescimo.cod_tipo = 1
+                                    AND pagamento_acrescimo.ocorrencia_pagamento = APC.ocorrencia_pagamento
+                        ), 0.00 )::numeric(14,2) AS correcao
                         , APC.valor::numeric(14,2) AS valor_pago_calculo
                         , to_char(APAG.data_pagamento, 'dd/mm/YYYY') AS data_pagamento_br
                          ,CASE WHEN APDIF.valor IS NOT NULL THEN

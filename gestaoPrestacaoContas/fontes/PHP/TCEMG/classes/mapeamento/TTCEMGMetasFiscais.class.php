@@ -33,12 +33,12 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGMetasFiscais.class.php 61464 2015-01-20 13:38:33Z jean $
+    * $Id: TTCEMGMetasFiscais.class.php 64322 2016-01-15 15:34:00Z jean $
     *
     * $Name: $
-    * $Date: 2015-01-20 11:38:33 -0200 (Ter, 20 Jan 2015) $
+    * $Date: 2016-01-15 13:34:00 -0200 (Sex, 15 Jan 2016) $
     * $Author: jean $
-    * $Rev: 61464 $
+    * $Rev: 64322 $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -66,6 +66,10 @@ class TTCEMGMetasFiscais extends Persistente
         $this->AddCampo('valor_corrente_resultado_nominal'          , 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_corrente_divida_publica_consolidada' , 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_corrente_divida_consolidada_liquida' , 'numeric', false,'14,2',false,false);
+        //
+        $this->AddCampo('valor_corrente_receita_primaria_adv'       , 'numeric', false,'14,2',false,false);
+        $this->AddCampo('valor_corrente_despesa_primaria_gerada'    , 'numeric', false,'14,2',false,false);
+        //
         $this->AddCampo('valor_constante_receita_total'             , 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_constante_receita_primaria'          , 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_constante_despesa_total'             , 'numeric', false,'14,2',false,false);
@@ -74,6 +78,10 @@ class TTCEMGMetasFiscais extends Persistente
         $this->AddCampo('valor_constante_resultado_nominal'         , 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_constante_divida_publica_consolidada', 'numeric', false,'14,2',false,false);
         $this->AddCampo('valor_constante_divida_consolidada_liquida', 'numeric', false,'14,2',false,false);
+        //
+        $this->AddCampo('valor_constante_receita_primaria_adv'      , 'numeric', false,'14,2',false,false);
+        $this->AddCampo('valor_constante_despesa_primaria_gerada'   , 'numeric', false,'14,2',false,false);
+        //
         $this->AddCampo('percentual_pib_receita_total'              , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_receita_primaria'           , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_despesa_total'              , 'numeric', false, '7,3',false,false);
@@ -82,6 +90,10 @@ class TTCEMGMetasFiscais extends Persistente
         $this->AddCampo('percentual_pib_resultado_nominal'          , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_divida_publica_consolidada' , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_divida_consolidada_liquida' , 'numeric', false, '7,3',false,false);
+        //
+        $this->AddCampo('percentual_pib_receita_primaria_adv' , 'numeric', false, '7,3',false,false);
+        $this->AddCampo('percentual_pib_despesa_primaria_adv' , 'numeric', false, '7,3',false,false);
+        //
     }
 
     public function recuperaValoresMetasFiscais(&$rsRecordSet)
@@ -101,6 +113,8 @@ class TTCEMGMetasFiscais extends Persistente
              , REPLACE(valor_corrente_resultado_nominal::VARCHAR, '.', ',') AS valor_corrente_resultado_nominal
              , REPLACE(valor_corrente_divida_publica_consolidada::VARCHAR, '.', ',') AS valor_corrente_divida_publica_consolidada
              , REPLACE(valor_corrente_divida_consolidada_liquida::VARCHAR, '.', ',') AS valor_corrente_divida_consolidada_liquida
+             , REPLACE(valor_corrente_receita_primaria_adv::VARCHAR, '.', ',') AS valor_corrente_receita_primaria_adv
+             , REPLACE(valor_corrente_despesa_primaria_gerada::VARCHAR, '.', ',') AS valor_corrente_despesa_primaria_gerada
              , REPLACE(valor_constante_receita_total::VARCHAR, '.', ',') AS valor_constante_receita_total
              , REPLACE(valor_constante_receita_primaria::VARCHAR, '.', ',') AS valor_constante_receita_primaria
              , REPLACE(valor_constante_despesa_total::VARCHAR, '.', ',') AS valor_constante_despesa_total
@@ -109,6 +123,8 @@ class TTCEMGMetasFiscais extends Persistente
              , REPLACE(valor_constante_resultado_nominal::VARCHAR, '.', ',') AS valor_constante_resultado_nominal
              , REPLACE(valor_constante_divida_publica_consolidada::VARCHAR, '.', ',') AS valor_constante_divida_publica_consolidada
              , REPLACE(valor_constante_divida_consolidada_liquida::VARCHAR, '.', ',') AS valor_constante_divida_consolidada_liquida
+             , REPLACE(valor_constante_receita_primaria_adv::VARCHAR, '.', ',') AS valor_constante_receita_primaria_adv
+             , REPLACE(valor_constante_despesa_primaria_gerada::VARCHAR, '.', ',') AS valor_constante_despesa_primaria_gerada
              , REPLACE(percentual_pib_receita_total::VARCHAR, '.', ',') AS percentual_pib_receita_total
              , REPLACE(percentual_pib_receita_primaria::VARCHAR, '.', ',') AS percentual_pib_receita_primaria
              , REPLACE(percentual_pib_despesa_total::VARCHAR, '.', ',') AS percentual_pib_despesa_total
@@ -117,6 +133,8 @@ class TTCEMGMetasFiscais extends Persistente
              , REPLACE(percentual_pib_resultado_nominal::VARCHAR, '.', ',') AS percentual_pib_resultado_nominal
              , REPLACE(percentual_pib_divida_publica_consolidada::VARCHAR, '.', ',') AS percentual_pib_divida_publica_consolidada
              , REPLACE(percentual_pib_divida_consolidada_liquida::VARCHAR, '.', ',') AS percentual_pib_divida_consolidada_liquida
+             , REPLACE(percentual_pib_receita_primaria_adv::VARCHAR, '.', ',') AS percentual_pib_receita_primaria_adv
+             , REPLACE(percentual_pib_despesa_primaria_adv::VARCHAR, '.', ',') AS percentual_pib_despesa_primaria_adv
           FROM tcemg.metas_fiscais
          WHERE exercicio::INTEGER IN (".$this->getDado('exercicio').")
          ORDER BY exercicio

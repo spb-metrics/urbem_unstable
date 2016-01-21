@@ -32,12 +32,12 @@
 
   * @ignore
   *
-  * $Id: PRManterConfiguracaoMetasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: PRManterConfiguracaoMetasFiscais.php 64322 2016-01-15 15:34:00Z jean $
 
-  * $Revision: 59612 $
+  * $Revision: 64322 $
   * $Name: $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Author: jean $
+  * $Date: 2016-01-15 13:34:00 -0200 (Sex, 15 Jan 2016) $
 
 */
 
@@ -75,6 +75,10 @@ switch ($stAcao) {
             $obTTCEMGMetasFiscais->setDado('valor_corrente_resultado_nominal'          , $request->get('flValorCorrenteResultadoNominal'));
             $obTTCEMGMetasFiscais->setDado('valor_corrente_divida_publica_consolidada' , $request->get('flValorCorrenteDividaPublicaConsolidada'));
             $obTTCEMGMetasFiscais->setDado('valor_corrente_divida_consolidada_liquida' , $request->get('flValorCorrenteDividaConsolidadaLiquida'));
+            //
+            $obTTCEMGMetasFiscais->setDado('valor_corrente_receita_primaria_adv'       , $request->get('flValorCorrenteReceitaPrimariaAdv'));
+            $obTTCEMGMetasFiscais->setDado('valor_corrente_despesa_primaria_gerada'    , $request->get('flValorCorrenteDespesaPrimariaGerada'));
+            //
 
             $obTTCEMGMetasFiscais->setDado('valor_constante_receita_total'             , $request->get('flValorConstanteReceitaTotal'));
             $obTTCEMGMetasFiscais->setDado('valor_constante_receita_primaria'          , $request->get('flValorConstanteReceitaPrimaria'));
@@ -84,6 +88,10 @@ switch ($stAcao) {
             $obTTCEMGMetasFiscais->setDado('valor_constante_resultado_nominal'         , $request->get('flValorConstanteResultadoNominal'));
             $obTTCEMGMetasFiscais->setDado('valor_constante_divida_publica_consolidada', $request->get('flValorConstanteDividaPublicaConsolidada'));
             $obTTCEMGMetasFiscais->setDado('valor_constante_divida_consolidada_liquida', $request->get('flValorConstanteDividaConsolidadaLiquida'));
+            //
+            $obTTCEMGMetasFiscais->setDado('valor_constante_receita_primaria_adv'      , $request->get('flValorConstanteReceitaDividaAdv'));
+            $obTTCEMGMetasFiscais->setDado('valor_constante_despesa_primaria_gerada'   , $request->get('flValorConstanteDespesaPrimariaGerada'));
+            //
 
             $obTTCEMGMetasFiscais->setDado('percentual_pib_receita_total'              , $request->get('flPercentualPIBReceitaTotal'));
             $obTTCEMGMetasFiscais->setDado('percentual_pib_receita_primaria'           , $request->get('flPercentualPIBReceitaPrimaria'));
@@ -93,6 +101,10 @@ switch ($stAcao) {
             $obTTCEMGMetasFiscais->setDado('percentual_pib_resultado_nominal'          , $request->get('flPercentualPIBResultadoNominal'));
             $obTTCEMGMetasFiscais->setDado('percentual_pib_divida_publica_consolidada' , $request->get('flPercentualPIBDividaPublicaConsolidada'));
             $obTTCEMGMetasFiscais->setDado('percentual_pib_divida_consolidada_liquida' , $request->get('flPercentualPIBDividaConsolidadaLiquida'));
+            //
+            $obTTCEMGMetasFiscais->setDado('percentual_pib_receita_primaria_adv'       , $request->get('flPercentualPIBReceitaPrimariaAdv'));
+            $obTTCEMGMetasFiscais->setDado('percentual_pib_despesa_primaria_adv'       , $request->get('flPercentualPIBDespesaPrimariaAdv'));
+            //
 
             $obTTCEMGMetasFiscais->recuperaPorChave($rsTTCEMGMetasFiscais,$boTransacao);
 

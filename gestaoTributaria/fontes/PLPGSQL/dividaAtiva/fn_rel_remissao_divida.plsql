@@ -272,7 +272,15 @@ END IF;
 
 IF stCreditos IS NOT NULL THEN
     IF (boGrupo = true) THEN
-        stQuery:= stQuery ||' AND GRUPO_CREDITO.ANO_EXERCICIO||GRUPO_CREDITO.COD_GRUPO in ('''|| stCreditos ||''')';
+        --Formatando valores para ficar de acordo com o IN ('2010220','2011261','2012298','2013334','2014365')
+        stCodigos := STRING_TO_ARRAY(stCreditos, ',');
+        stCreditos := '';
+        FOR inIndex IN 1..array_upper(stCodigos, 1) LOOP
+            stCreditos := stCreditos||quote_literal(stCodigos[inIndex])||',';            
+        END LOOP;
+        stCreditos := SUBSTR(stCreditos, 1, LENGTH(stCreditos)-1);
+        
+        stQuery:= stQuery ||' AND GRUPO_CREDITO.ANO_EXERCICIO||GRUPO_CREDITO.COD_GRUPO in ('|| stCreditos ||')';
     ELSE
         stCodigos := STRING_TO_ARRAY(stCreditos, '-');
         stFiltro := '';
@@ -309,7 +317,28 @@ CREATE TABLE TMP_REL_REMISSAO'|| stTabela ||' (
 )';
 
 EXECUTE stQuery;
-stQuery := 'SELECT cod_calculo, cod_lancamento, inscricao::integer, cod_grupo, ano_exercicio, descricao, cod_inscricao, exercicio_da, dt_inscricao_da, valor, numcgm, nomcgm FROM TMP_LANCAMENTO'|| stTabela ||' ORDER BY cod_calculo,cod_lancamento,inscricao,cod_grupo,ano_exercicio,cod_inscricao , exercicio_da';
+stQuery := 'SELECT 
+                    cod_calculo
+                    , cod_lancamento
+                    , inscricao::integer
+                    , cod_grupo
+                    , ano_exercicio
+                    , descricao
+                    , cod_inscricao
+                    , exercicio_da
+                    , dt_inscricao_da
+                    , valor
+                    , numcgm
+                    , nomcgm 
+            FROM TMP_LANCAMENTO'|| stTabela ||' 
+            ORDER BY 
+                    cod_calculo
+                    ,cod_lancamento
+                    ,inscricao
+                    ,cod_grupo
+                    ,ano_exercicio
+                    ,cod_inscricao
+                    ,exercicio_da ';
 
 inCodCalculo := null;
 FOR reRegistro IN EXECUTE stQuery LOOP
@@ -364,8 +393,8 @@ FOR reRegistro IN EXECUTE stQuery LOOP
                    ,'|| nuValor         ||'
                    )';
         EXECUTE stInsert;
-        inCodCalculo := reRegistro.cod_calculo;
-        stNomCGM := reRegistro.numcgm ||' - '|| REPLACE(reRegistro.nomcgm,'''','''''');
+        inCodCalculo    := reRegistro.cod_calculo;
+        stNomCGM        := reRegistro.numcgm ||' - '|| REPLACE(reRegistro.nomcgm,'''','''''');
         inInscricao     := reRegistro.inscricao;
         inCodGrupo      := reRegistro.cod_grupo;
         stExercicio     := reRegistro.ano_exercicio;

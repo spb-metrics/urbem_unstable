@@ -70,7 +70,7 @@ class paginacaoLegada
         $this->order  = "";
         $this->tipo = "";
         $this->uni = "";
-        }
+    }
 
 /**************************************************************************/
 /**** Pega os dados disponibilizados de query e registros po pagina     ***/
@@ -80,14 +80,14 @@ class paginacaoLegada
         $this->sql = $sql;
         $this->rpp = $rpp;
         $this->uni = $uni;
-        }
+    }
 /**************************************************************************/
 /**** Pega o número  da página atual                                    ***/
 /**************************************************************************/
      function pegaPagina($pagina)
      {
         $this->pagina = $pagina;
-        }
+    }
 
 /**************************************************************************/
 /**** Gera os links de navegação entre  os registros                    ***/
@@ -96,22 +96,14 @@ class paginacaoLegada
     {
         global $PHP_SELF;
 
-        //$total_sql = preg_replace("/SELECT (.*?) FROM /sei", "'SELECT COUNT(*) as qtd FROM '", $this->sql);
-        //Transforma a querie num COUNT
-        //print "+++++++++++++++".$this->sql." <br>
-        //<b> $total_sql </b><br><br>";
-        //$sSQL = $total_sql;
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($this->sql);
-        //$this->quantidade  = trim($dbEmp->pegaCampo("qtd"));
         $this->quantidade  = $dbEmp->numeroDeLinhas;
         $this->paginas = ceil($this->quantidade / $this->rpp);
-        //$this->inicio = $this->pagina * $this->rpp + 1;
         $this->inicio = $this->pagina * $this->rpp;
 
         if ($this->uni == 1) {
-
             if ($this->pagina == "")
             $this->inicio = 0;
             if ($this->pagina == 0)
@@ -123,36 +115,41 @@ class paginacaoLegada
             if ($this->pagina >= 3)
             $this->inicio = $this->pagina;
         }
+
         if ($this->quantidade > $this->rpp) {
             if ($this->pagina > 0) {
                 $menos = $this->pagina - 1;
                 $url = "$PHP_SELF?".Sessao::getId()."&pagina=$menos";
-        if ($this->complemento) {
-           $url .= $this->complemento;
-        }
-                    $this->aux = "<a href=".$url.">Anterior</a>";
+        
+                if ($this->complemento) {
+                   $url .= $this->complemento;
+                }
+        
+                $this->aux = "<li><a href=".$url.">Anterior</a></li>";
             }
-            for ($i=0;$i<$this->paginas;$i++) {
+            
+            for ($i=0; $i < $this->paginas; $i++) {
                 $url = "$PHP_SELF?".Sessao::getId()."&pagina=$i";
-        if ($this->complemento) {
-                $url .= $this->complemento;
-             }
-                    $j = $i+1;
-                    if ($this->pagina == $i) {
-                        $this->aux .= " | <a href=".$url." style='color: red'>".$j."</a>";
-                    } else {
-                        $this->aux .= " | <a href=".$url.">$j</a>";
-                    }
+                if ($this->complemento) {
+                    $url .= $this->complemento;
+                }
+                $j = $i+1;
+                if ($this->pagina == $i) {
+                    $this->aux .= "<li class='active'><a href=".$url.">".$j."</a></li>";
+                } else {
+                    $this->aux .= "<li><a href=".$url.">$j</a></li>";
+                }
             }
+            
             if ($this->pagina < ($this->paginas - 1)) {
                 $mais = $this->pagina + 1;
                 $url = "$PHP_SELF?".Sessao::getId()."&pagina=$mais";
-        if ($this->complemento) {
-           $url .= $this->complemento;
+                if ($this->complemento) {
+                   $url .= $this->complemento;
+                }
+                $this->aux .= "<li><a href=".$url.">Próxima</a></li>";
+            }
         }
-                    $this->aux .= " | <a href=".$url.">Próxima</a>";
-            }
-            }
     }
 
 /**************************************************************************/
@@ -183,7 +180,7 @@ class paginacaoLegada
                     $url .= $this->complemento;
                 }
                $url = $funcao."(\"".$url."\")";
-               $this->aux = "<a href='#' onClick='javascript:".$url."'>Anterior</a>";
+               $this->aux = "<li><a href='#' onClick='javascript:".$url."'>Anterior</a></li>";
             }
             for ($i=0;$i<$this->paginas;$i++) {
                 $url = "pagina=$i";
@@ -192,10 +189,11 @@ class paginacaoLegada
                 }
                 $url = $funcao."(\"".$url."\")";
                 $j = $i+1;
+
                 if ($this->pagina == $i) {
-                    $this->aux .= " | <a href='#' onClick='javascript:".$url."' style='color: red'>".$j."</a>";
+                    $this->aux .= " <li class='active'><a href='#' onClick='javascript:".$url."'>".$j."</a></li>";
                 } else {
-                    $this->aux .= " | <a href='#' onClick='javascript:".$url."'>$j</a>";
+                    $this->aux .= " <li><a href='#' onClick='javascript:".$url."'>$j</a></li>";
                 }
             }
             if ($this->pagina < ($this->paginas - 1)) {
@@ -206,7 +204,7 @@ class paginacaoLegada
                    $url .= $this->complemento;
                 }
                 $url = $funcao."(\"".$url."\")";
-                $this->aux .= " | <a href='#' onClick='javascript:".$url."'>Próxima</a>";
+                $this->aux .= " <li><a href='#' onClick='javascript:".$url."'>Próxima</a></li>";
             }
         }
     }
@@ -214,11 +212,11 @@ class paginacaoLegada
 /**************************************************************************/
 /**** Pega o campo para order                                           ***/
 /**************************************************************************/
-     function pegaOrder($order,$tipo)
-     {
+    function pegaOrder($order,$tipo)
+    {
         $this->order = $order;
         $this->tipo = $tipo;
-        }
+    }
 
 /**************************************************************************/
 /**** Gera a quey completa para uso da paginação                       ***/
@@ -227,34 +225,39 @@ class paginacaoLegada
     {
         $query = $this->sql;
         $query .= " ORDER by $this->order $this->tipo";
+
         if ($this->uni != 1) {
-        if (($this->inicio == 1) || ($this->inicio < 0))
-            $this->inicio = 0;
+            if (($this->inicio == 1) || ($this->inicio < 0)) {
+                $this->inicio = 0;
+            }
         }
+
         $query .= " LIMIT $this->rpp OFFSET $this->inicio";
 
-            return $query;
-
+        return $query;
     }
+
 /**************************************************************************/
 /**** Escreve os links na página                                        ***/
 /**************************************************************************/
     public function mostraLinks()
     {
+        echo "<ul class='pagination'>";
         echo "$this->aux";
+        echo "</ul>";
     }
+
 /**************************************************************************/
 /**** Retorna o numero do primeiro registro da pagina corrente          ***/
 /**************************************************************************/
      function contador()
      {
-    if ($this->pagina) {
-       return ($this->pagina * $this->rpp) +1;
-    } else {
-           return 1;
+        if ($this->pagina) {
+           return ($this->pagina * $this->rpp) +1;
+        } else {
+            return 1;
+        }
     }
-     }
-
 }
 
 ?>

@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     Tesouraria
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 63540 2015-09-09 20:30:56Z franver $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
+ * $Id: RTCEMGExportacaoInclusaoProgramas.class.php 64340 2016-01-15 19:31:57Z jean $ RTCEMGExportarAcompanhamentoMensal.class.php 57095 2014-02-04 11:34:18Z lisiane $
  */
 
 /* Includes */
@@ -42,6 +42,7 @@ include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoINCA
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoIUOC.class.php";
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGincamp.class.php";
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoMensalIDE.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConsideracaoArquivo.class.php";
 
 /**
     * Classe de Regra para geração de arquivo de planejamento para o ExportacaoTCE-MG
@@ -60,6 +61,7 @@ class RTCEMGExportacaoInclusaoProgramas
     public $obTExportacaoTCEMGUniOrcam;
     public $obTTCEMGRegistrosArquivoPrograma;
     public $obTTCEMGArquivoIUOC;
+    public $obTTCEMGConsideracaoArquivo;
     
     /**
     * Metodo Construtor
@@ -75,6 +77,7 @@ class RTCEMGExportacaoInclusaoProgramas
         $this->obTTCEMGRegistrosArquivoPrograma     = new TTCEMGRegistrosArquivoPrograma;
         $this->obTTCEMGArquivoIncamp                = new TTCEMGArquivoINCAMP;
         $this->obTTCEMGArquivoIUOC                  = new TTCEMGArquivoIUOC;
+        $this->obTTCEMGConsideracaoArquivo          = new TTCEMGConsideracaoArquivo;
     }
 
     // SETANDO
@@ -184,6 +187,18 @@ class RTCEMGExportacaoInclusaoProgramas
             $this->obTTCEMGRegistrosArquivoPrograma->recuperaRecursosIncluisaoPrograma($rsInclusaoProgramas);
             
             $arRecordSetArquivos["INCPRO.csv"] = $rsInclusaoProgramas;
+        }
+
+        if ( Sessao::getExercicio() == '2016' ) {
+            if (in_array("CONSID.csv",$this->getArquivos())) {
+                $this->obTTCEMGConsideracaoArquivo->setDado('exercicio'   , $this->getExercicio());
+                $this->obTTCEMGConsideracaoArquivo->setDado('entidade'    , $this->getCodEntidades());
+                $this->obTTCEMGConsideracaoArquivo->setDado('mes'         , $this->getMes());
+                $this->obTTCEMGConsideracaoArquivo->setDado('modulo_sicom', 'inclusao');
+            
+                $this->obTTCEMGConsideracaoArquivo->recuperaConsid($rsConsideracaoArquivo);
+                $arRecordSetArquivos["CONSID.csv"] = $rsConsideracaoArquivo;
+            }
         }
         return $obErro;
     }

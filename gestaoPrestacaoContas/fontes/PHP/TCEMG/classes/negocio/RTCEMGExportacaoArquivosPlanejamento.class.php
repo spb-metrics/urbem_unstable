@@ -57,6 +57,7 @@ include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGArquivoUOC.
 include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGORGAO.class.php";
 include_once CAM_GF_EXP_MAPEAMENTO."TExportacaoTCEMGUniOrcam.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracao.class.php';
+include_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGConsideracaoArquivo.class.php";
 
 /**
     * Classe de Regra para geração de arquivo de planejamento para o ExportacaoTCE-MG
@@ -111,6 +112,7 @@ class RTCEMGExportacaoArquivosPlanejamento
         $this->obTTCEMGArquivoUOC                   = new TTCEMGArquivoUOC;
         $this->obTTCEMGRegistrosArquivoPrograma     = new TTCEMGRegistrosArquivoPrograma;
         $this->obTTCEMGORGAO                        = new TTCEMGORGAO;
+        $this->obTTCEMGCONSID                       = new TTCEMGConsideracaoArquivo;
     }
 
     // SETANDO
@@ -430,6 +432,29 @@ class RTCEMGExportacaoArquivosPlanejamento
             $rsRecordSet->inNumLinhas = count($arRegistros);
 
             $arRecordSetArquivos["UOC.csv"] = $rsRecordSet;
+        }
+
+        if (in_array("CONSID.csv",$this->getArquivos())) {
+            //Tipo Registro 10
+            $this->obTTCEMGCONSID->setDado('exercicio'   , $this->getExercicio());
+            $this->obTTCEMGCONSID->setDado('entidade'    , $this->getCodEntidades());
+            $this->obTTCEMGCONSID->setDado('mes'         , $this->getMes());
+            $this->obTTCEMGCONSID->setDado('modulo_sicom','planejamento');
+            $this->obTTCEMGCONSID->recuperaConsid($rsRecordSet10);
+            
+            $arRecordSetArquivos["CONSID10"] = $rsRecordSet10;
+            
+             //Tipo Registro 99
+            $arCONSID99 = array(
+                '0' => array(
+                    'tipo_registro' => '99',
+                )
+            );
+
+            $rsRecordSet99 = new RecordSet();
+            $rsRecordSet99->preenche($arCONSID99);
+
+            $arRecordSetArquivos["CONSID99"] = $rsRecordSet99;
         }
 
         return $obErro;

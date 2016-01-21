@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    $Id: LSClassificacaoReceita.php 62443 2015-05-11 17:35:07Z evandro $
+    $Id: LSClassificacaoReceita.php 64311 2016-01-14 17:50:11Z jean $
 
     * Casos de uso: uc-02.01.06
 */
@@ -136,28 +136,33 @@ $obROrcamentoClassificacaoReceita->setListarAnaliticas('true');
 
 $rsLista = new RecordSet();
 
-if($_REQUEST['tipoBusca'] == 'receitaDedutora'){
+if ($_REQUEST['tipoBusca'] == 'receitaDedutora') {
     $obROrcamentoClassificacaoReceita->setDedutora (true);
 
-}elseif ($_REQUEST['tipoBusca'] == 'receitaIRRF') {
+    $obROrcamentoClassificacaoReceita->listar( $rsLista, " ORDER BY mascara_classificacao" );
+
+} else if ($_REQUEST['tipoBusca'] == 'receitaIRRF') {
     include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoReceita.class.php" );
     $obROrcamentoReceita = new ROrcamentoReceita;
     
-    if($_REQUEST['inExercicio'] != "")
+    if ($_REQUEST['inExercicio'] != "") {
         $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setExercicio ( $_REQUEST['inExercicio']        );
+    }
     
-    if($_REQUEST['inCodReceitaIRRF'] != "")
+    if ($_REQUEST['inCodReceitaIRRF'] != "") {
         $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodReceita ( $_REQUEST['inCodReceitaIRRF']   );  
+    }
     
-    if($_REQUEST['inCodClassificacao'] != ""){
+    if ($_REQUEST['inCodClassificacao'] != ""){
         $stEstrutural = str_replace(".", "", $_REQUEST['inCodClassificacao']);                
         $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setCodEstrutural ( $stEstrutural );  
     }
 
-    if( $_REQUEST['stDescricao'] != "") 
+    if( $_REQUEST['stDescricao'] != "") {
         $obROrcamentoReceita->obROrcamentoClassificacaoReceita->setDescricao ( $_REQUEST['stDescricao'] );  
+    }
 
-        $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaListaIRRF ( $rsContaIRRF ,$obTransacao     );
+    $obROrcamentoReceita->obROrcamentoClassificacaoReceita->recuperaListaIRRF ( $rsContaIRRF ,$obTransacao     );
 
     if ( $rsContaIRRF->getNumLinhas() > 0 ) {
         foreach ($rsContaIRRF->getElementos() as $value) {
@@ -171,8 +176,8 @@ if($_REQUEST['tipoBusca'] == 'receitaDedutora'){
         }
         $rsLista->preenche($arAux);
     }
-
-}else{
+    
+} else {
     $obROrcamentoClassificacaoReceita->listar( $rsLista, " ORDER BY mascara_classificacao" );
 }
 

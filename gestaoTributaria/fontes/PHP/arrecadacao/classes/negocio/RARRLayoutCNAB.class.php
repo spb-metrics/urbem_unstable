@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRLayoutCNAB.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RARRLayoutCNAB.class.php 64341 2016-01-15 20:11:16Z evandro $
 
    * Casos de uso: uc-05.03.10
 */
@@ -322,26 +322,13 @@ function efetuarBaixa($arDadosArquivo, $boTransacao = "")
                 }
             }
         }
-/*
-    else {  //a parte final deste arquivo nao possui o valor total pago!! nao tem com oq validar!
-        //busca valor total do Arquivo
-        $nuTotalPagoArquivo = ltrim( substr( $stValorLinha, 7, 17 ), 0 );
-        $nuTotalPago = number_format( $nuTotalPago, 2, '', '' );
 
-        //verifica se o valor total baixado é igual ao valor total do arquivo
-        if ( trim($nuTotalPago) != trim($nuTotalPagoArquivo) ) {
-            $obErro->setDescricao("O valor total baixado difere do valor total do arquivo.");
-
-            return $obErro;
-        }
-    }
-*/
     }
 
     /* Após baixa, executa ações recorrentes*/
     $obErro = $this->posBaixa($boTransacao);
-//echo "terminou<br>";exit;
-    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTARRPagamento );
+
+    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->RARRLayoutCNAB );
 
     return $obErro;
 }

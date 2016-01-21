@@ -35,7 +35,7 @@
 
 * Casos de uso: uc-01.02.92, uc-01.02.93
 
-  $Id: interfaceCgm.class.php 63637 2015-09-23 17:04:21Z arthur $
+  $Id: interfaceCgm.class.php 64287 2016-01-08 16:45:40Z diogo.zarpelon $
 
 */
 
@@ -433,37 +433,66 @@ Recebe os dados em forma de matriz
 /**************************************************************************/
     public function exibeBusca($sSQL,$param="", $formulario = "cgm", $ctrl = 2)
     {
+        $stSqlPaginacao = $sSQL;
+
         if ($_GET['paginando']) {
             $sSQL = Sessao::read('stSql');
         }
+
         if ( !isset( $_GET['pagina'] ) ) {
             $_GET['pagina'] = 0;
         }
+        
         Sessao::write('stSql', $sSQL);
-        $paginacao = new paginacaoLegada;
-        $paginacao->pegaDados($sSQL,"10");
-        $paginacao->pegaPagina($_GET['pagina']);
-        $paginacao->complemento = "&controle=2&paginando=true";
-        $paginacao->geraLinks();
-        $paginacao->pegaOrder(" lower(C.nom_cgm)","ASC");
-        $sSQL = $paginacao->geraSQL();
+        
+        $obConexao = new Conexao;
+        $obErro = $obConexao->executaSQL( $rsRecordSetPaginacao, $stSqlPaginacao, $boTransacao);
+
+        $obPaginacao = new Paginacao;
+        $obPaginacao->setRecordSet( $rsRecordSetPaginacao );
+        $obPaginacao->geraStrLinks();
+        $obPaginacao->geraHrefLinks();
+        $obPaginacao->montaHTML();
+    
+        # Monta a tabela de Paginação 
+        $obTabelaPaginacao = new Tabela;
+        $obTabelaPaginacao->addLinha();
+        $obTabelaPaginacao->ultimaLinha->addCelula();
+
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>".$obPaginacao->getHTML()."</font>" );
+        $obTabelaPaginacao->ultimaLinha->commitCelula();
+        $obTabelaPaginacao->commitLinha();
+        $obTabelaPaginacao->addLinha();
+        $obTabelaPaginacao->ultimaLinha->addCelula();
+
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+        $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>Registros encontrados: ".$obPaginacao->getNumeroLinhas()."</font>" );
+        $obTabelaPaginacao->ultimaLinha->commitCelula();
+        $obTabelaPaginacao->commitLinha();
+        $obTabelaPaginacao->montaHTML();
+
+        $stHTMLPaginacao .= $obTabelaPaginacao->getHTML();        
+
+        # Monta o LIMIT + OFFSET para a consulta.
+        $offset = 0;
+
+        if ($_REQUEST['pg'] > 1) {
+           $offset = ($_REQUEST['pg'] - 1) * 10;
+        }
+
+        $stOrderBy = " ORDER BY lower(C.nom_cgm) ASC LIMIT 10 OFFSET $offset ";
+        $sSQL = $sSQL.$stOrderBy;
+
         //print $sSQL;
         $dbEmp = new dataBaseLegado;
         $dbEmp->abreBD();
         $dbEmp->abreSelecao($sSQL);
         $dbEmp->vaiPrimeiro();
-        if ( $pagina > 0 and $dbEmp->eof() ) {
-            $_GET['pagina']--;
-            $paginacao->pegaPagina($_GET['pagina']);
-            $paginacao->geraLinks();
-            $sSQL = $paginacao->geraSQL();
-            //Pega os dados encontrados em uma query
-            $dbEmp->abreBD();
-            $dbEmp->abreSelecao($sSQL);
-            $dbEmp->fechaBD();
-            $dbEmp->vaiPrimeiro();
-        }
-        $cont = $paginacao->contador();
+
+        $cont = $obPaginacao->geraContador();
 ?>
         <script type="text/javascript">
             function excluirCgm(cgm)
@@ -472,6 +501,7 @@ Recebe os dados em forma de matriz
                 var objeto = cgm;
                 alertaQuestao('<?=CAM_CGM."cgm/manutencao/excluiCgm.php?".Sessao::getId();?>','excluir',bem+'%26pagina=<?=$_GET["pagina"];?>',objeto,'sn_excluir','<?=Sessao::getId();?>&pagina=<?=$_GET["pagina"]?>&volta=true&controle=2');
             }
+
             function zebra(id, classe)
             {
                 var tabela = document.getElementById(id);
@@ -509,9 +539,6 @@ Recebe os dados em forma de matriz
                 <td class=labelleftcabecalho width=80%>Nome/Razão Social</td>
                 <td class=labelleftcabecalho>&nbsp;</td>
             </tr>
-
-
-
 <?php
 
         while (!$dbEmp->eof()) {
@@ -537,7 +564,7 @@ if ($param=='excluir') {
 <?php
 } else {
 ?>
-                 <a href='<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=3&numCgm=<?=$dbEmp->pegaCampo('numcgm');?>&nomCgm=<?=$dbEmp->pegaCampo('nom_cgm');?>&timestamp=<?=$dbEmp->pegaCampo('timestamp');?>&pagina=<?=$_GET['pagina']?>'><img src="<?=CAM_FW_IMAGENS."btneditar.gif";?>" height=20 border=0></a>
+                 <a href='<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=3&numCgm=<?=$dbEmp->pegaCampo('numcgm');?>&nomCgm=<?=$dbEmp->pegaCampo('nom_cgm');?>&timestamp=<?=$dbEmp->pegaCampo('timestamp');?>&pagina=<?=$_GET['pagina']?>&pg=<?=$_GET['pg']?>&pos=<?=$_GET['pos']?>'><img src="<?=CAM_FW_IMAGENS."btneditar.gif";?>" height=20 border=0></a>
 <?php
  }
 ?>
@@ -551,12 +578,18 @@ if ($param=='excluir') {
         $dbEmp->limpaSelecao();
         $dbEmp->fechaBD();
         echo $exec;
-        echo "<table id= 'paginacao' width=450 align=center><tr><td align=center ><font size=2>";
-        $paginacao->mostraLinks();
+
+        # Hack para nova paginação.
+        echo "<table id='paginacao' width='850' align='center'>
+                <tr>
+                <td align='center'>
+                <font size=2>";
+        echo $stHTMLPaginacao;
         echo "</font></tr></td></table>";
 ?>
         <script>zebra('processos','zb');</script>
 <?php
+    
     }//Fim da function exibeBusca
 
 
@@ -2928,7 +2961,7 @@ Se a variável $dados Cgm for maior que zero ele carrega também os dados do CGM
     <!--
     function Voltar()
     {
-        document.frm.action += "&pagina=<?=$_GET['pagina'];?>&volta=true";
+        document.frm.action += "&pagina=<?=$_GET['pg'];?>&pg=<?=$_GET['pg'];?>&pos=<?=$_GET['pos'];?>&volta=true";
         document.frm.controle.value = 2;
         document.frm.submit();
     }

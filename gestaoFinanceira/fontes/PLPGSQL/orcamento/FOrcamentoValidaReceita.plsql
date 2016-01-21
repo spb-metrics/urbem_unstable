@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: FOrcamentoValidaReceita.plsql 63519 2015-09-08 17:31:52Z franver $
+* $Id: FOrcamentoValidaReceita.plsql 64294 2016-01-11 12:55:40Z lisiane $
 *
 * Casos de uso: uc-02.01.22
 */
@@ -41,6 +41,7 @@ DECLARE
     
     stClassificacaoNiveis VARCHAR[];
     stAuxiliar            VARCHAR := '';
+    stTipoConta           VARCHAR := '';
     
     stMAscReduzidaNova      VARCHAR := '';
     stMAscReduzidaExistente VARCHAR := '';
@@ -57,12 +58,12 @@ DECLARE
     reRecordSet              RECORD;
     reRecordSetClassificacao RECORD;
 BEGIN
-
     SELECT publico.fn_nivel(stClassificacaoReceita)
     INTO inNivelClassificacaoNova;
     
+
     stClassificacaoNiveis := string_to_array(stClassificacaoReceita, '.');
-    
+
     FOR inCount IN REVERSE inNivelClassificacaoNova..inCount LOOP
         
         FOR inCount2 IN inCount2..inCount LOOP
@@ -84,7 +85,7 @@ BEGIN
                  AND conta_receita.cod_estrutural ILIKE '''||stAuxiliar||'%''
             ORDER BY cod_estrutural
         ';
-        
+
         FOR reRecordSetClassificacao IN EXECUTE stSqlAux
         LOOP
             IF reRecordSetClassificacao.cod_estrutural IS NOT NULL THEN
@@ -141,7 +142,17 @@ BEGIN
                 RETURN;
             END IF;
         END LOOP;
+        
+         SELECT tipo_nivel_conta FROM orcamento.fn_tipo_conta_receita(stExercicio, stAuxiliar) AS tipo_nivel_conta   
+         INTO stTipoConta;
+         --Quando o estrutural auxiliar for sintetico, sai do loop
+         IF stTipoConta = 'S' THEN
+             reRecordSetClassificacao.classificacao_receita_valida := 'true';
+             RETURN ;
+         END IF;
+         
         stAuxiliar := '';
+        stTipoConta:='';
     END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';

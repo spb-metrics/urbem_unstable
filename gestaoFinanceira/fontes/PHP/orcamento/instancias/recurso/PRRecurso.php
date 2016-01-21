@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Marcelo Boezzio Paulino
 
-    * $Id: PRRecurso.php 64153 2015-12-09 19:16:02Z evandro $
+    * $Id: PRRecurso.php 64337 2016-01-15 18:38:47Z michel $
 
     * Casos de uso: uc-02.01.05
 */
@@ -330,7 +330,7 @@ switch ($stAcao) {
                     
                     $obTTCEPECodigoFonteRecurso->setDado ('cod_recurso', $request->get('inCodRecurso'));
                     $obTTCEPECodigoFonteRecurso->setDado ('exercicio'  , $request->get('stExercicio'));
-                    $obTTCEPECodigoFonteRecurso->recuperaPorChave($rsCodigoFonteRecurso);
+                    $obTTCEPECodigoFonteRecurso->recuperaPorChave($rsCodigoFonteRecurso, $boTransacao);
                     
                     $obTTCEPECodigoFonteRecurso->setDado ('cod_fonte', $request->get('inCodTCE'));
                     $obTTCEPECodigoFonteRecurso->setDado ('exercicio', Sessao::getExercicio());
@@ -372,7 +372,7 @@ switch ($stAcao) {
         for ($stExercicio; $stExercicio <= $stExercicioFinal; $stExercicio++) {
             if (!$obErro->ocorreu()) {
                 $obROrcamentoRecurso->setExercicio($stExercicio);
-                $obErro = $obROrcamentoRecurso->excluir();
+                $obErro = $obROrcamentoRecurso->excluir($boTransacao);
             }
         }
         $stFiltro = "";

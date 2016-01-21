@@ -1316,6 +1316,47 @@ if (in_array("LQD.csv",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
     }
+}   
+    /**
+* IDE.csv | Autor : Eduardo Schitz
+*/
+if (in_array("CONSID.csv",$arFiltro["arArquivosSelecionados"])) {
+    $obExportador->addArquivo("CONSID.csv");
+
+    if (count($arRecordSetArquivos["CONSID10"]->arElementos) > 0) {
+        foreach ($arRecordSetArquivos["CONSID10"]->arElementos as $arCONSID10) {
+
+            $rsBloco = 'rsBloco_'.$inCount;
+            unset($$rsBloco);
+            $$rsBloco = new RecordSet();
+            $$rsBloco->preenche(array($arCONSID10));
+
+            $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
+            $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_arquivo");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("consideracoes");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(3000);
+        }
+    } else {
+        $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
+        $obExportador->roUltimoArquivo->addBloco($arRecordSetArquivos["CONSID99"]);
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    }
 }
 
 if ($arFiltro['stTipoExport'] == 'compactados') {

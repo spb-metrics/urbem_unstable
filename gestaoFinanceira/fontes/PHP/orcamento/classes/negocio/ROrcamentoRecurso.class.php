@@ -403,13 +403,13 @@ function alterar($boTransacao = "")
     * @param  Object $obTransacao Parâmetro Transação
     * @return Object Objeto Erro
 */
-function excluir($obTransacao = "")
+function excluir($boTransacao = "")
 {
     include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecursoDireto.class.php"   );
     include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php"         );
     include_once ( CAM_GF_PPA_MAPEAMENTO."TPPAAcaoRecurso.class.php"           );
     include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecursoDestinacao.class.php");
-    
+
     $obTOrcamentoRecursoDireto     = new TOrcamentoRecursoDireto;
     $obTOrcamentoRecurso           = new TOrcamentoRecurso;
     $obTPPAAcaoRecurso             = new TPPAAcaoRecurso;
@@ -417,45 +417,47 @@ function excluir($obTransacao = "")
 
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-    
+
     if ( !$obErro->ocorreu() ) {
-        
-        $obTPPAAcaoRecurso->recuperaTodos($rsPPAAcaoRecurso, " WHERE cod_recurso = ".$this->getCodRecurso()." AND exercicio_recurso = '".$this->getExercicio()."'");
-        
+        $obTPPAAcaoRecurso->recuperaTodos($rsPPAAcaoRecurso, " WHERE cod_recurso = ".$this->getCodRecurso()." AND exercicio_recurso = '".$this->getExercicio()."'", "",$boTransacao);
+
         $obTOrcamentoRecursoDestinacao->setDado  ('cod_recurso', $this->getCodRecurso() );
         $obTOrcamentoRecursoDestinacao->setDado  ('exercicio'  , $this->getExercicio()  );
-        $obTOrcamentoRecursoDestinacao->recuperaPorChave($rsRecursoDestinacao);
-                
-        if ($rsPPAAcaoRecurso->getNumlinhas() > 0 || $rsRecursoDestinacao->getNumlinhas() > 0) {
-            $obErro->setDescricao('Recurso não pode ser excluído porque está sendo utilizado.');
-        }else{
-            $obTOrcamentoRecursoDireto->setDado( "cod_recurso" , $this->getCodRecurso()      );
-            $obTOrcamentoRecursoDireto->setDado( "exercicio"   , $this->getExercicio()       );
-            $obTOrcamentoRecursoDireto->recuperaPorChave($rsTOrcamentoRecursoDireto);
-            $obTOrcamentoRecursoDireto->exclusao( $boTransacao );    
+        $obErro = $obTOrcamentoRecursoDestinacao->recuperaPorChave($rsRecursoDestinacao, $boTransacao);
 
-            if (!$obErro->ocorreu()) {
-                
-                if(SistemaLegado::pegaConfiguracao('cod_uf') == '16' ){
-                    include_once ( TTPB."TTPBRecurso.class.php" );
-                    include_once ( CAM_GF_ORC_MAPEAMENTO."TTCEPECodigoFonteRecurso.class.php" );
-                    
-                    $obTTPBRecurso = new TTPBRecurso();
-                    $obTTPBRecurso->setDado  ('cod_recurso', $this->getCodRecurso() );
-                    $obTTPBRecurso->setDado  ('exercicio'  , $this->getExercicio()  );
-                    $obErro = $obTTPBRecurso->exclusao ( $boTransacao );
-                    
-                    $obTTCEPECodigoFonteRecurso = new TTCEPECodigoFonteRecurso();
-                    $obTTCEPECodigoFonteRecurso->setDado  ( 'cod_recurso', $this->getCodRecurso() );
-                    $obTTCEPECodigoFonteRecurso->setDado  ( 'exercicio'  , $this->getExercicio()  );
-                    $obErro = $obTTCEPECodigoFonteRecurso->exclusao ( $boTransacao );
+        if ( !$obErro->ocorreu() ) {
+            if ($rsPPAAcaoRecurso->getNumlinhas() > 0 || $rsRecursoDestinacao->getNumlinhas() > 0) {
+                $obErro->setDescricao('Recurso não pode ser excluído porque está sendo utilizado.');
+            }else{
+                $obTOrcamentoRecursoDireto->setDado( "cod_recurso" , $this->getCodRecurso()      );
+                $obTOrcamentoRecursoDireto->setDado( "exercicio"   , $this->getExercicio()       );
+                $obTOrcamentoRecursoDireto->recuperaPorChave($rsTOrcamentoRecursoDireto, $boTransacao);
+                $obErro = $obTOrcamentoRecursoDireto->exclusao( $boTransacao );    
+
+                if (!$obErro->ocorreu()) {
+                    if(SistemaLegado::pegaConfiguracao('cod_uf') == '16' ){
+                        include_once ( TTPB."TTPBRecurso.class.php" );
+                        include_once ( CAM_GF_ORC_MAPEAMENTO."TTCEPECodigoFonteRecurso.class.php" );
+
+                        $obTTPBRecurso = new TTPBRecurso();
+                        $obTTPBRecurso->setDado  ('cod_recurso', $this->getCodRecurso() );
+                        $obTTPBRecurso->setDado  ('exercicio'  , $this->getExercicio()  );
+                        $obErro = $obTTPBRecurso->exclusao ( $boTransacao );
+
+                        if (!$obErro->ocorreu()) {
+                            $obTTCEPECodigoFonteRecurso = new TTCEPECodigoFonteRecurso();
+                            $obTTCEPECodigoFonteRecurso->setDado  ( 'cod_recurso', $this->getCodRecurso() );
+                            $obTTCEPECodigoFonteRecurso->setDado  ( 'exercicio'  , $this->getExercicio()  );
+                            $obErro = $obTTCEPECodigoFonteRecurso->exclusao ( $boTransacao );
+                        }
+                    }
+
+                    $obTOrcamentoRecurso->setDado( "cod_recurso" , $this->getCodRecurso() );
+                    $obTOrcamentoRecurso->setDado( "exercicio"   , $this->getExercicio()     );
+                    $obErro = $obTOrcamentoRecurso->exclusao( $boTransacao );
                 }
-                
-                $obTOrcamentoRecurso->setDado( "cod_recurso" , $this->getCodRecurso() );
-                $obTOrcamentoRecurso->setDado( "exercicio"   , $this->getExercicio()     );
-                $obErro = $obTOrcamentoRecurso->exclusao( $boTransacao );
+                $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTOrcamentoRecurso );
             }
-            $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTOrcamentoRecurso );
         }
     }
 

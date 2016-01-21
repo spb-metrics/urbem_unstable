@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.04.05
 
-  $Id: OCManterMapaCompras.php 64118 2015-12-04 12:33:31Z franver $
+  $Id: OCManterMapaCompras.php 64288 2016-01-08 17:25:00Z jean $
 
   */
 
@@ -1249,7 +1249,6 @@ function anularItem($inId, $flValorAnular, $flQuantidadeAnular, $hdnValorUnitari
     # Salva a anulação de itens
     $itens        = Sessao::read('itens');
     $solicitacoes = Sessao::read('solicitacoes');
-
     $stJs = $stErro = '';
 
     if (!empty($flValorAnular) && empty($flQuantidadeAnular)) {
@@ -1790,32 +1789,32 @@ function preencheRegistroPrecos($inCodMapa, $stExercicio)
 
 switch ($request->get("stCtrl")) {
     case 'detalhaItem':
-        $stJs = detalhaItem( $_REQUEST['cod_item'] );
+        $stJs = detalhaItem( $request->get('cod_item') );
     break;
 
     case 'calculaTotalAnulacao':
-        $flQuantidadeAnular = str_replace('.', '' , $_REQUEST['flQuantidadeAnular']);
+        $flQuantidadeAnular = str_replace('.', '' , $request->get('flQuantidadeAnular'));
         $flQuantidadeAnular = str_replace(',', '.', $flQuantidadeAnular);
-        $total = $_REQUEST['hdnValorUnitario'] * $flQuantidadeAnular;
+        $total = $request->get('hdnValorUnitario') * $flQuantidadeAnular;
         $total = number_format($total, 2, ',', '.' );
         $stJs  = "jQuery('#flValorAnular').val('".$total."');  \n";
     break;
 
     case 'calculaQtdeTotalAnulacao':
-        $flValorAnular = $_REQUEST['flValorAnular'];
+        $flValorAnular = $request->get('flValorAnular');
         $flValorAnular = str_replace('.', '' , $flValorAnular);
         $flValorAnular = str_replace(',', '.', $flValorAnular);
-        $total = $flValorAnular / $_REQUEST['hdnValorUnitario'];
+        $total = $flValorAnular / $request->get('hdnValorUnitario');
         $total = number_format($total, 4, ',', '.');
         $stJs = "jQuery('#flQuantidadeAnular').val('".$total."'); \n ";
     break;
 
     case 'incluirSolicitacao':
-        $stExercicioSolicitacao   = $_REQUEST['stExercicioSolicitacao'];
-        $inCodEntidadeSolicitacao = $_REQUEST['inCodEntidadeSolicitacao'];
-        $inCodSolicitacao         = $_REQUEST['inCodSolicitacao'];
-        $inCodTipoLicitacao       = $_REQUEST['inCodTipoLicitacao'];
-        $boRegistroPreco          = $_REQUEST['boRegistroPreco'];
+        $stExercicioSolicitacao   = $request->get('stExercicioSolicitacao');
+        $inCodEntidadeSolicitacao = $request->get('inCodEntidadeSolicitacao');
+        $inCodSolicitacao         = $request->get('inCodSolicitacao');
+        $inCodTipoLicitacao       = $request->get('inCodTipoLicitacao');
+        $boRegistroPreco          = $request->get('boRegistroPreco');
 
         $boIncluir = true;
 
@@ -1853,30 +1852,30 @@ switch ($request->get("stCtrl")) {
     break;
 
     case 'delSolicitacao':
-        $stJs = delSolicitacao($_REQUEST['inId'], $_REQUEST['stTipoCotacao']);
+        $stJs = delSolicitacao($request->get('inId'), $request->get('stTipoCotacao'));
     break;
 
     case 'delItem':
-        $stJs = delItem( $_REQUEST['inId'], $_REQUEST['stTipo'], $_REQUEST['stTipoCotacao'] );
+        $stJs = delItem( $request->get('inId'), $request->get('stTipo'), $request->get('stTipoCotacao') );
     break;
 
     case 'alterarItem':
-        $stJs = alterarItem($_REQUEST['inId'], $_REQUEST['stTipoCotacao']);
+        $stJs = alterarItem($request->get('inId'), $request->get('stTipoCotacao'));
     break;
 
     case 'salvarDadosItem':
         $stJs .= salvarDadosItem
-                 (    $_REQUEST['inId']
-                    , $_REQUEST['nuVlUnitario']
-                    , $_REQUEST['nuQuantidade']
-                    , $_REQUEST['nuVlTotal']
-                    , $_REQUEST['nuValorReserva']
-                    , $_REQUEST['nuHdnSaldoDotacao']
-                    , $_REQUEST['inCodDespesa']
-                    , $_REQUEST['stCodClassificacao']
-                    , $_REQUEST['inCodLote']
-                    , $_REQUEST['obHdnTipoCotacao']
-                    , $_REQUEST['boRegistroPreco']
+                 (    $request->get('inId')
+                    , $request->get('nuVlUnitario')
+                    , $request->get('nuQuantidade')
+                    , $request->get('nuVlTotal')
+                    , $request->get('nuValorReserva')
+                    , $request->get('nuHdnSaldoDotacao')
+                    , $request->get('inCodDespesa')
+                    , $request->get('stCodClassificacao')
+                    , $request->get('inCodLote')
+                    , $request->get('obHdnTipoCotacao')
+                    , $request->get('boRegistroPreco')
                  );
     break;
 
@@ -1893,25 +1892,25 @@ switch ($request->get("stCtrl")) {
     break;
 
     case 'anularItem':
-        $stJs = montaAnulacaoItem( $_REQUEST['inId']);
+        $stJs = montaAnulacaoItem( $request->get('inId'));
     break;
 
     case 'salvaAnularItem':
-        $stJs = anularItem($_REQUEST['inId'], $_REQUEST['flValorAnular'], $_REQUEST['flQuantidadeAnular'], $_REQUEST['hdnValorUnitario']);
+        $stJs = anularItem($request->get('inId'), $request->get('flValorAnular'), $request->get('flQuantidadeAnular'), $request->get('hdnValorUnitario'));
     break;
 
     case 'tipoLicitacao':
         //// isto foi jogado para a sessão pra ter que refazer toda a lista de itens nem ter
         //  que bloquear o select de tipo de licitação apos a primeira inclusão de solicitação na listagem
-        Sessao::write( 'inTipoLicitacao' , $_REQUEST['inCodTipoLicitacao']);
+        Sessao::write( 'inTipoLicitacao' , $request->get('inCodTipoLicitacao'));
     break;
 
     case 'calculaValorReservaXTotal':
-        $inQuantidade = $_REQUEST['nuQuantidade'];
+        $inQuantidade = $request->get('nuQuantidade');
 
         if ($inQuantidade > 0) {
-            $inQuantidade = str_replace(',','.',(str_replace('.','',$_REQUEST['nuQuantidade'])));
-            $vlTotal      = str_replace(',','.',(str_replace('.','',$_REQUEST['nuVlTotal'])));
+            $inQuantidade = str_replace(',','.',(str_replace('.','',$request->get('nuQuantidade'))));
+            $vlTotal      = str_replace(',','.',(str_replace('.','',$request->get('nuVlTotal'))));
             $vlUnitario = ($vlTotal / $inQuantidade);
 
             $stJs .= "jQuery('#nuVlTotal').val('".number_format($vlTotal, 2, ',', '.' )."');        \n";
@@ -1923,8 +1922,8 @@ switch ($request->get("stCtrl")) {
     break;
 
     case "calculaValorReserva":
-        $quantidade = str_replace(',','.',(str_replace('.','',$_REQUEST['nuQuantidade'])));
-        $vlUnitario = str_replace(',','.',(str_replace('.','',$_REQUEST['nuVlUnitario'])));
+        $quantidade = str_replace(',','.',(str_replace('.','',$request->get('nuQuantidade'))));
+        $vlUnitario = str_replace(',','.',(str_replace('.','',$request->get('nuVlUnitario'))));
 
         $valorTotal = $vlUnitario * $quantidade;
 
@@ -1932,6 +1931,20 @@ switch ($request->get("stCtrl")) {
         $stJs .= "jQuery('#nuVlUnitario').val('" .number_format ( $vlUnitario, 4, ',', '.' )."');   \n";
         $stJs .= "jQuery('#nuValorReserva').val('".number_format($valorTotal, 2, ',', '.')."');     \n";
         $stJs .= "jQuery('#stValorReserva').html('".number_format ( $valorTotal, 2, ',', '.' )."'); \n";
+
+    break;
+
+    case "anularTodosItens":
+        $arItens = Sessao::read('itens');
+        $stJs = "";
+
+        foreach ($arItens as $reg) {
+            if ($request->get('obHdnCheck') == 'true') {
+                $stJs .= anularItem($reg['inId'], number_format($reg['valor_total_mapa'],2,',','.'), number_format($reg['quantidade_mapa'],2,',','.'), $reg['valor_unitario']);
+            } else {
+                $stJs .= anularItem($reg['inId'], '', '', $reg['valor_unitario']);
+            }
+        }
 
     break;
 }

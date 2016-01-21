@@ -165,7 +165,7 @@ switch ($stCtrl) {
             $obISelectBoletim = new ISelectBoletim;
             $obISelectBoletim->obBoletim->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodigoEntidade']  );
             $obISelectBoletim->obBoletim->setExercicio( Sessao::getExercicio() );
-            $obISelectBoletim->obEvento->setOnChange ( "buscaDado('alteraBoletim');");
+            $obISelectBoletim->obEvento->setOnChange ( "montaParametrosGET('alteraBoletim');");
 
             $obFormulario = new Formulario;
             $obFormulario->addComponente ( $obISelectBoletim );

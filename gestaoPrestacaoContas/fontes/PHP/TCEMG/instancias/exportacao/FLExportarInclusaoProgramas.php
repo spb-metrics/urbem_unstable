@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLExportarInclusaoProgramas.php 61317 2015-01-06 12:47:58Z lisiane $
+ * $Id: FLExportarInclusaoProgramas.php 64340 2016-01-15 19:31:57Z jean $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -117,6 +117,10 @@ $arNomeArquivos = array(
     'INCAMP.csv',
     'INCPRO.csv'
 );
+
+if ( Sessao::getExercicio() == '2016' ) {
+    $arNomeArquivos[] = 'CONSID.csv';
+}
 
 // Preenche array
 for ($inCounter=0;$inCounter < count($arNomeArquivos);$inCounter++) {

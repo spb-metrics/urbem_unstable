@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 62857 2015-06-30 13:53:56Z franver $
+    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 64324 2016-01-15 15:44:14Z lisiane $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -81,7 +81,6 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
                     JOIN tcemg.consideracao_arquivo_descricao
                         USING (cod_arquivo)
             ";
-
         return $stSql;
     }
 
@@ -141,6 +140,9 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (38,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (39,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (40,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (58,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (59,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+          
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             ";
         }
@@ -149,6 +151,36 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES ( 1,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (42,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            ";
+        }
+        
+        if ( $this->getDado('modulo_sicom') == 'planejamento') {
+            $stSql = "
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (01,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (03,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (45,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (47,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (48,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (49,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (50,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (51,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (52,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (06,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (53,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (54,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (55,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (56,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            ";
+        }
+        
+        if ( $this->getDado('modulo_sicom') == 'inclusao') {
+            $stSql = "
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES ( 1,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (43,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (44,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (57,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             ";
         }
 

@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMResumoBaixaAutomatica.php 63839 2015-10-22 18:08:07Z franver $
+    * $Id: FMResumoBaixaAutomatica.php 64341 2016-01-15 20:11:16Z evandro $
     * Casos de uso: uc-05.03.19
 
 */
@@ -38,8 +38,6 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once( CAM_GT_ARR_NEGOCIO."RARRPagamento.class.php"                                             );
 include_once ( CAM_GT_ARR_MAPEAMENTO."TARRPagamento.class.php" );
-
-;
 
 // passar do request pra variaveis
 $inCodLote    = $_REQUEST["cod_lote"   ];
@@ -180,6 +178,7 @@ for ( $inX=0; $inX<count($arTMP1); $inX++ ) {
             $arCredOrig[$inY]["multa"] += $arTMP1[$inX]["multa"];
             $arCredOrig[$inY]["diferenca"] += $arTMP1[$inX]["diferenca"];
             $arCredOrig[$inY]["valor_pago_normal"] += $arTMP1[$inX]["valor_pago_normal"];
+            $arCredOrig[$inY]["correcao"] += $arTMP1[$inX]["correcao"];
             $boInserir = false;
             break;
         }
@@ -198,6 +197,7 @@ for ( $inX=0; $inX<count($arTMP1); $inX++ ) {
         $arCredOrig[$inY]["juros"] = $arTMP1[$inX]["juros"];
         $arCredOrig[$inY]["multa"] = $arTMP1[$inX]["multa"];
         $arCredOrig[$inY]["diferenca"] = $arTMP1[$inX]["diferenca"];
+        $arCredOrig[$inY]["correcao"] += $arTMP1[$inX]["correcao"];
         $arCredOrig[$inY]["valor_pago_normal"] = $arTMP1[$inX]["valor_pago_normal"];
         $arCredOrig[$inY]["tipo"] = "divida";
 
@@ -217,6 +217,7 @@ while ( !$rsListaOrigem->eof() ) {
     $arSomatorios = null;
     $flOrigemValorNormalOK = $flOrigemValorJurosOK = $flOrigemValorMultaOK = 0.00;
     $flOrigemValorDiffOK = $flOrigemValorTotalOK = $flOrigemValorInconsistenteOK = 0.00;
+    $flOrigemValorCorrecaoOK =  0.00;
 
     if ( $rsListaOrigem->getCampo('tipo') != "divida" ) {
         $stFiltro3 = " WHERE pagamento_lote.cod_lote IN ( ".$stFiltro2." ) \n";
@@ -250,6 +251,7 @@ while ( !$rsListaOrigem->eof() ) {
                     $arTMP1[$inY]['valor_pago_calculo'] += $arTMP[$inX]['valor_pago_calculo'];
                     $arTMP1[$inY]['juros'] += $arTMP[$inX]['juros'];
                     $arTMP1[$inY]['multa'] += $arTMP[$inX]['multa'];
+                    $arTMP1[$inY]['correcao'] += $arTMP[$inX]['correcao'];
                     $arTMP1[$inY]['valor_pago_normal'] += $arTMP[$inX]['valor_pago_normal'];
                     $arTMP1[$inY]['diferenca'] += $arTMP[$inX]['diferenca'];
 
@@ -272,11 +274,12 @@ while ( !$rsListaOrigem->eof() ) {
         $rsListaCreditos->setPrimeiroElemento();
 
         while ( !$rsListaCreditos->eof() ) {
-            $flOrigemValorNormalOK = $rsListaCreditos->getCampo( 'valor_pago_calculo' );
-            $flOrigemValorJurosOK  = $rsListaCreditos->getCampo( 'juros' );
-            $flOrigemValorMultaOK  = $rsListaCreditos->getCampo( 'multa' );
-            $flOrigemValorDiffOK   = $rsListaCreditos->getCampo( 'diferenca' );
-            $flOrigemValorTotalOK  = $rsListaCreditos->getCampo( 'valor_pago_normal' );
+            $flOrigemValorNormalOK   = $rsListaCreditos->getCampo( 'valor_pago_calculo' );
+            $flOrigemValorJurosOK    = $rsListaCreditos->getCampo( 'juros' );
+            $flOrigemValorMultaOK    = $rsListaCreditos->getCampo( 'multa' );
+            $flOrigemValorCorrecaoOK = $rsListaCreditos->getCampo( 'correcao' );
+            $flOrigemValorDiffOK     = $rsListaCreditos->getCampo( 'diferenca' );
+            $flOrigemValorTotalOK    = $rsListaCreditos->getCampo( 'valor_pago_normal' );
 
             if ($flOrigemValorNormalOK > 0) {
                 $arTmp[] = array(
@@ -301,6 +304,14 @@ while ( !$rsListaOrigem->eof() ) {
                     );
                 }
 
+                if ($flOrigemValorCorrecaoOK > 0) {
+                    $arTmp[] = array(
+                        "cod" => $rsListaCreditos->getCampo('origem'),
+                        "descricao_credito" => "Correção",
+                        "somatorio" => $flOrigemValorCorrecaoOK
+                    );
+                }
+
                 if ( ($flOrigemValorDiffOK > 0) && ($flOrigemValorNormalOK != $flOrigemValorTotalOK)) {
                     $arTmp[] = array(
                         "cod" => $rsListaCreditos->getCampo('origem'),
@@ -313,11 +324,12 @@ while ( !$rsListaOrigem->eof() ) {
             $rsListaCreditos->proximo();
         }
     } else {
-        $flOrigemValorNormalOK = $rsListaOrigem->getCampo( 'valor_pago_calculo' );
-        $flOrigemValorJurosOK  = $rsListaOrigem->getCampo( 'juros' );
-        $flOrigemValorMultaOK  = $rsListaOrigem->getCampo( 'multa' );
-        $flOrigemValorDiffOK   = $rsListaOrigem->getCampo( 'diferenca' );
-        $flOrigemValorTotalOK  = $rsListaOrigem->getCampo( 'valor_pago_normal' );
+        $flOrigemValorNormalOK   = $rsListaOrigem->getCampo( 'valor_pago_calculo' );
+        $flOrigemValorJurosOK    = $rsListaOrigem->getCampo( 'juros' );
+        $flOrigemValorMultaOK    = $rsListaOrigem->getCampo( 'multa' );
+        $flOrigemValorCorrecaoOK = $rsListaOrigem->getCampo( 'correcao' );
+        $flOrigemValorDiffOK     = $rsListaOrigem->getCampo( 'diferenca' );
+        $flOrigemValorTotalOK    = $rsListaOrigem->getCampo( 'valor_pago_normal' );
 
         if ($flOrigemValorNormalOK > 0) {
             $arTmp[] = array(
@@ -342,6 +354,14 @@ while ( !$rsListaOrigem->eof() ) {
                 );
             }
 
+            if ($flOrigemValorCorrecaoOK > 0) {
+                $arTmp[] = array(
+                    "cod" => $rsListaOrigem->getCampo('origem'),
+                    "descricao_credito" => "Correção",
+                    "somatorio" => $flOrigemValorCorrecaoOK
+                );
+            }
+
             if ( ($flOrigemValorDiffOK > 0) && ($flOrigemValorNormalOK != $flOrigemValorTotalOK)) {
                 $arTmp[] = array(
                     "cod" => $rsListaOrigem->getCampo('origem'),
@@ -357,19 +377,6 @@ while ( !$rsListaOrigem->eof() ) {
 
     $rsListaCreditos->preenche($arTmp);
 
-// diferença de pagamento
-//$obRARRPagamento->listaResumoLoteDiff($rsListaDiff);
-//$arTmp2 =  $rsListaCreditos->arElementos;
-//$arTmp2[] = array( 'cod' =>  '' ,'cod_credito' => '', 'cod_especie' => '' , 'cod_genero' => '', 'cod_natureza' => '', 'descricao_credito' => 'Diferença de Pagamento', 'somatorio' => $rsListaDiff->getCampo('somatorio'), 'juros' => '', 'multa' => '');
-//$rsListaCreditos->preenche($arTmp2);
-
-//$rsListaCreditos->setPrimeiroElemento();
-//foreach ($rsListaCreditos->arElementos as $value) {
-//    $stValor = str_replace(",",".",$value['somatorio']);
-//    $value['somatorio'] = $stValor;
-//  $arTmp[] = $value;
-//}
-//$rsListaCreditos->preenche($arTmp);
 $rsListaCreditos->addFormatacao( "somatorio", "NUMERIC_BR" );
 
 $rsListaCreditos->setPrimeiroElemento();

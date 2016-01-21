@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRPagamento.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: RARRPagamento.class.php 64341 2016-01-15 20:11:16Z evandro $
 
    * Casos de uso: uc-05.03.10
 */
@@ -708,7 +708,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         if ( $obErro->ocorreu() )
                             return $obErro;
 
-                        //$this->obTARRPagamentoAcrescimo->debug();
+                        
                         $nuTotal += $this->obTARRPagamentoAcrescimo->getDado("valor");
 
                         $inZ += 3;
@@ -736,7 +736,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         if ( $obErro->ocorreu() )
                             return $obErro;
 
-                        //$this->obTARRPagamentoAcrescimo->debug();
+                        
                         $nuTotal += $this->obTARRPagamentoAcrescimo->getDado("valor");
 
                         $inZ += 3;
@@ -855,7 +855,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                     $nuTotalCalculo    = 0;
                     $arDescontoCalculo = array();
 
-                    while ( !$rsConsultaCredito->eof() ) {
+                    while ( !$rsConsultaCredito->eof() ) {                        
                         $nuTotalJuroMulta += $rsConsultaCredito->getCampo('valor_credito_juros') + $rsConsultaCredito->getCampo('valor_credito_multa') + $rsConsultaCredito->getCampo('valor_credito_correcao');
                         $nuTotalCalculo   += $rsConsultaCredito->getCampo('valor');
                         if ( $rsConsultaCredito->getCampo('descontop') > 0 ) {
@@ -863,10 +863,10 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         }
                         $rsConsultaCredito->proximo();
                     }
+
                     $rsConsultaCredito->setPrimeiroElemento();
-                    if ($boParcelaVencida == TRUE) {
-                        $nuValorTotalParcela = $nuTotalJuroMulta + $rsLancamento->getCampo('valor_parcela');
-                        $nuValorTotalParcela = round( $nuValorTotalParcela, 2 );
+                    if ($boParcelaVencida == TRUE) {                        
+                        $nuValorTotalParcela = round( ($nuTotalJuroMulta + $rsLancamento->getCampo('valor_parcela')),8);                        
                     } else {
                         $nuValorTotalParcela = $rsLancamento->getCampo("valor_parcela");
                     }
@@ -882,7 +882,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                 }
 
                 if ( $rsLancamento->getCampo("total_parcelas") > 0 && $rsLancamento->getCampo("nr_parcela") > 0 ) {
-                    $nuTotalCalculo = round( ( $nuTotalCalculo / $rsLancamento->getCampo("total_parcelas") ), 2 );
+                    $nuTotalCalculo = $rsLancamento->getCampo("valor_parcela");
                 }
 
                 if ( !$obErro->ocorreu() AND $boCalculoEconomico == FALSE OR ( $boCalculoEconomico == TRUE AND $rsLancamento->getCampo("valor_parcela") > 0 ) ) {
@@ -892,7 +892,10 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         // Verifica se a diferença do valor da parcela com o valor pago esta entre o limite
                         // de valor minimo/maximo definido na configuracao
                         $nuDifPagamento = $nuValorTotalParcela - $this->getValorPagamento();
-                        if ($vlTipoAvaliacao == 'percentual') {
+
+                        if ($vlTipoAvaliacao == 'percentual') {                            
+                            $vlValorMaximo = str_replace('.','',$vlValorMaximo);
+                            $vlValorMaximo = number_format((double)$vlValorMaximo,2,'.','');                            
                             $nuValorDifMaximo = ( $nuValorTotalParcela * $vlValorMaximo) / 100;
                         } else {
                             $nuValorDifMaximo = $vlValorMaximo;
@@ -903,7 +906,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         $boPagamentoMenor    = FALSE;
 
                         if ( $this->getValorPagamento() < $nuValorTotalParcela ) {
-                            if ($nuDifPagamento > $nuValorDifMaximo) {
+                            if ($nuDifPagamento < $nuValorDifMaximo) {
                                 if ($boPagamentoAutomatico) {
                                     $this->obRARRTipoPagamento->setCodigoTipo(6);
                                     if( $this->obRARRConfiguracao->getMinimoLancamentoAutomatico() )
@@ -916,7 +919,8 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                             }
                             if ( $this->getValorPagamento() < $rsLancamento->getCampo("valor_parcela") ) {
                                 $boPagamentoMenor = TRUE;
-                            }
+                            }                            
+                            
                         } elseif ( $this->getValorPagamento() > $nuValorTotalParcela ) {
 
                             //$boPagamentoAcrescimo = TRUE;
@@ -968,7 +972,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                             $this->obTARRPagamento->setDado( "observacao"           , $this->getObservacao()                      );
                             $this->obTARRPagamento->setDado( "cod_tipo"             , $this->obRARRTipoPagamento->getCodigoTipo() );
                             $this->obTARRPagamento->setDado( "numcgm"               , Sessao::read( "numCgm" )                             );
-                            $obErro = $this->obTARRPagamento->inclusao( $boTransacao );
+                            $obErro = $this->obTARRPagamento->inclusao( $boTransacao );                            
 
                             //insere informaçoes do lote de pagamento manual
                             if ( $boPagamentoAutomatico == FALSE AND !$obErro->ocorreu() ) {
@@ -978,7 +982,6 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                 $this->obTARRPagamentoLoteManual->setDado( "cod_agencia"          , $this->obRMONAgencia->getCodAgencia() );
                                 $this->obTARRPagamentoLoteManual->setDado( "cod_banco"            , $this->obRMONBanco->getCodBanco() );
                                 $obErro = $this->obTARRPagamentoLoteManual->inclusao( $boTransacao );
-                                //$this->obTARRPagamentoLoteManual->debug();
                             }
 
                             //insere o processo se esse for setado
@@ -1066,7 +1069,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                     }
 
                                     $rsConsultaCredito->setPrimeiroElemento();
-//monetario _credito_acrescimo
+                                    //monetario _credito_acrescimo
                                     if ( !$rsListaCreditoAcrescimo->Eof() ) {
                                         $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
                                         $this->obTARRPagamentoAcrescimo->setDado( "ocorrencia_pagamento" , $this->inOcorrenciaPagamento           );
@@ -1122,7 +1125,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
 
                                 //$boPagamentoAcrescimo = FALSE;
                                 $boParamentoIgual     = FALSE;
-                                $nuValorCalculo = $rsLancamento->getCampo('valor');
+                                $nuValorCalculo       = $rsLancamento->getCampo('valor');                                
 
                                 $this->obTARRPagamentoCalculo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
                                 $this->obTARRPagamentoCalculo->setDado( "cod_calculo"          , $rsLancamento->getCampo('cod_calculo') );
@@ -1138,15 +1141,15 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                         if ( $rsLancamento->getCampo('nr_parcela') == 0 ) {
                                             $nuValorCalculo = $rsLancamento->getCampo('valor');
                                         } else {
-                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor')/$rsLancamento->getCampo('total_parcelas') , 2);
+                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor')/$rsLancamento->getCampo('total_parcelas') , 8);
                                         }
                                         if ( $rsLancamento->getCampo('valor') == 0 ) {
                                             $nuValorCalculo = 0;
                                         }
                                         if ($nuValorPagoTmp >= $nuValorCalculo AND $nuValorPagoTmp >= 0) {
-                                            $this->obTARRPagamentoCalculo->setDado( "valor" , $nuValorCalculo );
+                                            $this->obTARRPagamentoCalculo->setDado( "valor" , (floor($nuValorCalculo*100)/100) );
                                         } elseif ($nuValorPagoTmp > 0) {
-                                            $this->obTARRPagamentoCalculo->setDado( "valor" , $nuValorPagoTmp );
+                                            $this->obTARRPagamentoCalculo->setDado( "valor" , (floor($nuValorPagoTmp*100)/100) );
                                         } else {
                                             $this->obTARRPagamentoCalculo->setDado( "valor" , 0 );
                                         }
@@ -1161,10 +1164,10 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
 
                                         if ( $rsLancamento->getCampo('nr_parcela') == 1 && ( $rsLancamento->getCampo('valor') == $rsLancamento->getCampo('valor_lancamento') ) ) {
                                             $nuValorCalculo = $rsLancamento->getCampo('valor_parcela');
-                                        } elseif ( $rsLancamento->getCampo('nr_parcela') == 1 AND $nuTotalCalculo > 0 ) {
+                                        } elseif ( $rsLancamento->getCampo('nr_parcela') == 1 AND $nuTotalCalculo > 0 ) {                                            
 
                                             $nuDiffTotalCalculo = $nuTotalCalculo - $rsLancamento->getCampo('valor_parcela');
-                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas') , 2 );
+                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas') , 8 );
 
                                             if ($nuDiffTotalCalculo < 0) {
                                                 $nuDiffTotalCalculo = $nuDiffTotalCalculo * -1;
@@ -1173,13 +1176,13 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                                 $nuValorCalculo -= $nuDiffTotalCalculo;
                                             }
                                             $nuTotalCalculo = 0;
-                                        } else {
-                                            if ( $rsLancamento->getCampo('total_parcelas') > 0 && $rsLancamento->getCampo('nr_parcela') > 0 ) {
-                                                $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas') , 2);
+                                        } else {                                            
+                                            if ( $rsLancamento->getCampo('total_parcelas') > 0 && $rsLancamento->getCampo('nr_parcela') > 0 ) {                                                
+                                                $nuValorCalculo = round( ($rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas')) ,8);
                                             } else {
-                                                //deve verificar se sofre desconto
+                                                //deve verificar se sofre desconto                                                
                                                 $nuValorCalculo = $rsLancamento->getCampo('valor');
-                                                $nuDescontoCalculo = round( $arDescontoCalculo[$rsLancamento->getCampo('cod_calculo')], 2 );
+                                                $nuDescontoCalculo = round( $arDescontoCalculo[$rsLancamento->getCampo('cod_calculo')], 8 );
                                                 if ($nuDescontoCalculo > 0) {
                                                     $nuValorCalculo -= $nuDescontoCalculo;
                                                 }
@@ -1188,15 +1191,15 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                         if ( $rsLancamento->getCampo('valor') == 0 ) {
                                             $nuValorCalculo = 0;
                                         }
-
-                                        $this->obTARRPagamentoCalculo->setDado( "valor" , $nuValorCalculo );
-                                        $nuValorPagoTmp = $nuValorPagoTmp - $nuValorCalculo;
+                                        $this->obTARRPagamentoCalculo->setDado( "valor" , (floor($nuValorCalculo*100)/100) );
+                                        
+                                        $nuValorPagoTmp = round (($nuValorPagoTmp - $nuValorCalculo),8);
 
                                         if ( $nuValorPagoTmp > 0 )  $boPagamentoAcrescimo = TRUE;
                                     }
                                 } else {
                                     $this->obTARRPagamentoCalculo->setDado( "valor" , $this->getValorPagamento() );
-                                    $nuValorPagoTmp = $nuValorPagoTmp - $nuValorCalculo;
+                                    $nuValorPagoTmp = round (($nuValorPagoTmp - $nuValorCalculo),8);                                    
 
                                     if ( $nuValorPagoTmp > 0 ) $boPagamentoAcrescimo = true;
 
@@ -1211,17 +1214,15 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                     $boPagamentoAcrescimo = FALSE;
                                     $boPagamentoDiferenca = FALSE;
                                     if ( $rsLancamento->getCampo('nr_parcela') == 0 ) {
-                                        $nuValorCalculo = $rsLancamento->getCampo('valor');
-                                        $nuDescontoCalculo = round( $arDescontoCalculo[$rsLancamento->getCampo('cod_calculo')], 2 );
-                                        if ($nuDescontoCalculo > 0) {
-                                            $nuValorCalculo -= $nuDescontoCalculo;
-                                        }
-                                } else {
+                                            $nuValorPercentCredito = round(($rsLancamento->getCampo('valor') / $rsLancamento->getCampo('valor_lancamento')),8);
+                                            $nuValorCalculo = round( ($rsLancamento->getCampo('valor_parcela') * $nuValorPercentCredito),8);
+                                    } else {
                                         if ( $rsLancamento->getCampo('nr_parcela') == 1 && ( $rsLancamento->getCampo('valor') == $rsLancamento->getCampo('valor_lancamento') ) ) {
                                             $nuValorCalculo = $rsLancamento->getCampo('valor_parcela');
                                         } elseif ( $rsLancamento->getCampo('nr_parcela') == 1 AND $nuTotalCalculo > 0 ) {
-                                            $nuDiffTotalCalculo = $nuTotalCalculo - $rsLancamento->getCampo('valor_parcela');
-                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas'), 2 );
+
+                                            $nuDiffTotalCalculo = $nuTotalCalculo - $rsLancamento->getCampo('valor_parcela');                                            
+                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas'), 8 );                                            
                                             if ($nuDiffTotalCalculo < 0) {
                                                 $nuDiffTotalCalculo = $nuDiffTotalCalculo * -1;
                                                 $nuValorCalculo += $nuDiffTotalCalculo;
@@ -1230,9 +1231,9 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                             }
                                             $nuTotalCalculo = 0;
                                         } else {
-                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas') , 2 );
+                                            $nuValorCalculo = round( $rsLancamento->getCampo('valor') / $rsLancamento->getCampo('total_parcelas') , 8 );
                                             //$nuValorCalculo = $rsLancamento->getCampo('valor');
-                                            $nuDescontoCalculo = round( $arDescontoCalculo[$rsLancamento->getCampo('cod_calculo')], 2 );
+                                            $nuDescontoCalculo = round( $arDescontoCalculo[$rsLancamento->getCampo('cod_calculo')], 8 );
                                             if ($nuDescontoCalculo > 0) {
                                                 $nuValorCalculo -= $nuDescontoCalculo;
                                             }
@@ -1242,7 +1243,8 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                         $nuValorCalculo = 0;
                                     }
 
-                                    $this->obTARRPagamentoCalculo->setDado( "valor" , $nuValorCalculo );
+                                    //tecnica para cortar as casas decimais sem realizar arrendodamento
+                                    $this->obTARRPagamentoCalculo->setDado( "valor" , (floor($nuValorCalculo*100)/100) );
                                     $nuValorPagoTmp = 0.00;
                                 }
 
@@ -1259,101 +1261,28 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         $arPagamentoCalculo['cod_calculo']          = $this->obTARRPagamentoCalculo->getDado('cod_calculo');
                         $arPagamentoCalculo['ocorrencia_pagamento'] = $this->obTARRPagamentoCalculo->getDado('ocorrencia_pagamento');
                         $arPagamentoCalculo['cod_convenio']         = $this->obTARRPagamentoCalculo->getDado('cod_convenio');
-                        $arPagamentoCalculo['valor']                = $this->obTARRPagamentoCalculo->getDado('valor');
+                        $arPagamentoCalculo['valor']                = $this->obTARRPagamentoCalculo->getDado('valor');                        
                     }
 
                     //faz verificacoes de ACRESCIMO
+                    //Necessita vefificar se foi pago mais do que a o valor original da parcela para separar os acrescimos
+                    //Valor da diferenca precisa ser maior que zero, para separar nos acrescimos correspondentes
                     //utilizando as formulas de calculo de acrescimo (juro/multa)
-
                     if ($boPagamentoDiferenca == FALSE && $boPagamentoAcrescimo == TRUE  &&  !$obErro->ocorreu() ) {
-
-                        $arCalculo = array();
-                        //insere multa
-                        while ( !$rsConsultaCredito->eof() ) {
-
-                            if ( ( round( ($nuValorPagoTmp+$nuValorLancamentoAutomatico), 2 ) >= $rsConsultaCredito->getCampo('valor_credito_multa') ) AND $rsConsultaCredito->getCampo('valor_credito_multa') > 0 ) {
-                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_multa') );
-                                $nuValorPagoTmp = $nuValorPagoTmp - $rsConsultaCredito->getCampo('valor_credito_multa');
-                            } else {
-                                $boPagamentoDiferenca = TRUE;
-                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , 0.00 );
-
-                            }
-
-                            $nuTotal += $this->obTARRPagamentoAcrescimo->getDado('valor');
-
-                            $obRMONCreditoAcrescimo = new RMONCreditoAcrescimo;
-                            $obRMONCreditoAcrescimo->setCodCredito( $rsConsultaCredito->getCampo("cod_credito") );
-                            $obRMONCreditoAcrescimo->setCodEspecie( $rsConsultaCredito->getCampo("cod_especie") );
-                            $obRMONCreditoAcrescimo->setCodGenero( $rsConsultaCredito->getCampo("cod_genero") );
-                            $obRMONCreditoAcrescimo->setCodNatureza( $rsConsultaCredito->getCampo("cod_natureza") );
-                            $obRMONCreditoAcrescimo->setCodTipo(3);
-
-                            $obRMONCreditoAcrescimo->ListarAcrescimosDoCredito( $rsListaCreditoAcrescimo, $boTransacao );
-
-                            if ( !$rsListaCreditoAcrescimo->Eof() ) {
-                                $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
-                                $this->obTARRPagamentoAcrescimo->setDado( "ocorrencia_pagamento" , $this->inOcorrenciaPagamento           );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_calculo"          , $rsConsultaCredito->getCampo('cod_calculo') );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_tipo"             , '3'                                     );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_acrescimo"        , $rsListaCreditoAcrescimo->getCampo("cod_acrescimo") );
-                                $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );
-                            }
-
-                            $arCalculo[] = $rsConsultaCredito->getCampo('cod_calculo');
-                            $rsConsultaCredito->proximo();
-                        }
-                        $rsConsultaCredito->setPrimeiroElemento();
-
-//insere correcao
-                        while ( !$rsConsultaCredito->eof() ) {
-
-                            if ( ( round( ($nuValorPagoTmp+$nuValorLancamentoAutomatico), 2 ) >= $rsConsultaCredito->getCampo('valor_credito_correcao') ) AND $rsConsultaCredito->getCampo('valor_credito_correcao') > 0 ) {
-                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_correcao') );
-                                $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_correcao');
-                            } else {
-                                $boPagamentoDiferenca = TRUE;
-                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , 0.00 );
-
-                            }
-
-                            $nuTotal += $this->obTARRPagamentoAcrescimo->getDado('valor');
-
-                            $obRMONCreditoAcrescimo = new RMONCreditoAcrescimo;
-                            $obRMONCreditoAcrescimo->setCodCredito( $rsConsultaCredito->getCampo("cod_credito") );
-                            $obRMONCreditoAcrescimo->setCodEspecie( $rsConsultaCredito->getCampo("cod_especie") );
-                            $obRMONCreditoAcrescimo->setCodGenero( $rsConsultaCredito->getCampo("cod_genero") );
-                            $obRMONCreditoAcrescimo->setCodNatureza( $rsConsultaCredito->getCampo("cod_natureza") );
-                            $obRMONCreditoAcrescimo->setCodTipo(1);
-
-                            $obRMONCreditoAcrescimo->ListarAcrescimosDoCredito( $rsListaCreditoAcrescimo, $boTransacao );
-
-                            if ( !$rsListaCreditoAcrescimo->Eof() ) {
-                                $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
-                                $this->obTARRPagamentoAcrescimo->setDado( "ocorrencia_pagamento" , $this->inOcorrenciaPagamento           );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_calculo"          , $rsConsultaCredito->getCampo('cod_calculo') );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_tipo"             , '1'                                     );
-                                $this->obTARRPagamentoAcrescimo->setDado( "cod_acrescimo"        , $rsListaCreditoAcrescimo->getCampo("cod_acrescimo") );
-                                $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );
-                            }
-
-                            $rsConsultaCredito->proximo();
-                        }
-
-                        $rsConsultaCredito->setPrimeiroElemento();
 
                         //insere juro
                         while ( !$rsConsultaCredito->eof() ) {
-
-                            if ( ( round( ($nuValorPagoTmp+$nuValorLancamentoAutomatico), 2 ) >= $rsConsultaCredito->getCampo('valor_credito_juros') ) AND $rsConsultaCredito->getCampo('valor_credito_juros') > 0 ) {
-                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_juros') );
-                                $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_juros');
+                            if ( ($nuValorPagoTmp > 0 ) && ($rsConsultaCredito->getCampo('valor_credito_juros') > 0) ) {                                
+                                //verifica se o valor que foi pago a mais é maior que o valor de juros ou menor e insere o valor que tem                                
+                                if ($nuValorPagoTmp >= $rsConsultaCredito->getCampo('valor_credito_juros')) {
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_juros') );
+                                }else{                                    
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , (floor($nuValorPagoTmp*100)/100) );
+                                }
+                                $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_juros');                                    
                             } else {
                                 $boPagamentoDiferenca = TRUE;
                                 $this->obTARRPagamentoAcrescimo->setDado( "valor" , 0.00 );
-
                             }
 
                             $nuTotal += $this->obTARRPagamentoAcrescimo->getDado('valor');
@@ -1376,6 +1305,89 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                 $this->obTARRPagamentoAcrescimo->setDado( "cod_acrescimo"        , $rsListaCreditoAcrescimo->getCampo("cod_acrescimo") );
                                 $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );
                             }
+                            
+                            $rsConsultaCredito->proximo();
+                        }
+                        $rsConsultaCredito->setPrimeiroElemento();
+                        
+                        //insere multa
+                        while ( !$rsConsultaCredito->eof() ) {
+                            if ( ($nuValorPagoTmp > 0 ) && $rsConsultaCredito->getCampo('valor_credito_multa') > 0 ) {
+                                //verifica se o valor que foi pago a mais é maior que o valor de multa ou menor e insere o valor que tem
+                                if ( $nuValorPagoTmp >= $rsConsultaCredito->getCampo('valor_credito_multa') ) {
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_multa') );
+                                }else{
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , (floor($nuValorPagoTmp*100)/100) );
+                                }
+                                $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_multa');
+                            } else {
+                                $boPagamentoDiferenca = TRUE;
+                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , 0.00 );
+                            }
+
+                            $nuTotal += $this->obTARRPagamentoAcrescimo->getDado('valor');
+
+                            $obRMONCreditoAcrescimo = new RMONCreditoAcrescimo;
+                            $obRMONCreditoAcrescimo->setCodCredito( $rsConsultaCredito->getCampo("cod_credito") );
+                            $obRMONCreditoAcrescimo->setCodEspecie( $rsConsultaCredito->getCampo("cod_especie") );
+                            $obRMONCreditoAcrescimo->setCodGenero( $rsConsultaCredito->getCampo("cod_genero") );
+                            $obRMONCreditoAcrescimo->setCodNatureza( $rsConsultaCredito->getCampo("cod_natureza") );
+                            $obRMONCreditoAcrescimo->setCodTipo(3);
+
+                            $obRMONCreditoAcrescimo->ListarAcrescimosDoCredito( $rsListaCreditoAcrescimo, $boTransacao );
+
+                            if ( !$rsListaCreditoAcrescimo->Eof() ) {
+                                $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
+                                $this->obTARRPagamentoAcrescimo->setDado( "ocorrencia_pagamento" , $this->inOcorrenciaPagamento           );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_calculo"          , $rsConsultaCredito->getCampo('cod_calculo') );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_tipo"             , '3'                                     );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_acrescimo"        , $rsListaCreditoAcrescimo->getCampo("cod_acrescimo") );
+                                $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );
+                            }
+                            
+                            $rsConsultaCredito->proximo();
+                        }
+                        $rsConsultaCredito->setPrimeiroElemento();
+
+                        //insere correcao
+                        while ( !$rsConsultaCredito->eof() ) {
+                            if ( $nuValorPagoTmp > 0 && $rsConsultaCredito->getCampo('valor_credito_correcao') > 0 ) {
+                                //verifica se o valor que foi pago a mais é maior que o valor de correcao ou menor e insere o valor que tem
+                                if ( $nuValorPagoTmp >= $rsConsultaCredito->getCampo('valor_credito_correcao') ) {                                    
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_correcao') );
+                                    $nuTotalCaluloPagamentoDiff = $rsConsultaCredito->getCampo('valor_credito_correcao');
+                                }else{
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , (floor($nuValorPagoTmp*100)/100) );
+                                    $nuTotalCaluloPagamentoDiff = $nuValorPagoTmp;
+                                }
+                                $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_correcao');
+                            } else {
+                                $boPagamentoDiferenca = TRUE;
+                                $this->obTARRPagamentoAcrescimo->setDado( "valor" , 0.00 );
+                                $nuTotalCaluloPagamentoDiff = 0.00;
+                            }
+
+                            $nuTotal += $nuTotalCaluloPagamentoDiff;
+
+                            $obRMONCreditoAcrescimo = new RMONCreditoAcrescimo;
+                            $obRMONCreditoAcrescimo->setCodCredito( $rsConsultaCredito->getCampo("cod_credito") );
+                            $obRMONCreditoAcrescimo->setCodEspecie( $rsConsultaCredito->getCampo("cod_especie") );
+                            $obRMONCreditoAcrescimo->setCodGenero( $rsConsultaCredito->getCampo("cod_genero") );
+                            $obRMONCreditoAcrescimo->setCodNatureza( $rsConsultaCredito->getCampo("cod_natureza") );
+                            $obRMONCreditoAcrescimo->setCodTipo(1);
+
+                            $obRMONCreditoAcrescimo->ListarAcrescimosDoCredito( $rsListaCreditoAcrescimo, $boTransacao );
+
+                            if ( !$rsListaCreditoAcrescimo->Eof() ) {
+                                $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
+                                $this->obTARRPagamentoAcrescimo->setDado( "ocorrencia_pagamento" , $this->inOcorrenciaPagamento           );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_calculo"          , $rsConsultaCredito->getCampo('cod_calculo') );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_tipo"             , '1'                                     );
+                                $this->obTARRPagamentoAcrescimo->setDado( "cod_acrescimo"        , $rsListaCreditoAcrescimo->getCampo("cod_acrescimo") );
+                                $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );                                
+                            }
 
                             $rsConsultaCredito->proximo();
                         }
@@ -1383,7 +1395,8 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                     }
                     unset( $rsConsultaCredito );
 
-                    //insere sobra na tabela pagamento_diferenca
+                    //Se depois de inserir todos os acrescimos ainda sobrar valor possitivo significa que foi pago um valor maior do que o esperado
+                    //então insere sobra deste valor na tabela pagamento_diferenca                    
 
                     if ( $nuValorPagoTmp > 0 AND !$obErro->ocorreu() ) {
 
@@ -1411,14 +1424,14 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                 $this->obTARRPagamentoDiferenca->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
                                 $this->obTARRPagamentoDiferenca->setDado( "cod_calculo"          , $rsLancamento->getCampo('cod_calculo') );
                                 $this->obTARRPagamentoDiferenca->setDado( "valor"                , $valorCalculoDiferenca );
-                                $obErro = $this->obTARRPagamentoDiferenca->inclusao( $boTransacao );
+                                $obErro = $this->obTARRPagamentoDiferenca->inclusao( $boTransacao );                                
                                 $nuTotal += $this->obTARRPagamentoDiferenca->getDado("valor");
 
                             }
                             $rsLancamento->proximo();
                         }
                     }
-
+ 
                     if ($nuValorPagoTmp < 0) {
                         $nuValorPagoTmp = $nuValorPagoTmp * -1;
                     }
@@ -1458,12 +1471,11 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                         $obErro = $this->executaLancamento( $stParametroJuroMulta, $stTipoCarne, $inInscricao, $nuTotalJuroMulta, $inParcela, $inGrupoCreditoOriginal, $dtDataVencimento, $boTransacao );
                                     }
                                 } else {
-                                    if ( $nuValorPagoTmp >= $this->obRARRConfiguracao->getMinimoLancamentoAutomatico() ) {
+                                    if ( $nuValorPagoTmp >= $this->obRARRConfiguracao->getMinimoLancamentoAutomatico() ) {                                        
                                         $obErro = $this->executaLancamento( $stParametro, $stTipoCarne, $inInscricao, $nuValorPagoTmp, $inParcela, $inGrupoCreditoOriginal, $dtDataVencimento, $boTransacao );
                                     }
                                 }
                             }
-
                             //se foi pago a mais, verifica se o valor pago a mais cobre o total de jura e multa
                             //senao, cria lancamento/calculp/parcela com o valor que faltou para cobrir juro e multa
                             elseif ( $boParcelaVencida == TRUE AND ( $nuValorTotalParcela > $nuTotal ) ) {
@@ -1603,20 +1615,39 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
     //se existe diferença entre o valor pago e a soma de pagamento_calculo + pagamento_acrescimo + pagamento_diferenca
     //adiciona ou subtrai a diferença no ultimo pagamento_calculo inserido
     if ( !$obErro->ocorreu() ) {
-        $nuTotal = round($nuTotal,6);
-        $x = $this->getValorPagamento() - $nuTotal;
+        $nuTotal = round($nuTotal,8);
+        $nuTotalPag = round($this->getValorPagamento(),8);
+        $x = bcsub($nuTotal,$nuTotalPag,2);
 
-        if ( ($x < 0) OR ($x > 0) ) {
-            $nuValorDif = $arPagamentoCalculo['valor'] + $x;
-
-            $this->obTARRPagamentoCalculo->setDado( "numeracao"            , $arPagamentoCalculo['numeracao']            );
-            $this->obTARRPagamentoCalculo->setDado( "cod_calculo"          , $arPagamentoCalculo['cod_calculo']          );
-            $this->obTARRPagamentoCalculo->setDado( "ocorrencia_pagamento" , $arPagamentoCalculo['ocorrencia_pagamento'] );
-            $this->obTARRPagamentoCalculo->setDado( "cod_convenio"         , $arPagamentoCalculo['cod_convenio']         );
-            $this->obTARRPagamentoCalculo->setDado( "valor"                , $nuValorDif                                 );
-
-            $obErro = $this->obTARRPagamentoCalculo->alteracao( $boTransacao );
+        if ($x != 0.00) {            
+            $stFiltroCalculo = "WHERE numeracao = '".$arPagamentoCalculo['numeracao']."'
+                                AND cod_convenio = ".$arPagamentoCalculo['cod_convenio']."
+                                AND ocorrencia_pagamento = ".$arPagamentoCalculo['ocorrencia_pagamento']." 
+                                AND valor > 0";
+            $stOrdemCalculo = "ORDER BY cod_calculo DESC LIMIT 1";
+            $obErro = $this->obTARRPagamentoCalculo->recuperaTotalPagamentoCalculo($rsTotalPagamentoCalculo, $stFiltroCalculo, $stOrdemCalculo, $boTransacao );            
+            
+            if ( !$obErro->ocorreu() ) {                
+                if ($x > 0) {
+                    $nuValorDif = $rsTotalPagamentoCalculo->getCampo('valor') - abs($x);    
+                }else{
+                    $nuValorDif = $rsTotalPagamentoCalculo->getCampo('valor') + abs($x);
+                }
+                
+                $nuValorDif = (round($nuValorDif*100)/100);
+                
+                $this->obTARRPagamentoCalculo->setDado( "cod_calculo"          , $rsTotalPagamentoCalculo->getCampo('cod_calculo') );
+                $this->obTARRPagamentoCalculo->setDado( "numeracao"            , $rsTotalPagamentoCalculo->getCampo('numeracao') );
+                $this->obTARRPagamentoCalculo->setDado( "ocorrencia_pagamento" , $rsTotalPagamentoCalculo->getCampo('ocorrencia_pagamento') );
+                $this->obTARRPagamentoCalculo->setDado( "cod_convenio"         , $rsTotalPagamentoCalculo->getCampo('cod_convenio') );
+                $this->obTARRPagamentoCalculo->setDado( "valor"                , $nuValorDif );
+                
+                $obErro = $this->obTARRPagamentoCalculo->alteracao( $boTransacao );
+            }
         }
+    }
+    if ($obErro->ocorreu()) {
+        return $obErro;
     }
 
         //se for uma baixa de ISSQN do economico executa a rotina para alterar valor LANCAMENTO, CALCULO E PARCELA zerados.
@@ -1752,7 +1783,7 @@ function executaLancamento($stParametro, $stTipoCarne, $inInscricao, $nuValor, $
     $obErro = $this->obRARRCarne->obRARRParcela->roRARRLancamento->roRARRCalculo->obRARRGrupo->listarCreditos( $rsCreditosGrupo, $boTransacao );
 
     if ( !$obErro->ocorreu() ) {
-        //seta valores do lancamento
+        //seta valores do lancamento        
         $this->obRARRCarne->obRARRParcela->roRARRLancamento->setDataVencimento( $dtDataVencimento );
         $this->obRARRCarne->obRARRParcela->roRARRLancamento->setTotalParcelas ( 1                 );
         $this->obRARRCarne->obRARRParcela->roRARRLancamento->setValor         ( $nuValor          );
@@ -2629,7 +2660,7 @@ function listarPagamentosManuaisAFechar(&$rsRecordSet, $boTransacao = '')
     }
     $stOrdem = " ORDER BY atp.pagamento ";
     $obErro = $this->obTARRPagamentoLoteManual->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao );
-//              $this->obTARRPagamentoLoteManual->debug();
+
     return $obErro;
 }
 
@@ -2723,7 +2754,7 @@ function efetuarEstornoBaixaManual($boTransacao = "")
     $this->obTARRProcessoPagamento->setDado( "cod_convenio", $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
 
     $obErro = $this->obTARRProcessoPagamento->exclusao( $boTransacao );
-    //$this->obTARRProcessoPagamento->debug();
+    
     if ($obErro->ocorreu() ) {
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTARRPagamento );
 

@@ -323,25 +323,30 @@ BEGIN
         IF inCodContrato != reRegistro.cod_contrato THEN
             stSqlEventoFixos := '
                     SELECT  evento_evento.cod_evento
-                            ,evento_evento.valor_quantidade  
-                    FROM( SELECT evento_evento.*
-                          FROM folhapagamento.evento_evento
-                          INNER JOIN( SELECT cod_evento
-                                             ,MAX(timestamp) as timestamp
-                                        FROM folhapagamento.evento_evento as max
-                                        GROUP BY cod_evento
-                                ) as max
-                            ON evento_evento.cod_evento = max.cod_evento
-                            AND evento_evento.timestamp = max.timestamp         
-                    ) as evento_evento
+                            ,evento_evento.valor_quantidade
+                            ,evento.fixado
+                      FROM ( SELECT evento_evento.*
+                               FROM folhapagamento'|| stEntidade ||'.evento_evento
+                         INNER JOIN ( SELECT cod_evento
+                                         ,   MAX(timestamp) as timestamp
+                                        FROM folhapagamento'|| stEntidade ||'.evento_evento as max
+                                 GROUP BY cod_evento
+                                    ) as max
+                                 ON evento_evento.cod_evento = max.cod_evento
+                                AND evento_evento.timestamp = max.timestamp         
+                           ) as evento_evento
                     
-                    INNER JOIN (SELECT regexp_split_to_table(NULLIF(valor,''''),'','')::integer as cod_evento 
-                                    FROM administracao.configuracao 
-                                    WHERE cod_modulo = 27 
-                                    AND exercicio = '''||stExercicio||'''
-                                    AND parametro = ''evento_automatico''
-                    ) as evento_fixo_configurado    
-                        ON evento_evento.cod_evento = evento_fixo_configurado.cod_evento';
+                INNER JOIN (SELECT regexp_split_to_table(NULLIF(valor,''''),'','')::integer as cod_evento 
+                              FROM administracao.configuracao 
+                             WHERE cod_modulo = 27 
+                               AND exercicio = '''||stExercicio||'''
+                               AND parametro = ''evento_automatico''
+                           ) as evento_fixo_configurado    
+                        ON evento_evento.cod_evento = evento_fixo_configurado.cod_evento
+
+                INNER JOIN folhapagamento.evento
+                        ON evento.cod_evento = evento_evento.cod_evento
+                        ';
             FOR reEventosConfigurados IN EXECUTE stSqlEventoFixos
             LOOP
                 /*
@@ -352,7 +357,7 @@ BEGIN
                         Gravar na coluna registro_evento.valor com o valor de folhapagamento.evento_evento.valor_quantidade
                 */
 
-                IF reRegistro.fixado = 'Q' THEN        
+                IF reEventosConfigurados.fixado = 'Q' THEN        
                     stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_periodo 
                                     (   
                                         cod_registro
@@ -420,7 +425,7 @@ BEGIN
                         EXECUTE stSqlAux;
                     END IF;
             
-                ELSEIF reRegistro.fixado = 'V' THEN
+                ELSEIF reEventosConfigurados.fixado = 'V' THEN
     
                     stSqlAux := 'INSERT INTO folhapagamento'|| stEntidade ||'.registro_evento_periodo 
                                     (

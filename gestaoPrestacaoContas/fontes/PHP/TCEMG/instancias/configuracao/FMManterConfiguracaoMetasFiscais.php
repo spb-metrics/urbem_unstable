@@ -31,11 +31,11 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
 
   * @ignore
-  * $Id: FMManterConfiguracaoMetasFiscais.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: FMManterConfiguracaoMetasFiscais.php 64322 2016-01-15 15:34:00Z jean $
   *
-  * $Rev: 59612 $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Rev: 64322 $
+  * $Author: jean $
+  * $Date: 2016-01-15 13:34:00 -0200 (Sex, 15 Jan 2016) $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
@@ -82,6 +82,19 @@ if ($rsTTCEMGMetasFiscais->getNumLinhas() > 0) {
     $pcPIBResultadoNominal = $rsTTCEMGMetasFiscais->getCampo('percentual_pib_resultado_nominal');
     $pcPIBDividaPublicaConsolidada = $rsTTCEMGMetasFiscais->getCampo('percentual_pib_divida_publica_consolidada');
     $pcPIBDividaConsolidadaLiquida = $rsTTCEMGMetasFiscais->getCampo('percentual_pib_divida_consolidada_liquida');
+
+    if ($request->get('inExercicio') == '2016') {
+        $vlCorrenteReceitaPrimariaAdv = $rsTTCEMGMetasFiscais->getCampo('valor_corrente_receita_primaria_adv');
+        $vlCorrenteDespesaPrimariaGerada = $rsTTCEMGMetasFiscais->getCampo('valor_corrente_despesa_primaria_gerada');
+
+        $vlConstanteReceitaDividaAdv = $rsTTCEMGMetasFiscais->getCampo('valor_constante_receita_primaria_adv');
+        $vlConstanteDespesaPrimariaGerada = $rsTTCEMGMetasFiscais->getCampo('valor_constante_despesa_primaria_gerada');
+
+        $pcPIBReceitaPrimariaAdv = $rsTTCEMGMetasFiscais->getCampo('percentual_pib_receita_primaria_adv');
+        $pcPIBDespesaPrimariaAdv = $rsTTCEMGMetasFiscais->getCampo('percentual_pib_despesa_primaria_adv');
+    }
+
+
 } else {
     $vlCorrenteReceitaTotal = '0,00';
     $vlCorrenteReceitaPrimaria = '0,00';
@@ -109,6 +122,17 @@ if ($rsTTCEMGMetasFiscais->getNumLinhas() > 0) {
     $pcPIBResultadoNominal = '0,000';
     $pcPIBDividaPublicaConsolidada = '0,000';
     $pcPIBDividaConsolidadaLiquida = '0,000';
+
+    if ($request->get('inExercicio') == '2016') {
+        $vlCorrenteReceitaPrimariaAdv = '0.00';
+        $vlCorrenteDespesaPrimariaGerada = '0.00';
+
+        $vlConstanteReceitaDividaAdv = '0.00';
+        $vlConstanteDespesaPrimariaGerada = '0.00';
+
+        $pcPIBReceitaPrimariaAdv = '0.00';
+        $pcPIBDespesaPrimariaAdv = '0.00';
+    }
 }
 
 //****************************************//
@@ -218,6 +242,30 @@ $obFlValorCorrenteDividaConsolidadaLiquida->setMaxLength(15);
 $obFlValorCorrenteDividaConsolidadaLiquida->setSize(17);
 $obFlValorCorrenteDividaConsolidadaLiquida->setValue($vlCorrenteDividaConsolidadaLiquida);
 
+//
+
+$obFlValorCorrenteReceitaPrimariaAdv = new Numerico();
+$obFlValorCorrenteReceitaPrimariaAdv->setId('flValorCorrenteReceitaPrimariaAdv');
+$obFlValorCorrenteReceitaPrimariaAdv->setName('flValorCorrenteReceitaPrimariaAdv');
+$obFlValorCorrenteReceitaPrimariaAdv->setRotulo('Valor Corrente da Receita Primária Adv');
+$obFlValorCorrenteReceitaPrimariaAdv->setTitle('Informar o valor corrente da Receita Primaria do exercício.');
+$obFlValorCorrenteReceitaPrimariaAdv->setDecimais(2);
+$obFlValorCorrenteReceitaPrimariaAdv->setMaxLength(15);
+$obFlValorCorrenteReceitaPrimariaAdv->setSize(17);
+$obFlValorCorrenteReceitaPrimariaAdv->setValue($vlCorrenteReceitaPrimariaAdv);
+
+$obFlValorCorrenteDespesaPrimariaGerada = new Numerico();
+$obFlValorCorrenteDespesaPrimariaGerada->setId('flValorCorrenteDespesaPrimariaGerada');
+$obFlValorCorrenteDespesaPrimariaGerada->setName('flValorCorrenteDespesaPrimariaGerada');
+$obFlValorCorrenteDespesaPrimariaGerada->setRotulo('Valor Corrente da Despesa Primária Gerada');
+$obFlValorCorrenteDespesaPrimariaGerada->setTitle('Informar o valor corrente da Despesa Primaria Gerada do exercício.');
+$obFlValorCorrenteDespesaPrimariaGerada->setDecimais(2);
+$obFlValorCorrenteDespesaPrimariaGerada->setMaxLength(15);
+$obFlValorCorrenteDespesaPrimariaGerada->setSize(17);
+$obFlValorCorrenteDespesaPrimariaGerada->setValue($vlCorrenteDespesaPrimariaGerada);
+
+//
+
 //****************************************//
 //Monta valores Constante
 //****************************************//
@@ -301,6 +349,30 @@ $obFlValorConstanteDividaConsolidadaLiquida->setDecimais(2);
 $obFlValorConstanteDividaConsolidadaLiquida->setMaxLength(15);
 $obFlValorConstanteDividaConsolidadaLiquida->setSize(17);
 $obFlValorConstanteDividaConsolidadaLiquida->setValue($vlConstanteDividaConsolidadaLiquida);
+
+//
+
+$obFlValorConstanteReceitaDividaAdv = new Numerico();
+$obFlValorConstanteReceitaDividaAdv->setId('flValorConstanteReceitaDividaAdv');
+$obFlValorConstanteReceitaDividaAdv->setName('flValorConstanteReceitaDividaAdv');
+$obFlValorConstanteReceitaDividaAdv->setRotulo('Valor Constante da Receita Dívida');
+$obFlValorConstanteReceitaDividaAdv->setTitle('Informar o valor constante de receita dívida adv.');
+$obFlValorConstanteReceitaDividaAdv->setDecimais(2);
+$obFlValorConstanteReceitaDividaAdv->setMaxLength(15);
+$obFlValorConstanteReceitaDividaAdv->setSize(17);
+$obFlValorConstanteReceitaDividaAdv->setValue($vlConstanteReceitaDividaAdv);
+
+$obFlValorConstanteDespesaPrimariaGerada = new Numerico();
+$obFlValorConstanteDespesaPrimariaGerada->setId('flValorConstanteDespesaPrimariaGerada');
+$obFlValorConstanteDespesaPrimariaGerada->setName('flValorConstanteDespesaPrimariaGerada');
+$obFlValorConstanteDespesaPrimariaGerada->setRotulo('Valor Constante da Despesa Primária Gerada');
+$obFlValorConstanteDespesaPrimariaGerada->setTitle('Informar o valor constante da despesa primária gerada. ');
+$obFlValorConstanteDespesaPrimariaGerada->setDecimais(2);
+$obFlValorConstanteDespesaPrimariaGerada->setMaxLength(15);
+$obFlValorConstanteDespesaPrimariaGerada->setSize(17);
+$obFlValorConstanteDespesaPrimariaGerada->setValue($vlConstanteDespesaPrimariaGerada);
+
+//
 
 //****************************************//
 //Monta Valores de PIB
@@ -395,6 +467,34 @@ $obFlPercentualPIBDividaConsolidadaLiquida->setMaxLength(5);
 $obFlPercentualPIBDividaConsolidadaLiquida->setSize(7);
 $obFlPercentualPIBDividaConsolidadaLiquida->setValue($pcPIBDividaConsolidadaLiquida);
 
+//
+
+$obFlPercentualPIBReceitaPrimariaAdv = new Porcentagem();
+$obFlPercentualPIBReceitaPrimariaAdv->setId('flPercentualPIBReceitaPrimariaAdv');
+$obFlPercentualPIBReceitaPrimariaAdv->setName('flPercentualPIBReceitaPrimariaAdv');
+$obFlPercentualPIBReceitaPrimariaAdv->setRotulo('Percentual do PIB da Receita Primária Adv');
+$obFlPercentualPIBReceitaPrimariaAdv->setTitle('Informar o valor percentual da Meta Fiscal esperada para a Dívida Consolidada Líquida do exercício financeiro em relação ao valor projetado do PIB do Estado de Minas Gerais, até um milésimo por cento (0,001%).<br/>
+A Dívida Consolidada Líquida corresponde à dívida pública consolidada menos as deduções que compreendem o ativo disponível e os haveres financeiros, líquidos dos Restos a Pagar Processados.<br/>
+Formatação: 00,000 (Informar com três casas decimais).');
+$obFlPercentualPIBReceitaPrimariaAdv->setDecimais(3);
+$obFlPercentualPIBReceitaPrimariaAdv->setMaxLength(5);
+$obFlPercentualPIBReceitaPrimariaAdv->setSize(7);
+$obFlPercentualPIBReceitaPrimariaAdv->setValue($pcPIBReceitaPrimariaAdv);
+
+$obFlPercentualPIBDespesaPrimariaAdv = new Porcentagem();
+$obFlPercentualPIBDespesaPrimariaAdv->setId('flPercentualPIBDespesaPrimariaAdv');
+$obFlPercentualPIBDespesaPrimariaAdv->setName('flPercentualPIBDespesaPrimariaAdv');
+$obFlPercentualPIBDespesaPrimariaAdv->setRotulo('Percentual do PIB da Despesa Primária Adv');
+$obFlPercentualPIBDespesaPrimariaAdv->setTitle('Informar o valor percentual da Meta Fiscal esperada para a Dívida Consolidada Líquida do exercício financeiro em relação ao valor projetado do PIB do Estado de Minas Gerais, até um milésimo por cento (0,001%).<br/>
+A Dívida Consolidada Líquida corresponde à dívida pública consolidada menos as deduções que compreendem o ativo disponível e os haveres financeiros, líquidos dos Restos a Pagar Processados.<br/>
+Formatação: 00,000 (Informar com três casas decimais).');
+$obFlPercentualPIBDespesaPrimariaAdv->setDecimais(3);
+$obFlPercentualPIBDespesaPrimariaAdv->setMaxLength(5);
+$obFlPercentualPIBDespesaPrimariaAdv->setSize(7);
+$obFlPercentualPIBDespesaPrimariaAdv->setValue($pcPIBDespesaPrimariaAdv);
+
+//
+
 //****************************************//
 //Monta FORMULARIO
 //****************************************//
@@ -414,6 +514,10 @@ $obFormulario->addComponente   ( $obFlValorCorrenteResultadoPrimario );
 $obFormulario->addComponente   ( $obFlValorCorrenteResultadoNominal );
 $obFormulario->addComponente   ( $obFlValorCorrenteDividaPublicaConsolidada );
 $obFormulario->addComponente   ( $obFlValorCorrenteDividaConsolidadaLiquida );
+//
+$obFormulario->addComponente   ( $obFlValorCorrenteReceitaPrimariaAdv );
+$obFormulario->addComponente   ( $obFlValorCorrenteDespesaPrimariaGerada );
+//
 $obFormulario->addTitulo       ( "Detalhamento das Metas Fiscais (Valor Constante)" );
 $obFormulario->addComponente   ( $obFlValorConstanteReceitaTotal );
 $obFormulario->addComponente   ( $obFlValorConstanteReceitaPrimaria );
@@ -423,6 +527,10 @@ $obFormulario->addComponente   ( $obFlValorConstanteDespesaResultadoPrimario );
 $obFormulario->addComponente   ( $obFlValorConstanteResultadoNominal );
 $obFormulario->addComponente   ( $obFlValorConstanteDividaPublicaConsolidada );
 $obFormulario->addComponente   ( $obFlValorConstanteDividaConsolidadaLiquida );
+//
+$obFormulario->addComponente   ( $obFlValorConstanteReceitaDividaAdv );
+$obFormulario->addComponente   ( $obFlValorConstanteDespesaPrimariaGerada );
+//
 $obFormulario->addTitulo       ( "Detalhamento das Metas Fiscais (Percentuais)" );
 $obFormulario->addComponente   ( $obFlPercentualPIBReceitaTotal );
 $obFormulario->addComponente   ( $obFlPercentualPIBReceitaPrimaria );
@@ -432,6 +540,10 @@ $obFormulario->addComponente   ( $obFlPercentualPIBResultadoPrimario );
 $obFormulario->addComponente   ( $obFlPercentualPIBResultadoNominal );
 $obFormulario->addComponente   ( $obFlPercentualPIBDividaPublicaConsolidada );
 $obFormulario->addComponente   ( $obFlPercentualPIBDividaConsolidadaLiquida );
+//
+$obFormulario->addComponente   ( $obFlPercentualPIBReceitaPrimariaAdv );
+$obFormulario->addComponente   ( $obFlPercentualPIBDespesaPrimariaAdv );
+//
 
 $obFormulario->OK();
 $obFormulario->show();

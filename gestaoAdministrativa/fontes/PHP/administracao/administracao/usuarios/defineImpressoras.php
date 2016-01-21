@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-01.03.93
 
-    $Id: defineImpressoras.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: defineImpressoras.php 64287 2016-01-08 16:45:40Z diogo.zarpelon $
 
     */
 
@@ -49,7 +49,9 @@ include_once 'interfaceUsuario.class.php';
 
 setAjuda( "UC-01.03.93" );
 
-$controle = $_REQUEST['controle'];
+$controle = $request->get('controle');
+$pg  = $request->get('pg');
+$pos = $request->get('pos');
 
 if (strlen($controle) == 0) {
     $controle = 0;
@@ -131,14 +133,49 @@ case 1: // Escolhe um usuário para adicionar acesso às impressoras
         Sessao::write('sql',$sql);
     }
 
-    $paginacaoLegada = new paginacaoLegada;
-    $paginacaoLegada->pegaDados(Sessao::read('sql'),"10");
-    $paginacaoLegada->pegaPagina($pagina);
-    $paginacaoLegada->complemento = "&controle=1";
-    $count = $paginacaoLegada->contador();
-    $paginacaoLegada->geraLinks();
-    $paginacaoLegada->pegaOrder("U.username","ASC");
-    $sSQL = $paginacaoLegada->geraSQL();
+    $obConexao = new Conexao;
+    $obErro = $obConexao->executaSQL( $rsRecordSetPaginacao, $sql, $boTransacao);
+
+    $obPaginacao = new Paginacao;
+    $obPaginacao->setRecordSet( $rsRecordSetPaginacao );
+    $obPaginacao->geraStrLinks();
+    $obPaginacao->geraHrefLinks();
+    $obPaginacao->montaHTML();
+    
+    # Monta a tabela de Paginação 
+    $obTabelaPaginacao = new Tabela;
+    $obTabelaPaginacao->addLinha();
+    $obTabelaPaginacao->ultimaLinha->addCelula();
+
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>".$obPaginacao->getHTML()."</font>" );
+    $obTabelaPaginacao->ultimaLinha->commitCelula();
+    $obTabelaPaginacao->commitLinha();
+    $obTabelaPaginacao->addLinha();
+    $obTabelaPaginacao->ultimaLinha->addCelula();
+
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setColSpan( $inNumDados + 2  );
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->setClass('show_dados_center_bold');
+    $obTabelaPaginacao->ultimaLinha->ultimaCelula->addConteudo("<font size='2'>Registros encontrados: ".$obPaginacao->getNumeroLinhas()."</font>" );
+    $obTabelaPaginacao->ultimaLinha->commitCelula();
+    $obTabelaPaginacao->commitLinha();
+    $obTabelaPaginacao->montaHTML();
+
+    $stHTMLPaginacao .= $obTabelaPaginacao->getHTML();
+
+    $count = $obPaginacao->geraContador();
+    
+    # Monta o LIMIT + OFFSET para a consulta da listagem.
+    $offset = 0;
+
+    if ($_REQUEST['pg'] > 1) {
+       $offset = ($_REQUEST['pg'] - 1) * 10;
+    }
+
+    $stOrderBy = " ORDER BY U.username ASC LIMIT 10 OFFSET $offset ";
+    $sSQL = Sessao::read('sql').$stOrderBy;
+
 ?>
     <table width='100%' id="tabelas">
         <tr>
@@ -147,21 +184,11 @@ case 1: // Escolhe um usuário para adicionar acesso às impressoras
             </td>
         </tr>
         <tr>
-            <td class='labelcentercabecalho' width='5%'>
-                &nbsp;
-            </td>
-            <td class='labelcentercabecalho' width='10%'>
-                CGM
-            </td>
-            <td class='labelcentercabecalho' width='75%'>
-                Nome
-            </td>
-            <td class='labelcentercabecalho' width='20%'>
-                Usuário
-            </td>
-            <td class='labelcentercabecalho' width='5%'>
-                &nbsp;
-            </td>
+            <td class='labelcentercabecalho' width='5%'>&nbsp;</td>
+            <td class='labelcentercabecalho' width='10%'>CGM</td>
+            <td class='labelcentercabecalho' width='75%'>Nome</td>
+            <td class='labelcentercabecalho' width='20%'>Usuário</td>
+            <td class='labelcentercabecalho' width='5%'>&nbsp;</td>
         </tr>
 <?php
     $conectaBD = new dataBaseLegado;
@@ -175,20 +202,12 @@ case 1: // Escolhe um usuário para adicionar acesso às impressoras
         $username = $conectaBD->pegaCampo("username");
 ?>
         <tr>
-            <td class='show_dados_center_bold'>
-                <?=$count++?>
-            </td>
-            <td class='show_dados_right'>
-                <?=$cgm;?>
-            </td>
-            <td class='show_dados'>
-                <?=$nomCgm;?>
-            </td>
-            <td class='show_dados'>
-                <?=$username;?>
-            </td>
+            <td class='show_dados_center_bold'><?=$count++?></td>
+            <td class='show_dados_right'><?=$cgm;?></td>
+            <td class='show_dados'><?=$nomCgm;?></td>
+            <td class='show_dados'><?=$username;?></td>
             <td class='botao'>
-                <a href='<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=2&cgm=<?=$cgm;?>&username=<?=$username;?>&pagina=<?=$pagina?>'>
+                <a href="<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=2&cgm=<?=$cgm;?>&username=<?=$username;?>&pagina=<?=$pagina;?>&pg=<?=$pg;?>&pos=<?=$pos;?>">
                     <img src="<?=CAM_FW_IMAGENS;?>botao_editar.png" border=0>
                 </a>
             </td>
@@ -201,9 +220,14 @@ case 1: // Escolhe um usuário para adicionar acesso às impressoras
 ?>
     </table>
 <?php
-    echo "<table id='paginacao' width=450><tr><td><font size=2>";
-            $paginacaoLegada->mostraLinks();
-    echo "</font></tr></td></table>";
+
+ # Hack para nova paginação.
+        echo "<table id='paginacao' width='850' align='center'>
+                <tr>
+                <td align='center'>
+                <font size=2>";
+        echo $stHTMLPaginacao;
+        echo "</font></tr></td></table>";
 
     ?>
 <script>zebra('tabelas','zb');</script>
@@ -266,7 +290,7 @@ case 2: // Mostra uma lista de impressoras a que o usuário pode ter acesso
 
         function Cancela()
         {
-            document.frm.action = "<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=1";
+            document.frm.action = "<?=$PHP_SELF;?>?<?=Sessao::getId();?>&controle=0";
             document.frm.submit();
         }
 

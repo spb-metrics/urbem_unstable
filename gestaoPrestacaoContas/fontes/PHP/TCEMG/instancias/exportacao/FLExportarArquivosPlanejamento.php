@@ -127,6 +127,7 @@ $arNomeArquivos = array(
     'REC.csv',
     'RFIS.csv',
     'UOC.csv',
+    'CONSID.csv',
 );
 
 // Preenche array

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacao.php 64207 2015-12-16 13:09:13Z evandro $
+    $Id: OCManterAutorizacao.php 64317 2016-01-15 12:53:03Z arthur $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -209,8 +209,13 @@ function montaCombo($stNomDespesa, Request $request)
 
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setExercicio(Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setCodDespesa('');
-        $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setDotacaoAnalitica(true);
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarCodEstruturalDespesa($rsClassificacao);
+        
+        // Caso resultar em mais de uma linha, retira as contas sinteticas trazendo somente as analiticas para o combo
+        if ( $rsClassificacao->getNumLinhas() > 1 ) {
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->setDotacaoAnalitica(true);
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->listarCodEstruturalDespesa($rsClassificacao);
+        }
 
         if (Sessao::read('inCodClassificacao') != ''){
             $js .= "jq('#stCodClassificacao_label').html('".$rsClassificacao->getCampo('cod_estrutural')." - ".$rsClassificacao->getCampo('descricao')."');\n";

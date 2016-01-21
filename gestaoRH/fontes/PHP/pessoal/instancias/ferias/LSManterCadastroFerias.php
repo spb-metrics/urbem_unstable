@@ -129,23 +129,20 @@ switch ($_REQUEST['stTipoFiltro']) {
 }
 
 if ($stAcao == "incluir") {
-    $stFiltro = " WHERE recuperarSituacaoDoContrato(cod_contrato,".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao").",'".Sessao::getEntidade()."') = 'A'";
+    $stFiltro = " AND recuperarSituacaoDoContrato(concederFerias.cod_contrato,".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao").",'".Sessao::getEntidade()."') = 'A'";
 }
 if ($stAcao == "consultar") {
-    $stWhereAnd = "\n WHERE ";
+    $stWhereAnd = "\n AND ";
     if(isset($_REQUEST['boConsultarCompetencia'])&&$_REQUEST['boConsultarCompetencia']==true){
-        $stFiltro = $stWhereAnd."ano_competencia = '".$_REQUEST['inAno']."'";
-        $stWhereAnd = "\n AND ";
+        $stFiltro = $stWhereAnd."concederFerias.ano_competencia = '".$_REQUEST['inAno']."'";
+
         if($_REQUEST['inCodMes']!= "")
-            $stFiltro .= $stWhereAnd."mes_competencia::integer = ".$_REQUEST['inCodMes'];
+            $stFiltro .= $stWhereAnd."concederFerias.mes_competencia::integer = ".$_REQUEST['inCodMes'];
     }
     if (trim($_REQUEST['stDataInicial']) != "" and trim($_REQUEST['stDataFinal']) != "") {
-        $stFiltro .= $stWhereAnd."( dt_inicio BETWEEN to_date('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') and to_date('".$_REQUEST['stDataFinal']."','dd/mm/yyyy')";
-        $stFiltro .= "              OR dt_fim    BETWEEN to_date('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') and to_date('".$_REQUEST['stDataFinal']."','dd/mm/yyyy'))";
+        $stFiltro .= $stWhereAnd."( concederFerias.dt_inicio BETWEEN to_date('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') and to_date('".$_REQUEST['stDataFinal']."','dd/mm/yyyy')";
+        $stFiltro .= "              OR concederFerias.dt_fim    BETWEEN to_date('".$_REQUEST['stDataInicial']."','dd/mm/yyyy') and to_date('".$_REQUEST['stDataFinal']."','dd/mm/yyyy'))";
     }
-}
-if ($stAcao == "excluir") {
-    $stFiltro = " WHERE ano_competencia = '".$_REQUEST["inAno"]."' AND mes_competencia >= '".str_pad($_REQUEST["inCodMes"],2,'0',STR_PAD_LEFT)."'";
 }
 
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalFerias.class.php");
@@ -157,7 +154,7 @@ $obTPessoalFerias->setDado("inCodPeriodoMovimentacao"   ,$rsPeriodoMovimentacao-
 $obTPessoalFerias->setDado("boFeriasVencidas"           ,(trim($_REQUEST['boApresentarSomenteFerias']) != "") ? 'true' : 'false');
 $obTPessoalFerias->setDado("inCodLote"                  ,(trim($_REQUEST["inCodLote"]) != "") ? $_REQUEST["inCodLote"] : 0);
 $obTPessoalFerias->setDado("inCodRegime"                ,0);
-$obTPessoalFerias->concederFerias($rsLista,$stFiltro,"\n ORDER BY nom_cgm, dt_inicial_aquisitivo, dt_final_aquisitivo");
+$obTPessoalFerias->concederFerias($rsLista,$stFiltro,"\n ORDER BY concederFerias.nom_cgm, concederFerias.dt_inicial_aquisitivo, concederFerias.dt_final_aquisitivo");
 
 //adicionado para poder verificar a quantidade de registros
 Sessao::write('arListaFerias',$rsLista->getElementos());
@@ -237,7 +234,7 @@ $obLista->commitDado();
 if ($_REQUEST['stAcao'] == "consultar" or  $_REQUEST['stAcao'] == "excluir") {
     $obLista->addDado();
     $obLista->ultimoDado->setAlinhamento("CENTRO");
-    $obLista->ultimoDado->setCampo( "[mes_competencia]/[ano_competencia]" );
+    $obLista->ultimoDado->setCampo( "competencia" );
     $obLista->commitDado();
 }
 

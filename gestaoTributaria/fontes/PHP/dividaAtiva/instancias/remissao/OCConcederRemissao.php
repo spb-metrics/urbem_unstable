@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCConcederRemissao.php 63839 2015-10-22 18:08:07Z franver $
+    * $Id: OCConcederRemissao.php 64290 2016-01-08 18:28:54Z evandro $
 
     * Casos de uso: uc-05.04.11
 */
@@ -285,27 +285,33 @@ switch ($_REQUEST['stCtrl']) {
         break;
 
     case "IncluirGrupoCredito":
-        if ($_GET["inCodGrupo"]) {
-            Sessao::write($_GET["inCodGrupo"], array());
+        if ($request->get("inCodGrupo")) {            
             $arListaGrupoCreditoSessao = Sessao::read( "arListaGrupoCredito" );
             $boIncluir = true;
             $inTotalDados = count( $arListaGrupoCreditoSessao );
             for ($inX=0; $inX<$inTotalDados; $inX++) {
-                if ($arListaGrupoCreditoSessao[$inX]["stCodGrupo"] == $_GET["inCodGrupo"]) {
+                if ($arListaGrupoCreditoSessao[$inX]["stCodGrupo"] == $request->get("inCodGrupo")) {
                     $boIncluir = false;
                     break;
                 }
             }
 
             if ($boIncluir) {
-                $arDados = explode( "/", $_GET["inCodGrupo"] );
+                $arDados = explode( "/", $request->get("inCodGrupo") );
                 $obRARRGrupo = new RARRGrupo;
                 $obRARRGrupo->setCodGrupo( $arDados[0] );
                 $obRARRGrupo->setExercicio( $arDados[1] );
                 $obRARRGrupo->consultarGrupo();
-                $arListaGrupoCreditoSessao[$inTotalDados]["stCodGrupo"] = $_GET["inCodGrupo"];
+                $obRARRGrupo->listarCreditos($rsCreditos);
+                $arListaGrupoCreditoSessao[$inTotalDados]["stCodGrupo"] = $request->get("inCodGrupo");
                 $arListaGrupoCreditoSessao[$inTotalDados]["stGrupoDescricao"] = $obRARRGrupo->getDescricao();
+                
+                foreach ($rsCreditos->getElementos() as $creditos) {
+                    $creditos['selecionado'] = true;
+                    $arCreditosGrupo[] = $creditos;
+                }
 
+                Sessao::write($request->get("inCodGrupo"), $arCreditosGrupo);
                 Sessao::write( "arListaGrupoCredito", $arListaGrupoCreditoSessao );
 
                 $rsListaGrupoCredito = new RecordSet;

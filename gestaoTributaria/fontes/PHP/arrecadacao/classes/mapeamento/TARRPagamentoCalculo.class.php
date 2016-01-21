@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRPagamentoCalculo.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TARRPagamentoCalculo.class.php 64341 2016-01-15 20:11:16Z evandro $
 
 * Casos de uso: uc-05.03.10
 */
@@ -81,5 +81,35 @@ function TARRPagamentoCalculo()
     $this->AddCampo('valor','numeric',true,'14,2',false,false);
 }
 
+function recuperaTotalPagamentoCalculo(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaTotalPagamentoCalculo($stFiltro,$stOrdem);
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
+
+function montaRecuperaTotalPagamentoCalculo($stFiltro,$stOrdem)
+{
+    $stSql = "SELECT MAX(cod_calculo) as cod_calculo
+                    ,pagamento_calculo.numeracao
+                    ,pagamento_calculo.ocorrencia_pagamento
+                    ,pagamento_calculo.valor
+                    ,pagamento_calculo.cod_convenio
+                FROM arrecadacao.pagamento_calculo 
+                ".$stFiltro."
+                GROUP BY numeracao
+                        ,ocorrencia_pagamento
+                        ,valor
+                        ,cod_convenio
+                ".$stOrdem." 
+                ";
+    return $stSql;
+}
+
+}//END OF CLASS
 ?>

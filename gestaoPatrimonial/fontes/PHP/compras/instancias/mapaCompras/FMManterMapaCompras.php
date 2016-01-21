@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.04.05
 
- $Id: FMManterMapaCompras.php 64118 2015-12-04 12:33:31Z franver $
+ $Id: FMManterMapaCompras.php 64284 2016-01-06 18:34:31Z jean $
 
  */
 
@@ -132,6 +132,19 @@ $obRadioMostraDadoNao->setLabel  ('Não');
 $obRadioMostraDadoNao->setName   ('boMostraDado');
 $obRadioMostraDadoNao->setId     ('boMostraDado');
 $obRadioMostraDadoNao->setValue  ('false');
+
+$obHdnCheck = new Hidden;
+$obHdnCheck->setName ( 'obHdnCheck' );
+$obHdnCheck->setId ( 'obHdnCheck' );
+
+$obCheckBoxAnularTodosItens = new CheckBox;
+$obCheckBoxAnularTodosItens->setName ( 'obAnularTodosItens' );
+$obCheckBoxAnularTodosItens->setId ( 'obAnularTodosItens' );
+$obCheckBoxAnularTodosItens->setRotulo ( 'Anular Todos' );
+$obCheckBoxAnularTodosItens->setTitle ( 'Anular todos os itens da lista' );
+$obCheckBoxAnularTodosItens->obEvento->setOnClick("if (this.checked) { jQuery('#obHdnCheck').val('true'); montaParametrosGET('anularTodosItens','obHdnCheck'); } else { jQuery('#obHdnCheck').val('false'); montaParametrosGET('anularTodosItens','obHdnCheck'); }");
+
+
 // Fim
 
 $obForm = new Form;
@@ -186,10 +199,11 @@ if ($stAcao != 'anular') {
 
 $obFormulario->addSpan               ( $obSpnSolicitacoes );
 //Aba dos Itens
-$obFormulario->addAba                ( "Itens"          );
-
-$obFormulario->addSpan               ( $obSpnItem  );
+$obFormulario->addAba                ( "Itens" );
+$obFormulario->addComponente         ( $obCheckBoxAnularTodosItens );
+$obFormulario->addSpan               ( $obSpnItem );
 $obFormulario->addSpan               ( $obSpnItens );
+$obFormulario->addHidden             ( $obHdnCheck );
 
 //Aba de Totais por item
 $obFormulario->addAba                ( "Totais"          );

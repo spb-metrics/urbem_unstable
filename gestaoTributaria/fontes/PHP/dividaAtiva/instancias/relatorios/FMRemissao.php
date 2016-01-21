@@ -103,6 +103,7 @@ if ($_REQUEST["stExercicioLista"]) {
     $stFiltro .= 'null';
 }
 
+//remissaoAutomatica.rptdesign
 $preview = new PreviewBirt( 5, 33, 3 );
 $preview->setVersaoBirt('2.5.0');
 $preview->setTitulo('Relatório de Remissão');
