@@ -65,18 +65,18 @@ class TLicitacaoRescisaoContrato extends Persistente
         $this->setCampoCod('num_contrato');
         $this->setComplementoChave('exercicio_contrato, cod_entidade');
 
-        $this->AddCampo('exercicio_contrato', 'character',true, '4', true, true);
-        $this->AddCampo('cod_entidade', 'integer', true, '', true, true);
-        $this->AddCampo('num_contrato', 'integer', true, '', true, true);
-        $this->AddCampo('exercicio', 'character', true, '4', false, false);
-        $this->AddCampo('num_rescisao', 'integer', true, '', false, false);
-        $this->AddCampo('dt_rescisao', 'date', true, '', false, false);
-        $this->AddCampo('vlr_multa', 'numeric', true, '14,2', false, false);
-        $this->AddCampo('vlr_indenizacao', 'numeric', true, '14,2', false, false);
-        $this->AddCampo('motivo', 'text', true, '', false, false);
+        $this->AddCampo('exercicio_contrato', 'character' , true , '4'   , true , true);
+        $this->AddCampo('cod_entidade'      , 'integer'   , true , ''    , true , true);
+        $this->AddCampo('num_contrato'      , 'integer'   , true , ''    , true , true);
+        $this->AddCampo('exercicio'         , 'character' , true , '4'   , false, false);
+        $this->AddCampo('num_rescisao'      , 'integer'   , true , ''    , false, false);
+        $this->AddCampo('dt_rescisao'       , 'date'      , true , ''    , false, false);
+        $this->AddCampo('vlr_multa'         , 'numeric'   , true , '14,2', false, false);
+        $this->AddCampo('vlr_indenizacao'   , 'numeric'   , true , '14,2', false, false);
+        $this->AddCampo('motivo'            , 'text'      , true , ''    , false, false);
     }
 
-    public function recuperaContratoRescisao(&$rsRecordSet, $stFiltro="",$stOrder="",$boTransacao="")
+    public function recuperaContratoRescisao(&$rsRecordSet, $stFiltro ="" ,$stOrder ="" ,$boTransacao = "")
     {
         return $this->executaRecupera("montaRecuperaContratoRescisao",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
     }

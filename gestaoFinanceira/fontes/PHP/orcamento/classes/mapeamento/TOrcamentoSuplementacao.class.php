@@ -1770,4 +1770,42 @@ function montaRecuperaDadosMANAD()
     return $stSql;
 }
 
+function recuperaValorTotalSuplementado(&$rsRecordSet, $stCondicao = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if( $stOrdem )
+        $stOrdem ( strpos( 'ORDER BY', $stOrdem ) ) ? $stOrdem : ' ORDER BY '.$stOrdem;
+    $stSql = $this->montaRecuperaValorTotalSuplementado().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
 }
+
+function montaRecuperaValorTotalSuplementado()
+{
+    $stSql="    SELECT SUM(suplementacao_suplementada.valor) as valor_suplementado       
+                
+                FROM orcamento.suplementacao  
+                
+                INNER JOIN orcamento.suplementacao_suplementada
+                        ON suplementacao_suplementada.cod_suplementacao = suplementacao.cod_suplementacao
+                       AND suplementacao_suplementada.exercicio         = suplementacao.exercicio
+                
+                LEFT JOIN orcamento.suplementacao_anulada
+                       ON suplementacao_anulada.exercicio         = suplementacao.exercicio
+                      AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+                
+                WHERE suplementacao_anulada.cod_suplementacao IS NULL
+                  AND suplementacao.cod_tipo = 1 
+            ";
+
+    return $stSql;
+}
+
+
+
+}//END OF CLASS

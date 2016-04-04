@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.03
 
-    $Id: PRExportarSEFIP.php 62307 2015-04-20 18:21:57Z michel $
+    $Id: PRExportarSEFIP.php 64500 2016-03-07 17:43:43Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -204,7 +204,7 @@ switch ($stAcao) {
             $arHeaderArquivo[0]['inscricao_resp']                                = $inCNPJ;
             $arHeaderArquivo[0]['nome_resp']                                     = $stNomePrefeitura;
             $arHeaderArquivo[0]['nome_pessoa_contato']                           = removeAcentos($stPessoaContato);
-            $arHeaderArquivo[0]['logradouro']                                    = $stLogradouro;
+            $arHeaderArquivo[0]['logradouro']                                    = str_replace(".","",$stLogradouro);
             $arHeaderArquivo[0]['bairro']                                        = $stBairro;
             $arHeaderArquivo[0]['cep']                                           = $inCep;
             include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoMunicipio.class.php");
@@ -449,7 +449,7 @@ switch ($stAcao) {
             $arHeaderEmpresa[0]['inscricao_empresa']                             = $inCNPJ;
             $arHeaderEmpresa[0]['zeros']                                         = 0;
             $arHeaderEmpresa[0]['nome_empresa']                                  = $stNomePrefeitura;
-            $arHeaderEmpresa[0]['logradouro']                                    = $stLogradouro;
+            $arHeaderEmpresa[0]['logradouro']                                    = str_replace(".","",$stLogradouro);
             $arHeaderEmpresa[0]['bairro']                                        = $stBairro;
             $arHeaderEmpresa[0]['cep']                                           = $inCep;
             include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoMunicipio.class.php");
@@ -1471,7 +1471,7 @@ switch ($stAcao) {
                     ######valor_descontado
 
                     ######ocorrencia
-                    if ($boMultiploVinculo) {
+                    if ($boMultiploVinculo && $rsContratos->getCampo('cod_categoria') != 13 ) {
                         $stOcorrencia = "05";
                     } else {
                         $stOcorrencia = $rsContratos->getCampo("num_ocorrencia");
@@ -1584,16 +1584,24 @@ switch ($stAcao) {
                     $arRegistroTrabalhador[$inIndex]['remuneracao_sem_13']                            = ( !$_POST["boCompetencia13"] ) ? str_replace(".","",number_format($nuRemuneracaoSem13,2,".","")) : "";
                     $arRegistroTrabalhador[$inIndex]['remuneracao_13']                                = ( !$_POST["boCompetencia13"] ) ? ($rsContratoRescisao->getNumLinhas() == -1) ? str_replace(".","",number_format($nuRemuneracao13,2,".","")) : ""   : "";
                     $arRegistroTrabalhador[$inIndex]['classe_contribuicao']                           = "";
-                    $arRegistroTrabalhador[$inIndex]['ocorrencia']                                    = ($stOcorrencia == 0) ? "" : str_pad($stOcorrencia,2,"0",STR_PAD_LEFT);
-                    $arRegistroTrabalhador[$inIndex]['valor_descontado']                              = str_replace(".","",number_format($nuValorDescontado,2,".",""));
+                    $arRegistroTrabalhador[$inIndex]['ocorrencia']                                    = ($stOcorrencia == 0) ? "" : str_pad($stOcorrencia,2,"0",STR_PAD_LEFT);                        
+                    if ( $rsContratos->getCampo('cod_categoria') != 13 ){
+                        $arRegistroTrabalhador[$inIndex]['valor_descontado']                          = str_replace(".","",number_format($nuValorDescontado,2,".",""));
+                    }else{
+                        $arRegistroTrabalhador[$inIndex]['valor_descontado']                          = 0;
+                    }
                     $arRegistroTrabalhador[$inIndex]['remuneracao_base']                              = ( !$_POST["boCompetencia13"] ) ? str_replace(".","",number_format($nuRemuneracaoBase,2,".","")) : "";
 
-                    if (in_array($rsContratos->getCampo("cod_categoria"),array(1,2,4,6,7,12,19,20,21,26))) {
+                    if (in_array($rsContratos->getCampo("cod_categoria"),array(1,2,4,6,7,12,13,19,20,21,26))) {
                         if ($_POST["boCompetencia13"]) {
                             $arRegistroTrabalhador[$inIndex]['base_calculo_13_22']                        = str_replace(".","",number_format($nuEventoBaseCalculadoPrevidenciaDecimoDesD,2,".",""));
                         } else {
-                            //Campo somente preenchido para contratos rescindidos
-                            $arRegistroTrabalhador[$inIndex]['base_calculo_13_22']                        = ($rsContratoRescisao->getNumLinhas() == 1) ? str_replace(".","",number_format($nuEventoRescisaoCalculadoDesDecimo,2,".","")) : "";
+                            if ( $rsContratos->getCampo('cod_categoria') != 13 ){
+                                //Campo somente preenchido para contratos rescindidos
+                                $arRegistroTrabalhador[$inIndex]['base_calculo_13_22']                        = ($rsContratoRescisao->getNumLinhas() == 1) ? str_replace(".","",number_format($nuEventoRescisaoCalculadoDesDecimo,2,".","")) : "";
+                            }else{
+                                $arRegistroTrabalhador[$inIndex]['base_calculo_13_22']                        = 0;
+                            }
                         }
                     } else {
                         $arRegistroTrabalhador[$inIndex]['base_calculo_13_22'] = 0;
@@ -1602,9 +1610,51 @@ switch ($stAcao) {
                     $arRegistroTrabalhador[$inIndex]['base_calculo_13_23']                            = ( !$_POST["boCompetencia13"] ) ? str_replace(".","",number_format($nuBaseCalculo1323,2,".","")) : "";
                     $arRegistroTrabalhador[$inIndex]['brancos']                                       = "";
                     $arRegistroTrabalhador[$inIndex]['final']                                         = "*";
+                        
                     Sessao::write("inTotalServidoresArquivo", Sessao::read("inTotalServidoresArquivo")+1);
+                    
+                    //Booleano para controlar contratos de categoria 13 e com miltiplas matriculas ja foi inserido no array                    
+                    $boPularRegistro = false;                    
+                    //Controlar contratos de categoria 13 e com miltiplas matriculas somando seus valores
+                    //1946 e 1802 , 1738 e 1948                    
+                    if ( $rsContratos->getCampo('cod_categoria') == 13 ){
+                        $stPisPasepContratoAnterior = $rsContratos->getCampo('servidor_pis_pasep');
+                        //Avança um registro para verificar se existe outra matricula para o mesmo servidor
+                        if ( $rsContratos->proximo() == true ){
+                            if ( $boRegistroRepetido == true ) {                                                                
+                                $arRegistroTrabalhador[0]['remuneracao_sem_13'] = $arRegistroTrabalhador[0]['remuneracao_sem_13'] + $arAuxRegistroCategoria13[0]['remuneracao_sem_13'];
+                                $arRegistroTrabalhador[0]['remuneracao_13']     = $arRegistroTrabalhador[0]['remuneracao_13']     + $arAuxRegistroCategoria13[0]['remuneracao_13'];
+                                $arRegistroTrabalhador[0]['remuneracao_base']   = $arRegistroTrabalhador[0]['remuneracao_base']   + $arAuxRegistroCategoria13[0]['remuneracao_base'];
+                                $arRegistroTrabalhador[0]['base_calculo_13_23'] = $arRegistroTrabalhador[0]['base_calculo_13_23'] + $arAuxRegistroCategoria13[0]['base_calculo_13_23'];
+                                $boRegistroRepetido = false;
+                                $boPularRegistro = false;
+                            //SistemaLegado::mostravar($arRegistroTrabalhador); 
+                            }else{
+                                if ($stPisPasepContratoAnterior == $rsContratos->getCampo('servidor_pis_pasep') ) {
+                                    $arAuxRegistroCategoria13 = $arRegistroTrabalhador;
+                                    $boPularRegistro = true;
+                                    $boRegistroRepetido = true;
+                                }
+                            }    
+                            //Volta para o registro corrente
+                            $rsContratos->anterior();
+                        }else{
+                            //Verifica se o ultimo registro é o repetido
+                            if ( $boRegistroRepetido == true ) {                                
+                                $arRegistroTrabalhador[0]['remuneracao_sem_13'] = $arRegistroTrabalhador[0]['remuneracao_sem_13'] + $arAuxRegistroCategoria13[0]['remuneracao_sem_13'];
+                                $arRegistroTrabalhador[0]['remuneracao_13']     = $arRegistroTrabalhador[0]['remuneracao_13']     + $arAuxRegistroCategoria13[0]['remuneracao_13'];
+                                $arRegistroTrabalhador[0]['remuneracao_base']   = $arRegistroTrabalhador[0]['remuneracao_base']   + $arAuxRegistroCategoria13[0]['remuneracao_base'];
+                                $arRegistroTrabalhador[0]['base_calculo_13_23'] = $arRegistroTrabalhador[0]['base_calculo_13_23'] + $arAuxRegistroCategoria13[0]['base_calculo_13_23'];
+                            }
+                            $boRegistroRepetido = false;
+                            $boPularRegistro = false;
+                        }
+                    }
 
-                    addRegistroTrabalhador($obExportador,$arRegistroTrabalhador);
+                    if ( $boPularRegistro == false ) {
+                        addRegistroTrabalhador($obExportador,$arRegistroTrabalhador);
+                    }
+                    
                     if (is_array($arMovimentacaoTrabalhador)) {
                         foreach ($arMovimentacaoTrabalhador as $inIndexTrab=>$arDados) {
                             if ($arDados["registro"] == $rsContratos->getCampo("registro")) {
@@ -1618,7 +1668,6 @@ switch ($stAcao) {
                 $rsContratos->proximo();
             }
             ##########REGISTRO DO TRABALHADOR
-
             ##########REGISTRO TOTALIZADOR DO ARQUIVO
             $inIndex = 0;
             $arFinal[$inIndex]['tipo_registro']                                 = 90;

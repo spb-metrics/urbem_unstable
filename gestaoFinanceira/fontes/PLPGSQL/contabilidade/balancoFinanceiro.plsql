@@ -23,7 +23,7 @@
 /* Script de função PLPGSQL
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
-$Id: balancoFinanceiro.plsql 64232 2015-12-21 17:21:16Z fabio $
+$Id: balancoFinanceiro.plsql 64414 2016-02-18 17:19:06Z michel $
 */
 
 
@@ -114,16 +114,15 @@ IF (stTipoDespesa = 'E') THEN
                         CASE
                             WHEN recurso like ''0001'' AND cod_estrutural NOT like ''9%''
                             THEN ''recurso_livre''
-                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND (cod_estrutural like ''1.0.0.0%'' OR cod_estrutural like ''2.0.0.0%'' OR cod_estrutural like ''7.0.0.0%'')
+                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND (cod_estrutural like ''1%'' OR cod_estrutural like ''2%'' OR cod_estrutural like ''7%'')
                             THEN ''recurso_vinculado''
-                            WHEN recurso like ''0001'' AND cod_estrutural like ''9.0.0.0%''
+                            WHEN recurso like ''0001'' AND cod_estrutural like ''9%''
                             THEN ''deducoes_recurso_livre''
-                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND cod_estrutural like ''9.0.0.0%''
+                            WHEN (recurso IS NULL OR recurso NOT LIKE ''0001'') AND cod_estrutural like ''9%''
                             THEN ''deducoes_recurso_vinculado''
                             WHEN cod_estrutural like ''9%'' AND recurso IS NOT NULL
                             THEN ''redutoras_receita_orcamentaria''
                             WHEN (cod_estrutural like ''1%'' OR cod_estrutural like ''2%'' OR cod_estrutural like ''7%'') AND recurso IS NOT NULL
-                            --PODE OCORRER DE UMA RECEITA DO EXERCÍCIO ATUAL NÃO SER ENCONTRADA NO EXERCÍCIO ANTERIOR
                             THEN ''receita_orcamentaria''
                     END as descricao
                     ,recurso
@@ -131,7 +130,7 @@ IF (stTipoDespesa = 'E') THEN
             ';
     
     IF(stExercicio >= '2014' )THEN
-        stSql := stSql || ',arrecadado_periodo_anterior';
+        stSql := stSql || ',0.00 AS arrecadado_periodo_anterior';
     END IF;
                     
                     
@@ -152,34 +151,47 @@ IF (stTipoDespesa = 'E') THEN
                             arrecadado_ano      numeric,                                           
                             diferenca           numeric                                           
                             )
+                  WHERE receita IS NOT NULL
     ';
     IF(stExercicio >= '2014' )THEN
         stSql := stSql || '
-                LEFT JOIN (	   SELECT SUM(valor_previsto_anterior) AS valor_previsto_anterior
-                                    , SUM(arrecadado_periodo_anterior) AS arrecadado_periodo_anterior
-                                    , SUM(arrecadado_ano_anterior) AS arrecadado_ano_anterior
-                                    , SUM(diferenca_anterior) AS diferenca_anterior
-                                    , cod_estrutural_anterior
-                                 FROM orcamento.fn_balancete_receita('|| quote_literal(stExercicioAnterior) ||'
-                                               ,''''
-                                               ,'|| quote_literal(dtInicialAnterior) ||'
-                                               ,'|| quote_literal(dtFinalAnterior) ||'
-                                               ,'|| quote_literal(stCodEntidade) ||'
-                                               ,'''','''','''','''','''','''','''')
-                                    AS exercicio_anterior(                      
-                                                            cod_estrutural_anterior      varchar,                                           
-                                                            receita_anterior             integer,                                           
-                                                            recurso_anterior             varchar,                                           
-                                                            descricao_anterior           varchar,                                           
-                                                            valor_previsto_anterior      numeric,                                           
-                                                            arrecadado_periodo_anterior  numeric,                                           
-                                                            arrecadado_ano_anterior      numeric,                                           
-                                                            diferenca_anterior           numeric                                           
-                                                         )
-                              GROUP BY exercicio_anterior.cod_estrutural_anterior
-                          ) as exercicio_anterior
-                    ON(retorno.cod_estrutural = exercicio_anterior.cod_estrutural_anterior)
-                
+                UNION
+
+                    SELECT 
+                        CASE
+                            WHEN recurso_anterior like ''0001'' AND cod_estrutural_anterior NOT like ''9%''
+                            THEN ''recurso_livre''
+                            WHEN (recurso_anterior IS NULL OR recurso_anterior NOT LIKE ''0001'') AND (cod_estrutural_anterior like ''1%'' OR cod_estrutural_anterior like ''2%'' OR cod_estrutural_anterior like ''7%'')
+                            THEN ''recurso_vinculado''
+                            WHEN recurso_anterior like ''0001'' AND cod_estrutural_anterior like ''9%''
+                            THEN ''deducoes_recurso_livre''
+                            WHEN (recurso_anterior IS NULL OR recurso_anterior NOT LIKE ''0001'') AND cod_estrutural_anterior like ''9%''
+                            THEN ''deducoes_recurso_vinculado''
+                            WHEN cod_estrutural_anterior like ''9%'' AND recurso_anterior IS NOT NULL
+                            THEN ''redutoras_receita_orcamentaria''
+                            WHEN (cod_estrutural_anterior like ''1%'' OR cod_estrutural_anterior like ''2%'' OR cod_estrutural_anterior like ''7%'') AND recurso_anterior IS NOT NULL
+                            THEN ''receita_orcamentaria''
+                    END as descricao
+                    ,recurso_anterior AS recurso
+                    ,0.00 AS arrecadado_periodo
+                    ,COALESCE(arrecadado_periodo_anterior, 0.00) AS arrecadado_periodo_anterior      
+                    FROM orcamento.fn_balancete_receita('|| quote_literal(stExercicioAnterior) ||'
+                                                        ,''''
+                                                        ,'|| quote_literal(dtInicialAnterior) ||'
+                                                        ,'|| quote_literal(dtFinalAnterior) ||'
+                                                        ,'|| quote_literal(stCodEntidade) ||'
+                                                        ,'''','''','''','''','''','''','''')
+                    AS exercicio_anterior(                      
+                            cod_estrutural_anterior      varchar,                                           
+                            receita_anterior             integer,                                           
+                            recurso_anterior             varchar,                                           
+                            descricao_anterior           varchar,                                           
+                            valor_previsto_anterior      numeric,                                           
+                            arrecadado_periodo_anterior  numeric,                                           
+                            arrecadado_ano_anterior      numeric,                                           
+                            diferenca_anterior          numeric                                           
+                            )
+                  WHERE receita_anterior IS NOT NULL
             ';
     END IF;
     stSql := stSql || '
@@ -372,17 +384,27 @@ EXECUTE stSql;
 
     IF (stTipoDespesa = 'E') THEN
     --INSERT para colocar inscricao_restos_pagar_processados e inscricao_restos_pagar_nao_processados
-        INSERT INTO tmp_calculo_despesas(classificacao,valor) VALUES('inscricao_restos_pagar_processados'
+        INSERT INTO tmp_calculo_despesas(classificacao,valor,valor_anterior) VALUES('inscricao_restos_pagar_processados'
                                                                     , (SELECT 
                                                                             ( 
                                                                             SUM(liquidado_ano) - SUM(pago_ano) 
                                                                             )
                                                                         FROM tmp_calculo_despesas)
+                                                                    , (SELECT 
+                                                                            ( 
+                                                                            SUM(liquidado_ano_anterior) - SUM(pago_ano_anterior) 
+                                                                            )
+                                                                        FROM tmp_calculo_despesas)
                                                                     );
-        INSERT INTO tmp_calculo_despesas(classificacao,valor) VALUES('inscricao_restos_pagar_nao_processados'
+        INSERT INTO tmp_calculo_despesas(classificacao,valor,valor_anterior) VALUES('inscricao_restos_pagar_nao_processados'
                                                                     , (SELECT 
                                                                             ( 
                                                                             (SUM(empenhado_ano) - SUM(anulado_ano)) - SUM(liquidado_ano)
+                                                                            )
+                                                                        FROM tmp_calculo_despesas)
+                                                                    , (SELECT 
+                                                                            ( 
+                                                                            (SUM(empenhado_ano_anterior) - SUM(anulado_ano_anterior)) - SUM(liquidado_ano_anterior)
                                                                             )
                                                                         FROM tmp_calculo_despesas)
                                                                     );
@@ -423,7 +445,7 @@ EXECUTE stSql;
                     ,SUM(valor) as valor
     ';
     IF (stExercicio::integer >= 2014) THEN
-        stSql := stSql || ',SUM(valor_anterior) as valor_anterior';
+        stSql := stSql || ',SUM(COALESCE(valor_anterior, 0.00)) as valor_anterior';
     END IF;
     stSql := stSql || '
                 FROM tmp_calculo_despesas
@@ -447,7 +469,7 @@ EXECUTE stSql;
                         SELECT 
                         CASE';
                         IF (stExercicio::integer >= 2014) THEN
-                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' AND nivel IN (4)';
+                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' ';
                         ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
                         END IF;
                             stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados''';
@@ -497,31 +519,57 @@ EXECUTE stSql;
                         ,0.00 AS vl_saldo_atual_anterior
                         ,0.00 AS vl_saldo_inicial_anterior
                         ,cod_estrutural 
-                        FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||'
+                        FROM ( SELECT *
+                                 FROM contabilidade.fn_rl_balancete_verificacao_transferencias('|| quote_literal(stExercicio) ||'
                                                                             ,''cod_entidade IN  ('|| stCodEntidade ||') ''
                                                                             ,'|| quote_literal(dtInicial) ||'
                                                                             ,'|| quote_literal(dtFinal) ||'
                                                                             ,''A''::CHAR)
-                                    as retorno
-                                    ( cod_estrutural varchar                                                    
-                                                ,nivel integer                                                               
-                                                ,nom_conta varchar                                                           
-                                                ,cod_sistema integer                                                         
-                                                ,indicador_superavit char(12)                                                    
-                                                ,vl_saldo_anterior numeric                                                   
-                                                ,vl_saldo_debitos  numeric                                                   
-                                                ,vl_saldo_creditos numeric                                                   
-                                                ,vl_saldo_atual    numeric                                                   
-                                                )
-                            GROUP BY descricao
-                                   , cod_estrutural 
+                                      AS retorno
+                                      ( cod_estrutural varchar                                                    
+                                       ,nivel integer                                                               
+                                       ,nom_conta varchar                                                           
+                                       ,cod_sistema integer                                                         
+                                       ,indicador_superavit char(12)                                                    
+                                       ,vl_saldo_anterior numeric                                                   
+                                       ,vl_saldo_debitos  numeric                                                   
+                                       ,vl_saldo_creditos numeric                                                   
+                                       ,vl_saldo_atual    numeric                                                   
+                                      )
+                                WHERE cod_estrutural SIMILAR TO ''4.5.1.1.0%|3.5.1.1.0%|4.5.1.2.0%|3.5.1.2.0%|4.5.1.3.0%|3.5.1.3%''
+                                UNION
+                               SELECT retorno.*
+                                 FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicio) ||'
+                                                                            ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                            ,'|| quote_literal(dtInicial) ||'
+                                                                            ,'|| quote_literal(dtFinal) ||'
+                                                                            ,''A''::CHAR)
+                                      AS retorno
+                                      ( cod_estrutural varchar                                                    
+                                       ,nivel integer                                                               
+                                       ,nom_conta varchar                                                           
+                                       ,cod_sistema integer                                                         
+                                       ,indicador_superavit char(12)                                                    
+                                       ,vl_saldo_anterior numeric                                                   
+                                       ,vl_saldo_debitos  numeric                                                   
+                                       ,vl_saldo_creditos numeric                                                   
+                                       ,vl_saldo_atual    numeric                                                   
+                                      )
+                                 JOIN contabilidade.plano_conta
+                                   ON plano_conta.exercicio = '|| quote_literal(stExercicio) ||'
+                                  AND plano_conta.cod_estrutural = retorno.cod_estrutural
+                                  AND plano_conta.escrituracao ilike ''anali%''
+                                WHERE retorno.cod_estrutural NOT SIMILAR TO ''4.5.1.1.0%|3.5.1.1.0%|4.5.1.2.0%|3.5.1.2.0%|4.5.1.3.0%|3.5.1.3%''
+                             ) AS retorno
+                    GROUP BY descricao
+                           , cod_estrutural 
                      
                      UNION ALL
                      
                         SELECT 
                         CASE';
                         IF (stExercicio::integer >= 2014) THEN
-                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' AND nivel IN (4)';
+                            stSql := stSql || ' WHEN cod_estrutural         like ''2.1.8%'' ';
                         ELSE stSql := stSql || ' WHEN cod_estrutural         like ''1.1.3%'' AND indicador_superavit = ''financeiro''';
                         END IF;
                             stSql := stSql || ' THEN ''depositos_restituiveis_valores_vinculados''';
@@ -571,29 +619,51 @@ EXECUTE stSql;
                         ,(sum(vl_saldo_atual)) AS vl_saldo_atual_anterior
                         ,(sum(vl_saldo_anterior)) AS vl_saldo_inicial_anterior
                         ,cod_estrutural 
-                        FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicioAnterior) ||'
+                        FROM ( SELECT *
+                                 FROM contabilidade.fn_rl_balancete_verificacao_transferencias('|| quote_literal(stExercicioAnterior) ||'
                                                                             ,''cod_entidade IN  ('|| stCodEntidade ||') ''
                                                                             ,'|| quote_literal(dtInicialAnterior) ||'
                                                                             ,'|| quote_literal(dtFinalAnterior) ||'
                                                                             ,''A''::CHAR)
-                                    as retorno
-                                    ( cod_estrutural varchar                                                    
-                                                ,nivel integer                                                               
-                                                ,nom_conta varchar                                                           
-                                                ,cod_sistema integer                                                         
-                                                ,indicador_superavit char(12)                                                    
-                                                ,vl_saldo_anterior numeric                                                   
-                                                ,vl_saldo_debitos  numeric                                                   
-                                                ,vl_saldo_creditos numeric                                                   
-                                                ,vl_saldo_atual    numeric                                                   
-                                                )
-                            GROUP BY descricao
-                                   , cod_estrutural 
+                                      AS retorno
+                                      ( cod_estrutural varchar                                                    
+                                       ,nivel integer                                                               
+                                       ,nom_conta varchar                                                           
+                                       ,cod_sistema integer                                                         
+                                       ,indicador_superavit char(12)                                                    
+                                       ,vl_saldo_anterior numeric                                                   
+                                       ,vl_saldo_debitos  numeric                                                   
+                                       ,vl_saldo_creditos numeric                                                   
+                                       ,vl_saldo_atual    numeric                                                   
+                                      )
+                                WHERE cod_estrutural SIMILAR TO ''4.5.1.1.0%|3.5.1.1.0%|4.5.1.2.0%|3.5.1.2.0%|4.5.1.3.0%|3.5.1.3%''
+                                UNION
+                               SELECT retorno.*
+                                 FROM contabilidade.fn_rl_balancete_verificacao('|| quote_literal(stExercicioAnterior) ||'
+                                                                            ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                            ,'|| quote_literal(dtInicialAnterior) ||'
+                                                                            ,'|| quote_literal(dtFinalAnterior) ||'
+                                                                            ,''A''::CHAR)
+                                      AS retorno
+                                      ( cod_estrutural varchar                                                    
+                                       ,nivel integer                                                               
+                                       ,nom_conta varchar                                                           
+                                       ,cod_sistema integer                                                         
+                                       ,indicador_superavit char(12)                                                    
+                                       ,vl_saldo_anterior numeric                                                   
+                                       ,vl_saldo_debitos  numeric                                                   
+                                       ,vl_saldo_creditos numeric                                                   
+                                       ,vl_saldo_atual    numeric                                                   
+                                      )
+                                 JOIN contabilidade.plano_conta
+                                   ON plano_conta.exercicio = '|| quote_literal(stExercicio) ||'
+                                  AND plano_conta.cod_estrutural = retorno.cod_estrutural
+                                  AND plano_conta.escrituracao ilike ''anali%''
+                                WHERE retorno.cod_estrutural NOT SIMILAR TO ''4.5.1.1.0%|3.5.1.1.0%|4.5.1.2.0%|3.5.1.2.0%|4.5.1.3.0%|3.5.1.3%''
+                             ) AS retorno
+                    GROUP BY descricao
+                           , cod_estrutural
                        ) AS fluxo_caixa_saldo
-                  JOIN contabilidade.plano_conta
-                    on plano_conta.exercicio = '|| quote_literal(stExercicio) ||'
-                   and plano_conta.cod_estrutural = fluxo_caixa_saldo.cod_estrutural
-                   and escrituracao ilike ''anali%''
                  WHERE descricao IS NOT NULL
               GROUP BY descricao    
     ';
@@ -604,18 +674,6 @@ EXECUTE stSql;
 
 stSql := 'SELECT 
             CASE
-		WHEN cod_estrutural          like ''4.5.1.1.0%''
-                    THEN ''transferencias_recebidas_orcamentaria''
-                WHEN cod_estrutural          like ''3.5.1.1.0%''
-                    THEN ''tranferencias_concedidas_orcamentaria''
-                WHEN cod_estrutural          like ''4.5.1.2.0%''                        
-                    THEN ''transferencias_recebidas_independentes_orcamentaria''
-                WHEN cod_estrutural          like ''3.5.1.2.0%''                        
-                    THEN ''transferencias_concedidas_independentes_orcamentaria''
-                WHEN cod_estrutural          like ''4.5.1.3.0%''
-                    THEN ''transferencias_recebidas_cobertura''
-                WHEN cod_estrutural          like ''3.5.1.3%''
-                    THEN ''transferencias_concedidas_cobertura''
                 WHEN cod_estrutural          like ''6.3.2.2.0%''
                     THEN ''pagamento_restos_pagar_processados''
                 WHEN cod_estrutural          like ''6.3.1.4.0%''
@@ -625,24 +683,54 @@ stSql := 'SELECT
             ,ABS(sum(vl_saldo_debitos)) as vl_saldo_debitos
             ,ABS(sum(vl_saldo_creditos)) as vl_saldo_creditos
             ,ABS(sum(vl_saldo_atual)) as vl_saldo_atual
-            FROM contabilidade.fn_rl_balancete_verificacao_transferencias('|| quote_literal(stExercicio) ||'
-                                                                ,''cod_entidade IN  ('|| stCodEntidade ||') ''
-                                                                ,'|| quote_literal(dtInicial) ||'
-                                                                ,'|| quote_literal(dtFinal) ||'
-                                                                ,''A''::CHAR)
-                        as retorno
-                        ( cod_estrutural varchar                                                    
-                                    ,nivel integer                                                               
-                                    ,nom_conta varchar                                                           
-                                    ,cod_sistema integer                                                         
-                                    ,indicador_superavit char(12)                                                    
-                                    ,vl_saldo_anterior numeric                                                   
-                                    ,vl_saldo_debitos  numeric                                                   
-                                    ,vl_saldo_creditos numeric                                                   
-                                    ,vl_saldo_atual    numeric                                                   
-                                    )
-            WHERE cod_estrutural SIMILAR TO ''4.5.1.1.0%|3.5.1.1.0%|4.5.1.2.0%|3.5.1.2.0%|4.5.1.3.0%|3.5.1.3%|6.3.2.2.0%|6.3.1.4.0%''
-                GROUP BY descricao
+            FROM ( SELECT cod_estrutural
+                        , 0.00 AS vl_saldo_anterior
+                        , vl_saldo_debitos
+                        , vl_saldo_creditos
+                        , vl_saldo_atual
+                     FROM contabilidade.fn_rl_balancete_verificacao_transferencias('|| quote_literal(stExercicio) ||'
+                                                                                  ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                                  ,'|| quote_literal(dtInicial) ||'
+                                                                                  ,'|| quote_literal(dtFinal) ||'
+                                                                                  ,''A''::CHAR)
+                          AS retorno
+                           ( cod_estrutural varchar                                                    
+                           , nivel integer                                                               
+                           , nom_conta varchar                                                           
+                           , cod_sistema integer                                                         
+                           , indicador_superavit char(12)                                                    
+                           , vl_saldo_anterior numeric                                                   
+                           , vl_saldo_debitos  numeric                                                   
+                           , vl_saldo_creditos numeric                                                   
+                           , vl_saldo_atual    numeric                                                   
+                           )
+
+                    UNION
+
+                   SELECT cod_estrutural
+                        , vl_saldo_atual AS vl_saldo_anterior
+                        , 0.00 AS vl_saldo_debitos
+                        , 0.00 AS vl_saldo_creditos
+                        , 0.00 AS vl_saldo_atual
+                     FROM contabilidade.fn_rl_balancete_verificacao_transferencias('|| quote_literal(stExercicioAnterior) ||'
+                                                                                  ,''cod_entidade IN  ('|| stCodEntidade ||') ''
+                                                                                  ,'|| quote_literal(dtInicialAnterior) ||'
+                                                                                  ,'|| quote_literal(dtFinalAnterior) ||'
+                                                                                  ,''A''::CHAR)
+                          AS retorno
+                           ( cod_estrutural varchar                                                    
+                           , nivel integer                                                               
+                           , nom_conta varchar                                                           
+                           , cod_sistema integer                                                         
+                           , indicador_superavit char(12)                                                    
+                           , vl_saldo_anterior numeric                                                   
+                           , vl_saldo_debitos  numeric                                                   
+                           , vl_saldo_creditos numeric                                                   
+                           , vl_saldo_atual    numeric                                                   
+                           )
+                 ) AS retorno
+           WHERE cod_estrutural SIMILAR TO ''6.3.2.2.0%|6.3.1.4.0%''
+        GROUP BY descricao
     ';
 
 FOR reRegistroAux IN EXECUTE stSql
@@ -732,21 +820,6 @@ ELSE
             ';
     EXECUTE stSql;
 END IF;
-
---UPDATE para ajustar valores de acordo com a regra de negocio
-    --Somando a Movimentacao dos restos a pagar
-    UPDATE resultado_financeiro
-        SET valor = (SELECT CASE WHEN (valor_debito - valor_credito) < 0.00 THEN (valor_debito - valor_credito) * -1
-                                 ELSE (valor_debito - valor_credito)
-                            END AS valor 
-                       FROM resultado_financeiro 
-                      WHERE descricao = 'pagamento_restos_pagar_processados')
-           ,valor_anterior  = (SELECT CASE WHEN (ABS(valor_debito_anterior) - ABS(valor_credito_anterior)) < 0.00 THEN (ABS(valor_debito_anterior) - ABS(valor_credito_anterior)) * -1
-                                 ELSE (ABS(valor_debito_anterior) - ABS(valor_credito_anterior))
-                            END AS valor_anterior 
-                       FROM resultado_financeiro 
-                      WHERE descricao = 'pagamento_restos_pagar_processados')
-    WHERE descricao = 'pagamento_restos_pagar_processados';
 
 --CRIANDO TABELA PARA RESULTADO DO RELATORIO 
     stSql := 'CREATE TEMPORARY TABLE relatorio_financeiro
@@ -921,13 +994,13 @@ END IF;
 --UPDATE para inserir os valores de acordo com a regra de negocio.
     --Passando valor para o valor_anterior para ficar de acordo com a regra da conta
     UPDATE relatorio_financeiro
-    SET valor_ingresso = COALESCE((SELECT valor_credito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
-        ,valor_ingresso_anterior = COALESCE((SELECT valor_credito_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_ingresso = COALESCE((SELECT ABS(valor_credito) FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+        ,valor_ingresso_anterior = COALESCE((SELECT ABS(valor_credito_anterior) FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
     WHERE ordem = 20;
     
     UPDATE relatorio_financeiro
-    SET valor_dispendios = COALESCE((SELECT valor_debito FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
-        ,valor_dispendios_anterior = COALESCE((SELECT valor_debito_anterior FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+    SET valor_dispendios = COALESCE((SELECT ABS(valor_debito) FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
+        ,valor_dispendios_anterior = COALESCE((SELECT ABS(valor_debito_anterior) FROM resultado_financeiro WHERE descricao = 'depositos_restituiveis_valores_vinculados'),0.00)
     WHERE ordem = 20;
     
     UPDATE relatorio_financeiro
@@ -962,7 +1035,37 @@ END IF;
              , valor_dispendios_anterior = COALESCE((SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'valores_restituiveis'),0.00)
          WHERE ordem = 21;
     END IF;
-    
+
+    UPDATE relatorio_financeiro
+    SET valor_ingresso          = COALESCE((SELECT ABS(valor_ingresso) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_orcamentaria'),0.00)
+      , valor_ingresso_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_orcamentaria'),0.00)
+    WHERE ordem = 12;
+
+    UPDATE relatorio_financeiro
+    SET valor_ingresso          = COALESCE((SELECT ABS(valor_ingresso) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_independentes_orcamentaria'),0.00)
+      , valor_ingresso_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_independentes_orcamentaria'),0.00)
+    WHERE ordem = 13;
+
+    UPDATE relatorio_financeiro
+    SET valor_ingresso          = COALESCE((SELECT ABS(valor_ingresso) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_cobertura'),0.00)
+      , valor_ingresso_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'transferencias_recebidas_cobertura'),0.00)
+    WHERE ordem = 14;
+
+    UPDATE relatorio_financeiro
+    SET valor_dispendios          = COALESCE((SELECT ABS(valor_dispendios) FROM resultado_financeiro WHERE descricao = 'tranferencias_concedidas_orcamentaria'),0.00)
+      , valor_dispendios_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'tranferencias_concedidas_orcamentaria'),0.00)
+    WHERE ordem = 12;
+
+    UPDATE relatorio_financeiro
+    SET valor_dispendios          = COALESCE((SELECT ABS(valor_dispendios) FROM resultado_financeiro WHERE descricao = 'transferencias_concedidas_independentes_orcamentaria'),0.00)
+      , valor_dispendios_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'transferencias_concedidas_independentes_orcamentaria'),0.00)
+    WHERE ordem = 13;
+
+    UPDATE relatorio_financeiro
+    SET valor_dispendios          = COALESCE((SELECT ABS(valor_dispendios) FROM resultado_financeiro WHERE descricao = 'transferencias_concedidas_cobertura'),0.00)
+      , valor_dispendios_anterior = COALESCE((SELECT ABS(valor_atual_anterior) FROM resultado_financeiro WHERE descricao = 'transferencias_concedidas_cobertura'),0.00)
+    WHERE ordem = 14;
+
     UPDATE relatorio_financeiro
     SET valor_ingresso = (SELECT valor_anterior FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
       , valor_ingresso_anterior = (SELECT valor_inicial_anterior FROM resultado_financeiro WHERE descricao = 'caixa_equivalentes')
@@ -997,7 +1100,7 @@ END IF;
     totalI  := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
     totalII := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
     totalIII:= (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(ABS(valor_ingresso)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
+    totalIV := (SELECT SUM(valor_ingresso)      as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
 
     UPDATE relatorio_financeiro
@@ -1008,7 +1111,7 @@ END IF;
     totalI  := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
     totalII := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
     totalIII:= (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(ABS(valor_ingresso_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
+    totalIV := (SELECT SUM(valor_ingresso_anterior)      as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro
@@ -1019,7 +1122,7 @@ END IF;
     totalI  := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
     totalII := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
     totalIII:= (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(ABS(valor_dispendios)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
+    totalIV := (SELECT SUM(valor_dispendios)      as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro
@@ -1030,7 +1133,7 @@ END IF;
     totalI  := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (0));
     totalII := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (12,13,14));
     totalIII:= (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (18,19,20,21));
-    totalIV := (SELECT SUM(ABS(valor_dispendios_anterior)) as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
+    totalIV := (SELECT SUM(valor_dispendios_anterior)      as valor_ingresso FROM relatorio_financeiro where ordem in (24,25));
     totalV  := totalI + totalII + totalIII + totalIV;
     
     UPDATE relatorio_financeiro

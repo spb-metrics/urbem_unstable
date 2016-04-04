@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Roberto Pawelski Rodrigues
 
-    $Id: ROrcamentoConfiguracao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: ROrcamentoConfiguracao.class.php 64548 2016-03-11 18:28:10Z evandro $
 
     * Casos de uso: uc-02.01.01
 */
@@ -227,6 +227,14 @@ var $stTipoNivel;
     * @access Public
     * @param Object $valor
 */
+var $inPorcentagemLimiteSuplementacaoDecreto;
+
+var $stSuplementacaoRigidaRecurso;
+
+function setLimiteSuplementacaoDecreto($valor) { $this->inPorcentagemLimiteSuplementacaoDecreto = $valor; }
+
+function setSuplementacaoRigidaRecurso($valor) { $this->stSuplementacaoRigidaRecurso = $valor; }
+
 function setCodModulo($valor) { $this->inCodModulo                       = $valor; }
 /**
     * @access Public
@@ -543,6 +551,10 @@ function getTipoReceita() { return $this->inCodTipoReceita;                }
     * Método Construtor
     * @access Private
 */
+function getLimiteSuplementacaoDecreto() { return $this->inPorcentagemLimiteSuplementacaoDecreto; }
+
+function getSuplementacaoRigidaRecurso() { return $this->stSuplementacaoRigidaRecurso; }
+
 function ROrcamentoConfiguracao()
 {
     $this->setExercicio   ( Sessao::getExercicio() );
@@ -821,6 +833,30 @@ function salvaConfiguracao($boTransacao = "")
         }
     }
 
+    if ( $this->getLimiteSuplementacaoDecreto() and !$obErro->ocorreu() ) {
+        $obTAdministracaoConfiguracao->setDado("parametro", "limite_suplementacao_decreto" );
+        $obTAdministracaoConfiguracao->recuperaPorChave($recordSet);
+        $obTAdministracaoConfiguracao->setDado( "valor", $this->getLimiteSuplementacaoDecreto() );
+        if ($recordSet->getNumLinhas() > 0) {
+            $obErro = $obTAdministracaoConfiguracao->alteracao( $boTransacao );
+        } else {
+            $obErro = $obTAdministracaoConfiguracao->inclusao( $boTransacao );
+        }
+    }
+
+    if ( Sessao::getExercicio() > 2015 && SistemaLegado::isTCEMG($boTransacao) ) {
+        if ( $this->getLimiteSuplementacaoDecreto() and !$obErro->ocorreu() ) {
+            $obTAdministracaoConfiguracao->setDado("parametro", "suplementacao_rigida_recurso" );
+            $obTAdministracaoConfiguracao->recuperaPorChave($recordSet);
+            $obTAdministracaoConfiguracao->setDado( "valor", $this->getSuplementacaoRigidaRecurso() );
+            if ($recordSet->getNumLinhas() > 0) {
+                $obErro = $obTAdministracaoConfiguracao->alteracao( $boTransacao );
+            } else {
+                $obErro = $obTAdministracaoConfiguracao->inclusao( $boTransacao );
+            }
+        }
+    }
+
     if ($boFlagTransacao) {
         if ( !$obErro->ocorreu() ) {
             $obErro = $obTransacao->commitAndClose();
@@ -852,9 +888,51 @@ function consultarConfiguracao($boTransacao = "")
 
     if ( !$obErro->ocorreu() ) {
         if (Sessao::getExercicio() < '2014') {
-            $arParametro = array( "cod_entidade_consorcio", "cod_entidade_prefeitura", "cod_entidade_camara", "cod_entidade_rpps", "forma_execucao_orcamento", "pao_posicao_digito_id", "pao_digitos_id_atividade", "pao_digitos_id_oper_especiais", "masc_rubrica_despesa", "masc_despesa", "masc_classificacao_receita", "unidade_medida_metas", "pao_digitos_id_projeto", "pao_digitos_id_nao_orcamentarios" , "masc_recurso", "masc_recurso_destinacao", "recurso_destinacao", "cod_contador", "cod_tec_contabil", "masc_class_despesa" );
+            $arParametro = array( "cod_entidade_consorcio"
+                                , "cod_entidade_prefeitura"
+                                , "cod_entidade_camara"
+                                , "cod_entidade_rpps"
+                                , "forma_execucao_orcamento"
+                                , "pao_posicao_digito_id"
+                                , "pao_digitos_id_atividade"
+                                , "pao_digitos_id_oper_especiais"
+                                , "masc_rubrica_despesa"
+                                , "masc_despesa"
+                                , "masc_classificacao_receita"
+                                , "unidade_medida_metas"
+                                , "pao_digitos_id_projeto"
+                                , "pao_digitos_id_nao_orcamentarios"
+                                , "masc_recurso"
+                                , "masc_recurso_destinacao"
+                                , "recurso_destinacao"
+                                , "cod_contador"
+                                , "cod_tec_contabil"
+                                , "masc_class_despesa" );
         } else {
-            $arParametro = array( "cod_entidade_consorcio", "cod_entidade_prefeitura", "cod_entidade_camara", "cod_entidade_rpps", "forma_execucao_orcamento", "pao_posicao_digito_id", "pao_digitos_id_atividade", "pao_digitos_id_oper_especiais", "masc_rubrica_despesa", "masc_despesa", "masc_classificacao_receita", "unidade_medida_metas", "unidade_medida_metas_receita", "unidade_medida_metas_despesa", "pao_digitos_id_projeto", "pao_digitos_id_nao_orcamentarios" , "masc_recurso", "masc_recurso_destinacao", "recurso_destinacao", "cod_contador", "cod_tec_contabil", "masc_class_despesa" );
+            $arParametro = array( "cod_entidade_consorcio"
+                                , "cod_entidade_prefeitura"
+                                , "cod_entidade_camara"
+                                , "cod_entidade_rpps"
+                                , "forma_execucao_orcamento"
+                                , "pao_posicao_digito_id"
+                                , "pao_digitos_id_atividade"
+                                , "pao_digitos_id_oper_especiais"
+                                , "masc_rubrica_despesa"
+                                , "masc_despesa"
+                                , "masc_classificacao_receita"
+                                , "unidade_medida_metas"
+                                , "unidade_medida_metas_receita"
+                                , "unidade_medida_metas_despesa"
+                                , "pao_digitos_id_projeto"
+                                , "pao_digitos_id_nao_orcamentarios"
+                                , "masc_recurso"
+                                , "masc_recurso_destinacao"
+                                , "recurso_destinacao"
+                                , "cod_contador"
+                                , "cod_tec_contabil"
+                                , "masc_class_despesa"
+                                , 'limite_suplementacao_decreto'
+                                , 'suplementacao_rigida_recurso' );
         }
         foreach ($arParametro as $stParametro) {
             $stFiltro = " WHERE COD_MODULO = ".$this->getCodModulo()." AND parametro = '".$stParametro."' AND exercicio = '".$this->getExercicio()."'";
@@ -905,6 +983,9 @@ function consultarConfiguracao($boTransacao = "")
         $this->setDestinacaoRecurso                 ( $arParametroConfiguracao["recurso_destinacao"]            );
         $this->setCodContador                       ( $arParametroConfiguracao["cod_contador"]                  );
         $this->setCodTecContabil                    ( $arParametroConfiguracao["cod_tec_contabil"]              );
+        $this->setLimiteSuplementacaoDecreto        ( $arParametroConfiguracao["limite_suplementacao_decreto"]  );
+        $this->setSuplementacaoRigidaRecurso        ( $arParametroConfiguracao["suplementacao_rigida_recurso"]  );
+        
     }
 
     return $obErro;

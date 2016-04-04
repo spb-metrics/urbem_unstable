@@ -32,34 +32,16 @@
 
     * @ignore
 
-    $Revision: 31583 $
-    $Name$
-    $Author: lbbarreiro $
-    $Date: 2008-01-02 08:44:54 -0200 (Qua, 02 Jan 2008) $
+    $Id: FLRPCredor.php 64417 2016-02-18 18:03:51Z michel $
 
     * Casos de uso : uc-02.03.10
 */
 
-/*
-$Log$
-Revision 1.12  2007/02/27 18:22:28  luciano
-#8512#
-
-Revision 1.11  2006/08/09 18:11:14  jose.eduardo
-Bug #6737#
-
-Revision 1.10  2006/07/17 17:36:34  andre.almeida
-Bug #6200#
-
-Revision 1.9  2006/07/05 20:49:08  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php"        );
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoConfiguracao.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoConfiguracao.class.php";
 include_once 'JSRPCredor.js';
 
 $rsRecordset = $rsOrgao = $rsUnidade = $rsRecurso = new RecordSet;
@@ -81,7 +63,7 @@ while ( !$rsEntidades->eof() ) {
 $rsEntidades->setPrimeiroElemento();
 
 $obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->listar( $rsRecurso );
-//$obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->listar( $rsOrgao );
+
 while ( !$rsRecurso->eof() ) {
     $arFiltroNom['recurso'][$rsRecurso->getCampo( 'cod_recurso' )] = $rsRecurso->getCampo( 'nom_recurso' );
     $rsRecurso->proximo();
@@ -99,8 +81,8 @@ $obHdnCaminho->setName("stCaminho");
 $obHdnCaminho->setValue( CAM_GF_EMP_INSTANCIAS."relatorio/OCEmpenhoRPCredor.php" );
 
 $obHdnModulo = new Hidden;
-$obHdnModulo->setName ( "inCodModulo"        );
-$obHdnModulo->setValue( $_REQUEST['modulo']  );
+$obHdnModulo->setName ( "inCodModulo" );
+$obHdnModulo->setValue( $request->get('modulo') );
 
 //Define o objeto SelectMultiplo para armazenar os ELEMENTOS
 $obCmbEntidades = new SelectMultiplo();
@@ -138,7 +120,7 @@ $obCmbEntidades->SetRecord2    ( $rsRecordset );
 $obCmbExercicio = new Select;
 $obCmbExercicio->setRotulo              ( "Exercício"                   );
 $obCmbExercicio->setName                ( "inExercicio"                 );
-$obCmbExercicio->setTitle               ( "Informeo exercício para o filtro." );
+$obCmbExercicio->setTitle               ( "Informe o exercício para o filtro." );
 $obCmbExercicio->setValue               ( $inExercicio                  );
 $obCmbExercicio->setStyle               ( "width: 200px"                );
 $obCmbExercicio->setCampoID             ( "exercicio"                   );
@@ -182,7 +164,7 @@ $obSpan->setId( "spnOrgaoUnidade" );
 
 //ELEMENTO DESPESA
 $stMascaraRubrica    = $obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->recuperaMascara();
-//$size =  strlen($stMascaraRubrica) + 10;
+
 $obTxtCodElementoDespesa = new BuscaInner;
 $obTxtCodElementoDespesa->setRotulo               ( "Elemento de Despesa" );
 $obTxtCodElementoDespesa->setTitle                ( "Informe o elemento de despesa para filtro" );
@@ -276,7 +258,8 @@ $obIMontaRecursoDestinacao->geraFormulario ( $obFormulario );
 $obFormulario->addComponente( $obBscFornecedor );
 $obFormulario->addComponente( $obTxtCodFuncao                         );
 $obFormulario->addComponente( $obTxtCodSubFuncao                      );
-$obFormulario->addComponenteComposto( $obTxtOrdenacao, $obCmbOrdenacao);
+if(Sessao::getExercicio() < 2016)
+    $obFormulario->addComponenteComposto( $obTxtOrdenacao, $obCmbOrdenacao);
 
 // Injeção de código no formulário
 $obMontaAssinaturas->geraFormulario( $obFormulario );

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterLiquidacao.php 63864 2015-10-27 13:26:11Z michel $
+    $Id: PRManterLiquidacao.php 64431 2016-02-22 18:00:21Z jean $
 
     $Revision: 32142 $
     $Name$
@@ -394,6 +394,21 @@ switch ($stAcao) {
             $obAdministracaoConfiguracao = new TAdministracaoConfiguracao;
             $obErro = $obAdministracaoConfiguracao->recuperaTodos($rsAdministracaoConfiguracao, " WHERE configuracao.parametro = 'seta_tipo_documento_liq_tceam' AND exercicio = '".Sessao::getExercicio()."'", "", $boTransacao);
             $boIncluirDocumento = $rsAdministracaoConfiguracao->getCampo('valor');
+
+            //se for prefeitura de Rio Grande do Sul, inclui as informações da nota fiscal
+            if ($inCodUF == 23 && !$obErro->ocorreu()) {
+                if ($_REQUEST['stIncluirNF'] == 'Sim') {
+                    include_once CAM_GPC_TCERS_MAPEAMENTO.'TTCERSNotaFiscal.class.php';
+                    $obTTCERSNotaFiscal = new TTCERSNotaFiscal;
+                    $obTTCERSNotaFiscal->setDado('cod_nota'     , $obREmpenhoNotaLiquidacao->getCodNota());
+                    $obTTCERSNotaFiscal->setDado('cod_entidade' , $request->get('inCodEntidade'));
+                    $obTTCERSNotaFiscal->setDado('exercicio'    , Sessao::getExercicio());
+                    $obTTCERSNotaFiscal->setDado('nro_nota'     , $request->get('inNumeroNF',''));
+                    $obTTCERSNotaFiscal->setDado('nro_serie'    , $request->get('inNumSerie',''));
+                    $obTTCERSNotaFiscal->setDado('data_emissao' , $request->get('dtEmissaoNF',''));
+                    $obErro = $obTTCERSNotaFiscal->inclusao( $boTransacao );
+                }
+            }
 
             //se for prefeitura do Rio Grande do Norte, inclui as informações da nota fiscal
             if ( $inCodUF == 20 && !$obErro->ocorreu() ) {

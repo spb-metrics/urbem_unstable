@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCSituacaoEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCSituacaoEmpenho.php 64470 2016-03-01 13:12:50Z jean $
 
     * Casos de uso: uc-02.03.13
 */
@@ -239,6 +239,10 @@ default:
     $obRegra->setDataInicialEstornoPagamento ($stDataInicial);
     $obRegra->setDataFinalEstornoPagamento   ($arFiltro['stDataSituacao']);
     $obRegra->setTipoEmpenho                 ($arFiltro['inCodTipoEmpenho']);
+
+    if (Sessao::getExercicio() > '2015') {
+        $obRegra->setCentroCusto             ($arFiltro['inCentroCusto']);
+    }
 
     $obRegra->obREmpenhoEmpenho->setCodEmpenhoInicial($arFiltro['inCodEmpenhoInicial']);
     $obRegra->obREmpenhoEmpenho->setCodEmpenhoFinal  ($arFiltro['inCodEmpenhoFinal']);

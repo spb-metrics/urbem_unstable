@@ -238,6 +238,12 @@ var $inLicitacaoInicial;
 */
 var $inLicitacaoFinal;
 
+/**
+    * @var Integer
+    * @access Private
+*/
+var $inCentroCusto;
+
 
 /**
     * @access Public
@@ -387,6 +393,12 @@ function setLicitacaoInicial($valor) { $this->inLicitacaoInicial = $valor; }
     * @param Integer $valor
 */
 function setLicitacaoFinal($valor) { $this->inLicitacaoFinal = $valor; }
+
+/**
+    * @access Public
+    * @param Integer $valor
+*/
+function setCentroCusto($valor) { $this->inCentroCusto = $valor; }
 
 /**
     * @access Public
@@ -926,6 +938,9 @@ function listarTodos(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
         
     if( $this->inLicitacaoFinal )
         $stFiltro .= " AND tabela.cod_licitacao <= ".$this->inLicitacaoFinal." \n";
+
+    if( $this->inCentroCusto )
+        $stFiltro .= " AND tabela.centro_custo = ".$this->inCentroCusto." \n";
     
     $obTEmpenhoAutorizacaoEmpenho->setDado( "numcgm"    , $this->obRUsuario->obRCGM->getNumCGM() );
     $obTEmpenhoAutorizacaoEmpenho->setDado( "exercicio" , $this->stExercicio );
@@ -933,10 +948,11 @@ function listarTodos(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
     $stFiltro = ($stFiltro) ? " AND " . substr($stFiltro, 4, strlen($stFiltro)) : "";
     $stOrder  = ($stOrder) ? $stOrder : "tabela.cod_entidade,tabela.cod_autorizacao";
     
-    if( $this->boEmpenhoCompraLicitacao )
+    if( $this->boEmpenhoCompraLicitacao ){
         $obErro = $obTEmpenhoAutorizacaoEmpenho->recuperaRelacionamentoTodosCompraLicitacao( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );  
-    else
+    } else {
         $obErro = $obTEmpenhoAutorizacaoEmpenho->recuperaRelacionamentoTodos( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+    }
     
     return $obErro;
 }
@@ -1163,6 +1179,9 @@ function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
         
     if( $this->inLicitacaoFinal )
         $stFiltro .= " AND tabela.cod_licitacao <= ".$this->inLicitacaoFinal." \n";
+
+    if( $this->inCentroCusto )
+        $stFiltro .= " AND tabela.centro_custo = ".$this->inCentroCusto." \n";
         
     $obTEmpenhoAutorizacaoEmpenho->setDado( "numcgm"    , $this->obRUsuario->obRCGM->getNumCGM() );
     $obTEmpenhoAutorizacaoEmpenho->setDado( "exercicio" , $this->stExercicio );
@@ -1170,10 +1189,11 @@ function listar(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
     $stFiltro = ($stFiltro) ? " AND " . substr($stFiltro, 4, strlen($stFiltro)) : "";
     $stOrder = ($stOrder) ? $stOrder : "tabela.cod_entidade,tabela.cod_autorizacao";
     
-    if( $this->boEmpenhoCompraLicitacao )
+    if( $this->boEmpenhoCompraLicitacao ){
         $obErro = $obTEmpenhoAutorizacaoEmpenho->recuperaEmpenhoCompraLicitacao( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
-    else
+    } else {
         $obErro = $obTEmpenhoAutorizacaoEmpenho->recuperaRelacionamento( $rsRecordSet, $stFiltro, $stOrder, $boTransacao );
+    }
 
     return $obErro;
 }
@@ -1279,12 +1299,13 @@ function incluir($boTransacao = "")
                     if( $this->obROrcamentoDespesa->getCodDespesa() and !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() )
                         $obErro->setDescricao( "Campo Desdobramento inválido!()" );
                 }
-
+                
                 if ( !$obErro->ocorreu() ) {
 
                     if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
 
-                        $obErro = $this->consultaSaldoAnterior( $nuSaldoAnterior , '', $boTransacao );
+                        $obErro = $this->consultaSaldoAnteriorDataEmpenho($nuSaldoAnterior, '', $boTransacao);
+
                         if ( !$obErro->ocorreu() ) {
                             if ( $nuSaldoAnterior >= $this->obROrcamentoReserva->getVlReserva() ) {
                                 $obErro = $this->checarPermissaoAutorizacao( $boTransacao );
@@ -1295,7 +1316,8 @@ function incluir($boTransacao = "")
                     }
 
                     if ( !$obErro->ocorreu() ) {
-                        $obErro = parent::incluir( $boTransacao );
+                        $obErro = parent::incluir( $boTransacao ); 
+
                         if ( !$obErro->ocorreu() ) {
                             if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
                                 $obErro = $this->getMascaraDespesaReduzida( $boTransacao );
@@ -1305,6 +1327,7 @@ function incluir($boTransacao = "")
                                     $obErro->setDescricao("A data de validade final deve ser maior ou igual ao dia de hoje!");
                                 }
                             }
+                            
                             if ( !$obErro->ocorreu() ) {
                                 $obErro = $this->buscaProximoCod($boTransacao );
                                 if ( !$obErro->ocorreu() ) {
@@ -1369,7 +1392,8 @@ function alterar($boTransacao = "")
                     $obErro = $this->getMascaraDespesaReduzida( $boTransacao );
 
                    if ( !$obErro->ocorreu() ) {
-                        $obErro = $this->consultaSaldoAnterior( $nuSaldoAnterior , '', $boTransacao );
+                        $obErro = $this->consultaSaldoAnteriorDataEmpenho($nuSaldoAnterior, '', $boTransacao);
+                        
                         if ( !$obErro->ocorreu() ) {
                             $nuNewVlReserva = str_replace('.','',$this->obROrcamentoReserva->getVlReserva());
                             $nuNewVlReserva = str_replace(',','.',$nuNewVlReserva);

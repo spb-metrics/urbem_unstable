@@ -34,24 +34,24 @@
  $Id:$
  */
 
-CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_conta_retencao(VARCHAR,INTEGER,INTEGER,INTEGER,INTEGER) RETURNS NUMERIC AS $$
+CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_conta_retencao(VARCHAR,INTEGER,INTEGER,INTEGER,INTEGER,VARCHAR) RETURNS NUMERIC AS $$
 DECLARE
     stExercicio                ALIAS FOR $1;
     inCodEmpenho               ALIAS FOR $2;
     inCodEntidade              ALIAS FOR $3;
     inMes                      ALIAS FOR $4;
     inCodConta                 ALIAS FOR $5;
+    stTipoConta                ALIAS FOR $6;
+    stSql                      VARCHAR := '';
+    reRecord                   RECORD;
     nuValor                    NUMERIC := 0.00;
 BEGIN
-
+    
+    stSql :='
     SELECT 
-        SUM(coalesce(empenho.ordem_pagamento_retencao.vl_retencao,0.00))
-          INTO nuValor
-          FROM contabilidade.plano_analitica
-                        
-    LEFT  JOIN empenho.ordem_pagamento_retencao
-            ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
-           AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio  
+        SUM(coalesce(empenho.ordem_pagamento_retencao.vl_retencao,0.00)) as valor          
+
+          FROM empenho.ordem_pagamento_retencao
                     
     INNER JOIN empenho.ordem_pagamento 
             ON ordem_pagamento.cod_ordem = ordem_pagamento_retencao.cod_ordem
@@ -77,7 +77,9 @@ BEGIN
                       , cod_entidade
                       , cod_nota
                       , max(timestamp) as timestamp
-                   FROM empenho.nota_liquidacao_paga                   
+                   FROM empenho.nota_liquidacao_paga
+                   WHERE exercicio = '''||stExercicio||'''
+                   AND cod_entidade = '||inCodEntidade||'
                GROUP BY exercicio
                       , cod_entidade
                       , cod_nota ) as max_nota_liquidacao_paga
@@ -97,19 +99,27 @@ BEGIN
             AND ordem_pagamento_anulada.cod_entidade    = ordem_pagamento.cod_entidade
             AND ordem_pagamento_anulada.cod_ordem       = ordem_pagamento.cod_ordem
     
-         WHERE plano_analitica.exercicio = stExercicio
-           AND ordem_pagamento_retencao.cod_entidade = inCodEntidade
-           AND nota_liquidacao.cod_empenho = inCodEmpenho
-           AND to_char(nota_liquidacao_paga.timestamp, 'mm')::int = inMes
-           AND plano_analitica.cod_conta = inCodConta
+         WHERE ordem_pagamento_retencao.exercicio = '''||stExercicio||'''
+           AND ordem_pagamento_retencao.cod_entidade = '||inCodEntidade||'
+           AND nota_liquidacao.cod_empenho = '||inCodEmpenho||'
+           AND to_char(nota_liquidacao_paga.timestamp, ''mm'')::int = '||inMes||'
            AND nota_liquidacao_paga_anulada.cod_nota IS NULL
-           AND ordem_pagamento_anulada.cod_ordem IS NULL;
-
-
-    IF nuValor IS NULL THEN
-        nuValor := 0.00;
+           AND ordem_pagamento_anulada.cod_ordem IS NULL';
+           
+    IF stTipoConta = 'receita' THEN
+        stSql := stSql || ' AND ordem_pagamento_retencao.cod_receita = '|| inCodConta;
+    ELSE--'plano'
+        stSql := stSql || ' AND ordem_pagamento_retencao.cod_plano = '|| inCodConta;
     END IF;
 
-    RETURN nuValor;
+    FOR reRecord IN EXECUTE stSql
+    LOOP        
+        IF reRecord.valor IS NULL THEN            
+            reRecord.valor := 0.00;
+        END IF;
+        
+        RETURN reRecord.valor;
+    END LOOP;
+
 END;
 $$ LANGUAGE 'plpgsql';

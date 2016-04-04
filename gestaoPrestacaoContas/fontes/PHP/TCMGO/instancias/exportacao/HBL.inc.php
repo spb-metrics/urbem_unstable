@@ -33,10 +33,10 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: HBL.inc.php 63215 2015-08-04 19:42:18Z franver $
-    * $Rev: 63215 $
+    * $Id: HBL.inc.php 64696 2016-03-22 18:23:17Z franver $
+    * $Rev: 64696 $
     * $Author: franver $
-    * $Date: 2015-08-04 16:42:18 -0300 (Ter, 04 Ago 2015) $
+    * $Date: 2016-03-22 15:23:17 -0300 (Ter, 22 Mar 2016) $
 
 */
 include_once CAM_GPC_TGO_MAPEAMENTO."TTCMGOHabilitacaoLicitacao.class.php";
@@ -383,7 +383,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2)
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(903);
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(901);
 
 $rsRecordSetHBL10  = null;
 $rsRecordSetHBL11  = null;

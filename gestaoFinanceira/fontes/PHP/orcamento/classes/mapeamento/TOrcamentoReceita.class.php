@@ -27,7 +27,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
 
-    $Id: TOrcamentoReceita.class.php 63518 2015-09-08 17:27:56Z franver $
+    $Id: TOrcamentoReceita.class.php 64362 2016-01-26 19:45:10Z michel $
 
     * Casos de uso: uc-02.01.06, uc-02.04.04, uc-02.01.34, uc-02.04.03
 */
@@ -1414,7 +1414,8 @@ function montaRecuperaLancamentosCreditosReceber()
                and configuracao_lancamento_receita.estorno           = false 
                      
              WHERE receita.credito_tributario = true 
-                 AND receita.cod_entidade = ".$this->getDado('cod_entidade');
+                 AND receita.cod_entidade = ".$this->getDado('cod_entidade')."
+                 AND receita.vl_original > 0 ";
              
     return $stSql;
 }

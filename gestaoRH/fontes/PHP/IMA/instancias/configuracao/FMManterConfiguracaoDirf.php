@@ -31,21 +31,20 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: FMManterConfiguracaoDirf.php 62511 2015-05-15 17:45:15Z evandro $
+    $Id: FMManterConfiguracaoDirf.php 64791 2016-04-01 12:50:22Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                        );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php"                                 );
-include_once ( CAM_GF_CONT_COMPONENTES."IPopUpEstrutural.class.php"                                      );
-include_once ( CAM_GRH_FOL_COMPONENTES."IBuscaInnerEvento.class.php"                                     );
-include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPrestador.class.php"                          );
-//include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfPlanoConta.class.php"                     );
-//include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfIrrfContaReceita.class.php"                 );
-include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfInss.class.php"                               );
-include_once ( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php"                              );
-include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php" );
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php";
+include_once CAM_GF_CONT_COMPONENTES."IPopUpEstrutural.class.php";
+include_once CAM_GRH_FOL_COMPONENTES."IBuscaInnerEvento.class.php";
+include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPrestador.class.php";
+include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfInss.class.php";
+include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php";
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
+include_once CAM_GA_CGM_COMPONENTES."IPopUpCGM.class.php";
 
 $stPrograma = "ManterConfiguracaoDirf";
 $pgFilt = "FL".$stPrograma.".php";
@@ -57,10 +56,10 @@ $pgJS   = "JS".$stPrograma.".js";
 
 $jsOnload = "montaParametrosGET('montaListaPrestadoresServico', ''); ";
 
-Sessao::write("arPrestadoresServico", array());
+Sessao::write("arPrestadoresServico"            , array());
 Sessao::write("arPrestadoresServicoRetencaoINSS", array());
 Sessao::write("arPrestadoresServicoRetencaoIRRF", array());
-Sessao::write("arPlanoSaude", array());
+Sessao::write("arPlanoSaude"                    , array());
 
 $stIdsComponentes = "";
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
@@ -68,24 +67,24 @@ $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPag
 //Define COMPONENTES DO FORMULARIO
 //**************************************************************************************************************************//
 $obHdnAcao =  new Hidden;
-$obHdnAcao->setName                             	( "stAcao"                                                              );
-$obHdnAcao->setValue                            	( $_REQUEST["stAcao"]                                                   );
+$obHdnAcao->setName( "stAcao" );
+$obHdnAcao->setValue( $request->get("stAcao") );
 
 $obHdnCtrl =  new Hidden;
-$obHdnCtrl->setName                             	( "stCtrl"                                                              );
-$obHdnCtrl->setValue                            	( $stCtrl                                                               );
+$obHdnCtrl->setName( "stCtrl" );
+$obHdnCtrl->setValue( $stCtrl );
 
 //Instancia o form
 $obForm = new Form;
-$obForm->setAction      ( $pgProc  );
-$obForm->setTarget      ( "oculto" );
+$obForm->setAction( $pgProc  );
+$obForm->setTarget( "oculto" );
 
 $rsConfiguracaoDirf = new RecordSet();
 $inTipoInscricao = 1;
-if ($_REQUEST["stAcao"] == "alterar") {
-    include_once( CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php"                           );
+if ($request->get("stAcao") == "alterar") {
+    include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php";
     $obTIMAConfiguracaoDirf = new TIMAConfiguracaoDirf();
-    $stFiltro = " AND configuracao_dirf.exercicio = '".$_REQUEST["inExercicio"]."'";
+    $stFiltro = " AND configuracao_dirf.exercicio = '".$request->get("inExercicio")."'";
     $obTIMAConfiguracaoDirf->recuperaRelacionamento($rsConfiguracaoDirf,$stFiltro);
 
     if ($rsConfiguracaoDirf->getNumLinhas() == 1) {
@@ -101,7 +100,7 @@ if ($_REQUEST["stAcao"] == "alterar") {
         $stNatureza         = $rsConfiguracaoDirf->getCampo("descricao");
         $inNatureza         = $rsConfiguracaoDirf->getCampo("cod_natureza");
 
-        include_once( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEvento.class.php');
+        include_once CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEvento.class.php';
         $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
         $obTFolhaPagamentoEvento->setDado('cod_evento', $rsConfiguracaoDirf->getCampo('cod_evento_molestia'));
         $obTFolhaPagamentoEvento->listar($rsEvento);
@@ -111,7 +110,7 @@ if ($_REQUEST["stAcao"] == "alterar") {
         $inExercicio = "";
     }
 
-    $stFiltro = " WHERE configuracao_dirf_prestador.exercicio = '".$_REQUEST["inExercicio"]."'";
+    $stFiltro = " WHERE configuracao_dirf_prestador.exercicio = '".$request->get("inExercicio")."'";
     $obTIMAConfiguracaoDirfPrestador = new TIMAConfiguracaoDirfPrestador();
     $obTIMAConfiguracaoDirfPrestador->recuperaRelacionamento($rsConfiguracaoDirfPrestador, $stFiltro);
 
@@ -134,7 +133,7 @@ if ($_REQUEST["stAcao"] == "alterar") {
     }
     Sessao::write("arPrestadoresServico", $arElementos);
 
-    $stFiltro = " WHERE configuracao_dirf_plano.exercicio = '".$_REQUEST['inExercicio']."'";
+    $stFiltro = " WHERE configuracao_dirf_plano.exercicio = '".$request->get('inExercicio')."'";
     $obTIMAConfiguracaoDirfPlano = new TIMAConfiguracaoDirfPlano();
     $obTIMAConfiguracaoDirfPlano->recuperaRelacionamento($rsConfiguracaoDirfPlano, $stFiltro);
     Sessao::remove("arPlanoSaude");
@@ -153,7 +152,7 @@ if ($_REQUEST["stAcao"] == "alterar") {
     Sessao::write("arPlanoSaude", $arElementosPlano);
     
     $obTIMAConfiguracaoDirfIrrf = new TIMAConfiguracaoDirf();
-    $obTIMAConfiguracaoDirfIrrf->setDado('exercicio', $_REQUEST["inExercicio"]);
+    $obTIMAConfiguracaoDirfIrrf->setDado('exercicio', $request->get("inExercicio"));
     $obTIMAConfiguracaoDirfIrrf->recuperaDadosIRRF($rsConfiguracaoDirfIrrf, "","",$boTransacao);    
 
     Sessao::remove("arPrestadoresServicoRetencaoIRRF");
@@ -171,14 +170,13 @@ if ($_REQUEST["stAcao"] == "alterar") {
     }
     Sessao::write("arPrestadoresServicoRetencaoIRRF",$arIRRF);
 
-    $stFiltro = " WHERE configuracao_dirf_inss.exercicio = '".$_REQUEST["inExercicio"]."'";
+    $stFiltro = " WHERE configuracao_dirf_inss.exercicio = '".$request->get("inExercicio")."'";
     $obTIMAConfiguracaoDirfInss = new TIMAConfiguracaoDirfInss();
     $obTIMAConfiguracaoDirfInss->recuperaRelacionamento($rsConfiguracaoDirfInss, $stFiltro);
-    
+
     Sessao::remove("arPrestadoresServicoRetencaoINSS");
     $arINSS = array();
     while ( !$rsConfiguracaoDirfInss->eof() ) {
-        
         $arTMP = array();
         $arTMP['inId']          = count($arINSS) + 1;
         $arTMP['classificacao'] = $rsConfiguracaoDirfInss->getCampo("cod_estrutural");
@@ -199,11 +197,10 @@ $obRadioPagamentoMes = new SimNao;
 $obRadioPagamentoMes->setName('boPagamentoMes');
 $obRadioPagamentoMes->setRotulo('Pagamento do Salário Ocorre no Mês de Competência?');
 $obRadioPagamentoMes->setTitle('Informe se o pagamento do mês ocorre na competência.');
-$obRadioPagamentoMes->setChecked( $_REQUEST['stAcao'] == 'alterar' ? $opPagamentoMes : 'S' );
+$obRadioPagamentoMes->setChecked( $request->get('stAcao') == 'alterar' ? $opPagamentoMes : 'S' );
 $obRadioPagamentoMes->obRadioSim->setValue('Sim');
 $obRadioPagamentoMes->obRadioNao->setValue('Não');
 
-include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGM.class.php");
 $obIPopUpCGM = new IPopUpCGM($obForm);
 $obIPopUpCGM->setRotulo("CGM");
 $obIPopUpCGM->setTitle("Selecione o CGM do responsável pela entrega da DIRF.");
@@ -264,26 +261,26 @@ $obIntExercicio->setSize(5);
 $obIntExercicio->setMaxLength(4);
 $obIntExercicio->setNull(false);
 $obIntExercicio->setValue($inExercicio);
-if ($_REQUEST["stAcao"] == "alterar") {
+if ($request->get("stAcao") == "alterar") {
     $obIntExercicio->setReadOnly(true);
 }
-if ($_REQUEST["stAcao"] == "incluir") {
+if ($request->get("stAcao") == "incluir") {
     $obIntExercicio->obEvento->setOnBlur("montaParametrosGET('limpaCodigosExercicio','stAcao');");
 }
 $stIdsComponentes .= $obIntExercicio->getId().",";
 
 $obNaturezaEstabelecimento = new BuscaInner();
-$obNaturezaEstabelecimento->setRotulo                 ( 'Natureza do Estabelecimento'              );
-$obNaturezaEstabelecimento->setTitle                  ( 'Selecione o código da natureza do estabelecimento.'                 );
-$obNaturezaEstabelecimento->setId                     ( 'stNatureza'         );
-$obNaturezaEstabelecimento->setNull                   ( false              );
-$obNaturezaEstabelecimento->setValue($stNatureza);
-$obNaturezaEstabelecimento->obCampoCod->setName       ( "inNatureza"            );
-$obNaturezaEstabelecimento->obCampoCod->setId       ( "inNatureza"            );
-$obNaturezaEstabelecimento->obCampoCod->setValue($inNatureza);
-$obNaturezaEstabelecimento->obCampoCod->setSize       ( 6                  );
-$obNaturezaEstabelecimento->obCampoCod->setMaxLength  ( 10                 );
-$obNaturezaEstabelecimento->obCampoCod->setAlign      ( "left"             );
+$obNaturezaEstabelecimento->setRotulo                ( 'Natureza do Estabelecimento'                        );
+$obNaturezaEstabelecimento->setTitle                 ( 'Selecione o código da natureza do estabelecimento.' );
+$obNaturezaEstabelecimento->setId                    ( 'stNatureza' );
+$obNaturezaEstabelecimento->setNull                  ( false        );
+$obNaturezaEstabelecimento->setValue                 ( $stNatureza  );
+$obNaturezaEstabelecimento->obCampoCod->setName      ( "inNatureza" );
+$obNaturezaEstabelecimento->obCampoCod->setId        ( "inNatureza" );
+$obNaturezaEstabelecimento->obCampoCod->setValue     ( $inNatureza  );
+$obNaturezaEstabelecimento->obCampoCod->setSize      ( 6            );
+$obNaturezaEstabelecimento->obCampoCod->setMaxLength ( 10           );
+$obNaturezaEstabelecimento->obCampoCod->setAlign     ( "left"       );
 $pgOculNatureza = "'".CAM_GRH_IMA_PROCESSAMENTO."OCNaturezaEstabelecimento.php?".Sessao::getId()."&".$obNaturezaEstabelecimento->obCampoCod->getName()."='+this.value+'&stNomCampoCod=".$obNaturezaEstabelecimento->obCampoCod->getName()."&stIdCampoDesc=".$obNaturezaEstabelecimento->getId()."'";
 $obNaturezaEstabelecimento->obCampoCod->obEvento->setOnChange ( "ajaxJavaScript(".$pgOculNatureza.",'preencheNaturezaEstabelecimento');");
 $obNaturezaEstabelecimento->setFuncaoBusca("abrePopUp('".CAM_GRH_IMA_POPUPS."configuracao/FLNaturezaEstabelecimento.php','".$obForm->getName()."', '". $obNaturezaEstabelecimento->obCampoCod->stName ."','". $obNaturezaEstabelecimento->stId . "','','" . Sessao::getId() ."','800','550');");
@@ -345,7 +342,7 @@ $stIdsComponentes .= $obPopUpRetencaoDIRF->obCampoCod->getId().",";
 $obHdnInId = new Hidden;
 $obHdnInId->setName( "inId" );
 $obHdnInId->setId( "inId" );
-$obHdnInId->setValue( $_REQUEST["inId"] );
+$obHdnInId->setValue( $request->get("inId") );
 
 $obIPopUpEstrutural = new IPopUpEstrutural();
 $obIPopUpEstrutural->setRotulo               ( "Código Classificação INSS" );
@@ -402,7 +399,7 @@ $obSpnPrestadoresServico = new Span;
 $obSpnPrestadoresServico->setId ( "spnListaPrestadoresServico" );
 
 $obIPopUpCGMPlanoSaude = new IPopUpCGM($obForm);
-$obIPopUpCGMPlanoSaude->setRotulo("CGM do Plano Privado de Assistência à Saúde");
+$obIPopUpCGMPlanoSaude->setRotulo("**CGM do Plano Privado de Assistência à Saúde");
 $obIPopUpCGMPlanoSaude->setTitle("Selecione o CGM do Plano Privado de Assistência à Saúde.");
 $obIPopUpCGMPlanoSaude->setTipo('juridica');
 $obIPopUpCGMPlanoSaude->setId("stNomCGMPlanoSaude");
@@ -413,7 +410,7 @@ $obIPopUpCGMPlanoSaude->setValue($stCGMPlanoSaude);
 $obIPopUpCGMPlanoSaude->obCampoCod->setValue($inCGMPlanoSaude);
 
 $obIntRegistro = new Inteiro();
-$obIntRegistro->setRotulo("Número Registro ANS");
+$obIntRegistro->setRotulo("**Número Registro ANS");
 $obIntRegistro->setTitle("Informe o número de registro da Agência Nacional de Saúde.");
 $obIntRegistro->setName("inRegistro");
 $obIntRegistro->setId("inRegistro");
@@ -422,7 +419,7 @@ $obIntRegistro->setMaxLength(6);
 $obIntRegistro->setValue($inRegistro);
 
 $obIBscEventoPlanoSaude = new IBuscaInnerEvento();
-$obIBscEventoPlanoSaude->setRotulo("Evento Plano de Saúde");
+$obIBscEventoPlanoSaude->setRotulo("**Evento Plano de Saúde");
 $obIBscEventoPlanoSaude->setId("stEventoPlanoSaude");
 $obIBscEventoPlanoSaude->setTitle("");
 $obIBscEventoPlanoSaude->obCampoCod->setName("inCodigoEventoPlanoSaude");
@@ -461,10 +458,10 @@ $obIBscEventoMolestia->montaPopUp();
 $obBtnOk = new Ok;
 
 $obBtnLimpar = new Button();
-$obBtnLimpar->setName								( "btnLimpar" 															);
-$obBtnLimpar->setValue("Limpar");
-$obBtnLimpar->setTitle								( "Clique para limpar os dados dos campos." 							);
-$obBtnLimpar->obEvento->setOnClick				    ( "document.frm.reset();");
+$obBtnLimpar->setName( "btnLimpar"                                );
+$obBtnLimpar->setValue( "Limpar"                                  );
+$obBtnLimpar->setTitle( "Clique para limpar os dados dos campos." );
+$obBtnLimpar->obEvento->setOnClick( "document.frm.reset();"       );
 
 $arCampos = array($obBscRubricaDespesa, $obCmbTipoPrestador, $obPopUpRetencaoDIRF);
 $stIdsComponentes = substr($stIdsComponentes,0,strlen($stIdsComponentes)-1);
@@ -516,11 +513,11 @@ $obFormulario->defineBarra    ( array( $obBtnIncluirPlanoSaude, $obBtnLimparPlan
 $obFormulario->addSpan        ( $obSpnPlanoSaude );
 $obFormulario->addTitulo      ("Informações de Rendimentos Isentos Por Moléstia Grave");
 $obFormulario->addComponente  ( $obIBscEventoMolestia);
-$obFormulario->defineBarra    ( array( $obBtnOk, $obBtnLimpar ) 										);
+$obFormulario->defineBarra    ( array( $obBtnOk, $obBtnLimpar ) );
 
 $obFormulario->show();
 
-if ($_REQUEST['stAcao'] == 'alterar') {
+if ($request->get('stAcao') == 'alterar') {
     $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPlanoSaude');";
     $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPrestadoresServico');";
     $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."','montaListaPrestadoresServicoRetencaoINSS');";

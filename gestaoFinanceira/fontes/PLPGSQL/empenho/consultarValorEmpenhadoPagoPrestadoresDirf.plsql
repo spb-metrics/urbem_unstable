@@ -41,41 +41,55 @@ Adicionada tag Log aos arquivos
 
 */
 
-CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_empenhado_pago_prestadores_dirf(VARCHAR,INTEGER,INTEGER,INTEGER,INTEGER) RETURNS NUMERIC AS $$
+CREATE OR REPLACE FUNCTION empenho.fn_consultar_valor_empenhado_pago_prestadores_dirf(VARCHAR,INTEGER,INTEGER,INTEGER) RETURNS NUMERIC AS $$
 
 DECLARE
     stExercicio                ALIAS FOR $1;
     inCodEmpenho               ALIAS FOR $2;
     inCodEntidade              ALIAS FOR $3;
-    inMes                      ALIAS FOR $4;
-    inCodConta                 ALIAS FOR $5;
+    inMes                      ALIAS FOR $4;    
     nuValor                    NUMERIC := 0.00;
 BEGIN
-
-    SELECT
+    
+    SELECT DISTINCT
         coalesce(sum(nota_liquidacao_paga.vl_pago),0.00)
+        FROM empenho.empenho        
         INTO nuValor
-    FROM    empenho.empenho              
-           ,empenho.nota_liquidacao      
-           ,empenho.nota_liquidacao_paga 
-           ,empenho.pre_empenho          
-           ,empenho.pre_empenho_despesa  
-    WHERE   nota_liquidacao_paga.cod_nota        = nota_liquidacao.cod_nota
-    AND     nota_liquidacao_paga.exercicio       = nota_liquidacao.exercicio
-    AND     nota_liquidacao_paga.cod_entidade    = nota_liquidacao.cod_entidade
-    AND     nota_liquidacao.exercicio_empenho    = empenho.exercicio
-    AND     nota_liquidacao.cod_entidade         = empenho.cod_entidade
-    AND     nota_liquidacao.cod_empenho          = empenho.cod_empenho
-    AND     pre_empenho.exercicio               = empenho.exercicio
-    AND     pre_empenho.cod_pre_empenho         = empenho.cod_pre_empenho
-    AND     pre_empenho_despesa.exercicio       = pre_empenho.exercicio
-    AND     pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-    AND     empenho.cod_entidade                 = inCodEntidade
-    AND     empenho.cod_empenho                  = inCodEmpenho
-    AND     empenho.exercicio                    = stExercicio
-    AND     to_char(nota_liquidacao_paga.timestamp, 'mm')::INT   = inMes
-    AND     pre_empenho_despesa.cod_conta = inCodConta
-    ;
+        
+        INNER JOIN empenho.nota_liquidacao      
+             ON nota_liquidacao.exercicio_empenho    = empenho.exercicio
+            AND nota_liquidacao.cod_entidade         = empenho.cod_entidade
+            AND nota_liquidacao.cod_empenho          = empenho.cod_empenho
+
+        INNER JOIN empenho.nota_liquidacao_paga 
+            ON nota_liquidacao_paga.cod_nota        = nota_liquidacao.cod_nota
+            AND nota_liquidacao_paga.exercicio       = nota_liquidacao.exercicio
+            AND nota_liquidacao_paga.cod_entidade    = nota_liquidacao.cod_entidade
+
+        INNER JOIN empenho.pre_empenho          
+            ON  pre_empenho.exercicio                = empenho.exercicio
+            AND pre_empenho.cod_pre_empenho          = empenho.cod_pre_empenho
+
+        LEFT JOIN empenho.pre_empenho_despesa  
+            ON pre_empenho_despesa.exercicio         = pre_empenho.exercicio
+            AND pre_empenho_despesa.cod_pre_empenho  = pre_empenho.cod_pre_empenho
+        
+        LEFT JOIN empenho.restos_pre_empenho
+                ON restos_pre_empenho.cod_pre_empenho   = pre_empenho.cod_pre_empenho
+                AND restos_pre_empenho.exercicio        = pre_empenho.exercicio
+         
+        LEFT JOIN empenho.nota_liquidacao_paga_anulada
+            ON nota_liquidacao_paga_anulada.exercicio       = nota_liquidacao_paga.exercicio
+            AND nota_liquidacao_paga_anulada.cod_nota       = nota_liquidacao_paga.cod_nota
+            AND nota_liquidacao_paga_anulada.cod_entidade   = nota_liquidacao_paga.cod_entidade
+            AND nota_liquidacao_paga_anulada.timestamp      = nota_liquidacao_paga.timestamp
+
+        WHERE empenho.cod_entidade = inCodEntidade
+        AND (empenho.cod_empenho = inCodEmpenho OR restos_pre_empenho.cod_pre_empenho = inCodEmpenho)
+        AND nota_liquidacao_paga_anulada.cod_nota IS NULL
+        AND to_char(nota_liquidacao_paga.timestamp, 'mm')::INT = inMes
+        AND to_char(nota_liquidacao_paga.timestamp, 'yyyy') = stExercicio    
+        ;
 
     IF nuValor IS NULL THEN
         nuValor := 0.00;

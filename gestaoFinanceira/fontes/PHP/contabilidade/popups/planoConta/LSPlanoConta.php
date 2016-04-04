@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 64184 2015-12-11 14:09:44Z arthur $
+    * $Id: LSPlanoConta.php 64695 2016-03-22 17:34:14Z arthur $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -803,6 +803,26 @@ if ($_REQUEST['tipoBusca']) {
             $obTContabilidadePlanoConta->recuperaContaSintetica($rsLista, $stCondicao, $stOrdem, $boTransacao);
 
             break;
+        
+        case 'plano_contas_PCASP':
+
+            $inExercicio = Sessao::getExercicio();
+
+            $stFiltro  = "\n pa.cod_plano is not null AND ";
+            $stFiltro .= "\n pc.exercicio = '" . $inExercicio . "' AND ";
+
+            if( $_REQUEST['stCodEstrutural'] )
+                $stFiltro .= "\n pc.cod_estrutural like publico.fn_mascarareduzida('".$_REQUEST['stCodEstrutural']."')||'%' AND ";
+            if( $_REQUEST['stDescricao'] )
+                $stFiltro .= "\n lower(pc.nom_conta) like lower('%".$_REQUEST['stDescricao']."%') AND ";
+
+            if (Sessao::getExercicio() > '2012') {
+                $stFiltro .= "\n   pc.cod_estrutural like '8.9.%'  AND ";
+            } else {
+                $stFiltro .= "\n   pc.cod_estrutural like '2.9.9.1.%'  AND ";
+            }            
+            
+        break;
     }
 
     if ($stFiltro) {

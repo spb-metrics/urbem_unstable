@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaPagamento.class.php 62324 2015-04-23 20:03:47Z diogo.zarpelon $
+    $Id: RTesourariaPagamento.class.php 64371 2016-01-28 16:55:09Z franver $
 
     $Revision: 32136 $
     $Name:  $
@@ -714,6 +714,7 @@ function consultarTipoOrdem($boTransacao = "")
     $obTTesourariaPagamento->setDado( 'cod_entidade' , $this->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->obROrcamentoEntidade->getCodigoEntidade() );
     $obTTesourariaPagamento->setDado( 'exercicio'    , $this->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->getExercicio() );
     $obErro = $obTTesourariaPagamento->recuperaTipoOrdem( $rsRecordSet, $boTransacao );
+
     if ( !$obErro->ocorreu() and !$rsRecordSet->eof() ) {
         $this->obREmpenhoPagamentoLiquidacao->obREmpenhoOrdemPagamento->setTipo( $rsRecordSet->getCampo( 'tipo_ordem' ) );
     }

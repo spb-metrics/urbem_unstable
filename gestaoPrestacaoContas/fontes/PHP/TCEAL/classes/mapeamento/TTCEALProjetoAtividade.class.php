@@ -30,7 +30,7 @@
     *
     * @author: Franver Sarmento de Moraes
     *
-    * $Id: TTCEALProjetoAtividade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTCEALProjetoAtividade.class.php 64801 2016-04-01 21:06:19Z carlos.silva $
     *
     * @ignore
     *
@@ -99,24 +99,24 @@ class TTCEALProjetoAtividade extends Persistente {
                     THEN '01'
                     ELSE '02'
                 END AS identificador
-             , titulo AS nome
+             , SUBSTR(remove_acentos(titulo), 1, 100) AS nome
           
           FROM (SELECT despesa.cod_entidade
                      , pao.exercicio
                      , acao.num_acao
                      , acao_dados.titulo
                   FROM orcamento.pao
-            
-            INNER JOIN orcamento.pao_ppa_acao
-                    ON pao_ppa_acao.num_pao = pao.num_pao
-                   AND pao_ppa_acao.exercicio = pao.exercicio
-            
+                       
             INNER JOIN orcamento.despesa
                     ON despesa.exercicio = pao.exercicio
                    AND despesa.num_pao = pao.num_pao
             
+			INNER JOIN orcamento.despesa_acao
+			        ON despesa_acao.exercicio_despesa  = despesa.exercicio
+			       AND despesa_acao.cod_despesa        = despesa.cod_despesa   
+			
             INNER JOIN ppa.acao
-                    ON ppa.acao.cod_acao = pao_ppa_acao.cod_acao
+                    ON ppa.acao.cod_acao = despesa_acao.cod_acao
             
             INNER JOIN ppa.acao_dados
                     ON acao.cod_acao                    = acao_dados.cod_acao

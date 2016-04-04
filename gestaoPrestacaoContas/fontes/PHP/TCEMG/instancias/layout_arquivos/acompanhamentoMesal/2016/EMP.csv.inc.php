@@ -259,6 +259,11 @@ if (count($rsRecordSetEMP10->getElementos()) > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipodespesaemprpps");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
         
         if (count($rsRecordSetEMP11->getElementos()) > 0) {
             foreach ($rsRecordSetEMP11->getElementos() as $arEMP11) {

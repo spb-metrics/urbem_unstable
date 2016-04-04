@@ -27,7 +27,7 @@
  * Página de Processamento Manter Solicitação de Compra
  * Data de Criação   : 21/09/2006
 
- $Id: PRManterSolicitacaoCompra.php 64213 2015-12-17 12:54:03Z evandro $
+ $Id: PRManterSolicitacaoCompra.php 64416 2016-02-18 17:35:05Z evandro $
 
  * @ignore
 
@@ -643,6 +643,29 @@ switch ($stAcao) {
                 foreach ($arExclui as $stChave => $valor) {
 
                     if ($valor['inCodDespesa'] && $valor['inCodEstrutural']) {
+                        # Busca a quantidade anulada do item (se houver) para deletar na item_dotacao_anulacao.
+                        $obTComprasSolicitacaoItemDotacaoAnulacao = new TComprasSolicitacaoItemDotacaoAnulacao;
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("exercicio"       , $obTComprasSolicitacao->getDado('exercicio') );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_entidade"    , $obTComprasSolicitacao->getDado('cod_entidade') );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_solicitacao" , $obTComprasSolicitacao->getDado('cod_solicitacao') );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_centro"      , $valor['inCodCentroCusto'] );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_item"        , $valor['inCodItem'] );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_despesa"     , $valor['inCodDespesa'] );
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->setDado("cod_conta"       , $valor['inCodEstrutural'] );
+
+                        $stFiltroAnulacaoDotacao  = " WHERE  solicitacao_item_dotacao_anulacao.exercicio       = '".$obTComprasSolicitacao->getDado('exercicio')."' \n";
+                        $stFiltroAnulacaoDotacao .= "   AND  solicitacao_item_dotacao_anulacao.cod_entidade    = ".$obTComprasSolicitacao->getDado('cod_entidade')." \n";
+                        $stFiltroAnulacaoDotacao .= "   AND  solicitacao_item_dotacao_anulacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado('cod_solicitacao')." \n";
+                        $stFiltroAnulacaoDotacao .= "   AND  solicitacao_item_dotacao_anulacao.cod_item        = ".$valor['inCodItem']." \n";
+                        $stFiltroAnulacaoDotacao .= "   AND  solicitacao_item_dotacao_anulacao.cod_centro      = ".$valor['inCodCentroCusto']." \n";
+                        $stFiltroAnulacaoDotacao .= "   AND  solicitacao_item_dotacao_anulacao.cod_despesa     = ".$valor['inCodDespesa']." \n";
+                        $obTComprasSolicitacaoItemDotacaoAnulacao->recuperaTodos($rsRecordSetItemDotacaoAnulado, $stFiltroAnulacaoDotacao);
+
+                        if ($rsRecordSetItemDotacaoAnulado->getNumLinhas() > 0) {
+                            $obTComprasSolicitacaoItemDotacaoAnulacao->exclusao();
+                        }
+
+                        //Busca para deletar na item_dotacao.
                         $stFiltro = " WHERE  solicitacao_item_dotacao.cod_item        = ".$valor['inCodItem']."                                \n";
                         $stFiltro.= "   AND  solicitacao_item_dotacao.cod_centro      = ".$valor['inCodCentroCusto']."                         \n";
                         $stFiltro.= "   AND  solicitacao_item_dotacao.cod_despesa     = ".$valor['inCodDespesa']."                             \n";
@@ -669,6 +692,26 @@ switch ($stAcao) {
                         $obTComprasSolicitacaoItemDotacao->recuperaTodos($rsRecordSetItem,$stFiltro);
                     }
 
+                    # Busca anulada do item (se houver) para deletar na solicitacao_item_anulacao
+                    $obTComprasSolicitacaoItemAnulacao = new TComprasSolicitacaoItemAnulacao();
+                    $obTComprasSolicitacaoItemAnulacao->setDado("exercicio"      , $obTComprasSolicitacao->getDado('exercicio') );
+                    $obTComprasSolicitacaoItemAnulacao->setDado("cod_entidade"   , $obTComprasSolicitacao->getDado('cod_entidade') );
+                    $obTComprasSolicitacaoItemAnulacao->setDado("cod_solicitacao", $obTComprasSolicitacao->getDado('cod_solicitacao') );
+                    $obTComprasSolicitacaoItemAnulacao->setDado("cod_item"       , $valor['inCodItem'] );
+                    $obTComprasSolicitacaoItemAnulacao->setDado("cod_centro"     , $valor['inCodCentroCusto'] );
+
+                    $stFiltroAnulacao = " WHERE solicitacao_item_anulacao.exercicio       = '".$obTComprasSolicitacao->getDado( 'exercicio')."'     \n";
+                    $stFiltroAnulacao.= "   AND solicitacao_item_anulacao.cod_entidade    = ".$obTComprasSolicitacao->getDado( 'cod_entidade')."    \n";
+                    $stFiltroAnulacao.= "   AND solicitacao_item_anulacao.cod_solicitacao = ".$obTComprasSolicitacao->getDado( 'cod_solicitacao')." \n";
+                    $stFiltroAnulacao.= "   AND solicitacao_item_anulacao.cod_item        = ".$valor['inCodItem']." \n";
+                    $stFiltroAnulacao.= "   AND solicitacao_item_anulacao.cod_centro      = ".$valor['inCodCentroCusto']." \n";
+                    $obTComprasSolicitacaoItemAnulacao->recuperaTodos($rsRecordSetItemAnulado, $stFiltroAnulacao);
+
+                    if ( $rsRecordSetItemAnulado->getNumLinhas() > 0) {
+                        $obTComprasSolicitacaoItemAnulacao->exclusao();                        
+                    }
+
+                    # Busca do item para deletar na solicitacao_item
                     $stFiltro = " WHERE  solicitacao_item.cod_item        = ".$valor['inCodItem']. "                                  \n";
                     $stFiltro.= "   AND  solicitacao_item.cod_centro      = ".$valor['inCodCentroCusto']. "                           \n";
                     $stFiltro.= "   AND  solicitacao_item.cod_solicitacao = ".$obTComprasSolicitacao->getDado("cod_solicitacao")."    \n";
@@ -786,6 +829,7 @@ switch ($stAcao) {
             }
 
             # Faz a exclusão de todas as dotações para inserir posteriormente.
+            $obTComprasSolicitacaoItemDotacao = new TComprasSolicitacaoItemDotacao();
             $obTComprasSolicitacaoItemDotacao->setDado('exercicio'       , $_REQUEST['hdnExercicio']);
             $obTComprasSolicitacaoItemDotacao->setDado('cod_entidade'    , $_REQUEST['HdnCodEntidade']);
             $obTComprasSolicitacaoItemDotacao->setDado('cod_solicitacao' , $_REQUEST['HdnInSolicitacao']);

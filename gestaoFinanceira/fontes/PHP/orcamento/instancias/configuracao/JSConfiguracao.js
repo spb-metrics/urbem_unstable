@@ -85,6 +85,13 @@ function validaCampos(BuscaValor){
     document.frm.action = '<?=$pgProc;?>?<?=Sessao::getId();?>';
 }
 
+function validaPorcentagem(nuValorPorcentagem){    
+    var nuValor = parseFloat(nuValorPorcentagem.replace(",","."));
+    if ( nuValor > 100) {
+        jQuery('#nuLimiteSuplementacaoDecreto').val("100,00");
+    }
+}
+
 function toFloat( strValor ) {
 // Descrição: Garante retorno numérico para entradas de strings
 // toFloat('-12,345') -> -12.345

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoComplementar.php 64256 2015-12-22 16:06:28Z michel $
+    $Id: FMManterEmpenhoComplementar.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     * Casos de uso: uc-02.03.36
 */
@@ -104,7 +104,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setExercicio( Sessao::getExercicio() );
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->setExercicio( Sessao::getExercicio() );
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm') );
-    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidade );
+    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarEntidadeRestos( $rsEntidade );
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->listar( $rsTipo, " cod_tipo <> 0 " );
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->listar( $rsHistorico );
 
@@ -186,9 +186,41 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obHdnEmitirEmpenhoComplementar->setValue( "stEmitirEmpenhoComplementar" );
 
     // Define Objeto TextBox para Codigo da Entidade
-    $obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario;
-    $obEntidadeUsuario->obTextBox->obEvento->setOnChange( 'getIMontaAssinaturas()' );
-    $obEntidadeUsuario->obSelect->obEvento->setOnChange( 'getIMontaAssinaturas()' );
+    //$obEntidadeUsuario = new ITextBoxSelectEntidadeUsuario;
+    //$obEntidadeUsuario->obTextBox->obEvento->setOnChange( 'getIMontaAssinaturas()' );
+    //$obEntidadeUsuario->obSelect->obEvento->setOnChange( 'getIMontaAssinaturas()' );
+    
+    // Define Objeto TextBox para Codigo da Entidade
+    $obTxtCodEntidade = new TextBox;
+    $obTxtCodEntidade->setName('inCodEntidade');
+    $obTxtCodEntidade->setId  ('inCodEntidade');
+
+    if ($rsEntidade->getNumLinhas()==1) {
+         $obTxtCodEntidade->setValue($rsEntidade->getCampo("cod_entidade"));
+           $jsOnload = "montaParametrosGET('buscaDtEmpenho', 'inCodEntidade');";
+    }
+
+    $obTxtCodEntidade->setRotulo ('Entidade');
+    $obTxtCodEntidade->setTitle  ('Selecione a entidade.');
+    $obTxtCodEntidade->setInteiro(true);
+    $obTxtCodEntidade->setNull   (false);
+    
+    // Define Objeto Select para Nome da Entidade
+    $obEntidadeUsuario = new Select;
+    $obEntidadeUsuario->setName ('stNomEntidade');
+    $obEntidadeUsuario->setId   ('stNomEntidade');
+    //$obEntidadeUsuario->setValue($inCodEntidade);
+
+    if ($rsEntidade->getNumLinhas()>1) {
+        $obEntidadeUsuario->addOption            ('', 'Selecione');
+        $obEntidadeUsuario->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade,inCodContrato,inCodFornecedor,stExercicioContrato');getIMontaAssinaturas();");
+        $obTxtCodEntidade->obEvento->setOnChange("limparCampos();montaParametrosGET('buscaDtEmpenho', 'inCodEntidade,inCodContrato,inCodFornecedor,stExercicioContrato');getIMontaAssinaturas();");
+    }
+    $obEntidadeUsuario->setCampoId   ('cod_entidade');
+    $obEntidadeUsuario->setCampoDesc ('nom_cgm');
+    $obEntidadeUsuario->setStyle     ('width: 520');
+    $obEntidadeUsuario->preencheCombo($rsEntidade);
+    $obEntidadeUsuario->setNull      (false);
 
     // Define Objeto BuscaInner para Empenho
     $obBscEmpenho = new BuscaInner;
@@ -423,7 +455,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addHidden( $obHdnValidaFornecedor  );
     $obFormulario->addHidden( $obHdnEmitirEmpenhoComplementar  );
     
-    $obFormulario->addComponente( $obEntidadeUsuario );
+    $obFormulario->addComponenteComposto($obTxtCodEntidade, $obEntidadeUsuario);
+    //$obFormulario->addComponente( $obEntidadeUsuario );
     $obFormulario->addComponente( $obBscEmpenho );
     $obFormulario->addSpan( $obSpanEmpenho );
 

@@ -66,6 +66,7 @@ $obTTCEMGDCLRF = new TTCEMGDCLRF();
 $obTTCEMGDCLRF->setDado('exercicio',Sessao::getExercicio());
 $obTTCEMGDCLRF->setDado('mes_referencia',$stMes);
 $obTTCEMGDCLRF->setDado('cod_orgao',$rsAdminConfigEntidade->getCampo('valor'));
+$obTTCEMGDCLRF->setDado('tipo_registro', '10');
 $obTTCEMGDCLRF->recuperaValoresArquivoDCLRF($rsRecordSetDCLRF10);
 
 //Tipo Registro 99 – Declaração de inexistência de informações
@@ -130,7 +131,87 @@ if (count($rsRecordSetDCLRF10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
-
+ 
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("publicacao_relatorio_lrf");
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_publicacao_relatorio_lrf");
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(8);
+        
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bimestre");
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("meta_bimestral");
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("medida_adotada");
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(4000);
+    
+    //Gera registro 20 somente no mês de dezembro
+    if($stMes == 12) {
+        $obTTCEMGDCLRF = new TTCEMGDCLRF();
+        $obTTCEMGDCLRF->setDado('exercicio',Sessao::getExercicio());
+        $obTTCEMGDCLRF->setDado('mes_referencia',$stMes);
+        $obTTCEMGDCLRF->setDado('cod_orgao',$rsAdminConfigEntidade->getCampo('valor'));
+        $obTTCEMGDCLRF->setDado('tipo_registro', '20');
+        $obTTCEMGDCLRF->recuperaValoresArquivoDCLRF($rsRecordSetDCLRF20);
+                
+        if (count($rsRecordSetDCLRF20->getElementos()) > 0) {
+            $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
+            $obExportador->roUltimoArquivo->addBloco($rsRecordSetDCLRF20);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cont_op_credito");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desc_cont_op_credito");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1000);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("realiz_op_credito");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_realiz_op_credito_capta");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_realiz_op_credito_receb");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+            
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_realiz_op_credito_assun_dir");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+        
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_realiz_op_credito_assun_obg");
+            $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
+        }
+    }
+    
 } else{
     $obExportador->roUltimoArquivo->addBloco($rsRecordSetDCLRF99);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
@@ -138,11 +219,12 @@ if (count($rsRecordSetDCLRF10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 }
+
 $rsRecordSetDCLRF10 = null;
+$rsRecordSetDCLRF20 = null;
 $rsAdminConfiguracao = null;
 $rsAdminConfigEntidade = null;
 $rsRecordSetDCLRF99 = null;
 $obTAdministracaoConfiguracao = null;
 $obTAdministracaoConfiguracaoEntidade = null;
 $obTTCEMGDCLRF = null;
-?>

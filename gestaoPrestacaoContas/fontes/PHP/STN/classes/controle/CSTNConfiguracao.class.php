@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id:$
+ * $Id: CSTNConfiguracao.class.php 64797 2016-04-01 14:43:02Z arthur $
  */
 
 include CAM_FW_COMPONENTES . 'Table/TableTree.class.php';
@@ -77,7 +77,7 @@ class CSTNConfiguracao
      *
      * @return void
      */
-    public function montaForm($arParam)
+    public function montaFormRCL($arParam)
     {
         if ($arParam['stDataImplantacao'] != '') {
             //Inclui o componente ITextBoxSelectEntidadeGeral
@@ -111,25 +111,205 @@ class CSTNConfiguracao
             $obSlPeriodo->setId      ('stPeriodo');
             $obSlPeriodo->setRotulo  ('Período');
             $obSlPeriodo->setTitle   ('Informe o período.');
+            $obSlPeriodo->obEvento->setOnChange("montaParametrosGET('habilitaReceitaCorrente');");
             $obSlPeriodo->addOption  ('', 'Selecione');
             foreach ($arPeriodo as $stKey => $stValue) {
                 $obSlPeriodo->addOption($stKey, $stValue);
             }
             $obSlPeriodo->setObrigatorioBarra(true);
 
+            $obLblReceitaCorrente = new Label();
+            $obLblReceitaCorrente->setId('lblReceitaCorrente');
+            $obLblReceitaCorrente->setRotulo('RECEITAS CORRENTES');
+
+            //Valor Receita Tributaria
+            $obNuValorReceitaTributaria = new Numerico();
+            $obNuValorReceitaTributaria->setName            ('nuValorReceitaTributaria');
+            $obNuValorReceitaTributaria->setId              ('nuValorReceitaTributaria');
+            $obNuValorReceitaTributaria->setRotulo          ('Receita Tributaria');
+            $obNuValorReceitaTributaria->setTitle           ('Receita Tributaria');
+            $obNuValorReceitaTributaria->setSize            (20);
+            $obNuValorReceitaTributaria->setNegativo        (true);
+            $obNuValorReceitaTributaria->setValue           ('0,00');
+            $obNuValorReceitaTributaria->setObrigatorioBarra(true);
+            $obNuValorReceitaTributaria->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+            
+            //Valor Receita de Contribuições
+            $obNuValorReceitaContribuicoes = new Numerico();
+            $obNuValorReceitaContribuicoes->setName            ('nuValorReceitaContribuicoes');
+            $obNuValorReceitaContribuicoes->setId              ('nuValorReceitaContribuicoes');
+            $obNuValorReceitaContribuicoes->setRotulo          ('Receita de Contribuições');
+            $obNuValorReceitaContribuicoes->setTitle           ('Receita de Contribuições');
+            $obNuValorReceitaContribuicoes->setSize            (20);
+            $obNuValorReceitaContribuicoes->setNegativo        (true);
+            $obNuValorReceitaContribuicoes->setValue           ('0,00');
+            $obNuValorReceitaContribuicoes->setObrigatorioBarra(true);
+            $obNuValorReceitaContribuicoes->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Receita Patrimonial
+            $obNuValorReceitaPatrominial = new Numerico();
+            $obNuValorReceitaPatrominial->setName            ('nuValorReceitaPatrominial');
+            $obNuValorReceitaPatrominial->setId              ('nuValorReceitaPatrominial');
+            $obNuValorReceitaPatrominial->setRotulo          ('Receita Patrimonial');
+            $obNuValorReceitaPatrominial->setTitle           ('Receita Patrimonial');
+            $obNuValorReceitaPatrominial->setSize            (20);
+            $obNuValorReceitaPatrominial->setNegativo        (true);
+            $obNuValorReceitaPatrominial->setValue           ('0,00');
+            $obNuValorReceitaPatrominial->setObrigatorioBarra(true);
+            $obNuValorReceitaPatrominial->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+            
+            //Valor Receita Agropecuária
+            $obNuValorReceitaAgropecuaria = new Numerico();
+            $obNuValorReceitaAgropecuaria->setName            ('nuValorReceitaAgropecuaria');
+            $obNuValorReceitaAgropecuaria->setId              ('nuValorReceitaAgropecuaria');
+            $obNuValorReceitaAgropecuaria->setRotulo          ('Receita Agropecuária');
+            $obNuValorReceitaAgropecuaria->setTitle           ('Receita Agropecuária');
+            $obNuValorReceitaAgropecuaria->setSize            (20);
+            $obNuValorReceitaAgropecuaria->setNegativo        (true);
+            $obNuValorReceitaAgropecuaria->setValue           ('0,00');
+            $obNuValorReceitaAgropecuaria->setObrigatorioBarra(true);
+            $obNuValorReceitaAgropecuaria->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Receita Industrial
+            $obNuValorReceitaIndustrial = new Numerico();
+            $obNuValorReceitaIndustrial->setName            ('nuValorReceitaIndustrial');
+            $obNuValorReceitaIndustrial->setId              ('nuValorReceitaIndustrial');
+            $obNuValorReceitaIndustrial->setRotulo          ('Receita Industrial');
+            $obNuValorReceitaIndustrial->setTitle           ('Receita Industrial');
+            $obNuValorReceitaIndustrial->setSize            (20);
+            $obNuValorReceitaIndustrial->setNegativo        (true);
+            $obNuValorReceitaIndustrial->setValue           ('0,00');
+            $obNuValorReceitaIndustrial->setObrigatorioBarra(true);
+            $obNuValorReceitaIndustrial->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Receita de Serviços
+            $obNuValorReceitaServicos = new Numerico();
+            $obNuValorReceitaServicos->setName            ('nuValorReceitaServicos');
+            $obNuValorReceitaServicos->setId              ('nuValorReceitaServicos');
+            $obNuValorReceitaServicos->setRotulo          ('Receita de Serviços');
+            $obNuValorReceitaServicos->setTitle           ('Receita de Serviços');
+            $obNuValorReceitaServicos->setSize            (20);
+            $obNuValorReceitaServicos->setNegativo        (true);
+            $obNuValorReceitaServicos->setValue           ('0,00');
+            $obNuValorReceitaServicos->setObrigatorioBarra(true);
+            $obNuValorReceitaServicos->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Transferências Correntes
+            $obNuValorTransferenciaCorrente = new Numerico();
+            $obNuValorTransferenciaCorrente->setName            ('nuValorTransferenciaCorrente');
+            $obNuValorTransferenciaCorrente->setId              ('nuValorTransferenciaCorrente');
+            $obNuValorTransferenciaCorrente->setRotulo          ('Transferências Correntes');
+            $obNuValorTransferenciaCorrente->setTitle           ('Transferências Correntes');
+            $obNuValorTransferenciaCorrente->setSize            (20);
+            $obNuValorTransferenciaCorrente->setNegativo        (true);
+            $obNuValorTransferenciaCorrente->setValue           ('0,00');
+            $obNuValorTransferenciaCorrente->setObrigatorioBarra(true);
+            $obNuValorTransferenciaCorrente->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Outras Receitas Correntes
+            $obnuValorOutrasReceitas = new Numerico();
+            $obnuValorOutrasReceitas->setName            ('nuValorOutrasReceitas');
+            $obnuValorOutrasReceitas->setId              ('nuValorOutrasReceitas');
+            $obnuValorOutrasReceitas->setRotulo          ('Outras Receitas Correntes');
+            $obnuValorOutrasReceitas->setTitle           ('Outras Receitas Correntes');
+            $obnuValorOutrasReceitas->setSize            (20);
+            $obnuValorOutrasReceitas->setNegativo        (true);
+            $obnuValorOutrasReceitas->setValue           ('0,00');
+            $obnuValorOutrasReceitas->setObrigatorioBarra(true);
+            $obnuValorOutrasReceitas->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            $obLblDeducoes = new Label();
+            $obLblDeducoes->setId('lblDeducoes');
+            $obLblDeducoes->setRotulo('DEDUÇÕES');
+
+            //Valor Contrib. Plano Seg. Social Servidor
+            $obNuValorContribPlanoSSS = new Numerico();
+            $obNuValorContribPlanoSSS->setName            ('nuValorContribPlanoSSS');
+            $obNuValorContribPlanoSSS->setId              ('nuValorContribPlanoSSS');
+            $obNuValorContribPlanoSSS->setRotulo          ('Contrib. Plano Seg. Social Servidor');
+            $obNuValorContribPlanoSSS->setTitle           ('Contrib. Plano Seg. Social Servidor');
+            $obNuValorContribPlanoSSS->setSize            (20);
+            $obNuValorContribPlanoSSS->setNegativo        (true);
+            $obNuValorContribPlanoSSS->setValue           ('0,00');
+            $obNuValorContribPlanoSSS->setObrigatorioBarra(true);
+            $obNuValorContribPlanoSSS->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Compensação Financ. entre Regimes Previd
+            $obNuValorCompensacaoFinanceira = new Numerico();
+            $obNuValorCompensacaoFinanceira->setName            ('nuValorCompensacaoFinanceira');
+            $obNuValorCompensacaoFinanceira->setId              ('nuValorCompensacaoFinanceira');
+            $obNuValorCompensacaoFinanceira->setRotulo          ('Compensação Financ. entre Regimes Previd');
+            $obNuValorCompensacaoFinanceira->setTitle           ('Compensação Financ. entre Regimes Previd');
+            $obNuValorCompensacaoFinanceira->setSize            (20);
+            $obNuValorCompensacaoFinanceira->setNegativo        (true);
+            $obNuValorCompensacaoFinanceira->setValue           ('0,00');
+            $obNuValorCompensacaoFinanceira->setObrigatorioBarra(true);
+            $obNuValorCompensacaoFinanceira->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor Dedução Fundeb
+            $obNuValorDeducaoFundeb = new Numerico();
+            $obNuValorDeducaoFundeb->setName            ('nuValorDeducaoFundeb');
+            $obNuValorDeducaoFundeb->setId              ('nuValorDeducaoFundeb');
+            $obNuValorDeducaoFundeb->setRotulo          ('Dedução Fundeb');
+            $obNuValorDeducaoFundeb->setTitle           ('Dedução Fundeb');
+            $obNuValorDeducaoFundeb->setSize            (20);
+            $obNuValorDeducaoFundeb->setNegativo        (true);
+            $obNuValorDeducaoFundeb->setValue           ('0,00');
+            $obNuValorDeducaoFundeb->setObrigatorioBarra(true);
+            $obNuValorDeducaoFundeb->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
+
+            //Valor TOTAL DA RCL ( Receitas Correntes - Deduções )
+            $obLblTotalRCL = new Label();
+            $obLblTotalRCL->setId('lblTotalRCL');
+            $obLblTotalRCL->setRotulo('TOTAL DA RECEITA CORRENTE LÍQUIDA ');
+
             //Instancia um textbox para o valor do cheque
             $obNumValor = new Numerico();
             $obNumValor->setName            ('flValor');
             $obNumValor->setId              ('flValor');
             $obNumValor->setRotulo          ('Valor');
-            $obNumValor->setTitle           ('Informe o valor do período');
+            $obNumValor->setTitle           ('Valor da Receita Corrente Líquida');
             $obNumValor->setObrigatorioBarra(true);
             $obNumValor->setNegativo        (true);
+
+            $obFormularioValor = new Formulario();
+            $obFormularioValor->setForm(FALSE);
+            $obFormularioValor->addComponente  ( $obNumValor );
+            $obFormularioValor->montaHTML();
+
+            $obSpanValor= new Span;
+            $obSpanValor->setId( 'spnValor' );
+            $obSpanValor->setValue( $obFormularioValor->getHTML());
+
+            #Receitas Correntes
+            $obFormularioRC = new Formulario();
+            $obFormularioRC->setForm(FALSE);
+            $obFormularioRC->addComponente  ( $obLblReceitaCorrente );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaTributaria );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaContribuicoes );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaPatrominial );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaAgropecuaria );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaIndustrial );
+            $obFormularioRC->addComponente  ( $obNuValorReceitaServicos );
+            $obFormularioRC->addComponente  ( $obNuValorTransferenciaCorrente );
+            $obFormularioRC->addComponente  ( $obnuValorOutrasReceitas );
+            $obFormularioRC->addComponente  ( $obLblDeducoes );
+            $obFormularioRC->addComponente  ( $obNuValorContribPlanoSSS );
+            $obFormularioRC->addComponente  ( $obNuValorCompensacaoFinanceira );
+            $obFormularioRC->addComponente  ( $obNuValorDeducaoFundeb );
+            $obFormularioRC->addComponente  ( $obLblTotalRCL );
+            $obFormularioRC->montaHTML();
+
+            $obSpanReceitasCorrentes= new Span;
+            $obSpanReceitasCorrentes->setId( 'spnReceitasCorrentes' );
+            $obSpanReceitasCorrentes->setValue( $obFormularioRC->getHTML());
+            $obSpanReceitasCorrentes->setStyle( "display: none; visibility: hidden;" );
+            #Fim Receitas Correntes
 
             //Instancia um botao incluir para incluir os dados do formulario na lista
             $obBtnIncluir = new Button();
             $obBtnIncluir->setValue   ('Incluir');
-            $obBtnIncluir->obEvento->setOnClick("montaParametrosGET('incluirValor','flValor,stPeriodo,inCodEntidade');");
+            $obBtnIncluir->obEvento->setOnClick("montaParametrosGET('incluirValorRCL','');");
 
             //Instancia um botao para limpar o formulario
             $obBtnLimpar = new Button();
@@ -139,10 +319,208 @@ class CSTNConfiguracao
 
             //Instancia um formulario
             $obFormulario = new Formulario();
-            $obFormulario->addTitulo      (utf8_decode($arParam['stTitle']));
-            $obFormulario->addComponente  ($obITextBoxSelectEntidadeGeral);
-            $obFormulario->addComponente  ($obSlPeriodo);
-            $obFormulario->addComponente  ($obNumValor);
+            $obFormulario->addTitulo      ( $arParam['stTitle'] );
+            $obFormulario->addComponente  ( $obITextBoxSelectEntidadeGeral );
+            $obFormulario->addComponente  ( $obSlPeriodo );
+            $obFormulario->addSpan        ($obSpanReceitasCorrentes);
+            $obFormulario->addSpan        ($obSpanValor);
+            $obFormulario->defineBarra    ( array($obBtnIncluir,$obBtnLimpar) );
+
+            $obFormulario->montaInnerHTML();
+
+            $stJs .= "jq('#spnFormAux').html('" . $obFormulario->getHTML() . "');";
+        } else {
+            $stJs .= "jq('#spnFormAux').html('');";
+        }
+
+        echo $stJs;
+    }
+
+    /**
+     * Metodo montaFormulario, monta o formulario de vinculo de despesa pessoal
+     *
+     * @author      Analista        Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
+     * @author      Desenvolvedor   Henrique Boaventura <henrique.boaventura@cnm.org.br>
+     * @param array  $arParam Array de dados
+     * @param string $stTitle String com o titulo para o formulario
+     *
+     * @return void
+     */
+    public function montaFormDespesaPessoal($arParam)
+    {
+        if ($arParam['stDataImplantacao'] != '') {
+            //Inclui o componente ITextBoxSelectEntidadeGeral
+            include CAM_GF_ORC_COMPONENTES . 'ITextBoxSelectEntidadeGeral.class.php';
+
+            $arData = explode('/',$arParam['stDataImplantacao']);
+
+            //Instancia o componente ITextBoxSelectEntidadeGeral
+            $obITextBoxSelectEntidadeGeral = new ITextBoxSelectEntidadeGeral();
+            $obITextBoxSelectEntidadeGeral->obTextBox->obEvento->setOnChange("montaParametrosGET('buscaDadosPeriodo');");
+            $obITextBoxSelectEntidadeGeral->obSelect->obEvento->setOnChange("montaParametrosGET('buscaDadosPeriodo');");
+            $obITextBoxSelectEntidadeGeral->inExercicio = $arData[2];
+            $obITextBoxSelectEntidadeGeral->setObrigatorioBarra(true);
+
+            //Preenche o array do periodo com os 12 meses anteriores a data de imp
+            for ($i=($arData[1] - 1); $i > ($arData[1] - 14); $i--) {
+                if ($i != '0') {
+                    $inMes = $i;
+                    $inAno = $arData[2];
+                    if ($i < 0) {
+                        $inMes = 13 + $i;
+                        $inAno--;
+                    }
+                    if ($inAno != $arData[2])
+                        $arPeriodo[(abs($inMes) . '/' . $inAno)] = ($this->arMes[abs($inMes)] . '/' . $inAno);
+                }
+            }
+
+            //Instancia um select
+            $obSlPeriodo = new Select();
+            $obSlPeriodo->setName    ('stPeriodo');
+            $obSlPeriodo->setId      ('stPeriodo');
+            $obSlPeriodo->setRotulo  ('Período');
+            $obSlPeriodo->setTitle   ('Informe o período.');
+            $obSlPeriodo->addOption  ('', 'Selecione');
+            foreach ($arPeriodo as $stKey => $stValue) {
+                $obSlPeriodo->addOption($stKey, $stValue);
+            }
+            $obSlPeriodo->setObrigatorioBarra(true);
+
+            $obLblTotalBrutaPessoal = new Label();
+            $obLblTotalBrutaPessoal->setId('lblTotalBrutaPessoal');
+            $obLblTotalBrutaPessoal->setRotulo('DESPESA BRUTA COM PESSOAL');
+
+            //Valor Pessoal Ativo
+            $obNuValorPessoalAtivo = new Numerico();
+            $obNuValorPessoalAtivo->setName            ('nuValorPessoalAtivo');
+            $obNuValorPessoalAtivo->setId              ('nuValorPessoalAtivo');
+            $obNuValorPessoalAtivo->setRotulo          ('Pessoal Ativo');
+            $obNuValorPessoalAtivo->setTitle           ('Despesa Pessoal Ativo');
+            $obNuValorPessoalAtivo->setSize            (20);
+            $obNuValorPessoalAtivo->setNegativo        (true);
+            $obNuValorPessoalAtivo->setValue           ('0,00');
+            $obNuValorPessoalAtivo->setObrigatorioBarra(true);
+            $obNuValorPessoalAtivo->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+            
+            //Valor Pessoal Inativo e Pensionista
+            $obNuValorPessoalInativo = new Numerico();
+            $obNuValorPessoalInativo->setName            ('nuValorPessoalInativo');
+            $obNuValorPessoalInativo->setId              ('nuValorPessoalInativo');
+            $obNuValorPessoalInativo->setRotulo          ('Pessoal Inativo e Pensionista');
+            $obNuValorPessoalInativo->setTitle           ('Despesa Pessoal Inativo e Pensionista');
+            $obNuValorPessoalInativo->setSize            (20);
+            $obNuValorPessoalInativo->setNegativo        (true);
+            $obNuValorPessoalInativo->setValue           ('0,00');
+            $obNuValorPessoalInativo->setObrigatorioBarra(true);
+            $obNuValorPessoalInativo->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+
+            //Valor Outras Despesas Terceirização
+            $obNuValorOutrasDespesas = new Numerico();
+            $obNuValorOutrasDespesas->setName            ('nuValorOutrasDespesas');
+            $obNuValorOutrasDespesas->setId              ('nuValorOutrasDespesas');
+            $obNuValorOutrasDespesas->setRotulo          ('Outras Despesas Terceirização');
+            $obNuValorOutrasDespesas->setTitle           ('Outras Despesas Terceirização');
+            $obNuValorOutrasDespesas->setSize            (20);
+            $obNuValorOutrasDespesas->setNegativo        (true);
+            $obNuValorOutrasDespesas->setValue           ('0,00');
+            $obNuValorOutrasDespesas->setObrigatorioBarra(true);
+            $obNuValorOutrasDespesas->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+            
+            $obLblTotalNaoComputadas = new Label();
+            $obLblTotalNaoComputadas->setId('lblTotalNaoComputadas');
+            $obLblTotalNaoComputadas->setRotulo('DESPESAS NÃO COMPUTADAS');
+
+            //Valor Indenizações Demissão e IDV
+            $obNuValorIndenizacoes = new Numerico();
+            $obNuValorIndenizacoes->setName            ('nuValorIndenizacoes');
+            $obNuValorIndenizacoes->setId              ('nuValorIndenizacoes');
+            $obNuValorIndenizacoes->setRotulo          ('Indenizações Demissão e IDV');
+            $obNuValorIndenizacoes->setTitle           ('Indenizações Demissão e IDV');
+            $obNuValorIndenizacoes->setSize            (20);
+            $obNuValorIndenizacoes->setNegativo        (true);
+            $obNuValorIndenizacoes->setValue           ('0,00');
+            $obNuValorIndenizacoes->setObrigatorioBarra(true);
+            $obNuValorIndenizacoes->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+
+            //Valor Decorrentes de Decisão Judicial
+            $obNuValorDecisaoJudicial = new Numerico();
+            $obNuValorDecisaoJudicial->setName            ('nuValorDecisaoJudicial');
+            $obNuValorDecisaoJudicial->setId              ('nuValorDecisaoJudicial');
+            $obNuValorDecisaoJudicial->setRotulo          ('Decorrentes de Decisão Judicial');
+            $obNuValorDecisaoJudicial->setTitle           ('Decorrentes de Decisão Judicial');
+            $obNuValorDecisaoJudicial->setSize            (20);
+            $obNuValorDecisaoJudicial->setNegativo        (true);
+            $obNuValorDecisaoJudicial->setValue           ('0,00');
+            $obNuValorDecisaoJudicial->setObrigatorioBarra(true);
+            $obNuValorDecisaoJudicial->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+
+            //Valor Despesas Exercicios Anteriores
+            $obNuValorExercicioAnterior = new Numerico();
+            $obNuValorExercicioAnterior->setName            ('nuValorExercicioAnterior');
+            $obNuValorExercicioAnterior->setId              ('nuValorExercicioAnterior');
+            $obNuValorExercicioAnterior->setRotulo          ('Despesas Exercicios Anteriores');
+            $obNuValorExercicioAnterior->setTitle           ('Despesas Exercicios Anteriores');
+            $obNuValorExercicioAnterior->setSize            (20);
+            $obNuValorExercicioAnterior->setNegativo        (true);
+            $obNuValorExercicioAnterior->setValue           ('0,00');
+            $obNuValorExercicioAnterior->setObrigatorioBarra(true);
+            $obNuValorExercicioAnterior->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+
+            //Valor Inativos e Pensionistas com Recursos Vinculados
+            $obNuValorInativosPensionista = new Numerico();
+            $obNuValorInativosPensionista->setName            ('nuValorInativosPensionista');
+            $obNuValorInativosPensionista->setId              ('nuValorInativosPensionista');
+            $obNuValorInativosPensionista->setRotulo          ('Inativos e Pensionistas com Recursos Vinculados');
+            $obNuValorInativosPensionista->setTitle           ('Inativos e Pensionistas com Recursos Vinculados');
+            $obNuValorInativosPensionista->setSize            (20);
+            $obNuValorInativosPensionista->setNegativo        (true);
+            $obNuValorInativosPensionista->setValue           ('0,00');
+            $obNuValorInativosPensionista->setObrigatorioBarra(true);
+            $obNuValorInativosPensionista->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
+
+            //Valor total de campos
+            $obNumValorTotal = new Numerico();
+            $obNumValorTotal->setName            ('flValor');
+            $obNumValorTotal->setId              ('flValor');
+            $obNumValorTotal->setRotulo          ('Total da Despesa Mensal');
+            $obNumValorTotal->setTitle           ('Total da Despesa Mensal');
+            $obNumValorTotal->setSize            (20);
+            $obNumValorTotal->setNegativo        (true);
+            $obNumValorTotal->setReadOnly        (true);
+            $obNumValorTotal->setDisabled        (true);
+            $obNumValorTotal->setValue           ('0,00');
+            $obNumValorTotal->setObrigatorioBarra(true);
+
+            //Instancia um botao incluir para incluir os dados do formulario na lista
+            $obBtnIncluir = new Button();
+            $obBtnIncluir->setValue   ('Incluir');
+            $obBtnIncluir->obEvento->setOnClick("montaParametrosGET('incluirValorDespesaPessoal','');");
+
+            //Instancia um botao para limpar o formulario
+            $obBtnLimpar = new Button();
+            $obBtnLimpar->setValue   ('Limpar');
+            $obBtnLimpar->setId      ('Limpar');
+            $obBtnLimpar->obEvento->setOnClick ('limpaFormularioAux();');
+
+            //Instancia um formulario
+            $obFormulario = new Formulario();
+            $obFormulario->addTitulo    ( utf8_decode($arParam['stTitle']) );
+            $obFormulario->addComponente( $obITextBoxSelectEntidadeGeral );
+            $obFormulario->addComponente( $obSlPeriodo );
+            if (Sessao::getExercicio() >= '2016') {
+                $obFormulario->addComponente( $obLblTotalBrutaPessoal );
+                $obFormulario->addComponente( $obNuValorPessoalAtivo );
+                $obFormulario->addComponente( $obNuValorPessoalInativo );
+                $obFormulario->addComponente( $obNuValorOutrasDespesas );
+                $obFormulario->addComponente( $obLblTotalNaoComputadas );
+                $obFormulario->addComponente( $obNuValorIndenizacoes );
+                $obFormulario->addComponente( $obNuValorDecisaoJudicial );
+                $obFormulario->addComponente( $obNuValorExercicioAnterior );
+                $obFormulario->addComponente( $obNuValorInativosPensionista );
+            }
+            $obFormulario->addComponente( $obNumValorTotal );
+            
             $obFormulario->defineBarra    (array($obBtnIncluir,$obBtnLimpar));
 
             $obFormulario->montaInnerHTML();
@@ -153,6 +531,59 @@ class CSTNConfiguracao
         }
 
         echo $stJs;
+    }
+
+    public function somaValores()
+    {
+        $nuSomaTotal = 0.00;        
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorPessoalAtivo'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorPessoalInativo'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorOutrasDespesas'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorIndenizacoes'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorDecisaoJudicial'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorExercicioAnterior'],false );
+        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorInativosPensionista'],false );
+        
+        $nuSomaTotal = $this->mascaraValor($nuSomaTotal,true);
+         
+        $stJs = " jq('#flValor').val('".$nuSomaTotal."'); ";
+
+        echo $stJs;
+    }
+
+    public function somaValoresRCL()
+    {   
+        $nuTotal    = 0.00;
+        $nuReceita  = 0.00;
+        $nuDeducoes = 0.00;
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaTributaria']    ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaContribuicoes'] ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaPatrominial']   ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaAgropecuaria']  ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaIndustrial']    ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorReceitaServicos']      ,false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorTransferenciaCorrente'],false );
+        $nuReceita += $this->mascaraValor( $_REQUEST['nuValorOutrasReceitas']       ,false );
+
+        $nuDeducoes += $this->mascaraValor( $_REQUEST['nuValorContribPlanoSSS']      ,false );
+        $nuDeducoes += $this->mascaraValor( $_REQUEST['nuValorCompensacaoFinanceira'],false );
+        $nuDeducoes += $this->mascaraValor( $_REQUEST['nuValorDeducaoFundeb']        ,false );
+
+        $nuTotal = ($nuReceita) - ($nuDeducoes);
+        $nuTotal = $this->mascaraValor($nuTotal,true);
+         
+        $stJs = " jq('#flValor').val('".$nuTotal."'); ";
+
+        echo $stJs;
+    }
+
+    public function mascaraValor($value, $boNumberBR = false)
+    {    
+        if($boNumberBR)
+            $value = number_format($value,2,',','.');
+        else
+            $value = str_replace(',','.',str_replace('.','',$value));
+        return $value;
     }
 
     /**
@@ -178,8 +609,6 @@ class CSTNConfiguracao
             $table->setRecordset($rsPeriodo);
             $table->setSummary  ('Lista de Valores');
 
-            ////$table->setConditional( true , "#efefef" );
-
             $table->Head->addCabecalho( 'Periodo',          70);
             $table->Head->addCabecalho( 'Valor',        20);
 
@@ -190,8 +619,6 @@ class CSTNConfiguracao
                                   "ajaxJavaScript('OCVincularReceitaCorrenteLiquida.php?Valor&id=%s','excluirValor')",
                                   array('id')
                                  );
-
-            //$table->Foot->addSoma('valor','D');
 
             $table->montaHTML();
 
@@ -251,6 +678,47 @@ class CSTNConfiguracao
         }
 
         return $stHTML;
+    }
+    
+    public function habilitaReceitaCorrente()
+    {   
+        $obNumValor = new Numerico();
+        $obNumValor->setName            ('flValor');
+        $obNumValor->setId              ('flValor');
+        $obNumValor->setObrigatorioBarra(true);
+        $obNumValor->setNegativo        (true);
+
+        $arPeriodo = explode('/', $_REQUEST['stPeriodo']);
+        $inExercicio = $arPeriodo[1];
+
+        if($inExercicio>=2016){
+            $stJs  = " jq('#spnReceitasCorrentes').css('display', 'inline'); ";
+            $stJs .= " jq('#spnReceitasCorrentes').css('visibility', 'visible'); ";
+
+            $obNumValor->setRotulo          ('( Receitas Correntes - Deduções ) - Valor');
+            $obNumValor->setTitle           ('Total da Receita Corrente Líquida ( Receitas Correntes - Deduções )');
+            $obNumValor->setSize            (20);
+            $obNumValor->setReadOnly        (true);
+            $obNumValor->setDisabled        (true);
+            $obNumValor->setValue           ('0,00');
+        }else{
+            $stJs  = " jq('#spnReceitasCorrentes').css('display', 'none'); ";
+            $stJs .= " jq('#spnReceitasCorrentes').css('visibility', 'hidden'); ";
+
+            $obNumValor->setRotulo          ('Valor');
+            $obNumValor->setTitle           ('Valor da Receita Corrente Líquida');
+        }
+
+        $obFormularioValor = new Formulario();
+        $obFormularioValor->setForm(FALSE);
+        $obFormularioValor->addComponente  ( $obNumValor );
+        $obFormularioValor->montaInnerHTML();
+
+        $stJs .= " jq('#spnValor').html('".$obFormularioValor->getHTML()."'); ";
+        if($inExercicio>=2016)
+            $stJs .= " montaParametrosGET('somaValoresRCL'); ";
+
+        echo $stJs;
     }
 
     /**
@@ -353,6 +821,108 @@ class CSTNConfiguracao
 
         echo $stJs;
 
+    }
+
+    public function incluirValorRCL($arParam)
+    {
+        $obErro = new Erro();
+        if ($arParam['stPeriodo'] == '') {
+            $obErro->setDescricao('Selecione um período');
+        } elseif ($arParam['flValor'] == '') {
+            $obErro->setDescricao('Preencha o campo valor');
+        }
+        if (!$obErro->ocorreu()) {
+            $arPeriodo = (array) Sessao::read('arPeriodo');
+            foreach ($arPeriodo as $arPeriodoAux) {
+                if ($arParam['stPeriodo'] == ($arPeriodoAux['mes'] . '/' . $arPeriodoAux['ano']) ) {
+                    $obErro->setDescricao('Periodo já está na lista');
+                    break;
+                }
+            }
+        }
+
+        $inCount = count($arPeriodo);
+        if (!$obErro->ocorreu()) {
+            $arData = explode('/',$arParam['stPeriodo']);
+            $arPeriodo[$inCount]['id'          ] = $inCount;
+            $arPeriodo[$inCount]['cod_entidade'] = $arParam['inCodEntidade'];
+            $arPeriodo[$inCount]['mes'         ] = $arData[0];
+            $arPeriodo[$inCount]['ano'         ] = $arData[1];
+            if ( $arPeriodo[$inCount]['ano'] >= '2016' ) {
+                $arPeriodo[$inCount]['valor_receita_tributaria']       = $this->mascaraValor($arParam['nuValorReceitaTributaria']    ,false);
+                $arPeriodo[$inCount]['valor_receita_contribuicoes']    = $this->mascaraValor($arParam['nuValorReceitaContribuicoes'] ,false);
+                $arPeriodo[$inCount]['valor_receita_patrimonial']      = $this->mascaraValor($arParam['nuValorReceitaPatrominial']   ,false);
+                $arPeriodo[$inCount]['valor_receita_agropecuaria']     = $this->mascaraValor($arParam['nuValorReceitaAgropecuaria']  ,false);
+                $arPeriodo[$inCount]['valor_receita_industrial']       = $this->mascaraValor($arParam['nuValorReceitaIndustrial']    ,false);
+                $arPeriodo[$inCount]['valor_receita_servicos']         = $this->mascaraValor($arParam['nuValorReceitaServicos']      ,false);
+                $arPeriodo[$inCount]['valor_transferencias_correntes'] = $this->mascaraValor($arParam['nuValorTransferenciaCorrente'],false);
+                $arPeriodo[$inCount]['valor_outras_receitas']          = $this->mascaraValor($arParam['nuValorOutrasReceitas']       ,false);
+                $arPeriodo[$inCount]['valor_contrib_plano_sss']        = $this->mascaraValor($arParam['nuValorContribPlanoSSS']      ,false);
+                $arPeriodo[$inCount]['valor_compensacao_financeira']   = $this->mascaraValor($arParam['nuValorCompensacaoFinanceira'],false);
+                $arPeriodo[$inCount]['valor_deducao_fundeb']           = $this->mascaraValor($arParam['nuValorDeducaoFundeb']        ,false);
+            }
+            $arPeriodo[$inCount]['valor'       ] = str_replace(',','.',str_replace('.','',$arParam['flValor'  ]));
+            $arPeriodo[$inCount]['descricao'   ] = $this->arMes[$arData[0]] . '/' . $arData[1];
+
+            Sessao::write('arPeriodo',$arPeriodo);
+
+            $stJs .= "jq('#spnLista').html('" . $this->buildListaPeriodo($arPeriodo) . "');";
+            $stJs .= 'limpaFormularioAux();';
+        } else {
+            $stJs .= "alertaAviso('" . $obErro->getDescricao() . "','form','erro','".Sessao::getId()."');";
+        }
+
+        echo $stJs;
+
+    }
+
+    public function incluirValorDespesaPessoal($arParam)
+    {
+        $obErro = new Erro();
+        if ($arParam['stPeriodo'] == '') {
+            $obErro->setDescricao('Selecione um período');
+        } elseif ($arParam['flValor'] == '') {
+            $obErro->setDescricao('Preencha o campo valor');
+        }
+        if (!$obErro->ocorreu()) {
+            $arPeriodo = (array) Sessao::read('arPeriodo');
+            foreach ($arPeriodo as $arPeriodoAux) {
+                if ($arParam['stPeriodo'] == ($arPeriodoAux['mes'] . '/' . $arPeriodoAux['ano']) ) {
+                    $obErro->setDescricao('Periodo já está na lista');
+                    break;
+                }
+            }
+        }
+
+        $inCount = count($arPeriodo);
+        if (!$obErro->ocorreu()) {
+            $arData = explode('/',$arParam['stPeriodo']);
+            $arPeriodo[$inCount]['id']           = $inCount;
+            $arPeriodo[$inCount]['cod_entidade'] = $arParam['inCodEntidade'];
+            $arPeriodo[$inCount]['mes']          = $arData[0];
+            $arPeriodo[$inCount]['ano']          = $arData[1];
+            $arPeriodo[$inCount]['descricao']    = $this->arMes[$arData[0]] . '/' . $arData[1];
+            if ( Sessao::getExercicio() >= '2016' ) {
+                $arPeriodo[$inCount]['valor_pessoal_ativo']         = $this->mascaraValor($arParam['nuValorPessoalAtivo'],false);
+                $arPeriodo[$inCount]['valor_pessoal_inativo']       = $this->mascaraValor($arParam['nuValorPessoalInativo'],false);
+                $arPeriodo[$inCount]['valor_terceirizacao']         = $this->mascaraValor($arParam['nuValorOutrasDespesas'],false);
+                $arPeriodo[$inCount]['valor_indenizacoes']          = $this->mascaraValor($arParam['nuValorIndenizacoes'],false);
+                $arPeriodo[$inCount]['valor_decisao_judicial']      = $this->mascaraValor($arParam['nuValorDecisaoJudicial'],false);
+                $arPeriodo[$inCount]['valor_exercicios_anteriores'] = $this->mascaraValor($arParam['nuValorExercicioAnterior'],false);
+                $arPeriodo[$inCount]['valor_inativos_pensionistas'] = $this->mascaraValor($arParam['nuValorInativosPensionista'],false);
+            }
+            
+            $arPeriodo[$inCount]['valor'] = $this->mascaraValor($arParam['flValor'],false);
+
+            Sessao::write('arPeriodo',$arPeriodo);
+
+            $stJs .= "jq('#spnLista').html('" . $this->buildListaPeriodo($arPeriodo) . "');";
+            $stJs .= 'limpaFormularioAux();';
+        } else {
+            $stJs .= "alertaAviso('" . $obErro->getDescricao() . "','form','erro','".Sessao::getId()."');";
+        }
+
+        echo $stJs;
     }
 
     /**
@@ -748,10 +1318,12 @@ class CSTNConfiguracao
             case 'incluirRCL':
                 $pgOcul = 'OCVincularReceitaCorrenteLiquida.php';
                 $stTitle = 'Dados da Receita Corrente Líquida';
+                $stCtrl = 'montaFormRCL';
                 break;
             case 'incluirDP':
                 $pgOcul = 'OCVincularDespesaPessoal.php';
                 $stTitle = 'Dados da Despesa Pessoal';
+                $stCtrl = 'montaFormDespesaPessoal';
                 break;
             }
 
@@ -759,7 +1331,7 @@ class CSTNConfiguracao
             $stJs .= "jq('#stDataImplantacao').val('" . $stDataImplantacao . "');";
             $stJs .= "jq('#stDataImplantacao').attr('readonly', 'readonly');";
 
-            $stJs .= "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=" . utf8_encode($stTitle) . "','montaForm');";
+            $stJs .= "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=" . utf8_encode($stTitle) . "',".$stCtrl.");";
         }
 
         echo $stJs;
@@ -805,7 +1377,18 @@ class CSTNConfiguracao
                 if (!isset($arPeriodoDB[$arAux['mes'] . '-' . $arAux['ano'] . '-' . $arAux['valor']])) {
                     $this->obModel->inMes                                  = $arAux['mes'];
                     $this->obModel->inAno                                  = $arAux['ano'];
-                    $this->obModel->flValor                                = $arAux['valor'];
+                    $this->obModel->nuValorReceitaTributaria     = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_tributaria']       : 0.00;
+                    $this->obModel->nuValorReceitaContribuicoes  = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_contribuicoes']    : 0.00;
+                    $this->obModel->nuValorReceitaPatrimonial    = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_patrimonial']      : 0.00;
+                    $this->obModel->nuValorReceitaAgropecuaria   = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_agropecuaria']     : 0.00;
+                    $this->obModel->nuValorReceitaIndustrial     = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_industrial']       : 0.00;
+                    $this->obModel->nuValorReceitaServicos       = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_servicos']         : 0.00;
+                    $this->obModel->nuValorTransferenciaCorrente = ($arAux['ano'] >= '2016') ? $arAux['valor_transferencias_correntes'] : 0.00;
+                    $this->obModel->nuValorOutrasReceitas        = ($arAux['ano'] >= '2016') ? $arAux['valor_outras_receitas']          : 0.00;
+                    $this->obModel->nuValorContribPlanoSSS       = ($arAux['ano'] >= '2016') ? $arAux['valor_contrib_plano_sss']        : 0.00;
+                    $this->obModel->nuValorCompensacaoFinanceira = ($arAux['ano'] >= '2016') ? $arAux['valor_compensacao_financeira']   : 0.00;
+                    $this->obModel->nuValorDeducaoFundeb         = ($arAux['ano'] >= '2016') ? $arAux['valor_deducao_fundeb']           : 0.00;
+                    $this->obModel->flValor = $arAux['valor'];
 
                     $obErro = $this->obModel->vincularReceitaCorrenteLiquida(false, $boTransacao);
                     if ($obErro->ocorreu()) {
@@ -881,15 +1464,24 @@ class CSTNConfiguracao
             //Inclui os periodos que nao existem na basa
             foreach ((array) $arPeriodo as $arAux) {
                 if (!isset($arPeriodoDB[$arAux['mes'] . '-' . $arAux['ano'] . '-' . $arAux['valor']])) {
-                    $this->obModel->inMes                                  = $arAux['mes'];
-                    $this->obModel->inAno                                  = $arAux['ano'];
-                    $this->obModel->flValor                                = $arAux['valor'];
-
+                    $this->obModel->inMes                      = $arAux['mes'];
+                    $this->obModel->inAno                      = $arAux['ano'];
+                    if (Sessao::getExercicio() >= '2016') {
+                        $this->obModel->nuValorPessoalAtivo        = $arAux['valor_pessoal_ativo'];
+                        $this->obModel->nuValorPessoalInativo      = $arAux['valor_pessoal_inativo'];
+                        $this->obModel->nuValorOutrasDespesas      = $arAux['valor_terceirizacao'];
+                        $this->obModel->nuValorIndenizacoes        = $arAux['valor_indenizacoes'];
+                        $this->obModel->nuValorDecisaoJudicial     = $arAux['valor_decisao_judicial'];
+                        $this->obModel->nuValorExercicioAnterior   = $arAux['valor_exercicios_anteriores'];
+                        $this->obModel->nuValorInativosPensionista = $arAux['valor_inativos_pensionistas'];    
+                    }
+                    
+                    $this->obModel->flValor                    = $arAux['valor'];
+                    
                     $obErro = $this->obModel->vincularDespesaPessoal(false, $boTransacao);
                     if ($obErro->ocorreu()) {
                         break;
                     }
-                    //unset($arPeriodoDB[$arAux['mes'] . '-' . $arAux['ano'] . '-' . $arAux['valor']]);
                 }
 
                 foreach ((array) $arPeriodoDB as $arDelete => $boValor) {

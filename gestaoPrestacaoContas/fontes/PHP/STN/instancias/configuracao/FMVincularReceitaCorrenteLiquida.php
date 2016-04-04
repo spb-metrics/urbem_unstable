@@ -59,8 +59,7 @@ $obDtImplantacao->setTitle ('Informe a data de implantação');
 $obDtImplantacao->setName  ('stDataImplantacao');
 $obDtImplantacao->setId    ('stDataImplantacao');
 $obDtImplantacao->setNull  (false);
-$stJs = "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=Dados da Receita Corrente Líquida','montaForm');";
-//$obDtImplantacao->obEvento->setOnChange("montaParametrosGET('montaForm','stDataImplantacao');");
+$stJs = "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=Dados da Receita Corrente Líquida','montaFormRCL');";
 $obDtImplantacao->obEvento->setOnChange($stJs);
 
 //Instancia um span para o formulario

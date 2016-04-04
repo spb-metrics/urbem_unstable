@@ -50,11 +50,10 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 
 class TTCEMGConfigurarIDE extends Persistente
 {
-    public function TTCEMGConfigurarIDE()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('tcemg.configurar_ide');
-
         $this->setCampoCod('exercicio');
 
         $this->AddCampo('exercicio'           ,'varchar',true  ,4  ,true  ,false);
@@ -64,8 +63,11 @@ class TTCEMGConfigurarIDE extends Persistente
 
     public function montaRecuperaTodos()
     {
-        $stSql = " SELECT * FROM tcemg.configurar_ide WHERE exercicio = '".$this->getDado('exercicio')."' \n";
-
+        $stSql = "
+              SELECT *
+                FROM tcemg.configurar_ide
+               WHERE exercicio = '".$this->getDado('exercicio')."'
+        ";
         return $stSql;
     }
 
@@ -77,91 +79,148 @@ class TTCEMGConfigurarIDE extends Persistente
     public function montaRecuperaDadosExportacao()
     {
         $stSql = "
-                    SELECT
-                            configurar_ide.cod_municipio AS codmunicipio
-                          , configurar_ide.opcao_semestralidade AS opcaosemestralidade
-                          , TO_CHAR(NOW(),'ddmmyyyy') AS datageracao
-                          , configurar_ide.exercicio
-                          , tabela.cnpj AS cnpjmunicipio
-                          , tabela.cod_orgao AS codorgao
-                          , tabela.tipo_orgao AS tipoorgao
-                          , tabela.exercicio_loa AS exercicioreferencialoa
-                          ,  (SELECT ano_inicio from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exercicioinicialppa
-                          ,  (SELECT ano_final from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exerciciofinalppa
-                          , TO_CHAR(NOW(),'yyyymmdd')||'".Sessao::getExercicio()."'||'".$this->getDado('mes')."' AS codcontroleremessa
-                          --  configurar_ide.cod_municipio AS codMunicipio
-                          --, configurar_ide.opcao_semestralidade AS opcaoSemestralidade
-                          --, TO_CHAR(NOW(),'ddmmyyyy') AS dataGeracao
-                          --, configurar_ide.exercicio
-                          --, tabela.cnpj AS cnpjMunicipio
-                          --, tabela.cod_orgao AS codOrgao
-                          --, tabela.tipo_orgao AS tipoOrgao
-                          --, tabela.exercicio_loa AS exercicioReferenciaLOA
-                          --, tabela.exercicio_inicial_ppa AS exercicioInicialPPA
-                          --, tabela.exercicio_final_ppa AS exercicioFinalPPA
-                          --, '' AS codControleRemessa --Deve ser analisado pois o campo não é obrigatório, deve ser criado mais tarde.
-
-                    FROM tcemg.configurar_ide
-                    JOIN (SELECT
-                                    sw_cgm_pessoa_juridica.cnpj
-                                  , config_entidade.valor AS cod_orgao
-                                  , 2 AS tipo_orgao
-                                  , entidade.exercicio
-                                  , CASE WHEN entidade.cod_entidade = (SELECT
-                                                                                valor
-                                                                        FROM administracao.configuracao
-                                                                        WHERE parametro = 'cod_entidade_prefeitura'
-                                                                          AND exercicio = '2014'
-                                                                    )::integer
-                                        THEN
-                                            (SELECT configuracao_loa.exercicio
-                                                FROM normas.norma
-                                                JOIN tcemg.configuracao_loa
-                                                  ON configuracao_loa.cod_norma = norma.cod_norma
-                                                WHERE configuracao_loa.exercicio = entidade.exercicio
-                                            )
-                                        ELSE
-                                            ''
-                                    END AS exercicio_loa
-                                , ppa.exercicio_inicial_ppa
-                                , ppa.exercicio_final_ppa
-
-                            FROM sw_cgm_pessoa_juridica
-                            JOIN orcamento.entidade
-                              ON entidade.numcgm = sw_cgm_pessoa_juridica.numcgm
-                            JOIN (SELECT valor, cod_entidade, exercicio FROM administracao.configuracao_entidade WHERE parametro = 'tcemg_tipo_orgao_entidade_sicom') AS config_entidade
-                              ON config_entidade.exercicio = entidade.exercicio
-                             AND config_entidade.cod_entidade = entidade.cod_entidade
-                            JOIN (SELECT
-                                            norma.exercicio AS exercicio_inicial_ppa
-                                          , SUBSTR(norma_data_termino.dt_termino::varchar,1,4) AS exercicio_final_ppa
-                                          , configuracao_leis_ppa.exercicio
-                                        FROM normas.norma
-                                        JOIN tcemg.configuracao_leis_ppa
-                                          ON configuracao_leis_ppa.cod_norma = norma.cod_norma
-                                        JOIN normas.norma_data_termino
-                                          ON norma_data_termino.cod_norma = norma.cod_norma
-                                        WHERE configuracao_leis_ppa.tipo_configuracao = 'consulta'
-                                          AND configuracao_leis_ppa.status <> 'f'
-                                ) ppa
-                              ON ppa.exercicio = entidade.exercicio\n";
+              SELECT configurar_ide.cod_municipio AS codmunicipio
+                   , configurar_ide.opcao_semestralidade AS opcaosemestralidade
+                   , TO_CHAR(NOW(),'ddmmyyyy') AS datageracao
+                   , configurar_ide.exercicio
+                   , tabela.cnpj AS cnpjmunicipio
+                   , tabela.cod_orgao AS codorgao
+                   , tabela.tipo_orgao AS tipoorgao
+                   , tabela.exercicio_loa AS exercicioreferencialoa
+                   , (SELECT ano_inicio from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exercicioinicialppa
+                   , (SELECT ano_final from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exerciciofinalppa
+                   , TO_CHAR(NOW(),'yyyymmdd')||'".Sessao::getExercicio()."'||'".$this->getDado('mes')."' AS codcontroleremessa
+                FROM tcemg.configurar_ide
+          INNER JOIN (
+                      SELECT sw_cgm_pessoa_juridica.cnpj
+                           , config_entidade.valor AS cod_orgao
+                           , 2 AS tipo_orgao
+                           , entidade.exercicio
+                           , CASE WHEN entidade.cod_entidade = (SELECT valor
+                                                                  FROM administracao.configuracao
+                                                                 WHERE parametro = 'cod_entidade_prefeitura'
+                                                                   AND exercicio = '".Sessao::getExercicio()."'
+                                                               )::integer
+                                  THEN (SELECT configuracao_loa.exercicio
+                                          FROM normas.norma
+                                    INNER JOIN tcemg.configuracao_loa
+                                            ON configuracao_loa.cod_norma = norma.cod_norma
+                                         WHERE configuracao_loa.exercicio = entidade.exercicio)
+                                  ELSE ''
+                              END AS exercicio_loa
+                           , ppa.exercicio_inicial_ppa
+                           , ppa.exercicio_final_ppa
+                        FROM sw_cgm_pessoa_juridica
+                  INNER JOIN orcamento.entidade
+                          ON entidade.numcgm = sw_cgm_pessoa_juridica.numcgm
+                  INNER JOIN (
+                              SELECT valor
+                                   , cod_entidade
+                                   , exercicio
+                                FROM administracao.configuracao_entidade
+                               WHERE parametro = 'tcemg_tipo_orgao_entidade_sicom'
+                             ) AS config_entidade
+                          ON config_entidade.exercicio = entidade.exercicio
+                         AND config_entidade.cod_entidade = entidade.cod_entidade
+                  INNER JOIN (
+                              SELECT norma.exercicio AS exercicio_inicial_ppa
+                                   , SUBSTR(norma_data_termino.dt_termino::varchar,1,4) AS exercicio_final_ppa
+                                   , configuracao_leis_ppa.exercicio
+                                FROM normas.norma
+                          INNER JOIN tcemg.configuracao_leis_ppa
+                                  ON configuracao_leis_ppa.cod_norma = norma.cod_norma
+                          INNER JOIN normas.norma_data_termino
+                                  ON norma_data_termino.cod_norma = norma.cod_norma
+                               WHERE configuracao_leis_ppa.tipo_configuracao = 'consulta'
+                                 AND configuracao_leis_ppa.status <> 'f'
+                             ) ppa
+                          ON ppa.exercicio = entidade.exercicio
+        ";
 
         if (count(explode(',',$this->getDado('entidades'))) > 1) {
-            $stSql .= "WHERE entidade.cod_entidade = (SELECT valor
+            $stSql .= "
+                       WHERE entidade.cod_entidade = (SELECT valor
                                                         FROM administracao.configuracao
-                                                        WHERE parametro = 'cod_entidade_prefeitura'
-                                                          AND exercicio = '".$this->getDado('exercicio')."'
-                                                    )::integer";
+                                                       WHERE parametro = 'cod_entidade_prefeitura'
+                                                         AND exercicio = '".Sessao::getExercicio()."'
+                                                     )::integer
+            ";
         } else {
             $stSql .= "WHERE entidade.cod_entidade = ".$this->getDado('entidades');
         }
+        $stSql .= "   ) as tabela
+                   ON tabela.exercicio = configurar_ide.exercicio
+                WHERE configurar_ide.exercicio = '".Sessao::getExercicio()."'
+        ";
+        return $stSql;
+    }
 
-        $stSql .= "     ) as tabela
-                      ON tabela.exercicio = configurar_ide.exercicio
+    public function recuperaDadosExportacaoFolha(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaDadosExportacaoFolha",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
 
-                    WHERE configurar_ide.exercicio = '".$this->getDado('exercicio')."'
+    public function montaRecuperaDadosExportacaoFolha()
+    {
+        $stSql = "
+              SELECT configurar_ide.cod_municipio AS codmunicipio
+                   , configurar_ide.opcao_semestralidade AS opcaosemestralidade
+                   , TO_CHAR(NOW(),'ddmmyyyy') AS datageracao
+                   , configurar_ide.exercicio
+                   , tabela.cnpj AS cnpjmunicipio
+                   , tabela.cod_orgao AS codorgao
+                   , tabela.tipo_orgao AS tipoorgao
+                   , tabela.exercicio_loa AS exercicioreferencialoa
+                   , (SELECT ano_inicio from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exercicioinicialppa
+                   , (SELECT ano_final from ppa.ppa WHERE '".Sessao::getExercicio()."' between ano_inicio AND ano_final) AS exerciciofinalppa
+                   , TO_CHAR(NOW(),'yyyymmdd')||'".Sessao::getExercicio()."'||'".$this->getDado('mes')."' AS codcontroleremessa
+                FROM tcemg.configurar_ide
+          INNER JOIN (
+                      SELECT sw_cgm_pessoa_juridica.cnpj
+                           , config_entidade.valor AS cod_orgao
+                           , 2 AS tipo_orgao
+                           , entidade.exercicio
+                           , CASE WHEN entidade.cod_entidade = (SELECT valor
+                                                                  FROM administracao.configuracao
+                                                                 WHERE parametro = 'cod_entidade_prefeitura'
+                                                                   AND exercicio = '".Sessao::getExercicio()."'
+                                                               )::integer
+                                  THEN (SELECT configuracao_loa.exercicio
+                                          FROM normas.norma
+                                    INNER JOIN tcemg.configuracao_loa
+                                            ON configuracao_loa.cod_norma = norma.cod_norma
+                                         WHERE configuracao_loa.exercicio = entidade.exercicio)
+                                  ELSE ''
+                              END AS exercicio_loa
+                        FROM sw_cgm_pessoa_juridica
+                  INNER JOIN orcamento.entidade
+                          ON entidade.numcgm = sw_cgm_pessoa_juridica.numcgm
+                  INNER JOIN (
+                              SELECT valor
+                                   , cod_entidade
+                                   , exercicio
+                                FROM administracao.configuracao_entidade
+                               WHERE parametro = 'tcemg_tipo_orgao_entidade_sicom'
+                             ) AS config_entidade
+                          ON config_entidade.exercicio = entidade.exercicio
+                         AND config_entidade.cod_entidade = entidade.cod_entidade
         ";
 
+        if (count(explode(',',$this->getDado('entidades'))) > 1) {
+            $stSql .= "
+                       WHERE entidade.cod_entidade = (SELECT valor
+                                                        FROM administracao.configuracao
+                                                       WHERE parametro = 'cod_entidade_prefeitura'
+                                                         AND exercicio = '".Sessao::getExercicio()."'
+                                                     )::integer
+            ";
+        } else {
+            $stSql .= "WHERE entidade.cod_entidade = ".$this->getDado('entidades');
+        }
+        $stSql .= "   ) as tabela
+                   ON tabela.exercicio = configurar_ide.exercicio
+                WHERE configurar_ide.exercicio = '".Sessao::getExercicio()."'
+        ";
         return $stSql;
     }
     

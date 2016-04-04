@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: $
-* $Name: $
-* $Author: $
-* $Date: $
+* $Id: TCEMGRelatorioDividaFlutuanteDepositos.plsql 64385 2016-02-03 16:36:00Z michel $
 */
 
 
@@ -192,41 +189,66 @@ BEGIN
     EXECUTE stSql;
 
     CREATE UNIQUE INDEX unq_totaliza            ON tmp_totaliza         (cod_estrutural varchar_pattern_ops, oid_temp);
-    
-        stSql := '
-                    SELECT * FROM (
-                        SELECT
-                             tmp_totaliza.cod_estrutural
-                            ,tmp_totaliza.cod_plano
-                            ,publico.fn_nivel(tmp_totaliza.cod_estrutural) as nivel                                                        
-                            ,tmp_totaliza.nom_conta
-                            ,sw_cgm.nom_cgm
-                            ,tmp_totaliza.cod_entidade
-                            ,0.00 as vl_saldo_anterior
-                            ,0.00 as vl_saldo_debitos
-                            ,0.00 as vl_saldo_creditos
-                            ,0.00 as vl_saldo_atual
-                        FROM tmp_totaliza
-                        JOIN orcamento.entidade
-                            ON entidade.cod_entidade = tmp_totaliza.cod_entidade
-                            AND entidade.exercicio   = tmp_totaliza.exercicio
-                        JOIN sw_cgm
-                            ON sw_cgm.numcgm = entidade.numcgm
-                        WHERE   tmp_totaliza.exercicio   = ' || quote_literal(stExercicio) || '
-                    )as retorno
-                    WHERE nivel >= 5
-                    AND cod_estrutural ILIKE ''2.1.8.8%''
-                    ORDER BY cod_estrutural ';
 
+        stSql := '
+                    SELECT totaliza_planos.cod_estrutural
+                         , totaliza_planos.cod_plano
+                         , totaliza_planos.nom_conta
+                         , totaliza_planos.exercicio
+                         , sw_cgm.nom_cgm
+                         , totaliza_planos.cod_entidade
+                         , SUM(totaliza_planos.vl_saldo_anterior)*(-1) AS vl_saldo_anterior
+                         , ABS(SUM(totaliza_planos.vl_saldo_debitos)) AS vl_saldo_debitos
+                         , ABS(SUM(totaliza_planos.vl_saldo_creditos)) AS vl_saldo_creditos
+                         , ((SUM(totaliza_planos.vl_saldo_anterior) + SUM(ABS(totaliza_planos.vl_saldo_debitos))) - SUM(ABS(totaliza_planos.vl_saldo_creditos)))*(-1) AS vl_saldo_atual
+                      FROM (
+                             SELECT cod_estrutural
+                                  , cod_plano
+                                  , nom_conta
+                                  , exercicio
+                                  , cod_entidade
+                                  , CASE WHEN tipo = ''I''
+                                         THEN SUM(vl_lancamento)
+                                         ELSE 0.00
+                                    END AS vl_saldo_anterior
+                                  , CASE WHEN tipo = ''T'' AND tipo_valor = ''D''
+                                         THEN SUM(vl_lancamento)
+                                         ELSE 0.00
+                                    END AS vl_saldo_debitos
+                                  , CASE WHEN tipo = ''T'' AND tipo_valor = ''C''
+                                         THEN SUM(vl_lancamento)
+                                         ELSE 0.00
+                                    END AS vl_saldo_creditos
+                               FROM tmp_totaliza
+                              WHERE exercicio = '||quote_literal(stExercicio)||'
+                                ' || stFiltro || '
+                                AND publico.fn_nivel(cod_estrutural) >= 5
+                                AND cod_estrutural ILIKE ''2.1.8.8%''
+                           GROUP BY cod_estrutural
+                                  , cod_plano
+                                  , nom_conta
+                                  , exercicio
+                                  , cod_entidade
+                                  , tipo
+                                  , tipo_valor
+                           ) AS totaliza_planos
+                      JOIN orcamento.entidade
+                        ON entidade.cod_entidade = totaliza_planos.cod_entidade
+                       AND entidade.exercicio   = totaliza_planos.exercicio
+                      JOIN sw_cgm
+                        ON sw_cgm.numcgm = entidade.numcgm
+                  GROUP BY totaliza_planos.cod_estrutural
+                         , totaliza_planos.cod_plano
+                         , totaliza_planos.nom_conta
+                         , totaliza_planos.exercicio
+                         , totaliza_planos.cod_entidade
+                         , sw_cgm.nom_cgm
+                  ORDER BY totaliza_planos.cod_entidade
+                         , totaliza_planos.cod_estrutural
+                         , totaliza_planos.cod_plano ';
 
     FOR reRegistro IN EXECUTE stSql
     LOOP
-        arRetorno := contabilidade.fn_totaliza_balancete_verificacao( publico.fn_mascarareduzida(reRegistro.cod_estrutural) , stDtInicial, stDtFinal);
-        reRegistro.vl_saldo_anterior := arRetorno[1];
-        reRegistro.vl_saldo_debitos  := arRetorno[2];
-        reRegistro.vl_saldo_creditos := arRetorno[3];
-        reRegistro.vl_saldo_atual    := arRetorno[4];
-        
         IF  ( reRegistro.vl_saldo_anterior = 0.00 ) AND
             ( reRegistro.vl_saldo_debitos  = 0.00 ) AND
             ( reRegistro.vl_saldo_creditos = 0.00 ) AND

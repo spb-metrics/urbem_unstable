@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FLManterOrdemPagamento.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterOrdemPagamento.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     * Casos de uso: uc-02.03.19
                     uc-02.03.20
@@ -42,6 +42,10 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+
+if($_REQUEST['stAcao'] == 'liquidar' || $_REQUEST['stAcao'] == 'anular')
+include_once( CAM_GF_INCLUDE."validaGF.inc.php");
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
 $stAcao = $request->get('stAcao');
@@ -66,9 +70,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addSpan($obSpan);
     $obFormulario->show();
 } else {
-    if($stAcao<>"imprimir" and $stAcao<>"imprimirAN")
-        include_once( CAM_GF_INCLUDE."validaGF.inc.php");
-
     include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoOrdemPagamento.class.php" );
 
     //Define o nome dos arquivos PHP
@@ -97,8 +98,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $rsRecordset = new RecordSet;
     $obREmpenhoOrdemPagamento->obROrcamentoEntidade->setExercicio( Sessao::getExercicio()     );
     $obREmpenhoOrdemPagamento->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm')   );
+    
+    if($stAcao == 'incluir' || $stAcao == 'anular')
+    $obREmpenhoOrdemPagamento->obROrcamentoEntidade->listarEntidadeRestos( $rsEntidades );
+    else
     $obREmpenhoOrdemPagamento->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidades );
-
+    
     // DEFINE OBJETOS DO FORMULARIO
 
     // Define SELECT multiplo para codigo da entidade

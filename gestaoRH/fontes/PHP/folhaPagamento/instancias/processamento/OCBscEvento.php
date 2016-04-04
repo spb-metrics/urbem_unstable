@@ -123,7 +123,9 @@ function preencheDescEvento()
             $stJs .= "d.frm.HdninCodigoEvento.value = '".$rsEvento->getCampo('cod_evento')."';\n";
             $stJs .= "d.frm.stHdnFixado.value = '".$rsEvento->getCampo('fixado')."';\n";
             $stJs .= "d.frm.stHdnApresentaParcela.value = '".$rsEvento->getCampo('apresenta_parcela')."';\n";
+            $stJs .= "if(d.getElementById('stTextoComplementar') != null) { ";
             $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '".$rsEvento->getCampo('observacao')."';\n";
+            $stJs .= "}\n ";
             
             if ($boInformaValorQuantidade || $boInformaQuantidadeParcelas) {
                 $stJs .= preencheValorQuantidade( $rsEvento->getCampo("fixado"), $rsEvento->getCampo("valor_quantidade"), $rsEvento->getCampo("limite_calculo") );
@@ -133,7 +135,9 @@ function preencheDescEvento()
             $stJs .= "d.getElementById('".$_REQUEST['stCampoCodEvento']."').focus();\n";
             $stJs .= "d.getElementById('spnDadosEvento').innerHTML = '';\n";
             $stJs .= "d.frm.hdnDescEvento.value = '';\n";
+            $stJs .= "if(d.getElementById('stTextoComplementar') != null) { ";
             $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '&nbsp;';\n";
+            $stJs .= "}\n ";
             $stJs .= "alertaAviso('Código de evento inválido. (".$inCodigoEvento.") ','form','erro','".Sessao::getId()."');\n";
         }
     } else {

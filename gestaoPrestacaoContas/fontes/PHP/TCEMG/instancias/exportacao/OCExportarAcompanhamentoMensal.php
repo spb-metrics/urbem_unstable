@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: OCExportarAcompanhamentoMensal.php 62335 2015-04-24 19:37:37Z franver $
+ * $Id: OCExportarAcompanhamentoMensal.php 64559 2016-03-14 19:03:33Z jean $
  */
 
 set_time_limit(0);
@@ -434,6 +434,26 @@ if (Sessao::getExercicio() == '2015' AND in_array("SUPDEF.csv",$arFiltro["arArqu
    $obExportador->addArquivo("SUPDEF.csv");
    $stNomeArquivo = "SUPDEF";
    include_once(CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/acompanhamentoMesal/".Sessao::getExercicio()."/SUPDEF.csv.inc.php");
+}
+
+/**
+* CRONEM.csv | Autor : Jean da Silva
+*/
+
+if (in_array("CRONEM.csv",$arFiltro["arArquivosSelecionados"])){
+   $obExportador->addArquivo("CRONEM.csv");
+   $stNomeArquivo = "CRONEM";
+   include_once(CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/acompanhamentoMesal/".Sessao::getExercicio()."/CRONEM.csv.inc.php");
+}
+
+/**
+* TEREM.csv | Autor : Jean da Silva
+*/
+
+if (in_array("TEREM.csv",$arFiltro["arArquivosSelecionados"])){
+   $obExportador->addArquivo("TEREM.csv");
+   $stNomeArquivo = "TEREM";
+   include_once(CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/acompanhamentoMesal/".Sessao::getExercicio()."/TEREM.csv.inc.php");
 }
 
 	

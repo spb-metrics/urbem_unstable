@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: JSManterAutorizacaoParcial.js 64052 2015-11-24 18:26:04Z michel $
+    $Id: JSManterAutorizacaoParcial.js 64393 2016-02-11 13:54:53Z arthur $
 */
 ?>
 
@@ -47,6 +47,31 @@ function buscaValor(valor,parametros){
     document.frm.submit();
     document.frm.target = stTarget;
     document.frm.action = stAction;
+}
+
+function selecionaDotacao( Objeto ){
+
+    var f = document.frm;
+    var arRetorno;
+    
+    for( i=0 ; i<f.elements.length ; i++) {			
+        if( typeof(f.elements[i]) == 'object' ){
+            var idE = new String(f.elements[i].id);
+            if( f.elements[i].id != Objeto.id && idE.substring(0,10) == 'rd_dotacao'){
+                f.elements[i].checked = false;
+            }
+        }
+    }
+    
+    // Através do valor vindo da lista, é criado um array de parametros a ser passado por request
+    arRetorno = Objeto.value.split(',');
+    
+    // Retira espaços da string, para quando cod_despesa vier vazio da consulta da lista
+    arRetorno[2] = arRetorno[2].replace(/^\s+|\s+$/g,"");
+    
+    parametro = '&codItem='+arRetorno[0]+'&codCotacao='+arRetorno[1]+'&codDespesa='+arRetorno[2];
+    
+    executaFuncaoAjax( 'alterarItemDotacao', parametro, true );
 }
 
 </script>

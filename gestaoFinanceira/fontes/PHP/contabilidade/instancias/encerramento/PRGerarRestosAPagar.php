@@ -56,6 +56,7 @@ Adicionada tag Log aos arquivos
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
+include_once ( CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracaoEntidade.class.php" );
 include_once ( CAM_GF_CONT_MAPEAMENTO."FContabilidadeEncerramento.class.php" );
 include_once ( CAM_GF_CONT_MAPEAMENTO."FContabilidadeVerificaVinculoRestos.class.php" );
 
@@ -76,6 +77,7 @@ $obFContabilidadeVerificaVinculoRestos = new FContabilidadeVerificaVinculoRestos
 
 $obTransacao = new Transacao;
 $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
 
 if (Sessao::getExercicio() < '2013') {
     //Verifica se todas as despesas esta vinculada a contabilidade
@@ -98,7 +100,7 @@ if (Sessao::getExercicio() < '2013') {
 if ( !$obErro->ocorreu() ) {
     SistemaLegado::BloqueiaFrames(true,true);
     flush();
-
+   
     $obFContabilidadeEncerramento->setDado('stExercicio', Sessao::getExercicio());
     if (Sessao::getExercicio() >= '2013') {
         $obFContabilidadeEncerramento->setDado('inCodEntidade', $request->get('inCodEntidade'));
@@ -109,7 +111,7 @@ if ( !$obErro->ocorreu() ) {
     } else {
         $obErro = $obFContabilidadeEncerramento->gerarRestosEncerramento($rsEncerramento, $boTransacao);
     }
-
+   
     //Inluindo ou alterando o campo RESTOS A PAGAR nos empenhos
     if ( !$obErro->ocorreu() ) {
         if (Sessao::getExercicio() >= '2013') {
@@ -134,7 +136,6 @@ if ( !$obErro->ocorreu() ) {
             $obRConfiguracaoEntidade->setParametro( "virada_GF_entidade_".$request->get('inCodEntidade') );
             $obRConfiguracaoEntidade->setValor( "T" );
             $obRConfiguracaoEntidade->setCodModulo( 10 );
-
             $obRConfiguracaoEntidade->verificaParametro( $boExiste, $boTransacao );
 
             if ($boExiste) {
@@ -142,8 +143,21 @@ if ( !$obErro->ocorreu() ) {
             } else {
                 $obErro = $obRConfiguracaoEntidade->incluir( $boTransacao );
             }
-        }
+            
+            $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade;
+            $obTAdministracaoConfiguracaoEntidade->setDado('exercicio', Sessao::getExercicio());
+            $obTAdministracaoConfiguracaoEntidade->setDado('cod_entidade', $request->get('inCodEntidade'));
+            $obTAdministracaoConfiguracaoEntidade->setDado('cod_modulo', 10);
+            $obTAdministracaoConfiguracaoEntidade->setDado('parametro', 'virada_GF');
+            $obTAdministracaoConfiguracaoEntidade->setDado('valor', 'T');
+            $obTAdministracaoConfiguracaoEntidade->recuperaPorChave( $rsConfig, $boTransacao );
 
+            if ($rsConfig->getNumLinhas() > 0) {
+                $obErro = $obTAdministracaoConfiguracaoEntidade->alteracao( $boTransacao );
+            } else {
+                $obErro = $obTAdministracaoConfiguracaoEntidade->inclusao( $boTransacao );
+            }
+        }
     }
 }
 

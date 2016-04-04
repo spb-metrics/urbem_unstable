@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterLiquidacao.php 64153 2015-12-09 19:16:02Z evandro $
+    $Id: FMManterLiquidacao.php 64431 2016-02-22 18:00:21Z jean $
 
     $Revision: 32093 $
     $Name:  $
@@ -629,6 +629,8 @@ $boMostrarCombo = $rsAdministracaoConfiguracao->getCampo('valor');
 
 // Verifica quais estados estão selecionados para saber quais dados incluir, se for necessário, nas combos de tipo de documento.
 
+Sessao::write('inUf', $stConfiguracaoUf);
+
 switch ($stConfiguracaoUf) {
     case '2':
         $obComboEstados = 'true';
@@ -806,6 +808,35 @@ switch ($stConfiguracaoUf) {
         $obTTCETOTipoDocumento = new TTCETOTipoDocumento;
         $obTTCETOTipoDocumento->recuperaTodos($rsTipoDocumento);
         Sessao::write('tipoEstado', 'TO');
+    break;
+    case '23':
+        $obHdnVlVlTotalDoctoFiscal = new Hidden;
+        $obHdnVlVlTotalDoctoFiscal->setName  ( "nuTotalNf" );
+        $obHdnVlVlTotalDoctoFiscal->setId    ( "nuTotalNf" );
+            
+        //Radio para definicao de Inclusão de Documento Fiscal
+        $obRdIncluirNFS = new Radio;
+        $obRdIncluirNFS->setRotulo  ( "*Incluir Documento Fiscal" );
+        $obRdIncluirNFS->setName    ( "stIncluirNF"  );
+        $obRdIncluirNFS->setId      ( "stIncluirNF1" );
+        $obRdIncluirNFS->setValue   ( "Sim" );
+        $obRdIncluirNFS->setLabel   ( "Sim" );
+        $obRdIncluirNFS->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
+        $obRdIncluirNFS->setChecked ( false );
+     
+        $obRdIncluirNFN = new Radio;
+        $obRdIncluirNFN->setRotulo  ( "*Incluir Documento Fiscal" );
+        $obRdIncluirNFN->setName    ( "stIncluirNF"    );
+        $obRdIncluirNFN->setId      ( "stIncluirNF2"   );
+        $obRdIncluirNFN->setValue   ( "Não" );
+        $obRdIncluirNFN->setLabel   ( "Não" );
+        $obRdIncluirNFN->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
+        $obRdIncluirNFN->setChecked ( true );
+        
+        $arRadiosNF = array( $obRdIncluirNFS, $obRdIncluirNFN );
+        
+        $obSpnNF = new Span();
+        $obSpnNF->setId( 'spnNF' );
     break;
 }
 
@@ -993,6 +1024,12 @@ switch ($stConfiguracaoUf) {
         $obFormulario->addComponente( $obDtEmissaoNF );
         $obFormulario->addComponente( $obTxtCodValidacaoNF );
         $obFormulario->addComponente( $obTxtModeloNF );
+    break;
+    case '23':
+        $obFormulario->addTitulo('Documento Fiscal');
+        $obFormulario->addHidden        ( $obHdnVlVlTotalDoctoFiscal );
+        $obFormulario->agrupaComponentes( $arRadiosNF );
+        $obFormulario->addSpan          ( $obSpnNF );
     break;
 }
 

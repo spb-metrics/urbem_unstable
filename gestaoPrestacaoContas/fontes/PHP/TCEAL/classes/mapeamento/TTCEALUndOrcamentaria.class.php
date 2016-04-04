@@ -27,7 +27,7 @@
     *
     * @author: Franver Sarmento de Moraes
     *
-    * $Id: TTCEALUndOrcamentaria.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTCEALUndOrcamentaria.class.php 64771 2016-03-30 19:35:02Z carlos.silva $
     *
     * @ignore
     *
@@ -75,7 +75,7 @@ class TTCEALUndOrcamentaria extends Persistente {
                             lpad(cod_und_orcamentaria::varchar,4,'0') AS cod_und_orcamentaria,
                             lpad(cod_orgao::varchar,2,'0') AS cod_orgao,
                             nome,
-                            identificador,
+                            LPAD(identificador::VARCHAR, 2, '0') AS identificador,
                             cnpj,
                             descricao
                     FROM (
@@ -128,6 +128,7 @@ class TTCEALUndOrcamentaria extends Persistente {
              
              WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
                AND despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
+               AND PJ.cnpj <> ''
              
              GROUP BY despesa.exercicio
                  , unidade.num_unidade

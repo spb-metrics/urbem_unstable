@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPreEmpenho.class.php 64136 2015-12-08 12:00:33Z arthur $
+    $Id: REmpenhoPreEmpenho.class.php 64372 2016-01-28 17:55:48Z arthur $
 
     *Casos de uso: uc-02.01.23
                    uc-02.03.15
@@ -442,6 +442,7 @@ class REmpenhoPreEmpenho
         } else {
             $obErro = $obTEmpenhoPreEmpenho->recuperaSaldoAnterior( $rsRecordSet, $stOrder, $boTransacao );
         }
+        
         if ( !$obErro->ocorreu() ) {
             $nuSaldoAnterior = $rsRecordSet->getCampo( "saldo_anterior" );
         }
@@ -852,10 +853,12 @@ class REmpenhoPreEmpenho
             $obTEmpenhoPreEmpenho->setDado( "cgm_usuario"     , $this->obRUsuario->obRCGM->getNumCGM() );
 
             $obErro = $obTEmpenhoPreEmpenho->inclusao( $boTransacao );
+            
             if ( !$obErro->ocorreu() ) {
                 if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
                     $obErro = $this->salvarDespesa( $boTransacao );
                 }
+                
                 if ( !$obErro->ocorreu() ) {
                     if ( sizeof( $this->arItemPreEmpenho ) > 0 ) {
                         $nuVlTotal = 0;
@@ -867,12 +870,16 @@ class REmpenhoPreEmpenho
                             }
                         }
                         if ( $this->obROrcamentoDespesa->getCodDespesa() and !$obErro->ocorreu() ) {
-                            $this->consultaSaldoAnterior( $nuSaldoAnterior,'', $boTransacao );
-                            $nuVlTotal = number_format((float) $nuVlTotal,2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
+
+                            $this->consultaSaldoAnteriorDataEmpenho( $nuSaldoAnterior,'', $boTransacao );
+
+                            $nuVlTotalReserva = number_format((float) $this->obROrcamentoReserva->getVlReserva(),2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
                             $nuSaldoAnterior = number_format((float) $nuSaldoAnterior,2,'.',''); // fossem demonstradas no var_dump como iguais, ficava oculto no ponto flutuante uma diferença
-                            if ($nuVlTotal > $nuSaldoAnterior) {
+                            
+                            if ($nuVlTotalReserva > $nuSaldoAnterior) {
                                 $obErro->setDescricao( "Não há saldo disponível para esta dotação(".$this->obROrcamentoDespesa->getCodDespesa().")!" );
                             }
+                            
                         }
                     } else {
                         $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );
@@ -1041,12 +1048,13 @@ class REmpenhoPreEmpenho
                             $obTEmpenhoItemEmpenhoDespesasFixas->inclusao($boTransacao);
                         }
                         if ( $this->obROrcamentoDespesa->getCodDespesa() and !$obErro->ocorreu() ) {
-                            $this->consultaSaldoAnterior( $nuSaldoAnterior,'', $boTransacao );
-                                                        $nuVlTotal = number_format((float) $nuVlTotal,2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
-                                                        $nuSaldoAnterior = number_format((float) $nuSaldoAnterior,2,'.',''); // fossem demonstradas no var_dump como iguais, ficava oculto no ponto flutuante uma diferença
+                            
+                            $this->consultaSaldoAnteriorDataEmpenho( $nuSaldoAnterior,'', $boTransacao );
+                            $nuVlTotal = number_format((float) $nuVlTotal,2,'.',''); // usando number_format pois no if abaixo dava diferença. Foi identificado que, embora as variáveis
+                            $nuSaldoAnterior = number_format((float) $nuSaldoAnterior,2,'.',''); // fossem demonstradas no var_dump como iguais, ficava oculto no ponto flutuante uma diferença
                             if ($nuVlTotal > $nuSaldoAnterior) {
-                                                            $obErro->setDescricao( "Não há saldo disponível para esta dotação(".$this->obROrcamentoDespesa->getCodDespesa().")!" );
-                                                        }
+                                $obErro->setDescricao( "Não há saldo disponível para esta dotação(".$this->obROrcamentoDespesa->getCodDespesa().")!" );
+                            }
 
                         }
                     } else {

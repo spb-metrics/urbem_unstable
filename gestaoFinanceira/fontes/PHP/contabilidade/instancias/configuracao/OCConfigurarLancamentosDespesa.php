@@ -144,7 +144,7 @@ function montaCombos($inCodDespesa, $stAba = "", $stValorRadio = "")
 
         case 'demaisDespesas':
           $stFiltroDebito = " AND pc.exercicio = '".Sessao::getExercicio()."'
-                      AND ( pc.cod_estrutural like '3.3.2%' OR pc.cod_estrutural like '3.4.1%' OR pc.cod_estrutural like '3.4.2%' OR pc.cod_estrutural like '3.4.3%' OR pc.cod_estrutural like '3.4.4%' OR pc.cod_estrutural like '3.4.9%'  OR pc.cod_estrutural like '3.5.5%') ";
+                      AND pc.cod_estrutural like '3.%' ";
           break;
       }
       if ($stFiltroCredito == '') {

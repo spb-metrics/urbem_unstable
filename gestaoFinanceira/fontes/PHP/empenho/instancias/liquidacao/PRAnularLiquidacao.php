@@ -82,14 +82,14 @@ $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
 if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $arDtAutorizacao[1]) {
-    SistemaLegado::LiberaFrames(true,False);
+    SistemaLegado::LiberaFrames(true,true);
     SistemaLegado::exibeAviso(urlencode("Mês da Anulação encerrado!"),"n_incluir","erro");
     exit;
 }
 
 switch ($stAcao) {
     case "anular":
-        SistemaLegado::LiberaFrames(true, false);
+        SistemaLegado::BloqueiaFrames(true, true);
         Sessao::setTrataExcecao(true);
 
         $obREmpenhoEmpenho->setExercicio ( $_REQUEST["dtExercicioEmpenho"] );
@@ -142,8 +142,8 @@ switch ($stAcao) {
             SistemaLegado::executaFrameOculto( "var x = window.open('".CAM_FW_POPUPS."relatorio/OCRelatorio.php".$stCampos."','oculto');" );
         } else {
             SistemaLegado::exibeAviso( urlencode( $obErro->getDescricao()), "n_incluir", "erro" );
+            SistemaLegado::LiberaFrames(true, true);
         }
-        SistemaLegado::LiberaFrames(true, false);
         Sessao::encerraExcecao();
     break;
 

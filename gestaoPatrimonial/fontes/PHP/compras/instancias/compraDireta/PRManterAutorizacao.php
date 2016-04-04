@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: PRManterAutorizacao.php 64005 2015-11-17 16:49:06Z michel $
+ $Id: PRManterAutorizacao.php 64370 2016-01-28 16:23:40Z arthur $
 
  * Casos de uso: uc-03.04.32
  */
@@ -458,7 +458,9 @@ $stDtCompraDireta = $_REQUEST['stDtCompraDireta'];
 
                     $rsItensSolicitacaoAgrupados->proximo();
                 }
-
+                
+                $obAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+                $obAutorizacaoEmpenho->setTipoEmissao('R');
                 $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
 
                 # Salvar Assinaturas configuráveis se houverem

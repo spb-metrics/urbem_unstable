@@ -191,6 +191,15 @@ case 'buscaFornecedor':
         $stJs .= 'jq("#stNomFornecedor").html("&nbsp;");';
     }
     break;
+
+    default:
+        if(Sessao::getExercicio()>2015){
+            include_once CAM_FW_PDF."RRelatorio.class.php";
+
+            $obRRelatorio = new RRelatorio;
+            $obRRelatorio->executaFrameOculto( "OCGeraRelatorioRestosPagarAnuladoPagamentoEstorno.php" );
+        }
+    break;
 }
 
 echo $stJs;

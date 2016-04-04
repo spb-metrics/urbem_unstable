@@ -78,9 +78,12 @@ if ( count($rsRecordSetHABLIC10->getElementos()) > 0) {
     $boChave = true;
     foreach ($rsRecordSetHABLIC10->getElementos() as $arHABLIC10) {
         $inCount++;
-        if($arHABLIC10['natureza_objeto']!=99){
-            $stChave10 = $arHABLIC10['cod_orgao'].$arHABLIC10['cod_unidade'].$arHABLIC10['exercicio_licitacao'].$arHABLIC10['num_processo_licitatorio'].$arHABLIC10['num_documento'];
-             
+        if( $arHABLIC10['natureza_objeto'] != 99 ){
+            $stChave10 = $arHABLIC10['cod_orgao']
+                        .$arHABLIC10['cod_unidade']
+                        .$arHABLIC10['exercicio_licitacao']
+                        .$arHABLIC10['num_processo_licitatorio'];
+
             $rsBloco = 'rsBloco_'.$inCount;
             unset($$rsBloco);
             $$rsBloco = new RecordSet();
@@ -119,7 +122,7 @@ if ( count($rsRecordSetHABLIC10->getElementos()) > 0) {
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
             
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_documento");
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_documento");
             $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
@@ -227,19 +230,25 @@ if ( count($rsRecordSetHABLIC10->getElementos()) > 0) {
             //11
             $stChave11 = '';
             $stChave11Unica = '';
+
             foreach ($rsRecordSetHABLIC11->getElementos() as $arHABLIC11) {
                 $inCount++;
-                $stChave11 = $arHABLIC11['cod_orgao'].$arHABLIC11['cod_unidade'].$arHABLIC11['exercicio_licitacao'].$arHABLIC11['num_processo_licitatorio'].$arHABLIC11['cnpj_empresa_hablic'];                
-                if ($stChave10 === $stChave11){
+                $stChave11 = $arHABLIC11['cod_orgao']
+                            .$arHABLIC11['cod_unidade']
+                            .$arHABLIC11['exercicio_licitacao']
+                            .$arHABLIC11['num_processo_licitatorio'];
+
+                if ( $stChave10 === $stChave11 ){
                     //Registro Unico do registro 11
                     $stChave11Aux = $arHABLIC11['cod_orgao']
-                                    .$arHABLIC11['cod_unidade']
-                                    .$arHABLIC11['exercicio_licitacao']
-                                    .$arHABLIC11['num_processo_licitatorio']
-                                    .$arHABLIC11['tipo_documento_socio']
-                                    .$arHABLIC11['num_documento_socio']
-                                    .$arHABLIC11['tipo_participacao'];    
-                    if ($stChave11Unica !== $stChave11Aux) {
+                                   .$arHABLIC11['cod_unidade']
+                                   .$arHABLIC11['exercicio_licitacao']
+                                   .$arHABLIC11['num_processo_licitatorio']
+                                   .$arHABLIC11['tipo_documento_socio']
+                                   .$arHABLIC11['num_documento_socio']
+                                   .$arHABLIC11['tipo_participacao'];
+
+                    if ( $stChave11Unica !== $stChave11Aux ) {
                         $stChave11Unica = $stChave11Aux;
 
                         $rsBloco = 'rsBloco_'.$inCount;
@@ -307,9 +316,12 @@ if ( count($rsRecordSetHABLIC10->getElementos()) > 0) {
                 $boChave = true;
                 foreach ($rsRecordSetHABLIC20->getElementos() as $arHABLIC20) {
                     $inCount++;
-                    $stChave20 = $arHABLIC20['cod_orgao'].$arHABLIC20['cod_unidade'].$arHABLIC20['exercicio_licitacao'].$arHABLIC20['num_processo_licitatorio'];
+                    $stChave20 = $arHABLIC20['cod_orgao']
+                                .$arHABLIC20['cod_unidade']
+                                .$arHABLIC20['exercicio_licitacao']
+                                .$arHABLIC20['num_processo_licitatorio'];
+
                     if($stChave11===$stChave20){
-       
                         if(!($stChaveAux20===$arHABLIC20['cod_orgao'].$arHABLIC20['cod_unidade'].$arHABLIC20['exercicio_licitacao'].$arHABLIC20['num_processo_licitatorio'].$arHABLIC20['num_documento'])) {
                             $stChaveAux20===$arHABLIC20['cod_orgao'].$arHABLIC20['cod_unidade'].$arHABLIC20['exercicio_licitacao'].$arHABLIC20['num_processo_licitatorio'].$arHABLIC20['num_documento'];
                             $rsBloco = 'rsBloco_'.$inCount;

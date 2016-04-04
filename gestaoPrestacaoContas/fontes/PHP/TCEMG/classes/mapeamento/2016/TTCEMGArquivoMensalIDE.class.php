@@ -56,43 +56,47 @@ class TTCEMGArquivoMensalIDE extends Persistente
     public function montaRecuperaDadosExportacao()
     {
         $stSql = "
-        SELECT ( SELECT cnpj 
-                   FROM sw_cgm_pessoa_juridica
-              LEFT JOIN administracao.configuracao 
-                     ON parametro = 'cod_entidade_prefeitura' 
-                    AND configuracao.exercicio = '".Sessao::getExercicio()."'
-              LEFT JOIN orcamento.entidade 
-                     ON cod_entidade=configuracao.valor::integer 
-                    AND entidade.exercicio = configuracao.exercicio
-                  WHERE sw_cgm_pessoa_juridica.numcgm=entidade.numcgm
-             ) AS cnpj_municipio
-             , ( SELECT DISTINCT cod_municipio
-                   FROM tcemg.configurar_ide
-             ) AS cod_municipio
-             , LPAD((SELECT valor
-                       FROM tcemg.orgao
-                 INNER JOIN administracao.configuracao_entidade
-                         ON configuracao_entidade.valor::integer = orgao.num_orgao
-                      WHERE  configuracao_entidade.exercicio   = ACE.exercicio 
-                        AND configuracao_entidade.cod_entidade = ACE.cod_entidade 
-                        AND parametro = 'tcemg_codigo_orgao_entidade_sicom'
-             ), 2, '0') AS cod_orgao
-             , ( SELECT valor 
-                   FROM tcemg.orgao
-             INNER JOIN administracao.configuracao_entidade
-                     ON configuracao_entidade.valor::integer = orgao.num_orgao
-                  WHERE configuracao_entidade.exercicio    = ACE.exercicio 
-                    AND configuracao_entidade.cod_entidade = ACE.cod_entidade 
-                    AND parametro = 'tcemg_tipo_orgao_entidade_sicom'
-             ) AS tipo_orgao
-             , '".Sessao::getExercicio()."' AS exercicio_referencia
-             , '".$this->getDado('mes')."' AS mes_referencia
-             , to_char(CURRENT_DATE::timestamp,'ddmmyyyy') as data_geracao
-             , to_char(CURRENT_DATE::timestamp,'yyyymmdd')||''||'".Sessao::getExercicio()."'||'".$this->getDado('mes')."' as cod_remessa
-          FROM administracao.configuracao_entidade AS ACE
-         WHERE ACE.exercicio = '".Sessao::getExercicio()."' 
-           AND ACE.cod_entidade IN (".$this->getDado('entidades').") 
-           AND ACE.parametro = 'tcemg_codigo_orgao_entidade_sicom' ";
+          SELECT (
+                  SELECT cnpj 
+                    FROM sw_cgm_pessoa_juridica
+               LEFT JOIN administracao.configuracao 
+                      ON parametro = 'cod_entidade_prefeitura' 
+                     AND configuracao.exercicio = '".Sessao::getExercicio()."'
+               LEFT JOIN orcamento.entidade 
+                      ON cod_entidade=configuracao.valor::integer 
+                     AND entidade.exercicio = configuracao.exercicio
+                   WHERE sw_cgm_pessoa_juridica.numcgm=entidade.numcgm
+                 ) AS cnpj_municipio
+               , ( SELECT DISTINCT cod_municipio
+                     FROM tcemg.configurar_ide
+                 ) AS cod_municipio
+               , LPAD((
+                       SELECT valor
+                         FROM tcemg.orgao
+                   INNER JOIN administracao.configuracao_entidade
+                           ON configuracao_entidade.valor::integer = orgao.num_orgao
+                        WHERE configuracao_entidade.exercicio   = ACE.exercicio 
+                          AND configuracao_entidade.cod_entidade = ACE.cod_entidade 
+                          AND parametro = 'tcemg_codigo_orgao_entidade_sicom'
+                 ), 2, '0') AS cod_orgao
+               , (
+                  SELECT valor 
+                    FROM tcemg.orgao
+              INNER JOIN administracao.configuracao_entidade
+                      ON configuracao_entidade.valor::integer = orgao.num_orgao
+                   WHERE configuracao_entidade.exercicio    = ACE.exercicio 
+                     AND configuracao_entidade.cod_entidade = ACE.cod_entidade 
+                     AND parametro = 'tcemg_tipo_orgao_entidade_sicom'
+                 ) AS tipo_orgao
+               , '".$this->getDado('exercicio')."' AS exercicio_referencia
+               , '".$this->getDado('mes')."' AS mes_referencia
+               , to_char(CURRENT_DATE::timestamp,'ddmmyyyy') as data_geracao
+               , to_char(CURRENT_DATE::timestamp,'yyyymmdd')||''||'".$this->getDado('exercicio')."'||'".$this->getDado('mes')."' as cod_remessa
+            FROM administracao.configuracao_entidade AS ACE
+           WHERE ACE.exercicio = '".Sessao::getExercicio()."' 
+             AND ACE.cod_entidade IN (".$this->getDado('entidades').") 
+             AND ACE.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+        ";
         return $stSql;
     }
     

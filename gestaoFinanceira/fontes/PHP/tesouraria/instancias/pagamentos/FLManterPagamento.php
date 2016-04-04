@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FLManterPagamento.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLManterPagamento.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     $Revision: 32797 $
     $Name$
@@ -43,6 +43,10 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+
+if($_REQUEST['stAcao'] == 'incluir' || $_REQUEST['stAcao'] == 'alterar')
+include_once( CAM_GF_INCLUDE."validaGF.inc.php");
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CLA_IAPPLETTERMINAL );
 include_once ( CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php"          );
@@ -84,7 +88,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRTesourariaBoletim->addPagamento();
     $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->setExercicio( Sessao::getExercicio() );
     $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm') );
-    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidades );
+    $obRTesourariaBoletim->roUltimoPagamento->obREmpenhoPagamentoLiquidacao->obREmpenhoNotaLiquidacao->roREmpenhoEmpenho->obROrcamentoEntidade->listarEntidadeRestos( $rsEntidades );
 
     // DEFINICAO DOS COMPONENTES
     $obForm = new Form;

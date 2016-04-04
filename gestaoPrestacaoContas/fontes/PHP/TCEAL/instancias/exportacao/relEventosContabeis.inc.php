@@ -55,10 +55,10 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
     $obTTCEALRelEventosContabeis->setDado('stExercicio'  , Sessao::getExercicio());
     $obTTCEALRelEventosContabeis->setDado('inCodEntidade', $inCodEntidade );
     $obTTCEALRelEventosContabeis->setDado('bimestre'     , $inBimestre  );
-    $obTTCEALRelEventosContabeis->setDado('dt_incial'    , $dtInicial );
+    $obTTCEALRelEventosContabeis->setDado('dt_inicial'   , $dtInicial );
     $obTTCEALRelEventosContabeis->setDado('dt_final'     , $dtFinal );
     $obTTCEALRelEventosContabeis->recuperaRelacionamento ($rsRecordSet);
-
+        
     $idCount=0;
     $arResult = array();
     
@@ -79,4 +79,5 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
 }
     
 unset($UndGestora, $CodUndGestora, $obTTCEALRelEventosContabeis, $stPeriodoMovimentacao, $obTEntidade);
+
 ?>

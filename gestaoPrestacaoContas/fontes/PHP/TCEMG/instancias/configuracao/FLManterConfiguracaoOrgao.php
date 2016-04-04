@@ -32,6 +32,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once ( CAM_GF_CONT_NEGOCIO."RContabilidadeLancamentoValor.class.php" );
+include_once( CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeUsuario.class.php" );
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracaoOrgao";
@@ -44,11 +45,6 @@ $pgJS   = "JS".$stPrograma.".js";
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
 $stAcao   = $request->get('stAcao');
-
-$obRegra = new RContabilidadeLancamentoValor;
-$obRegra->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->setExercicio( Sessao::getExercicio() );
-$obRegra->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm') );
-$obRegra->obRContabilidadeLancamento->obRContabilidadeLote->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidade, "E.numcgm" );
 
 //Instancia o formulário
 $obForm = new Form;
@@ -73,22 +69,11 @@ $obHdnModulo = new Hidden;
 $obHdnModulo->setName ( "modulo"                 );
 $obHdnModulo->setValue( $request->get('modulo')  );
 
-//Define o objeto COMBO para Entidade
-$obCmbEntidade = new Select;
-$obCmbEntidade->setName      ( "inCodEntidade" );
-$obCmbEntidade->setRotulo    ( "Entidade" );
-
-// Caso o usuário tenha permissão para mais de uma entidade, exibe o selecionar.
-// Se tiver apenas uma, evita o addOption forçando a primeira e única opção ser selecionada.
-if ($rsEntidade->getNumLinhas()>1) {
-    $obCmbEntidade->addOption    ( "", "Selecione" );
+$obITextBoxSelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
+$obITextBoxSelectEntidadeUsuario->setNull ( false );
+if ($request->get('inCodEntidade') != "") {
+    $obITextBoxSelectEntidadeUsuario->setCodEntidade($request->get('inCodEntidade'));
 }
-
-$obCmbEntidade->setCampoId   ( "[cod_entidade]" );
-$obCmbEntidade->setCampoDesc ( "[cod_entidade] - [nom_cgm]" );
-$obCmbEntidade->preencheCombo( $rsEntidade );
-$obCmbEntidade->setNull      ( false );
-$obCmbEntidade->setTitle     ( 'Selecione uma Entidade' );
 
 //Define o objeto TextBox para o Reduzido
 $obTxtReduzido = new TextBox;
@@ -110,7 +95,7 @@ $obFormulario->addForm( $obForm );
 $obFormulario->addTitulo     ( "Configuração de orgão"  );
 $obFormulario->addHidden     ( $obHdnAcao     );
 $obFormulario->addHidden     ( $obHdnModulo   );
-$obFormulario->addComponente ( $obCmbEntidade );
+$obFormulario->addComponente ( $obITextBoxSelectEntidadeUsuario );
 $obFormulario->OK();
 $obFormulario->show();
 

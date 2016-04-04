@@ -83,8 +83,8 @@ class TTCEALLoaReceita extends Persistente
                             , cod_und_gestora
                             , cod_und_orcamentaria
                             , cod_orgao
-                            , cod_recurso
-                            , cod_receita
+                            , LPAD(cod_recurso, 9, '0') AS cod_recurso
+                            , RPAD(cod_receita, 16, '0') AS cod_receita
                             , vl_original AS vl_receita
                             , TRIM(descricao) as descricao
                             , tipo

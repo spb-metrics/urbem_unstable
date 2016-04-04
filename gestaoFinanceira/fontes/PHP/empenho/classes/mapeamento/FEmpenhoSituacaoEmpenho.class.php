@@ -77,7 +77,7 @@ function FEmpenhoSituacaoEmpenho()
 
 function montaRecuperaTodos()
 {
-    $stSql  = "select * \n";
+    $stSql  = "select retorno.*                                                                                        \n";
     $stSql .= "  from ".$this->getTabela()."('".$this->getDado("stEntidade")."',                                        \n";
     $stSql .= "  '".$this->getDado("exercicio")."','".$this->getDado("stDataInicialEmissao")."',                        \n";
     $stSql .= "  '".$this->getDado("stDataFinalEmissao")."','".$this->getDado("stDataInicialAnulacao")."',              \n";
@@ -107,6 +107,26 @@ function montaRecuperaTodos()
     $stSql .= "  liquidadoapagar     numeric,                                           \n";
     $stSql .= "  cod_recurso         integer                                            \n";
     $stSql .= "  )                                                                        ";
+
+    if (Sessao::getExercicio() > '2015') {
+        $stSql .= "
+                    INNER JOIN empenho.empenho
+                            ON empenho.cod_empenho = retorno.empenho
+                           AND empenho.cod_entidade = retorno.entidade
+                           AND empenho.exercicio = retorno.exercicio
+
+                    INNER JOIN empenho.pre_empenho
+                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+
+                    INNER JOIN empenho.item_pre_empenho
+                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                           AND item_pre_empenho.exercicio = pre_empenho.exercicio
+                \n";
+
+        if ($this->getDado("inCentroCusto") != "") {
+            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado("inCentroCusto")."\n";
+        }
+    }
 
     return $stSql;
 }

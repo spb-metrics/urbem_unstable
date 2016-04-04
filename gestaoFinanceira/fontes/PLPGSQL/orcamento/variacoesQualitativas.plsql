@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 27052 $
-* $Name$
-* $Author: cako $
-* $Date: 2007-12-05 15:12:56 -0200 (Qua, 05 Dez 2007) $
+* $Id: variacoesQualitativas.plsql 64402 2016-02-16 20:59:49Z michel $
 *
 * Casos de uso: uc-02.01.23
 */
@@ -88,7 +85,7 @@ BEGIN
             And pe.cod_pre_empenho         = ped.cod_pre_empenho
             
             And e.cod_entidade             IN (' || stCodEntidades || ')
-            And e.exercicio                = ' || quote_literal(stExercicio) || '
+            And e.exercicio                IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
             
             AND e.exercicio                = pe.exercicio
             AND e.cod_pre_empenho          = pe.cod_pre_empenho
@@ -118,7 +115,7 @@ BEGIN
                  And EIPE.exercicio           = EEAI.exercicio
                  And EIPE.cod_pre_empenho     = EEAI.cod_pre_empenho
                  And EIPE.num_item            = EEAI.num_item
-                 And EEAI.exercicio           = '|| quote_literal(stExercicio) ||'
+                 And EEAI.exercicio           IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
                  And EEAI.cod_entidade        IN ('||stCodEntidades||')
                  And OD.cod_despesa           = EPED.cod_despesa
                  AND OD.exercicio             = EPED.exercicio';
@@ -155,7 +152,7 @@ BEGIN
             And EPE.exercicio            = EE.exercicio
             And EPE.cod_pre_empenho      = EE.cod_pre_empenho
             
-            And EE.exercicio             = '|| quote_literal(stExercicio) ||'
+            And EE.exercicio             IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
             And EE.cod_entidade          IN ('||stCodEntidades||')
             
             And EE.cod_empenho           = ENL.cod_empenho
@@ -198,7 +195,7 @@ BEGIN
             And EPE.cod_pre_empenho      = EE.cod_pre_empenho
             
             And EE.cod_entidade          IN ('||stCodEntidades||')
-            And EE.exercicio             = ' || quote_literal(stExercicio) ||'
+            And EE.exercicio             IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
             
             And EE.cod_empenho           = ENL.cod_empenho
             And EE.exercicio             = ENL.exercicio_empenho
@@ -242,7 +239,7 @@ BEGIN
                     And pe.cod_pre_empenho         = ped.cod_pre_empenho
                     
                     And e.cod_entidade             IN (' || stCodEntidades || ')
-                    And e.exercicio                = ' || quote_literal(stExercicio) || '
+                    And e.exercicio                IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
                     
                     AND e.exercicio                = pe.exercicio
                     AND e.cod_pre_empenho          = pe.cod_pre_empenho
@@ -279,7 +276,7 @@ BEGIN
           And EE.cod_entidade             = ENL.cod_entidade
           And EE.cod_empenho              = ENL.cod_empenho
           And EE.cod_entidade             IN ('||stCodEntidades||')
-          And EE.exercicio                = ' || quote_literal(stExercicio) || '
+          And EE.exercicio                IN ('|| quote_literal(stExercicio) ||',' || quote_literal(stExercicioAnterior) || ')
           
           And ENL.exercicio               = ENLI.exercicio
           And ENL.cod_nota                = ENLI.cod_nota

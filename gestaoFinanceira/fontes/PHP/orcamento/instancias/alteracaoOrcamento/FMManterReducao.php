@@ -172,6 +172,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtTotal->setSize     ( 23 );
     $obTxtTotal->setMaxLength( 23 );
     $obTxtTotal->setMinValue ( 1 );
+    $obTxtTotal->obEvento->setOnChange("buscaDado('validaValorLimiteSuplementacao');");
 
     // Define Objeto BuscaInner para Dotacao Redutoras
     $obBscDespesaReducao = new BuscaInner;

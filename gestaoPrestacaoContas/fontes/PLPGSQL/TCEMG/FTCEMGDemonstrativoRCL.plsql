@@ -27,7 +27,7 @@
     * @author Analista:      Eduardo Paculski Schitz
     * @author Desenvolvedor: Franver Sarmento de Moraes
     
-    $Id: FTCEMGDemonstrativoRCL.plsql 63595 2015-09-15 18:26:39Z franver $
+    $Id: FTCEMGDemonstrativoRCL.plsql 64421 2016-02-19 12:14:17Z fabio $
 */
 CREATE OR REPLACE FUNCTION tcemg.fn_relatorio_demostrativo_rcl(VARCHAR, VARCHAR, VARCHAR, VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 

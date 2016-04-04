@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaAutenticacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: RTesourariaAutenticacao.class.php 64368 2016-01-28 12:04:02Z franver $
 
     $Revision: 30835 $
     $Name$
@@ -193,6 +193,7 @@ function autenticar($boTransacao = "")
     include_once ( CAM_GF_TES_MAPEAMENTO ."TTesourariaAutenticacao.class.php"           );
     $obTransacao                         = new Transacao();
     $obTTesourariaAutenticacao           = new TTesourariaAutenticacao();
+    $boFlagTransacao = false;
     $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
     if ( !$obErro->ocorreu() ) {
         $obErro = $this->buscaProximoCodigo( $boTransacao );

@@ -35,7 +35,7 @@
     * @subpackage Exportador
 
     * Casos de uso: uc-02.08.01
-    $Id: RExportacaoTCERSArquivosPrincipais.class.php 61774 2015-03-03 16:24:44Z michel $
+    $Id: RExportacaoTCERSArquivosPrincipais.class.php 64594 2016-03-17 17:01:31Z jean $
 */
 
 /* Includes */
@@ -174,7 +174,11 @@ class RExportacaoTcersArquivosPrincipais
             $this->obFExportacaoPagamento->setDado('dtInicial'      , $this->getDataInicial()   );
             $this->obFExportacaoPagamento->setDado('dtFinal'        , $this->getDataFinal()     );
             $this->obFExportacaoPagamento->setDado('stCodEntidades' , $this->getCodEntidades()  );
-            $obErro =   $this->obFExportacaoPagamento->recuperaTodos($rsRecordset               );
+            if (Sessao::getExercicio() > '2015') {
+                $obErro = $this->obFExportacaoPagamento->recuperaArquivo2016($rsRecordset       );
+            } else {
+                $obErro = $this->obFExportacaoPagamento->recuperaTodos($rsRecordset             );
+            }
             $arRecordset["PAGAMENT.TXT"] = $rsRecordset;
         }
         if (in_array("LIQUIDAC.TXT",$this->arArquivos)) {
@@ -186,6 +190,7 @@ class RExportacaoTcersArquivosPrincipais
             $obErro =   $this->obFExportacaoLiquidacao->recuperaDadosExportacao($rsRecordset        );
 
             $inCount=0;
+            
             while ( !$rsRecordset->eof()) {
                 $arRecordsetNovo[$inCount]['exercicio']             = $rsRecordset->getCampo('exercicio');
                 $arRecordsetNovo[$inCount]['cod_empenho']           = $rsRecordset->getCampo('cod_empenho');
@@ -203,6 +208,9 @@ class RExportacaoTcersArquivosPrincipais
                 $arRecordsetNovo[$inCount]['exercicio_contrato']    = $rsRecordset->getCampo('exercicio_contrato');
                 $arRecordsetNovo[$inCount]['zero']                  = "000000000000000000000000000000";
                 $arRecordsetNovo[$inCount]['branco']                = '';
+                $arRecordsetNovo[$inCount]['num_nota']              = $rsRecordset->getCampo('num_nota');
+                $arRecordsetNovo[$inCount]['num_serie']             = $rsRecordset->getCampo('num_serie');
+                $arRecordsetNovo[$inCount]['existe_nf']             = $rsRecordset->getCampo('existe_nf');
 
                 $rsRecordset->proximo();
                 $inCount++;

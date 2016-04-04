@@ -27,10 +27,7 @@
   * Página de Formulario
   * Data de Criação: 31/07/2014
   * @author Desenvolvedor: Evandro Melos
-  * $Id: OCGeraRelatorioDividaFlutuante.php 59612 2014-09-02 12:00:51Z gelson $
-  * $Date: $
-  * $Author: $
-  * $Rev: $
+  * $Id: OCGeraRelatorioDividaFlutuante.php 64782 2016-03-31 16:55:09Z michel $
   *
 */
 include_once '../../../../../../config.php';
@@ -44,11 +41,12 @@ $stDataFinal    = Sessao::read('data_final');
 
 //-------------------------------
 // Preparando a chamada para o layout do relatório
+// Layout LHTCEMGRelatorioDividaFlutuante.php
 $obMPDF = new FrameWorkMPDF(6,55,8);
 $obMPDF->setCodEntidades($inCodEntidades);
 $obMPDF->setDataInicio($stDataInicial);
 $obMPDF->setDataFinal($stDataFinal);
-$obMPDF->setNomeRelatorio("Demostrativo Divida Flutuante");
+$obMPDF->setNomeRelatorio("Demonstrativo Dívida Flutuante");
 $obMPDF->setFormatoFolha("A4-L");
 
 $obMPDF->setConteudo($arDados);

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoOrdemPagamento.class.php 64197 2015-12-15 12:56:27Z jean $
+    $Id: REmpenhoOrdemPagamento.class.php 64368 2016-01-28 12:04:02Z franver $
 
     * Casos de uso: uc-02.03.03,uc-02.03.05,uc-02.03.20,uc-02.03.23,uc-02.04.05,uc-02.03.28
 */
@@ -750,30 +750,36 @@ function anular($boTransacao = "")
                     $obErro->setDescricao( "A data de anulação deve ser posterior ou igual à data da emissão." );
                 }
                 if ( !$obErro->ocorreu() ) {
-                        if ($valorParaAnular <= $valorAval) {
-                            $this->setTimestampAnulacao( date('Y-m-d H:i:s.us') );
+                    if ($valorParaAnular <= $valorAval) {
+                        if ( !$obErro->ocorreu() ) {
+                            if ( is_array($this->arOrdemPagamentoLiquidacaoAnulada) ) {
+                                foreach ($this->arOrdemPagamentoLiquidacaoAnulada as $obOPLA) {
+                                    /*
+                                     * Ticket #23502, é necessário fazer a busca do timestamp apartir do PHP, pois como o banco está numa mesma transação. Ele não altera cria um novo timestamp durante esse processo.
+                                     * Foi também necessário adicionar um sleep, porque quando o PHP criar um timestamp, ele não pega o milisegundo EX.: 2016-01-01 09:10:35.000000.
+                                     * Sendo assim o sleep logo abaixo é para fazer o PHP esperar um segundo para continuar o processo.
+                                     **/
 
-                            $obTEmpenhoOrdemPagamentoAnulada->setDado( "cod_ordem"    , $this->inCodigoOrdem  );
-                            $obTEmpenhoOrdemPagamentoAnulada->setDado( "exercicio"    , $this->stExercicio    );
-                            $obTEmpenhoOrdemPagamentoAnulada->setDado( "cod_entidade" , $this->obROrcamentoEntidade->getCodigoEntidade() );
-                            $obTEmpenhoOrdemPagamentoAnulada->setDado( "motivo"       , $this->stMotivo       );
-                            $obTEmpenhoOrdemPagamentoAnulada->setDado( "timestamp"    , $this->getTimestampAnulacao() );
-                            $obErro = $obTEmpenhoOrdemPagamentoAnulada->inclusao( $boTransacao );
-                            // Grava Anulações
-                            if ( !$obErro->ocorreu() ) {
-                                if ( is_array($this->arOrdemPagamentoLiquidacaoAnulada) ) {
-                                    foreach ($this->arOrdemPagamentoLiquidacaoAnulada as $obOPLA) {
-                                        $obOPLA->setDado ( 'timestamp', $this->getTimestampAnulacao() );
-                                        $obErro = $obOPLA->inclusao( $boTransacao );
+                                    $this->setTimestampAnulacao( date('Y-m-d H:i:s.u') );
+                                    sleep(1);
+                                    $obTEmpenhoOrdemPagamentoAnulada->setDado( "cod_ordem"    , $this->inCodigoOrdem  );
+                                    $obTEmpenhoOrdemPagamentoAnulada->setDado( "exercicio"    , $this->stExercicio    );
+                                    $obTEmpenhoOrdemPagamentoAnulada->setDado( "cod_entidade" , $this->obROrcamentoEntidade->getCodigoEntidade() );
+                                    $obTEmpenhoOrdemPagamentoAnulada->setDado( "motivo"       , $this->stMotivo       );
+                                    $obTEmpenhoOrdemPagamentoAnulada->setDado( "timestamp"    , $this->getTimestampAnulacao() );
+                                    $obErro = $obTEmpenhoOrdemPagamentoAnulada->inclusao( $boTransacao );
 
-                                        if ( $obErro->ocorreu() ) { break; }
-                                    }
+                                    // Grava Anulações
+                                    $obOPLA->setDado ( 'timestamp', $this->getTimestampAnulacao() );
+                                    $obErro = $obOPLA->inclusao( $boTransacao );
+
+                                    if ( $obErro->ocorreu() ) { break; }
                                 }
                             }
-                         } else {
-                            $obErro->setDescricao( "Valor a anular excede o valor disponível!" );
                         }
-                    //}
+                    } else {
+                        $obErro->setDescricao( "Valor a anular excede o valor disponível!" );
+                    }
                 }
             }
         }

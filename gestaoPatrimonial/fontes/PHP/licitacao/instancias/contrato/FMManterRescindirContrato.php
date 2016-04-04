@@ -170,14 +170,14 @@ $obVlMulta = new Moeda;
 $obVlMulta->setRotulo('Valor da Multa');
 $obVlMulta->setTitle('Informe o valor da multa.');
 $obVlMulta->setName('vlMulta');
-$obVlMulta->setNull(true);
+$obVlMulta->setNull(false);
 
 //monta o campo Moeda Indenizaçãos
 $obVlIndenizacao = new Moeda;
 $obVlIndenizacao->setRotulo('Valor da Indenização');
 $obVlIndenizacao->setTitle('Informe o valor da indenização.');
 $obVlIndenizacao->setName('vlIndenizacao');
-$obVlIndenizacao->setNull(true);
+$obVlIndenizacao->setNull(false);
 
 //monta a textArea Motivo
 $obVlMotivo = new TextArea;

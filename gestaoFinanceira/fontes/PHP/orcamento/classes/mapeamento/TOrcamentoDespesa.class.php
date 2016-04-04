@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TOrcamentoDespesa.class.php 63613 2015-09-17 19:40:48Z arthur $
+    $Id: TOrcamentoDespesa.class.php 64548 2016-03-11 18:28:10Z evandro $
 
     $Revision: 30668 $
     $Name$
@@ -1036,6 +1036,7 @@ public function montaRecuperaDespesaDotacao()
     $stSql .= "      ) AS dotacao                                        \n";
     $stSql .= "     ,CD.descricao                                        \n";
     $stSql .= "     ,O.cod_despesa                                       \n";
+    $stSql .= "     ,O.cod_recurso                                       \n";
     $stSql .= "  FROM                                                    \n";
     $stSql .= "      orcamento.conta_despesa  AS CD,                 \n";
     $stSql .= "      orcamento.despesa        AS O                   \n";

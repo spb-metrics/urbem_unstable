@@ -27,7 +27,7 @@
     *
     * @author: Evandro Melos
     *
-    * $Id: TTCEALLeisOrcamentarias.class.php 59698 2014-09-05 14:22:29Z carlos.silva $
+    * $Id: TTCEALLeisOrcamentarias.class.php 64795 2016-04-01 14:35:55Z carlos.silva $
     *
     * @ignore
     *
@@ -47,142 +47,105 @@ class TTCEALLeisOrcamentarias extends Persistente
        
     public function listarExportacaoLeisOrcamentarias(&$rsRecordSet,$stFiltro="",$stOrder=" ",$boTransacao="")
     {
-        $stSql = "  SELECT (SELECT PJ.cnpj
-                                FROM orcamento.entidade
-                                INNER JOIN sw_cgm_pessoa_juridica as PJ
-                                        ON PJ.numcgm = entidade.numcgm
-                                 WHERE entidade.exercicio = '".$this->getDado('exercicio')."'
-                                   AND entidade.cod_entidade = ".$this->getDado('cod_entidade')."
-                           ) AS cod_und_gestora
-                         , ( SELECT CASE WHEN valor = '' 
-                                                   THEN '0000'::VARCHAR
-                                                   ELSE valor
-                                                   END valor
-                                       FROM administracao.configuracao_entidade
-                                      WHERE exercicio = '".$this->getDado('exercicio')."'
-                                        AND cod_entidade = ".$this->getDado('cod_entidade')."
-                                        AND cod_modulo = 62
-                                        AND parametro = 'tceal_configuracao_unidade_autonoma'
-                            ) AS codigo_ua
-                          , exercicio
-                          , complementacao
-                          , num_lei_ppa                
-                          , data_lei_ppa
-                          , data_pub_lei_ppa
-                          , num_ldo
-                          , data_ldo
-                          , data_pub_ldo
-                          , num_loa
-                          , data_loa
-                          , data_pub_loa
-                          , perc_credito_adicional
-                          , perc_op_credito_antecipacao
-                          , perc_op_credito_interno
-                          , perc_op_credito_externo
-                    FROM(
-                            SELECT '".$this->getDado('exercicio')."'::VARCHAR AS exercicio
-                                  , (SELECT CASE WHEN valor = ''
-                                                    THEN '0'
-                                                    ELSE valor
-                                                    END AS valor
-                                       FROM administracao.configuracao
-                                       WHERE configuracao.cod_modulo = 62
-                                         AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                         AND configuracao.parametro like 'tceal_config_complementacao_loa'
-                                   ) AS complementacao
-                                   , ppa_publicacao.cod_norma AS num_lei_ppa
-                                   , TO_CHAR(ppa.timestamp ,'DD/MM/YYYY') AS data_lei_ppa
-                                   , ppa.fn_verifica_homologacao(ppa.cod_ppa) AS homologado
-                                   , TO_CHAR(ppa_publicacao.timestamp ,'DD/MM/YYYY') AS data_pub_lei_ppa
-                                   , homologacao.cod_norma AS num_ldo
-                                   , TO_CHAR(ldo.timestamp ,'DD/MM/YYYY') AS data_ldo
-                                   , TO_CHAR(homologacao.timestamp ,'DD/MM/YYYY') AS data_pub_ldo
-                                   , ( SELECT CASE WHEN valor = ''
-                                                    THEN '0'
-                                                    ELSE valor
-                                                    END AS valor
-                                         FROM administracao.configuracao
-                                        WHERE configuracao.cod_modulo = 62
-                                          AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                          AND configuracao.parametro like 'tceal_config_cod_norma'
-                                     ) AS num_loa                                    
-                                   , TO_CHAR(norma.dt_assinatura ,'DD/MM/YYYY') AS data_loa
-                                   , TO_CHAR(norma.dt_publicacao ,'DD/MM/YYYY') AS data_pub_loa
-                                   , ( SELECT CASE WHEN valor = ''
-                                                    THEN to_number('0','99')::numeric(14,2)
-                                                    ELSE to_number(valor,'99')::numeric(14,2)
-                                                    END AS valor
-                                         FROM administracao.configuracao
-                                        WHERE configuracao.cod_modulo = 62
-                                          AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                          AND configuracao.parametro like 'tceal_config_credito_adicional'
-                                     ) AS perc_credito_adicional
-                                   , ( SELECT CASE WHEN valor = ''
-                                                    THEN to_number('0','99')::numeric(14,2)
-                                                    ELSE to_number(valor,'99')::numeric(14,2)
-                                                    END AS valor
-                                         FROM administracao.configuracao
-                                        WHERE configuracao.cod_modulo = 62
-                                          AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                          AND configuracao.parametro like 'tceal_config_credito_antecipacao'
-                                     ) AS perc_op_credito_antecipacao
-                                   , ( SELECT CASE WHEN valor = ''
-                                                    THEN to_number('0','99')::numeric(14,2)
-                                                    ELSE to_number(valor,'99')::numeric(14,2)
-                                                    END AS valor
-                                        FROM administracao.configuracao
-                                       WHERE configuracao.cod_modulo = 62
-                                         AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                         AND configuracao.parametro like 'tceal_config_credito_interno'
-                                     ) AS perc_op_credito_interno
-                                   , ( SELECT CASE WHEN valor = ''
-                                                    THEN to_number('0','99')::numeric(14,2)
-                                                    ELSE to_number(valor,'99')::numeric(14,2)
-                                                    END AS valor
-                                         FROM administracao.configuracao
-                                         WHERE configuracao.cod_modulo = 62
-                                           AND configuracao.exercicio = '".$this->getDado('exercicio')."'
-                                           AND configuracao.parametro like 'tceal_config_credito_externo'
-                                     ) AS perc_op_credito_externo             
-                                FROM ppa.ppa
-                          
-                          INNER JOIN ppa.ppa_publicacao
-                                  ON ppa_publicacao.cod_ppa = ppa.cod_ppa                             
-                          
-                          INNER JOIN ldo.ldo 
-                                  ON ldo.cod_ppa  = ppa.cod_ppa
-                                 
-                          INNER JOIN ldo.homologacao
-                                  ON homologacao.cod_ppa  = ldo.cod_ppa
-                                 AND homologacao.ano = ldo.ano           
-                            
-                          INNER JOIN normas.norma
-                                  ON homologacao.cod_norma  = norma.cod_norma
-                                  
-                               WHERE '".$this->getDado('exercicio')."' BETWEEN ppa.ano_inicio AND ppa.ano_final
-                    )AS leis_orcamentarias
+        $stSql = "                
+                SELECT
+                    (SELECT PJ.cnpj
+                        FROM orcamento.entidade
+                        INNER JOIN sw_cgm_pessoa_juridica as PJ
+                            ON PJ.numcgm = entidade.numcgm
+                         WHERE entidade.exercicio = '".$this->getDado('exercicio')."'
+                           AND entidade.cod_entidade = ".$this->getDado('cod_entidade')."
+                       ) AS cod_und_gestora
+                     , ( SELECT CASE WHEN valor = '' 
+                                   THEN '0000'::VARCHAR
+                                   ELSE valor
+                                   END valor
+                               FROM administracao.configuracao_entidade
+                              WHERE exercicio = '".$this->getDado('exercicio')."'
+                            AND cod_entidade = ".$this->getDado('cod_entidade')."
+                            AND cod_modulo = 62
+                            AND parametro = 'tceal_configuracao_unidade_autonoma'
+                        ) AS codigo_ua
+                      , norma.cod_norma AS num_loa
+                      , '".$this->getDado('exercicio')."'
+                      , (SELECT CASE WHEN valor = ''
+                                        THEN '0'
+                                        ELSE valor
+                                        END AS valor
+                           FROM administracao.configuracao
+                           WHERE configuracao.cod_modulo = 62
+                             AND configuracao.exercicio = '".$this->getDado('exercicio')."'
+                             AND configuracao.parametro like 'tceal_config_complementacao_loa'
+                          ) AS complementacao
+                                                   
+                      , TO_CHAR(norma.dt_assinatura ,'DD/MM/YYYY') AS data_loa
+                      , TO_CHAR(norma.dt_publicacao ,'DD/MM/YYYY') AS data_pub_loa
+                          , CAST(( SELECT CASE WHEN valor = ''
+                                THEN to_number('0','99')::numeric(14,2)
+                                ELSE to_number(valor,'99')::numeric(14,2)
+                                END AS valor
+                         FROM administracao.configuracao
+                        WHERE configuracao.cod_modulo = 62
+                          AND configuracao.exercicio = '".$this->getDado('exercicio')."'
+                          AND configuracao.parametro like 'tceal_config_credito_adicional'
+                         ) AS int8) AS perc_credito_adicional
+                         
+                       , CAST(( SELECT CASE WHEN valor = ''
+                                THEN to_number('0','99')::numeric(14,2)
+                                ELSE to_number(valor,'99')::numeric(14,2)
+                                END AS valor
+                         FROM administracao.configuracao
+                        WHERE configuracao.cod_modulo = 62
+                          AND configuracao.exercicio = '".$this->getDado('exercicio')."'
+                          AND configuracao.parametro like 'tceal_config_credito_antecipacao'
+                         ) AS int8) AS perc_op_credito_antecipacao
+                
+                       , CAST(( SELECT CASE WHEN valor = ''
+                                THEN to_number('0','99')::numeric(14,2)
+                                ELSE to_number(valor,'99')::numeric(14,2)
+                                END AS valor
+                        FROM administracao.configuracao
+                           WHERE configuracao.cod_modulo = 62
+                         AND configuracao.exercicio = '".$this->getDado('exercicio')."'
+                         AND configuracao.parametro like 'tceal_config_credito_interno'
+                         ) AS int8) AS perc_op_credito_interno
+                
+                       , CAST(( SELECT CASE WHEN valor = ''
+                                THEN to_number('0','99')::numeric(14,2)
+                                ELSE to_number(valor,'99')::numeric(14,2)
+                                END AS valor
+                         FROM administracao.configuracao
+                         WHERE configuracao.cod_modulo = 62
+                           AND configuracao.exercicio = '".$this->getDado('exercicio')."'
+                           AND configuracao.parametro like 'tceal_config_credito_externo'
+                         ) AS int8) AS perc_op_credito_externo
+                
+                       , homologacao.cod_norma AS num_ldo
+                       , TO_CHAR(ldo.timestamp ,'DD/MM/YYYY') AS data_ldo
+                       , TO_CHAR(homologacao.timestamp ,'DD/MM/YYYY') AS data_pub_ldo
+                       , ppa_publicacao.cod_norma AS num_lei_ppa
+                       , TO_CHAR(ppa.timestamp ,'DD/MM/YYYY') AS data_lei_ppa
+                       , ppa.fn_verifica_homologacao(ppa.cod_ppa) AS homologado
+                       , TO_CHAR(ppa_publicacao.timestamp ,'DD/MM/YYYY') AS data_pub_lei_ppa
+                       , '".$this->getDado('exercicio')."' AS exercicio
 
-                WHERE homologado = true
-
-                GROUP BY cod_und_gestora
-                       , codigo_ua
-                       , exercicio
-                       , complementacao
-                       , num_lei_ppa                
-                       , data_lei_ppa
-                       , data_pub_lei_ppa
-                       , num_ldo
-                       , data_ldo
-                       , data_pub_ldo
-                       , num_loa
-                       , data_loa
-                       , data_pub_loa
-                       , perc_credito_adicional
-                       , perc_op_credito_antecipacao
-                       , perc_op_credito_interno
-                       , perc_op_credito_externo
-                       
-                ORDER BY num_lei_ppa ";
+                      FROM normas.norma
+                
+                INNER JOIN ( SELECT * FROM ldo.homologacao ORDER BY timestamp DESC LIMIT 1) AS homologacao
+                        ON homologacao.cod_norma = norma.cod_norma
+                
+                INNER JOIN ldo.ldo
+                    ON ldo.cod_ppa = homologacao.cod_ppa
+                       AND ldo.ano = homologacao.ano
+                
+                INNER JOIN ppa.ppa
+                    ON ppa.cod_ppa = ldo.cod_ppa
+                
+                INNER JOIN ( SELECT * FROM ppa.ppa_publicacao ORDER BY timestamp DESC LIMIT 1) AS ppa_publicacao
+                    ON ppa_publicacao.cod_ppa = ppa.cod_ppa
+                
+                WHERE '".$this->getDado('exercicio')."' BETWEEN ppa.ano_inicio AND ppa.ano_final
+                ";
         
         return $this->executaRecuperaSql($stSql,$rsRecordSet,"","",$boTransacao);
     }

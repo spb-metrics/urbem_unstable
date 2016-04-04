@@ -210,7 +210,6 @@ BEGIN
     
     END IF;
     
-    
     IF stTipoEmissao = 'E' THEN
         -- Valor Anulado, leva me consideração a data final passada como parametro
         SELECT
@@ -286,47 +285,101 @@ BEGIN
            
     END IF;
 
-    -- Valor suplementado
-    SELECT
-        COALESCE( sum(valor), 0.00 )
-    INTO
-        nuValorSuplementado
-    FROM
-          orcamento.suplementacao_suplementada
-        , orcamento.suplementacao  AS S  
-    
-    WHERE suplementacao_suplementada.cod_suplementacao  = S.cod_suplementacao
-      AND suplementacao_suplementada.exercicio          = S.exercicio
-      
-      AND S.dt_suplementacao BETWEEN TO_DATE(dtInicioExercicio,'dd/mm/yyyy')
-                                 AND TO_DATE(dtEmpenho,'dd/mm/yyyy')
-      AND suplementacao_suplementada.cod_despesa = inCodDespesa
-      AND suplementacao_suplementada.exercicio = stExercicio
-      AND NOT EXISTS ( SELECT 1
-                               FROM orcamento.suplementacao_anulada osa
-                              WHERE cod_suplementacao = S.cod_suplementacao
-                                AND osa.exercicio = stExercicio
-                    );
-    -- Valor da Suplementação Reduzida
-    SELECT
+    IF stTipoEmissao = 'E' THEN
+        
+        -- Valor suplementado
+        SELECT
             COALESCE( sum(valor), 0.00 )
         INTO
-           nuValorReduzido
-        FROM orcamento.suplementacao_reducao
+            nuValorSuplementado
+        FROM
+              orcamento.suplementacao_suplementada
+            , orcamento.suplementacao  AS S  
         
-        INNER JOIN orcamento.suplementacao
-             ON suplementacao.exercicio = suplementacao_reducao.exercicio
-            AND suplementacao.cod_suplementacao = suplementacao_reducao.cod_suplementacao
-       
+        WHERE suplementacao_suplementada.cod_suplementacao  = S.cod_suplementacao
+          AND suplementacao_suplementada.exercicio          = S.exercicio
+
+          AND suplementacao_suplementada.cod_despesa        = inCodDespesa
+          AND suplementacao_suplementada.exercicio          = stExercicio
+          AND S.dt_suplementacao BETWEEN TO_DATE(dtInicioExercicio,'dd/mm/yyyy')
+                                     AND TO_DATE(dtEmpenho,'dd/mm/yyyy')          
+          AND NOT EXISTS ( SELECT 1
+                             FROM orcamento.suplementacao_anulada osa
+                            WHERE cod_suplementacao = S.cod_suplementacao
+                              AND osa.exercicio = stExercicio
+                        );
+    
+    ELSEIF stTipoEmissao = 'R' THEN
+    
+        -- Valor suplementado
+        SELECT
+            COALESCE( sum(valor), 0.00 )
+        INTO
+            nuValorSuplementado
+        FROM
+              orcamento.suplementacao_suplementada
+            , orcamento.suplementacao  AS S  
+        
+        WHERE suplementacao_suplementada.cod_suplementacao  = S.cod_suplementacao
+          AND suplementacao_suplementada.exercicio          = S.exercicio
+
+          AND suplementacao_suplementada.cod_despesa        = inCodDespesa
+          AND suplementacao_suplementada.exercicio          = stExercicio
+          AND NOT EXISTS ( SELECT 1
+                             FROM orcamento.suplementacao_anulada osa
+                            WHERE cod_suplementacao = S.cod_suplementacao
+                              AND osa.exercicio = stExercicio
+                        );
+
+    END IF;
+    
+    IF stTipoEmissao = 'E' THEN
+        
+        -- Valor da Suplementação Reduzida
+        SELECT
+            COALESCE( sum(valor), 0.00 )
+        INTO
+            nuValorReduzido
+        FROM orcamento.suplementacao_reducao
+            
+  INNER JOIN orcamento.suplementacao
+          ON suplementacao.exercicio = suplementacao_reducao.exercicio
+         AND suplementacao.cod_suplementacao = suplementacao_reducao.cod_suplementacao
+           
         WHERE suplementacao_reducao.cod_despesa = inCodDespesa  
           AND suplementacao_reducao.exercicio   = stExercicio
-          AND suplementacao.dt_suplementacao BETWEEN TO_DATE(dtInicioExercicio,'dd/mm/yyyy') AND TO_DATE(dtEmpenho,'dd/mm/yyyy')
+          AND suplementacao.dt_suplementacao BETWEEN TO_DATE(dtInicioExercicio,'dd/mm/yyyy')
+                                                 AND TO_DATE(dtEmpenho,'dd/mm/yyyy')
           AND cod_tipo <> 16
           AND NOT EXISTS ( SELECT 1
                                FROM orcamento.suplementacao_anulada osa
                               WHERE cod_suplementacao = suplementacao.cod_suplementacao
                                 AND osa.exercicio = stExercicio
                     );
+    
+    ELSEIF stTipoEmissao = 'R' THEN
+    
+        -- Valor da Suplementação Reduzida
+        SELECT
+            COALESCE( sum(valor), 0.00 )
+        INTO
+           nuValorReduzido
+        FROM orcamento.suplementacao_reducao
+        
+  INNER JOIN orcamento.suplementacao
+          ON suplementacao.exercicio = suplementacao_reducao.exercicio
+         AND suplementacao.cod_suplementacao = suplementacao_reducao.cod_suplementacao
+       
+       WHERE suplementacao_reducao.cod_despesa = inCodDespesa  
+         AND suplementacao_reducao.exercicio   = stExercicio
+         AND cod_tipo <> 16
+         AND NOT EXISTS ( SELECT 1
+                              FROM orcamento.suplementacao_anulada osa
+                             WHERE cod_suplementacao = suplementacao.cod_suplementacao
+                               AND osa.exercicio = stExercicio
+                   );
+    
+    END IF;
 
     IF( nuValorReserva IS NULL ) THEN
         nuValorReserva := 0.00;

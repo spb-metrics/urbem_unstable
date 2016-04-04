@@ -138,6 +138,10 @@ $obREmpenhoAutorizacaoEmpenho->setCodModalidadeLicitacao( $_REQUEST['inCodModali
 $obREmpenhoAutorizacaoEmpenho->setLicitacaoInicial( $_REQUEST['inLicitacaoInicial'] );
 $obREmpenhoAutorizacaoEmpenho->setLicitacaoFinal( $_REQUEST['inLicitacaoFinal'] );
 
+if (Sessao::getExercicio() > '2015') {
+    $obREmpenhoAutorizacaoEmpenho->setCentroCusto ( $_REQUEST['inCentroCusto']);
+}
+
 if ($stAcao == 'alterar') {
     $obREmpenhoAutorizacaoEmpenho->setAlterar( true );
 }

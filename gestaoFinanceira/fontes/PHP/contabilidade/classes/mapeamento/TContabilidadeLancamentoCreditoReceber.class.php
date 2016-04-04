@@ -29,7 +29,7 @@
 
     * @author Desenvolvedor: Carlos Adriano
 
-    $Id: TContabilidadeLancamentoCreditoReceber.class.php 60368 2014-10-15 20:16:11Z silvia $
+    $Id: TContabilidadeLancamentoCreditoReceber.class.php 64362 2016-01-26 19:45:10Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -101,7 +101,7 @@ class TContabilidadeLancamentoCreditoReceber extends Persistente
                        ".$arParam['cod_lote'].",
                        ".$arParam['cod_entidade'].",
                        ".$arParam['cod_historico'].",
-                       'I',
+                       'M',
                        '".$arParam['exercicio']."'
                    )";
        

@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: ArquivoExportadorBlocoColuna.class.php 63232 2015-08-06 13:31:19Z arthur $
+$Id: ArquivoExportadorBlocoColuna.class.php 64496 2016-03-03 20:48:19Z jean $
 
 Casos de uso: uc-01.01.00
 */
@@ -245,13 +245,13 @@ function FormataTipoDado($stCampo)
             $stCampo = str_replace("\r\n"," ",$stCampo);
             $stCampo = str_replace("\n"," ",$stCampo);
             $stCampo = str_replace(chr(10)," ",$stCampo);
-            $stCampo = utf8_decode($stCampo);
             switch ( trim($this->roBloco->roArquivo->getTipoDocumento()) ) {
                 case "TCM_BA":
                     $stCampo = str_ireplace( array("select","insert","update","delete","drop","xp_"), " ", $stCampo);
                     $stCampo = str_replace( array("'",';','--') ," ",$stCampo);
                 break;
             default:
+                    $stCampo = utf8_decode($stCampo);
                     $stCampo = preg_replace ("/[.|,|;|\/|-]/", " ", $stCampo);
                     $stCampo = str_replace('  ', ' ', $stCampo);
                 break;

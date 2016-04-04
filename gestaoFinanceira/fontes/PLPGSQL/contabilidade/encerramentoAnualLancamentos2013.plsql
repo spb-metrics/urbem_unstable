@@ -90,7 +90,7 @@ BEGIN
                                 , plano_analitica.cod_plano
                                 , coalesce(total_credito.valor,0.00)            AS valor_cre
                                 , coalesce(total_debito.valor,0.00)             AS valor_deb
-                                , coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00) AS saldo                             
+                                , coalesce(( COALESCE(abs(-(total_credito.valor)),0) - COALESCE(total_debito.valor,0) ),0.00) AS saldo
                              FROM contabilidade.plano_conta
                                 , contabilidade.plano_analitica
                         LEFT JOIN ( SELECT cod_plano, conta_debito.exercicio, SUM(vl_lancamento) AS valor
@@ -148,17 +148,31 @@ BEGIN
             intSeqIns         := intSeqIns  + 1;
 
             IF substr(recLancamento.cod_estrutural,1,1) = '3' THEN
-               numSaldo        := -(recLancamento.saldo);
-               intCodPlanoDeb  := intCodPlano2371101;
-               intCodPlanoCre  := recLancamento.cod_plano;
-               intCodHistorico := 801;
+               IF recLancamento.saldo < 0 THEN
+                  numSaldo        := ABS(recLancamento.saldo);
+                  intCodPlanoDeb  := intCodPlano2371101;
+                  intCodPlanoCre  := recLancamento.cod_plano;
+                  intCodHistorico := 801;
+               ELSE
+                  numSaldo        := recLancamento.saldo;
+                  intCodPlanoDeb  := recLancamento.cod_plano;
+                  intCodPlanoCre  := intCodPlano2371101;
+                  intCodHistorico := 801;
+               END IF;
             END IF;
 
             IF substr(recLancamento.cod_estrutural,1,1) = '4' THEN
-               numSaldo        := recLancamento.saldo;
-               intCodPlanoDeb  := recLancamento.cod_plano;
-               intCodPlanoCre  := intCodPlano2371101;
-               intCodHistorico := 802;
+               IF recLancamento.saldo > 0 THEN
+                  numSaldo        := recLancamento.saldo;
+                  intCodPlanoDeb  := recLancamento.cod_plano;
+                  intCodPlanoCre  := intCodPlano2371101;
+                  intCodHistorico := 802;
+               ELSE
+                  numSaldo        := ABS(recLancamento.saldo);
+                  intCodPlanoDeb  := intCodPlano2371101;
+                  intCodPlanoCre  := recLancamento.cod_plano;
+                  intCodHistorico := 802;
+               END IF;
             END IF;
 
             PERFORM contabilidade.encerramentoAnualLancamentos( varExercicio
@@ -226,8 +240,9 @@ BEGIN
                                                                AND exercicio     = varExercicio);
 
          -- Ticket #22953 pede para apurar o saldo e fazer o lancamento das contas  6.3.1.4, 5.3.1.1, 6.3.2.2, 5.3.2.1
+         -- Ticket #22953 pede para apurar o saldo e fazer o lancamento das contas  6.3.1.9.1, 5.3.1.2, 6.3.2.9.9, 5.3.2.2
          IF ( varExercicio >= '2014' ) THEN
-        --APURA O SALDO E FAZ O LANCAMENTO DAS CONTAS 6.3.1.4 E 6.3.2.2 PARA CREDITAR NAS CONTAS 5.3.1.1 E 5.3.2.1 RESPECTIVAMENTE
+        --APURA O SALDO E FAZ O LANCAMENTO DAS CONTAS 6.3.1.4, 6.3.2.2, 6.3.1.9.1 E 6.3.2.9.9 PARA CREDITAR NAS CONTAS 5.3.1.1, 5.3.2.1, 5.3.1.2 E 5.3.2.2 RESPECTIVAMENTE
             stSql := ' SELECT plano_conta.cod_estrutural
                             , plano_analitica.cod_plano
                             , coalesce(total_credito.valor,0.00)            AS valor_cre
@@ -267,8 +282,10 @@ BEGIN
                         AND plano_conta.exercicio     = plano_analitica.exercicio
                         AND plano_conta.cod_sistema   = 2
                         AND plano_conta.exercicio     =  ' || quote_literal(varExercicio) || '
-                        AND ( plano_conta.cod_estrutural LIKE ''6.3.1.4%''
-                                OR plano_conta.cod_estrutural LIKE ''6.3.2.2%''
+                        AND (    plano_conta.cod_estrutural LIKE ''6.3.1.4%''
+                              OR plano_conta.cod_estrutural LIKE ''6.3.2.2%''
+                              OR plano_conta.cod_estrutural LIKE ''6.3.1.9.1%''
+                              OR plano_conta.cod_estrutural LIKE ''6.3.2.9.9%''
                             )
                         AND NOT ( total_debito.valor IS NULL AND total_credito.valor IS NULL )
                     ORDER BY plano_conta.cod_estrutural '; 
@@ -289,6 +306,10 @@ BEGIN
                         intSeqIns := FazerLancamento('6.3.1.4.0.00.00.00.00.00','5.3.1.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
                     ELSIF substr(recLancamento.cod_estrutural,1,15) = '6.3.2.2.0.00.00' THEN 
                         intSeqIns := FazerLancamento('6.3.2.2.0.00.00.00.00.00','5.3.2.1.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    ELSIF substr(recLancamento.cod_estrutural,1,15) = '6.3.1.9.1.00.00' THEN 
+                        intSeqIns := FazerLancamento('6.3.1.9.1.00.00.00.00.00','5.3.1.2.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
+                    ELSIF substr(recLancamento.cod_estrutural,1,15) = '6.3.2.9.9.00.00' THEN 
+                        intSeqIns := FazerLancamento('6.3.2.9.9.00.00.00.00.00','5.3.2.2.0.00.00.00.00.00',intCodHistorico,varExercicio,RecLancamento.saldo,'',intCodlote,CAST('M' AS VARCHAR),intCodEntidade);
                     END IF;
                 END IF;
             END LOOP; 
@@ -446,7 +467,11 @@ BEGIN
                     bolCriouLote := TRUE;
                 END IF;
 
-                intSeqIns := contabilidade.fn_insere_lancamentos(varExercicio, RecLancamento.cod_plano, 0,'', '', RecLancamento.saldo, intCodlote, intCodEntidade, intCodHistorico, CAST('M' AS VARCHAR), '');
+                IF recLancamento.saldo > 0 THEN
+                    intSeqIns := contabilidade.fn_insere_lancamentos(varExercicio, RecLancamento.cod_plano, 0,'', '', RecLancamento.saldo, intCodlote, intCodEntidade, intCodHistorico, CAST('M' AS VARCHAR), '');
+                ELSE
+                    intSeqIns := contabilidade.fn_insere_lancamentos(varExercicio, 0, RecLancamento.cod_plano,'', '', ABS(RecLancamento.saldo), intCodlote, intCodEntidade, intCodHistorico, CAST('M' AS VARCHAR), '');
+                END IF;
             END IF;
         END LOOP;
 

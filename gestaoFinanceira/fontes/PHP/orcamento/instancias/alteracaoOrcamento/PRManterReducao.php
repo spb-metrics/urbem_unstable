@@ -70,6 +70,84 @@ if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('me
     exit;
 }
 
+/*
+#23438
+Através desta configuração, quando o usuario realizar algum credito suplementar por redução, deverá levar em consideração os recursos das dotações reduzidas e suplementadas, ou seja,
+Quando reduzir uma dotação da fonte 148 somente poderá suplementar dotações da fonte 148.
+A única excessão será com as fontes 100, 101 e 102, que poderão ser reduzidas e suplementadas entre si, e as fontes 118 e 119 que também poderão ser reduzidas e suplementadas entre si.
+*/
+$stConfiguracao = SistemaLegado::pegaConfiguracao('suplementacao_rigida_recurso', 8, Sessao::getExercicio(), $boTransacao);
+if ( $stConfiguracao == 'sim' ) {
+    $arRecursos          = Sessao::read('arRecursos');
+    $arRecursosRedutoras = Sessao::read('arRecursosRedutoras');
+    //Retirando recursos que nao possuem valor
+    foreach ($arRecursos as $key => $value) {
+        if ( $value['valor_recurso'] <= 0 ) {
+            unset($arRecursos[$key]);
+        }
+    }
+    foreach ($arRecursosRedutoras as $key => $value) {
+        if ( $value['valor_recurso'] <= 0 ) {
+            unset($arRecursosRedutoras[$key]);
+        }
+    }
+
+    //Verificando se o que foi suplementado esta no array de redutoras 
+    //exceto recursos 100 101 102 118 119 os valoresde devem ser agrupados.
+    foreach ($arRecursos as $key => $value) {
+        switch ($value['cod_recurso']) {
+            case 100:
+            case 101:
+            case 102:
+            case 118:
+            case 119:
+                $nuValorTotalRecursoUnidas = $nuValorTotalRecursoUnidas+$value['valor_recurso'];
+            break;
+            
+            default:
+                foreach ($arRecursosRedutoras as $key2 => $value2) {
+                    if ( $value['cod_recurso'] == $value2['cod_recurso']) {
+                        if ( $value['valor_recurso'] != $value2['valor_recurso'] ) {
+                            SistemaLegado::exibeAviso("O Valores Totais do Recurso: ".$value['nom_recurso']." devem ser iguais para Suplementa e Redutora.", 'aviso', 'aviso');
+                            exit();
+                        }
+                    }
+                }                
+            break;
+        }
+    }
+    //Verificando se o que foi redutoras esta no array de suplementado
+    //exceto recursos 100 101 102 118 119 os valoresde devem ser agrupados.
+    foreach ($arRecursosRedutoras as $key => $value) {
+        switch ($value['cod_recurso']) {
+            case 100:
+            case 101:
+            case 102:
+            case 118:
+            case 119:
+                $nuValorTotalRecursoRedutoraUnidas = $nuValorTotalRecursoRedutoraUnidas+$value['valor_recurso'];
+            break;
+            
+            default:
+                foreach ($arRecursos as $key2 => $value2) {
+                    if ( $value['cod_recurso'] == $value2['cod_recurso']) {
+                        if ( $value['valor_recurso'] != $value2['valor_recurso'] ) {
+                            SistemaLegado::exibeAviso("O Valores Totais do Recurso: '".$value['nom_recurso']."' devem ser iguais para Suplementa e Redutora.", 'aviso', 'aviso');
+                            exit();
+                        }
+                    }
+                }                
+            break;
+        }
+    }
+    //Validando o valor entre os recursos que devem ser agrupados
+    //recursos 100 101 102 118 119 os valoresde devem ser agrupados.
+    if ( $nuValorTotalRecursoRedutoraUnidas != $nuValorTotalRecursoUnidas ) {        
+        SistemaLegado::exibeAviso("A fonte de recurso das dotações suplementadas devem ser iguais as dotações redutoras!", 'aviso', 'aviso');
+        exit();
+    }
+}
+
 switch ($stAcao) {
 
     case "Suplementa":

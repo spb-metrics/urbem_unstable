@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id:$
+ * $Id: RSTNConfiguracao.class.php 64789 2016-03-31 20:15:38Z michel $
  */
 
 include_once CAM_FW_INCLUDE         . 'valida.inc.php';
@@ -47,34 +47,52 @@ include_once CAM_GA_ADM_MAPEAMENTO  . 'TAdministracaoConfiguracao.class.php';
 
 class RSTNConfiguracao
 {
-    public $obTransacao,
-        $obROrcamentoEntidade,
-        $obTPPA,
-        $obTSTNReceitaCorrenteLiquida,
-        $obTSTNDespesaPessoal,
-        $obTSTNRREOAnexo13,
-        $obTSTNRiscosFiscais,
-        $obTSTNProvidencias,
-        $obTSTNVinculoSTNReceita,
-        $obTSTNTipoVinculoSTNReceita,
-        $obTAdministracaoConfiguracao,
-        $stDataImplantacao,
-        $inMes,
-        $inAno,
-        $flValor,
-        $flReceitaPrevidenciaria,
-        $flDespesaPrevidenciaria,
-        $flSaldoFinanceiro,
-        $stExercicio,
-        $inCodEntidade,
-        $stDescricao,
-        $inCodRisco,
-        $inCodIdentificador,
-        $flValorProvidencia,
-        $inCodProvidencia,
-        $inCodReceita,
-        $boIRRF,
-        $inCodTipoReceita;
+    public  $obTransacao,
+            $obROrcamentoEntidade,
+            $obTPPA,
+            $obTSTNReceitaCorrenteLiquida,
+            $obTSTNDespesaPessoal,
+            $obTSTNRREOAnexo13,
+            $obTSTNRiscosFiscais,
+            $obTSTNProvidencias,
+            $obTSTNVinculoSTNReceita,
+            $obTSTNTipoVinculoSTNReceita,
+            $obTAdministracaoConfiguracao,
+            $stDataImplantacao,
+            $inMes,
+            $inAno,
+            $flValor,
+            $flReceitaPrevidenciaria,
+            $flDespesaPrevidenciaria,
+            $flSaldoFinanceiro,
+            $stExercicio,
+            $inCodEntidade,
+            $stDescricao,
+            $inCodRisco,
+            $inCodIdentificador,
+            $flValorProvidencia,
+            $inCodProvidencia,
+            $inCodReceita,
+            $boIRRF,
+            $inCodTipoReceita,
+            $nuValorPessoalAtivo,
+            $nuValorPessoalInativo,
+            $nuValorOutrasDespesas,
+            $nuValorIndenizacoes,
+            $nuValorDecisaoJudicial,
+            $nuValorExercicioAnterior,
+            $nuValorInativosPensionista,
+            $nuValorReceitaTributaria,
+            $nuValorReceitaContribuicoes,
+            $nuValorReceitaPatrimonial,
+            $nuValorReceitaAgropecuaria,
+            $nuValorReceitaIndustrial,
+            $nuValorReceitaServicos,
+            $nuValorTransferenciaCorrente,
+            $nuValorOutrasReceitas,
+            $nuValorContribPlanoSSS,
+            $nuValorCompensacaoFinanceira,
+            $nuValorDeducaoFundeb;
 
     /**
      * Metodo contrutor, instancia as classes necessarias.
@@ -136,11 +154,22 @@ class RSTNConfiguracao
         $obErro = $this->obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
         if (!$obErro->ocorreu()) {
-            $this->obTSTNReceitaCorrenteLiquida->setDado           ('exercicio'   , $this->obROrcamentoEntidade->stExercicio);
-            $this->obTSTNReceitaCorrenteLiquida->setDado           ('cod_entidade', $this->obROrcamentoEntidade->inCodigoEntidade);
-            $this->obTSTNReceitaCorrenteLiquida->setDado           ('mes'         , $this->inMes);
-            $this->obTSTNReceitaCorrenteLiquida->setDado           ('ano'         , $this->inAno);
-            $this->obTSTNReceitaCorrenteLiquida->setDado           ('valor'       , $this->flValor);
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('exercicio'   , $this->obROrcamentoEntidade->stExercicio);
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('cod_entidade', $this->obROrcamentoEntidade->inCodigoEntidade);
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('mes'         , $this->inMes);
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('ano'         , $this->inAno);
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_tributaria'       , $this->nuValorReceitaTributaria );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_contribuicoes'    , $this->nuValorReceitaContribuicoes );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_patrimonial'      , $this->nuValorReceitaPatrimonial );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_agropecuaria'     , $this->nuValorReceitaAgropecuaria );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_industrial'       , $this->nuValorReceitaIndustrial );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_receita_servicos'         , $this->nuValorReceitaServicos );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_transferencias_correntes' , $this->nuValorTransferenciaCorrente );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_outras_receitas'          , $this->nuValorOutrasReceitas );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_contrib_plano_sss'        , $this->nuValorContribPlanoSSS );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_compensacao_financeira'   , $this->nuValorCompensacaoFinanceira );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor_deducao_fundeb'           , $this->nuValorDeducaoFundeb );
+            $this->obTSTNReceitaCorrenteLiquida->setDado ('valor' , $this->flValor);
 
             //Verifica se ja existe o registro na base
             $this->obTSTNReceitaCorrenteLiquida->recuperaPorChave($rsValor);
@@ -207,7 +236,17 @@ class RSTNConfiguracao
             $this->obTSTNDespesaPessoal->setDado           ('cod_entidade', $this->obROrcamentoEntidade->inCodigoEntidade);
             $this->obTSTNDespesaPessoal->setDado           ('mes'         , $this->inMes);
             $this->obTSTNDespesaPessoal->setDado           ('ano'         , $this->inAno);
-            $this->obTSTNDespesaPessoal->setDado           ('valor'       , $this->flValor);
+            if ($this->obROrcamentoEntidade->stExercicio >= '2016') {
+                $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_ativo'        , $this->nuValorPessoalAtivo );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_inativo'      , $this->nuValorPessoalInativo );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_terceirizacao'        , $this->nuValorOutrasDespesas );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_indenizacoes'         , $this->nuValorIndenizacoes );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_decisao_judicial'     , $this->nuValorDecisaoJudicial );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_exercicios_anteriores', $this->nuValorExercicioAnterior );
+                $this->obTSTNDespesaPessoal->setDado           ('valor_inativos_pensionistas', $this->nuValorInativosPensionista );
+            }
+            
+            $this->obTSTNDespesaPessoal->setDado           ('valor'                      , $this->flValor );
 
             //Verifica se ja existe o registro na base
             $this->obTSTNDespesaPessoal->recuperaPorChave($rsValor);

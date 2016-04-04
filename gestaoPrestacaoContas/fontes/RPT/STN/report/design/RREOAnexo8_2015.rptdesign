@@ -7,7 +7,7 @@
     <property name="layoutPreference">fixed layout</property>
     <list-property name="libraries">
         <structure>
-            <property name="fileName">urbem_250.rptlibrary</property>
+            <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_250.rptlibrary</property>
             <property name="namespace">urbem_250</property>
         </structure>
     </list-property>
@@ -774,8 +774,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_250.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_250.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="receitas_ensino" id="1150">

@@ -478,7 +478,7 @@ $obLblDtEmpenho->setRotulo   ( "Data de Emissão" );
 
 $obBtnOk = new Ok();
 $obBtnOk->setId( 'Ok' );
-$obBtnOk->obEvento->setOnCLick('if(Valida())BloqueiaFrames(true,false);Salvar();');
+$obBtnOk->obEvento->setOnCLick('if(Valida())BloqueiaFrames(true,true);Salvar();');
 
 $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao.$stFiltro;
 $obBtnCancelar = new Cancelar();

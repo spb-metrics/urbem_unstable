@@ -53,11 +53,22 @@ class TSTNReceitaCorrenteLiquida extends Persistente
         $this->setCampoCod        ('');
         $this->setComplementoChave('mes, ano, exercicio, cod_entidade');
 
-        $this->AddCampo('mes'          , 'integer', true, ''    , true , false);
-        $this->AddCampo('ano'          , 'varchar', true, '4'   , true , false);
-        $this->AddCampo('exercicio'    , 'varchar', true, '4'   , true , false);
-        $this->AddCampo('cod_entidade' , 'integer', true, ''    , true , true );
-        $this->AddCampo('valor'        , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('mes'                           , 'integer', true, ''    , true , false);
+        $this->AddCampo('ano'                           , 'varchar', true, '4'   , true , false);
+        $this->AddCampo('exercicio'                     , 'varchar', true, '4'   , true , false);
+        $this->AddCampo('cod_entidade'                  , 'integer', true, ''    , true , true );
+        $this->AddCampo('valor_receita_tributaria'      , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_receita_contribuicoes'   , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_receita_patrimonial'     , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_receita_agropecuaria'    , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_receita_industrial'      , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_receita_servicos'        , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_transferencias_correntes', 'numeric', true, '14,2', false, false); 
+        $this->AddCampo('valor_outras_receitas'         , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_contrib_plano_sss'       , 'numeric', true, '14,2', false, false);   
+        $this->AddCampo('valor_compensacao_financeira'  , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_deducao_fundeb'          , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor'                         , 'numeric', true, '14,2', false, false);
     }
 
     /**

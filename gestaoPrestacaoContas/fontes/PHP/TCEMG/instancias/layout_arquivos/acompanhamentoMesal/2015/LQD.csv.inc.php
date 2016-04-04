@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: LQD.csv.inc.php 62269 2015-04-15 18:28:39Z franver $
-  * $Date: 2015-04-15 15:28:39 -0300 (Qua, 15 Abr 2015) $
+  * $Id: LQD.csv.inc.php 64534 2016-03-10 16:35:02Z franver $
+  * $Date: 2016-03-10 13:35:02 -0300 (Qui, 10 Mar 2016) $
   * $Author: franver $
-  * $Rev: 62269 $
+  * $Rev: 64534 $
   *
 */
 /**
@@ -47,9 +47,11 @@ $rsRecordSetLQD11 = new RecordSet();
 $rsRecordSetLQD12 = new RecordSet();
 
 $obTTCEMGLQD = new TTCEMGLQD();
-$obTTCEMGLQD->setDado('exercicio', Sessao::getExercicio());
-$obTTCEMGLQD->setDado('entidades', $stEntidades);
-$obTTCEMGLQD->setDado('mes', $stMes);
+$obTTCEMGLQD->setDado('exercicio' , Sessao::getExercicio());
+$obTTCEMGLQD->setDado('entidades' , $stEntidades);
+$obTTCEMGLQD->setDado('mes'       , $stMes);
+$obTTCEMGLQD->setDado('dt_inicial', $stDataInicial);
+$obTTCEMGLQD->setDado('dt_final'  , $stDataFinal);
 
 //Tipo Registro 10
 $obTTCEMGLQD->recuperaExportacao10($rsRecordSetLQD10);
@@ -190,7 +192,6 @@ if (count($rsRecordSetLQD10->getElementos()) > 0) {
                                     if ($inCodReduzido11 ===  $arLQD12['cod_reduzido'] ) {
                                         $stChave12 = $arLQD12['tipo_registro']
                                                        .$arLQD12['cod_reduzido']
-                                                       .$arLQD12['cod_unidade']
                                                        .$arLQD12['num_empenho']
                                                        .$arLQD12['dt_empenho']
                                                        .$arLQD12['num_liquidacao']

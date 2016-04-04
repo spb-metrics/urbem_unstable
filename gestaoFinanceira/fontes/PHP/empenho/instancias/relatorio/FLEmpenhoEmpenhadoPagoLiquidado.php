@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FLEmpenhoEmpenhadoPagoLiquidado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FLEmpenhoEmpenhadoPagoLiquidado.php 64470 2016-03-01 13:12:50Z jean $
 
     * Casos de uso : uc-02.03.06
 */
@@ -346,6 +346,16 @@ $obTxtEntidadeSelecionadas->setId('stEntidadeSelecionadas');
 $obTxtEntidadeSelecionadas->setName('stEntidadeSelecionadas');
 $obTxtEntidadeSelecionadas->setValue('');
 
+if (Sessao::getExercicio() > '2015') {
+    $obCentroCusto = new TextBox;
+    $obCentroCusto->setRotulo ("Centro de Custo");
+    $obCentroCusto->setTitle ("Informe o centro de custo");
+    $obCentroCusto->setName ('inCentroCusto');
+    $obCentroCusto->setId ('inCentroCusto');
+    $obCentroCusto->setInteiro (true);  
+}
+
+
 // Instanciação do objeto Lista de Assinaturas
 // Limpa papeis das Assinaturas na Sessão
 $arAssinaturas = Sessao::read('assinaturas');
@@ -363,6 +373,9 @@ $obFormulario->addHidden    ( $obTxtEntidadeSelecionadas);
 $obFormulario->addTitulo    ( "Dados para Filtro" );
 $obFormulario->addComponente( $obCmbEntidades      );
 $obFormulario->addComponente( $obPeriodicidade );
+if (Sessao::getExercicio() > '2015'){
+    $obFormulario->addComponente( $obCentroCusto );
+}
 $obFormulario->addComponente( $obBscDespesa );
 $obFormulario->addComponenteComposto( $obTxtOrgao, $obCmbOrgao  );
 $obFormulario->addComponenteComposto( $obTxtUnidade, $obCmbUnidade  );

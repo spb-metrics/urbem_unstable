@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: OCGeraRelatorioNotaLiquidacaoEmpenho.php 63351 2015-08-20 13:42:42Z evandro $
+    * $Id: OCGeraRelatorioNotaLiquidacaoEmpenho.php 64593 2016-03-17 14:27:10Z jean $
 
     * Casos de uso: uc-02.03.21
 */
@@ -862,6 +862,22 @@ foreach ($arRecordSetTodos as $inChave => $arRecordSet) {
         $obPDF->addCampo            ("sigla_uf"     , 8, '', '', 'LTBR');
         $obPDF->setAlinhamento      ("R");
         $obPDF->addCampo            ("vl_nota"      , 8, '', '', 'LTBR');        
+    }
+
+    //TCERS - Rio Grande do Sul
+    if ( SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 23 ) {
+        $obPDF->addRecordSet        ($arRecordSet[14] ); 
+        $obPDF->setAlturaCabecalho  ( 5 );
+        $obPDF->setQuebraPaginaLista( false );
+        $obPDF->setAlinhamento      ("L" );
+        
+        $obPDF->addCabecalho        ("NÚMERO DA NOTA FISCAL" , 34, 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("SÉRIE"                 , 34, 5, '', '', 'LTBR','205,206,205');
+        $obPDF->addCabecalho        ("DATA DE EMISSÃO"       , 32, 5, '', '', 'LTBR','205,206,205');
+        
+        $obPDF->addCampo            ("nro_nota"     , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("nro_serie"    , 8, '', '', 'LTBR');
+        $obPDF->addCampo            ("data_emissao" , 8, '', '', 'LTBR'); 
     }
 
     $arAssinaturas = Sessao::read('assinaturas');

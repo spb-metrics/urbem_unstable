@@ -61,12 +61,8 @@ include_once ($pgOcul);
 $rsEntidades = new RecordSet();
 $rsRecordResponsavel = new RecordSet();
 
-$stAcao   = $request->get('stAcao');
-$stModulo = $request->get('modulo');
-
-if (empty($stAcao)) {
-    $stAcao = "alterar";
-}
+$stAcao   = $request->get('stAcao','manter');
+$stModulo = $request->get('modulo',55);
 
 $obTTCEMGConfiguracaoOrgao = new TTCEMGConfiguracaoOrgao();
 
@@ -86,6 +82,11 @@ foreach($arResponsaveis as $responsavel){
 }
 Sessao::write("arResponsaveis", $arrResponsaveis);
 
+// Declaração das variáveis usadas nos componentes para não ocorrer erro de variável nula
+$inCodEntidade = $request->get("inCodEntidade");
+$inValor = "";
+$inOrgaoUnidade = "";
+
 //****************************************//
 //Define COMPONENTES DO FORMULARIO
 //****************************************//
@@ -94,7 +95,6 @@ $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
 $obForm->setName('frm');
-
 
 //Define o objeto da ação stAcao
 $obHdnModulo = new Hidden;
@@ -117,14 +117,25 @@ $obHdnStAcao->setName ( "stHdnAcao" );
 $obHdnStAcao->setId   ( "stHdnAcao" );
 $obHdnStAcao->setValue( $stAcao );
 
+//Define o objeto hidden da entidade
+$obHdnEntidade = new Hidden;
+$obHdnEntidade->setName ( "hdnCodEntidade"  );
+$obHdnEntidade->setId   ( "hdnCodEntidade"  );
+$obHdnEntidade->setValue( $inCodEntidade );
+
+//Define o objeto hidden do ID
+$obHdnInId = new Hidden;
+$obHdnInId->setName("hdnInId");
+$obHdnInId->setId  ("hdnInId");
+
 
 //Lista de códigos cadastrados para cada entidade
-if ($stAcao == 'manter') {
-    $obTTCEMGConfiguracaoOrgao->setDado('cod_modulo', $stModulo);
-    $obTTCEMGConfiguracaoOrgao->setDado('parametro' ,'tcemg_codigo_orgao_entidade_sicom');
-    $obTTCEMGConfiguracaoOrgao->setDado("exercicio" ,Sessao::getExercicio());
-    $obTTCEMGConfiguracaoOrgao->recuperaCodigos($rsEntidades," AND ent.cod_entidade = ".$request->get('inCodEntidade')," \n ORDER BY ent.cod_entidade");
-        
+$obTTCEMGConfiguracaoOrgao->setDado('cod_modulo', $stModulo);
+$obTTCEMGConfiguracaoOrgao->setDado('parametro' ,'tcemg_codigo_orgao_entidade_sicom');
+$obTTCEMGConfiguracaoOrgao->setDado("exercicio" ,Sessao::getExercicio());
+$obTTCEMGConfiguracaoOrgao->recuperaCodigos($rsEntidades," AND ent.cod_entidade = ".$request->get('inCodEntidade')," \n ORDER BY ent.cod_entidade");
+
+if ($rsEntidades->getNumLinhas() > 0) {
     foreach ($rsEntidades->arElementos as $index => $value) {
         if (substr($value['valor'],3,1) == "_") {
             $valor = substr($value['valor'],0,3);
@@ -134,26 +145,9 @@ if ($stAcao == 'manter') {
         $rsEntidades->arElementos[$index]['valor'] = $valor;
     }
     
-    $obTTCEMGConfiguracaoOrgao->setDado('cod_entidade', $request->get('inCodEntidade'));
-    $obTTCEMGConfiguracaoOrgao->setDado("exercicio" ,Sessao::getExercicio());
-    $obTTCEMGConfiguracaoOrgao->recuperaPorChave($rsDaodosOrgao);
-    
-    $inCodEntidade     = $rsEntidades->getCampo('cod_entidade');
-    $inValor           = $rsEntidades->getCampo('valor');
-    $inOrgaoUnidade    = $rsEntidades->getCampo('orgao_unidade');
-}else{
-    $inCodEntidade  = $request->get('inCodEntidade');
-    $inOrgao        = "";
-    $inNumCGM       = "";
-    $inOrgaoUnidade = "";
-    $stNomCGM       = "";
-    $inTipoResponsavel = "";
-    $inCrcContador  = "";
-    $stUFContador   = "";
-    $stCargo        = "";
-    $dtDataInicio   = "";
-    $dtDataFim      = "";
-    $stEmail        = "";
+    $inCodEntidade  = $rsEntidades->getCampo('cod_entidade');
+    $inValor        = $rsEntidades->getCampo('valor');
+    $inOrgaoUnidade = $rsEntidades->getCampo('orgao_unidade');
 }
 
 $obITextBoxSelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
@@ -161,15 +155,6 @@ $obITextBoxSelectEntidadeUsuario->setNull ( false );
 $obITextBoxSelectEntidadeUsuario->setCodEntidade($inCodEntidade);
 $obITextBoxSelectEntidadeUsuario->obTextBox->setDisabled(true);
 $obITextBoxSelectEntidadeUsuario->obSelect->setDisabled(true);
-
-$obHdnEntidade = new Hidden;
-$obHdnEntidade->setName ( "hdnCodEntidade"  );
-$obHdnEntidade->setId   ( "hdnCodEntidade"  );
-$obHdnEntidade->setValue( $inCodEntidade );
-
-$obHdnInId = new Hidden;
-$obHdnInId->setName("hdnInId");
-$obHdnInId->setId  ("hdnInId");
 
 
 $obTxtOrgao = new TextBox();
@@ -205,10 +190,9 @@ $obBscCGMS->setRotulo               ( "*CGM Responsável"    );
 $obBscCGMS->setTitle                ( "Selecione o CGM."    );
 $obBscCGMS->setName                 ( 'stNomCGM'            );
 $obBscCGMS->setId                   ( "stNomCGM"            );
-$obBscCGMS->setValue                ( $stNomCGM             );
 $obBscCGMS->obCampoCod->setId       ( "inNumCGM"            );
 $obBscCGMS->obCampoCod->setName     ( "inNumCGM"            );
-$obBscCGMS->obCampoCod->setValue    ( $inNumCGM             );
+$obBscCGMS->setTipo                 ( "fisica"              );
 $obBscCGMS->setObrigatorio          (false);
 $obBscCGMS->setObrigatorioBarra     (false);
 
@@ -222,6 +206,7 @@ $obCmbTipoRespensavel->addOption ( "1","Gestor" );
 $obCmbTipoRespensavel->addOption ( "2","Contador" );
 $obCmbTipoRespensavel->addOption ( "3","Controle Interno" );
 $obCmbTipoRespensavel->addOption ( "4","Ordenador de Despesa por Delegação" );
+$obCmbTipoRespensavel->addOption ( "5","Informações - Folha de Pagamento" );
 $obCmbTipoRespensavel->obEvento->setOnChange("buscaCampos('verificaTipoResponsavel', this.value);");
 
 $obTxtCargo = new TextBox();
@@ -230,25 +215,21 @@ $obTxtCargo->setName     ( 'stCargoGestor' );
 $obTxtCargo->setId       ( 'stCargoGestor' );
 $obTxtCargo->setSize     ( 50 );
 $obTxtCargo->setMaxLength( 50 );
-$obTxtCargo->setValue    ( $stCargo );
 
 $obDtInicio = new Data();
 $obDtInicio->setName  ( 'dtInicio' );
 $obDtInicio->setId    ( 'dtInicio' );
 $obDtInicio->setRotulo( '*Data de Início' );
-$obDtInicio->setValue ( $dtDataInicio );
 
 $obDtTermino = new Data();
 $obDtTermino->setName  ( 'dtFim' );
 $obDtTermino->setId    ( 'dtFim' );
 $obDtTermino->setRotulo( '*Data de Término' );
-$obDtTermino->setValue ( $dtDataFim );
 
 $obTxtEmail = new TextBox();
 $obTxtEmail->setRotulo   ( 'E-mail' );
 $obTxtEmail->setName     ( 'stEMail' );
 $obTxtEmail->setId       ( 'stEmail' );
-$obTxtEmail->setValue    ( $stEmail );
 $obTxtEmail->setSize     ( 50 );
 $obTxtEmail->setMaxLength( 50 );
 $obTxtEmail->setNull     ( true );

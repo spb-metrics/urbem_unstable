@@ -170,6 +170,10 @@ $arArquivos = array(
       array(
         'arquivo' => 'atribContContabeis',
         'nome'    => 'Atributo das Contas Contábeis'
+    ),
+    array(
+        'arquivo' => 'relEventosContabeis',
+        'nome' => 'Relação dos Eventos Contábeis'
     )
 );
 

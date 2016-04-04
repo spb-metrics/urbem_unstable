@@ -33,26 +33,13 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 30668 $
-    $Name$
-    $Autor:$
-    $Date: 2008-04-14 15:37:22 -0300 (Seg, 14 Abr 2008) $
+    $Id: FTesourariaListarArrecadacaoTCEMS.class.php 64692 2016-03-22 13:36:45Z michel $
 
     * Casos de uso: uc-02.04.08
 */
 
-/*
-$Log$
-Revision 1.5  2007/07/13 19:10:48  cako
-Bug#9383#, Bug#9384#
-
-Revision 1.4  2006/07/05 20:38:37  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FTesourariaListarArrecadacaoTCEMS extends Persistente
 {
@@ -67,163 +54,229 @@ function FTesourariaListarArrecadacaoTCEMS()
 
 function montaRecuperaTodos()
 {
-    $stSql = "                                                                           \n";
-    if (!$this->getDado('retencao')) {
-        $stSql  = "SELECT *                                                                  \n";
-        $stSql .= "FROM tesouraria.fn_listar_arrecadacao_tce('".$this->getDado("stFiltro")."', '".$this->getDado("stFiltro")."' );  \n";
-    }
-    $stSql .= "                                                                          \n";
-    $stSql .= "SELECT tbl.exercicio                                                      \n";
-    $stSql .= "      ,tbl.cod_entidade                                                   \n";
-    $stSql .= "      ,tbl.cod_boletim                                                   \n";
-    $stSql .= "      ,tbl.conta_debito                                                   \n";
-    $stSql .= "      ,tbl.conta_credito                                                  \n";
-    $stSql .= "      ,tbl.numeracao                                                      \n";
-    $stSql .= "      ,tbl.cod_receita                                                    \n";
-    $stSql .= "      ,tbl.tipo                                                           \n";
-    if ($this->getDado('retencao')) {
-       $stSql .= "   ,tbl.cod_ordem                                                     \n";
-       $stSql .= "   ,tbl.cod_plano                                                     \n";
-    }
-    $stSql .= "      ,( tbl.valor - tbl.vl_desconto + tbl.vl_juros + tbl.vl_multa ) AS valor \n";
-    $stSql .= "      ,CPCD.cod_estrutural AS cod_estrutural_debito                       \n";
-    $stSql .= "      ,CPCC.cod_estrutural AS cod_estrutural_credito                      \n";
-    $stSql .= "FROM(                                                                     \n";
-    $stSql .= "      SELECT tmp_arrecadacao.cod_entidade                                \n";
-    $stSql .= "            ,tmp_arrecadacao.exercicio                                   \n";
-    $stSql .= "            ,tmp_arrecadacao.cod_boletim                                  \n";
-    $stSql .= "            ,tmp_arrecadacao.conta_debito                                \n";
-    $stSql .= "            ,tmp_arrecadacao.conta_credito                               \n";
-    $stSql .= "            ,tmp_arrecadacao.numeracao                                   \n";
-    $stSql .= "            ,tmp_arrecadacao.cod_receita                                 \n";
-    $stSql .= "            ,'A' as tipo                                                  \n";
-    if ($this->getDado('retencao')) {
-        $stSql .= "        ,aopr.cod_ordem                                              \n";
-        $stSql .= "        ,aopr.cod_plano                                              \n";
-        $stSql .= "        ,valor                                                       \n";
-        $stSql .= "        ,vl_desconto                                                 \n";
-        $stSql .= "        ,vl_juros                                                    \n";
-        $stSql .= "        ,vl_multa                                                    \n";
-    } else {
-        $stSql .= "        ,SUM( valor ) AS valor                                        \n";
-        $stSql .= "        ,SUM( vl_desconto ) AS vl_desconto                            \n";
-        $stSql .= "        ,SUM( vl_juros ) AS vl_juros                                  \n";
-        $stSql .= "        ,SUM( vl_multa ) as vl_multa                                  \n";
-    }
-    $stSql .= "      FROM tmp_arrecadacao                                                \n";
-    if ($this->getDado('retencao')) {
-        $stSql .= "       JOIN tesouraria.arrecadacao_ordem_pagamento_retencao as aopr                     \n";
-        $stSql .= "       ON (    aopr.cod_arrecadacao       = tmp_arrecadacao.cod_arrecadacao             \n";
-        $stSql .= "           AND aopr.timestamp_arrecadacao = tmp_arrecadacao.timestamp_arrecadacao       \n";
-        $stSql .= "           AND aopr.exercicio             = tmp_arrecadacao.exercicio                   \n";
-        $stSql .= "           AND aopr.cod_entidade          = tmp_arrecadacao.cod_entidade                \n";
-        $stSql .= "           AND aopr.cod_plano             = tmp_arrecadacao.conta_credito               \n";
-        $stSql .= "       )                                                             \n";
-    }
-    $stSql .= "      WHERE                                                               \n";
-    if($this->getDado('retencao'))
-         $stSql .= " EXISTS ";
-    else $stSql .= " NOT EXISTS ";
-    $stSql .= "             ( SELECT aopr.cod_arrecadacao                                                         \n";
-    $stSql .= "                 FROM tesouraria.arrecadacao_ordem_pagamento_retencao as aopr                      \n";
-    $stSql .= "                WHERE     aopr.cod_arrecadacao       = tmp_arrecadacao.cod_arrecadacao             \n";
-    $stSql .= "                      AND aopr.timestamp_arrecadacao = tmp_arrecadacao.timestamp_arrecadacao       \n";
-    $stSql .= "                      AND aopr.exercicio             = tmp_arrecadacao.exercicio                   \n";
-    $stSql .= "                      AND aopr.cod_entidade          = tmp_arrecadacao.cod_entidade                \n";
-    $stSql .= "                      AND aopr.cod_plano             = tmp_arrecadacao.conta_credito               \n";
-    $stSql .= "             )                                                                                     \n";
-    if (!$this->getDado('retencao')) {
-        $stSql .= "      GROUP BY exercicio                                                  \n";
-        $stSql .= "              ,cod_entidade                                               \n";
-        $stSql .= "              ,cod_boletim                                               \n";
-        $stSql .= "              ,conta_debito                                               \n";
-        $stSql .= "              ,conta_credito                                              \n";
-        $stSql .= "              ,numeracao                                                  \n";
-        $stSql .= "              ,cod_receita                                                \n";
-    }
-    $stSql .= "                                                                          \n";
-    $stSql .= "      UNION ALL                                                           \n";
-    $stSql .= "                                                                          \n";
-    $stSql .= "      SELECT tmp_arrecadacao_estornada.cod_entidade                      \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.exercicio                         \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.cod_boletim                       \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.conta_debito                      \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.conta_credito                     \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.numeracao                         \n";
-    $stSql .= "            ,tmp_arrecadacao_estornada.cod_receita                       \n";
-    $stSql .= "            ,'E' as tipo                                                  \n";
-    if ($this->getDado('retencao')) {
-        $stSql .= "        ,aeopr.cod_ordem                                              \n";
-        $stSql .= "        ,aeopr.cod_plano                                              \n";
-        $stSql .= "        ,valor                                                        \n";
-        $stSql .= "        ,vl_desconto                                                  \n";
-        $stSql .= "        ,vl_juros                                                     \n";
-        $stSql .= "        ,vl_multa                                                     \n";
-    } else {
-        $stSql .= "        ,SUM( valor ) as valor                                        \n";
-        $stSql .= "        ,SUM( vl_desconto ) as vl_desconto                            \n";
-        $stSql .= "        ,SUM( vl_juros ) AS vl_juros                                  \n";
-        $stSql .= "        ,SUM( vl_multa ) as vl_multa                                  \n";
-    }
-    $stSql .= "      FROM tmp_arrecadacao_estornada                                      \n";
-    if ($this->getDado('retencao')) {
-        $stSql .= "       JOIN tesouraria.arrecadacao_estornada_ordem_pagamento_retencao as aeopr                     \n";
-        $stSql .= "       ON (    aeopr.cod_arrecadacao       = tmp_arrecadacao_estornada.cod_arrecadacao             \n";
-        $stSql .= "           AND aeopr.timestamp_arrecadacao = tmp_arrecadacao_estornada.timestamp_arrecadacao       \n";
-        $stSql .= "           AND aeopr.exercicio             = tmp_arrecadacao_estornada.exercicio                   \n";
-        $stSql .= "           AND aeopr.cod_entidade          = tmp_arrecadacao_estornada.cod_entidade                \n";
-        $stSql .= "           AND aeopr.cod_plano             = tmp_arrecadacao_estornada.conta_debito                \n";
-        $stSql .= "       )                                                             \n";
-    }
+    $stSql = "";
 
-    $stSql .= "     WHERE                                                                \n";
-    if($this->getDado('retencao'))
-         $stSql .= " EXISTS ";
-    else $stSql .= " NOT EXISTS ";
-    $stSql .= "          ( SELECT aeopr.cod_arrecadacao                                                                \n";
-    $stSql .= "              FROM tesouraria.arrecadacao_estornada_ordem_pagamento_retencao as aeopr                   \n";
-    $stSql .= "             WHERE     aeopr.cod_arrecadacao       = tmp_arrecadacao_estornada.cod_arrecadacao          \n";
-    $stSql .= "                   AND aeopr.timestamp_arrecadacao = tmp_arrecadacao_estornada.timestamp_arrecadacao    \n";
-    $stSql .= "                   AND aeopr.exercicio             = tmp_arrecadacao_estornada.exercicio                \n";
-    $stSql .= "                   AND aeopr.cod_entidade          = tmp_arrecadacao_estornada.cod_entidade             \n";
-    $stSql .= "                   AND aeopr.cod_plano             = tmp_arrecadacao_estornada.conta_debito             \n";
-    $stSql .= "          )                                                                                             \n";
     if (!$this->getDado('retencao')) {
-        $stSql .= "      GROUP BY exercicio                                                  \n";
-        $stSql .= "              ,cod_entidade                                               \n";
-        $stSql .= "              ,cod_boletim                                               \n";
-        $stSql .= "              ,conta_debito                                               \n";
-        $stSql .= "              ,conta_credito                                              \n";
-        $stSql .= "              ,numeracao                                                  \n";
-        $stSql .= "              ,cod_receita                                                \n";
+        $stSql .= "
+              SELECT *
+                FROM tesouraria.fn_listar_arrecadacao_tce( '".$this->getDado("stFiltro")."'
+                                                         , '".$this->getDado("stFiltro")."'
+                                                         );
+
+              SELECT tbl.exercicio
+                    ,tbl.cod_entidade
+                    ,tbl.cod_boletim
+                    ,tbl.conta_debito
+                    ,tbl.conta_credito
+                    ,tbl.numeracao
+                    ,tbl.cod_receita
+                    ,tbl.tipo
+                    ,( tbl.valor - tbl.vl_desconto + tbl.vl_juros + tbl.vl_multa ) AS valor
+                    ,CPCD.cod_estrutural AS cod_estrutural_debito
+                    ,CPCC.cod_estrutural AS cod_estrutural_credito
+                    ,tbl.cod_historico
+                FROM(
+                     SELECT tmp_arrecadacao.cod_entidade
+                          ,tmp_arrecadacao.exercicio
+                          ,tmp_arrecadacao.cod_boletim
+                          ,tmp_arrecadacao.conta_debito
+                          ,tmp_arrecadacao.conta_credito
+                          ,tmp_arrecadacao.numeracao
+                          ,tmp_arrecadacao.cod_receita
+                          ,'A' as tipo
+                          ,SUM( valor ) AS valor
+                          ,SUM( vl_desconto ) AS vl_desconto
+                          ,SUM( vl_juros ) AS vl_juros
+                          ,SUM( vl_multa ) as vl_multa
+                          ,tmp_arrecadacao.cod_historico
+                       FROM tmp_arrecadacao
+                      WHERE NOT EXISTS
+                            ( SELECT aopr.cod_arrecadacao
+                                FROM tesouraria.arrecadacao_ordem_pagamento_retencao as aopr
+                               WHERE aopr.cod_arrecadacao       = tmp_arrecadacao.cod_arrecadacao
+                                 AND aopr.timestamp_arrecadacao = tmp_arrecadacao.timestamp_arrecadacao
+                                 AND aopr.exercicio             = tmp_arrecadacao.exercicio
+                                 AND aopr.cod_entidade          = tmp_arrecadacao.cod_entidade
+                                 AND aopr.cod_plano             = tmp_arrecadacao.conta_credito
+                            )
+                   GROUP BY exercicio
+                          ,cod_entidade
+                          ,cod_boletim
+                          ,conta_debito
+                          ,conta_credito
+                          ,numeracao
+                          ,cod_receita
+                          ,cod_historico
+
+                      UNION ALL
+
+                     SELECT tmp_arrecadacao_estornada.cod_entidade
+                          ,tmp_arrecadacao_estornada.exercicio
+                          ,tmp_arrecadacao_estornada.cod_boletim
+                          ,tmp_arrecadacao_estornada.conta_debito
+                          ,tmp_arrecadacao_estornada.conta_credito
+                          ,tmp_arrecadacao_estornada.numeracao
+                          ,tmp_arrecadacao_estornada.cod_receita
+                          ,'E' as tipo
+                          ,SUM( valor ) as valor
+                          ,SUM( vl_desconto ) as vl_desconto
+                          ,SUM( vl_juros ) AS vl_juros
+                          ,SUM( vl_multa ) as vl_multa
+                          ,tmp_arrecadacao_estornada.cod_historico
+                       FROM tmp_arrecadacao_estornada
+                      WHERE NOT EXISTS
+                            ( SELECT aeopr.cod_arrecadacao
+                                FROM tesouraria.arrecadacao_estornada_ordem_pagamento_retencao as aeopr
+                               WHERE aeopr.cod_arrecadacao       = tmp_arrecadacao_estornada.cod_arrecadacao
+                                 AND aeopr.timestamp_arrecadacao = tmp_arrecadacao_estornada.timestamp_arrecadacao
+                                 AND aeopr.exercicio             = tmp_arrecadacao_estornada.exercicio
+                                 AND aeopr.cod_entidade          = tmp_arrecadacao_estornada.cod_entidade
+                                 AND aeopr.cod_plano             = tmp_arrecadacao_estornada.conta_debito
+                            )
+                   GROUP BY exercicio
+                          ,cod_entidade
+                          ,cod_boletim
+                          ,conta_debito
+                          ,conta_credito
+                          ,numeracao
+                          ,cod_receita
+                          ,cod_historico
+                   
+                   ORDER BY exercicio
+                          ,cod_entidade
+                          ,cod_boletim
+                          ,conta_debito
+                          ,conta_credito
+                          ,numeracao
+                    ) AS tbl
+           LEFT JOIN contabilidade.plano_analitica CPAD
+                  ON tbl.conta_debito = CPAD.cod_plano
+                 AND tbl.exercicio    = CPAD.exercicio
+           LEFT JOIN contabilidade.plano_conta  CPCD
+                  ON CPAD.cod_conta = CPCD.cod_conta
+                 AND CPAD.exercicio = CPCD.exercicio
+           LEFT JOIN contabilidade.plano_analitica CPAC
+                  ON tbl.conta_credito = CPAC.cod_plano
+                 AND tbl.exercicio     = CPAC.exercicio
+           LEFT JOIN contabilidade.plano_conta CPCC
+                  ON CPAC.cod_conta = CPCC.cod_conta
+                 AND CPAC.exercicio = CPCC.exercicio
+
+            ORDER BY tipo
+                   ,exercicio
+                   ,cod_entidade
+                   ,conta_debito
+                   ,conta_credito ";
+    }else{
+        $stSql .= "
+              SELECT tbl.exercicio
+                    ,tbl.cod_entidade
+                    ,tbl.cod_boletim
+                    ,tbl.conta_debito
+                    ,tbl.conta_credito
+                    ,tbl.numeracao
+                    ,tbl.cod_receita
+                    ,tbl.tipo
+                    ,tbl.cod_ordem
+                    ,tbl.cod_plano
+                    ,( tbl.valor - tbl.vl_desconto + tbl.vl_juros + tbl.vl_multa ) AS valor
+                    ,CPCD.cod_estrutural AS cod_estrutural_debito
+                    ,CPCC.cod_estrutural AS cod_estrutural_credito
+                    ,tbl.cod_historico
+                FROM(
+                     SELECT tmp_arrecadacao.cod_entidade
+                          ,tmp_arrecadacao.exercicio
+                          ,tmp_arrecadacao.cod_boletim
+                          ,tmp_arrecadacao.conta_debito
+                          ,tmp_arrecadacao.conta_credito
+                          ,tmp_arrecadacao.numeracao
+                          ,tmp_arrecadacao.cod_receita
+                          ,'A' as tipo
+                          ,aopr.cod_ordem
+                          ,aopr.cod_plano
+                          ,valor
+                          ,vl_desconto
+                          ,vl_juros
+                          ,vl_multa
+                          ,tmp_arrecadacao.cod_historico
+                       FROM tmp_arrecadacao
+                 INNER JOIN tesouraria.arrecadacao_ordem_pagamento_retencao as aopr
+                         ON (    aopr.cod_arrecadacao       = tmp_arrecadacao.cod_arrecadacao
+                             AND aopr.timestamp_arrecadacao = tmp_arrecadacao.timestamp_arrecadacao
+                             AND aopr.exercicio             = tmp_arrecadacao.exercicio
+                             AND aopr.cod_entidade          = tmp_arrecadacao.cod_entidade
+                             AND aopr.cod_plano             = tmp_arrecadacao.conta_credito
+                            )
+                      WHERE EXISTS
+                            ( SELECT aopr.cod_arrecadacao
+                                FROM tesouraria.arrecadacao_ordem_pagamento_retencao as aopr
+                               WHERE aopr.cod_arrecadacao       = tmp_arrecadacao.cod_arrecadacao
+                                 AND aopr.timestamp_arrecadacao = tmp_arrecadacao.timestamp_arrecadacao
+                                 AND aopr.exercicio             = tmp_arrecadacao.exercicio
+                                 AND aopr.cod_entidade          = tmp_arrecadacao.cod_entidade
+                                 AND aopr.cod_plano             = tmp_arrecadacao.conta_credito
+                            )
+
+                      UNION ALL
+
+                     SELECT tmp_arrecadacao_estornada.cod_entidade
+                          ,tmp_arrecadacao_estornada.exercicio
+                          ,tmp_arrecadacao_estornada.cod_boletim
+                          ,tmp_arrecadacao_estornada.conta_debito
+                          ,tmp_arrecadacao_estornada.conta_credito
+                          ,tmp_arrecadacao_estornada.numeracao
+                          ,tmp_arrecadacao_estornada.cod_receita
+                          ,'E' as tipo
+                          ,aeopr.cod_ordem
+                          ,aeopr.cod_plano
+                          ,valor
+                          ,vl_desconto
+                          ,vl_juros
+                          ,vl_multa
+                          ,tmp_arrecadacao_estornada.cod_historico
+                       FROM tmp_arrecadacao_estornada
+                 INNER JOIN tesouraria.arrecadacao_estornada_ordem_pagamento_retencao as aeopr
+                         ON (    aeopr.cod_arrecadacao       = tmp_arrecadacao_estornada.cod_arrecadacao
+                             AND aeopr.timestamp_arrecadacao = tmp_arrecadacao_estornada.timestamp_arrecadacao
+                             AND aeopr.exercicio             = tmp_arrecadacao_estornada.exercicio
+                             AND aeopr.cod_entidade          = tmp_arrecadacao_estornada.cod_entidade
+                             AND aeopr.cod_plano             = tmp_arrecadacao_estornada.conta_debito
+                            )
+                      WHERE EXISTS
+                            ( SELECT aeopr.cod_arrecadacao
+                                FROM tesouraria.arrecadacao_estornada_ordem_pagamento_retencao as aeopr
+                               WHERE aeopr.cod_arrecadacao       = tmp_arrecadacao_estornada.cod_arrecadacao
+                                 AND aeopr.timestamp_arrecadacao = tmp_arrecadacao_estornada.timestamp_arrecadacao
+                                 AND aeopr.exercicio             = tmp_arrecadacao_estornada.exercicio
+                                 AND aeopr.cod_entidade          = tmp_arrecadacao_estornada.cod_entidade
+                                 AND aeopr.cod_plano             = tmp_arrecadacao_estornada.conta_debito
+                            )
+                   ORDER BY exercicio
+                          ,cod_entidade
+                          ,cod_boletim
+                          ,conta_debito
+                          ,conta_credito
+                          ,numeracao
+                    ) AS tbl
+           LEFT JOIN contabilidade.plano_analitica CPAD
+                  ON tbl.conta_debito = CPAD.cod_plano
+                 AND tbl.exercicio    = CPAD.exercicio
+           LEFT JOIN contabilidade.plano_conta  CPCD
+                  ON CPAD.cod_conta = CPCD.cod_conta
+                 AND CPAD.exercicio = CPCD.exercicio
+           LEFT JOIN contabilidade.plano_analitica CPAC
+                  ON tbl.conta_credito = CPAC.cod_plano
+                 AND tbl.exercicio     = CPAC.exercicio
+           LEFT JOIN contabilidade.plano_conta CPCC
+                  ON CPAC.cod_conta = CPCC.cod_conta
+                 AND CPAC.exercicio = CPCC.exercicio
+            ORDER BY tipo
+                   ,exercicio
+                   ,cod_entidade
+                   ,cod_ordem
+                   ,conta_debito
+                   ,conta_credito ";
     }
-    $stSql .= "                                                                          \n";
-    $stSql .= "      ORDER BY exercicio                                                  \n";
-    $stSql .= "              ,cod_entidade                                               \n";
-    $stSql .= "              ,cod_boletim                                               \n";
-    $stSql .= "              ,conta_debito                                               \n";
-    $stSql .= "              ,conta_credito                                              \n";
-    $stSql .= "              ,numeracao                                                  \n";
-    $stSql .= ") AS tbl                                                                  \n";
-    $stSql .= " LEFT JOIN contabilidade.plano_analitica CPAD                             \n";
-    $stSql .= "        ON tbl.conta_debito = CPAD.cod_plano                              \n";
-    $stSql .= "       AND tbl.exercicio = CPAD.exercicio                                 \n";
-    $stSql .= " LEFT JOIN contabilidade.plano_conta  CPCD                                \n";
-    $stSql .= "        ON CPAD.cod_conta = CPCD.cod_conta                                \n";
-    $stSql .= "       AND CPAD.exercicio = CPCD.exercicio                                \n";
-    $stSql .= " LEFT JOIN contabilidade.plano_analitica CPAC                             \n";
-    $stSql .= "        ON tbl.conta_credito = CPAC.cod_plano                             \n";
-    $stSql .= "       AND tbl.exercicio = CPAC.exercicio                                 \n";
-    $stSql .= " LEFT JOIN contabilidade.plano_conta CPCC                                 \n";
-    $stSql .= "        ON CPAC.cod_conta = CPCC.cod_conta                                \n";
-    $stSql .= "       AND CPAC.exercicio = CPCC.exercicio                                \n";
-    $stSql .= " ORDER BY tipo                                                            \n";
-    $stSql .= "         ,exercicio                                                       \n";
-    $stSql .= "         ,cod_entidade                                                    \n";
-    if($this->getDado('retencao'))
-        $stSql .= "     ,cod_ordem                                                       \n";
-    $stSql .= "         ,conta_debito                                                    \n";
-    $stSql .= "         ,conta_credito                                                   \n";
 
     return $stSql;
 }

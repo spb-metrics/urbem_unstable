@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: FMManterCertificacao.php 63516 2015-09-08 13:48:28Z michel $
+    $Id: FMManterCertificacao.php 64452 2016-02-23 21:03:45Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -131,9 +131,10 @@ if (( $stAcao == 'alterar' ) || ( $stAcao == 'consultar' )) {
     $obLblFornecedor->setRotulo( 'Fornecedor' );
 } else {
     $obFornecedor = new IPopUpFornecedor($obForm);
-    $obFornecedor->setId ( "stNomFornecedor" );
+    $obFornecedor->setId   ( "stNomFornecedor" );
     $obFornecedor->setTitle( "Selecione o Fornecedor." );
-    $obFornecedor->setNull( false );
+    $obFornecedor->setNull ( false );
+    $obFornecedor->obCampoCod->obEvento->setOnBlur( "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&inCodLicitacao='+frm.inCodLicitacao.value+'&inCodFornecedor='+this.value, 'validaFornecedorLicitacao');" );
 }
 
 if( ( $stAcao == 'incluir' ) || ( $stAcao == 'alterar' ) ){
@@ -155,14 +156,7 @@ if( ( $stAcao == 'incluir' ) || ( $stAcao == 'alterar' ) ){
   
     $obISelectModalidade = new ISelectModalidade();
     $obISelectModalidade->setNull( false );
-    
-    // verifica pois não pode incluir licitações já utilizadas por outros fornecedores na mesma modalidade stFiltraLicitacao = true
-    if ( $stAcao == 'incluir' ) {
-        $obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=true&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");
-    } else {
-        $obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&stFiltraLicitacao=false&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");    
-    }
-    
+    $obISelectModalidade->obEvento->setOnChange("ajaxJavaScript('".$pgOcul."?". Sessao::getId(). "&inCodLicitacao='+frm.inCodLicitacao.value+'&stExercicioLicitacao='+frm.stExercicioLicitacao.value+'&inCodEntidade='+frm.inCodEntidade.value+'&inCodModalidade='+frm.inCodModalidade.value+'&numLicitacao='+document.getElementById('hdnNumLicitacao').value+'&stFiltro=', 'carregaLicitacao');");    
     $obISelectModalidade->setValue($request->get('inCodModalidade') ? $request->get('inCodModalidade') : '');    
     
     //Carrega as informações na alteração

@@ -60,11 +60,11 @@ if ($stAcao == 'alterar') {
     $obTPatrimonioGrupo = new TPatrimonioGrupo();
 
     $stFiltro = "
-          WHERE grupo.cod_natureza = ".$_REQUEST['inCodNatureza']."
-            AND grupo.cod_grupo    = ".$_REQUEST['inCodGrupo'];
+          WHERE grupo.cod_natureza = ".$request->get('inCodNatureza')."
+            AND grupo.cod_grupo    = ".$request->get('inCodGrupo');
 
     $obTPatrimonioGrupo->recuperaGrupo( $rsGrupo, $stFiltro );
-        
+
     $inCodNatureza    = $rsGrupo->getCampo( 'cod_natureza' );
     $inCodPlano       = $rsGrupo->getCampo( 'cod_plano' );
     $stNomConta       = $rsGrupo->getCampo( 'nom_conta' );

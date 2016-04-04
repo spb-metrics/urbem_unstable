@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenho.php 64256 2015-12-22 16:06:28Z michel $
+    $Id: FMManterEmpenho.php 64400 2016-02-16 16:00:53Z arthur $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -165,8 +165,11 @@ $arChaveAtributo =  array( "cod_pre_empenho" => $request->get('inCodPreEmpenho')
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 
-if ($inCodDespesa)
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior( $nuSaldoAnterior );
+if ($inCodDespesa){
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho( $nuSaldoAnterior );
+}
 
 $nuSaldoAnterior = number_format( $nuSaldoAnterior, 2, ',', '.');
 

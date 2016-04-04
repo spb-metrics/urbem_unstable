@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisiane Morais
   *
   * @ignore
-  * $Id: FMManterConsideracao.php 64308 2016-01-14 13:58:36Z lisiane $
+  * $Id: FMManterConsideracao.php 64510 2016-03-08 14:05:56Z jean $
   * $Date: $
   * $Author: $
   * $Rev: $
@@ -98,6 +98,7 @@ $obSlcTipoExportacao->addOption('mensal','Acompanhamento Mesal');
 $obSlcTipoExportacao->addOption('planejamento','Arquivos Planejamento');
 $obSlcTipoExportacao->addOption('balancete','Balancete Contabil');
 $obSlcTipoExportacao->addOption('inclusao',' Inclusão Programas');
+$obSlcTipoExportacao->addOption('folha',' Folha de Pagamento');
 $obSlcTipoExportacao->obEvento->setOnChange(" document.getElementById('inMes').value = ''; ");
 
 $obPeriodoMes = new Mes;

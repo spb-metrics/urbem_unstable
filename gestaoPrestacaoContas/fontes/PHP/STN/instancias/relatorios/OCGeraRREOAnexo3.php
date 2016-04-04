@@ -33,14 +33,14 @@
 
     * Casos de uso : uc-06.01.03
 
-    $Id: OCGeraRREOAnexo3.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+    $Id: OCGeraRREOAnexo3.php 64455 2016-02-24 16:59:33Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
-
+// gestaoPrestacaoContas/fontes/RPT/STN/report/design/RREOAnexo3.rptdesign
 $preview = new PreviewBirt(6,36,22);
 $preview->setTitulo('Demonstrativo da Receita Corrente Liquída');
 $preview->setVersaoBirt( '2.5.0' );

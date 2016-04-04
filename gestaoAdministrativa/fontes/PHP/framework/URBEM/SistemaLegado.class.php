@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: SistemaLegado.class.php 64153 2015-12-09 19:16:02Z evandro $
+ $Id: SistemaLegado.class.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -202,6 +202,33 @@ public static function isTCMGO($boTransacao = '')
         return false;
     }
     if ( ( trim($rsRecordSet->getCampo('valor')) == trim('9') ) ) {
+        return true;
+    }
+
+    return false;
+}
+
+public static function isTCEMG($boTransacao = '')
+{
+    $stSql = "SELECT
+                valor
+              FROM
+                administracao.configuracao
+              WHERE
+                    cod_modulo = 2
+                AND parametro  = 'cod_uf'
+                AND exercicio  = '".Sessao::getExercicio()."'
+            ";
+
+    $obConexao   = new Conexao;
+    $obErro      = new Erro;
+    $obRecordSet = new RecordSet;
+
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    if ( $obErro->ocorreu() ) {
+        return false;
+    }
+    if ( ( trim($rsRecordSet->getCampo('valor')) == trim('11') ) ) {
         return true;
     }
 
@@ -1388,5 +1415,29 @@ public static function removeAcentosSimbolos(&$string)
             break;
         }    
 }
+/*******************************************************************************************************/
+/**** Formata numero do padrao do banco para o padrao brasileiro e vice e versa                     ****/
+/**** Exemplo de uso .: mascaraValorBD("2.341,30",false); = 2341.30                                 ****/
+/**** Exemplo de uso .: mascaraValorBD("2341.30",true); = 2.341,30                                  ****/
+/*******************************************************************************************************/
+public static function formataValorDecimal($value, $boToBR = false)
+{    
+    if($boToBR)
+        $value = number_format($value,2,',','.');
+    else
+        $value = str_replace(',','.',str_replace('.','',$value));
+    return $value;
+}
+
+
+/************************************************************************************/
+/**** Exibe mensagem no topo do sistema com fundo vermelho e letras em cor branca ***/
+/************************************************************************************/
+public static function exibeAlertaTopo($data)
+{
+    echo '<div style="background:#FF0000; padding: 10px; color: #FFF; text-align:left;">'.$data.'</div>';
+    return true;
+}
+
 
 }//END CLASS

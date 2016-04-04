@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterOrdemPagamento.php 60514 2014-10-24 19:19:34Z evandro $
+    * $Id: FMManterOrdemPagamento.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     * Casos de uso: uc-02.03.20
                     uc-02.03.04
@@ -109,7 +109,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obREmpenhoOrdemPagamento = new REmpenhoOrdemPagamento;
     $obREmpenhoOrdemPagamento->obROrcamentoEntidade->setExercicio( Sessao::getExercicio()    );
     $obREmpenhoOrdemPagamento->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm')  );
-    $obREmpenhoOrdemPagamento->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidade );
+    $obREmpenhoOrdemPagamento->obROrcamentoEntidade->listarEntidadeRestos( $rsEntidade );
 
     $stNomeEntidade = $request->get('stNomeEntidade');
 

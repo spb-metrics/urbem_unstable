@@ -62,7 +62,7 @@ class TTBADotTermoParc extends Persistente
 	$stSql =  "
                SELECT 1 AS tipo_registro
                     , ".$this->getDado('unidade_gestora')." AS unidade_gestora
-                    , termo_parceria_prorrogacao.nro_termo_aditivo AS num_termo
+                    , termo_parceria.nro_processo AS num_termo
                     , row_number() over( ORDER BY despesa.cod_despesa ) AS num_sequencial
                     , despesa.cod_despesa
                     , despesa.num_unidade AS unidade_orcamentaria
@@ -105,7 +105,7 @@ class TTBADotTermoParc extends Persistente
                   AND termo_parceria.cod_entidade = termo_parceria_dotacao.cod_entidade
                   AND termo_parceria.nro_processo = termo_parceria_dotacao.nro_processo 
 
-           INNER JOIN tcmba.termo_parceria_prorrogacao
+            LEFT JOIN tcmba.termo_parceria_prorrogacao
                    ON termo_parceria_prorrogacao.exercicio    = termo_parceria.exercicio
                   AND termo_parceria_prorrogacao.cod_entidade = termo_parceria.cod_entidade 
                   AND termo_parceria_prorrogacao.nro_processo = termo_parceria.nro_processo 
@@ -117,7 +117,6 @@ class TTBADotTermoParc extends Persistente
                       )
 
              ORDER BY despesa.cod_despesa ";
-
         return $stSql;
     }
 

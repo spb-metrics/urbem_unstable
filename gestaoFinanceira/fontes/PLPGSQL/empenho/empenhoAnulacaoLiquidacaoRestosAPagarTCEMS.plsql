@@ -273,26 +273,25 @@ BEGIN
              , tabela_debito.estrutural_debito
              , tabela_credito.plano_credito
              , tabela_credito.estrutural_credito
-          FROM orcamento.despesa
-    INNER JOIN orcamento.recurso
-            ON recurso.cod_recurso = despesa.cod_recurso
-           AND recurso.exercicio   = despesa.exercicio
-    INNER JOIN ( SELECT plano_recurso.cod_recurso
-                      , plano_recurso.exercicio
-                      , plano_analitica.cod_plano AS plano_debito
-                      , plano_conta.cod_estrutural AS estrutural_debito
-                   FROM contabilidade.plano_recurso
-             INNER JOIN contabilidade.plano_analitica
-                     ON plano_analitica.cod_plano = plano_recurso.cod_plano
-                    AND plano_analitica.exercicio = plano_recurso.exercicio
-             INNER JOIN contabilidade.plano_conta
-                     ON plano_conta.cod_conta = plano_analitica.cod_conta
-                    AND plano_conta.exercicio = plano_analitica.exercicio
-                  WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.3%''
-                    AND plano_conta.exercicio = '''||EXERCICIO||'''
-             ) AS tabela_debito
-            ON tabela_debito.cod_recurso = recurso.cod_recurso
-    INNER JOIN ( SELECT plano_recurso.cod_recurso
+          FROM contabilidade.plano_recurso
+    INNER JOIN (SELECT plano_recurso.cod_recurso
+                     , plano_recurso.exercicio
+                     , plano_analitica.cod_plano AS plano_debito
+                     , plano_conta.cod_estrutural AS estrutural_debito
+                  FROM contabilidade.plano_recurso
+            INNER JOIN contabilidade.plano_analitica
+                    ON plano_analitica.cod_plano = plano_recurso.cod_plano
+                   AND plano_analitica.exercicio = plano_recurso.exercicio
+            INNER JOIN contabilidade.plano_conta
+                    ON plano_conta.cod_conta = plano_analitica.cod_conta
+                   AND plano_conta.exercicio = plano_analitica.exercicio
+                 WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.3%''
+                   AND plano_conta.exercicio = '''||EXERCICIO||'''
+               ) AS tabela_debito
+            ON tabela_debito.cod_recurso = plano_recurso.cod_recurso
+           AND tabela_debito.exercicio   = plano_recurso.exercicio
+    INNER JOIN (
+                 SELECT plano_recurso.cod_recurso
                       , plano_recurso.exercicio
                       , plano_analitica.cod_plano AS plano_credito
                       , plano_conta.cod_estrutural AS estrutural_credito
@@ -306,13 +305,14 @@ BEGIN
                   WHERE plano_conta.cod_estrutural LIKE ''8.2.1.1.2%''
                     AND plano_conta.exercicio = '''||EXERCICIO||'''
              ) AS tabela_credito
-            ON tabela_credito.cod_recurso = recurso.cod_recurso
-    INNER JOIN orcamento.conta_despesa
-            ON conta_despesa.exercicio = despesa.exercicio
-           AND conta_despesa.cod_conta = despesa.cod_conta
-         WHERE conta_despesa.cod_estrutural = '''||stCodEstrutural||'''
-           AND despesa.exercicio = '''||EXERCLIQUIDACAO||'''
-           AND recurso.cod_recurso = ' || inCodRecurso || '
+            ON tabela_credito.cod_recurso = plano_recurso.cod_recurso
+           AND tabela_credito.exercicio   = plano_recurso.exercicio
+         WHERE plano_recurso.exercicio   = '''||EXERCICIO||'''
+           AND plano_recurso.cod_recurso = ' || inCodRecurso || '
+      GROUP BY tabela_debito.plano_debito
+             , tabela_debito.estrutural_debito
+             , tabela_credito.plano_credito
+             , tabela_credito.estrutural_credito
             ';
         ELSE
             SQLCONTAFIXA := '

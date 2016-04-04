@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Roberto Pawelski Rodrigues
 
-    $Id: PRConfiguracao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: PRConfiguracao.php 64548 2016-03-11 18:28:10Z evandro $
 
     * Casos de uso: uc-02.01.01
 */
@@ -234,11 +234,16 @@ if (!$obErro->ocorreu()) {
         $obRConfiguracaoOrcamento->setUnidadeMedidaMetasReceita( $request->get("inCodApuracaoMetasReceita") );
     $obRConfiguracaoOrcamento->setUnidadeMedidaMetasDespesa( $request->get("inCodApuracaoMetasDespesa") );
     }
-    $obRConfiguracaoOrcamento->setCodContador             ( $request->get("inCodContador")        );
-    $obRConfiguracaoOrcamento->setCodTecContabil          ( $request->get("inCodTecContabil")     );
-    $obRConfiguracaoOrcamento->setMascClassDespesa        ( $request->get("stMascPosicaoDespesa") );
-    $obRConfiguracaoOrcamento->setMascClassReceita        ( $request->get("stMascReceita")        );
-    $obRConfiguracaoOrcamento->setMascClassReceitaDedutora( $request->get("stMascReceitaDedutora"));
+    $obRConfiguracaoOrcamento->setCodContador                ( $request->get("inCodContador")         );
+    $obRConfiguracaoOrcamento->setCodTecContabil             ( $request->get("inCodTecContabil")      );
+    $obRConfiguracaoOrcamento->setMascClassDespesa           ( $request->get("stMascPosicaoDespesa")  );
+    $obRConfiguracaoOrcamento->setMascClassReceita           ( $request->get("stMascReceita")         );
+    $obRConfiguracaoOrcamento->setMascClassReceitaDedutora   ( $request->get("stMascReceitaDedutora") );
+    $obRConfiguracaoOrcamento->setLimiteSuplementacaoDecreto ( $request->get("nuLimiteSuplementacaoDecreto") );
+
+    if ( Sessao::getExercicio() > 2015 && SistemaLegado::isTCEMG($boTransacao) ) {
+        $obRConfiguracaoOrcamento->setSuplementacaoRigidaRecurso ( ($request->get("stSuplementacaoRegidaRecurso") == 'S') ? 'sim':'nao' );
+    }
 
     if(!$obErro->ocorreu())
         $obErro = $obRConfiguracaoOrcamento->salvaConfiguracao( $boTransacao );

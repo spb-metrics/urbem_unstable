@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FrameWorkMPDF.class.php 63190 2015-08-03 18:55:30Z carlos.silva $
-  * $Date: 2015-08-03 15:55:30 -0300 (Seg, 03 Ago 2015) $
-  * $Author: carlos.silva $
-  * $Rev: 63190 $
+  * $Id: FrameWorkMPDF.class.php 64782 2016-03-31 16:55:09Z michel $
+  * $Date: 2016-03-31 13:55:09 -0300 (Qui, 31 Mar 2016) $
+  * $Author: michel $
+  * $Rev: 64782 $
   *
 */
 
@@ -158,6 +158,13 @@ class FrameWorkMPDF
     
     /**
     * 
+    * @var boolean
+    *    
+    */
+    private $boCabecalho;
+    
+    /**
+    * 
     * @var Objeto
     *    
     */
@@ -218,6 +225,10 @@ class FrameWorkMPDF
     
     public function getTipoSaida() { return $this->stTipoSaida; } 
     public function setTipoSaida( $stTipoSaida ) { $this->stTipoSaida = $stTipoSaida; }
+    
+    public function getMostraCabecalho() { return $this->boCabecalho; } 
+    public function setMostraCabecalho( $valor ) { $this->boCabecalho = $valor; }
+    
 
     /**
      *
@@ -226,20 +237,25 @@ class FrameWorkMPDF
      * Metodo construtor da class FrameWorkMPDF
      * 
      */
-    public function FrameWorkMPDF( $inCodGestao, $inCodModulo, $inCodRelatorio )
+    public function FrameWorkMPDF( $inCodGestao, $inCodModulo, $inCodRelatorio = '' )
     {
         $this->setCodGestao( $inCodGestao );
         $this->setCodModulo( $inCodModulo );
-        $this->setCodRelatorio( $inCodRelatorio );
-        
-        $stLinkCSS = file_get_contents("../../../../../../gestaoAdministrativa/fontes/RPT/framework/MPDF/style.css");
-        
-        $this->setFolhaCSS ( $stLinkCSS );
-        
-        $this->preencheDiretorioArquivo();
-        $this->preencheNomeArquivo();
 
-        $this->obViewLoader = new ViewLoader($this->getDiretorioArquivo());
+        $stLinkCSS = file_get_contents("../../../../../../gestaoAdministrativa/fontes/RPT/framework/MPDF/style.css");
+
+        $this->setFolhaCSS ( $stLinkCSS );
+
+        if($inCodRelatorio != ''){
+            $this->setCodRelatorio( $inCodRelatorio );
+
+            $this->preencheDiretorioArquivo();
+            $this->preencheNomeArquivo();
+    
+            $this->obViewLoader = new ViewLoader($this->getDiretorioArquivo());
+        }
+        
+        $this->setMostraCabecalho( TRUE );
     }
     
     /**
@@ -344,7 +360,7 @@ class FrameWorkMPDF
         // Quando for selecionada duas ou mais entidades para gerar o relatório, será verificado qual entidade está como prefeitura na tabela administracao.configuracao
         // Caso contrário será gerado com a entidade selecionada
         
-        if(substr_count($this->getCodEntidades(), ',') > 0) {
+        if(substr_count($this->getCodEntidades(), ',') > 0 || empty($this->getCodEntidades())) {
             $inCodEntidade = SistemaLegado::pegaDado('valor','administracao.configuracao',"where cod_modulo = 8 AND parametro ILIKE 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."'");
             $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade);
 
@@ -384,13 +400,18 @@ class FrameWorkMPDF
     {
         $obRodape = new ViewLoader("../../../../../../gestaoAdministrativa/fontes/RPT/framework/MPDF/");
         
-        $arRodape = array( "stRodape" => "URBEM CNM" );
+        $arRodape = array( "stRodape" => "URBEM - Soluções Integradas de Administração Municipal - www.urbem.cnm.org.br" );
         
         $this->setRodapeHTML($obRodape->loadTemplate("LHRodape.php", $arRodape, false));
     }
 
     public function getDownloadNomeRelatorio() {
-        return preg_replace("/[^a-zA-Z0-9]/","", ucwords( $this->getNomeRelatorio() ) )."_".date("Y-m-d",time())."_".date("Hi",time()).".pdf";
+        $stNomRelatorio = $this->getNomeRelatorio();
+        SistemaLegado::removeAcentosSimbolos($stNomRelatorio);
+        $stNomRelatorio = ucwords( $stNomRelatorio );
+        $stNomRelatorio = preg_replace("/[^a-zA-Z0-9]/","", $stNomRelatorio );
+
+        return $stNomRelatorio."_".date("Y-m-d",time())."_".date("Hi",time()).".pdf";
     }
 
     /**
@@ -400,28 +421,41 @@ class FrameWorkMPDF
     * Metodo para gerar o relátorio em PDF
     *    
     */
-    public function gerarRelatorio()
+    public function gerarRelatorio($stHtml = '', $stHtmlCabecalho = '')
     {
         // mPDF($mode='',$format='A4',$default_font_size=0,$default_font='',$mgl=15,$mgr=15,$mgt=16,$mgb=16,$mgh=9,$mgf=9, $orientation='P')
-        $this->obMPDF = new mPDF($mode='',$format=$this->getFormatoFolha(),$default_font_size=0,$default_font='',$mgl=15,$mgr=15,$mgt=35,$mgb=16,$mgh=9,$mgf=9, $orientation='P');
         
+        $mgt = 35;
+        if($stHtml!='' && $stHtmlCabecalho!=''){
+            $inLinhasCabecalho = substr_count($stHtmlCabecalho, '<tr>');
+            $mgt = $mgt + (4 * $inLinhasCabecalho);
+        }
+
+        $this->obMPDF = new mPDF($mode='',$format=$this->getFormatoFolha(),$default_font_size=0,$default_font='',$mgl=5,$mgr=7,$mgt,$mgb=16,$mgh=9,$mgf=9, $orientation='P');
+
         // converte o arquivo LHarquivo.php para código HTML
-        $this->setPrincipalHTML($this->obViewLoader->loadTemplate($this->getNomeArquivo(), $this->getConteudo(), false));
-        
+        if($stHtml=='')
+            $this->setPrincipalHTML($this->obViewLoader->loadTemplate($this->getNomeArquivo(), $this->getConteudo(), false));
+        else
+            $this->setPrincipalHTML($stHtml);
+
         // Monta o Cabeçalho e o Rodapé do relatório
-        $this->montaCabecalhoHTML();
+        if($this->getMostraCabecalho())
+            $this->montaCabecalhoHTML();
+        $this->setCabecalhoHTML($this->getCabecalhoHTML().$stHtmlCabecalho);
+
         $this->montaRodapeHTML();
-        
+
         // recebe o HTML que foi gerado do cabecalho e do rodape e inseri na classe mPDF
         $this->obMPDF->SetHTMLHeader($this->getCabecalhoHTML());
         $this->obMPDF->SetHTMLFooter($this->getRodapeHTML());
 
         // Adiciona a folha de estilo ao relatório
         $this->obMPDF->WriteHTML($this->getFolhaCSS(), 1);
-        
+
         // Adiciona o código HTMl do relatório, que será gerado pelos arquivo LHarquivo.php
         $this->obMPDF->WriteHTML($this->getPrincipalHTML(), 2);
-        
+
         //Setando parametros para melhorar o desempenho da escrita PDF..
         error_reporting(0);
         $this->obMPDF->useSubstitutions = false; 

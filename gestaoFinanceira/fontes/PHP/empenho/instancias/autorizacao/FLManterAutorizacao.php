@@ -187,6 +187,15 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     
     $obIMontaCompraDiretaLicitacaoEmpenho = new IMontaCompraDiretaLicitacaoEmpenho($obForm);
 
+    if (Sessao::getExercicio() > '2015') {
+        $obCentroCusto = new TextBox;
+        $obCentroCusto->setRotulo ("Centro de Custo");
+        $obCentroCusto->setTitle ("Informe o centro de custo");
+        $obCentroCusto->setName ('inCentroCusto');
+        $obCentroCusto->setId ('inCentroCusto');
+        $obCentroCusto->setInteiro (true);
+    }
+
     //****************************************//
     //Monta FORMULARIO
     //****************************************//
@@ -200,6 +209,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addTitulo( "Dados para Filtro"  );
     $obFormulario->addComponente( $obCmbEntidades );
     $obFormulario->addComponente( $obLblExercicio );
+    if (Sessao::getExercicio() > '2015') {
+        $obFormulario->addComponente( $obCentroCusto  );
+    }
     $obFormulario->addComponente( $obPopUpDotacao );
 
     $obFormulario->agrupaComponentes( array( $obTxtCodAutorizacaoInicial, $obLabel, $obTxtCodAutorizacaoFinal ) );

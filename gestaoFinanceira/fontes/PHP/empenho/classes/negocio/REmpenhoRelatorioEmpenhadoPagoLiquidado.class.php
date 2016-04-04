@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 61245 2014-12-19 21:08:54Z arthur $
+    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 64470 2016-03-01 13:12:50Z jean $
 
     $Revision: 32880 $
     $Name$
@@ -142,6 +142,12 @@ var $stDemonstracaoDescricaoRecurso;
 var $stDemonstracaoDescricaoElementoDespesa;
 
 /**
+    * @var Integer
+    * @access Private
+*/
+var $inCentroCusto;
+
+/**
      * @access Public
      * @param Object $valor
 */
@@ -231,6 +237,12 @@ function setDemonstracaoDescricaoElementoDespesa($valor) { $this->stDemonstracao
     * @param String $valor
 */
 function setTipoRelatorio($valor) { $this->stTipoRelatorio = $valor; }
+
+/**
+    * @access Public
+    * @param String $valor
+*/
+function setCentroCusto($valor) { $this->inCentroCusto = $valor; }
 
 /**
      * @access Public
@@ -324,6 +336,12 @@ function getDemonstracaoDescricaoElementoDespesa() { return $this->stDemonstraca
 function getTipoRelatorio() { return $this->stTipoRelatorio; }
 
 /**
+     * @access Public
+     * @return Integer
+*/
+function getCentroCusto() { return $this->inCentroCusto; }
+
+/**
     * Método Construtor
     * @access Private
 */
@@ -387,6 +405,11 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFEmpenhoEmpenhadoPagoLiquidado->setDado("stDemonstracaoDescricaoEmpenho",$this->getDemonstracaoDescricaoEmpenho());
     $obFEmpenhoEmpenhadoPagoLiquidado->setDado("inCodDotacao",$this->getCodDotacao());
     $obFEmpenhoEmpenhadoPagoLiquidado->setDado("boMostrarAnuladoMesmoPeriodo", true);
+
+    if (Sessao::getExercicio() > '2015') {
+        $obFEmpenhoEmpenhadoPagoLiquidado->setDado("inCentroCusto", $this->getCentroCusto());
+    }
+
     $obErro = $obFEmpenhoEmpenhadoPagoLiquidado->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
 
     $inCount            = 0;

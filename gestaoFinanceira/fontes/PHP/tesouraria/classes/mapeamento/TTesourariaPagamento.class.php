@@ -160,6 +160,7 @@ function recuperaTipoOrdem(&$rsRecordSet, $boTransacao = "")
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
     $stSql = $this->montaRecuperaTipoOrdem();
+    $this->setDebug($stSql);
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
     return $obErro;

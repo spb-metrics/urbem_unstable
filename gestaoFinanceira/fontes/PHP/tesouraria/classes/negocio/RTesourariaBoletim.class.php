@@ -33,32 +33,22 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: RTesourariaBoletim.class.php 64153 2015-12-09 19:16:02Z evandro $
-
-    $Revision: 32021 $
-    $Name$
-    $Autor:$
-    $Date: 2007-10-04 15:58:52 -0300 (Qui, 04 Out 2007) $
+    $Id: RTesourariaBoletim.class.php 64692 2016-03-22 13:36:45Z michel $
 
     * Casos de uso: uc-02.04.04,uc-02.04.05,uc-02.04.17,uc-02.04.06,uc-02.04.20, uc-02.04.02,uc-02.04.25,uc-02.04.33,uc-02.04.34
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaTransferencia.class.php"   );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaPagamento.class.php"       );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaBordero.class.php"         );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaTerminal.class.php"        );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaUsuarioTerminal.class.php" );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaArrecadacao.class.php"     );
-include_once ( CAM_GF_TES_NEGOCIO    ."RTesourariaConfiguracao.class.php"    );
-include_once ( CAM_GF_ORC_NEGOCIO    ."ROrcamentoEntidade.class.php"         );
-include_once ( CAM_GF_CONT_MAPEAMENTO    ."TContabilidadeConfiguracaoLancamentoReceita.class.php"    );
+include_once CAM_GF_TES_NEGOCIO."RTesourariaTransferencia.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaPagamento.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaBordero.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaTerminal.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaUsuarioTerminal.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaArrecadacao.class.php";
+include_once CAM_GF_TES_NEGOCIO."RTesourariaConfiguracao.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php";
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeConfiguracaoLancamentoReceita.class.php";
 
-/**
-    * Classe de Regra de Boletim
-    * @author Analista: Lucas Leusin
-    * @author Desenvolvedor: Anderson R. M. Buzo
-*/
 class RTesourariaBoletim
 {
 /*
@@ -607,8 +597,14 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                         $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , 950  );
                         $inCodHistoricoDesdobramento = 950;
                     } else {
-                        $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
-                        $inCodHistoricoDesdobramento = 907;
+                        $inCodHistoricoDesdobramento = $rsArrecadacao->getCampo( "cod_historico" );
+
+                        if(empty($inCodHistoricoDesdobramento)){
+                            $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
+                            $inCodHistoricoDesdobramento = 907;
+                        }else{
+                            $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , $inCodHistoricoDesdobramento );
+                        }
                     }
                     if (Sessao::getExercicio() > '2012') {
                         $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalDebito                        );
@@ -720,8 +716,17 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                                 $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , $nuVlDisponibilidadeRet                     );
                             }
                             if ($boRetencao) {
-                                   $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"          , 950  );
-                            } else $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"          , null );
+                                $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"          , 950  );
+                            } else{
+                                $inCodHistoricoReceitaFixa = $rsArrecadacao->getCampo( "cod_historico" );
+
+                                if(empty($inCodHistoricoReceitaFixa)){
+                                    $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"      , null                       );
+                                }else{
+                                    $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"      , $inCodHistoricoReceitaFixa );
+                                }
+                            }
+                            
                             $obErro = $obFTesourariaRealizacaoReceitaFixa->executaFuncao( $rsRetornoFuncao, $boTransacao );
                         }
                     }
@@ -790,8 +795,14 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                 $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , 950  );
                 $inCodHistorico = 950;
             } else {
-                $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
-                $inCodHistorico = 907;
+                $inCodHistorico = $rsArrecadacao->getCampo( "cod_historico" );
+
+                if(empty($inCodHistorico)){
+                    $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , null );
+                    $inCodHistorico = 907;
+                }else{
+                    $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_historico" , $inCodHistorico );
+                }
             }
             if (Sessao::getExercicio() > '2012') {
                 $obFTesourariaRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalDebito                        );
@@ -909,7 +920,15 @@ function lancarArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "", $boTra
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_despesa"          , $nuVlTotalDespesa                           );
                             $obFTesourariaRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , $nuVlTotalDisponibilidade                   );
                         }
-                        $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"          , null                                        );
+
+                        $inCodHistoricoReceitaFixa = $rsArrecadacao->getCampo( "cod_historico" );
+
+                        if(empty($inCodHistoricoReceitaFixa)){
+                            $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"      , null                       );
+                        }else{
+                            $obFTesourariaRealizacaoReceitaFixa->setDado( "cod_historico"      , $inCodHistoricoReceitaFixa );
+                        }
+
                         $obErro = $obFTesourariaRealizacaoReceitaFixa->executaFuncao( $rsRetornoFuncao, $boTransacao );
 
                         $rsArrecadacao->proximo();
@@ -1122,8 +1141,14 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , 951  );
                         $inCodHistoricoDesdobramento = 951;
                     } else {
-                        $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , null );
-                        $inCodHistoricoDesdobramento = 914;
+                        $inCodHistoricoDesdobramento = $rsArrecadacao->getCampo( "cod_historico" );
+
+                        if(empty($inCodHistoricoDesdobramento)){
+                            $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , null );
+                            $inCodHistoricoDesdobramento = 914;
+                        }else{
+                            $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , $inCodHistoricoDesdobramento );
+                        }
                     }
                     if (Sessao::getExercicio() > '2012') {
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_plano_conta_recebimento", $stCodPlanoEstruturalCredito                       );
@@ -1235,8 +1260,16 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                                 $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , $nuVlDisponibilidadeRet                     );
                             }
                             if ($boRetencao) {
-                                   $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"          , 951                 );
-                            } else $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"          , null                );
+                                $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"          , 951                 );
+                            } else{
+                                $inCodHistoricoReceitaFixa = $rsArrecadacao->getCampo( "cod_historico" );
+
+                                if(empty($inCodHistoricoReceitaFixa)){
+                                    $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"      , null                       );
+                                }else{
+                                    $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"      , $inCodHistoricoReceitaFixa );
+                                }
+                            }
                             $obErro = $obFTesourariaEstornoRealizacaoReceitaFixa->executaFuncao( $rsRetornoFuncao, $boTransacao );
                         }
 
@@ -1308,8 +1341,14 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                         $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , 951  );
                         $inCodHistorico = 951;
                     } else {
-                        $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , null );
-                        $inCodHistorico = 914;
+                        $inCodHistorico = $rsArrecadacao->getCampo( "cod_historico" );
+
+                        if(empty($inCodHistorico)){
+                            $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , null );
+                            $inCodHistorico = 914;
+                        }else{
+                            $obFTesourariaEstornoRealizacaoReceitaVariavel->setDado( "cod_historico"    , $inCodHistorico );
+                        }
                     }
                     
                     if (Sessao::getExercicio() > '2012') {
@@ -1434,7 +1473,15 @@ function lancarEstornoArrecadacao(&$arCodLote, $rsArrecadacao, $boRetencao = "",
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_despesa"          , $nuVlTotalDespesa                           );
                             $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "valor_disponibilidades" , $nuVlTotalDisponibilidade                   );
                         }
-                        $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"          , null                                        );
+
+                        $inCodHistoricoReceitaFixa = $rsArrecadacao->getCampo( "cod_historico" );
+
+                        if(empty($inCodHistoricoReceitaFixa)){
+                            $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"      , null                       );
+                        }else{
+                            $obFTesourariaEstornoRealizacaoReceitaFixa->setDado( "cod_historico"      , $inCodHistoricoReceitaFixa );
+                        }
+
                         $obErro = $obFTesourariaEstornoRealizacaoReceitaFixa->executaFuncao( $rsRetornoFuncao, $boTransacao );
 
                         $rsArrecadacao->proximo();

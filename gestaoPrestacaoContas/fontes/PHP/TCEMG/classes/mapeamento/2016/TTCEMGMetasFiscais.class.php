@@ -82,6 +82,12 @@ class TTCEMGMetasFiscais extends Persistente
         $this->AddCampo('percentual_pib_resultado_nominal'          , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_divida_publica_consolidada' , 'numeric', false, '7,3',false,false);
         $this->AddCampo('percentual_pib_divida_consolidada_liquida' , 'numeric', false, '7,3',false,false);
+        $this->AddCampo('valor_corrente_receita_primaria_adv'       , 'numeric', false, '14,2',false,false);
+        $this->AddCampo('valor_corrente_despesa_primaria_gerada'    , 'numeric', false, '14,2',false,false);
+        $this->AddCampo('valor_constante_receita_primaria_adv'      , 'numeric', false, '14,2',false,false);
+        $this->AddCampo('valor_constante_despesa_primaria_gerada'   , 'numeric', false, '14,2',false,false);
+        $this->AddCampo('percentual_pib_receita_primaria_adv'       , 'numeric', false, '7,3',false,false);
+        $this->AddCampo('percentual_pib_despesa_primaria_adv'       , 'numeric', false, '7,3',false,false);
     }
 
     public function recuperaValoresMetasFiscais(&$rsRecordSet)
@@ -116,7 +122,12 @@ class TTCEMGMetasFiscais extends Persistente
              , REPLACE(percentual_pib_resultado_primario::VARCHAR, '.', ',') AS percentual_pib_resultado_primario
              , REPLACE(percentual_pib_resultado_nominal::VARCHAR, '.', ',') AS percentual_pib_resultado_nominal
              , REPLACE(percentual_pib_divida_publica_consolidada::VARCHAR, '.', ',') AS percentual_pib_divida_publica_consolidada
-             , REPLACE(percentual_pib_divida_consolidada_liquida::VARCHAR, '.', ',') AS percentual_pib_divida_consolidada_liquida
+             , REPLACE(valor_corrente_receita_primaria_adv::VARCHAR, '.', ',') AS valor_corrente_receita_primaria_adv
+             , REPLACE(valor_corrente_despesa_primaria_gerada::VARCHAR, '.', ',') AS valor_corrente_despesa_primaria_gerada
+             , REPLACE(valor_constante_receita_primaria_adv::VARCHAR, '.', ',') AS valor_constante_receita_primaria_adv
+             , REPLACE(valor_constante_despesa_primaria_gerada::VARCHAR, '.', ',') AS valor_constante_despesa_primaria_gerada
+             , REPLACE(percentual_pib_receita_primaria_adv::VARCHAR, '.', ',') AS percentual_pib_receita_primaria_adv
+             , REPLACE(percentual_pib_despesa_primaria_adv::VARCHAR, '.', ',') AS percentual_pib_despesa_primaria_adv
           FROM tcemg.metas_fiscais
          WHERE exercicio::INTEGER IN (".$this->getDado('exercicio').")
          ORDER BY exercicio

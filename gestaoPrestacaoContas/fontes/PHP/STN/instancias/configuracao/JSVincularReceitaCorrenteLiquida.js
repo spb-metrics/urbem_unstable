@@ -35,7 +35,18 @@
 ?>                                                                                                                     
 <script type="text/javascript">
     function limpaFormularioAux(){
-        jq('#flValor').val('');
+        jq('#flValor').val('0,00');
+        jq('#nuValorReceitaTributaria').val('0,00');
+        jq('#nuValorReceitaContribuicoes').val('0,00');
+        jq('#nuValorReceitaPatrominial').val('0,00');
+        jq('#nuValorReceitaAgropecuaria').val('0,00');
+        jq('#nuValorReceitaIndustrial').val('0,00');
+        jq('#nuValorReceitaServicos').val('0,00');
+        jq('#nuValorTransferenciaCorrente').val('0,00');
+        jq('#nuValorOutrasReceitas').val('0,00');
+        jq('#nuValorContribPlanoSSS').val('0,00');
+        jq('#nuValorCompensacaoFinanceira').val('0,00');
+        jq('#nuValorDeducaoFundeb').val('0,00');
         jq('#stPeriodo').selectOptions('', true);
     }
     

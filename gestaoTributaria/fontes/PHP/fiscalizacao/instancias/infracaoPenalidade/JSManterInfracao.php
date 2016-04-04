@@ -31,7 +31,7 @@
  * @author Desenvolvedor : Pedro Vaz de Mello de Medeiros
  * @ignore
 
- $Id: JSManterInfracao.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+ $Id: JSManterInfracao.php 64421 2016-02-19 12:14:17Z fabio $
 
  * Casos de uso:
  */

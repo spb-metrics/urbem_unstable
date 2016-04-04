@@ -36,31 +36,62 @@
 CREATE OR REPLACE FUNCTION stn.pl_total_subcontas_entidade ( varchar, varchar ) RETURNS SETOF RECORD AS $$
 
 DECLARE
-    dtData             ALIAS FOR $1;
-    stCodEntidades     ALIAS FOR $2;
-    inExercicio        INTEGER;
-    reRegistro         RECORD;
-    stSql              VARCHAR :='';
-    stSqlAux           VARCHAR :='';
-    stPl               VARCHAR :='';
-    stConta            VARCHAR :='4.';
-    stContaDedutora    VARCHAR :='9.';
-    inMes              INTEGER;
-    flTotalMes         FLOAT[] ;
-    flTotalReceita     FLOAT[] ;
+    dtData                  ALIAS FOR $1;
+    stCodEntidades          ALIAS FOR $2;
+    inExercicio             INTEGER;
+    reRegistro              RECORD;
+    stSql                   VARCHAR :='';
+    stSqlAux                VARCHAR :='';
+    stPl                    VARCHAR :='';
+    stConta                 VARCHAR :='4.';
+    stContaDedutora         VARCHAR :='9.';
+    inMes                   INTEGER;
+    flTotalMes              FLOAT[] ;
+    flTotalReceita          FLOAT[] ;
+    flTotalMes_OTC          FLOAT[] ;
+    flTotalReceita_OTC      FLOAT[] ;
+    stDeduzirIRRF           VARCHAR := '';
+    stMes                   varchar;
+    arDatas                 varchar[];
+    inAno                   integer;
+    i                       integer;
+    stDataIni               varchar;
+    arValoresConfigurados   NUMERIC[];
+    nuValorAux              NUMERIC;
 
-    flTotalMes_OTC     FLOAT[] ;
-    flTotalReceita_OTC FLOAT[] ;
-    stDeduzirIRRF      VARCHAR := '';
 BEGIN
         inExercicio :=  substr(dtData, 7, 4 ) ;
         inMes       :=  substr(dtData, 4, 2 ) ; 
+
+        inAno := inExercicio;
 
         IF inExercicio > 2012 THEN
             stPl    := '_novo';
             stConta := '';
             stContaDedutora := '';
-        END IF;
+            
+            --ALTERACOES PARA 2016 buscar as datas de acordo com o filtro
+            IF inExercicio >= 2016 THEN
+                i := 12;
+                WHILE i >= 1 LOOP
+                    if ( inMes < 10 ) then
+                        stMes := '0' || inMes;
+                    else
+                        stMes := inMes;
+                    end if;
+                
+                    arDatas[i] :=  '01/' || stMes || '/'|| inAno;
+                
+                    i := i - 1;
+                    inMes := inMes - 1;
+                    if ( inMes = 0 ) then
+                        inAno := inAno -1;
+                        inMes := 12;
+                    end if;
+                END LOOP;
+            
+            END IF;--IF inExercicio >= 2016 
+        END IF;--IF inExercicio > 2012
 
         --Dados para o relatorio
         stSql := 'CREATE TEMPORARY TABLE tmp_valor AS (
@@ -156,8 +187,8 @@ BEGIN
 
                 )';
         EXECUTE stSql;
-raise notice 'tmp_valor: %', stSql;
-                    --- Linha   RECEITAS CORRENTES(I)
+
+        --- Linha   RECEITAS CORRENTES(I)
         stSql := ' select 1 as ordem 
                                        ,cast( retorno.cod_conta                as varchar ) 
                                        ,cast( trim(retorno.nom_conta) || '' (I)'' as varchar )
@@ -366,18 +397,18 @@ raise notice 'tmp_valor: %', stSql;
                            ,cast(0 as numeric) as mes_10        
                            ,cast(0 as numeric) as mes_11        
                            ,cast(0 as numeric) as mes_12        
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
+                           ,cast(0 as numeric) as total_mes_1         
+                           ,cast(0 as numeric) as total_mes_2         
+                           ,cast(0 as numeric) as total_mes_3         
+                           ,cast(0 as numeric) as total_mes_4         
+                           ,cast(0 as numeric) as total_mes_5         
+                           ,cast(0 as numeric) as total_mes_6         
+                           ,cast(0 as numeric) as total_mes_7         
+                           ,cast(0 as numeric) as total_mes_8         
+                           ,cast(0 as numeric) as total_mes_9         
+                           ,cast(0 as numeric) as total_mes_10        
+                           ,cast(0 as numeric) as total_mes_11        
+                           ,cast(0 as numeric) as total_mes_12        
                 union
 
             SELECT 1 AS ordem
@@ -787,18 +818,18 @@ raise notice 'tmp_valor: %', stSql;
                            ,cast(0 as numeric) as mes_10        
                            ,cast(0 as numeric) as mes_11        
                            ,cast(0 as numeric) as mes_12        
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12     
+                           ,cast(0 as numeric) as total_mes_1         
+                           ,cast(0 as numeric) as total_mes_2         
+                           ,cast(0 as numeric) as total_mes_3         
+                           ,cast(0 as numeric) as total_mes_4         
+                           ,cast(0 as numeric) as total_mes_5         
+                           ,cast(0 as numeric) as total_mes_6         
+                           ,cast(0 as numeric) as total_mes_7         
+                           ,cast(0 as numeric) as total_mes_8         
+                           ,cast(0 as numeric) as total_mes_9         
+                           ,cast(0 as numeric) as total_mes_10        
+                           ,cast(0 as numeric) as total_mes_11        
+                           ,cast(0 as numeric) as total_mes_12     
         ';
        
         --
@@ -1682,11 +1713,199 @@ raise notice 'tmp_valor: %', stSql;
     flTotalMes_OTC  [10] := 0; 
     flTotalMes_OTC  [11] := 0; 
     flTotalMes_OTC  [12] := 0;   
-raise notice '%', stSql;
+
     FOR reRegistro IN EXECUTE stSql
     LOOP 
-       -------- totalizando OUtras receitas tributárias 
-       if ( reRegistro.cod_estrutural = stConta||'1.1.0.0.00.00.00.00.00' ) then
+
+        --AJUSTES DO DADOS PARA BUSCAR DE ACORDO COM A CONFIGURACAO A PARTIR DE 2016 SEM ALTERAR O QUE JA FAZ CASO NAO TENHA NADA CONFIGURADO
+        arValoresConfigurados[1] := null;
+        arValoresConfigurados[2] := null;
+        arValoresConfigurados[3] := null;
+        arValoresConfigurados[4] := null;
+        arValoresConfigurados[5] := null;
+        arValoresConfigurados[6] := null;
+        arValoresConfigurados[7] := null;
+        arValoresConfigurados[8] := null;
+        arValoresConfigurados[9] := null;
+        arValoresConfigurados[10] := null;
+        arValoresConfigurados[11] := null;
+        arValoresConfigurados[12] := null;
+
+        i := 1;
+        WHILE i <= 12 LOOP
+            nuValorAux := 0.00;
+            stDataIni := arDatas[i];
+
+            IF (SELECT COUNT(*) 
+                FROM stn.receita_corrente_liquida
+                WHERE mes = substr(stDataIni,4,2)::integer 
+                AND exercicio = ''||substr(stDataIni,7,4)::integer||'' 
+            ) >= 1 THEN
+
+                --'RECEITAS CORRENTES (I)'
+                IF reRegistro.cod_estrutural = '1.0.0.0.00.00.00.00.00' THEN
+                    SELECT ( SUM(COALESCE(valor_receita_tributaria,0.00)) 
+                             +SUM(COALESCE(valor_receita_contribuicoes,0.00))
+                             +SUM(COALESCE(valor_receita_patrimonial,0.00))
+                             +SUM(COALESCE(valor_receita_agropecuaria,0.00))
+                             +SUM(COALESCE(valor_receita_industrial,0.00))
+                             +SUM(COALESCE(valor_receita_servicos,0.00))
+                             +SUM(COALESCE(valor_transferencias_correntes,0.00))
+                             +SUM(COALESCE(valor_outras_receitas,0.00))                             
+                           ) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;                    
+                END IF;
+
+
+                --'Receita Tributaria'
+                IF reRegistro.cod_estrutural = '1.1.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_tributaria,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                    
+                END IF;
+
+                --'Receita De Contribuicoes
+                IF reRegistro.cod_estrutural = '1.2.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_contribuicoes,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+            
+                --'Receita Patrimonial'
+                IF reRegistro.cod_estrutural = '1.3.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_patrimonial,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+            
+                --'Receita Agropecuaria'
+                IF reRegistro.cod_estrutural = '1.4.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_agropecuaria,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'Receita Industrial'
+                IF reRegistro.cod_estrutural = '1.5.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_industrial,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'Receita De Servicos'
+                IF reRegistro.cod_estrutural = '1.6.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_receita_servicos,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'Transferencias Correntes'
+                IF reRegistro.cod_estrutural = '1.7.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_transferencias_correntes,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'Outras Receitas Correntes'
+                IF reRegistro.cod_estrutural = '1.9.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_outras_receitas,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'(R) DEDUCOES DA RECEITA CORRENTE'
+                IF reRegistro.cod_estrutural = '4.9.0.0.0.00.00.00.00.00' THEN
+                    SELECT (SUM(COALESCE(valor_contrib_plano_sss,0.00)) 
+                             +SUM(COALESCE(valor_compensacao_financeira,0.00))
+                             +SUM(COALESCE(valor_deducao_fundeb,0.00))
+                           ) * -1 as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;                    
+                END IF;
+
+
+                --'Contrib. Plano Seg. Social Servidor'
+                IF reRegistro.cod_estrutural = '4.9.6.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_contrib_plano_sss,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'Compensação Financ. entre Regimes Previd.'
+                IF reRegistro.cod_estrutural = '4.9.6.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_compensacao_financeira,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+                --'DEDUÇÃO DA RECEITA PARA FORMAÇÃO DO FUNDEB'
+                IF reRegistro.cod_estrutural = '4.9.7.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_deducao_fundeb,0.00)) as valor
+                        INTO nuValorAux
+                    FROM stn.receita_corrente_liquida
+                    WHERE mes = substr(stDataIni,4,2)::integer 
+                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
+                END IF;
+
+            END IF;
+            
+            i := i + 1;
+        END LOOP;
+
+        reRegistro.mes_1  := COALESCE(arValoresConfigurados[1],reRegistro.mes_1);
+        reRegistro.mes_2  := COALESCE(arValoresConfigurados[2],reRegistro.mes_2);
+        reRegistro.mes_3  := COALESCE(arValoresConfigurados[3],reRegistro.mes_3);
+        reRegistro.mes_4  := COALESCE(arValoresConfigurados[4],reRegistro.mes_4);
+        reRegistro.mes_5  := COALESCE(arValoresConfigurados[5],reRegistro.mes_5);
+        reRegistro.mes_6  := COALESCE(arValoresConfigurados[6],reRegistro.mes_6);
+        reRegistro.mes_7  := COALESCE(arValoresConfigurados[7],reRegistro.mes_7);
+        reRegistro.mes_8  := COALESCE(arValoresConfigurados[8],reRegistro.mes_8);
+        reRegistro.mes_9  := COALESCE(arValoresConfigurados[9],reRegistro.mes_9);
+        reRegistro.mes_10 := COALESCE(arValoresConfigurados[10],reRegistro.mes_10);
+        reRegistro.mes_11 := COALESCE(arValoresConfigurados[11],reRegistro.mes_11);
+        reRegistro.mes_12 := COALESCE(arValoresConfigurados[12],reRegistro.mes_12);
+
+        -------- totalizando OUtras receitas tributárias 
+        if ( reRegistro.cod_estrutural = stConta||'1.1.0.0.00.00.00.00.00' ) then
             flTotalReceita[1]  := reRegistro.mes_1;
             flTotalReceita[2]  := reRegistro.mes_2;
             flTotalReceita[3]  := reRegistro.mes_3;
@@ -1699,9 +1918,9 @@ raise notice '%', stSql;
             flTotalReceita[10] := reRegistro.mes_10;
             flTotalReceita[11] := reRegistro.mes_11;
             flTotalReceita[12] := reRegistro.mes_12;
-       end if;
+        end if;
 
-       if ( (reRegistro.cod_estrutural = stConta||'1.1.1.2.02.00.00.00.00') 
+        if ( (reRegistro.cod_estrutural = stConta||'1.1.1.2.02.00.00.00.00') 
         or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.04.00.00.00.00') 
         or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.08.00.00.00.00') ) then
             

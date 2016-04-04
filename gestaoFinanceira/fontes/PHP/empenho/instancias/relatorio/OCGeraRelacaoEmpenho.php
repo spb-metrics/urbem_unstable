@@ -30,7 +30,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: OCGeraRelacaoEmpenho.php 61605 2015-02-12 16:04:02Z diogo.zarpelon $
+* $Id: OCGeraRelacaoEmpenho.php 64670 2016-03-18 20:25:16Z jean $
 *
 */
 
@@ -39,7 +39,12 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 
-$preview = new PreviewBirt(2, 10, 1);
+if (Sessao::getExercicio() > '2015') {
+    $preview = new PreviewBirt(2, 10, 12);
+} else {
+    $preview = new PreviewBirt(2, 10, 1);
+}
+
 $preview->setTitulo('Relação de Empenhos');
 $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel (true );
@@ -165,6 +170,12 @@ if ($_REQUEST['inCodFornecedor'] != '') {
     $preview->addParametro( 'cod_fornecedor', $_REQUEST['inCodFornecedor'] );
 } else {
     $preview->addParametro( 'cod_fornecedor', '' );
+}
+
+if ($_REQUEST['inCentroCusto'] != '') {
+    $preview->addParametro( 'centro_custo', $_REQUEST['inCentroCusto'] );
+} else {
+    $preview->addParametro( 'centro_custo', '' );
 }
 
 $preview->preview();

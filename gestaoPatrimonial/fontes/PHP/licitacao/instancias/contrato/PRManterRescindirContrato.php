@@ -82,9 +82,7 @@ case "rescindir":
 
     if ( implode(array_reverse(explode('/',$request->get('dtRescisao')))) < implode(array_reverse(explode('/',$request->get('dtAssinatura')))) ) {
         SistemaLegado::exibeAviso(urlencode("A data de rescisão não pode ser anterior que a data de assinatura do contrato"), "n_incluir", "erro" );
-
     } else {
-
         $obTLicitacaoRescisaoContrato = new TLicitacaoRescisaoContrato();
         $obTLicitacaoRescisaoContrato->recuperaProximoNumRescisao($rsLicitacaoRescisaoContrato);
         $obTLicitacaoRescisaoContrato->setDado('exercicio_contrato', $request->get('stExercicio'));
@@ -93,10 +91,8 @@ case "rescindir":
         $obTLicitacaoRescisaoContrato->setDado('exercicio', Sessao::getExercicio());
         $obTLicitacaoRescisaoContrato->setDado('num_rescisao', $rsLicitacaoRescisaoContrato->getCampo("maximo"));
         $obTLicitacaoRescisaoContrato->setDado('dt_rescisao', $request->get('dtRescisao'));
-        $vlMulta = number_format(str_replace(".", "", $request->get('vlMulta')), 2, ".", "");
-        $obTLicitacaoRescisaoContrato->setDado('vlr_multa', $vlMulta);
-        $vlIndenizacao = number_format(str_replace(".", "", $request->get('vlIndenizacao')), 2, ".", "");
-        $obTLicitacaoRescisaoContrato->setDado('vlr_indenizacao', $vlIndenizacao);
+        $obTLicitacaoRescisaoContrato->setDado('vlr_multa', $request->get('vlMulta'));
+        $obTLicitacaoRescisaoContrato->setDado('vlr_indenizacao', $request->get('vlIndenizacao'));
         $obTLicitacaoRescisaoContrato->setDado('motivo', $request->get('stMotivo'));
         $obTLicitacaoRescisaoContrato->inclusao();
 

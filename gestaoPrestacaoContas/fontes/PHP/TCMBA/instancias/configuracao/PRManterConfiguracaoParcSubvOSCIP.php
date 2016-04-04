@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   * @ignore
   *
-  * $Id: PRManterConfiguracaoParcSubvOSCIP.php 64307 2016-01-13 19:42:57Z jean $
-  * $Revision: 64307 $
-  * $Author: jean $
-  * $Date: 2016-01-13 17:42:57 -0200 (Qua, 13 Jan 2016) $
+  * $Id: PRManterConfiguracaoParcSubvOSCIP.php 64410 2016-02-18 12:13:33Z lisiane $
+  * $Revision: 64410 $
+  * $Author: lisiane $
+  * $Date: 2016-02-18 10:13:33 -0200 (Qui, 18 Fev 2016) $
 */
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once CAM_GPC_TCMBA_MAPEAMENTO.'TTCMBATermoParceria.class.php';
@@ -71,33 +71,35 @@ if( $request->get('stAcao') == 'configurar' ){
         */
 
         $arTermoParcerias = Sessao::read('arTermoParcerias');
-
-        foreach ($arTermoParcerias as $dados) {
-            if ($dados['nro_processo'] == $request->get('stHdnNumeroProcessoAnterior')) {
-                 if ( trim($request->get('stHdnNumeroProcessoAnterior')) != trim($request->get('stNumeroProcesso')) ) {
-                    $stNumeroProcesso = trim($request->get('stHdnNumeroProcessoAnterior'));
-                } else {
-                    $stNumeroProcesso = trim($request->get('stNumeroProcesso'));
-                }
-
-                $obTTCMBATermoParceriaDotacao->setDado('exercicio'   , $stExercicioProcesso );
-                $obTTCMBATermoParceriaDotacao->setDado('cod_entidade', $request->get('inCodEntidade') );
-                $obTTCMBATermoParceriaDotacao->setDado('nro_processo', $stNumeroProcesso );
-                $obErro = $obTTCMBATermoParceriaDotacao->recuperaPorChave($rsTermoParceriaDotacao,$boTransacao);
-
-                if (!$obErro->ocorreu() && $rsTermoParceriaDotacao->getNumLinhas() > 0) {
-                    $obErro = $obTTCMBATermoParceriaDotacao->exclusao($boTransacao);            
-                }
-
-                if ( !$obErro->ocorreu() ) {
-                    $obTTCMBATermoParceria = new TTCMBATermoParceria();
-                    $obTTCMBATermoParceria->setDado('exercicio'    , $stExercicioProcesso );
-                    $obTTCMBATermoParceria->setDado('cod_entidade' , $request->get('inCodEntidade') );
-                    $obTTCMBATermoParceria->setDado('nro_processo' , $stNumeroProcesso );
-                    $obErro = $obTTCMBATermoParceria->recuperaPorChave($rsTermoParceriaAnterior,$boTransacao);
-
-                    if (!$obErro->ocorreu() && $rsTermoParceriaAnterior->getNumLinhas() > 0) {
-                        $obErro = $obTTCMBATermoParceria->exclusao($boTransacao);
+        
+        if (is_array($arTermoParcerias))  {
+            foreach ($arTermoParcerias as $dados) {
+                if ($dados['nro_processo'] == $request->get('stHdnNumeroProcessoAnterior')) {
+                    if ( trim($request->get('stHdnNumeroProcessoAnterior')) != trim($request->get('stNumeroProcesso')) ) {
+                        $stNumeroProcesso = trim($request->get('stHdnNumeroProcessoAnterior'));
+                    } else {
+                        $stNumeroProcesso = trim($request->get('stNumeroProcesso'));
+                    }
+    
+                    $obTTCMBATermoParceriaDotacao->setDado('exercicio'   , $stExercicioProcesso );
+                    $obTTCMBATermoParceriaDotacao->setDado('cod_entidade', $request->get('inCodEntidade') );
+                    $obTTCMBATermoParceriaDotacao->setDado('nro_processo', $stNumeroProcesso );
+                    $obErro = $obTTCMBATermoParceriaDotacao->recuperaPorChave($rsTermoParceriaDotacao,$boTransacao);
+    
+                    if (!$obErro->ocorreu() && $rsTermoParceriaDotacao->getNumLinhas() > 0) {
+                        $obErro = $obTTCMBATermoParceriaDotacao->exclusao($boTransacao);            
+                    }
+    
+                    if ( !$obErro->ocorreu() ) {
+                        $obTTCMBATermoParceria = new TTCMBATermoParceria();
+                        $obTTCMBATermoParceria->setDado('exercicio'    , $stExercicioProcesso );
+                        $obTTCMBATermoParceria->setDado('cod_entidade' , $request->get('inCodEntidade') );
+                        $obTTCMBATermoParceria->setDado('nro_processo' , $stNumeroProcesso );
+                        $obErro = $obTTCMBATermoParceria->recuperaPorChave($rsTermoParceriaAnterior,$boTransacao);
+    
+                        if (!$obErro->ocorreu() && $rsTermoParceriaAnterior->getNumLinhas() > 0) {
+                            $obErro = $obTTCMBATermoParceria->exclusao($boTransacao);
+                        }
                     }
                 }
             }
@@ -168,43 +170,45 @@ if( $request->get('stAcao') == 'configurar' ){
 } else if($request->get('stAcao') == 'excluirTermoParceria') {
     $arTermoParcerias = Sessao::read("arTermoParcerias");
     $stNroProcesso = "";
-    foreach($arTermoParcerias AS $arTermoParceria){
-        if($arTermoParceria["inId"] == $request->get('inId')){
-            
-            $stNroProcesso = trim($arTermoParceria['nro_processo']).'/'.$arTermoParceria['exercicio'];
-            
-            $obTTCMBATermoParceriaProrrogacao = new TTCMBATermoParceriaProrrogacao();
-            $obTTCMBATermoParceriaProrrogacao->setDado('exercicio'   , $arTermoParceria['exercicio']);
-            $obTTCMBATermoParceriaProrrogacao->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
-            $obTTCMBATermoParceriaProrrogacao->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
-            $obErro = $obTTCMBATermoParceriaProrrogacao->recuperaPorChave($rsTermoParceriaProrrogacao, $boTransacao);
-            
-            if(!$obErro->ocorreu() && $rsTermoParceriaProrrogacao->getNumLinhas() > 0){
-                $obErro->setDescricao("Esse Termo de Parceria já possui Prorrogações cadastradas.");
-            }
-            
-            if(!$obErro->ocorreu()){
-                $obTTCMBATermoParceriaDotacao = new TTCMBATermoParceriaDotacao();
-                $obTTCMBATermoParceriaDotacao->setDado('exercicio'   , $arTermoParceria['exercicio']);
-                $obTTCMBATermoParceriaDotacao->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
-                $obTTCMBATermoParceriaDotacao->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
-                $obErro = $obTTCMBATermoParceriaDotacao->recuperaPorChave($rsTermoParceriaDotacao, $boTransacao);
-            }
-            
-            if(!$obErro->ocorreu() && $rsTermoParceriaDotacao->getNumLinhas() > 0){
-                $obErro = $obTTCMBATermoParceriaDotacao->exclusao($boTransacao);
-            }
-            
-            if(!$obErro->ocorreu()){
-                $obTTCMBATermoParceria = new TTCMBATermoParceria();
-                $obTTCMBATermoParceria->setDado('exercicio'   , $arTermoParceria['exercicio']);
-                $obTTCMBATermoParceria->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
-                $obTTCMBATermoParceria->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
-                $obErro = $obTTCMBATermoParceria->recuperaPorChave($rsTermoParceria, $boTransacao);
-            }
-            
-            if(!$obErro->ocorreu() && $rsTermoParceria->getNumLinhas() > 0){
-                $obErro = $obTTCMBATermoParceria->exclusao($boTransacao);
+    if(is_array($arTermoParcerias)) {
+        foreach($arTermoParcerias AS $arTermoParceria){
+            if($arTermoParceria["inId"] == $request->get('inId')){
+                
+                $stNroProcesso = trim($arTermoParceria['nro_processo']).'/'.$arTermoParceria['exercicio'];
+                
+                $obTTCMBATermoParceriaProrrogacao = new TTCMBATermoParceriaProrrogacao();
+                $obTTCMBATermoParceriaProrrogacao->setDado('exercicio'   , $arTermoParceria['exercicio']);
+                $obTTCMBATermoParceriaProrrogacao->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
+                $obTTCMBATermoParceriaProrrogacao->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
+                $obErro = $obTTCMBATermoParceriaProrrogacao->recuperaPorChave($rsTermoParceriaProrrogacao, $boTransacao);
+                
+                if(!$obErro->ocorreu() && $rsTermoParceriaProrrogacao->getNumLinhas() > 0){
+                    $obErro->setDescricao("Esse Termo de Parceria já possui Prorrogações cadastradas.");
+                }
+                
+                if(!$obErro->ocorreu()){
+                    $obTTCMBATermoParceriaDotacao = new TTCMBATermoParceriaDotacao();
+                    $obTTCMBATermoParceriaDotacao->setDado('exercicio'   , $arTermoParceria['exercicio']);
+                    $obTTCMBATermoParceriaDotacao->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
+                    $obTTCMBATermoParceriaDotacao->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
+                    $obErro = $obTTCMBATermoParceriaDotacao->recuperaPorChave($rsTermoParceriaDotacao, $boTransacao);
+                }
+                
+                if(!$obErro->ocorreu() && $rsTermoParceriaDotacao->getNumLinhas() > 0){
+                    $obErro = $obTTCMBATermoParceriaDotacao->exclusao($boTransacao);
+                }
+                
+                if(!$obErro->ocorreu()){
+                    $obTTCMBATermoParceria = new TTCMBATermoParceria();
+                    $obTTCMBATermoParceria->setDado('exercicio'   , $arTermoParceria['exercicio']);
+                    $obTTCMBATermoParceria->setDado('cod_entidade', $arTermoParceria['cod_entidade']);
+                    $obTTCMBATermoParceria->setDado('nro_processo', trim($arTermoParceria['nro_processo']));
+                    $obErro = $obTTCMBATermoParceria->recuperaPorChave($rsTermoParceria, $boTransacao);
+                }
+                
+                if(!$obErro->ocorreu() && $rsTermoParceria->getNumLinhas() > 0){
+                    $obErro = $obTTCMBATermoParceria->exclusao($boTransacao);
+                }
             }
         }
     }

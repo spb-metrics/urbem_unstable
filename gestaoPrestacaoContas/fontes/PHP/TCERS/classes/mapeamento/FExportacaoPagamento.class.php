@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 59612 $
+    $Revision: 64498 $
     $Name$
-    $Author: gelson $
-    $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+    $Author: evandro $
+    $Date: 2016-03-04 13:24:52 -0300 (Sex, 04 Mar 2016) $
 
     * Casos de uso: uc-02.08.01
 */
@@ -120,6 +120,65 @@ function montaRecuperaTodos()
     $stSql .= "    oid                                     oid                          \n";
     $stSql .= "  )                                                                        ";
 
+    return $stSql;
+}
+
+function recuperaArquivo2016(&$rsRecordSet)
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    
+    $stSql = $this->montaRecuperaArquivo2016();
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql );
+    
+    return $obErro;
+}
+
+function montaRecuperaArquivo2016()
+{
+    $stSql  = "select                                                                    
+                    lpad(tabela.exercicio_empenho,4,'0') as exercicio_empenho      
+                    , lpad(tabela.cod_empenho::varchar,7,'0') as cod_empenho       
+                    , lpad(tabela.cod_entidade::varchar,2,'0') as cod_entidade        
+                    , cod_ordem                                                       
+                    , vl_pago                                                          
+                    , CASE WHEN (observacao <> '') THEN                                    
+                            remove_acentos(replace(observacao,'''',''))                                                   
+                         ELSE                                                            
+                            'PAGAMENTO DE EMPENHO'                                       
+                    END as observacao                                      
+                    , to_char(data_pagamento,'dd/mm/yyyy') as data_pagamento           
+                    , sinal_valor                                                      
+                    , cod_operacao                                                       
+                    , debito_codigo_conta_verificacao                                    
+                    , credito_codigo_conta_verificacao                                   
+                    , '' as branco
+                    , cod_nota AS numero_liquidacao
+                  from tcers.fn_exportacao_pagamento_novo(                                       
+                                                          '".$this->getDado("stExercicio")    ."',
+                                                          '".$this->getDado("stCodEntidades") ."',
+                                                          '".$this->getDado("dtInicial")      ."',
+                                                          '".$this->getDado("dtFinal")        ."',
+                                                          ''                                      
+                                                          ) as                                    
+                        tabela(
+                                cod_nota                                integer,
+                                exercicio_empenho                       char(4),                     
+                                cod_empenho                             integer,                     
+                                cod_entidade                            integer,                     
+                                cod_ordem                               integer,                     
+                                vl_pago                                 numeric,                     
+                                observacao                              varchar,                     
+                                data_pagamento                          date,                        
+                                sinal_valor                             text,                        
+                                cod_operacao                            integer,                     
+                                debito_codigo_conta_verificacao         varchar,                     
+                                credito_codigo_conta_verificacao        varchar,                     
+                                oid                                     oid                          
+                               )                                                                      
+            ";
     return $stSql;
 }
 

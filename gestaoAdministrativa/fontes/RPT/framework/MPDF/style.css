@@ -57,11 +57,15 @@ h5 {
 #table02 {
     width:80mm;
     }
+
 .th0 {
     width:65px;
     }
 .th2 {
     width:90mm;
+    padding-left: 22;
+    padding-bottom:-1;
+    padding-right:-1;
     }
 .th3 {
     width:35mm;
@@ -98,6 +102,10 @@ h5 {
 /* preenche a borda na lateral esqueda */
 .border_left {
     border-left: 1px solid black;
+}
+/* sem borda */
+.border_none {
+    border: none;
 }
 
 /* Alinhamento de texto à esquerda */
@@ -171,6 +179,45 @@ h5 {
 .tabulacao_nivel_6 {
     padding-left: 12mm;
 }
+
+/* Espaçamento entre linhas de 1.*/
+.cabecalho_geral {
+    padding-bottom: 2;
+    padding-top: 2;
+    margin-top: 20;
+    font-weight: bold;
+}
+
+/* Espaçamento entre linhas de 1mm. Nivel 1.*/
+.tr_nivel_1 {
+    padding-bottom: 1mm;
+    padding-top: 1mm;
+}
+
+/* Espaçamento entre linhas de 2mm. Nivel 2.*/
+.tr_nivel_2 {
+    padding-bottom: 2mm;
+    padding-top: 2mm;
+}
+
+/* Espaçamento entre linhas de 3mm. Nivel 3.*/
+.tr_nivel_3 {
+    padding-bottom: 3mm;
+    padding-top: 3mm;
+}
+
+/* Espaçamento entre linhas de 4mm. Nivel 4.*/
+.tr_nivel_4 {
+    padding-bottom: 4mm;
+    padding-top: 4mm;
+}
+
+/* Espaçamento entre linhas de 5mm. Nivel 5.*/
+.tr_nivel_5 {
+    padding-bottom: 5mm;
+    padding-top: 5mm;
+}
+
 /* Altera o tamanho da fonte para 8px*/
 .font_size_8 {
     font-size: 8px;
@@ -178,6 +225,18 @@ h5 {
 /* Altera o tamanho da fonte para 9px*/
 .font_size_9 {
     font-size: 9px;
+}
+/* Altera o tamanho da fonte para 10px*/
+.font_size_10 {
+    font-size: 10px;
+}
+/* Altera o tamanho da fonte para 10px*/
+.font_size_11 {
+    font-size: 11px;
+}
+/* Altera o tamanho da fonte para 10px*/
+.font_size_12 {
+    font-size: 12px;
 }
 
 /* Estilo do Rodapé */

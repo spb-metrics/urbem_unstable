@@ -32,18 +32,13 @@
 
   * @ignore
   *
-  * $Id: OCManterConfiguracaoOrgao.php 59612 2014-09-02 12:00:51Z gelson $
-
-  * $Revision: 59612 $
-  * $Name: $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Id: OCManterConfiguracaoOrgao.php 64779 2016-03-31 14:29:57Z michel $
 
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoUF.class.php" );
-include_once(CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoOrgao.class.php" );
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoUF.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGConfiguracaoOrgao.class.php";
 
 function processarForm($boExecuta = false, $stArquivo = "Form", $stAcao = "manter")
 {
@@ -150,19 +145,19 @@ function montaListaResponsavel()
 function montaCamposContador( $inTipoResponsavel )
 {
     $obFormulario = new Formulario();
-    
+
     $obTxtCRCContador = new TextBox();
     $obTxtCRCContador->setRotulo   ( '*CRC' );
     $obTxtCRCContador->setName     ( 'stCRCContador' );
     $obTxtCRCContador->setId       ( 'stCRCContador' );
     $obTxtCRCContador->setMaxLength( 11 );
     $obTxtCRCContador->setValue    ( $inCrcContador );
-    
+
     $obTUF = new TUF();
     $stFiltro = " WHERE cod_pais = 1 ";
     $stOrder = " sigla_uf ASC ";
     $obTUF->recuperaTodos( $rsUF, $stFiltro, $stOrder );
-    
+
     $obCmbUFContador = new Select;
     $obCmbUFContador->setName       ( "stSiglaUF" );
     $obCmbUFContador->setId         ( "stSiglaUF" );
@@ -174,24 +169,42 @@ function montaCamposContador( $inTipoResponsavel )
     $obCmbUFContador->addOption     ( "", "Selecione" );
     $obCmbUFContador->preencheCombo ( $rsUF );
     $obCmbUFContador->setValue      ( $stUFContador );
-    
+
     $obFormulario->addComponente( $obTxtCRCContador );
     $obFormulario->addComponente( $obCmbUFContador );
     $obFormulario->montaInnerHTML();
-    
+
     if ( $inTipoResponsavel == 2 )
         $stJs .= "d.getElementById('spnCamposContador').innerHTML = '".$obFormulario->getHTML()."';";
     else
         $stJs .= "d.getElementById('spnCamposContador').innerHTML = '';";
-        
+
     return $stJs;
 }
 
 function incluirResponsavel()
 {
+    switch($_REQUEST["inTipoResponsavel"]){
+        case 1:
+            $stNomeResponsavel = "Gestor";
+        break;
+        case 2:
+            $stNomeResponsavel = "Contador";
+        break;
+        case 3:
+            $stNomeResponsavel = "Controle Interno";
+        break;
+        case 4:
+            $stNomeResponsavel = "Ordenador de Despesa por Delegação";
+        break;
+        case 5:
+            $stNomeResponsavel = "Informações - Folha de Pagamento";
+        break;
+    }
+
     if ( $_REQUEST["stHdnAcao"] != "alterar") {
         $obTTCEMGConfiguracaoOrgao = new TTCEMGConfiguracaoOrgao();
-        
+
         $obErro = new Erro();
         if ( $_REQUEST["inNumCGM"] == "" ) {
             return "alertaAviso('Preencher o campo CGM Responsável.','form','erro','".Sessao::getId()."');\n";
@@ -218,16 +231,7 @@ function incluirResponsavel()
         $arNovoResponsavel["cod_entidade"] = $_REQUEST["hdnCodEntidade"];
         $arNovoResponsavel["num_cgm"] = $_REQUEST["inNumCGM"];
         $arNovoResponsavel["nom_cgm"] = $_REQUEST["stNomCGM"];
-        
-        if ( $_REQUEST["inTipoResponsavel"] == 1 )
-            $arNovoResponsavel["nom_tipo_responsavel"] = "Gestor";
-        else if ( $_REQUEST["inTipoResponsavel"] == 2 )
-            $arNovoResponsavel["nom_tipo_responsavel"] = "Contador";
-        else if ( $_REQUEST["inTipoResponsavel"] == 3 )
-            $arNovoResponsavel["nom_tipo_responsavel"] = "Controle Interno";
-        else if ( $_REQUEST["inTipoResponsavel"] == 4 )
-            $arNovoResponsavel["nom_tipo_responsavel"] = "Ordenador de Despesa por Delegação";
-            
+        $arNovoResponsavel["nom_tipo_responsavel"] = $stNomeResponsavel;
         $arNovoResponsavel["dt_inicio"] = $_REQUEST["dtInicio"];
         $arNovoResponsavel["dt_fim"] = $_REQUEST["dtFim"];
         $arNovoResponsavel["crc_contador"] = $_REQUEST["stCRCContador"];
@@ -236,9 +240,9 @@ function incluirResponsavel()
         $arNovoResponsavel["email"] = $_REQUEST["stEMail"];
         $arNovoResponsavel["tipo_responsavel"] = $_REQUEST["inTipoResponsavel"];
         $arNovoResponsavel["inId"] = count($arResponsaveis);
-        
-        if ( $arNovoResponsavel != "" ) {
-            foreach ($arResponsaveis as $arrResponsaveis) {   
+
+        if ( $arResponsaveis != "" ) {
+            foreach ($arResponsaveis as $arrResponsaveis) {
                 if ($arrResponsaveis['num_cgm'] == $arNovoResponsavel['num_cgm'] &&
                     $arrResponsaveis['tipo_responsavel'] == $arNovoResponsavel['tipo_responsavel'] &&
                     $arrResponsaveis['cod_entidade'] == $arNovoResponsavel['cod_entidade'])
@@ -251,61 +255,51 @@ function incluirResponsavel()
                 }
             }
         }
-        
+
         if ( !$obErro->ocorreu() ) {
             $arResponsaveis[] = $arNovoResponsavel;
             Sessao::write('arResponsaveis',$arResponsaveis);
-        }    
+        }
     } else {
-
         $obErro  = new Erro();
-    
+
         $arResponsaveis = Sessao::read('arResponsaveis');
         foreach ($arResponsaveis as $key => $arResponsavel) {
             if ($arResponsavel['inId'] == $_REQUEST['hdnInId']) {
                     $arResponsaveis[$key]['cod_entidade']     = $_REQUEST['hdnCodEntidade'];
                     $arResponsaveis[$key]['num_cgm']          = $_REQUEST['inNumCGM'];
                     $arResponsaveis[$key]['nom_cgm']          = $_REQUEST['stNomCGM'];
-                    
-                    if ( $_REQUEST["inTipoResponsavel"] == 1 )
-                        $arResponsaveis[$key]["nom_tipo_responsavel"] = "Gestor";
-                    else if ( $_REQUEST["inTipoResponsavel"] == 2 )
-                        $arResponsaveis[$key]["nom_tipo_responsavel"] = "Contador";
-                    else if ( $_REQUEST["inTipoResponsavel"] == 3 )
-                        $arResponsaveis[$key]["nom_tipo_responsavel"] = "Controle Interno";
-                    else if ( $_REQUEST["inTipoResponsavel"] == 4 )
-                        $arResponsaveis[$key]["nom_tipo_responsavel"] = "Ordenador de Despesa por Delegação";
-                    
+                    $arResponsaveis[$key]["nom_tipo_responsavel"] = $stNomeResponsavel;
                     $arResponsaveis[$key]['dt_inicio']        = $_REQUEST['dtInicio'];
                     $arResponsaveis[$key]['dt_fim']           = $_REQUEST['dtFim'];
                     $arResponsaveis[$key]['crc_contador']     = $_REQUEST['stCRCContador'];
                     $arResponsaveis[$key]['uf_crccontador']   = $_REQUEST['stSiglaUF'];
                     $arResponsaveis[$key]['cargo_ordenador_despesa']   = $_REQUEST['stCargoGestor'];
-                    $arResponsaveis[$key]['email']            = $_REQUEST['stEMail'];        
+                    $arResponsaveis[$key]['email']            = $_REQUEST['stEMail'];
                     $arResponsaveis[$key]['tipo_responsavel'] = $_REQUEST['inTipoResponsavel'];
-                    
-                    Sessao::write('arResponsaveis',$arResponsaveis);     
+
+                    Sessao::write('arResponsaveis',$arResponsaveis);
                 break;
             }
         }
-    }    
-    
+    }
+
     if ( $obErro->ocorreu() ) {
         $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     } else {
         $stJs .= montaListaResponsavel();
-    
+
         $stJs .= "f.inNumCGM.value = ''; \n";
         $stJs .= "d.getElementById('stNomCGM').innerHTML = '&nbsp;';\n";
         $stJs .= "f.inTipoResponsavel.value = '';\n";
         $stJs .= "f.stCargoGestor.value = '';\n";
-        
+
         if ( $_REQUEST["inTipoResponsavel"] == 2 ) {
             $stJs .= "f.stCRCContador.value = '';\n";
             $stJs .= "f.stSiglaUF.value = '';\n";
             $stJs .= "d.getElementById('spnCamposContador').innerHTML = '';";
         }
-        
+
         $stJs .= "f.dtInicio.value = '';\n";
         $stJs .= "f.dtFim.value = '';\n";
         $stJs .= "f.stEMail.value = '';\n";
@@ -313,7 +307,7 @@ function incluirResponsavel()
         $stJs .= "f.stHdnAcao.value = '';\n";
         $stJs .= "f.btIncluirResponsavel.value = 'Incluir';\n";
     }
-    
+
     return $stJs;
 }
 
@@ -339,12 +333,12 @@ function excluirResponsavel()
     Sessao::write('arResponsaveis', $arResponsaveis);
 
     $stJs .= montaListaResponsavel();
-    
+
     SistemaLegado::executaFrameOculto($stJs);
 }
 
 function alterarResponsavel()
-{    
+{
     $arResponsaveis = Sessao::read('arResponsaveis');
     foreach($arResponsaveis as $arResponsavel){
         if ( $arResponsavel["inId"] == $_GET["inId"] ) {
@@ -355,13 +349,13 @@ function alterarResponsavel()
             $stJs .= "f.inTipoResponsavel.value = '".$arResponsavel['tipo_responsavel']."';\n";
             $stJs .= "d.getElementById('stCargoGestor').focus();\n";
             $stJs .= "f.stCargoGestor.value = '".$arResponsavel['cargo_ordenador_despesa']."';\n";
-            
+
             if ( $arResponsavel["tipo_responsavel"] == 2 ) {
                 $stJs .= montaCamposContador($arResponsavel["tipo_responsavel"]);
                 $stJs .= "window.parent[2].frm.stCRCContador.value = '".$arResponsavel['crc_contador']."';\n";
                 $stJs .= "window.parent[2].frm.stSiglaUF.value = '".$arResponsavel['uf_crccontador']."';\n";
             }
-            
+
             $stJs .= "f.dtInicio.value = '".$arResponsavel['dt_inicio']."';\n";
             $stJs .= "f.dtFim.value = '".$arResponsavel['dt_fim']."';\n";
             $stJs .= "f.stEMail.value = '".$arResponsavel['email']."';\n";
@@ -369,7 +363,6 @@ function alterarResponsavel()
             $stJs .= "f.btIncluirResponsavel.value = 'Alterar';\n";
             $stJs .= "f.hdnInId.value = '".$arResponsavel["inId"]."';\n";
         }
-        
     }
     return $stJs;
 }
@@ -377,16 +370,16 @@ function alterarResponsavel()
 switch ($request->get('stCtrl')) {
     case 'verificaTipoResponsavel':
         $stJs .= montaCamposContador($request->get('tipoResponsavel'));
-        break;
+    break;
     case 'incluirResponsavel':
         $stJs .= incluirResponsavel();
-        break;
+    break;
     case 'excluirResponsavel':
         $stJs .= excluirResponsavel();
-        break;
+    break;
     case 'alterarResponsavel':
         $stJs .= alterarResponsavel();
-        break;
+    break;
 }
 
 if (isset($stJs)) {

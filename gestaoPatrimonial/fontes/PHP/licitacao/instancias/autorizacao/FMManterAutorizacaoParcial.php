@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterAutorizacaoParcial.php 64052 2015-11-24 18:26:04Z michel $
+    $Id: FMManterAutorizacaoParcial.php 64390 2016-02-05 20:39:04Z arthur $
 
  */
 
@@ -297,11 +297,7 @@ $stParams .= "&inCodMapa=".$rsLicitacao->getCampo( 'mapa_compra'            );
 $stParams .= "&stExercicioMapa=".$rsLicitacao->getCampo( 'exercicio'        );
 
 # Carrega as informações básicas da Licitação.
-$stJs  = "<script type='text/javascript'> \n";
-$stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId().$stParams."','buscaInfoLicitacao'); \n";
-$stJs .= "</script>	\n";
-
-echo $stJs;
+$jsOnload = "executaFuncaoAjax('buscaInfoLicitacao','".Sessao::getId().$stParams."');";
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 

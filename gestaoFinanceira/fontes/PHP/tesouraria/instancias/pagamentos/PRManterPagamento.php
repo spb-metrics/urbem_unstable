@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterPagamento.php 64023 2015-11-19 19:40:11Z carlos.silva $
+    * $Id: PRManterPagamento.php 64368 2016-01-28 12:04:02Z franver $
 
     * Casos de uso: uc-02.04.05
 */

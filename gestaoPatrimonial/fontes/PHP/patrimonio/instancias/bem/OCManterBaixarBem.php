@@ -87,6 +87,8 @@ function montaListaBens($arBens)
 switch ($stCtrl) {
     case 'incluirBaixaBem':
         
+        $arBens = Sessao::read('bens');
+        
         if ($request->get('inTipoBaixa') == '') {
             $stMensagem = 'Prencha o campo Tipo de baixa.';
         }
@@ -97,6 +99,13 @@ switch ($stCtrl) {
             $stMensagem = 'O campo Bem Final não pode ser superior ao Inicial.';
         }
         
+        if (is_array( $arBens )) {
+            
+            if ( $request->get('inTipoBaixa') != $arBens[0]['tipo_baixa'] ){
+                $stMensagem = 'O tipo de baixa selecionado deve ser o mesmo dos bens que já estão na lista.';
+            }
+        }
+
         if ($stMensagem == '') {
             $obTPatrimonioBemBaixado = new TPatrimonioBemBaixado();
 
@@ -110,23 +119,11 @@ switch ($stCtrl) {
             //recupera de acordo com o filtro
             $obTPatrimonioBemBaixado->recuperaRelacionamento( $rsBem, $stFiltro );
             
-            if ( $request->get('inTipoBaixa') == 1 || $request->get('inTipoBaixa') == 3 || $request->get('inTipoBaixa') == 5) {
-                // verifica se o bem pertence a configuração de bens Imóveis
-                $stTipoBaixa = "Imóvel";
-                $inTipoBaixa = 2;
-            } else if ( $request->get('inTipoBaixa') == 2 || $request->get('inTipoBaixa') == 4 || $request->get('inTipoBaixa') == 6) {
-                // verifica se o bem pertence a configuração de bens Móveis
-                $stTipoBaixa = "Móvel";
-                $inTipoBaixa = 1;
-            }
-            
             //loop para preencher a sessao com os bens selecionados
-            $arBens = Sessao::read('bens');
             $inCount = count( $arBens );
-                                    
+
             while ( !$rsBem->eof() ) {
                 $boRepetido       = false;
-                $boOutroTipoBaixa = false;
                 
                 if ( is_array( $arBens ) ) {
                     foreach ($arBens as $arTEMP) {
@@ -141,13 +138,6 @@ switch ($stCtrl) {
                     $arBemBaixado[] = $rsBem->getCampo('cod_bem');
                 }
 
-                // se foi selecionado um tipo de baixa, verifica se o bem pertence ao mesmo tipo de baixa selecionado.
-                if ( $request->get('inTipoBaixa') != "" && $request->get('inTipoBaixa') != 0 && $inTipoBaixa != $rsBem->getCampo('codigo')) {
-                    // caso o tipo de baixa seja diferente do selecionado, não entra na lista de baixa.
-                    $arBemOutroTipo[] = $rsBem->getCampo('cod_bem');
-                    $boOutroTipoBaixa = true;
-                } 
-                
                 // Monta lista dos bens disponiveis para baixa.
                 if ( !$boRepetido && $rsBem->getCampo('status') != 'baixado' && !$boOutroTipoBaixa) {
                     $arBens[$inCount]['id']                 = $inCount;
@@ -156,19 +146,16 @@ switch ($stCtrl) {
                     $arBens[$inCount]['descricao']          = $rsBem->getCampo( 'descricao' );
                     $arBens[$inCount]['codigo_tipo']        = $rsBem->getCampo( 'codigo' );
                     $arBens[$inCount]['descricao_natureza'] = $rsBem->getCampo( 'descricao_natureza' );
+                    $arBens[$inCount]['tipo_baixa']         = $request->get('inTipoBaixa');
                     $inCount++;
                 }
                 
                 $rsBem->proximo();
             }
-            
+
             // Monta avisos, caso houver alguma inconsistencia
             if ( is_array( $arBemBaixado ) && is_array( $arRepetido ) ) {
                 $stJs.= "alertaAviso('Os bens (".implode(',',$arBemBaixado).") já estão baixados e os bens (".implode(',',$arRepetido).") já estão na lista.','form','erro','".Sessao::getId()."');";
-            } elseif ( is_array( $arBemBaixado ) && is_array( $arBemOutroTipo ) ) {
-                $stJs.= "alertaAviso('Os bens (".implode(',',$arBemBaixado).") já estão baixados e os bens (".implode(',',$arBemOutroTipo).") não pertencem ao mesmo tipo de natureza ".$stTipoBaixa." selecionado para a baixa.','form','erro','".Sessao::getId()."');";
-            } elseif ( !is_array( $arBemBaixado ) && is_array( $arBemOutroTipo ) ) {
-                $stJs.= "alertaAviso('Os bens (".implode(',',$arBemOutroTipo).") não pretencem ao mesmo tipo de natureza selecionada para baixa.','form','erro','".Sessao::getId()."');";
             } elseif ( is_array( $arBemBaixado ) && !is_array( $arRepetido ) ) {
                 $stJs.= "alertaAviso('Os bens (".implode(',',$arBemBaixado).") já estão baixados.','form','erro','".Sessao::getId()."');";
             } elseif ( !is_array( $arBemBaixado ) && is_array( $arRepetido ) ) {
@@ -187,6 +174,7 @@ switch ($stCtrl) {
             $stJs = "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."');\n";
         }
         break;
+    
     case 'excluirBem' :
         $arBem = Sessao::read('bens');
         for ( $i = 0; $i < count( $arBem ); $i++ ) {

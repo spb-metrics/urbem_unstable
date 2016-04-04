@@ -99,8 +99,8 @@ BEGIN
                         FROM recuperarDirfPrestadoresServicoValorEmpenhoExercicio('|| quote_literal(stEntidade) ||', '|| inExercicio ||', '|| inCodEntidade ||', '|| reRegistro.numcgm ||', '|| quote_literal(reRegistro.tipo) ||')';
     
             nuTotalEmpenhoCGM   := selectintonumeric(stSql);
-            
-            stSql := ' SELECT consultar_total_retencoes_cgm('|| inExercicio ||', '|| reRegistro.numcgm ||', '|| inCodEntidade ||', '|| reRegistro.cod_conta ||', '|| quote_literal(stEntidade) ||')';
+
+            stSql := ' SELECT consultar_total_retencoes_cgm('|| inExercicio ||', '|| reRegistro.numcgm ||', '|| inCodEntidade ||', '|| reRegistro.cod_conta ||', '|| quote_literal(stEntidade) ||','''||reRegistro.tipo_conta||''')';
 
             nuTotalRetencoesCGM := selectintonumeric(stSql);
 

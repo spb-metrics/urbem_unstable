@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 63906 2015-11-05 12:31:01Z franver $
+    $Id: TContabilidadePlanoConta.class.php 64773 2016-03-30 21:45:45Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -798,73 +798,126 @@ function montaRecuperaDadosExportacaoAjustes()
 }
 
 function montaRecuperaDadosExportacaoBalVerificacao()
-{
-    $stSQL  = " SELECT                                                                                                                                                                   \n";
-    $stSQL  .= "     replace(cod_estrutural,'.','') as cod_estrutural,                                                                                                                   \n";
-    $stSQL  .= "     cod_entidade, \n";
-    $stSQL  .= "     substr(nom_sistema,1,1) as nom_sistema,                                                                                                                             \n";
-    $stSQL  .= "     nivel,                                                                                                                                                              \n";
-    $stSQL  .= "     nom_conta,                                                                                                                                                          \n";
-    $stSQL  .= "     CASE WHEN vl_saldo_anterior >=0 THEN                                                                                                                                \n";
-    $stSQL  .= "                    replace(vl_saldo_anterior::varchar,'-','')                                                                                                                                    \n";
-    $stSQL  .= "                 ELSE                                                                                                                                                    \n";
-    $stSQL  .= "                    '0'                                                                                                                                                  \n";
-    $stSQL  .= "                 END as  saldo_anterior_devedora,                                                                                                                        \n";
-    $stSQL  .= "     CASE WHEN vl_saldo_anterior <0 THEN                                                                                                                                 \n";
-    $stSQL  .= "                    replace(vl_saldo_anterior::varchar,'-','')                                                                                                                                    \n";
-    $stSQL  .= "                 ELSE                                                                                                                                                    \n";
-    $stSQL  .= "                    '0'                                                                                                                                                  \n";
-    $stSQL  .= "                 END as  saldo_anterior_credora,                                                                                                                         \n";
-    $stSQL  .= "     vl_saldo_debitos,                                                                                                                                                   \n";
-    $stSQL  .= "     vl_saldo_creditos * -1 as vl_saldo_creditos,                                                                                                                                        \n";
-    $stSQL  .= "     CASE WHEN vl_saldo_atual >=0 THEN                                                                                                                                   \n";
-    $stSQL  .= "                    replace(vl_saldo_atual::varchar,'-','')                                                                                                                                       \n";
-    $stSQL  .= "                 ELSE                                                                                                                                                    \n";
-    $stSQL  .= "                    '0'                                                                                                                                                  \n";
-    $stSQL  .= "                 END as  saldo_atual_devedora,                                                                                                                           \n";
-    $stSQL  .= "     CASE WHEN vl_saldo_atual <0 THEN                                                                                                                                    \n";
-    $stSQL  .= "                    replace(vl_saldo_atual::varchar,'-','')                                                                                                                                       \n";
-    $stSQL  .= "                 ELSE                                                                                                                                                    \n";
-    $stSQL  .= "                    '0'                                                                                                                                                  \n";
-    $stSQL  .= "                 END as  saldo_atual_credora,                                                                                                                            \n";
-    $stSQL  .= "     CASE WHEN trim(both ' ' from nom_sistema) = 'Não Informado' THEN                                                                                                                     \n";
-    $stSQL  .= "                 ''                                                                                                                                                    \n";
-    $stSQL  .= "                  ELSE nom_sistema                                                                                                                                \n";
-    $stSQL  .= "                  END as nom_sistema,                                                                                                                                                   \n";
-    $stSQL  .= "     CASE WHEN escrituracao = 'analitica' THEN                                                                                                                        \n";
-    $stSQL  .= "                 'S'                                                                                                                                                   \n";
-    $stSQL  .= "          WHEN escrituracao = 'sintetica' THEN                                                                                                                        \n";
-    $stSQL  .= "                 'N'                                                                                                                                                   \n";
-    $stSQL  .= "                  END as escrituracao,                                                                                                                                                   \n";
-    $stSQL  .= "     CASE WHEN indicador_superavit = 'permanente' THEN                                                                                                                        \n";
-    $stSQL  .= "                 'P'                                                                                                                                                   \n";
-    $stSQL  .= "     WHEN indicador_superavit = 'financeiro' THEN                                                                                                                        \n";
-    $stSQL  .= "                 'F'                                                                                                                                                   \n";
-    $stSQL  .= "                  END as indicador_superavit,                                                                                                                                                   \n";
-    $stSQL  .= "     tipo_conta ,                                                                                                                                                        \n";
-    //$stSQL  .= "     nom_sistema,                                                                                                                                                        \n";
-    $stSQL  .= "     '' as branco                                                                                                                                                       \n";
-    //$stSQL  .= "     escrituracao,                                                                                                                                                       \n";
-    //$stSQL  .= "     indicador_superavit                                                                                                                                                 \n";
-    $stSQL  .= " FROM                                                                                                                                                                    \n";
-    $stSQL  .= "     contabilidade.fn_exportacao_balancete_verificacao('".$this->getDado("stExercicio")."',' cod_entidade IN (".$this->getDado("stCodEntidades").")','".$this->getDado("dtInicial")."','".$this->getDado("dtFinal")."') \n";
-    $stSQL  .= " AS                                                                                                                                                                      \n";
-    $stSQL  .= "     tabela( cod_estrutural      VARCHAR,                                                                                                                                \n";
-    $stSQL  .= "             cod_entidade        INTEGER,                                                                                                                                \n";
-    $stSQL  .= "             nivel               INTEGER,                                                                                                                                \n";
-    $stSQL  .= "             nom_conta           VARCHAR,                                                                                                                                \n";
-    $stSQL  .= "             vl_saldo_anterior   NUMERIC,                                                                                                                                \n";
-    $stSQL  .= "             vl_saldo_debitos    NUMERIC,                                                                                                                                \n";
-    $stSQL  .= "             vl_saldo_creditos   NUMERIC,                                                                                                                                \n";
-    $stSQL  .= "             vl_saldo_atual      NUMERIC,                                                                                                                                \n";
-    $stSQL  .= "             tipo_conta          VARCHAR,                                                                                                                                \n";
-    $stSQL  .= "             nom_sistema         VARCHAR,                                                                                                                                \n";
-    $stSQL  .= "             escrituracao        CHAR(9),                                                                                                                                \n";
-    $stSQL  .= "             indicador_superavit CHAR(12))                                                                                                                                \n";
-    $stSQL  .= " WHERE (vl_saldo_debitos <> 0.00 or vl_saldo_creditos <> 0.00 or vl_saldo_anterior <> 0.00 )
-                 ORDER BY cod_estrutural;
-    \n";
-
+{  
+        $stSQL = " SELECT REPLACE(tabela.cod_estrutural,'.','') AS cod_estrutural                                                                                                                   
+                 , cod_entidade
+                 , SUBSTR(nom_sistema,1,1) AS natureza_informacao                                                                                                                             
+                 , nivel                                                                                                                                                              
+                 , tabela.nom_conta                                                                                                                                                          
+                 , CASE WHEN vl_saldo_anterior >=0 THEN                                                                                                                                
+                                    replace(vl_saldo_anterior::varchar,'-','')                                                                                                                                    
+                                ELSE                                                                                                                                                    
+                                    '0'                                                                                                                                                  
+                                END AS  saldo_anterior_devedora                                                                                                                        
+                 , CASE WHEN vl_saldo_anterior <0 THEN                                                                                                                                 
+                                replace(vl_saldo_anterior::varchar,'-','')                                                                                                                                    
+                            ELSE                                                                                                                                                    
+                                '0'                                                                                                                                                  
+                            END as  saldo_anterior_credora                                                                                                                         
+                 , vl_saldo_debitos                                                                                                                                                   
+                 , vl_saldo_creditos * -1 as vl_saldo_creditos                                                                                                                                        
+                 , CASE WHEN vl_saldo_atual >=0 THEN                                                                                                                                   
+                                 replace(vl_saldo_atual::varchar,'-','')                                                                                                                                       
+                             ELSE                                                                                                                                                    
+                                 '0'                                                                                                                                                  
+                             END as  saldo_atual_devedora                                                                                                                           
+                 , CASE WHEN vl_saldo_atual <0 THEN                                                                                                                                    
+                                 replace(vl_saldo_atual::varchar,'-','')                                                                                                                                       
+                             ELSE                                                                                                                                                    
+                                 '0'                                                                                                                                                  
+                             END as  saldo_atual_credora                                                                                                                            
+                 , CASE WHEN trim(both ' ' from nom_sistema) = 'Não Informado' THEN                                                                                                                     
+                             ''                                                                                                                                                    
+                             ELSE nom_sistema                                                                                                                                
+                             END as nom_sistema                                                                                                                                                   
+                 , CASE WHEN tabela.escrituracao = 'analitica' THEN                                                                                                                        
+                             'S'                                                                                                                                                   
+                     WHEN tabela.escrituracao = 'sintetica' THEN                                                                                                                        
+                             'N'                                                                                                                                                   
+                             END as escrituracao                                                                                                                                                   
+                 , CASE WHEN tabela.indicador_superavit = 'permanente' THEN                                                                                                                        
+                             'P'                                                                                                                                                   
+                         WHEN tabela.indicador_superavit = 'financeiro' THEN                                                                                                                        
+                             'F'                                                                                                                                                   
+                             END as indicador_superavit                                                                                                                                                   
+                 , tipo_conta                                                                                                                                                         
+                 , tabela.cod_recurso                                                                                                                                                 
+            FROM (
+                    SELECT *
+                      FROM ( 
+                        SELECT
+                            tabela.cod_estrutural
+                            , CASE WHEN pce.cod_entidade IS NOT NULL
+                                        THEN pce.cod_entidade
+                                ELSE pba.cod_entidade
+                              END AS cod_entidade
+                            , nivel
+                            , tabela.nom_conta
+                            , vl_saldo_anterior
+                            , vl_saldo_debitos
+                            , vl_saldo_creditos
+                            , vl_saldo_atual 
+                            , contabilidade.fn_tipo_conta_plano(pc.exercicio, tabela.cod_estrutural) AS tipo_conta
+                            , sc.nom_sistema
+                            , escrituracao
+                            , tabela.indicador_superavit
+                            , CASE WHEN tabela.cod_estrutural LIKE '8.1.1.1.1%'
+                                   THEN COALESCE(plano_recurso.cod_recurso, 0)
+                                   ELSE 0
+                              END AS cod_recurso
+                        FROM contabilidade.fn_rl_balancete_verificacao(  '".$this->getDado("stExercicio")."'
+                                                                        ,'cod_entidade IN (".$this->getDado("stCodEntidades").")'
+                                                                        ,'".$this->getDado("dtInicial")."'
+                                                                        ,'".$this->getDado("dtFinal")."'
+                                                                        , 'A'::char)
+                            AS tabela (cod_estrutural VARCHAR
+                                        , nivel INTEGER
+                                        , nom_conta VARCHAR
+                                        , cod_sistema INTEGER
+                                        , indicador_superavit CHAR(12)
+                                        , vl_saldo_anterior NUMERIC
+                                        , vl_saldo_debitos NUMERIC
+                                        , vl_saldo_creditos NUMERIC
+                                        , vl_saldo_atual NUMERIC
+                                        ) 
+                            , contabilidade.plano_conta as pc 
+                    LEFT JOIN contabilidade.plano_analitica 
+                           ON plano_analitica.cod_conta = pc.cod_conta
+                          AND plano_analitica.exercicio = pc.exercicio
+                
+                    LEFT JOIN contabilidade.plano_recurso
+                           ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                          AND plano_recurso.exercicio = plano_analitica.exercicio
+                    
+                    LEFT JOIN ( 
+                               SELECT
+                                      pb.cod_entidade               
+                                    , pa.cod_conta               
+                                    , pa.exercicio               
+                                 FROM               
+                                    contabilidade.plano_banco as pb,               
+                                    contabilidade.plano_analitica as pa               
+                               WHERE               
+                                    pb.cod_plano    = pa.cod_plano AND               
+                                    pb.exercicio    = pa.exercicio               
+                            ) as pba
+                          ON (  pc.cod_conta   = pba.cod_conta AND               
+                                pc.exercicio   = pba.exercicio )               
+                    LEFT JOIN tcers.plano_conta_entidade as pce               
+                           ON ( pc.cod_conta   = pce.cod_conta AND               
+                                 pc.exercicio   = pce.exercicio ),               
+                        contabilidade.sistema_contabil as sc 
+            
+                    WHERE '".$this->getDado("stExercicio")."' = pc.exercicio
+                      AND tabela.cod_estrutural = pc.cod_estrutural
+                      AND pc.exercicio = sc.exercicio
+                      AND pc.cod_sistema = sc.cod_sistema 
+                    ) AS tabela
+                WHERE cod_entidade IS NULL
+                   OR cod_entidade IN (".$this->getDado("stCodEntidades").")
+                ) AS tabela
+            WHERE (vl_saldo_debitos <> 0.00 or vl_saldo_creditos <> 0.00 or vl_saldo_anterior <> 0.00 )
+         ORDER BY cod_estrutural; ";
     return $stSQL;
 }
 
@@ -1434,9 +1487,19 @@ function recuperaDadosExportacaoBalVerificacaoEnceramento(&$rsRecordSet, $stCond
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
 
-    if(trim($stOrdem))
+    if (trim($stOrdem)) {
         $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
-    $stSql = $this->montaRecuperaDadosExportacaoBalVerificacaoEnceramento().$stCondicao.$stOrdem;
+    } else {
+        $stOrdem = " ORDER BY cod_estrutural ";
+    }
+
+    if (Sessao::getExercicio() < '2015') {
+        $stSql = $this->montaRecuperaDadosExportacaoBalVerificacaoEnceramento().$stCondicao.$stOrdem;
+    } else {
+        $stSql = $this->montaRecuperaDadosExportacaoBalVerificacaoEnceramento2016().$stCondicao.$stOrdem;
+    }
+
+    
     $this->setDebug( $stSql );    
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -1473,7 +1536,10 @@ function montaRecuperaDadosExportacaoBalVerificacaoEnceramento()
                         ,cod_entidade
                         ,tipo_conta
                         ,nivel
-                        ,substr(nom_sistema,1,1) as nom_sistema
+                        ,CASE WHEN trim(both ' ' from nom_sistema) = 'Não Informado' THEN
+                                ''
+                            ELSE substr(nom_sistema,1,1)
+                         END as nom_sistema
                         ,CASE WHEN trim(both ' ' from nom_sistema) = 'Não Informado' THEN
                                 ''
                             ELSE nom_sistema
@@ -1511,6 +1577,81 @@ function montaRecuperaDadosExportacaoBalVerificacaoEnceramento()
     return $stSQL;
 }
 
+function montaRecuperaDadosExportacaoBalVerificacaoEnceramento2016()
+{
+    $stSQL  = " SELECT
+                        REPLACE(tabela.cod_estrutural,'.','') AS cod_estrutural
+                      , CASE WHEN vl_saldo_anterior >= 0 THEN REPLACE(tabela.vl_saldo_anterior::varchar,'-','')
+                             ELSE '0'
+                        END AS  saldo_anterior_devedora
+                      , CASE WHEN tabela.vl_saldo_anterior < 0 THEN REPLACE(tabela.vl_saldo_anterior::varchar,'-','')
+                            ELSE '0'
+                        END AS saldo_anterior_credora
+                      , tabela.vl_saldo_debitos
+                      , tabela.vl_saldo_creditos * -1 AS vl_saldo_creditos
+                      , CASE WHEN tabela.vl_saldo_atual >= 0 THEN REPLACE(tabela.vl_saldo_atual::varchar,'-','')
+                            ELSE '0'
+                        END AS saldo_atual_devedora
+                      , CASE WHEN tabela.vl_saldo_atual < 0 THEN REPLACE(tabela.vl_saldo_atual::varchar,'-','')
+                             ELSE '0'
+                        END AS saldo_atual_credora
+                      , tabela.nom_conta
+                      , tabela.cod_entidade
+                      , tabela.tipo_conta
+                      , tabela.nivel
+                      , CASE WHEN trim(both ' ' FROM tabela.nom_sistema) = 'Não Informado' THEN ''
+                             ELSE substr(tabela.nom_sistema,1,1)
+                        END AS nom_sistema
+                      , CASE WHEN trim(both ' ' FROM tabela.nom_sistema) = 'Não Informado' THEN ''
+                             ELSE tabela.nom_sistema
+                        END AS natureza
+                      , CASE WHEN tabela.escrituracao = 'analitica' THEN 'S'
+                             WHEN tabela.escrituracao = 'sintetica' THEN 'N'
+                        END AS escrituracao
+                      , CASE WHEN tabela.indicador_superavit = 'permanente' THEN 'P'
+                             WHEN tabela.indicador_superavit = 'financeiro' THEN 'F'
+                        END AS indicador_superavit
+                      , COALESCE(recurso.cod_recurso, 0) AS cod_recurso
+
+                  FROM contabilidade.fn_exportacao_balancete_verificacao ('".$this->getDado("stExercicio")."'
+                                                                          ,' cod_entidade IN (".$this->getDado("stCodEntidades").")'
+                                                                          ,'".$this->getDado("dtInicial")."'
+                                                                          ,'".$this->getDado("dtFinal")."'
+                                                                         ) 
+                    AS tabela ( cod_estrutural      VARCHAR,
+                                cod_entidade        INTEGER,
+                                nivel               INTEGER,
+                                nom_conta           VARCHAR,
+                                vl_saldo_anterior   NUMERIC,
+                                vl_saldo_debitos    NUMERIC,
+                                vl_saldo_creditos   NUMERIC,
+                                vl_saldo_atual      NUMERIC,
+                                tipo_conta          VARCHAR,
+                                nom_sistema         VARCHAR,
+                                escrituracao        CHAR(9),
+                                indicador_superavit CHAR(12)
+                              )
+
+            INNER JOIN contabilidade.plano_conta
+                    ON plano_conta.cod_estrutural = tabela.cod_estrutural
+                   AND plano_conta.exercicio = '".$this->getDado("stExercicio")."'
+
+             LEFT JOIN contabilidade.plano_analitica
+                    ON plano_analitica.cod_conta = plano_conta.cod_conta
+                   AND plano_analitica.exercicio = plano_conta.exercicio
+
+             LEFT JOIN contabilidade.plano_recurso
+                    ON plano_recurso.cod_plano = plano_analitica.cod_plano
+                   AND plano_recurso.exercicio = plano_analitica.exercicio
+
+             LEFT JOIN orcamento.recurso
+                    ON recurso.exercicio = plano_recurso.exercicio
+                   AND recurso.cod_recurso = plano_recurso.cod_recurso
+
+                  WHERE (vl_saldo_debitos <> 0.00 OR vl_saldo_creditos <> 0.00 OR vl_saldo_anterior <> 0.00 ) 
+    ";
+    return $stSQL;
+}
 
 }
 ?>

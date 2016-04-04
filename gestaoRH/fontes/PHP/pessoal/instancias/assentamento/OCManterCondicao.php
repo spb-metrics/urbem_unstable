@@ -485,10 +485,8 @@ function montaAlterarAssentamentoVinculado($boExecuta=false)
     $rsAssentamento = new Recordset;
     $inCodClassificacaoVinculacao = $_GET['inCodClassificacaoVinculacao'];
 
-    $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->obRPessoalClassificacaoAssentamento->setCodClassificacaoAssentamento($inCodClassificacaoVinculacao);
     $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->listarAssentamentoNaoVinculado( $rsAssentamento );
     $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->obRPessoalClassificacaoAssentamento->listarClassificacao( $rsClassificacao );
-
     $obRPessoalAssentamentoVinculado->obRFuncao->listar( $rsFuncao );
 
     while (!$rsRecordSet->eof()) {
@@ -532,6 +530,7 @@ function montaAlterarAssentamentoVinculado($boExecuta=false)
                 $inContador++;
                 $rsAssentamento->proximo();
             }
+            
             if ($boControle) {
                 $inContador = 0;
             }
@@ -622,14 +621,14 @@ function preencheAssentamentoNaoVinculado($boExecuta=false,$inCodClassificacaoVi
     if ($inCodClassificacaoVinculado != "") {
         $inCodClassificacao = $inCodClassificacaoVinculado;
         $rsAssentamento = new Recordset;
-//         if ($_REQUEST['stSigla'] != "" and $_REQUEST['stAcao'] != 'alterar') {
+         if ($_REQUEST['stSigla'] != "" and $_REQUEST['stAcao'] != 'alterar') {
             $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->obRPessoalClassificacaoAssentamento->setCodClassificacaoAssentamento( $inCodClassificacao );
             $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->setSigla( $_REQUEST['stSigla'] );
             $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->listarAssentamento( $rsAssentamento );
-//         }
+         }
         $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->setCodAssentamento( $rsAssentamento->getCampo('cod_assentamento') );
-        $rsAssentamento = new Recordset;
         $obRPessoalAssentamentoVinculado->obRPessoalAssentamento1->listarAssentamentoNaoVinculado( $rsAssentamento );
+        
         $inCount = 0;
         while (!$rsAssentamento->eof()) {
             $inCount++;
@@ -640,6 +639,7 @@ function preencheAssentamentoNaoVinculado($boExecuta=false,$inCodClassificacaoVi
             } else {
                 $stSelected = '';
             }
+            
             $stJs .= "f.$stCombo.options[$inCount] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
             $rsAssentamento->proximo();
         }

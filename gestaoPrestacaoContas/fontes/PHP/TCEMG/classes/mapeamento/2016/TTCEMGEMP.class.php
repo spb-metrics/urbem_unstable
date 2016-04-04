@@ -103,7 +103,46 @@ class TTCEMGEMP extends Persistente
 
     public function montaRecuperaDadosEMP10()
     {
-        $stSql  = " SELECT DISTINCT ON(EE.cod_empenho)
+        $stSql  = " SELECT tiporegistro
+                         , codOrgao
+                         , codunidadesub
+                         , codfuncao
+                         , codsubfuncao
+                         , codprograma
+                         , idacao
+                         , idsubacao
+                         , subelemento
+                         , nroempenho
+                         , dtempenho
+                         , modalidadeempenho
+                         , tpempenho
+                         , vlbruto
+                         , especificacaoempenho
+                         , despdeccontrato
+                         , codorgaorespcontrato
+                         , codunidadesubrespcontrato
+                         , nrocontrato
+                         , dataassinaturacontrato
+                         , nrosequencialtermoaditivo
+                         , despdecconvenio
+                         , nroconvenio
+                         , dataassinaturaconvenio
+                         , despdeclicitacao
+                         , codorgaoresplicit -- o registro 8 não possui nenhuma informação no Urbem segundo a Ane Caroline Fiegenbaum Pereira
+                         , CASE WHEN despdeclicitacao = 1 THEN ''
+                                WHEN despdeclicitacao = 8 THEN ''
+                                ELSE codUnidadeSubRespLicit
+                         END AS codUnidadeSubRespLicit -- É necessário ter o despdeclicitacao 8 porém não tem informação nenhuma no urbem para ele
+                         , nroProcessoLicitatorio
+                         , exercicioProcessoLicitatorio
+                         , tipoProcesso
+                         , cpfOrdenador
+                         , natureza_objeto
+                         , tipodespesaemprpps -- segundo Valtair Santos, não possui nenhum registro no urbem para esse campo, então ficará em branco
+
+                    FROM (
+
+                    SELECT DISTINCT ON(EE.cod_empenho)
                     10 AS tiporegistro
                     ,	(SELECT valor
                         FROM administracao.configuracao_entidade
@@ -322,6 +361,7 @@ class TTCEMGEMP extends Persistente
                                     3
                             END
                         END AS natureza_objeto
+                    , '' AS tipodespesaemprpps
                     
                     FROM empenho.empenho AS EE
                     
@@ -525,8 +565,10 @@ class TTCEMGEMP extends Persistente
                     AND EE.cod_entidade IN (".$this->getDado('entidade').") -- ENTRADA ENTIDADE
                     GROUP BY codOrgao,codunidadesub,codfuncao,codsubfuncao,codprograma,idacao,naturezadespesa,subelemento,nroempenho,dtempenho,modalidadeempenho,tpempenho,vlbruto,especificacaoempenho,despdeccontrato,
                     codorgaorespcontrato,codunidadesubrespcontrato,nrocontrato,dataassinaturacontrato,nrosequencialtermoaditivo,despdecconvenio,nroconvenio,dataassinaturaconvenio,despdeclicitacao,nroProcessoLicitatorio, codorgaoresplicit,
-                    tipoProcesso,cpfOrdenador,C_CD.cod_compra_direta,tipo_objeto.cod_tipo_objeto,L_LIC.exercicio, exercicioProcessoLicitatorio, codUnidadeSubRespLicit, config_licitacao.exercicio_licitacao, config_licitacao.num_licitacao ";
-        
+                    tipoProcesso,cpfOrdenador,C_CD.cod_compra_direta,tipo_objeto.cod_tipo_objeto,L_LIC.exercicio, exercicioProcessoLicitatorio, codUnidadeSubRespLicit, config_licitacao.exercicio_licitacao, config_licitacao.num_licitacao
+
+                ) AS retorno
+        ";
         return $stSql;
     }
     

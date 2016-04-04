@@ -31,60 +31,106 @@
 
  * @ignore
 
- * $Id: OCGeraRelatorioRazaoDespesa.php 62788 2015-06-17 18:14:39Z evandro $
+ * $Id: OCGeraRelatorioRazaoDespesa.php 64774 2016-03-30 22:01:05Z michel $
 
  * Casos de uso : uc-06.01.20
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
+include_once '../../../../../../config.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGRelatorioRazaoDespesa.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO.'FRelatorioPagamentoOrdemNotaEmpenho.class.php';
+
 include_once CAM_FW_LEGADO."funcoesLegado.lib.php";
 include_once CLA_MPDF;
+
+$arFiltro = Sessao::read('filtroRelatorio');
+if(count($arFiltro)>0)
+    $request = new Request($arFiltro);
 
 $arData = $arEstrutural = $arDataReceita = $registros = array();
 $rsData = new Recordset;
 
 $obTTCEMGRelatorioRazaoDespesa = new TTCEMGRelatorioRazaoDespesa;
-$obTTCEMGRelatorioRazaoDespesa->setDado('dt_inicial'    , $_REQUEST['stDataInicial']);
-$obTTCEMGRelatorioRazaoDespesa->setDado('dt_final'      , $_REQUEST['stDataFinal']);
-$obTTCEMGRelatorioRazaoDespesa->setDado('tipo_relatorio', $_REQUEST['stTipoRelatorio']);
-$obTTCEMGRelatorioRazaoDespesa->setDado('num_orgao'     , $_REQUEST['inNumOrgao']);
-$obTTCEMGRelatorioRazaoDespesa->setDado('num_unidade'   , $_REQUEST['inNumUnidade']);
-$obTTCEMGRelatorioRazaoDespesa->setDado('num_pao'       , $_REQUEST['inCodPao']);
+$obTTCEMGRelatorioRazaoDespesa->setDado('dt_inicial'    , $request->get('stDataInicial'));
+$obTTCEMGRelatorioRazaoDespesa->setDado('dt_final'      , $request->get('stDataFinal'));
+$obTTCEMGRelatorioRazaoDespesa->setDado('tipo_relatorio', $request->get('stTipoRelatorio'));
+$obTTCEMGRelatorioRazaoDespesa->setDado('num_orgao'     , $request->get('inNumOrgao'));
+$obTTCEMGRelatorioRazaoDespesa->setDado('num_unidade'   , $request->get('inNumUnidade'));
+$obTTCEMGRelatorioRazaoDespesa->setDado('num_pao'       , $request->get('inCodPao'));
 $obTTCEMGRelatorioRazaoDespesa->setDado('exercicio'     , Sessao::getExercicio());
-$obTTCEMGRelatorioRazaoDespesa->setDado('entidade'      , implode(',', $_REQUEST['inCodEntidade']));
-$obTTCEMGRelatorioRazaoDespesa->setDado('cod_recurso'   , isset($_REQUEST['inCodRecurso']) ? implode(',', $_REQUEST['inCodRecurso']) : null);
-$obTTCEMGRelatorioRazaoDespesa->setDado('situacao'    , $_REQUEST['inSituacao']);
+$obTTCEMGRelatorioRazaoDespesa->setDado('entidade'      , implode(',', $request->get('inCodEntidade')));
+$obTTCEMGRelatorioRazaoDespesa->setDado('cod_recurso'   , $request->get('inCodRecurso') ? implode(',', $request->get('inCodRecurso')) : null);
+$obTTCEMGRelatorioRazaoDespesa->setDado('situacao'      , $request->get('inSituacao'));
 
-//Seleciona consulta dependendo do tipo do relatório
-switch($_REQUEST['stTipoRelatorio']) {
-    case 'educacao_receita_extra_orcamentaria':
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosReceitaExtraOrcamentaria($rsData);
-    break;
-    
+$stExercicioEmpenho = Sessao::getExercicio();
+
+$inCodRecurso = $request->get('inCodRecurso');
+
+switch($request->get('stTipoRelatorio')) {
     case 'educacao_despesa_extra_orcamentaria':
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosDespesaExtraOrcamentaria($rsData);
+        $stTipoRelatorio = 'Educação - Despesa Extra Orçamentária';
     break;
-    
+
+    case 'fundeb_60':
+        $stTipoRelatorio = 'FUNDEB 60%';
+        $inCodRecurso[] = 118;
+    break;
+
+    case 'fundeb_40':
+        $stTipoRelatorio = 'FUNDEB 40%';
+        $inCodRecurso[] = 119;
+    break;
+
+    case 'ensino_fundamental':
+        $stTipoRelatorio = 'Ensino Fundamental';
+        $stFiltro = " AND despesa.cod_subfuncao = 361";
+    break;
+
+    case 'gasto_25':
+        $stTipoRelatorio = 'Gasto com 25%';
+        $inCodRecurso[] = 101;
+        $stFiltro  = " AND despesa.cod_subfuncao NOT IN ( 362,363,364 )";
+    break;
+
+    case 'saude':
+        $stTipoRelatorio = 'Saúde';
+        $inCodRecurso[] = 102;
+    break;
+
+    case 'diversos':
+        $stTipoRelatorio = 'Diversos';
+        $inCodRecurso[] = 100;
+    break;
+
     case 'restos_pagar':
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosRestosPagar($rsData,"","ORDER BY dt_pagamento, empenho",$boTransacao);
-    break;
-
-    case 'empenhado':
-    case 'liquidado':
-    case 'pago':
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaEmpenhoLiquidadoPago($rsData);
-        foreach($rsData->getElementos() as $registro) {    
-            $arOrgaoUnidade[]       = $registro['num_orgao'].",".$registro['num_unidade']; 
-        }
-    break;
-
-    default:
-        $obTTCEMGRelatorioRazaoDespesa->recuperaDadosConsultaPrincipal($rsData);
+        $stTipoRelatorio = 'Restos a Pagar';
+        $stFiltro = " AND pagamento.exercicio_empenho < '".Sessao::getExercicio()."'";
+        $stExercicioEmpenho = "";
     break;
 }
 
-switch($_REQUEST['inSituacao']) {
+$stFiltro .= " AND ( pagamento.timestamp_pagamento::DATE BETWEEN to_date('".$request->get('stDataInicial')."','dd/mm/yyyy') AND to_date('".$request->get('stDataFinal')."','dd/mm/yyyy') )";
+
+if($request->get('inNumOrgao'))
+   $stFiltro .= " AND despesa.num_orgao = ".$request->get('inNumOrgao');
+
+if($request->get('inNumUnidade'))
+   $stFiltro .= " AND despesa.num_unidade = ".$request->get('inNumUnidade');
+
+if($request->get('inCodPao'))
+   $stFiltro .= " AND despesa.num_pao = ".$request->get('inCodPao');
+
+if(count($inCodRecurso)>0)
+    $request->set('inCodRecurso', $inCodRecurso);
+
+if($request->get('inCodRecurso'))
+    $stFiltro .= " AND despesa.cod_recurso IN (".implode(',', $request->get('inCodRecurso')).")";
+
+if($request->get('inCodDespesa'))
+   $stFiltro .= " AND despesa.cod_despesa = ".$request->get('inCodDespesa');
+
+switch($request->get('inSituacao')) {
     case '1':
         $stNomeRelatorio = "Empenhados";
     break;
@@ -98,119 +144,143 @@ switch($_REQUEST['inSituacao']) {
     break;
 }
 
-//Preenche com campos de agrupamento
-foreach($rsData->getElementos() as $registro) {        
-    $arEstrutural[]         = array_key_exists('despesa'         , $registro) ? $registro['despesa'] : null;
-    $arData[]               = array_key_exists('dt_pagamento'    , $registro) ? $registro['dt_pagamento'] : null;
-    $arDataReceita[]        = array_key_exists('dt_transferencia', $registro) ? $registro['dt_transferencia'] : null;
-}
+$obFRelatorioPagamentoOrdemNotaEmpenho = new FRelatorioPagamentoOrdemNotaEmpenho;
+$obFRelatorioPagamentoOrdemNotaEmpenho->setDado('exercicio'     , Sessao::getExercicio());
+$obFRelatorioPagamentoOrdemNotaEmpenho->setDado('stEntidade'    , implode(',', $request->get('inCodEntidade')));
+$obFRelatorioPagamentoOrdemNotaEmpenho->setDado('exercicio_empenho' , $stExercicioEmpenho);
 
-$incount = 0;
-foreach($rsData->getElementos() as $registro) {
-    if($orgao != $registro['cod_orgao'] or $unidade != $registro['cod_unidade']) {
-       $arOrgaoUnidade[$incount]['cod_orgao'] = $registro['cod_orgao'];
-       $arOrgaoUnidade[$incount]['cod_unidade'] = $registro['cod_unidade'];
-       
-       $incount ++;
-       $orgao = $registro['cod_orgao'];
-       $unidade = $registro['cod_unidade'];
+//Relatórios Educação - Despesa Extra Orçamentária, segue padrão anterior
+if($request->get('stTipoRelatorio') == 'educacao_despesa_extra_orcamentaria'){
+    $obTTCEMGRelatorioRazaoDespesa->recuperaDadosDespesaExtraOrcamentaria($rsRecordSet);
+
+    $arDia      = array();
+    $arTotalDia = array();
+    $arTotal    = array();
+
+    foreach($rsRecordSet->getElementos() as $registro) {
+        $arDia[$registro['dt_pagamento']][] = $registro;
+
+        $arTotalDia[$registro['dt_pagamento']]['valor']           += $registro['valor'];
+        $arTotalDia[$registro['dt_pagamento']]['valor_estornado'] += $registro['valor_estornado'];
+        $arTotalDia[$registro['dt_pagamento']]['valor_liquido']   += ( $registro['valor'] - $registro['valor_estornado'] );
+
+        $arTotal['valor']           += $registro['valor'];
+        $arTotal['valor_estornado'] += $registro['valor_estornado'];
+        $arTotal['valor_liquido']   += ( $registro['valor'] - $registro['valor_estornado'] );
     }
+
+    $arDados = array(
+        'arDia'               => $arDia,
+        'stTipoRelatorio'     => $stTipoRelatorio,
+        'arTotalDia'          => $arTotalDia,
+        'arTotal'             => $arTotal
+    );
+}else{
+    //Padrão Razão Pagamento, Ticket #23593
+    $obFRelatorioPagamentoOrdemNotaEmpenho->recuperaRazaoTCEMG($rsRecordSet, $stFiltro);
+
+    $arOrgaoUnidade      = array();
+    $arNomOrgaoUnidade   = array();
+    $arTotal             = array();
+    $arTotalOrgao        = array();
+    $arTotalOrgaoUnidade = array();
+    $arTotalDotacao      = array();
+
+    foreach($rsRecordSet->getElementos() as $registro) {
+        $arOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']][] = $registro;
+
+        $arNomOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['num_orgao']   = $registro['num_orgao'];
+        $arNomOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['nom_orgao']   = $registro['nom_orgao'];
+        $arNomOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['num_unidade'] = $registro['num_unidade'];
+        $arNomOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['nom_unidade'] = $registro['nom_unidade'];
+
+        $vlAnulado = $registro['vl_anulado'];
+        $vlAnuladoRetencao = 0;
+        if($registro['vl_retencao'] > 0)
+            $vlAnuladoRetencao = $vlAnulado;
+        $vlAnuladoLiquido = $vlAnulado - $vlAnuladoRetencao;
+
+        $vlTotalPago = $registro['vl_pago'] - $vlAnulado;
+        $vlTotalRetencao = $registro['vl_retencao'] - $vlAnuladoRetencao;
+        $vlTotalLiquido = $registro['vl_liquido'] - $vlAnuladoLiquido;
+
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_pago']     += $registro['vl_pago'];
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_retencao'] += $registro['vl_retencao'];
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_liquido']  += $registro['vl_liquido'];
+
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_anulado_p'] += $vlAnulado;
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_anulado_r'] += $vlAnuladoRetencao;
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_anulado_l'] += $vlAnuladoLiquido;
+
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_total_p'] += $vlTotalPago;
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_total_r'] += $vlTotalRetencao;
+        $arTotalDotacao[$registro['num_orgao']][$registro['num_unidade']][$registro['dotacao'].' - '.$registro['descricao_despesa'].' - '.$registro['nom_recurso']]['vl_total_l'] += $vlTotalLiquido;
+
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_pago']     += $registro['vl_pago'];
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_retencao'] += $registro['vl_retencao'];
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_liquido']  += $registro['vl_liquido'];
+
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_anulado_p'] += $vlAnulado;
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_anulado_r'] += $vlAnuladoRetencao;
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_anulado_l'] += $vlAnuladoLiquido;
+
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_total_p'] += $vlTotalPago;
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_total_r'] += $vlTotalRetencao;
+        $arTotalOrgaoUnidade[$registro['num_orgao']][$registro['num_unidade']]['vl_total_l'] += $vlTotalLiquido;
+
+        $arTotalOrgao[$registro['num_orgao']]['vl_pago']     += $registro['vl_pago'];
+        $arTotalOrgao[$registro['num_orgao']]['vl_retencao'] += $registro['vl_retencao'];
+        $arTotalOrgao[$registro['num_orgao']]['vl_liquido']  += $registro['vl_liquido'];
+
+        $arTotalOrgao[$registro['num_orgao']]['vl_anulado_p'] += $vlAnulado;
+        $arTotalOrgao[$registro['num_orgao']]['vl_anulado_r'] += $vlAnuladoRetencao;
+        $arTotalOrgao[$registro['num_orgao']]['vl_anulado_l'] += $vlAnuladoLiquido;
+
+        $arTotalOrgao[$registro['num_orgao']]['vl_total_p'] += $vlTotalPago;
+        $arTotalOrgao[$registro['num_orgao']]['vl_total_r'] += $vlTotalRetencao;
+        $arTotalOrgao[$registro['num_orgao']]['vl_total_l'] += $vlTotalLiquido;
+
+        $arTotal['vl_pago']     += $registro['vl_pago'];
+        $arTotal['vl_retencao'] += $registro['vl_retencao'];
+        $arTotal['vl_liquido']  += $registro['vl_liquido'];
+
+        $arTotal['vl_anulado_p'] += $vlAnulado;
+        $arTotal['vl_anulado_r'] += $vlAnuladoRetencao;
+        $arTotal['vl_anulado_l'] += $vlAnuladoLiquido;
+
+        $arTotal['vl_total_p'] += $vlTotalPago;
+        $arTotal['vl_total_r'] += $vlTotalRetencao;
+        $arTotal['vl_total_l'] += $vlTotalLiquido;
+    }
+
+    $arDados = array(
+        'arOrgaoUnidade'      => $arOrgaoUnidade,
+        'stTipoRelatorio'     => $stTipoRelatorio,
+        'arNomOrgaoUnidade'   => $arNomOrgaoUnidade,
+        'arTotalDotacao'      => $arTotalDotacao,
+        'arTotalOrgaoUnidade' => $arTotalOrgaoUnidade,
+        'arTotalOrgao'        => $arTotalOrgao,
+        'arTotal'             => $arTotal
+    );
 }
 
-//Seta variável título do relatório
-switch($_REQUEST['stTipoRelatorio']) {
-    case 'educacao_despesa_extra_orcamentaria':
-    $stTipoRelatorio = 'Educação - Despesa Extra Orçamentária';
-    break;
-
-    case 'educacao_receita_extra_orcamentaria':
-    $stTipoRelatorio = 'Educação - Receita Extra Orçamentária';
-    break;
-    
-    case 'fundeb_60':
-    $stTipoRelatorio = 'FUNDEB 60%';
-    break;
-    
-    case 'fundeb_40':
-    $stTipoRelatorio = 'FUNDEB 40%';
-    break;
-    
-    case 'ensino_fundamental':
-    $stTipoRelatorio = 'Ensino Fundamental';
-    break;
-    
-    case 'gasto_25':
-    $stTipoRelatorio = 'Gasto com 25%';
-    break;
-    
-    case 'saude':
-    $stTipoRelatorio = 'Saúde';
-    break;
-    
-    case 'diversos':
-    $stTipoRelatorio = 'Diversos';
-    break;
-
-    case 'restos_pagar':
-    $stTipoRelatorio = 'Restos a Pagar';
-    break;
-    
-    case 'empenhado':
-    $stTipoRelatorio = 'Empenhado';
-    break;
-    
-    case 'liquidado':
-    $stTipoRelatorio = 'Liquidado';
-    break;
-    
-    case 'pago':
-    $stTipoRelatorio = 'Pago';
-    break;
-}
-
-if(is_array($arOrgaoUnidade))         { $arOrgaoUnidade = array_unique($arOrgaoUnidade); }
-if(is_array($arEstrutural))           { $arEstrutural   = array_unique($arEstrutural); }
-if(is_array($arData))                 { $arData         = array_unique($arData); }
-if(is_array($arDataReceita))          { $arDataReceita  = array_unique($arDataReceita); }
-if(is_array($rsData->getElementos())) { $registros      = $rsData->getElementos(); }
-
-$arDados = array(
-    'registros'       => $rsData->getElementos(),
-    'stTipoRelatorio' => $stTipoRelatorio,
-    'arEstrutural'    => $arEstrutural,
-    'arData'          => $arData,
-    'arDataReceita'   => $arDataReceita,
-    'arOrgaoUnidade'  => $arOrgaoUnidade,
-);
-   
 // Switch necessário para selecionar template do relatório. Embora parecidos, há campos que constam num que não constam no outro.
-switch($_REQUEST['stTipoRelatorio']) {
-    case 'restos_pagar':
-    $obMPDF = new FrameWorkMPDF(6,55,11);
-    break;
-
+switch($request->get('stTipoRelatorio')) {
     case 'educacao_despesa_extra_orcamentaria':
-    $obMPDF = new FrameWorkMPDF(6,55,12);
-    break;
-
-    case 'educacao_receita_extra_orcamentaria':
-    $obMPDF = new FrameWorkMPDF(6,55,13);
-    break;
-    
-    case 'empenhado':
-    case 'liquidado':
-    case 'pago':
-    $obMPDF = new FrameWorkMPDF(6,55,16);
+        #LHTCEMGRelatorioRazaoDespesaDespesaExtraOrc.php
+        $obMPDF = new FrameWorkMPDF(6,55,12);
     break;
 
     default:
-    $obMPDF = new FrameWorkMPDF(6,55,10);
+        #LHTCEMGRelatorioRazaoDespesa.php
+        $obMPDF = new FrameWorkMPDF(6,55,10);
     break;
 }
 
+$obMPDF->setCodEntidades(implode(',', $request->get('inCodEntidade')));
 $obMPDF->setDataInicio($request->get("stDataInicial"));
 $obMPDF->setDataFinal($request->get("stDataFinal"). " - ".  $stNomeRelatorio);
-$obMPDF->setNomeRelatorio("Razão da Despesa");
+$obMPDF->setNomeRelatorio("Razao da Despesa");
 $obMPDF->setFormatoFolha("A4-L");
 $obMPDF->setConteudo($arDados);
 $obMPDF->gerarRelatorio();

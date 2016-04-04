@@ -869,6 +869,28 @@ TD.show_dados_center_bold  {
     height: 45px;
 }
 
+TD.show_dados_left_bold  {
+   background-color : #EDF4FA;
+   color : #000000;
+   font-size : 13px;
+   font-family : Futura, Arial, Helvetica, sans-serif;
+   font-weight : bold;
+   font-style : normal;
+   text-align : left;
+    height: 45px;
+}
+
+TD.show_dados_right_bold  {
+   background-color : #EDF4FA;
+   color : #000000;
+   font-size : 13px;
+   font-family : Futura, Arial, Helvetica, sans-serif;
+   font-weight : bold;
+   font-style : normal;
+   text-align : right;
+    height: 45px;
+}
+
 tr.zb td { 
     background:#D0E4F2; 
 }

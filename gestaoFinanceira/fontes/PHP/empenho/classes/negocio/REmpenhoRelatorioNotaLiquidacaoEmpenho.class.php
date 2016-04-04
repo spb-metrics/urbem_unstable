@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoRelatorioNotaLiquidacaoEmpenho.class.php 63465 2015-08-31 18:06:10Z jean $
+    $Id: REmpenhoRelatorioNotaLiquidacaoEmpenho.class.php 64593 2016-03-17 14:27:10Z jean $
 
     $Revision: 30668 $
     $Name$
@@ -682,6 +682,29 @@ function geraRecordSet(&$arRecordSet , $stOrder = "")
         $rsNewRecord20 = new RecordSet;
         $rsNewRecord20->preenche($arLinha20);
         $arRecordSet[20] = $rsNewRecord20;
+    }
+
+    //TCERS - Rio Grande do Sul
+    if (SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio()) == 23) {
+        include_once CAM_GPC_TCERS_MAPEAMENTO.'TTCERSNotaFiscal.class.php';
+        $obTTCERSNotaFiscal = new TTCERSNotaFiscal;
+        
+        $stFiltroDocumento = " WHERE nota_fiscal.cod_entidade = " .$this->inCodEntidade;
+        $stFiltroDocumento.= "   AND nota_fiscal.exercicio    = '".$this->stExercicio."'";
+        $stFiltroDocumento.= "   AND nota_fiscal.cod_nota     = " .$this->inCodNota;
+
+        $obTTCERSNotaFiscal->recuperaTodos($rsDocumento, $stFiltroDocumento);
+        
+        $arLinha14[0]['exercicio']    = $rsDocumento->getCampo('exercicio');
+        $arLinha14[0]['cod_entidade'] = $rsDocumento->getCampo('cod_entidade');
+        $arLinha14[0]['cod_nota']     = $rsDocumento->getCampo('cod_nota');
+        $arLinha14[0]['nro_nota']     = $rsDocumento->getCampo('nro_nota');
+        $arLinha14[0]['nro_serie']    = $rsDocumento->getCampo('nro_serie');        
+        $arLinha14[0]['data_emissao'] = $rsDocumento->getCampo('data_emissao');
+       
+        $rsNewRecord14 = new RecordSet;
+        $rsNewRecord14->preenche($arLinha14);
+        $arRecordSet[14] = $rsNewRecord14;
     }
 
 }

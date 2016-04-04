@@ -135,80 +135,76 @@ function recuperaNTF10(&$rsRecordSet, $stFiltro="", $stOrdem="", $boTransacao=""
 function montaRecuperaNTF10()
 {
     $stSql  = " SELECT DISTINCT ON (NF.nro_nota::NUMERIC, NF.exercicio)  
-                       10 AS tiporegistro
-                       , RPAD((NF.cod_nota||''||NF.nro_nota||''||to_char(data_emissao, 'ddmmyyyy')), 15, '0') AS codnotafiscal
+                          10 AS tiporegistro
+                        , RPAD((NF.cod_nota||''||NF.nro_nota||''||to_char(data_emissao, 'ddmmyyyy')), 15, '0') AS codnotafiscal
                         
-                       , (SELECT valor::INTEGER
-                            FROM administracao.configuracao_entidade
-                           WHERE exercicio=NF.exercicio
-                             AND parametro='tcemg_codigo_orgao_entidade_sicom'
-                             AND cod_entidade=NF.cod_entidade)
-                          AS codorgao
+                        , (
+                           SELECT valor::INTEGER
+                             FROM administracao.configuracao_entidade
+                            WHERE exercicio=NF.exercicio
+                              AND parametro='tcemg_codigo_orgao_entidade_sicom'
+                              AND cod_entidade=NF.cod_entidade
+                          ) AS codorgao
                         , NF.nro_nota AS nfnumero 
-                        , CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1 THEN
-                                   NF.nro_serie 
-                               ELSE
-                                   ' '
-                          END AS nfserie
-                        
-                        , CASE WHEN CGMPJ_empenho.cnpj!='' THEN
-                                   2
-                               ELSE
-                                   CASE WHEN CGMPF_empenho.cpf!='' THEN
-                                       1
-                                   ELSE
-                                       3
-                                   END
-                          END AS tipodocumento
-            
-                        , CASE WHEN CGMPJ_empenho.cnpj!='' THEN
-                                   CGMPJ_empenho.cnpj
-                               ELSE
-                                   CASE WHEN CGMPF_empenho.cpf!='' THEN
-                                       CGMPF_empenho.cpf
-                                   ELSE
-                                      ''
-                                   END
-                          END AS nrodocumento
-                          
+                        , CASE WHEN tipo_nota_fiscal.cod_tipo != 4 AND tipo_nota_fiscal.cod_tipo != 1
+                                  THEN NF.nro_serie 
+                                  ELSE ' '
+                        END AS nfserie
+                        , CASE WHEN CGMPJ_empenho.cnpj!= ''
+                                  THEN 2
+                                  ELSE CASE WHEN CGMPF_empenho.cpf!= ''
+                                              THEN 1
+                                              ELSE 3
+                                       END
+                        END AS tipodocumento
+                        , CASE WHEN CGMPJ_empenho.cnpj!= ''
+                                  THEN CGMPJ_empenho.cnpj
+                                  ELSE CASE WHEN CGMPF_empenho.cpf!= ''
+                                              THEN CGMPF_empenho.cpf
+                                              ELSE ''
+                                       END
+                        END AS nrodocumento
                         , NF.inscricao_estadual AS nroinscestadual
-                        , NF.inscricao_municipal  AS nroinscmunicipal
-                        , CGMMUN.nom_municipio as nomemunicipio
-                        , (SELECT cep 
-                             FROM sw_cep_logradouro
-                            WHERE cod_logradouro = (SELECT cod_logradouro
-                                                      FROM sw_logradouro
-                                                     WHERE cod_municipio=CGM.cod_municipio
-                                                       AND cod_uf=CGM.cod_uf
-                                                  ORDER BY cod_logradouro desc limit 1) )
-                          AS cepmunicipio
-                        , ( SELECT sw_uf.sigla_uf 
+                        , NF.inscricao_municipal AS nroinscmunicipal
+                        , CGMMUN.nom_municipio AS nomemunicipio
+                        , (
+                            SELECT cep 
+                              FROM sw_cep_logradouro
+                             WHERE cod_logradouro = (
+                                                     SELECT cod_logradouro
+                                                       FROM sw_logradouro
+                                                      WHERE cod_municipio = CGM.cod_municipio
+                                                        AND cod_uf = CGM.cod_uf
+                                                   ORDER BY cod_logradouro DESC LIMIT 1
+                                                    )
+                          ) AS cepmunicipio
+                        , (
+                            SELECT sw_uf.sigla_uf 
                               FROM empenho.empenho AS EE
                          LEFT JOIN empenho.pre_empenho AS EPE
-                                ON EPE.exercicio=EE.exercicio
-                               AND EPE.cod_pre_empenho=EE.cod_pre_empenho
+                                ON EPE.exercicio = EE.exercicio
+                               AND EPE.cod_pre_empenho = EE.cod_pre_empenho
                          LEFT JOIN sw_cgm
-                                ON sw_cgm.numcgm=EPE.cgm_beneficiario
+                                ON sw_cgm.numcgm = EPE.cgm_beneficiario
                          LEFT JOIN sw_uf
-                                ON sw_uf.cod_uf=sw_cgm.cod_uf
-                               AND sw_uf.cod_pais=sw_cgm.cod_pais
-                             WHERE (EE.exercicio=NFEL.exercicio_empenho
-                                    AND EE.cod_empenho=NFEL.cod_empenho
-                                    AND EE.cod_entidade=NFEL.cod_entidade)
-                                OR (EE.exercicio=NFE.exercicio_empenho
-                                    AND EE.cod_empenho=NFE.cod_empenho
-                                    AND EE.cod_entidade=NFE.cod_entidade))
-                          AS ufcredor
-                        , CASE WHEN NF.cod_tipo = 1 THEN 1
-                               WHEN NF.cod_tipo = 4 THEN 1
-                               WHEN NF.cod_tipo = 2 THEN 2
-                               WHEN NF.cod_tipo = 3 THEN 3
-                               ELSE 0
-                          END AS notafiscaleletronica
+                                ON sw_uf.cod_uf = sw_cgm.cod_uf
+                               AND sw_uf.cod_pais = sw_cgm.cod_pais
+                             WHERE (
+                                    EE.exercicio = NFEL.exercicio_empenho
+                                    AND EE.cod_empenho = NFEL.cod_empenho
+                                    AND EE.cod_entidade = NFEL.cod_entidade
+                                   )
+                                OR (
+                                    EE.exercicio=NFE.exercicio_empenho
+                                    AND EE.cod_empenho = NFE.cod_empenho
+                                    AND EE.cod_entidade = NFE.cod_entidade
+                                   )
+                          ) AS ufcredor
+                        , NF.cod_tipo AS notafiscaleletronica
                         , NF.chave_acesso AS chaveacesso
                         , NF.chave_acesso_municipal AS chaveacessomunicipal
                         , NF.aidf AS nfaidf
-                        , to_char(data_emissao, 'ddmmyyyy') as dtemissaonf
+                        , to_char(data_emissao, 'ddmmyyyy') AS dtemissaonf
                         , CASE WHEN ENL.dt_vencimento < NF.data_emissao OR EE.dt_vencimento < NF.data_emissao
                                THEN to_char(data_emissao, 'ddmmyyyy')
                                ELSE CASE WHEN ENL.dt_vencimento IS NOT NULL
@@ -225,7 +221,7 @@ function montaRecuperaNTF10()
                         
                         FROM tcemg.nota_fiscal AS NF
                         
-                        JOIN tcemg.tipo_nota_fiscal
+                  INNER JOIN tcemg.tipo_nota_fiscal
                           ON tipo_nota_fiscal.cod_tipo = NF.cod_tipo
                    
                    LEFT JOIN tcemg.nota_fiscal_empenho_liquidacao AS NFEL

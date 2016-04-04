@@ -34,11 +34,11 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGConfiguracaoArquivoDCLRF.class.php 59719 2014-09-08 15:00:53Z franver $
+    * $Id: TTCEMGConfiguracaoArquivoDCLRF.class.php 64693 2016-03-22 14:02:13Z jean $
     *
-    * $Date: 2014-09-08 12:00:53 -0300 (Seg, 08 Set 2014) $
-    * $Author: franver $
-    * $Rev: 59719 $
+    * $Date: 2016-03-22 11:02:13 -0300 (Ter, 22 Mar 2016) $
+    * $Author: jean $
+    * $Rev: 64693 $
 */
 
 include_once( "../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php" );
@@ -66,22 +66,32 @@ class TTCEMGConfiguracaoArquivoDCLRF extends Persistente {
         $this->AddCampo('valor_inscrito_rpnp_incentivo_instituicao_financeira', 'numeric', false, '14,2', false, false);
         $this->AddCampo('valor_compromissado'                                 , 'numeric', false, '14,2', false, false);
         $this->AddCampo('valor_recursos_nao_aplicados'                        , 'numeric', false, '14,2', false, false);
-    }
+        $this->AddCampo('publicacao_relatorio_lrf'                            , 'integer', false,     '', false, false);
+        $this->AddCampo('dt_publicacao_relatorio_lrf'                         , 'date'   , false,     '', false, false);
+        $this->AddCampo('bimestre'                                            , 'integer', false,     '', false, false);
+        $this->AddCampo('meta_bimestral'                                      , 'integer', false,     '', false, false);
+        $this->AddCampo('medida_adotada'                                      , 'text'   , false,     '', false, false);
+        $this->AddCampo('cont_op_credito'                                     , 'integer', false,     '', false, false);
+        $this->AddCampo('desc_cont_op_credito'                                , 'text'   , false,     '', false, false);
+        $this->AddCampo('realiz_op_credito'                                   , 'integer', false,     '', false, false);
+        $this->AddCampo('tipo_realiz_op_credito_capta'                        , 'integer', false,     '', false, false);
+        $this->AddCampo('tipo_realiz_op_credito_receb'                        , 'integer', false,     '', false, false);
+        $this->AddCampo('tipo_realiz_op_credito_assun_dir'                    , 'integer', false,     '', false, false);
+        $this->AddCampo('tipo_realiz_op_credito_assun_obg'                    , 'integer', false,     '', false, false);
+    }    
     
-    function recuperaValoresArquivoDCLRF(&$rsRecordSet)
-    {
+    function recuperaValoresArquivoDCLRF(&$rsRecordSet) {
         return $this->executaRecupera("montaRecuperaValoresArquivoDCLRF",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
     }
     
-    function montaRecuperaValoresArquivoDCLRF()
-    {
+    function montaRecuperaValoresArquivoDCLRF() {
         $stSql .= "
         SELECT exercicio ";
         
         if($this->getDado("cod_orgao") != ''){
             $stSql .= "
-             , 10 AS tipo_registro
-             , '".$this->getDado("cod_orgao")."' AS cod_orgao
+             , ".$this->getDado("tipo_registro")." AS tipo_registro
+             , '".$this->getDado("cod_orgao")."'   AS cod_orgao
             ";
         }
         
@@ -95,13 +105,25 @@ class TTCEMGConfiguracaoArquivoDCLRF extends Persistente {
              , REPLACE(valor_inscrito_rpnp_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_instituicao_financeira
              , REPLACE(valor_compromissado::VARCHAR, '.',',') AS valor_compromissado
              , REPLACE(valor_recursos_nao_aplicados::VARCHAR, '.',',') AS valor_recursos_nao_aplicados
+             , publicacao_relatorio_lrf
+             , TO_CHAR(dt_publicacao_relatorio_lrf, 'DD/MM/YYYY') AS dt_publicacao_relatorio_lrf
+             , bimestre
+             , meta_bimestral
+             , medida_adotada
+             , cont_op_credito
+             , desc_cont_op_credito
+             , realiz_op_credito
+             , tipo_realiz_op_credito_capta
+             , tipo_realiz_op_credito_receb
+             , tipo_realiz_op_credito_assun_dir
+             , tipo_realiz_op_credito_assun_obg
+             
           FROM tcemg.configuracao_arquivo_dclrf 
          WHERE exercicio = '".$this->getDado('exercicio')."'
            AND mes_referencia = ".$this->getDado('mes_referencia');
+           
         return $stSql;
     }
     
     public function __destruct(){}
-
 }
-?>

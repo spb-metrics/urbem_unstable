@@ -52,7 +52,10 @@ DECLARE
     intMes          integer;
     dtInicioMes     varchar[];
     dtFimMes        varchar[];
-    
+    arMes           integer[];
+    arAno           varchar[];
+    boValorConfigurado BOOLEAN := false;
+
 BEGIN
 
     boRestos = true;
@@ -74,6 +77,26 @@ BEGIN
     intI    := 1;
     intMes  := 2;
     
+    /*
+    -------------ALTERACOES A PARTIR DE 2016----------------
+        DEVE BUSCAR OS VALORES DO MES DE ACORDO COM A CONFIGURACAO
+        Gestão Prestação de Contas :: STN :: Configuração :: Vincular Despesa Pessoal
+        Logado em 2016 só poderá ser informado os periodos de 2015 em diante.
+        Armazenas os meses já configurado e o ano de referencia da tabela.
+    */
+    SELECT  publico.concatenar_array(mes) as mes 
+           ,publico.concatenar_array(ano) as ano
+    INTO arMes 
+        ,arAno
+    FROM stn.despesa_pessoal 
+    WHERE exercicio >= '2015' --exercicio de 2015 na qual os dados deveram ser informados quando o usuario estiver logado em 2016
+    AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR);
+
+    IF array_length(arMes,1) >= 1 THEN
+        boValorConfigurado := TRUE;
+    END IF;
+
+
     stSql := '
 	
     CREATE TEMPORARY TABLE tmp_empenhos_restos AS (
@@ -175,17 +198,26 @@ BEGIN
         
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            IF (SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR) ) >= 1 THEN
-            stSql := stSql||' (SELECT COALESCE(SUM(valor), 0.00)
-                                 FROM stn.despesa_pessoal
-                                WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
-                                  AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
-                                  AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN                
+                stSql := stSql||' (SELECT valor_pessoal_ativo
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
             ELSE
-            stSql := stSql||'
-            COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||  quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1%'' and conta_despesa.cod_estrutural not like ''3.1.9.0.01%''
-                              and conta_despesa.cod_estrutural not like ''3.1.9.0.03%''
-                              and conta_despesa.cod_estrutural not like ''3.1.9.0.34%'')') || ' )), 0.00) as liquidado_mes'||intMes||',  ';
+                IF (SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR) ) >= 1 THEN                    
+                    stSql := stSql||' (SELECT COALESCE(SUM(valor), 0.00)
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+                ELSE
+                    stSql := stSql||'
+                    COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||  quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1%'' and conta_despesa.cod_estrutural not like ''3.1.9.0.01%''
+                                      and conta_despesa.cod_estrutural not like ''3.1.9.0.03%''
+                                      and conta_despesa.cod_estrutural not like ''3.1.9.0.34%'')') || ' )), 0.00) as liquidado_mes'||intMes||',  ';
+                    END IF;
             END IF;
             intMes := intMes + 1;
         END LOOP;      
@@ -194,7 +226,7 @@ BEGIN
                         COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicial)||', '||quote_literal(dtFinal)||', ' ||  quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1%'' and conta_despesa.cod_estrutural not like ''3.1.9.0.01%''
                               and conta_despesa.cod_estrutural not like ''3.1.9.0.03%''
                               and conta_despesa.cod_estrutural not like ''3.1.9.0.34%'')') || ' )), 0.00) as liquidado,
-            ';
+                    ';
         
         if (boRestos = true) then
             stSql := stSql || '
@@ -219,8 +251,17 @@ BEGIN
             
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            stSql := stSql||'
-                COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', '||quote_literal(stCodEntidades)||', '|| quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.01%'' OR conta_despesa.cod_estrutural like ''3.1.9.0.03%'')') || ')), 0.00) as liquidado_mes'||intMes||',  ';  
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_pessoal_inativo
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||'
+                    COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', '||quote_literal(stCodEntidades)||', '|| quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.01%'' OR conta_despesa.cod_estrutural like ''3.1.9.0.03%'')') || ')), 0.00) as liquidado_mes'||intMes||',  ';  
+            END IF;
             intMes := intMes + 1;
         END LOOP;  
             
@@ -247,8 +288,17 @@ BEGIN
             
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            stSql := stSql||'
-                COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.34%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_terceirizacao
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||'
+                    COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.34%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';
+            END IF;
             intMes := intMes + 1;
         END LOOP;
         
@@ -299,8 +349,17 @@ BEGIN
         
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            stSql := stSql||'
-                COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.94%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';            
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_indenizacoes
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||'
+                    COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like  ''3.1.9.0.94%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';            
+            END IF;
             intMes := intMes + 1;    
         END LOOP;
         
@@ -327,9 +386,18 @@ BEGIN
             
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            stSql := stSql||'
-                COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.91%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';           
-            intMes := intMes + 1;    
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_decisao_judicial
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||'
+                    COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.91%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';           
+            END IF;
+            intMes := intMes + 1;
         END LOOP;
         
         stSql := stSql || 'COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicial)||', '||quote_literal(dtFinal)||', ' ||quote_literal(stCodEntidades)||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.91%'') ') || ')), 0.00) as liquidado, ';
@@ -355,8 +423,17 @@ BEGIN
             
         intMes := 1;
         WHILE intMes <= 12 LOOP
-            stSql := stSql||'COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.92%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';
-            intMes := intMes + 1;    
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_exercicios_anteriores
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||'COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicioMes[intMes])||', '||quote_literal(dtFimMes[intMes])||', ' ||quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.92%'') ') || ')), 0.00) as liquidado_mes'||intMes||',  ';
+            END IF;
+            intMes := intMes + 1;
         END LOOP;
         
         stSql := stSql || 'COALESCE((select * from stn.fn_rgf_despesa_liquidada_anexo1('||quote_literal(dtInicial)||', '||quote_literal(dtFinal)||', ' ||quote_literal(stCodEntidades) ||', ' || quote_literal('(conta_despesa.cod_estrutural like ''3.1.9.0.92%'') ') || ')), 0.00) as liquidado, ';
@@ -378,24 +455,25 @@ BEGIN
             1 as subgrupo,
             cast(''3.2.4.0.00.00.00.00.00'' as varchar) as cod_estrutural ,
             cast(''Inativos e Pensionistas com Recursos Vinculados'' as varchar) as descricao ,
-            2 as nivel,
-            0.00 as liquidado_mes1,
-            0.00 as liquidado_mes2,
-            0.00 as liquidado_mes3,
-            0.00 as liquidado_mes4,
-            0.00 as liquidado_mes5,                
-            0.00 as liquidado_mes6,
-            0.00 as liquidado_mes7,
-            0.00 as liquidado_mes8,
-            0.00 as liquidado_mes9,
-            0.00 as liquidado_mes10,
-            0.00 as liquidado_mes11,
-            0.00 as liquidado_mes12,
-            0.00 as liquidado,
-            0.00 as restos
+            2 as nivel, ';
+        
+        intMes := 1;
+        WHILE intMes <= 12 LOOP
+            --VERIFICA SE O DADO ENCONTRADO NA CONFIGURACAO É REFERENTE AO MESMO MES DO PERIODO
+            IF (boValorConfigurado) AND ((SELECT COUNT(*) FROM stn.despesa_pessoal WHERE mes = SUBSTR(dtInicioMes[intMes],4,2)::INTEGER AND ano = ''||SUBSTR(dtInicioMes[intMes],7,4)||'' AND cod_entidade::VARCHAR IN (stCodEntidades::VARCHAR)) >= 1) THEN
+                stSql := stSql||' (SELECT valor_inativos_pensionistas
+                                         FROM stn.despesa_pessoal
+                                        WHERE mes = '||SUBSTR(dtInicioMes[intMes],4,2)::INTEGER||'
+                                          AND ano = '''||SUBSTR(dtInicioMes[intMes],7,4)||'''
+                                          AND cod_entidade IN ('||stCodEntidades||'))   as liquidado_mes'||intMes||',  ';
+            ELSE
+                stSql := stSql||' 0.00 as liquidado_mes'||intMes||', ';
+            END IF;
+            intMes := intMes + 1;
+        END LOOP;
 
-    )
-	';
+        stSql := stSql || ' 0.00 as liquidado, 0.00 as restos ) ';
+	
 
 	EXECUTE stSql;
     -------------------------------------------------
@@ -407,6 +485,35 @@ BEGIN
        AND nivel = 2
        AND cod_estrutural = '3.1.1.0.00.00.00.00.00';
 	
+    /* 
+        UPDATE PARA EXERCICIO DE 2016
+    */
+    IF stExercicio::varchar >= '2016' THEN
+        stSql := 'SELECT DISTINCT cod_estrutural FROM tmp_rgf_anexo1_despesa_liquida_mensal ';
+    
+        FOR reReg IN EXECUTE stSql
+        LOOP
+            stSqlAux := 'UPDATE tmp_rgf_anexo1_despesa_liquida_mensal SET
+                            liquidado = (SELECT 
+                                                COALESCE(liquidado_mes1, 0.00)
+                                                +COALESCE(liquidado_mes2, 0.00)
+                                                +COALESCE(liquidado_mes3, 0.00)
+                                                +COALESCE(liquidado_mes4, 0.00)
+                                                +COALESCE(liquidado_mes5, 0.00)
+                                                +COALESCE(liquidado_mes6, 0.00)
+                                                +COALESCE(liquidado_mes7, 0.00)
+                                                +COALESCE(liquidado_mes8, 0.00)
+                                                +COALESCE(liquidado_mes9, 0.00)
+                                                +COALESCE(liquidado_mes10, 0.00)
+                                                +COALESCE(liquidado_mes11, 0.00)
+                                                +COALESCE(liquidado_mes12, 0.00)
+                                                FROM tmp_rgf_anexo1_despesa_liquida_mensal 
+                                                WHERE cod_estrutural = '''||reReg.cod_estrutural||''' ) 
+                        WHERE cod_estrutural = '''||reReg.cod_estrutural||''' ';
+            EXECUTE stSqlAux;
+        END LOOP;
+    END IF;
+
     -- Calcular totais do nivel pai
 
     stSql := 'SELECT DISTINCT grupo FROM tmp_rgf_anexo1_despesa_liquida_mensal ';
@@ -429,11 +536,13 @@ BEGIN
              restos = (SELECT COALESCE(SUM(restos), 0.00) FROM tmp_rgf_anexo1_despesa_liquida_mensal WHERE grupo = ' || reReg.grupo || ' AND nivel = 2)
             WHERE
                 grupo = ' || reReg.grupo || ' AND nivel = 1 ';     
-                
+
         EXECUTE stSqlAux;
     END LOOP;
 
-	stSql := 'SELECT 
+    
+
+	stSql :='  SELECT 
                     nivel,
                     cod_estrutural,
                     descricao,
@@ -451,7 +560,9 @@ BEGIN
                     liquidado_mes12,
                     liquidado,
                     restos
-     FROM tmp_rgf_anexo1_despesa_liquida_mensal ORDER BY ordem, grupo';
+                FROM tmp_rgf_anexo1_despesa_liquida_mensal 
+                
+                ORDER BY ordem, grupo';
     
     FOR reRegistro IN EXECUTE stSql
     LOOP

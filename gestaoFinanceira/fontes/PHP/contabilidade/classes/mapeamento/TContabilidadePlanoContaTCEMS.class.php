@@ -121,18 +121,19 @@ function montaRecuperaContaAnalitica()
 
 function montaRecuperaContaPlanoAnalitica()
 {
-    $stSQL  = " SELECT                                          \n";
-    $stSQL .= "     pa.cod_conta ,                              \n";
-    $stSQL .= "     pc.exercicio ,                              \n";
-    $stSQL .= "     pc.nom_conta ,                              \n";
-    $stSQL .= "     pc.cod_classificacao ,                      \n";
-    $stSQL .= "     pc.cod_sistema ,                            \n";
-    $stSQL .= "     pc.cod_estrutural                           \n";
-    $stSQL .= "FROM                                             \n";
-    $stSQL .= "     contabilidade.plano_analitica as pa,        \n";
-    $stSQL .= "     contabilidade.plano_conta as pc             \n";
-    $stSQL .= " WHERE  pa.cod_conta = pc.cod_conta AND          \n";
-    $stSQL .= " pa.exercicio = pc.exercicio                     \n";
+    $stSQL  = " SELECT                                          
+                       pa.cod_conta ,                           
+                       pc.exercicio ,                           
+                       pc.nom_conta ,                           
+                       pc.cod_classificacao ,                   
+                       pc.cod_sistema ,                         
+                       pc.cod_estrutural                        
+                  FROM                                          
+                       contabilidade.plano_analitica as pa,     
+                       contabilidade.plano_conta as pc          
+                   WHERE  pa.cod_conta = pc.cod_conta AND       
+                          pa.exercicio = pc.exercicio
+            "  ;
 
     return $stSQL;
 

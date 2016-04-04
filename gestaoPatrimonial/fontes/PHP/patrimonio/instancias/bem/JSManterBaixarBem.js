@@ -53,8 +53,8 @@ Adicionando ao repositório
 */
 ?>
 <script>
-
-	function Limpar()
+	
+    function Limpar()
 	{		
 		ajaxJavaScript( 'OCManterBaixarBem.php?<?php echo Sessao::getId(); ?>','limparBens' );
 	}
@@ -69,4 +69,16 @@ Adicionando ao repositório
 		$('stNomBemInicio').innerHTML = '&nbsp;';
 		$('stNomBemFim').innerHTML = '&nbsp;';
 	}
+    
+    function consultarBensBaixados(inCodigo, stDataBaixa, stMotivo) {
+    
+        var link    = "<?= CAM_GP_PAT_INSTANCIAS.'bem/LSManterBaixarBemPopUp.php'; ?>";
+        var sessao  = "<?= Sessao::getId();?>";
+        var params  = "&inCodigo="+inCodigo+"&stDataBaixa="+stDataBaixa+"&stMotivo="+stMotivo;
+        
+        // Abre a listagem que exibe os bens baixados
+        abrePopUp(link, '', '', '', sessao+params, '','');
+        
+    }
+    
 </script>          

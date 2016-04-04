@@ -35,7 +35,7 @@
 
 	* @ignore
 
-	$Id: OCManterContrato.php 59612 2014-09-02 12:00:51Z gelson $
+	$Id: OCManterContrato.php 64526 2016-03-09 19:10:59Z jean $
 */
 
 include_once ( '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php'     );
@@ -260,6 +260,7 @@ function MontaModalidade($ent)
     $obTxtNroProcesso->setTitle             ( "Informe o número do processo."   );
     $obTxtNroProcesso->setNull              ( false                             );
     $obTxtNroProcesso->setInteiro           ( true                              );
+    $obTxtNroProcesso->setMaxLength         ( 5                                 );
     
     //Início TextBox Exercicio do Processo
     $obTxtExercicioProcesso = new TextBox;

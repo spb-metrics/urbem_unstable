@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertold Rodrigues
     * @author Programador: Lucas Teixeira Stephanou
 
-    * $Id: PRManterCalculo.php 63868 2015-10-27 17:31:08Z evandro $
+    * $Id: PRManterCalculo.php 64497 2016-03-04 13:58:07Z evandro $
 
     Caso de uso: uc-05.03.05
 **/
@@ -321,13 +321,15 @@ switch ($stAcao) {
 
                     $obTAdministracaoAuditoria->setDado( "objeto", "cod_calculo=".$stCalculos );
                     $obTAdministracaoAuditoria->setDado( "transacao", false );
-                    $obTAdministracaoAuditoria->inclusao();
+                    $obErro = $obTAdministracaoAuditoria->inclusao($boTransacao);
 
                     unset( $rsRecordSet );
                 }
 
             }
 
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro , $obTAdministracaoAuditoria );
+            
             SistemaLegado::LiberaFrames();
             if ( $obErro->ocorreu() ) {
                 SistemaLegado::exibeAviso( urlencode($obErro->getDescricao()), "n_erro", "erro", Sessao::getId(), "../" );

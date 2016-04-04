@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenho.php 64212 2015-12-17 12:38:12Z michel $
+    $Id: PRManterEmpenho.php 64400 2016-02-16 16:00:53Z arthur $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -163,6 +163,7 @@ switch ($stAcao) {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodCategoria( $request->get('inCodCategoria'));
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setdataEmpenho($request->get('stDtEmpenho'));
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEntidade($request->get('inCodEntidade') );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setTipoEmissao('R');
     
     $obErro = $obREmpenhoEmpenhoAutorizacao->autorizarEmpenho($boTransacao);
 

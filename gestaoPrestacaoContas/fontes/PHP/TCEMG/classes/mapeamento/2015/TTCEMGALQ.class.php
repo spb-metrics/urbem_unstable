@@ -40,41 +40,18 @@
 
     * Casos de uso: uc-06.04.00
 */
-
-/*
-$Log$
-Revision 1.7  2007/10/10 23:35:33  hboaventura
-correção dos arquivos
-
-Revision 1.6  2007/10/05 18:35:14  hboaventura
-Correção dos desdobramentos
-
-Revision 1.5  2007/06/14 19:31:03  hboaventura
-Correção de bugs
-
-Revision 1.4  2007/06/12 20:44:11  hboaventura
-inclusão dos casos de uso uc-06.04.00
-
-Revision 1.3  2007/06/12 18:34:05  hboaventura
-inclusão dos casos de uso uc-06.04.00
-
-Revision 1.2  2007/06/07 15:36:31  hboaventura
-Inclusão do filtro por periodicidade
-
-Revision 1.1  2007/04/21 20:22:43  hboaventura
-Arquivos para geração do TCMGO
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TTCEMGALQ extends Persistente
 {
     /**
     * Método Construtor
     * @access Private
-*/
+    */
+    public function __construct() {
+        parent::Persistente();
+    }
 
     public function recuperaExportacaoALQ10(&$rsRecordSet, $stFiltro = "", $stOrder = "", $boTransacao = "")
     {
@@ -88,12 +65,12 @@ class TTCEMGALQ extends Persistente
 		    ,   tcemg.seq_cod_red_alq(empenho.exercicio, empenho.cod_entidade,empenho.cod_empenho) as cod_reduzido
                     ,   orgao_sicom.valor AS cod_orgao
                     ,   CASE WHEN pre_empenho.implantado = 't' THEN
-                                CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL) THEN
-					LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')
-				     ELSE LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')
-				    END
-                                ELSE LPAD((LPAD(''||despesa_empenho.num_orgao,2, '0')||LPAD(''||despesa_empenho.num_unidade,2, '0')), 5, '0') 
-                            END AS codunidadesub 
+                             CASE WHEN ( uniorcam.num_orgao_atual IS NOT NULL)
+							      THEN LPAD(LPAD(uniorcam.num_orgao_atual::VARCHAR,2,'0')||LPAD(uniorcam.num_unidade_atual::VARCHAR,2,'0'),5,'0')
+				                  ELSE LPAD(restos_pre_empenho.num_unidade::VARCHAR,5,'0')
+				              END
+                             ELSE LPAD((LPAD(''||despesa_empenho.num_orgao,2, '0')||LPAD(''||despesa_empenho.num_unidade,2, '0')), 5, '0') 
+                         END AS codunidadesub 
                     ,   empenho.cod_empenho AS num_empenho
                     ,   to_char(empenho.dt_empenho,'ddmmyyyy') as dt_empenho
                     ,   to_char(nota_liquidacao.dt_liquidacao,'ddmmyyyy') as dt_liquidacao
@@ -267,92 +244,68 @@ class TTCEMGALQ extends Persistente
     public function montaRecuperaExportacaoALQ12()
     {
         $stSql = "
-                    SELECT
-                            12 AS tipo_registro
-                          , tcemg.seq_cod_red_alq(empenho.exercicio, empenho.cod_entidade,empenho.cod_empenho) as cod_reduzido
-                          , SUBSTR(TO_CHAR(nota_liquidacao_item_anulado.timestamp,'ddmmyyyy'),3,2) AS mes_competencia
-                          , SUBSTR(TO_CHAR(nota_liquidacao_item_anulado.timestamp,'ddmmyyyy'),5,8) AS exercicio_competencia
-                          , SUM(nota_liquidacao_item_anulado.vl_anulado) AS vl_anulado_dsp_exercicio_ant
-                          , empenho.cod_empenho as num_empenho
-						  , TCEMG.numero_nota_liquidacao('".$this->getDado('exercicio')."', empenho.cod_entidade, nota_liquidacao.cod_nota, nota_liquidacao.exercicio_empenho, empenho.cod_empenho ) AS num_liquidacao
-						  , TCEMG.numero_anulacao_liquidacao('".$this->getDado('exercicio')."',pre_empenho.exercicio,empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao_item_anulado.timestamp)  AS  num_anulacao
-
-                    FROM  empenho.empenho
-
-                    JOIN  empenho.nota_liquidacao
-                      ON  nota_liquidacao.exercicio_empenho = empenho.exercicio
-                     AND  nota_liquidacao.cod_entidade = empenho.cod_entidade
-                     AND  nota_liquidacao.cod_empenho = empenho.cod_empenho
-
-                    JOIN  empenho.nota_liquidacao_item_anulado
-                      ON  nota_liquidacao_item_anulado.exercicio = nota_liquidacao.exercicio
-                     AND  nota_liquidacao_item_anulado.cod_entidade = nota_liquidacao.cod_entidade
-                     AND  nota_liquidacao_item_anulado.cod_nota = nota_liquidacao.cod_nota
-
-                    JOIN  empenho.pre_empenho
-                      ON  pre_empenho.exercicio = empenho.exercicio
-                     AND  pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-
-                    JOIN empenho.pre_empenho_despesa
+                  SELECT 12 AS tipo_registro
+                       , tcemg.seq_cod_red_alq(empenho.exercicio, empenho.cod_entidade,empenho.cod_empenho) as cod_reduzido
+                       , SUBSTR(TO_CHAR(nota_liquidacao_item_anulado.timestamp,'ddmmyyyy'),3,2) AS mes_competencia
+                       , SUBSTR(TO_CHAR(nota_liquidacao_item_anulado.timestamp,'ddmmyyyy'),5,8) AS exercicio_competencia
+                       , SUM(nota_liquidacao_item_anulado.vl_anulado) AS vl_anulado_dsp_exercicio_ant
+                       , empenho.cod_empenho as num_empenho
+                       , TCEMG.numero_nota_liquidacao('".$this->getDado('exercicio')."', empenho.cod_entidade, nota_liquidacao.cod_nota, nota_liquidacao.exercicio_empenho, empenho.cod_empenho ) AS num_liquidacao
+                       , TCEMG.numero_anulacao_liquidacao('".$this->getDado('exercicio')."',pre_empenho.exercicio,empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao_item_anulado.timestamp)  AS  num_anulacao
+                    FROM empenho.empenho
+              INNER JOIN empenho.nota_liquidacao
+                      ON nota_liquidacao.exercicio_empenho = empenho.exercicio
+                     AND nota_liquidacao.cod_entidade      = empenho.cod_entidade
+                     AND nota_liquidacao.cod_empenho       = empenho.cod_empenho
+              INNER JOIN empenho.nota_liquidacao_item_anulado
+                      ON nota_liquidacao_item_anulado.exercicio = nota_liquidacao.exercicio
+                     AND nota_liquidacao_item_anulado.cod_entidade = nota_liquidacao.cod_entidade
+                     AND nota_liquidacao_item_anulado.cod_nota = nota_liquidacao.cod_nota
+              INNER JOIN empenho.pre_empenho
+                      ON pre_empenho.exercicio = empenho.exercicio
+                     AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+               LEFT JOIN (
+                          SELECT restos_pre_empenho.exercicio
+                               , restos_pre_empenho.cod_pre_empenho
+                               , substring(restos_pre_empenho.cod_estrutural from 6 for 2) AS elemento
+                            FROM empenho.restos_pre_empenho
+                           WHERE substring(restos_pre_empenho.cod_estrutural from 6 for 2)::INTEGER IN (91,92)
+                             AND substring(restos_pre_empenho.cod_estrutural from 2 for 1)::INTEGER IN (1)
+                         ) AS restos_pre_empenho
+                      ON restos_pre_empenho.exercicio = pre_empenho.exercicio
+                     AND restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+               LEFT JOIN empenho.pre_empenho_despesa
                       ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
                      AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-
-               LEFT JOIN  empenho.restos_pre_empenho
-                      ON  restos_pre_empenho.exercicio = pre_empenho.exercicio
-                     AND  restos_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-
-                    JOIN (SELECT  despesa.*
-                                , conta_despesa.cod_estrutural
-                                , pre_empenho_despesa.cod_pre_empenho
+               LEFT JOIN (
+                          SELECT pre_empenho_despesa.cod_pre_empenho
+                               , pre_empenho_despesa.exercicio
+                               , despesa.cod_entidade
+                               , substring(conta_despesa.cod_estrutural from 9 for 2) AS elemento
                             FROM empenho.pre_empenho_despesa
-                            JOIN orcamento.despesa
+                      INNER JOIN orcamento.despesa
                               ON despesa.exercicio = pre_empenho_despesa.exercicio
                              AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
-                            JOIN orcamento.conta_despesa
+                      INNER JOIN orcamento.conta_despesa
                               ON conta_despesa.exercicio = despesa.exercicio
                              AND conta_despesa.cod_conta = despesa.cod_conta
-                            JOIN tcemg.orgao
-                              ON orgao.num_orgao = despesa.num_orgao
-                             AND orgao.exercicio = despesa.exercicio
-                            JOIN administracao.configuracao_entidade
-                              ON configuracao_entidade.valor::integer = orgao.num_orgao
-                             AND configuracao_entidade.exercicio = orgao.exercicio
-                           WHERE configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
-                             AND configuracao_entidade.cod_modulo = 55
+                           WHERE substring(conta_despesa.cod_estrutural from 9 for 2)::INTEGER IN (91,92)
+                             AND substring(conta_despesa.cod_estrutural from 3 for 1)::INTEGER IN (1)
                         ) AS despesa
                       ON despesa.exercicio = pre_empenho.exercicio
                      AND despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
                      AND despesa.cod_entidade = empenho.cod_entidade
-
-               LEFT JOIN  (SELECT  conta_despesa.cod_estrutural
-                                 , conta_despesa.cod_conta
-                                 , conta_despesa.exercicio
-                                 , pre_empenho_despesa.cod_pre_empenho
-                             FROM empenho.pre_empenho_despesa
-                       INNER JOIN orcamento.conta_despesa
-                               ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
-                              AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
-                        ) AS despesa_sub_elemento
-                      ON  despesa_sub_elemento.exercicio = pre_empenho.exercicio
-                     AND  despesa_sub_elemento.cod_pre_empenho = pre_empenho.cod_pre_empenho
-
-               LEFT JOIN  orcamento.recurso
-                      ON  recurso.exercicio = despesa.exercicio
-                     AND  recurso.cod_recurso = despesa.cod_recurso
-
-                   --WHERE TO_DATE(nota_liquidacao_item_anulado.timestamp::varchar, 'yyyy-mm-dd') BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
-				   WHERE TO_DATE(nota_liquidacao_item_anulado.timestamp::varchar, 'yyyy-mm-dd') BETWEEN TO_DATE('01/01/".($this->getDado('exercicio')-1)."','dd/mm/yyyy') AND TO_DATE('31/12/".($this->getDado('exercicio')-1)."','dd/mm/yyyy')
+                   WHERE nota_liquidacao_item_anulado.timestamp BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+				                                                    AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')
                      AND nota_liquidacao_item_anulado.cod_entidade IN (".$this->getDado('entidades').")
-
-                GROUP BY pre_empenho.exercicio
-                       , empenho.cod_entidade
-                       , nota_liquidacao.cod_nota
-                       , nota_liquidacao_item_anulado.timestamp
-                       , empenho.cod_empenho
-                       , empenho.exercicio
-					   , num_liquidacao
-					   , num_anulacao
-                       
+                     AND ( despesa.elemento IS NOT NULL OR restos_pre_empenho.elemento IS NOT NULL )
+                GROUP BY tipo_registro
+                       , cod_reduzido
+                       , mes_competencia
+                       , exercicio_competencia
+                       , num_empenho
+                       , num_liquidacao
+                       , num_anulacao
         ";
         return $stSql;
     }

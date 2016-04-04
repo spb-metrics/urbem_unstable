@@ -32,12 +32,12 @@
 
   * @ignore
   *
-  * $Id: PRManterConfiguracaoMetasFiscais.php 64322 2016-01-15 15:34:00Z jean $
+  * $Id: PRManterConfiguracaoMetasFiscais.php 64403 2016-02-17 12:33:38Z jean $
 
-  * $Revision: 64322 $
+  * $Revision: 64403 $
   * $Name: $
   * $Author: jean $
-  * $Date: 2016-01-15 13:34:00 -0200 (Sex, 15 Jan 2016) $
+  * $Date: 2016-02-17 10:33:38 -0200 (Qua, 17 Fev 2016) $
 
 */
 
@@ -115,7 +115,7 @@ switch ($stAcao) {
             }
 
             if (!$obErro->ocorreu()) {
-                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId(),"Confiduração de Metas Fiscais","manter","aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId(),"Configuração de Metas Fiscais","manter","aviso", Sessao::getId(), "../");
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }

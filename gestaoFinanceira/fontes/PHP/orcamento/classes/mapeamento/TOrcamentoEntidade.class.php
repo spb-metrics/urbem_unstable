@@ -189,6 +189,20 @@ function recuperaEntidadeGeral(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
     return $obErro;
 }
+function recuperaEntidadeRestos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if(trim($stOrdem))
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    $stSql = $this->montaRecuperaRelacionamentoRestos().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
 
 function montaRecuperaRelacionamento()
 {
@@ -204,6 +218,28 @@ function montaRecuperaRelacionamento()
 
     return $stSql;
 }
+
+function montaRecuperaRelacionamentoRestos()
+{
+    $stSql  = "  SELECT  sw_cgm.numcgm                                                      
+                       , sw_cgm.nom_cgm                                                    
+                       , entidade.*   
+             
+                   FROM orcamento.entidade
+             INNER JOIN sw_cgm                                                              
+                     ON sw_cgm.numcgm = entidade.numcgm
+             
+                  WHERE cod_entidade
+                 NOT IN ( SELECT cod_entidade 
+                            FROM administracao.configuracao_entidade
+                           WHERE configuracao_entidade.exercicio  = '".$this->getDado('exercicio')."'
+                             AND configuracao_entidade.cod_modulo = 10
+                             AND configuracao_entidade.parametro  = 'virada_GF' )
+                    AND entidade.exercicio  = '".$this->getDado('exercicio')."' ";
+
+    return $stSql;
+}
+
 
 function montaRecuperaRelacionamentoNomes()
 {
@@ -417,11 +453,11 @@ function montaRecuperaDadosMANAD()
     $stSql .= "            , '' as im                                                     \n";
     $stSql .= "            , '' as suframa                                                \n";
     $stSql .= "            , '0' as ind_centr                                             \n";
-    $stSql .= "            , '".$this->getDado('stDtInicial')."' as dt_ini                                                 \n";
-    $stSql .= "            , '".$this->getDado('stDtFinal')."' as dt_fin                                                 \n";
+    $stSql .= "            , '".$this->getDado('stDtInicial')."' as dt_ini                \n";
+    $stSql .= "            , '".$this->getDado('stDtFinal')."' as dt_fin                  \n";
     $stSql .= "            , '003' as cod_ver                                             \n";
     $stSql .= "            , config_cod_fin.valor as cod_fin                              \n";
-    $stSql .= "            , '2' as ind_ed                                                 \n";
+    $stSql .= "            , '2' as ind_ed                                                \n";
     $stSql .= "       FROM orcamento.entidade AS entidade                                 \n";
     $stSql .= " INNER JOIN sw_cgm AS cgm ON cgm.numcgm = entidade.numcgm                  \n";
     $stSql .= "  LEFT JOIN sw_cgm_pessoa_juridica AS cgm_pj ON cgm_pj.numcgm = cgm.numcgm \n";

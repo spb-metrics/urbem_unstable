@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterEmpenho.php 59620 2014-09-02 17:25:32Z arthur $
+    * $Id: LSManterEmpenho.php 64470 2016-03-01 13:12:50Z jean $
 
     * Casos de uso: uc-02.03.03
                     uc-02.01.08
@@ -119,6 +119,9 @@ $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCompraFinal( $_R
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCodModalidadeLicitacao( $_REQUEST['inCodModalidadeLicitacao'] );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setLicitacaoInicial( $_REQUEST['inLicitacaoInicial'] );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setLicitacaoFinal( $_REQUEST['inLicitacaoFinal'] );
+if (Sessao::getExercicio() > '2015') {
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->setCentroCusto( $_REQUEST['inCentroCusto'] );
+}
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->listar( $rsLista );
 
 $stLink .= "&stAcao=".$stAcao;

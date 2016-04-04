@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCIMImovel.class.php 63376 2015-08-21 18:55:42Z arthur $
+    * $Id: RCIMImovel.class.php 64728 2016-03-23 19:49:02Z jean $
 
     * Casos de uso: uc-05.01.09
 */
@@ -1459,7 +1459,7 @@ function listarImoveisConsulta(&$rsRecordSet, $boTransacao = "", $stOrder = " in
         for ( $inX=0; $inX<count( $this->arAtributosDinamicosConsultaImob ); $inX++ ) {
             switch ($this->arAtributosDinamicosConsultaImob[$inX]["cod_cadastro"]) {
                 case 5: //edificacao
-                    $stFiltroAtrbEdf .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]." ) OR ";
+                    $stFiltroAtrbEdf .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."'' ) OR ";
                     $stFiltroImovel .= "
                         AND atev.inscricao_municipal = I.inscricao_municipal
                     ";
@@ -1467,7 +1467,7 @@ function listarImoveisConsulta(&$rsRecordSet, $boTransacao = "", $stOrder = " in
                     break;
 
                 case 4: //imovel
-                    $stFiltroAtrbImovel .= " ( atributo_imovel_valor.cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND atributo_imovel_valor.valor = ".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]." ) OR ";
+                    $stFiltroAtrbImovel .= " ( atributo_imovel_valor.cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND atributo_imovel_valor.valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."' ) OR ";
                     $stFiltroImovel .= "
                         AND aiv.inscricao_municipal = I.inscricao_municipal
                     ";
@@ -1477,18 +1477,12 @@ function listarImoveisConsulta(&$rsRecordSet, $boTransacao = "", $stOrder = " in
 
                 case 3: //lote rural
                     $boLoteUrbano = false;
-                    $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]." ) OR ";
-                    $stFiltroLote .= "
-                        AND aluv.cod_lote = IL.cod_lote
-                    ";
+                    $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."'' ) OR ";
                     $inTotalLote++;
                     break;
 
                 case 2: //lote urbano
-                    $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]." ) OR ";
-                    $stFiltroLote .= "
-                        AND aluv.cod_lote = IL.cod_lote
-                    ";
+                    $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."'' ) OR ";
                     $inTotalLote++;
                     break;
             }
@@ -1577,7 +1571,7 @@ function listarImoveisConsulta(&$rsRecordSet, $boTransacao = "", $stOrder = " in
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbLote" , $stFiltroAtrbLote );
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbEdf" , $stFiltroAtrbEdf );
     $obErro = $this->obFCIMRelatorioCadastroImobiliario->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
-
+    
     return $obErro;
 }
 

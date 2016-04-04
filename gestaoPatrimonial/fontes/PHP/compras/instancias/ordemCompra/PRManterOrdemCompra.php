@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterOrdemCompra.php 64005 2015-11-17 16:49:06Z michel $
+    $Id: PRManterOrdemCompra.php 64595 2016-03-17 17:35:31Z jean $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -73,9 +73,9 @@ $i = 1;
 
 if ( strpos($stAcao,"anular")===false && strpos($stAcao,"reemitir")===false ) {
     $arItens = Sessao::read('arItens');
-
+    
     $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
-
+    
     foreach ($arItens as $chave =>$dados) {
         $inQtdItem = str_replace(',','.',str_replace('.','',$_REQUEST['qtdeOC_'.$i]));
 
@@ -189,13 +189,15 @@ if ($obErro == true) {
                         $rsItemPreEmpenho->proximo();
                     }
 
-                    $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$value['cod_item'];
-                    $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-
-                    if ($rsItemMarca->getNumLinhas() < 1) {
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $value['cod_item']                                    );
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
-                        $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                    if($arItensAlmoxarifado[$value['num_item']]['inMarca'] != null) {
+                        $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$value['cod_item'];
+                        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
+    
+                        if ($rsItemMarca->getNumLinhas() < 1) {
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $value['cod_item']                                    );
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
+                            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                        }
                     }
 
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio()                                        );
@@ -317,14 +319,16 @@ if ($obErro == true) {
 
                         $rsItemPreEmpenho->proximo();
                     }
-
-                    $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$stValor['num_item']]['inMarca']." AND acim.cod_item = ".$stValor['cod_item'];
-                    $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-            
-                    if ($rsItemMarca->getNumLinhas() < 1) {
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $stValor['cod_item']                                  );
-                        $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$stValor['num_item']]['inMarca'] );
-                        $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                    
+                    if($arItensAlmoxarifado[$stValor['num_item']]['inMarca'] != null) {
+                        $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$stValor['num_item']]['inMarca']." AND acim.cod_item = ".$stValor['cod_item'];
+                        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
+                
+                        if ($rsItemMarca->getNumLinhas() < 1) {
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $stValor['cod_item']                                  );
+                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$stValor['num_item']]['inMarca'] );
+                            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                        }
                     }
 
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio());
@@ -339,14 +343,12 @@ if ($obErro == true) {
                     $obTOrdemCompraItem->setDado('cod_marca'            , $arItensAlmoxarifado[$stValor['num_item']]['inMarca']             );
                     $obTOrdemCompraItem->setDado('cod_item'             , $stValor['cod_item']                                              );
                     $obTOrdemCompraItem->setDado('cod_centro'           , $arItensAlmoxarifado[$stValor['num_item']]['inCodCentroCusto']    );
-
                     $obTOrdemCompraItem->alteracao();
                 }
             }
         }
         SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$_REQUEST['inCodEntidade']."&inCodOrdem=".$_REQUEST['inCodOrdemCompra']."&stTipo=".$_REQUEST['stTipo']."&stTipoOrdem=".$stTipoOrdem."&stExercicioOrdemCompra=".$_REQUEST['stExercicioOrdemCompra'],"Ordem de $stDesc - ".$_REQUEST['inCodOrdemCompra'],"incluir","incluir", Sessao::getId(), "../");
     break;
-
     case "anular":
     case "anularOS":
         $obTOrdemCompraAnulacao = new TComprasOrdemAnulacao();

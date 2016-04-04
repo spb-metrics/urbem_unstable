@@ -117,4 +117,96 @@ function montaConsultaValorConta()
     return $stSql;
 }
 
+function recuperaRP(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    
+    $stGroup = "
+            GROUP BY retorno.entidade
+                   , retorno.empenho
+                   , retorno.exercicio
+                   , retorno.cgm
+                   , retorno.razao_social
+                   , retorno.cod_nota
+                   , retorno.valor
+                   , retorno.data
+    ";
+    
+    if($stOrdem == ""){
+        $stOrdem = "
+            ORDER BY to_date(retorno.data, 'DD/MM/YYYY')
+                   , retorno.entidade
+                   , retorno.exercicio
+                   , retorno.empenho
+                   , retorno.cod_nota
+        ";
+    }
+    
+    $stSql = $this->montaRecuperaRP().$stFiltro.$stGroup.$stOrdem;
+    $this->setDebug($stSql);
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaRP()
+{
+    $stSql  = "SELECT retorno.entidade
+                    , retorno.empenho
+                    , retorno.exercicio
+                    , retorno.cgm
+                    , retorno.razao_social
+                    , retorno.cod_nota
+                    , retorno.valor
+                    , retorno.data
+                    , to_date(retorno.data, 'DD/MM/YYYY') AS data_banco
+                    , SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_anulado
+                    , retorno.valor - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_saldo
+                 FROM ".$this->getTabela()."
+                    ( '".$this->getDado("exercicioEmpenho")."'
+                    , '".$this->getDado("stFiltro")."'
+                    , '".$this->getDado("stDataInicial")."'
+                    , '".$this->getDado("stDataFinal")."'
+                    , '".$this->getDado("stEntidade")."'
+                    , '".$this->getDado("inOrgao")."'
+                    , '".$this->getDado("inUnidade")."'
+                    , '".$this->getDado("inRecurso")."'
+                    , '".$this->getDado('stDestinacaoRecurso')."'
+                    , '".$this->getDado('inCodDetalhamento')."'
+                    , '".str_replace(".","",$this->getDado("stElementoDespesa"))."'
+                    , '".$this->getDado("inSituacao")."'
+                    , '".$this->getDado("stCodFuncao")."'
+                    , '".$this->getDado("stCodSubFuncao")."'
+                    ) AS retorno
+                    ( entidade            integer
+                    , empenho             integer
+                    , exercicio           char(4)
+                    , cgm                 integer
+                    , razao_social        varchar
+                    , cod_nota            integer
+                    , valor               numeric
+                    , data                text
+                    )
+
+            LEFT JOIN empenho.nota_liquidacao_item_anulado
+                   ON nota_liquidacao_item_anulado.cod_entidade = retorno.entidade
+                  AND nota_liquidacao_item_anulado.exercicio_item = retorno.exercicio
+                  AND nota_liquidacao_item_anulado.exercicio = '".$this->getDado("exercicio")."'
+                  AND nota_liquidacao_item_anulado.cod_nota = retorno.cod_nota
+                  AND (nota_liquidacao_item_anulado.timestamp::DATE
+                        BETWEEN to_date('".$this->getDado("stDataInicial")."', 'DD/MM/YYYY')
+                            AND to_date('".$this->getDado("stDataFinal")."', 'DD/MM/YYYY')
+                      )
+
+                WHERE retorno.exercicio < '".$this->getDado("exercicio")."'
+    ";
+
+    if( $this->getDado("inCodFornecedor") != '' )
+        $stSql .= " AND retorno.cgm = ".$this->getDado("inCodFornecedor");
+
+    return $stSql;
+}
+
 }

@@ -131,6 +131,12 @@ var $stDataInicialEstornoPagamento;
 var $stDataFinalEstornoPagamento;
 
 /**
+    * @var Integer
+    * @access Private
+*/
+var $inCentroCusto;
+
+/**
      * @access Public
      * @param Integer $valor
 */
@@ -207,6 +213,14 @@ function setDataFinalEstornoPagamento($valor) { $this->stDataFinalEstornoPagamen
 function setTipoEmpenho($valor)
 {
     $this->stTipoEmpenho = $valor;
+}
+/**
+     * @access Public
+     * @param Object $valor
+*/
+function setCentroCusto($valor)
+{
+    $this->inCentroCusto = $valor;
 }
 
 /**
@@ -287,6 +301,14 @@ function getTipoEmpenho()
 {
     return $this->stTipoEmpenho;
 }
+/**
+     * @access Public
+     * @param Object $valor
+*/
+function getCentroCusto()
+{
+    return $this->inCentroCusto;
+}
 
 /**
     * Método Construtor
@@ -350,6 +372,10 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFEmpenhoSituacaoEmpenho->setDado("inCodFornecedor", $this->obREmpenhoEmpenho->obRCGM->getNumCGM());
     $obFEmpenhoSituacaoEmpenho->setDado("inSituacao", $this->getSituacao());
     $obFEmpenhoSituacaoEmpenho->setDado("stTipoEmpenho", $this->getTipoEmpenho());
+
+    if (Sessao::getExercicio() > '2015') {
+        $obFEmpenhoSituacaoEmpenho->setDado("inCentroCusto",$this->getCentroCusto());
+    }
 
     $obErro = $obFEmpenhoSituacaoEmpenho->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
 

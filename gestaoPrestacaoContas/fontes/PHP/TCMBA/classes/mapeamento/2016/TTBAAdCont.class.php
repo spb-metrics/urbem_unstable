@@ -69,7 +69,7 @@ class TTBAAdCont extends Persistente
                   SELECT 1 AS tipo_registro
                        , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                        , contrato_aditivos.num_aditivo
-                       , contrato.numero_contrato AS num_contrato
+                       , contrato.numero_contrato
                        , contrato_aditivos.objeto
                        , TO_CHAR(contrato_aditivos.dt_assinatura, 'DDMMYYYY') AS dt_assinatura_aditivo
                        , TO_CHAR(contrato_aditivos.dt_vencimento, 'DDMMYYYY') AS dt_vencimento_aditivo

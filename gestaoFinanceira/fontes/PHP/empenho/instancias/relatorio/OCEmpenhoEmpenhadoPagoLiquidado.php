@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: OCEmpenhoEmpenhadoPagoLiquidado.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCEmpenhoEmpenhadoPagoLiquidado.php 64470 2016-03-01 13:12:50Z jean $
 
     * Casos de uso : uc-02.03.06
 */
@@ -249,6 +249,11 @@ switch ( $request->get('stCtrl') ) {
                 $stFiltro = substr( $stFiltro,0,strlen($stFiltro)-4 );
                 $obREmpenhoEmpenhadoPagoLiquidado->setFiltro                 ( $stFiltro );
             }
+
+            if (Sessao::getExercicio() > '2015'){
+                $obREmpenhoEmpenhadoPagoLiquidado->setCentroCusto ($arFiltro['inCentroCusto']);
+            }
+
             $obREmpenhoEmpenhadoPagoLiquidado->setCodEntidade            ( $stEntidade );
             $obREmpenhoEmpenhadoPagoLiquidado->setExercicio              ( Sessao::getExercicio() );
             $obREmpenhoEmpenhadoPagoLiquidado->setCodDotacao             ( $arFiltro['inCodDotacao'] );
@@ -303,6 +308,10 @@ switch ( $request->get('stCtrl') ) {
                 $obREmpenhoEmpenhadoPagoEstornado->setFiltro                 ( $stFiltro );
             }
 
+            if (Sessao::getExercicio() > '2015'){
+                $obREmpenhoEmpenhadoPagoEstornado->setCentroCusto ($arFiltro['inCentroCusto']);
+            }
+
             $obREmpenhoEmpenhadoPagoEstornado->setCodEntidade            ( $stEntidade );
             $obREmpenhoEmpenhadoPagoEstornado->setExercicio              ( Sessao::getExercicio() );
             $obREmpenhoEmpenhadoPagoEstornado->setCodDotacao             ( $arFiltro['inCodDotacao'] );
@@ -332,7 +341,7 @@ switch ( $request->get('stCtrl') ) {
             }
 
             $obREmpenhoEmpenhadoPagoEstornado->geraRecordSet( $rsEmpenhoEmpenhadoPagoEstornado );
-
+            
             Sessao::write('filtroRelatorio', $arFiltro);
             Sessao::write('rsRecordSet', $rsEmpenhoEmpenhadoPagoEstornado);
 

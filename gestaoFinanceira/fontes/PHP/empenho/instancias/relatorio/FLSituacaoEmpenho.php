@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FLSituacaoEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FLSituacaoEmpenho.php 64470 2016-03-01 13:12:50Z jean $
 
     * Casos de uso: uc-02.03.13
 */
@@ -356,6 +356,15 @@ $obCmbSituacao->addOption("4", "A Liquidar");
 $obCmbSituacao->addOption("5", "Pagos");
 $obCmbSituacao->addOption("6", "A Pagar");
 
+if (Sessao::getExercicio() > '2015') {
+    $obCentroCusto = new TextBox;
+    $obCentroCusto->setRotulo ("Centro de Custo");
+    $obCentroCusto->setTitle ("Informe o centro de custo");
+    $obCentroCusto->setName ('inCentroCusto');
+    $obCentroCusto->setId ('inCentroCusto');
+    $obCentroCusto->setInteiro (true);  
+}
+
 include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
 $obMontaAssinaturas = new IMontaAssinaturas;
 $obMontaAssinaturas->setEventosCmbEntidades ( $obCmbEntidades );
@@ -370,6 +379,9 @@ $obFormulario->addComponente              ($obPeriodicidadeEmissao);
 $obFormulario->addComponente              ($obSituacaoAte);
 $obFormulario->agrupaComponentes          (array( $obTxtCodEmpenhoInicial, $obLblEmpenho, $obTxtCodEmpenhoFinal));
 $obFormulario->addComponente              ($obCmbTipoEmpenho);
+if (Sessao::getExercicio() > '2015') {
+    $obFormulario->addComponente( $obCentroCusto );
+}
 $obFormulario->addComponente              ($obBscDespesa);
 $obFormulario->addHidden                  ($obHdnMascClassificacao);
 $obFormulario->addComponente              ($obBscRubricaDespesa);

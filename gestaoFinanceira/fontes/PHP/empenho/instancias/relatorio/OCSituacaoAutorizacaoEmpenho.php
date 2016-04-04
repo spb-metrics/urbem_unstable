@@ -138,9 +138,10 @@ switch ($_REQUEST['stCtrl']) {
             $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setDestinacaoRecurso( $arFiltro['inCodUso'].".".$arFiltro['inCodDestinacao'].".".$arFiltro['inCodEspecificacao'] );
         $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodDetalhamento( $arFiltro['inCodDetalhamento'] );
 
-        $obRegra->setOrdenacao                                  ( $arFiltro['inOrdenacao']                    );
-        $obRegra->obREmpenhoEmpenho->obRCGM->setNumCGM          ( $arFiltro['inCodCredor']                );
-        $obRegra->setSituacao                                   ( $arFiltro['inSituacao']                     );
+        $obRegra->setOrdenacao                                  ( $arFiltro['inOrdenacao']    );
+        $obRegra->obREmpenhoEmpenho->obRCGM->setNumCGM          ( $arFiltro['inCodCredor']    );
+        $obRegra->setSituacao                                   ( $arFiltro['inSituacao']     );
+        $obRegra->setCentroCusto                                ( $arFiltro['inCentroCusto']  );
 
         $obRegra->geraRecordSet( $rsSituacaoEmpenho );
         Sessao::write('rsRecordSet', $rsSituacaoEmpenho);

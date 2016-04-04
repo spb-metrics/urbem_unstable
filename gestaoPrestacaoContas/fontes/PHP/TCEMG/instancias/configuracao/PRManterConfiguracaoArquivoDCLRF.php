@@ -32,11 +32,11 @@
   
   * @ignore
   *
-  * $Id: PRManterConfiguracaoArquivoDCLRF.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: PRManterConfiguracaoArquivoDCLRF.php 64504 2016-03-07 19:23:58Z carlos.silva $
   
-  * $Revision: 59612 $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Revision: 64504 $
+  * $Author: carlos.silva $
+  * $Date: 2016-03-07 16:23:58 -0300 (Seg, 07 Mar 2016) $
   
 */
 
@@ -65,8 +65,7 @@ switch ($stAcao){
         $obTTCEMGConfiguracaoArquivoDCLRF = new TTCEMGConfiguracaoArquivoDCLRF();
         $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
         
-        if(!$obErro->ocorreu())
-        {
+        if(!$obErro->ocorreu()) {
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('exercicio',$request->get('stExercicio'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('mes_referencia',$request->get('stMes'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_concessoes_garantia',$request->get('flValorSaldoAtualConcessoesGarantia'));
@@ -77,22 +76,42 @@ switch ($stAcao){
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_inscrito_rpnp_incentivo_instituicao_financeira',$request->get('flValorInscritoRPNPIncentivoInstituicaoFinanceiro'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_compromissado',$request->get('flValorCompromissado'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_recursos_nao_aplicados',$request->get('flValorRecursosNaoAplicados'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('publicacao_relatorio_lrf', $request->get('inPublicacaoRelatorioLRF'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('dt_publicacao_relatorio_lrf', $request->get('dtPublicacaoRelatorioLRF'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('bimestre', $request->get('inBimestre'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('meta_bimestral', $request->get('inMetaBimestral'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('medida_adotada', $request->get('stMedidasAdotadas'));
             
+            //Seta o valor atual para os campos abaixo caso não seja o mês de dezembro
             $obTTCEMGConfiguracaoArquivoDCLRF->recuperaPorChave($rsTTCEMGConfiguracaoArquivoDCLRF);
             
-            if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() < 0)
-            {
+            if($request->get('stMes') == 12) {
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('cont_op_credito', $request->get('inContOpCredito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('desc_cont_op_credito', $request->get('stDescContOpCredito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('realiz_op_credito', $request->get('inRealizOpCredito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_capta', $request->get('inTipoRealizOpCreditoCapta'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_receb', $request->get('inTipoRealizOpCreditoReceb'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_assun_dir', $request->get('inTipoRealizOpCreditoAssunDir'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_assun_obg', $request->get('inTipoRealizOpCreditoAssunObg'));
+            } else {
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('cont_op_credito', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('cont_op_credito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('desc_cont_op_credito', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('desc_cont_op_credito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('realiz_op_credito', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('realiz_op_credito'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_capta', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_capta'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_receb', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_receb'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_assun_dir', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_assun_dir'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('tipo_realiz_op_credito_assun_obg', $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_assun_obg'));
+            }
+            
+            if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() < 0) {
                 $obErro = $obTTCEMGConfiguracaoArquivoDCLRF->inclusao($boTransacao);
-            } else
-            {
+            } else {
                 $obErro = $obTTCEMGConfiguracaoArquivoDCLRF->alteracao($boTransacao);
             }
 
-            if(!$obErro->ocorreu())
-            {
+            if(!$obErro->ocorreu()) {
                 SistemaLegado::alertaAviso($pgFilt."?".Sessao::getId(),"Configuração de Dados Complementares à LRF","manter","aviso", Sessao::getId(), "../");
-            }else
-            {
+            } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
             

@@ -19,7 +19,8 @@
     <table class='border'>
         <thead>
             <tr>
-                <td class="border text_align_center" width="28%">Título</td>
+                <td class="border text_align_center" width="20%">Título</td>
+                <td class="border text_align_center" width="08%">Identificação do Orgão</td>
                 <td class="border text_align_center" width="14%">Saldo Anterior</td>
                 <td class="border text_align_center" width="14%">Inscrição</td>
                 <td class="border text_align_center" width="14%">Restabelicimento</td>
@@ -28,27 +29,38 @@
                 <td class="border text_align_center" width="14%">Saldo Atual</td>
             </tr>
             <tr>
-                <td class="text_align_left font_weight_bold" colspan=7>Restos a Pagar - Exercício Atual</td>
+                <td class="text_align_left font_weight_bold" colspan=8>Restos a Pagar - Exercício Atual</td>
             </tr>
         </thead>
         <tbody>
+            <?php
+                //Exercício Atual
+                foreach ($total_restos_entidade as $key => $exercicio) {
+                    foreach ($exercicio as $stExercicio => $restos) {
+                        $vlTotalInscricaoAtual  += $restos['inscricao_p'];
+                        $vlTotalSaldoAtualAtual += $restos['saldo_atual_p'];
+
+                        echo '<tr>';
+                        echo '<td class="border text_align_left"  > Restos a Pagar '.$stExercicio.'                    </td>';
+                        echo '<td class="border text_align_center"> '.$restos['entidade'].'                            </td>';
+                        echo '<td class="border text_align_right"> 0,00                                                </td>';
+                        echo '<td class="border text_align_right">'.number_format($restos['inscricao_p'],2,',','.').'  </td>';
+                        echo '<td class="border text_align_right"> 0,00                                                </td>';
+                        echo '<td class="border text_align_right"> 0,00                                                </td>';
+                        echo '<td class="border text_align_right"> 0,00                                                </td>';
+                        echo '<td class="border text_align_right">'.number_format($restos['saldo_atual_p'],2,',','.').'</td>';
+                        echo '</tr>';
+                    }
+                }
+            ?>
             <tr>
-                <td class="border text_align_left">Restos a Pagar - Exercício Atual          </td>
-                <td class="border text_align_right"><?php echo $total_restos_entidade['saldo_anterior_p']; ?></td>
-                <td class="border text_align_right"><?php echo $total_restos_entidade['inscricao_p'];     ?></td>
-                <td class="border text_align_right"> 0,00                                                  </td>
-                <td class="border text_align_right"><?php echo $total_restos_entidade['baixa_p'];         ?></td>
-                <td class="border text_align_right"><?php echo $total_restos_entidade['cancelamento_p'];  ?></td>
-                <td class="border text_align_right"><?php echo $total_restos_entidade['saldo_atual_p'];    ?></td>
-            </tr>
-            <tr>
-                <td class="border text_align_right font_weight_bold">Total </td>
-                <td class="border text_align_right font_weight_bold"><?php echo $total_restos_entidade['saldo_anterior_p']; ?></td>
-                <td class="border text_align_right font_weight_bold"><?php echo $total_restos_entidade['inscricao_p'];     ?></td>
-                <td class="border text_align_right font_weight_bold"> 0,00                                                  </td>
-                <td class="border text_align_right font_weight_bold"><?php echo $total_restos_entidade['baixa_p'];         ?></td>
-                <td class="border text_align_right font_weight_bold"><?php echo $total_restos_entidade['cancelamento_p'];  ?></td>
-                <td class="border text_align_right font_weight_bold"><?php echo $total_restos_entidade['saldo_atual_p'];    ?></td>
+                <td class="border text_align_right font_weight_bold" colspan=2>Total                                                </td>
+                <td class="border text_align_right font_weight_bold"> 0,00                                                          </td>
+                <td class="border text_align_right font_weight_bold"><?php echo number_format($vlTotalInscricaoAtual,2,',','.');  ?></td>
+                <td class="border text_align_right font_weight_bold"> 0,00                                                          </td>
+                <td class="border text_align_right font_weight_bold"> 0,00                                                          </td>
+                <td class="border text_align_right font_weight_bold"> 0,00                                                          </td>
+                <td class="border text_align_right font_weight_bold"><?php echo number_format($vlTotalSaldoAtualAtual,2,',','.'); ?></td>
             </tr>
         </tbody>
     </table>
@@ -244,11 +256,11 @@
             </tr>
                 <?php
                     $vlTotalSaldoAnteriorMontante    = $total_restos_entidade['saldo_anterior'] + $vlTotalSaldoAnteriorRP + $vlTotalSaldoAnteriorRNP + $vlTotalSaldoAnteriorDepositos;
-                    $vlTotalInscricaoMontante        = $total_restos_entidade['inscricoes'] + $vlTotalInscricaoRP + $vlTotalInscricaoRNP + $vlTotalInscricaoDepositos;
+                    $vlTotalInscricaoMontante        = $total_restos_entidade['inscricoes'] + $vlTotalInscricaoRP + $vlTotalInscricaoRNP + $vlTotalInscricaoDepositos + $vlTotalInscricaoAtual;
                     $vlTotalRestabelecimentoMontante = /*$total_restos_entidade['inscricoes'] + */ $vlTotalRestabelecimentoRP + $vlTotalRestabelecimentoRNP + $vlTotalRestabelecimentoDepositos;
                     $vlTotalBaixaMontante            = $total_restos_entidade['baixas'] + $vlTotalBaixaRP + $vlTotalBaixaRNP + $vlTotalBaixaDepositos;
                     $vlTotalCancelamentoMontante     = $total_restos_entidade['cancelamentos'] + $vlTotalCancelamentoRP + $vlTotalCancelamentoRNP + $vlTotalCancelamentoDepositos;
-                    $vlTotalSaldoAtualMontante       = $total_restos_entidade['saldo_atual'] + $vlTotalSaldoAtualRP + $vlTotalSaldoAtualRNP + $vlTotalSaldoAtualDepositos;
+                    $vlTotalSaldoAtualMontante       = $total_restos_entidade['saldo_atual'] + $vlTotalSaldoAtualRP + $vlTotalSaldoAtualRNP + $vlTotalSaldoAtualDepositos +$vlTotalSaldoAtualAtual;
                 ?>
             <tr>
                 <td class="border text_align_right font_weight_bold" colspan=2 > Total </td>
@@ -263,6 +275,7 @@
     </table>
 </div>
 <br/>
+<pagebreak />
 <div id="totais_orgao">
     <table>
         <!-- TOTAIS ORGAO -->

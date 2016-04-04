@@ -72,7 +72,7 @@ function FEmpenhoSituacaoAutorizacaoEmpenho()
 
 function montaRecuperaTodos()
 {
-    $stSql  = "select * \n";
+    $stSql  = "select retorno.* \n";
     $stSql .= "  from " . $this->getTabela() . "('" . $this->getDado("stEntidade") ."',             \n";
     $stSql .= "  '" . $this->getDado("exercicio") . "','" . $this->getDado("stDataInicialEmissao")."',         \n";
     $stSql .= "  '" . $this->getDado("stDataFinalEmissao")."','" . $this->getDado("stDataInicialAnulacao")."',   \n";
@@ -98,9 +98,44 @@ function montaRecuperaTodos()
     $stSql .= "  autorizado_anulado  numeric,                                           \n";
     $stSql .= "  saldoautorizado     numeric,                                           \n";
     $stSql .= "  liquidado           numeric,                                           \n";
-    $stSql .= "  pago                numeric,                                          \n";
-    $stSql .= "  empenhadoapagar     numeric                                           \n";
+    $stSql .= "  pago                numeric,                                           \n";
+    $stSql .= "  empenhadoapagar     numeric                                            \n";
     $stSql .= "  )                                                                        ";
+
+    if (Sessao::getExercicio() > '2015') {
+        $stSql .= " INNER JOIN empenho.empenho
+                            ON empenho.cod_empenho = retorno.empenho
+                           AND empenho.exercicio = retorno.exercicio
+                           AND empenho.cod_entidade = retorno.entidade
+ 
+                    INNER JOIN empenho.pre_empenho
+                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                           AND pre_empenho.exercicio = empenho.exercicio
+ 
+                    INNER JOIN empenho.item_pre_empenho
+                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                           AND item_pre_empenho.exercicio = pre_empenho.exercicio \n";
+
+        if ($this->getDado('inCentroCusto') != "") {
+            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado('inCentroCusto')." \n";
+        }
+        
+        
+        $stSql .= "   GROUP BY  retorno.autorizacao
+                              , retorno.exercicio
+                              , retorno.emissao
+                              , retorno.entidade
+                              , retorno.credor
+                              , retorno.empenho
+                              , retorno.autorizado
+                              , retorno.autorizado_anulado
+                              , retorno.saldoautorizado
+                              , retorno.liquidado
+                              , retorno.pago
+                              , retorno.empenhadoapagar
+                              
+                     ORDER BY retorno.autorizacao";
+    }
 
     return $stSql;
 }

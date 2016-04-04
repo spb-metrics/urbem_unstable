@@ -36,7 +36,7 @@
     * Casos de uso: uc-03.05.25
                     uc-03.05.26
 
-    $Id: TComprasCotacaoFornecedorItem.class.php 64118 2015-12-04 12:33:31Z franver $
+    $Id: TComprasCotacaoFornecedorItem.class.php 64411 2016-02-18 15:55:59Z arthur $
 
 */
 
@@ -497,8 +497,7 @@ class TComprasCotacaoFornecedorItem extends Persistente
                               , cotacao_fornecedor_item.vl_cotacao
                               , julgamento_item.cgm_fornecedor
                               , sw_cgm.nom_cgm
-                              , julgamento_item.ordem
-                         HAVING coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) > 0 ";
+                              , julgamento_item.ordem ";
         if($stOrdem=='')
             $stOrder = " ORDER BY cotacao_item.cod_item ";
 

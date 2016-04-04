@@ -86,7 +86,7 @@ function salvar($obTransacao = "")
     return $obErro;
 }
 
-function listar(&$rsUnidadeOrcamento, $boTransacao = "")
+function listar(&$rsUnidadeOrcamento, $stOrder = "", $boTransacao = "")
 {
     $this->obTExportacaoTCEALUniOrcam->setDado( 'exercicio',$this->getExercicio() );
     $stOrder = "num_orgao,num_unidade";
@@ -100,7 +100,6 @@ function listarDadosConversao(&$rsUnidadeOrcamento, $boTransacao = "")
     $stOrder = "exercicio,num_orgao,num_unidade";
     $this->obTExportacaoTCEALUniOrcam->setDado( 'exercicio',$this->getExercicio() );
     $obErro = $this->obTExportacaoTCEALUniOrcam->recuperaDadosUniOrcamConversao( $rsUnidadeOrcamento, $stFiltro, $stOrder, $boTransacao );
-
     return $obErro;
 }
 

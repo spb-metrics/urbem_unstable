@@ -31,7 +31,7 @@
 2
     * Casos de uso: uc-04.08.15
 
-    $Id: PRExportarDIRF.php 62430 2015-05-07 20:35:00Z evandro $
+    $Id: PRExportarDIRF.php 64485 2016-03-02 19:09:27Z evandro $
 
 */
 
@@ -291,9 +291,9 @@ if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
 if ($_POST["boPrestadoresServico"]) {
     $obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
     if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
-        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($_POST['inAnoCompetencia']-1));        
         $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamento($rsTemp2);        
     } else {        
+        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($_POST['inAnoCompetencia']-1));        
         $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServico($rsTemp2);
     }
 } else {
@@ -523,7 +523,9 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
     $linha = 'Dirf|2015|'.$rsTipo1->getCampo('ano_calendario').'|'.$boRetificadora.'|'.$rsTipo1->getCampo('numero_recibo').'|M1LB5V2|'."\n";
     fputs($file, $linha);
 
-    $linha = 'RESPO|'.str_pad($rsTipo1->getCampo('cpf_responsavel'),11,0,STR_PAD_LEFT).'|'.$rsTipo1->getCampo('nome_responsavel').'|'.
+    $stNomeResponsavel = $rsTipo1->getCampo('nome_responsavel');
+    SistemaLegado::removeAcentosSimbolos($stNomeResponsavel);
+    $linha = 'RESPO|'.str_pad($rsTipo1->getCampo('cpf_responsavel'),11,0,STR_PAD_LEFT).'|'.$stNomeResponsavel.'|'.
             str_pad($rsTipo1->getCampo('ddd_responsavel'),2,0,STR_PAD_LEFT).'|'.str_pad($rsTipo1->getCampo('fone_responsavel'),8,0,STR_PAD_LEFT).'|'.
             $rsTipo1->getCampo('ramal_responsavel').'|'.str_pad($rsTipo1->getCampo('fax_responsavel'),8,0,STR_PAD_LEFT).'|'.
             $rsTipo1->getCampo('email_responsavel')."|\n";

@@ -129,6 +129,11 @@ var $stDataFinalEstornoPagamento;
     * @access Private
 */
 var $inCodAutorizacao;
+/**
+    * @var Integer
+    * @access Private
+*/
+var $inCentroCusto;
 
 /**
      * @access Public
@@ -205,6 +210,11 @@ function setDataFinalEstornoPagamento($valor) { $this->stDataFinalEstornoPagamen
      * @param Object $valor
 */
 function setCodAutorizacao($valor) { $this->inCodAutorizacao      = $valor; }
+/**
+     * @access Public
+     * @param Object $valor
+*/
+function setCentroCusto($valor) { $this->inCentroCusto = $valor; }
 
 /**
      * @access Public
@@ -281,6 +291,11 @@ function getDataFinalEstornoPagamento() { return $this->stDataFinalEstornoPagame
      * @param Object $valor
 */
 function getCodAutorizacao() { return $this->inCodAutorizacao;                }
+/**
+     * @access Public
+     * @param Object $valor
+*/
+function getCentroCusto() { return $this->inCentroCusto;                }
 
 /**
     * Método Construtor
@@ -345,10 +360,13 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $obFEmpenhoSituacaoEmpenho->setDado("inSituacao"              ,$this->getSituacao());
     $obFEmpenhoSituacaoEmpenho->setDado("inCodAutorizacao"        ,$this->getCodAutorizacao());
 
+    if (Sessao::getExercicio() > '2015') {
+        $obFEmpenhoSituacaoEmpenho->setDado("inCentroCusto"       ,$this->getCentroCusto());
+    }
+
     $obErro = $obFEmpenhoSituacaoEmpenho->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
 
     $inCount                  = 0;
-    //$inTotalEmpenhado       = 0;
     $inTotalAutorizado  	   = 0;
     $inTotalAutorizadoAnulado = 0;
     $inTotalSaldoAutorizado   = 0;
@@ -389,25 +407,15 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
         $arRecord[$inCount]['autorizado']             = number_format( $rsRecordSet->getCampo('autorizado'), 2, ',', '.' );
         $arRecord[$inCount]['autorizado_anulado']     = number_format( $rsRecordSet->getCampo('autorizado_anulado'), 2, ',', '.' );
         $arRecord[$inCount]['saldoautorizado']        = number_format( $rsRecordSet->getCampo('saldoautorizado'), 2, ',', '.' );
-        //$arRecord[$inCount]['empenhado']        = number_format( $rsRecordSet->getCampo('empenhado'), 2, ',', '.' );
-        //$arRecord[$inCount]['saldoempenhado']   = number_format( $rsRecordSet->getCampo('saldoempenhado'), 2, ',', '.' );
-        //$arRecord[$inCount]['anulado']          = number_format( $rsRecordSet->getCampo('anulado'), 2, ',', '.' );
-        //$arRecord[$inCount]['aliquidar']        = number_format( $rsRecordSet->getCampo('aliquidar'), 2, ',', '.' );
-        //$arRecord[$inCount]['liquidadoapagar']  = number_format( $rsRecordSet->getCampo('liquidadoapagar'), 2, ',', '.' );
 
         $inCount = $inCount2;
 
         $inTotalAutorizado            = $inTotalAutorizado + $rsRecordSet->getCampo('autorizado');
         $inTotalAutorizadoAnulado     = $inTotalAutorizadoAnulado + $rsRecordSet->getCampo('autorizado_anulado');
         $inTotalSaldoAutorizado       = $inTotalSaldoAutorizado + $rsRecordSet->getCampo('saldoautorizado');
-        //$inTotalEmpenhado           = $inTotalEmpenhado + $rsRecordSet->getCampo('empenhado');
-        //$inTotalAnulado             = $inTotalAnulado + $rsRecordSet->getCampo('anulado');
-        //$inTotalSaldoEmpenhado      = $inTotalSaldoEmpenhado + $rsRecordSet->getCampo('saldoempenhado');
         $inTotalLiquidado           = $inTotalLiquidado + $rsRecordSet->getCampo('liquidado');
-        //$inTotalALiquidar           = $inTotalALiquidar + $rsRecordSet->getCampo('aliquidar');
         $inTotalPago                = $inTotalPago + $rsRecordSet->getCampo('pago');
         $inTotalEmpenhadoAPagar     = $inTotalEmpenhadoAPagar + $rsRecordSet->getCampo('empenhadoapagar');
-        //$inTotalLiquidadoAPagar     = $inTotalLiquidadoAPagar + $rsRecordSet->getCampo('liquidadoapagar');
 
         $rsRecordSet->proximo();
 
@@ -423,14 +431,8 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $arRecord[$inCount]['autorizado']       = "";
     $arRecord[$inCount]['autorizado_anulado'] = "";
     $arRecord[$inCount]['saldoautorizado']  = "";
-    //$arRecord[$inCount]['empenhado']        = "";
-    //$arRecord[$inCount]['anulado']          = "";
-    //$arRecord[$inCount]['saldoempenhado']   = "";
-    //$arRecord[$inCount]['liquidado']        = "";
-    //$arRecord[$inCount]['aliquidar']        = "";
     $arRecord[$inCount]['pago']             = "";
     $arRecord[$inCount]['empenhadoapagar']  = "";
-    //$arRecord[$inCount]['liquidadoapagar']  = "";
 
     $inCount++;
 
@@ -440,14 +442,9 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
     $arRecord[$inCount]['autorizacao']      = "";
     $arRecord[$inCount]['emissao ']         = "";
     $arRecord[$inCount]['credor']           = "TOTAL";
-    //$arRecord[$inCount]['empenhado']        = number_format( $inTotalEmpenhado, 2, ',', '.' );
-    //$arRecord[$inCount]['anulado']          = number_format( $inTotalAnulado, 2, ',', '.' );
-    //$arRecord[$inCount]['saldoempenhado']   = number_format( $inTotalSaldoEmpenhado, 2, ',', '.' );
     $arRecord[$inCount]['liquidado']        = number_format( $inTotalLiquidado, 2, ',', '.' );
-    //$arRecord[$inCount]['aliquidar']        = number_format( $inTotalALiquidar, 2, ',', '.' );
     $arRecord[$inCount]['pago']             = number_format( $inTotalPago, 2, ',', '.' );
     $arRecord[$inCount]['empenhadoapagar']  = number_format( $inTotalEmpenhadoAPagar, 2, ',', '.' );
-    //$arRecord[$inCount]['liquidadoapagar']  = number_format( $inTotalLiquidadoAPagar,2, ',', '.' );
     $arRecord[$inCount]['autorizado']       = number_format( $inTotalAutorizado,2, ',', '.' );
     $arRecord[$inCount]['autorizado_anulado'] = number_format( $inTotalAutorizadoAnulado,2, ',', '.' );
     $arRecord[$inCount]['saldoautorizado']  = number_format( $inTotalSaldoAutorizado,2, ',', '.' );

@@ -28,7 +28,7 @@
     * Data de Criação       03/09/2015
     * @author Analista      Valtair Santos
     * @author Desenvolvedor Evandro Melos
-    * $Id: MovRestoPagar.inc.php 63510 2015-09-04 15:12:29Z evandro $
+    * $Id: MovRestoPagar.inc.php 64570 2016-03-15 18:46:06Z jean $
     * $Rev:$
     * $Author:$
     * $Date:$

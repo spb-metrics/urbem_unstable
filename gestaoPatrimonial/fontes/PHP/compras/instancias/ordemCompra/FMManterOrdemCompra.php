@@ -30,13 +30,14 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: FMManterOrdemCompra.php 62696 2015-06-09 14:19:37Z michel $
+    * $Id: FMManterOrdemCompra.php 64639 2016-03-17 19:51:04Z arthur $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 require_once(TCOM."TComprasOrdem.class.php");
+require_once(TCOM."TComprasObjeto.class.php");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterOrdemCompra";
@@ -48,22 +49,22 @@ $pgOcul       = "OC".$stPrograma.".php";
 $pgJS         = "JS".$stPrograma.".js";
 
 $stAcao = $request->get('stAcao');
-$stTipoOrdem = ( strpos($stAcao,'OS')===false ) ? 'C' : 'S';
-$stDesc = ($stTipoOrdem=='C') ? 'Compra' : 'Serviço';
+$stTipoOrdem = ( strpos($stAcao,'OS') === false ) ? 'C' : 'S';
+$stDesc = ($stTipoOrdem == 'C') ? 'Compra' : 'Serviço';
 
 $obCompraOrdemCompra = new TComprasOrdem();
-$obCompraOrdemCompra->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-$obCompraOrdemCompra->setDado('exercicio', $_REQUEST['stExercicioOrdemCompra']);
-$obCompraOrdemCompra->setDado('cod_ordem', $_REQUEST['inCodOrdemCompra']);
-$obCompraOrdemCompra->setDado('tipo'     , $stTipoOrdem );
+$obCompraOrdemCompra->setDado('cod_entidade', $request->get('inCodEntidade'));
+$obCompraOrdemCompra->setDado('exercicio'   , $request->get('stExercicioOrdemCompra'));
+$obCompraOrdemCompra->setDado('cod_ordem'   , $request->get('inCodOrdemCompra'));
+$obCompraOrdemCompra->setDado('tipo'        , $stTipoOrdem );
 
 include_once ($pgJS);
-$stEmpenho = $_REQUEST['inCodEmpenho']."/".$_REQUEST['stExercicioEmpenho'];
+$stEmpenho = $request->get('inCodEmpenho')."/".$request->get('stExercicioEmpenho');
 
 if ( strpos($stAcao,'incluir') !== false ) {
-    $jsOnLoad = "executaFuncaoAjax('BuscaEmpenhoItens','&inCodEmpenho=".$_REQUEST["inCodEmpenho"]."&inCodEntidade=".$_REQUEST['inCodEntidade']."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$_REQUEST['stAcao']."');";
+    $jsOnLoad = "executaFuncaoAjax('BuscaEmpenhoItens','&stEmpenho=".$stEmpenho."&inCodEntidade=".$request->get('inCodEntidade')."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$request->get('stAcao')."');";
 } else {
-    $jsOnLoad = "executaFuncaoAjax('BuscaOrdemCompraItens','&inCodEmpenho=".$_REQUEST["inCodEmpenho"]."&inCodEntidade=".$_REQUEST['inCodEntidade']."&stExercicioOrdemCompra=".$_REQUEST['stExercicioOrdemCompra']."&inCodOrdemCompra=".$_REQUEST['inCodOrdemCompra']."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$_REQUEST['stAcao']."');";
+    $jsOnLoad = "executaFuncaoAjax('BuscaOrdemCompraItens','&stEmpenho=".$stEmpenho."&inCodEntidade=".$request->get('inCodEntidade')."&stExercicioOrdemCompra=".$request->get('stExercicioOrdemCompra')."&inCodOrdemCompra=".$request->get('inCodOrdemCompra')."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$request->get('stAcao')."');";
 }
 
 $arFiltros = Sessao::read('arFiltros');
@@ -87,7 +88,7 @@ if ( !empty($arFiltros) ) {
     }
 }
 
-$stLocation = $pgList."?".Sessao::getId()."&stAcao=".$_REQUEST['stAcao'].$stFiltro;
+$stLocation = $pgList."?".Sessao::getId()."&stAcao=".$request->get('stAcao').$stFiltro;
 
 //DEFINICAO DOS COMPONENTES DO FORMULARIO
 $obForm = new Form();
@@ -110,12 +111,12 @@ if ( strpos($stAcao,'incluir') === false ) {
     // adiciona o campo de número de ordem de compra ao formulário
     $obLblNumOrdemCompra = new Label();
     $obLblNumOrdemCompra->setRotulo("Ordem de $stDesc");
-    $obLblNumOrdemCompra->setValue($_REQUEST['inCodOrdemCompra']."/".$_REQUEST['stExercicioOrdemCompra']);
+    $obLblNumOrdemCompra->setValue($request->get('inCodOrdemCompra')."/".$request->get('stExercicioOrdemCompra'));
 
     // adiciona o campo de data de ordem de compra ao formulário
     $obLblDtOrdemCompra = new Label();
     $obLblDtOrdemCompra->setRotulo("Data da Ordem de $stDesc");
-    $obLblDtOrdemCompra->setValue($_REQUEST['dtOrdemCompra']);
+    $obLblDtOrdemCompra->setValue($request->get('dtOrdemCompra'));
 
     /***********************
     *    monta os hiddens  *
@@ -124,61 +125,65 @@ if ( strpos($stAcao,'incluir') === false ) {
     // adiciona o hidden de número de ordem de compra ao formulário
     $obHdnNumOrdemCompra = new Hidden();
     $obHdnNumOrdemCompra->setName  ( "inCodOrdemCompra" );
-    $obHdnNumOrdemCompra->setValue ( $_REQUEST['inCodOrdemCompra']  );
+    $obHdnNumOrdemCompra->setValue ( $request->get('inCodOrdemCompra')  );
 
     // adiciona o hidden de exercicio de compra ao formulário
     $obHdnExercicioOrdemCompra = new Hidden();
     $obHdnExercicioOrdemCompra->setName  ( "stExercicioOrdemCompra" );
-    $obHdnExercicioOrdemCompra->setValue ( $_REQUEST['stExercicioOrdemCompra']  );
+    $obHdnExercicioOrdemCompra->setValue ( $request->get('stExercicioOrdemCompra')  );
 
     // adiciona o hidden de data de compra ao formulário
     $obHdnDtOrdemCompra = new Hidden();
     $obHdnDtOrdemCompra->setName  ( "dtOrdemCompra" );
-    $obHdnDtOrdemCompra->setValue ( $_REQUEST['dtOrdemCompra']  );
+    $obHdnDtOrdemCompra->setValue ( $request->get('dtOrdemCompra')  );
 }
 
 $obLblEntidade = new Label();
 $obLblEntidade->setRotulo("Entidade");
-$obLblEntidade->setValue($_REQUEST['inCodEntidade']." - ".$_REQUEST['stEntidade']);
+$obLblEntidade->setValue($request->get('inCodEntidade')." - ".$request->get('stEntidade'));
 
 $obLblNumEmpenho = new Label();
 $obLblNumEmpenho->setRotulo("Número do Empenho");
-$obLblNumEmpenho->setValue($_REQUEST['inCodEmpenho']."/".$_REQUEST['stExercicioEmpenho']);
+$obLblNumEmpenho->setValue($request->get('inCodEmpenho')."/".$request->get('stExercicioEmpenho'));
 
 // Número da Licitação / Compra Direta
 // é feita a verificação do tipo para saber o que colocar no campo
 $obLblCodigo = new Label();
-if ($_REQUEST["stTipo"] == "licitacao") {
+if ($request->get('stTipo') == "licitacao") {
     $obLblCodigo->setRotulo("Número da Licitação");
-    $obLblCodigo->setValue($_REQUEST['inCodigo']."/".$_REQUEST['stExercicio']);
+    $obLblCodigo->setValue($request->get('inCodigo')."/".$request->get('stExercicio'));
 } else {
     $obLblCodigo->setRotulo("Compra Direta");
-    $obLblCodigo->setValue($_REQUEST['inCodigo'] );
+    $obLblCodigo->setValue($request->get('inCodigo') );
 }
 
 $obLblModalidade = new Label();
 $obLblModalidade->setRotulo("Modalidade");
-$obLblModalidade->setValue($_REQUEST['inCodModalidade']." - ".$_REQUEST['stModalidade']);
+$obLblModalidade->setValue($request->get('inCodModalidade')." - ".$request->get('stModalidade'));
+
+$obObjeto = new TComprasObjeto();
+$obObjeto->setDado('cod_objeto',$request->get('inCodObjeto'));
+$obObjeto->recuperaPorChave( $rsObjeto );
 
 $obLblObjeto = new Label();
 $obLblObjeto->setRotulo("Objeto");
-$obLblObjeto->setValue($_REQUEST['inCodObjeto']." - ".$_REQUEST['stObjeto']);
+$obLblObjeto->setValue($request->get('inCodObjeto')." - ".$rsObjeto->getCampo('descricao'));
 
 $obLblFornecedor = new Label();
 $obLblFornecedor->setRotulo("Fornecedor");
-$obLblFornecedor->setValue($_REQUEST['inCodFornecedor']." - ".$_REQUEST['stFornecedor']);
+$obLblFornecedor->setValue($request->get('inCodFornecedor')." - ".$request->get('stFornecedor'));
 
 $obLblCondicoesPagamento = new Label();
 $obLblCondicoesPagamento->setRotulo("Condições de Pagamento");
-$obLblCondicoesPagamento->setValue($_REQUEST['stCondicoesPagamento']);
+$obLblCondicoesPagamento->setValue($request->get('stCondicoesPagamento'));
 
 if ($stTipo == 'licitacao') {
     $obLblLocalEntrega = new Label();
     $obLblLocalEntrega->setRotulo("Local de Entrega do Material");
-    $obLblLocalEntrega->setValue($_REQUEST['stLocalEntregaMaterial']);
+    $obLblLocalEntrega->setValue($request->get('stLocalEntregaMaterial'));
 }
 
-if(($_REQUEST["stTipo"] == "diversos" && $_REQUEST['cgm_entrega_material'] == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){
+if(($request->get('stTipo') == "diversos" && $request->get('cgm_entrega_material') == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){
     include_once CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php";
     $obLocalizacaoEntrega = new IPopUpCGMVinculado( $obForm );
     $obLocalizacaoEntrega->setNull              ( false                                 );
@@ -190,14 +195,14 @@ if(($_REQUEST["stTipo"] == "diversos" && $_REQUEST['cgm_entrega_material'] == ''
     $obLocalizacaoEntrega->setId                ( 'stNomEntrega'                        );
     $obLocalizacaoEntrega->obCampoCod->setName  ( 'inEntrega'                           );
     $obLocalizacaoEntrega->obCampoCod->setId    ( 'inEntrega'                           );
-    $obLocalizacaoEntrega->obCampoCod->setValue ( $_REQUEST['cgm_entrega_material']     );
-    $obLocalizacaoEntrega->setValue             ( $_REQUEST['stLocalEntregaMaterial']   );
+    $obLocalizacaoEntrega->obCampoCod->setValue ( $request->get('cgm_entrega_material') );
+    $obLocalizacaoEntrega->setValue             ( $request->get('stLocalEntregaMaterial') );
 }else{
     if(isset($_REQUEST['cgm_entrega_material'])&&$_REQUEST['cgm_entrega_material']!=''){
         $obHdnCgmEntrega = new Hidden();
         $obHdnCgmEntrega->setName  ( "inEntrega" );
         $obHdnCgmEntrega->setId    ( "inEntrega" );
-        $obHdnCgmEntrega->setValue ( $_REQUEST['cgm_entrega_material']  );
+        $obHdnCgmEntrega->setValue ( $request->get('cgm_entrega_material')  );
     }
 }
 
@@ -258,9 +263,9 @@ if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false 
     $obLblStatus->setValue($stStatusOC);
 
     if ($stStatusOC == "Anulada") {
-        $stFiltro  =    " exercicio = '". $_REQUEST['stExercicioOrdemCompra']."' ";
-        $stFiltro .=    "AND cod_entidade = ". $_REQUEST['inCodEntidade']." ";
-        $stFiltro .=    "AND cod_ordem = ". $_REQUEST['inCodOrdemCompra']." ";
+        $stFiltro  =    " exercicio = '". $request->get('stExercicioOrdemCompra')."' ";
+        $stFiltro .=    "AND cod_entidade = ". $request->get('inCodEntidade')." ";
+        $stFiltro .=    "AND cod_ordem = ". $request->get('inCodOrdemCompra')." ";
         $stFiltro .=    "AND tipo = '".$stTipoOrdem."' ";
 
         $obCompraOrdemCompra->recuperaMotivo( $rsMotivo, $stFiltro );
@@ -297,19 +302,19 @@ if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false 
 $obHdnCodEntidade = new Hidden();
 $obHdnCodEntidade->setName  ( "inCodEntidade" );
 $obHdnCodEntidade->setId    ( "inCodEntidade" );
-$obHdnCodEntidade->setValue ( $_REQUEST['inCodEntidade']  );
+$obHdnCodEntidade->setValue ( $request->get('inCodEntidade')  );
 
 $obHdnExercicioEmpenho = new Hidden();
 $obHdnExercicioEmpenho->setName  ( "stExercicioEmpenho" );
-$obHdnExercicioEmpenho->setValue ( $_REQUEST['stExercicioEmpenho']  );
+$obHdnExercicioEmpenho->setValue ( $request->get('stExercicioEmpenho')  );
 
 $obHdnCodEmpenho = new Hidden();
 $obHdnCodEmpenho->setName  ( "inCodEmpenho" );
-$obHdnCodEmpenho->setValue ( $_REQUEST['inCodEmpenho']  );
+$obHdnCodEmpenho->setValue ( $request->get('inCodEmpenho')  );
 
 $obHdnTipo = new Hidden();
 $obHdnTipo->setName  ( "stTipo" );
-$obHdnTipo->setValue ( $_REQUEST['stTipo']  );
+$obHdnTipo->setValue ( $request->get('stTipo')  );
 
 /*******************************
         fim dos hiddens
@@ -340,7 +345,7 @@ if ( strpos($stAcao,'incluir') === false ) {
 }
 $obFormulario->addComponente($obLblEntidade);
 $obFormulario->addComponente($obLblNumEmpenho);
-if($_REQUEST["stTipo"] != "diversos"){
+if($request->get('stTipo') != "diversos"){
     $obFormulario->addComponente($obLblCodigo);
     $obFormulario->addComponente($obLblModalidade);
     $obFormulario->addComponente($obLblObjeto);
@@ -360,7 +365,7 @@ if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false 
     $obFormulario->addComponente($obTxtMotivo);
 }
 
-if(($_REQUEST["stTipo"] == "diversos" && $_REQUEST['cgm_entrega_material'] == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){    
+if(($request->get('stTipo') == "diversos" && $request->get('cgm_entrega_material') == '') && (strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false)){    
     $obFormulario->addComponente( $obLocalizacaoEntrega );
 }else{
     if(isset($_REQUEST['cgm_entrega_material'])&&$_REQUEST['cgm_entrega_material']!=''){
@@ -392,4 +397,5 @@ if ( strpos($stAcao,'consultar') === false ) {
 $obFormulario->Show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
 ?>

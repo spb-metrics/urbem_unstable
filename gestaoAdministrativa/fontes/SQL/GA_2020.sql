@@ -1717,7 +1717,7 @@ BEGIN
                                                  FROM pg_catalog.pg_proc
                                                  JOIN pg_catalog.pg_namespace
                                                    ON pg_namespace.oid = pg_proc.pronamespace
-                                                WHERE pg_proc.oid > 200000
+                                                WHERE pg_proc.oid > 20000
                                                   AND proisagg = FALSE
                                              ) AS busca
                                     ), ',' )

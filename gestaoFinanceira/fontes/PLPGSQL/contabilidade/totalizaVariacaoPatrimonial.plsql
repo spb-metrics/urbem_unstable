@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: $
-* $Name$
-* $Author: $
-* $Date: $
+* $Id: totalizaVariacaoPatrimonial.plsql 64402 2016-02-16 20:59:49Z michel $
 *
 */
 
@@ -88,7 +85,7 @@ BEGIN
     nuDebito        := coalesce(nuDebito,0.00);
 
     --Totaliza Saldo Atual
-    nuSaldoAtual    := ( nuSaldoAnterior + nuDebito ) + nuCredito;
+    nuSaldoAtual    := nuDebito + nuCredito;
     nuSaldoAtual    := coalesce(nuSaldoAtual,0.00);
 
     --Preenche array de retorno

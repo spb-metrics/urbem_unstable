@@ -27,7 +27,7 @@
     * @category    Urbem
     * @package     TCE/MG
     * @author      Carolina Schwaab Marcal
-    * $Id: TTCEMGCTB.class.php 63927 2015-11-09 16:25:18Z lisiane $
+    * $Id: TTCEMGCTB.class.php 64396 2016-02-11 19:30:20Z michel $
 
 */
 
@@ -377,32 +377,6 @@ class TTCEMGCTB extends Persistente
                                     THEN '11'
                                 WHEN lo.tipo = 'T'
                                     AND transferencia.cod_tipo = 2
-                                    AND transferencia_estornada.cod_lote_estorno IS NOT NULL
-                                    AND (
-                                        SELECT CASE
-                                                WHEN COUNT(plano_conta.*) > 0
-                                                    THEN TRUE
-                                                ELSE FALSE
-                                                END
-                                        FROM contabilidade.plano_conta     
-                                        INNER JOIN contabilidade.plano_analitica 
-                                            ON plano_conta.cod_conta = plano_analitica.cod_conta
-                                           AND plano_conta.exercicio = plano_analitica.exercicio 
-                                        WHERE plano_analitica.cod_plano = transferencia.cod_plano_credito
-                                            AND plano_analitica.exercicio = transferencia.exercicio
-                                            AND (
-                                                SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451100000'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451220101'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451220102'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451220103'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451220104'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451220199'
-                                                OR SUBSTR(REPLACE(plano_conta.cod_estrutural, '.', ''), 1, 9) = '451300000'
-                                                ) 
-                                        )
-                                    THEN '13'
-                                WHEN lo.tipo = 'T'
-                                    AND transferencia.cod_tipo = 2
                                     AND (
                                         SELECT CASE
                                                 WHEN COUNT(plano_conta.*) > 0
@@ -542,11 +516,6 @@ class TTCEMGCTB extends Persistente
                          AND transferencia.tipo         = lo.tipo
                          AND transferencia.exercicio    = lo.exercicio
                          AND transferencia.cod_entidade = lo.cod_entidade
-                   LEFT JOIN tesouraria.transferencia_estornada
-                          ON transferencia_estornada.cod_lote     = lo.cod_lote
-                         AND transferencia_estornada.tipo         = lo.tipo
-                         AND transferencia_estornada.exercicio    = lo.exercicio
-                         AND transferencia_estornada.cod_entidade = lo.cod_entidade
                    LEFT JOIN (
                             SELECT conta_debito.cod_lote
                                 , conta_debito.tipo

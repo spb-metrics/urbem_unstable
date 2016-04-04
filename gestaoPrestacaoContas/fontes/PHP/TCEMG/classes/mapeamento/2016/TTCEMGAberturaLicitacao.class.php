@@ -76,7 +76,7 @@ class TTCEMGAberturaLicitacao extends Persistente
                       WHEN 10 THEN 3
                       ELSE 1
                   END AS natureza_procedimento
-               , TO_CHAR(sw_processo.timestamp,'ddmmyyyy') AS dt_abertura
+               , TO_CHAR(licitacao.timestamp,'ddmmyyyy') AS dt_abertura
                , TO_CHAR(edital.dt_aprovacao_juridico,'ddmmyyyy') AS dt_edital_convite
                , diario_oficial.dt_publicacao_edital
                , publicacao_edital_veiculo1.dt_publicacao_edital_veiculo1
@@ -211,10 +211,6 @@ class TTCEMGAberturaLicitacao extends Persistente
               ON contrato_licitacao.num_contrato = contrato.num_contrato
              AND contrato_licitacao.cod_entidade = contrato.cod_entidade
              AND contrato_licitacao.exercicio    = contrato.exercicio
-
-      INNER JOIN sw_processo
-              ON sw_processo.cod_processo  = licitacao.cod_processo
-             AND sw_processo.ano_exercicio = licitacao.exercicio_processo
 
       INNER JOIN compras.objeto
               ON objeto.cod_objeto = licitacao.cod_objeto

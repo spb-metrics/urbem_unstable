@@ -190,12 +190,13 @@ define( "CAM_GPC_ITBI_IPTU_NEGOCIO"   ,       CAM_GPC_ITBI_IPTU_CLASSES."negocio
 define( "CAM_GPC_ITBI_IPTU_INSTANCIAS",       CAM_GPC_ITBI_IPTU."instancias/"        );
 
 //TRIBUNAL DE CONTAS DE AL
-define( "CAM_GPC_TCEAL_CLASSES"   ,       CAM_GPC_TCEAL."classes/"           );
-define( "CAM_GPC_TCEAL_MAPEAMENTO",  CAM_GPC_TCEAL_CLASSES."mapeamento/");
-define( "CAM_GPC_TCEAL_NEGOCIO"   ,       CAM_GPC_TCEAL_CLASSES."negocio/"   );
-define( "CAM_GPC_TCEAL_CONTROLE"  ,      CAM_GPC_TCEAL_CLASSES."controle/"  );
-define( "CAM_GPC_TCEAL_INSTANCIAS",      CAM_GPC_TCEAL."instancias/"        );
-define( "CAM_GPC_TCEAL_POPUPS"    ,       CAM_GPC_TCEAL."popups/"            );
+define( "CAM_GPC_TCEAL_CLASSES"   ,       CAM_GPC_TCEAL."classes/"               );
+define( "CAM_GPC_TCEAL_MAPEAMENTO",       CAM_GPC_TCEAL_CLASSES."mapeamento/"    );
+define( "CAM_GPC_TCEAL_NEGOCIO"   ,       CAM_GPC_TCEAL_CLASSES."negocio/"       );
+define( "CAM_GPC_TCEAL_CONTROLE"  ,       CAM_GPC_TCEAL_CLASSES."controle/"      );
+define( "CAM_GPC_TCEAL_INSTANCIAS",       CAM_GPC_TCEAL."instancias/"            );
+define( "CAM_GPC_TCEAL_POPUPS"    ,       CAM_GPC_TCEAL."popups/"                );
+define( "CAM_GPC_TCEAL_RELATORIOS",       CAM_GPC_TCEAL_INSTANCIAS."relatorios/" );
 
 //TRIBUNAL DE CONTAS DE PE
 define( "CAM_GPC_TCEPE_CLASSES"   , CAM_GPC_TCEPE."classes/"           );

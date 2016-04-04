@@ -35,3 +35,4 @@
 ----------------
 
 SELECT atualizarbanco('ALTER TABLE folhapagamento.valor_diversos ALTER COLUMN valor TYPE NUMERIC(16,4);');
+

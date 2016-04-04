@@ -76,13 +76,25 @@ $rsExercicio = $rsOrgao = $rsUnidade = $rsRecurso = new RecordSet;
 $obREmpenhoEmpenho = new REmpenhoEmpenho;
 $obREmpenhoEmpenho->recuperaExerciciosRP( $rsExercicio );
 
-$obForm = new Form;
-$obForm->setAction( $pgGeraRel );
-$obForm->setTarget( "telaPrincipal" );
+if(Sessao::getExercicio()<2016){
+    $obForm = new Form;
+    $obForm->setAction( $pgGeraRel );
+    $obForm->setTarget( "telaPrincipal" );
 
-$obHdnCaminho = new Hidden;
-$obHdnCaminho->setName("stCaminho");
-$obHdnCaminho->setValue( "" );
+    $obHdnCaminho = new Hidden;
+    $obHdnCaminho->setName("stCaminho");
+    $obHdnCaminho->setValue( "" );
+}else{
+    $obForm = new Form;
+    $obForm->setAction( CAM_FW_POPUPS."relatorio/OCRelatorio.php" );
+    $obForm->setTarget( "oculto" );
+
+    $obHdnCaminho = new Hidden;
+    $obHdnCaminho->setName("stCaminho");
+    $obHdnCaminho->setValue( CAM_GF_EMP_INSTANCIAS."relatorio/".$pgOcul );
+}
+
+
 
 $obPeriodicidade = new Periodicidade();
 $obPeriodicidade->setExercicio      ( Sessao::getExercicio() );
@@ -193,9 +205,9 @@ $obCmbSituacao->setStyle               ( "width: 200px"                 );
 $obCmbSituacao->addOption              ( "", "Selecione"                );
 $obCmbSituacao->addOption              ( "1", "Anulados"                );
 $obCmbSituacao->addOption              ( "2", "Liquidados"              );
-$obCmbSituacao->addOption              ( "3", "Anulados (Liquidados)"   );
-$obCmbSituacao->addOption              ( "4", "Pagamentos"              );
-$obCmbSituacao->addOption              ( "5", "Estornos"                );
+$obCmbSituacao->addOption              ( "3", "Anulação de Liquidação"  );
+$obCmbSituacao->addOption              ( "4", "Pagos"                   );
+$obCmbSituacao->addOption              ( "5", "Anulação de Pagamento"   );
 $obCmbSituacao->setNull                ( false );
 
 // Define Objeto BuscaInner para Fornecedor

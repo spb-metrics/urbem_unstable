@@ -2,94 +2,149 @@
     <h4>Razão da Despesa - <?= $stTipoRelatorio ?></h4>
 </div>
 
+<?php
+    foreach($arNomOrgaoUnidade as $inOrgao => $unidade){
+        foreach($unidade as $inUnidade => $orgaoUnidade){
+            echo "<h5>";
+            echo "  Orgão : ".$inOrgao.' - '.$orgaoUnidade['nom_orgao']." <br />";
+            echo "  Unidade : ".$inUnidade.' - '.$orgaoUnidade['nom_unidade']." <br />";
+            echo "</h5> ";
 
-<?php $boPrimeiroRegistroDespesa = true;?>
-<?php $inCount = 0;?>
-<?php $orgao = '';?>
-<?php $unidade = '';?>
+            $arDotacao = $arOrgaoUnidade[$inOrgao][$inUnidade];
 
-<?php foreach($registros as $registro): ?>
-<?php $inCount ++;?>
-    <!-- ANALISA OS ORGAOS E UNIDADES -->
-    <?php if((($registroAnterior['cod_orgao'] != $registro['cod_orgao']) || ($registroAnterior['cod_unidade'] != $registro['cod_unidade'])) || (!isset($registroAnterior))): ?>
-            <h5>
-                Orgão : <?= $registro['cod_orgao'] ?> - <?= $registro['nom_orgao'] ?> <br />
-                Unidade: <?=  $registro['cod_unidade'] ?> - <?= $registro['nom_unidade'] ?><br />
-            </h5>
-      <?php $orgao = $registro['cod_orgao'] ;
-            $unidade =  $registro['cod_unidade'];
-            $subtotal = 0;
-            $subTotalAnulado = 0;
-         endif; ?>
-    
-    <!-- DESPESA -->    
-    <?php  if(($registroAnterior['despesa'] != $registro['despesa']) || (!isset($registroAnterior))): ?>
-        <h5><?= $registro['despesa'] ?></h5>
-    <?php $boPrimeiroRegistroDespesa = true;
-        endif;
-    ?>
+            foreach($arDotacao as $stDotacao => $registro){
+                echo "<h5>                   ";
+                echo "  Dotação : ".$stDotacao;
+                echo "</h5>                  ";
 
-    <!-- SE FOR O PRIMEIRO REGISTRO DA DESPESA, ORGAO E UNIDADE, CRIA UMA NOVA TABLE -->  
-     <?php if($boPrimeiroRegistroDespesa):
-                $boPrimeiroRegistroDespesa = false;
-              
-     ?>
-        <table class='border'>
-            <thead>
-                <tr>
-                    <th class='text_align_center border'style="width:10mm;">Empenho</th>
-                    <th class='text_align_left border' style="width:15mm;">Data Emp.</th>
-                    <th class='text_align_left border' style="width:35mm;">Credor</th>
-                    <th class='text_align_left border' style="width:10mm;">Recurso</th>
-                    <th class='text_align_left border' style="width:15mm;">Data Pag.</th>
-                    <th class='text_align_left border' style="width:40mm;">Banco / Ag. / Cc.</th>
-                    <th class='text_align_left border' style="width:15mm;">Documento</th>
-                    <th class='text_align_right border'style="width:15mm;">Valor</th>
-                    <th class='text_align_right border'style="width:15mm;">Valor Anulado</th>
-                    <th class='text_align_left border' style="width:45mm;">Dotação</th>
-                </tr>
-            </thead>
-        <tbody>
-        <?php endif; ?>
-        
-         <?php if($orgao == $registro['cod_orgao'] and $unidade == $registro['cod_unidade']): ?>
-                <tr>
-                    <td class='text_align_center border'style="width:10mm;"><?= $registro['empenho'] ?></td>
-                    <td class='text_align_left border' style="width:15mm;"><?= $registro['dt_empenho'] ?></td>
-                    <td class='text_align_left border' style="width:35mm;"><?= $registro['credor'] ?></td>
-                    <td class='text_align_left border' style="width:10mm;"><?= $registro['cod_recurso'] ?></td>
-                    <td class='text_align_left border' style="width:15mm;"><?= $registro['stData'] ?></td>
-                    <td class='text_align_left border' style="width:40mm;"><?= $registro['banco'] ?></td>
-                    <td class='text_align_left border' style="width:15mm;"><?= $registro['num_documento'] ?></td>            
-                    <td class='text_align_right border'style="width:15mm;"><?= number_format($registro['valor'], '2', ',', '.') ?></td>
-                    <td class='text_align_right border'style="width:15mm;"><?= number_format($registro['valor_anulado'], '2', ',', '.') ?></td>
-                    <td class='text_align_left border' style="width:45mm;"><?= $registro['dotacao'] ?></td>
-                </tr>
-            <?php
-                $registroAnterior = $registro;
-                $subtotal = $subtotal + $registro['valor'];
-                $subTotalAnulado = $subTotalAnulado + $registro['valor_anulado'];
-            endif; ?>
-   
-   <!-- SE A DESPESA DO PROXIMO FOR DIFERENTE INSERE OS SUBTOTAIS-->   
-   <?php if(($registroAnterior['despesa'] != $registros[$inCount]['despesa'])): ?>
-        </tbody>
-    </table>
-    <?php endif;  ?>
-   
-    <?php if( ($registro['cod_orgao'] != $registros[$inCount]['cod_orgao']) || ($registro['cod_unidade'] != $registros[$inCount]['cod_unidade']) ): ?>
-        <p> 
-               SubTotal : <?= number_format($subtotal, '2', ',', '.') ?> <br />
-               SubTotal Anulado: <?= number_format($subTotalAnulado, '2', ',', '.') ?> <br />
-        </p>
-    <?php endif;  ?>
-    <?php
-        $totalGeral         = $registro['vl_total'];
-        $totalGeralAnulado  = $registro['vl_total_anulado'];
-    endforeach;
-    ?>
-    
-    <p>
-        <h5>TOTAL DO PERÍODO:  <?= number_format($totalGeral, '2', ',', '.') ?> <br /> </h5>
-        <h5>TOTAL DO PERÍODO ANULADO:  <?= number_format($totalGeralAnulado, '2', ',', '.') ?> <br /> </h5> 
-    </p>
+                echo "<table class='border'> ";
+                echo "  <thead>              ";
+                echo "      <tr>             ";
+                echo "          <th class='text_align_center border font_size_9' width=\"6%\" >DATA PGTO     </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"7%\" >EMPENHO       </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"6%\" >NOTA          </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"6%\" >OP            </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"17%\">CREDOR        </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"7%\" >VALOR BRUTO   </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"6%\" >RETENÇÃO      </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"7%\" >VALOR LÍQUIDO </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"8%\" >DOCUMENTO     </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"21%\">BCO PGTO      </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"4%\" >FONTE         </th>";
+                echo "          <th class='text_align_center border font_size_9' width=\"5%\" >ANULADO       </th>";
+                echo "      </tr>            ";
+                echo "  </thead>             ";
+                echo "  <tbody>              ";
+
+                foreach($registro as $pagamento){
+                    if($pagamento['bo_pagamento_estornado']=='t')
+                        $boAnul = 'Sim';
+                    else
+                        $boAnul = 'Não';
+
+                    echo "      <tr> ";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['dt_pagamento']."                                              </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['cod_empenho']."/".$pagamento['exercicio_empenho']."           </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['cod_nota']."/".$pagamento['exercicio_nota']."                 </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['cod_ordem']."/".$pagamento['exercicio_ordem']."               </td>";
+                    echo "          <td class='text_align_left border font_size_9 tr_nivel_1'   >".$pagamento['numcgm']." - ".$pagamento['credor']."                         </td>";
+                    echo "          <td class='text_align_right border font_size_9 tr_nivel_1'  >".number_format($pagamento['vl_pago'], '2', ',', '.')."                     </td>";
+                    echo "          <td class='text_align_right border font_size_9 tr_nivel_1'  >".number_format($pagamento['vl_retencao'], '2', ',', '.')."                 </td>";
+                    echo "          <td class='text_align_right border font_size_9 tr_nivel_1'  >".number_format($pagamento['vl_liquido'], '2', ',', '.')."                  </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['documento']." - ".$pagamento['tipo_documento']."              </td>";
+                    echo "          <td class='text_align_left border font_size_9 tr_nivel_1'   >".$pagamento['conta_banco']." - ".$pagamento['nom_conta_plano_pagamento']." </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$pagamento['cod_recurso_pgto']."                                          </td>";
+                    echo "          <td class='text_align_center border font_size_9 tr_nivel_1' >".$boAnul."                                                                 </td>";
+                    echo "      </tr> ";
+                }
+
+                echo "  </tbody> ";
+                echo "</table>   ";
+
+                $totalDotacao = $arTotalDotacao[$inOrgao][$inUnidade][$stDotacao];
+                echo "<table style=\"margin-top:5mm;\">                                      ";
+                echo "      <tr>                                                             ";
+                echo "          <td class='text_align_center' width=\"25%\" >           </td>";
+                echo "          <td class='text_align_right border' width=\"17%\" >Sub-Total Dotação                                               </td>";
+                echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalDotacao['vl_pago'], '2', ',', '.')."      </td>";
+                echo "          <td class='text_align_right border' width=\"6%\"  >".number_format($totalDotacao['vl_retencao'], '2', ',', '.')."  </td>";
+                echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalDotacao['vl_liquido'], '2', ',', '.')."   </td>";
+                echo "          <td class='text_align_center' width=\"38%\" >           </td>";
+                echo "      </tr>                                                            ";
+                echo "      <tr>                                                             ";
+                echo "          <td class='text_align_center' >                         </td>";
+                echo "          <td class='text_align_right border' >(-) Anulações Pgto                                              </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_anulado_p'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_anulado_r'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_anulado_l'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_center' >                         </td>";
+                echo "      </tr>                                                            ";
+                echo "      <tr>                                                             ";
+                echo "          <td class='text_align_center' >                         </td>";
+                echo "          <td class='text_align_right border' >Total Dotação                                                 </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_total_p'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_total_r'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_right border' >".number_format($totalDotacao['vl_total_l'], '2', ',', '.')." </td>";
+                echo "          <td class='text_align_center' >                         </td>";
+                echo "      </tr>                                                            ";
+                echo "</table>                                                               ";
+            }
+
+            $totalUnidade = $arTotalOrgaoUnidade[$inOrgao][$inUnidade];
+            echo "<table style=\"margin-top:5mm;\">                                      ";
+            echo "      <tr>                                                             ";
+            echo "          <td class='text_align_center' width=\"25%\" >           </td>";
+            echo "          <td class='text_align_right border' width=\"17%\" >Sub-Total Unidade                                               </td>";
+            echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalUnidade['vl_pago'], '2', ',', '.')."      </td>";
+            echo "          <td class='text_align_right border' width=\"6%\"  >".number_format($totalUnidade['vl_retencao'], '2', ',', '.')."  </td>";
+            echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalUnidade['vl_liquido'], '2', ',', '.')."   </td>";
+            echo "          <td class='text_align_center' width=\"38%\" >           </td>";
+            echo "      </tr>                                                            ";
+            echo "      <tr>                                                             ";
+            echo "          <td class='text_align_center' >                         </td>";
+            echo "          <td class='text_align_right border' >(-) Anulações Pgto                                              </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_anulado_p'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_anulado_r'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_anulado_l'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_center' >                         </td>";
+            echo "      </tr>                                                            ";
+            echo "      <tr>                                                             ";
+            echo "          <td class='text_align_center' >                         </td>";
+            echo "          <td class='text_align_right border' >Total Unidade                                                 </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_total_p'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_total_r'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_right border' >".number_format($totalUnidade['vl_total_l'], '2', ',', '.')." </td>";
+            echo "          <td class='text_align_center' >                         </td>";
+            echo "      </tr>                                                            ";
+            echo "</table>                                                               ";
+        }
+
+        $totalOrgao = $arTotalOrgao[$inOrgao];
+        echo "<table style=\"margin-top:5mm;\">                                      ";
+        echo "      <tr>                                                             ";
+        echo "          <td class='text_align_center' width=\"25%\" >           </td>";
+        echo "          <td class='text_align_right border' width=\"17%\" >Sub-Total Orgão                                               </td>";
+        echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalOrgao['vl_pago'], '2', ',', '.')."      </td>";
+        echo "          <td class='text_align_right border' width=\"6%\"  >".number_format($totalOrgao['vl_retencao'], '2', ',', '.')."  </td>";
+        echo "          <td class='text_align_right border' width=\"7%\"  >".number_format($totalOrgao['vl_liquido'], '2', ',', '.')."   </td>";
+        echo "          <td class='text_align_center' width=\"38%\" >           </td>";
+        echo "      </tr>                                                            ";
+        echo "      <tr>                                                             ";
+        echo "          <td class='text_align_center' >                         </td>";
+        echo "          <td class='text_align_right border' >(-) Anulações Pgto                                            </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_anulado_p'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_anulado_r'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_anulado_l'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_center' >                         </td>";
+        echo "      </tr>                                                            ";
+        echo "      <tr>                                                             ";
+        echo "          <td class='text_align_center' >                         </td>";
+        echo "          <td class='text_align_right border' >Total Orgão                                                 </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_total_p'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_total_r'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_right border' >".number_format($totalOrgao['vl_total_l'], '2', ',', '.')." </td>";
+        echo "          <td class='text_align_center' >                         </td>";
+        echo "      </tr>                                                            ";
+        echo "</table>                                                               ";
+    }
+?>

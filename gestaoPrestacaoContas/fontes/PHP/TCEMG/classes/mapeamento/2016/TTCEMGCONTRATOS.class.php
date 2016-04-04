@@ -97,7 +97,7 @@ class TTCEMGCONTRATOS extends Persistente
                     ELSE
                             ''
                     END AS codOrgaoResp,
-                    CASE WHEN TC.cod_modalidade_licitacao=5 OR TC.cod_modalidade_licitacao=6 THEN
+                    CASE WHEN (TC.cod_modalidade_licitacao = 5 OR TC.cod_modalidade_licitacao = 6) AND (TC.cod_modalidade_licitacao = 1 OR TC.cod_modalidade_licitacao = 8) THEN
                             LPAD((LPAD(''||TC.num_orgao_modalidade,2, '0')||LPAD(''||TC.num_unidade_modalidade,2, '0')), 5, '0')
                     ELSE
                             LPAD((LPAD(''||TC.num_orgao,2, '0')||LPAD(''||TC.num_unidade,2, '0')), 5, '0')
@@ -141,7 +141,6 @@ class TTCEMGCONTRATOS extends Persistente
                     AND TC.cod_entidade IN (".$this->getDado('entidade').") -- ENTRADA ENTIDADE
                     
                     ORDER BY TC.nro_contrato, TC.cod_entidade";
-                    
         return $stSql;
     }
     
@@ -422,7 +421,10 @@ class TTCEMGCONTRATOS extends Persistente
                     TCA.cod_tipo_valor AS alteracaoValor,
                     LPAD(''||TCA.cod_tipo_aditivo,2, '0') AS tipoTermoAditivo,
                     TCA.descricao AS dscAlteracao,
-                    to_char(TCA.data_termino, 'ddmmyyyy') AS novaDataTermino,
+                    CASE WHEN TCA.cod_tipo_aditivo = 7 OR TCA.cod_tipo_aditivo = 13 OR TCA.cod_tipo_aditivo = 14
+                            THEN to_char(TCA.data_termino, 'ddmmyyyy')
+                            ELSE ''
+                    END AS novaDataTermino,
                     REPLACE(TCA.valor::TEXT, '.', ',') AS valorAditivo,
                     to_char(TCA.data_publicacao, 'ddmmyyyy') AS dataPublicacao,
                     sw_cgm.nom_cgm AS veiculoDivulgacao

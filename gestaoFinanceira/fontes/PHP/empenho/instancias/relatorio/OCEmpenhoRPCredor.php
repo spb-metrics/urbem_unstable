@@ -31,30 +31,14 @@
 
     * @ignore
 
-    $Revision: 31894 $
-    $Name$
-    $Author: cako $
-    $Date: 2007-12-05 15:12:56 -0200 (Qua, 05 Dez 2007) $
+    $Id: OCEmpenhoRPCredor.php 64417 2016-02-18 18:03:51Z michel $
 
     * Casos de uso : uc-02.03.10
 */
 
-/*
-$Log$
-Revision 1.10  2006/08/09 18:13:11  jose.eduardo
-Bug #6737#
-
-Revision 1.9  2006/07/18 18:51:31  eduardo
-Bug #6226#
-
-Revision 1.8  2006/07/05 20:49:08  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoRelatorioRPCredor.class.php"    );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoRelatorioRPCredor.class.php";
 
 $obRegra = new REmpenhoRelatorioRPCredor;
 
@@ -80,12 +64,11 @@ if ( $rsTotalEntidades->getNumLinhas() == $inCount ) {
 } else {
    $arFiltro['relatorio'] = "";
 }
-switch ($_REQUEST['stCtrl']) {
+switch ($request->get('stCtrl')) {
 
     case "MontaOrgao":
-        if ($_REQUEST["inExercicio"]) {
-            if ($_REQUEST["inExercicio"] > '2004') {
-
+        if ($request->get('inExercicio')) {
+            if ($request->get('inExercicio') > '2004') {
                 $obTxtOrgao = new TextBox;
                 $obTxtOrgao->setRotulo              ( "Órgão"                      );
                 $obTxtOrgao->setTitle               ( "Informe o órgão para filtro");
@@ -141,7 +124,7 @@ switch ($_REQUEST['stCtrl']) {
                 $js .= "f.inCodOrgaoTxt.value = ''; \n";
                 $js .= "f.inCodUnidade.options[0] = new Option('Selecione','','selected'); \n";
                 $js .= "f.inCodUnidadeTxt.value = ''; \n";
-                $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setExercicio($_REQUEST["inExercicio"]);
+                $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setExercicio($request->get('inExercicio'));
                 $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->listar( $rsOrgao );
                 while ( !$rsOrgao->eof() ) {
                     $arFiltroNomFiltro['orgao'][$rsOrgao->getCampo( 'num_orgao' )] = $rsOrgao->getCampo( 'nom_orgao' );
@@ -204,9 +187,9 @@ switch ($_REQUEST['stCtrl']) {
      $js  = "limpaSelect(f.inCodUnidade,0) \n";
      $js .= "f.inCodUnidadeTxt.value = ''; \n";
      $js .= "f.inCodUnidade.options[0] = new Option('Selecione','','selected'); \n";
-     if ($_REQUEST["inCodOrgao"]) {
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setExercicio( $_REQUEST["inExercicio"] );
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $_REQUEST["inCodOrgao"] );
+     if ($request->get('inCodOrgao')) {
+        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->setExercicio( $request->get('inExercicio') );
+        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao( $request->get('inCodOrgao') );
 
         $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->listar( $rsUnidade, "","", $boTransacao );
         while ( !$rsUnidade->eof() ) {
@@ -231,11 +214,11 @@ switch ($_REQUEST['stCtrl']) {
 
    case "mascaraClassificacao":
         //monta mascara da RUBRICA DE DESPESA
-        $arMascClassificacao = Mascara::validaMascaraDinamica( $_POST['stMascClassificacao'] , $_POST['stElementoDespesa'] );
+        $arMascClassificacao = Mascara::validaMascaraDinamica( $request->get('stMascClassificacao') , $request->get('stElementoDespesa') );
         $js .= "f.stElementoDespesa.value = '".$arMascClassificacao[1]."'; \n";
 
         //busca DESCRICAO DA RUBRICA DE DESPESA
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascara          ( $_POST['stMascClassificacao'] );
+        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascara          ( $request->get('stMascClassificacao') );
         $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setMascClassificacao( $arMascClassificacao[1]       );
         $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->recuperaDescricaoDespesa( $stDescricao );
         if ($stDescricao != "") {
@@ -251,15 +234,15 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case 'buscaFornecedor':
-        if ($_POST["inCGM"] != "") {
-            $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( $_POST["inCGM"] );
+        if ($request->get('inCGM', '')!= "") {
+            $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( $request->get('inCGM') );
             $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->listar( $rsCGM );
             $stNomFornecedor = $rsCGM->getCampo( "nom_cgm" );
             if (!$stNomFornecedor) {
                 $js .= 'f.inCGM.value = "";';
                 $js .= 'f.inCGM.focus();';
                 $js .= 'd.getElementById("stNomFornecedor").innerHTML = "&nbsp;";';
-                $js .= "alertaAviso('@Valor inválido. (".$_POST["inCGM"].")','form','erro','".Sessao::getId()."');";
+                $js .= "alertaAviso('@Valor inválido. (".$request->get('inCGM').")','form','erro','".Sessao::getId()."');";
             } else {
                 $js .= 'd.getElementById("stNomFornecedor").innerHTML = "'.$stNomFornecedor.'";';
             }
@@ -268,58 +251,252 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     default:
-        $arFiltro = Sessao::read('filtroRelatorio');
-        $arFiltro['inOrdenacao'] = $arFiltro['inOrdenacao'] ? $arFiltro['inOrdenacao'] : 1;
-        $stFiltro = "";
-        $obRegra->setFiltro                 ( $stFiltro );
-        $obRegra->setCodEntidade            ( $stEntidade );
-        if ($arFiltro['inExercicio'] == '') {
-            $obRegra->setExercicio              ( Sessao::getExercicio());
-        } else {
-            $obRegra->setExercicio              ( $arFiltro['inExercicio'] );
+        //RELATÓRIO ANTERIOR ATÉ 2015
+        if(Sessao::getExercicio() < 2016){
+            $arFiltro = Sessao::read('filtroRelatorio');
+            $arFiltro['inOrdenacao'] = $arFiltro['inOrdenacao'] ? $arFiltro['inOrdenacao'] : 1;
+            $stFiltro = "";
+            $obRegra->setFiltro                 ( $stFiltro );
+            $obRegra->setCodEntidade            ( $stEntidade );
+            if ($arFiltro['inExercicio'] == '') {
+                $obRegra->setExercicio              ( Sessao::getExercicio());
+            } else {
+                $obRegra->setExercicio              ( $arFiltro['inExercicio'] );
+            }
+            $obRegra->setDataInicial            ( "01/01/".$arFiltro['inExercicio'] );
+            $obRegra->setDataFinal              ( $arFiltro['stDataSituacao'] );
+            $obRegra->obROrcamentoOrgao->setNumeroOrgao( $arFiltro['inCodOrgao'] );
+            $obRegra->obROrcamentoUnidadeOrcamentaria->setNumeroUnidade( $arFiltro['inCodUnidade'] );
+            $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setCodEstrutural( $arFiltro['stElementoDespesa'] );
+            $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso( $arFiltro['inCodRecurso'] );
+            if($arFiltro['inCodUso'] && $arFiltro['inCodDestinacao'] && $arFiltro['inCodEspecificacao'])
+            $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setDestinacaoRecurso( $arFiltro['inCodUso'].".".$arFiltro['inCodDestinacao'].".".$arFiltro['inCodEspecificacao'] );
+
+            $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodDetalhamento( $arFiltro['inCodDetalhamento'] );
+
+            $obRegra->setFuncao                ( $arFiltro['stCodFuncao'] );
+            $obRegra->setSubFuncao             ( $arFiltro['stCodSubFuncao'] );
+            $obRegra->setOrdem                 ( $arFiltro['inOrdenacao'] );
+            $obRegra->setModulo                ( $arFiltro['inCodModulo'] );
+
+            $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM     ( $arFiltro['inCGM'] );
+            $obRegra->obREmpenhoEmpenho->setCodEmpenhoInicial  ( $arFiltro['inCodEmpenhoInicial']  );
+            $obRegra->obREmpenhoEmpenho->setCodEmpenhoFinal    ( $arFiltro['inCodEmpenhoFinal']    );
+
+            switch ($arFiltro['inOrdenacao']) {
+                case "1":
+                    $arFiltro['stOrdenacao'] = "Empenho";
+                break;
+    
+                case "2":
+                    $arFiltro['stOrdenacao'] = "Vencimento";
+                break;
+    
+                case "3":
+                    $arFiltro['stOrdenacao'] = "Recurso";
+                break;
+                case "4":
+                    $arFiltro['stOrdenacao'] = "Credor";
+                break;
+
+            }
+
+            $obRegra->geraRecordSet( $rsEmpenhoRPCredor , $arFiltro['inOrdenacao'] );
+            Sessao::write('filtroRelatorio', $arFiltro);
+            Sessao::write('rsRecordSet', $rsEmpenhoRPCredor);
+            $obRegra->obRRelatorio->executaFrameOculto( "OCGeraRelatorioEmpenhoRPCredor.php" );
+        }else{
+            //NOVO RELATÓRIO APÓS 2015
+            include_once '../../../../../../config.php';
+            include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
+            include_once CLA_MPDF;
+            include_once CAM_GF_EMP_MAPEAMENTO."FEmpenhoRelatorioSituacaoRP.class.php";
+            include_once CAM_FW_PDF."RRelatorio.class.php";
+
+            $arFiltro = Sessao::read('filtroRelatorio');
+            $request = new Request($arFiltro);
+
+            $stDataFinal        = $request->get('stDataSituacao');
+            $inCodEntidades     = $request->get('inCodEntidade');
+            $stExercicioEmpenho = $request->get('inExercicio');
+            $inCGM              = $request->get('inCGM');
+
+            $stFiltro = " WHERE 1 = 1 \n";
+
+            $arDataFinal = explode('/', $stDataFinal);
+            $stDataInicial  = '01/01/'.$arDataFinal[2];
+
+            $stExercicio = Sessao::getExercicio();
+
+            $inCodEntidades = implode(',', $inCodEntidades);
+
+            $obFEmpenhoRelatorioSituacaoRP = new FEmpenhoRelatorioSituacaoRP();
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'exercicio'         , $stExercicio);
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'cod_entidade'      , $inCodEntidades);
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'dt_inicial'        , $stDataInicial);
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'dt_final'          , $stDataFinal);
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'exercicio_empenho' , $stExercicioEmpenho);
+            $obFEmpenhoRelatorioSituacaoRP->setDado( 'cgm_credor'        , $inCGM);
+
+            //Array Filtro
+            $inCount = 0;
+            $arFiltro = array();
+            $arFiltro[$inCount]['titulo'] = 'Exercício';
+            $arFiltro[$inCount]['valor']  = $stExercicio;
+            $inCount++;
+
+            $arFiltro[$inCount]['titulo'] = 'Entidades';
+            $arFiltro[$inCount]['valor']  = $inCodEntidades;
+
+            $inCount++;
+
+            $arFiltro[$inCount]['titulo'] = 'Data Inicial';
+            $arFiltro[$inCount]['valor']  = $stDataInicial;
+
+            $inCount++;
+
+            $arFiltro[$inCount]['titulo'] = 'Data Final';
+            $arFiltro[$inCount]['valor']  = $stDataFinal;
+
+            if($stExercicioEmpenho != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Exercício Empenho';
+                $arFiltro[$inCount]['valor']  = $stExercicioEmpenho;
+            }
+
+            if($request->get('inCodEmpenhoInicial', '') != '' || $request->get('inCodEmpenhoFinal', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Número do Empenho';
+                if($request->get('inCodEmpenhoInicial', '') != '' && $request->get('inCodEmpenhoFinal', '') != ''){
+                    $stNroEmpenho = $request->get('inCodEmpenhoInicial').' até '.$request->get('inCodEmpenhoFinal');
+                    $stFiltro .= " AND empenho.cod_empenho BETWEEN ".$request->get('inCodEmpenhoInicial')." AND ".$request->get('inCodEmpenhoFinal')."   \n";
+                }else if($request->get('inCodEmpenhoInicial', '')){
+                    $stNroEmpenho = $request->get('inCodEmpenhoInicial').' até '.$request->get('inCodEmpenhoInicial');
+                    $stFiltro .= " AND empenho.cod_empenho BETWEEN ".$request->get('inCodEmpenhoInicial')." AND ".$request->get('inCodEmpenhoInicial')." \n";
+                }else{
+                    $stNroEmpenho = $request->get('inCodEmpenhoFinal').' até '.$request->get('inCodEmpenhoFinal');
+                    $stFiltro .= " AND empenho.cod_empenho BETWEEN ".$request->get('inCodEmpenhoFinal')." AND ".$request->get('inCodEmpenhoFinal')."     \n";
+                }
+
+                $arFiltro[$inCount]['valor']  = $stNroEmpenho;
+            }
+
+            $assinaturas = Sessao::read('assinaturas');
+            if ( count($assinaturas['selecionadas']) > 0 ) {
+                include_once CAM_FW_PDF."RAssinaturas.class.php";
+                $obRAssinaturas = new RAssinaturas;
+                $obRAssinaturas->setArAssinaturas( $assinaturas['selecionadas'] );
+                $rsAssinaturas = $obRAssinaturas->getArAssinaturas();
+
+                foreach ($rsAssinaturas as $key => $assinatura) {
+                    $arAssinaturas[] = $rsAssinaturas[$key]->getElementos();
+                }
+            }
+
+            if($request->get('stElementoDespesa', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Elemento de Despesa';
+                $arFiltro[$inCount]['valor']  = $request->get('stElementoDespesa');
+                $stFiltro .= " AND despesa.cod_estrutural LIKE '".str_replace(".", "", $request->get('stElementoDespesa'))."%' \n";
+            }
+
+            if($request->get('inCodRecurso', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Recurso';
+                $arFiltro[$inCount]['valor']  = $request->get('inCodRecurso').' - '.$request->get('stDescricaoRecurso');
+                $stFiltro .= " AND despesa.cod_recurso = ".$request->get('inCodRecurso')."                                     \n";
+            }
+
+            if($request->get('inCGM', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Credor';
+                $arFiltro[$inCount]['valor']  = $request->get('inCGM').' - '.$request->get('stNomFornecedor');
+            }
+
+            if($request->get('stCodFuncao', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Função';
+                $arFiltro[$inCount]['valor']  = $request->get('stCodFuncao');
+                $stFiltro .= " AND despesa.cod_funcao = ".$request->get('stCodFuncao')."                                       \n";
+            }
+
+            if($request->get('stCodSubFuncao', '') != ''){
+                $inCount++;
+                $arFiltro[$inCount]['titulo'] = 'Sub-função';
+                $arFiltro[$inCount]['valor']  = $request->get('stCodSubFuncao');
+                $stFiltro .= " AND despesa.cod_subfuncao = ".$request->get('stCodSubFuncao')."                                 \n";
+            }
+
+            //Gerando os records sets
+            $rsSituacaoRP = new RecordSet();
+            $stOrder = "ORDER BY rp.credor
+                               , rp.cod_entidade
+                               , rp.exercicio
+                               , rp.cod_empenho
+                       ";
+            $obFEmpenhoRelatorioSituacaoRP->recuperaTodos($rsSituacaoRP, $stFiltro, $stOrder);
+
+            $arSituacaoRP = $rsSituacaoRP->getElementos();
+
+            //SOMAR TODOS OS ARRAYS
+            $arRestosCredor   = array();
+            $arTotalCredor    = array();
+            $arTotalExercicio = array();
+            $arTotal          = array();
+            foreach($arSituacaoRP as $restos) {
+                $stCredor = $restos['cgm_credor'].' - '.$restos['credor'];
+                $arRestosCredor[$stCredor]['cpf_cnpj'] = $restos['cpf_cnpj'];
+                $arRestosCredor[$stCredor]['restos'][] = $restos;
+
+                $arTotalCredor[$restos['cgm_credor']]['empenhado']             += $restos['empenhado'];
+                $arTotalCredor[$restos['cgm_credor']]['aliquidar']             += $restos['aliquidar'];
+                $arTotalCredor[$restos['cgm_credor']]['liquidadoapagar']       += $restos['liquidadoapagar'];
+                $arTotalCredor[$restos['cgm_credor']]['anulado']               += $restos['anulado'];
+                $arTotalCredor[$restos['cgm_credor']]['liquidado']             += $restos['liquidado'];
+                $arTotalCredor[$restos['cgm_credor']]['pagamento']             += $restos['pagamento'];
+                $arTotalCredor[$restos['cgm_credor']]['empenhado_saldo']       += $restos['empenhado_saldo'];
+                $arTotalCredor[$restos['cgm_credor']]['aliquidar_saldo']       += $restos['aliquidar_saldo'];
+                $arTotalCredor[$restos['cgm_credor']]['liquidadoapagar_saldo'] += $restos['liquidadoapagar_saldo'];
+
+                $arTotalExercicio[$restos['exercicio']]['empenhado']             += $restos['empenhado'];
+                $arTotalExercicio[$restos['exercicio']]['aliquidar']             += $restos['aliquidar'];
+                $arTotalExercicio[$restos['exercicio']]['liquidadoapagar']       += $restos['liquidadoapagar'];
+                $arTotalExercicio[$restos['exercicio']]['anulado']               += $restos['anulado'];
+                $arTotalExercicio[$restos['exercicio']]['liquidado']             += $restos['liquidado'];
+                $arTotalExercicio[$restos['exercicio']]['pagamento']             += $restos['pagamento'];
+                $arTotalExercicio[$restos['exercicio']]['empenhado_saldo']       += $restos['empenhado_saldo'];
+                $arTotalExercicio[$restos['exercicio']]['aliquidar_saldo']       += $restos['aliquidar_saldo'];
+                $arTotalExercicio[$restos['exercicio']]['liquidadoapagar_saldo'] += $restos['liquidadoapagar_saldo'];
+
+                $arTotal[0]['empenhado']             += $restos['empenhado'];
+                $arTotal[0]['aliquidar']             += $restos['aliquidar'];
+                $arTotal[0]['liquidadoapagar']       += $restos['liquidadoapagar'];
+                $arTotal[0]['anulado']               += $restos['anulado'];
+                $arTotal[0]['liquidado']             += $restos['liquidado'];
+                $arTotal[0]['pagamento']             += $restos['pagamento'];
+                $arTotal[0]['empenhado_saldo']       += $restos['empenhado_saldo'];
+                $arTotal[0]['aliquidar_saldo']       += $restos['aliquidar_saldo'];
+                $arTotal[0]['liquidadoapagar_saldo'] += $restos['liquidadoapagar_saldo'];
+            }
+
+            $arDados['exercicio']               = $stExercicio;
+            $arDados['stDataInicial']           = $stDataInicial;
+            $arDados['stDataFinal']             = $stDataFinal;
+            $arDados['inCodEntidade']           = $inCodEntidades;
+
+            $arDados['restos_pagar']            = $arRestosCredor;
+            $arDados['total_credor']            = $arTotalCredor;
+            ksort($arTotalExercicio);
+            $arDados['total_exercicio']         = $arTotalExercicio;
+            $arDados['total']                   = $arTotal;
+            $arDados['arAssinaturas']           = $arAssinaturas;
+            $arDados['filtro']                  = $arFiltro;
+
+            Sessao::write('arDados', $arDados);
+
+            $obRRelatorio = new RRelatorio;
+            $obRRelatorio->executaFrameOculto( "OCGeraRelatorioEmpenhoRPCredor.php" );
         }
-        $obRegra->setDataInicial            ( "01/01/".$arFiltro['inExercicio'] );
-        $obRegra->setDataFinal              ( $arFiltro['stDataSituacao'] );
-        $obRegra->obROrcamentoOrgao->setNumeroOrgao( $arFiltro['inCodOrgao'] );
-        $obRegra->obROrcamentoUnidadeOrcamentaria->setNumeroUnidade( $arFiltro['inCodUnidade'] );
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->setCodEstrutural( $arFiltro['stElementoDespesa'] );
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodRecurso( $arFiltro['inCodRecurso'] );
-        if($arFiltro['inCodUso'] && $arFiltro['inCodDestinacao'] && $arFiltro['inCodEspecificacao'])
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setDestinacaoRecurso( $arFiltro['inCodUso'].".".$arFiltro['inCodDestinacao'].".".$arFiltro['inCodEspecificacao'] );
-
-        $obRegra->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->setCodDetalhamento( $arFiltro['inCodDetalhamento'] );
-
-        $obRegra->setFuncao                ( $arFiltro['stCodFuncao'] );
-        $obRegra->setSubFuncao             ( $arFiltro['stCodSubFuncao'] );
-        $obRegra->setOrdem                 ( $arFiltro['inOrdenacao'] );
-        $obRegra->setModulo                ( $arFiltro['inCodModulo'] );
-
-        $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM     ( $arFiltro['inCGM'] );
-        $obRegra->obREmpenhoEmpenho->setCodEmpenhoInicial  ( $arFiltro['inCodEmpenhoInicial']  );
-        $obRegra->obREmpenhoEmpenho->setCodEmpenhoFinal    ( $arFiltro['inCodEmpenhoFinal']    );
-
-        switch ($arFiltro['inOrdenacao']) {
-            case "1":
-                $arFiltro['stOrdenacao'] = "Empenho";
-            break;
-
-            case "2":
-                $arFiltro['stOrdenacao'] = "Vencimento";
-            break;
-
-            case "3":
-                $arFiltro['stOrdenacao'] = "Recurso";
-            break;
-            case "4":
-                $arFiltro['stOrdenacao'] = "Credor";
-            break;
-
-        }
-
-       $obRegra->geraRecordSet( $rsEmpenhoRPCredor , $arFiltro['inOrdenacao'] );
-       Sessao::write('filtroRelatorio', $arFiltro);
-       Sessao::write('rsRecordSet', $rsEmpenhoRPCredor);
-       $obRegra->obRRelatorio->executaFrameOculto( "OCGeraRelatorioEmpenhoRPCredor.php" );
 
     break;
 }

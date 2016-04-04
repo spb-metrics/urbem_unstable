@@ -78,12 +78,12 @@ function TEmpenhoOrdemPagamentoAnulada()
     $this->setCampoCod('');
     $this->setComplementoChave('cod_ordem,exercicio,cod_entidade,timestamp');
 
-    $this->AddCampo('cod_ordem','integer',true,'',true,true);
-    $this->AddCampo('exercicio','char',true,'04',true,true);
-    $this->AddCampo('cod_entidade','integer',true,'',true,false);
-    $this->AddCampo('timestamp','timestamp',false,'',true,true);
-    $this->AddCampo('motivo','text',true,'',false,false);
-//    $this->AddCampo('vl_anulado','numeric',true,'14,02',false,false);
+    $this->AddCampo('cod_ordem'   ,  'integer', true, '',  true,  true);
+    $this->AddCampo('exercicio'   ,  'varchar', true,'4',  true,  true);
+    $this->AddCampo('cod_entidade',  'integer', true, '',  true,  true);
+    $this->AddCampo('timestamp'   ,'timestamp', true, '',  true,  true);
+    $this->AddCampo('motivo'      ,     'text', true, '', false, false);
+
 }
 
 /**

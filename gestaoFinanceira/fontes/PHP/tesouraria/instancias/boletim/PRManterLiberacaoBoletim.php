@@ -32,19 +32,17 @@
 
     * @ignore
 
-    $Revision: 32021 $
-    $Name$
-    $Author: hwalves $
-    $Date: 2007-09-24 12:21:28 -0300 (Seg, 24 Set 2007) $
+    $Id: PRManterLiberacaoBoletim.php 64692 2016-03-22 13:36:45Z michel $
 
     * Casos de uso: uc-02.04.08 , uc-02.04.25
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php" );
+include_once CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php";
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLiberacaoBoletim";
@@ -58,7 +56,7 @@ $stNow = date( 'Y-m-d H:i:s.ms' );
 
 $obErro = new Erro();
 
-foreach ($_REQUEST as $campo => $valor) {
+foreach ($request->getAll() as $campo => $valor) {
     if (substr($campo,0,9) == 'boLiberar' && !$obErro->ocorreu()) {
         $inCodBoletim = str_replace('boLiberar_','',$campo);
         $inCodBoletim = substr($inCodBoletim,0,strpos($inCodBoletim,'_'));
@@ -68,13 +66,13 @@ foreach ($_REQUEST as $campo => $valor) {
 
 //valida a utilização da rotina de encerramento do mês contábil
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
-include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
+
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
 
-if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $_POST['inMes']) {
+if ($boUtilizarEncerramentoMes == 'true' AND $rsUltimoMesEncerrado->getCampo('mes') >= $request->get('inMes')) {
     if ($stAcao == 'excluir') {
         SistemaLegado::exibeAviso(urlencode("Mês do Cancelamento encerrado!"),"n_incluir","erro");
     } else {
@@ -95,7 +93,7 @@ $obRegra->obRTesourariaUsuarioTerminal->listar($userTerminal);
 $obRegra->obRTesourariaUsuarioTerminal->setTimestampUsuario( $userTerminal->getCampo('timestamp_usuario')  	);
 $obRegra->obRTesourariaUsuarioTerminal->roRTesourariaTerminal->setTimestampTerminal( $userTerminal->getCampo('timestamp_terminal') );
 $obRegra->setExercicio   ( Sessao::getExercicio() );
-$obRegra->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
+$obRegra->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
 
 $boTransacao="";
 while ( !$obErro->ocorreu() && !$rsBoletim->eof() ) {
@@ -124,7 +122,7 @@ if (!$obErro->ocorreu()) {
     if($stAcao == 'excluir')
         $stMensagem = $inCount > 1 ? "$inCount Liberações de Boletim Canceladas" : "Boletim ".$inCodBoletim."/".Sessao::getExercicio();
 
-    SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao."&inCodEntidade=".$_REQUEST['inCodEntidade']."&inMes=".$_REQUEST['inMes']."&stDataInicial=".$_REQUEST['stDataInicial']."&stDataFinal=".$_REQUEST['stDataFinal'], $stMensagem,$stAcao,"aviso", Sessao::getId(), "../");
+    SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao."&inCodEntidade=".$request->get('inCodEntidade')."&inMes=".$request->get('inMes')."&stDataInicial=".$request->get('stDataInicial')."&stDataFinal=".$request->get('stDataFinal'), $stMensagem,$stAcao,"aviso", Sessao::getId(), "../");
 } else {
     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_".$stAcao,"erro");
     SistemaLegado::LiberaFrames();

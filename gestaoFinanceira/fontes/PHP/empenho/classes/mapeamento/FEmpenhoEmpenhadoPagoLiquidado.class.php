@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: FEmpenhoEmpenhadoPagoLiquidado.class.php 61245 2014-12-19 21:08:54Z arthur $
+    $Id: FEmpenhoEmpenhadoPagoLiquidado.class.php 64470 2016-03-01 13:12:50Z jean $
 
     $Revision: 32880 $
     $Name$
@@ -82,7 +82,7 @@ function montaRecuperaTodos()
         $boMostrarAnuladoMesmoPeriodo = 'false';
     }
 
-    $stSql  = "select * \n";
+    $stSql = " SELECT retorno.*                                                         \n";
     $stSql .= "  from " . $this->getTabela() . "('" . $this->getDado("exercicio") ."',  \n";
     $stSql .= "  '" . $this->getDado("stFiltro") . "','" . $this->getDado("stDataInicial") . "', \n";
     $stSql .= "  '" . $this->getDado("stDataFinal") . "','".$this->getDado("stEntidade")."',\n";
@@ -112,6 +112,27 @@ function montaRecuperaTodos()
     $stSql .= "  despesa             varchar                                            \n";
     $stSql .= "  )                                                                        ";
 
+    if (Sessao::getExercicio() > '2015') {
+        $stSql .= " INNER JOIN empenho.empenho
+                            ON empenho.cod_empenho = retorno.empenho
+                           AND empenho.cod_entidade = retorno.entidade
+                           AND empenho.exercicio = retorno.exercicio
+
+                    INNER JOIN empenho.pre_empenho
+                            ON pre_empenho.exercicio = empenho.exercicio
+                           AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+
+                    INNER JOIN empenho.item_pre_empenho
+                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                           AND item_pre_empenho.exercicio = pre_empenho.exercicio
+                \n";
+
+        if ($this->getDado("inCentroCusto") != '') {
+            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado("inCentroCusto")."\n";
+        }
+    }
+
+
    return $stSql;
 }
 
@@ -132,7 +153,49 @@ function montaRecuperaPagosEstornados()
 {
     // Implementar aqui
 
-    $stSql  = "select entidade, descricao_categoria, nom_tipo, empenho, exercicio, cgm, Substr(razao_social,1,45) as razao_social, cod_nota, data, ordem, conta, Substr(nome_conta,1,45) as nome_conta, valor, valor_estornado, valor_liquido, descricao, recurso, despesa  \n";
+    if (Sessao::getExercicio() > '2015') {
+        $stSql = " SELECT retorno.entidade
+                        , retorno.descricao_categoria
+                        , retorno.nom_tipo
+                        , retorno.empenho
+                        , retorno.exercicio
+                        , retorno.cgm
+                        , SUBSTR(retorno.razao_social,1,45) as razao_social
+                        , retorno.cod_nota
+                        , retorno.data
+                        , retorno.ordem
+                        , retorno.conta
+                        , SUBSTR(retorno.nome_conta,1,45) as nome_conta
+                        , retorno.valor
+                        , retorno.valor_estornado
+                        , retorno.valor_liquido
+                        , retorno.descricao
+                        , retorno.recurso
+                        , retorno.despesa
+                        , item_pre_empenho.cod_centro AS centro_custo \n";
+
+    } else {
+        $stSql  = "select entidade
+                        , descricao_categoria
+                        , nom_tipo
+                        , empenho
+                        , exercicio
+                        , cgm
+                        , Substr(razao_social,1,45) as razao_social
+                        , cod_nota
+                        , data
+                        , ordem
+                        , conta
+                        , Substr(nome_conta,1,45) as nome_conta
+                        , valor
+                        , valor_estornado
+                        , valor_liquido
+                        , descricao
+                        , recurso
+                        , despesa  \n";
+    }
+
+    
     $stSql .= "  from empenho.fn_empenho_empenhado_pago_estornado('" . $this->getDado("exercicio") ."',                             \n";
     $stSql .= "  '" . $this->getDado("stFiltro") . "','" . $this->getDado("stDataInicial") . "',                                    \n";
     $stSql .= "  '" . $this->getDado("stDataFinal") . "','".$this->getDado("stEntidade")."',                                        \n";
@@ -163,6 +226,26 @@ function montaRecuperaPagosEstornados()
     $stSql .= "  despesa             varchar(150)                                                                                   \n";
     $stSql .= "  )                                                                                                                    ";
 
+    if (Sessao::getExercicio() > '2015') {
+        $stSql .= " INNER JOIN empenho.empenho
+                            ON empenho.cod_empenho = retorno.empenho
+                           AND empenho.cod_entidade = retorno.entidade
+                           AND empenho.exercicio = retorno.exercicio
+
+                    INNER JOIN empenho.pre_empenho
+                            ON pre_empenho.exercicio = empenho.exercicio
+                           AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+
+                    INNER JOIN empenho.item_pre_empenho
+                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                           AND item_pre_empenho.exercicio = pre_empenho.exercicio
+                \n";
+
+        if ($this->getDado("inCentroCusto") != '') {
+            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado("inCentroCusto")."\n";
+        }
+    }
+    
     return $stSql;
 }
 

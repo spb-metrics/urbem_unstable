@@ -90,11 +90,12 @@ class TTCEMGConsideracaoArquivo extends Persistente
     {
         $stSql  = "
             SELECT 10 as tipo_registro \n";
-        
-        if ( $this->getDado('exercicio') >= "2015" )
+
+        if ( $this->getDado('exercicio') >= "2015" && $this->getDado('tipo') != 'folhapagamento'){
             $stSql  .= " , consideracao_arquivo.nom_arquivo \n";
-        else
+        } else {
             $stSql  .= " , consideracao_arquivo.cod_arquivo \n";
+        }
         
         $stSql  .= "         
                  , CAD.descricao as consideracoes
@@ -107,7 +108,8 @@ class TTCEMGConsideracaoArquivo extends Persistente
              WHERE CAD.periodo      = '".$this->getDado('mes')."'
                AND CAD.cod_entidade IN(".$this->getDado('entidade').")
                AND CAD.modulo_sicom = '".$this->getDado('modulo_sicom')."'
-          ORDER BY consideracao_arquivo.cod_arquivo";
+          ORDER BY consideracao_arquivo.cod_arquivo
+        ";
         return $stSql;
     }
 

@@ -29,7 +29,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: FLRelacaoEmpenho.php 59612 2014-09-02 12:00:51Z gelson $
+* $Id: FLRelacaoEmpenho.php 64470 2016-03-01 13:12:50Z jean $
 *
 */
 
@@ -304,6 +304,15 @@ $obCmbOrdem->addOption              ( "credor", "Data / Credor"       );
 $obCmbOrdem->addOption              ( "credor_data", "Credor / Data"       );
 $obCmbOrdem->setNull                ( true );
 
+if (Sessao::getExercicio() > '2015') {
+    $obCentroCusto = new TextBox;
+    $obCentroCusto->setRotulo ("Centro de Custo");
+    $obCentroCusto->setTitle ("Informe o centro de custo");
+    $obCentroCusto->setName ('inCentroCusto');
+    $obCentroCusto->setId ('inCentroCusto');
+    $obCentroCusto->setInteiro (true);  
+}
+
 include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
 $obMontaAssinaturas = new IMontaAssinaturas;
 $obMontaAssinaturas->setEventosCmbEntidades ( $obCmbEntidades );
@@ -314,6 +323,9 @@ $obFormulario->addHidden    ( $obHdnCaminho );
 $obFormulario->addTitulo    ( "Dados para Filtro" );
 $obFormulario->addComponente( $obCmbEntidades      );
 $obFormulario->addComponente( $obPeriodicidade );
+if (Sessao::getExercicio() > '2015') {
+    $obFormulario->addComponente( $obCentroCusto );
+}
 $obFormulario->addComponente( $obBscDespesa );
 $obFormulario->addComponenteComposto( $obTxtOrgao, $obCmbOrgao  );
 $obFormulario->addComponenteComposto( $obTxtUnidade, $obCmbUnidade  );

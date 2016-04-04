@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacaoParcial.php 64205 2015-12-15 20:31:55Z michel $
+    $Id: PRManterAutorizacaoParcial.php 64364 2016-01-27 13:17:11Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -570,7 +570,9 @@ if(count($arListaDespesaFornecedor)==0){
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $dadosItens['cod_grandeza']   );
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade  ( $dadosItens['simbolo']                                    );
                     }
-
+                    
+                    $obAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+                    $obAutorizacaoEmpenho->setTipoEmissao('R');
                     $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
 
                     if ($obErro->ocorreu()) {

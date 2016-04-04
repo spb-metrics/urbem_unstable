@@ -26,10 +26,15 @@
 /**
     * @author Analista: Carlos Adriano
     * @author Desenvolvedor: Carlos Adriano
+    *
+    * $Id: TTGOPAR.class.php 64666 2016-03-18 20:07:39Z franver $
+    * $Author: franver $
+    * $Revision: 64666 $
+    * $Date: 2016-03-18 17:07:39 -0300 (Sex, 18 Mar 2016) $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class TTGOPAR extends Persistente
 {
@@ -37,7 +42,7 @@ class TTGOPAR extends Persistente
     * Método Construtor
     * @access Private
     */
-    public function TTCMGOProjecaoAtuarial()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela("tcmgo.projecao_atuarial");
@@ -45,48 +50,36 @@ class TTGOPAR extends Persistente
         $this->setCampoCod('exercicio');
         $this->setComplementoChave('num_orgao');
 
-        $this->AddCampo( 'num_orgao'  , 'integer' , true  , ''     ,true   , true  );
-        $this->AddCampo( 'exercicio'  , 'varchar' , true  , '4'    ,true   , true  );
-        $this->AddCampo( 'vl_receita' , 'numeric' , true  , '14,2' , false , false );
-        $this->AddCampo( 'vl_despesa' , 'numeric' , true  , '14,2' , false , false );
-        $this->AddCampo( 'vl_saldo'   , 'numeric' , true  , '14,2' , false , false );
-    }
-
-    public function recuperaTodos(&$rsRecordSet)
-    {
-        $obErro      = new Erro;
-        $obConexao   = new Conexao;
-        $rsRecordSet = new RecordSet;
-
-        $stSql = $this->montaRecuperaTodos();
-        $this->setDebug( $stSql );
-        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql );
-
-        return $obErro;
+        $this->AddCampo(  'num_orgao', 'integer', true,     '',  true,  true);
+        $this->AddCampo(  'exercicio', 'varchar', true,    '4',  true,  true);
+        $this->AddCampo( 'vl_receita', 'numeric', true, '14,2', false, false);
+        $this->AddCampo( 'vl_despesa', 'numeric', true, '14,2', false, false);
+        $this->AddCampo(   'vl_saldo', 'numeric', true, '14,2', false, false);
     }
 
     public function montaRecuperaTodos()
     {
-        $stSql = "SELECT
-                        '10' as tipo_registro,
-                        exercicio,
-                        num_orgao,
-                        case when lpad(trim(to_char(vl_receita, '9999999999D99')), 13, '0') != '' then
-                lpad(trim(to_char(vl_receita, '9999999999D99')), 13, '0')
-            else '0000000000,00' end as vl_receita,
-
-                        case when lpad(trim(to_char(vl_despesa, '9999999999D99')), 13, '0') != '' then
-                lpad(trim(to_char(vl_despesa, '9999999999D99')), 13, '0')
-            else '0000000000,00' end as vl_despesa,
-
-                        case when lpad(trim(to_char(vl_saldo, '9999999999D99')), 13, '0') != '' then
-                lpad(trim(to_char(vl_saldo, '9999999999D99')), 13, '0')
-            else '0000000000,00' end as vl_saldo,
-
-                        '1' as numero_registro
-                    FROM tcmgo.projecao_atuarial
-                   WHERE exercicio >= '".(Sessao::getExercicio() - 1)."'";
-
+        $stSql = "
+              SELECT '10' as tipo_registro
+                   , exercicio
+                   , num_orgao
+                   , CASE WHEN LPAD(TRIM(TO_CHAR(vl_receita, '9999999999D99')), 13, '0') != ''
+                          THEN LPAD(TRIM(TO_CHAR(vl_receita, '9999999999D99')), 13, '0')
+                          ELSE '0000000000,00'
+                      END AS vl_receita
+                   , CASE WHEN LPAD(TRIM(TO_CHAR(vl_despesa, '9999999999D99')), 13, '0') != ''
+                          THEN LPAD(TRIM(TO_CHAR(vl_despesa, '9999999999D99')), 13, '0')
+                          ELSE '0000000000,00'
+                      END AS vl_despesa
+                   , CASE WHEN LPAD(TRIM(TO_CHAR(vl_saldo, '9999999999D99')), 13, '0') != ''
+                          THEN LPAD(TRIM(TO_CHAR(vl_saldo, '9999999999D99')), 13, '0')
+                          ELSE '0000000000,00'
+                      END AS vl_saldo
+                   , '1' AS numero_registro
+                FROM tcmgo.projecao_atuarial
+               WHERE exercicio >= '".(Sessao::getExercicio() - 1)."'
+            ORDER BY exercicio ASC
+        ";
         return $stSql;
     }
 }

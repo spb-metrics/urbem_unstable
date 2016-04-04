@@ -32,7 +32,7 @@
 
  * @ignore
 
- * $Id: LSConsultaImovel.php 59612 2014-09-02 12:00:51Z gelson $
+ * $Id: LSConsultaImovel.php 64728 2016-03-23 19:49:02Z jean $
 
  * Casos de uso: uc-05.01.18
  */
@@ -111,14 +111,14 @@ $stMascaraLote = $obRCIMConfiguracao->getMascaraLote();
 $arAtributosFiltro = array();
 
 foreach ($arFiltroSessao as $valor => $key) {
-
     if (preg_match("/Atributo_/",$valor)) {
         if ($key) {
             $arDados = explode( "_", $valor );
+            $stValor = implode(",",$key);
             $arAtributosFiltro[] = array(
                 "cod_cadastro" => $arDados[2],
                 "cod_atributo" => $arDados[1],
-                "valor" => $key
+                "valor" => $stValor
             );
         }
     }

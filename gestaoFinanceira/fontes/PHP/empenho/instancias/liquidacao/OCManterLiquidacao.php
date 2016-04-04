@@ -33,7 +33,7 @@
     * @ignore
 
 
-    $Id: OCManterLiquidacao.php 60651 2014-11-06 12:38:46Z jean $
+    $Id: OCManterLiquidacao.php 64431 2016-02-22 18:00:21Z jean $
 
     $Revision: 30805 $
     $Name$
@@ -1187,18 +1187,28 @@ function montaNF( $ent ){
         $obTxtVlTotalLiquidNF->setNull    ( false                           );
         
         $obFormulario = new Formulario;
-        $obFormulario->addComponente    ( $obCmbTipoNota                );
-        $obFormulario->addComponente    ( $obTxtIncricaoMunicipal       );
-        $obFormulario->addComponente    ( $obTxtIncricaoEstadual        );
-        $obFormulario->addComponente    ( $obTxtAIDF                    );
-        $obFormulario->addComponente    ( $obDtEmissao                  );
-        $obFormulario->addComponente    ( $obTxtExercicio               );
-        $obFormulario->addSpan          ( $obSpnTipoNF                  );
-        $obFormulario->addTitulo        ( "Dados Financeiros do Documento Fiscal"   );
-        $obFormulario->addComponente    ( $obTxtVlTotalDoctoFiscal      );
-        $obFormulario->addComponente    ( $obTxtVlDescontoDoctoFiscal   );
-        $obFormulario->addComponente    ( $obTxtVlTotalLiquidNF         );
-        
+
+        switch (Sessao::read('inUf')){
+            case '23':
+                montaNumeroNF($obFormulario, true, "");
+                montaNumSerie($obFormulario, true, "");
+                $obFormulario->addComponente($obDtEmissao);
+            break;
+            default:
+                $obFormulario->addComponente    ( $obCmbTipoNota                );
+                $obFormulario->addComponente    ( $obTxtIncricaoMunicipal       );
+                $obFormulario->addComponente    ( $obTxtIncricaoEstadual        );
+                $obFormulario->addComponente    ( $obTxtAIDF                    );
+                $obFormulario->addComponente    ( $obDtEmissao                  );
+                $obFormulario->addComponente    ( $obTxtExercicio               );
+                $obFormulario->addSpan          ( $obSpnTipoNF                  );
+                $obFormulario->addTitulo        ( "Dados Financeiros do Documento Fiscal"   );
+                $obFormulario->addComponente    ( $obTxtVlTotalDoctoFiscal      );
+                $obFormulario->addComponente    ( $obTxtVlDescontoDoctoFiscal   );
+                $obFormulario->addComponente    ( $obTxtVlTotalLiquidNF         );
+            break;
+        }
+
         $obFormulario->montaInnerHTML();
         $stHtml = $obFormulario->getHTML();
         

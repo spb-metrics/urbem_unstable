@@ -110,7 +110,19 @@ BEGIN
                                                                                AND configuracao_lancamento_debito.cod_conta = plano_conta.cod_conta ) 
                                                     AND NOT EXISTS ( SELECT 1 FROM empenho.ordem_pagamento_retencao
                                                                               WHERE ordem_pagamento_retencao.exercicio = plano_analitica.exercicio   
-                                                                               AND ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano ) 
+                                                                               AND ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano )
+                                                    AND NOT EXISTS ( SELECT 1 FROM patrimonio.grupo_plano_depreciacao
+                                                                             WHERE grupo_plano_depreciacao.exercicio = plano_analitica.exercicio   
+                                                                               AND grupo_plano_depreciacao.cod_plano = plano_analitica.cod_plano )
+                                                    AND NOT EXISTS ( SELECT 1 FROM empenho.responsavel_adiantamento
+                                                                             WHERE responsavel_adiantamento.exercicio        = plano_analitica.exercicio   
+                                                                               AND responsavel_adiantamento.conta_lancamento = plano_analitica.cod_plano )
+                                                    AND NOT EXISTS ( SELECT 1 FROM empenho.contrapartida_responsavel
+                                                                             WHERE contrapartida_responsavel.exercicio           = plano_analitica.exercicio   
+                                                                               AND contrapartida_responsavel.conta_contrapartida = plano_analitica.cod_plano )
+                                                    AND NOT EXISTS ( SELECT 1 FROM tesouraria.recibo_extra
+                                                                             WHERE recibo_extra.exercicio = plano_analitica.exercicio   
+                                                                               AND recibo_extra.cod_plano = plano_analitica.cod_plano ) 
                                                     AND plano_conta.cod_estrutural NOT LIKE ''1.1.1%''
                                                     AND plano_conta.cod_estrutural NOT LIKE ''7.2.1.1.1%''
                                                     AND plano_conta.cod_estrutural NOT LIKE ''8.2.1.1.1%''
@@ -193,7 +205,10 @@ BEGIN
                                                                         AND configuracao_lancamento_debito.cod_conta = plano_conta.cod_conta )
                                              AND NOT EXISTS ( SELECT 1 FROM contabilidade.plano_analitica
                                                                       WHERE plano_analitica.cod_conta = plano_conta.cod_conta                                             
-                                                                        AND plano_analitica.exercicio = plano_conta.exercicio) 
+                                                                        AND plano_analitica.exercicio = plano_conta.exercicio ) 
+                                             AND NOT EXISTS ( SELECT 1 FROM orcamento.receita_credito_tributario
+                                                                      WHERE receita_credito_tributario.cod_conta = plano_conta.cod_conta                                             
+                                                                        AND receita_credito_tributario.exercicio = plano_conta.exercicio ) 
                                              AND plano_conta.cod_estrutural NOT LIKE ''1.1.1%''
                                              AND plano_conta.cod_estrutural NOT LIKE ''7.2.1.1.1%''
                                              AND plano_conta.cod_estrutural NOT LIKE ''8.2.1.1.1%''

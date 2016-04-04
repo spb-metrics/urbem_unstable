@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoOrdemPagamentoLiquidacaoAnulada.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TEmpenhoOrdemPagamentoLiquidacaoAnulada.class.php 64368 2016-01-28 12:04:02Z franver $
 
     $Revision: 30668 $
     $Name$
@@ -71,13 +71,13 @@ function TEmpenhoOrdemPagamentoLiquidacaoAnulada()
     $this->setCampoCod('');
     $this->setComplementoChave('exercicio,cod_entidade,cod_ordem,exercicio_liquidacao,cod_nota,timestamp');
 
-    $this->AddCampo('exercicio'           ,'chat'     ,true ,'04'   ,true ,true );
+    $this->AddCampo('exercicio'           ,'varchar'  ,true ,'4'   ,true ,true );
     $this->AddCampo('cod_entidade'        ,'integer'  ,true ,''     ,true ,true );
     $this->AddCampo('cod_ordem'           ,'integer'  ,true ,''     ,true ,true );
-    $this->AddCampo('exercicio_liquidacao','integer'  ,true ,''     ,true ,true );
+    $this->AddCampo('exercicio_liquidacao','varchar'  ,true ,'4'     ,true ,true );
     $this->AddCampo('cod_nota'            ,'integer'  ,true ,''     ,true ,true );
     $this->AddCampo('timestamp'           ,'timestamp',true ,''     ,true ,true );
-    $this->AddCampo('vl_anulado'          ,'numeric'  ,true ,'14,02',false,false);
+    $this->AddCampo('vl_anulado'          ,'numeric'  ,true ,'14,2',false,false);
 }
 
 function recuperaValorAnular(&$rsRecordSet, $boTransacao='')

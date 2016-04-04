@@ -26,7 +26,7 @@
  * @author Analista: Gelson W. Gonçalves
  * @author Desenvolvedor: Henrique Boaventura
 
- * $Id: PRManterBem.php 63088 2015-07-23 17:04:56Z arthur $
+ * $Id: PRManterBem.php 64578 2016-03-15 20:25:48Z arthur $
 
  * Casos de uso: uc-03.01.06
  */
@@ -427,15 +427,15 @@ switch ($stAcao) {
                 $obTTGOPatrimonioBemObra->inclusao();
             }
             
-            $stMensagem = "Incluir Bem concluído com sucesso! ($stMsg)";
-
             $stJs .= "jQuery('#stNumeroPlaca', window.parent.frames['telaPrincipal'].document).val('".$numeroPlaca."');";
             $stJs .= "jQuery('#stSpnListaReavaliacao', window.parent.frames['telaPrincipal'].document).html('');";
             $stJs .= "window.parent.frames['telaPrincipal'].HabilitaLayer('layer_1');";
             $stJs .= "d.getElementById('stCodClassificacao').focus();";
-            $stJs .= "alertaAviso('$stMensagem','form','aviso','".Sessao::getId()."');";
             Sessao::remove('arReavaliacao');
             SistemaLegado::executaFrameOculto($stJs);
+            
+            SistemaLegado::alertaAviso($pgForm."?".Sessao::getId()."&stAcao=".$stAcao,$stMsg,"incluir","aviso", Sessao::getId(), "../");
+            
         } else {
             SistemaLegado::exibeAviso(urlencode($stMensagem).'!',"n_incluir","erro");
         }

@@ -32,7 +32,7 @@
   * @package URBEM
   * @subpackage
 
-  * $Id: OCManterBem.php 64184 2015-12-11 14:09:44Z arthur $
+  * $Id: OCManterBem.php 64578 2016-03-15 20:25:48Z arthur $
 
   * Casos de uso: uc-03.01.06
 */
@@ -40,13 +40,81 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CAM_GP_PAT_MAPEAMENTO.'TPatrimonioBem.class.php';
+include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioTipoNatureza.class.php";
 
 switch ($request->get('stCtrl')) {
-    
+
+    case 'buscaPopupTipoBaixa':
+
+        $stMsgErro = "";
+        $inCodigo  = str_replace(".","",$request->get('inCodigo'));
+        
+        if ($request->get('inTipoBaixa') == '') {
+            $stMsgErro = 'Prencha o campo Tipo de baixa';
+        }
+        
+        //se for vazio, limpa os campos
+        if (trim($inCodigo) != '') {
+            
+            $obTPatrimonioBem         = new TPatrimonioBem();
+            $oTPatrimonioTipoNatureza = new TPatrimonioTipoNatureza();
+            
+            $boMostrarDescricao = $request->get('boMostrarDescricao');
+
+            # Validação para verificar se o item existe e não está baixado.
+            if (empty($stMsgErro)) {
+                
+                if ($request->get('boBemBaixado') == 'false') {
+                    $stFiltro .= ' AND NOT EXISTS
+                                       (
+                                            SELECT  1
+                                              FROM  patrimonio.bem_baixado
+                                             WHERE  bem_baixado.cod_bem = bem.cod_bem
+                                       ) ';
+                }
+
+                $obTPatrimonioBem->setDado( 'cod_bem', $inCodigo );
+                $obTPatrimonioBem->recuperaRelacionamento( $rsBem, $stFiltro );
+                
+                // verifica se o usuário setou algum tipo de baixa e se o bem pertence a configuração de bens Imóveis
+                if ( $request->get('inTipoBaixa') != 0 && ($request->get('inTipoBaixa') == 1 || $request->get('inTipoBaixa') == 3 || $request->get('inTipoBaixa') == 5)) {
+                    $inTipoBaixa = 2;
+                    $stTipoBaixa = "Imóvel";
+                
+                // verifica se o bem pertence a configuração de bens Móveis
+                } else if ( $request->get('inTipoBaixa') != 0 && ($request->get('inTipoBaixa') == 2 || $request->get('inTipoBaixa') == 4 || $request->get('inTipoBaixa') == 6)) {
+                    $inTipoBaixa = 1;
+                    $stTipoBaixa = "Móvel";
+                }
+                
+                if ($rsBem->getNumLinhas() <= 0) {
+                    $stMsgErro = "Esse Bem (".$inCodigo.") é Inválido ou está Baixado";
+                } else if ( $request->get('inTipoBaixa') != 0 && $rsBem->getCampo('codigo') != $inTipoBaixa ) {
+                    $stMsgErro = "Para realizar uma baixa de bem ".$stTipoBaixa." é necessário que o Tipo da Natureza do bem (".$inCodigo.") seja do mesmo tipo";
+                }
+
+            }
+
+            # Caso não encontre nenhum erro, preenche os campos com os dados.
+            if (empty($stMsgErro)) {
+                $stJs .= "jQuery('#".$request->get('stNomCampoCod')."').val('".$rsBem->getCampo('cod_bem')."');       \n";
+                $stJs .= "jQuery('#".$request->get('stIdCampoDesc')."').html(\"".$rsBem->getCampo('descricao')."\");  \n";
+            } else {
+                $stJs .= "alertaAviso('@".$stMsgErro.".','form','erro','".Sessao::getId()."');";
+                $stJs .= "jQuery('#".$request->get('stNomCampoCod')."').val('');          \n";
+                $stJs .= "jQuery('#".$request->get('stIdCampoDesc')."').html(\"&nbsp;\"); \n";
+            }
+        } else {
+            $stJs .= "jQuery('#".$request->get('stNomCampoCod')."').val('');          \n";
+            $stJs .= "jQuery('#".$request->get('stIdCampoDesc')."').html(\"&nbsp;\"); \n";
+        }
+        
+    break;
+        
     case 'buscaPopup':
         $stMsgErro = "";
         $inCodigo  = str_replace(".","",$request->get('inCodigo'));
-
+        
         //se for vazio, limpa os campos
         if (trim($inCodigo) != '') {
             //instancia o mapeamento e procura pelo codigo passado

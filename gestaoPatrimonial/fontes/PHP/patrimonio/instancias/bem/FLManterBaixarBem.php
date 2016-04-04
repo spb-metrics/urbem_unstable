@@ -42,6 +42,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CAM_GP_PAT_COMPONENTES.'IIntervaloPopUpBem.class.php';
+include_once CAM_GP_PAT_MAPEAMENTO.'TPatrimonioTipoBaixa.class.php';
 
 $stPrograma = "ManterBaixarBem";
 $pgFilt   = "FL".$stPrograma.".php";
@@ -52,6 +53,9 @@ $pgOcul   = "OC".$stPrograma.".php";
 $pgJs     = "JS".$stPrograma.".js";
 
 $stAcao = $request->get("stAcao");
+
+$obTPatrimonioTipoBaixa = new TPatrimonioTipoBaixa();
+$obTPatrimonioTipoBaixa->recuperaTodos($rsTipoBaixa, " ORDER BY cod_tipo");
 
 //cria um novo formulario
 $obForm = new Form;
@@ -76,6 +80,15 @@ $obPeriodicidade->setExercicio( Sessao::getExercicio() );
 $obPeriodicidade->setRotulo( 'Data de Baixa' );
 $obPeriodicidade->setTitle( 'Informe o intervalo da data de baixa.' );
 
+$obCmbTipoBaixa = new Select();
+$obCmbTipoBaixa->setName       ( "inTipoBaixa"   );
+$obCmbTipoBaixa->setRotulo     ( "Tipo da baixa" );
+$obCmbTipoBaixa->setId         ( "inTipoBaixa"   );
+$obCmbTipoBaixa->setCampoId    ( "cod_tipo"      );
+$obCmbTipoBaixa->setCampoDesc  ( "[cod_tipo] - [descricao]" );
+$obCmbTipoBaixa->addOption     ( '','Selecione'  );
+$obCmbTipoBaixa->preencheCombo ( $rsTipoBaixa    ); 
+
 $obFormulario = new Formulario();
 $obFormulario->setAjuda('UC-03.01.06');
 $obFormulario->addForm      ( $obForm );
@@ -84,6 +97,7 @@ $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addTitulo    ( "Dados para o Filtro" );
 $obFormulario->addComponente( $obIIntervaloPopUpBem );
 $obFormulario->addComponente( $obPeriodicidade );
+$obFormulario->addComponente( $obCmbTipoBaixa );
 $obFormulario->Ok();
 $obFormulario->show();
 

@@ -25,7 +25,7 @@
 <?php
 /**
     * Classe de mapeamento
-    * Data de Criação: 07/08/".$this->getDado('exercicio')."
+    * Data de Criação: 13/08/2014
 
     * @author Analista: Ane
     * @author Desenvolvedor: Carlos Adriano 
@@ -33,17 +33,13 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 62788 2015-06-17 18:14:39Z evandro $
+    * $Id: TTCEMGRelatorioRazaoDespesa.class.php 64774 2016-03-30 22:01:05Z michel $
     *
-    * $Name: $
-    * $Date: $
-    * $Author: $
-    * $Rev: $
 */
 
 class TTCEMGRelatorioRazaoDespesa extends Persistente
 {
-    public function TTCEMGRelatorioRazaoDespesa()
+    public function __construct()
     {
         parent::Persistente();
     }
@@ -594,523 +590,339 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
     }
     
     public function montaRecuperaDadosDespesaExtraOrcamentaria() {
-        $stSql  = " SELECT
-                            tabela.dt_pagamento
-                          , tabela.cod_recurso 
-                          , tabela.cod_recurso||' - '||tabela.nom_recurso AS nom_recurso
-                          , tabela.nome_despesa
-                          , tabela.cod_lote
-                          , tabela.valor AS valor_pago
-                          , banco.num_banco||' - '||banco.nom_banco AS banco
-                          , plano_recurso.cod_recurso AS cod_recurso_banco
-                      
+        $stSql  = " SELECT tabela.*
+                         , banco.num_banco||' - '||banco.nom_banco AS banco
+                         , plano_recurso.cod_recurso AS cod_recurso_banco
                       FROM (
-                          SELECT
-                                plano_debito.exercicio
-                              , dt_pagamento
-                              , cod_lote
-                              , cod_plano_credito
-                              , sum(coalesce(vl_pago,0.00)) AS valor
-                              , tipo_despesa
-                              , cod_entidade
-                              , nom_entidade
-                              , plano_debito.nom_conta
-                              , coalesce(cpr.cod_recurso, 9999999999) AS cod_recurso
-                              , coalesce(orr.nom_recurso, '') AS nom_recurso
-                              , cod_plano_debito
-                              , plano_debito.cod_plano
-                              , plano_debito.nome_despesa
-                          FROM
-                              (
-                      
+                          SELECT plano_debito.exercicio
+                               , plano_debito.dt_pagamento
+                               , sum(coalesce(plano_debito.vl_pago,0.00)) AS valor
+                               , sum(coalesce(plano_debito.vl_estornado,0.00)) AS valor_estornado
+                               , plano_debito.tipo_despesa
+                               , plano_debito.nom_conta
+                               , plano_debito.cod_entidade
+                               , plano_debito.nom_entidade
+                               , NULL AS documento
+                               , plano_debito.timestamp_transferencia AS dt_transferencia
+                               , plano_debito.nome_despesa
+                               , plano_debito.cgm_credor
+                               , plano_debito.credor
+                               , coalesce(plano_debito.cod_recurso, 9999999999) AS cod_recurso
+                               , coalesce(plano_debito.cod_recurso, 9999999999) ||' - '|| coalesce(plano_debito.nom_recurso, '') AS nom_recurso
+                               , plano_debito.bo_estornado
+                               , plano_debito.cod_plano                              
+                          FROM (
                               ---------------------------------------------
                               --                   PAGAMENTOS EXTRA 
                               ---------------------------------------------
                       
-                              SELECT
-                                    transferencia.exercicio
-                                  , to_char(to_date(transferencia.timestamp_transferencia::VARCHAR, 'YYYY-MM-DD'), 'DD/MM/YYYY') AS dt_pagamento
-                                  , transferencia.cod_lote
-                                  , CPCD.cod_plano
-                                  , transferencia.cod_plano_credito
+                             SELECT transferencia.exercicio
+                                  , to_char(transferencia.timestamp_transferencia::DATE, 'DD/MM/YYYY') AS dt_pagamento
                                   , SUM(coalesce(transferencia.valor,0.00)) AS vl_pago
-                                  , cast('EXT' AS varchar) AS tipo_despesa
+                                  , SUM(coalesce(transferencia_estornada.valor,0.00)) AS vl_estornado
+                                  , CAST('EXT' AS VARCHAR) AS tipo_despesa
                                   , CPC.nom_conta
                                   , OE.cod_entidade
                                   , OE.nom_cgm AS nom_entidade
-                                  , transferencia.timestamp_transferencia
+                                  , transferencia.timestamp_transferencia::DATE
                                   , CPCD.nome_despesa
-                                  , transferencia.cod_plano_debito
-                              FROM
-                                  tesouraria.transferencia
-                              -- BUSCA CONTA BANCO        
-                                  INNER JOIN (
-                                  SELECT
-                                       CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
-                                      ,CPA.cod_plano
-                                      ,CPA.exercicio 
-                                  FROM
-                                      contabilidade.plano_conta AS CPC,
-                                      contabilidade.plano_analitica AS CPA
-                                  WHERE 
-                                      CPC.cod_conta = CPA.cod_conta AND
-                                      CPC.exercicio = CPA.exercicio 
-                                  ) AS CPC on(
-                                  transferencia.cod_plano_credito= CPC.cod_plano AND
-                                  transferencia.exercicio        = CPC.exercicio 
-                                  )
-                              -- BUSCA CONTA DESPESA        
-                                  INNER JOIN (
-                                  SELECT
-                                       CPC.cod_estrutural || ' - ' || CPC.nom_conta AS nome_despesa                
-                                      ,CPA.cod_plano
-                                      ,CPA.exercicio 
-                                  FROM
-                                      contabilidade.plano_conta AS CPC,
-                                      contabilidade.plano_analitica AS CPA
-                                  WHERE 
-                                      CPC.cod_conta = CPA.cod_conta AND
-                                      CPC.exercicio = CPA.exercicio 
-                                  ) AS CPCD on(
-                                  transferencia.cod_plano_debito = CPCD.cod_plano AND
-                                  transferencia.exercicio        = CPCD.exercicio 
-                                  )
-                               --BUSCA ENTIDADE
-                                  INNER JOIN(
-                                  SELECT 
-                                       OE.cod_entidade || ' - ' || CGM.nom_cgm AS entidade
-                                      ,CGM.nom_cgm
-                                      ,OE.cod_entidade
-                                      ,OE.exercicio     
-                                  FROM 
-                                      orcamento.entidade AS OE
-                                      ,sw_cgm AS CGM 
-                                  WHERE
-                                      OE.numcgm = CGM.numcgm
-                                  ) AS OE on(
-                                  OE.cod_entidade = transferencia.cod_entidade   AND
-                                  OE.exercicio    = transferencia.exercicio 
-                                  )
-                                 
-                              WHERE 
-                                  transferencia.cod_tipo = 1
-                                  AND TO_DATE(TO_CHAR(transferencia.timestamp_transferencia,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
-                                  AND TO_CHAR(transferencia.timestamp_transferencia,'yyyy') = '".$this->getDado('exercicio')."'
-                                  
-                              GROUP BY    
-                                    transferencia.exercicio    
-                                  , transferencia.timestamp_transferencia
-                                  , transferencia.cod_lote
-                                  , transferencia.cod_plano_credito
-                                  , cpc.nom_conta
-                                  , oe.cod_entidade
-                                  , oe.nom_cgm
-                                  , cpcd.nome_despesa
-                                  , transferencia.cod_plano_debito
-                                  , CPCD.cod_plano
-                                  , OE.entidade
-                                  
-                              UNION ALL
-                      
-                              ---------------------------------------------
-                              --       ESTORNOS DE PAGAMENTOS EXTRA 
-                              ---------------------------------------------
-                      
-                              SELECT
-                                    transferencia_estornada.exercicio
-                                  , to_char(to_date(transferencia_estornada.timestamp_estornada::VARCHAR, 'YYYY-MM-DD'), 'DD/MM/YYYY') AS dt_pagamento
-                                  , transferencia_estornada.cod_lote
-                                  , CPCD.cod_plano
-                                  , transferencia.cod_plano_credito
-                                  , SUM(coalesce(transferencia_estornada.valor,0.00)) * (-1) AS vl_pago
-                                  , cast('EEX' AS varchar) AS tipo_despesa
+                                  , transferencia_credor.numcgm AS cgm_credor
+                                  , cgm_credor.nom_cgm AS credor
+                                  , CPCD.cod_recurso
+                                  , CPCD.nom_recurso
+                                  , CASE WHEN transferencia_estornada.cod_lote IS NOT NULL
+                                         THEN TRUE
+                                         ELSE FALSE
+                                    END AS bo_estornado
+                                  , transferencia.cod_plano_credito AS cod_plano
+                               FROM tesouraria.transferencia
+                                 -- BUSCA CONTA BANCO        
+                         INNER JOIN ( SELECT CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
+                                           , CPA.cod_plano
+                                           , CPA.exercicio 
+                                        FROM contabilidade.plano_conta AS CPC
+                                  INNER JOIN contabilidade.plano_analitica AS CPA
+                                          ON CPC.cod_conta = CPA.cod_conta
+                                         AND CPC.exercicio = CPA.exercicio 
+                                    ) AS CPC
+                                 ON transferencia.cod_plano_credito= CPC.cod_plano
+                                AND transferencia.exercicio        = CPC.exercicio 
+
+                                 -- BUSCA CONTA DESPESA        
+                         INNER JOIN ( SELECT CPC.cod_estrutural || ' - ' || CPA.cod_plano || ' - ' || CPC.nom_conta AS nome_despesa                
+                                           , CPA.cod_plano
+                                           , CPA.exercicio
+                                           , recurso.cod_recurso
+                                           , recurso.nom_recurso
+                                        FROM contabilidade.plano_conta AS CPC
+                                  INNER JOIN contabilidade.plano_analitica AS CPA
+                                          ON CPC.cod_conta = CPA.cod_conta
+                                         AND CPC.exercicio = CPA.exercicio
+                                   LEFT JOIN contabilidade.plano_recurso
+                                          ON plano_recurso.exercicio = CPA.exercicio
+                                         AND plano_recurso.cod_plano = CPA.cod_plano
+                                   LEFT JOIN orcamento.recurso
+                                          ON recurso.exercicio   = plano_recurso.exercicio
+                                         AND recurso.cod_recurso = plano_recurso.cod_recurso
+                                    ) AS CPCD
+                                 ON transferencia.cod_plano_debito = CPCD.cod_plano
+                                AND transferencia.exercicio        = CPCD.exercicio 
+
+                                 -- BUSCA ENTIDADE
+                         INNER JOIN ( SELECT OE.cod_entidade || ' - ' || CGM.nom_cgm AS entidade
+                                           , CGM.nom_cgm
+                                           , OE.cod_entidade
+                                           , OE.exercicio     
+                                        FROM orcamento.entidade AS OE
+                                  INNER JOIN sw_cgm AS CGM 
+                                          ON OE.numcgm = CGM.numcgm
+                                    ) AS OE
+                                 ON OE.cod_entidade = transferencia.cod_entidade
+                                AND OE.exercicio    = transferencia.exercicio
+
+                          LEFT JOIN tesouraria.transferencia_credor
+                                 ON transferencia_credor.cod_entidade    = transferencia.cod_entidade
+                                AND transferencia_credor.tipo            = transferencia.tipo
+                                AND transferencia_credor.exercicio       = transferencia.exercicio
+                                AND transferencia_credor.cod_lote        = transferencia.cod_lote
+
+                          LEFT JOIN sw_cgm AS cgm_credor 
+                                 ON cgm_credor.numcgm = transferencia_credor.numcgm
+                                
+                          LEFT JOIN tesouraria.transferencia_estornada
+                                 ON transferencia_estornada.cod_entidade    = transferencia.cod_entidade
+                                AND transferencia_estornada.tipo            = transferencia.tipo
+                                AND transferencia_estornada.exercicio       = transferencia.exercicio
+                                AND transferencia_estornada.cod_lote        = transferencia.cod_lote
+
+                              WHERE transferencia.cod_tipo = 1
+                                AND TO_DATE(TO_CHAR(transferencia.timestamp_transferencia,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
+                                AND TO_CHAR(transferencia.timestamp_transferencia,'yyyy') = '".$this->getDado('exercicio')."'
+
+                           GROUP BY transferencia.exercicio
+                                  , transferencia.timestamp_transferencia::DATE
                                   , CPC.nom_conta
                                   , OE.cod_entidade
-                                  , OE.nom_cgm AS nom_entidade
-                                  , transferencia_estornada.timestamp_estornada
-                                  , cpcd.nome_despesa
-                                  , transferencia.cod_plano_debito
-                              FROM
-                                  tesouraria.transferencia
-                                  INNER JOIN tesouraria.transferencia_estornada on(
-                                  transferencia_estornada.cod_entidade    = transferencia.cod_entidade   AND
-                                  transferencia_estornada.tipo            = transferencia.tipo           AND
-                                  transferencia_estornada.exercicio       = transferencia.exercicio      AND
-                                  transferencia_estornada.cod_lote        = transferencia.cod_lote
-                                  )
-                              
-                              -- BUSCA CONTA BANCO        
-                                  INNER JOIN (
-                                  SELECT
-                                       CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
-                                      ,CPA.cod_plano
-                                      ,CPA.exercicio 
-                                  FROM
-                                      contabilidade.plano_conta AS CPC,
-                                      contabilidade.plano_analitica AS CPA
-                                  WHERE 
-                                      CPC.cod_conta = CPA.cod_conta AND
-                                      CPC.exercicio = CPA.exercicio 
-                                  ) AS CPC on(
-                                  transferencia.cod_plano_credito= CPC.cod_plano AND
-                                  transferencia.exercicio        = CPC.exercicio 
-                                  )
-                              -- BUSCA CONTA DESPESA        
-                                  INNER JOIN (
-                                  SELECT
-                                       CPC.cod_estrutural || ' - ' || CPC.nom_conta AS nome_despesa                
-                                      ,CPA.cod_plano
-                                      ,CPA.exercicio 
-                                  FROM
-                                      contabilidade.plano_conta AS CPC,
-                                      contabilidade.plano_analitica AS CPA
-                                  WHERE 
-                                      CPC.cod_conta = CPA.cod_conta AND
-                                      CPC.exercicio = CPA.exercicio 
-                                  ) AS CPCD on(
-                                  transferencia.cod_plano_debito = CPCD.cod_plano AND
-                                  transferencia.exercicio        = CPCD.exercicio 
-                                  )
-                               --BUSCA ENTIDADE
-                                  INNER JOIN(
-                                  SELECT 
-                                      OE.cod_entidade || ' - ' || CGM.nom_cgm AS entidade
-                                      ,CGM.nom_cgm
-                                      ,OE.cod_entidade
-                                      ,OE.exercicio     
-                                  FROM 
-                                      orcamento.entidade AS OE
-                                      ,sw_cgm AS CGM 
-                                  WHERE
-                                      OE.numcgm = CGM.numcgm
-                                  ) AS OE on(
-                                  OE.cod_entidade = transferencia.cod_entidade   AND
-                                  OE.exercicio    = transferencia.exercicio 
-                                  )
-                              WHERE 
-                                  transferencia.cod_tipo = 1
-                                  AND TO_DATE(TO_CHAR(transferencia.timestamp_transferencia,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
-                                  AND TO_CHAR(transferencia.timestamp_transferencia,'yyyy') = '".$this->getDado('exercicio')."'
-                                  
-                              GROUP BY       
-                                    transferencia_estornada.exercicio
-                                  , transferencia_estornada.timestamp_estornada
-                                  , transferencia_estornada.cod_lote 
+                                  , OE.nom_cgm
+                                  , CPCD.nome_despesa
+                                  , transferencia_credor.numcgm
+                                  , cgm_credor.nom_cgm
+                                  , CPCD.cod_recurso
+                                  , CPCD.nom_recurso
+                                  , transferencia_estornada.cod_lote
                                   , transferencia.cod_plano_credito
-                                  , cpc.nom_conta
-                                  , oe.cod_entidade
-                                  , oe.nom_cgm
-                                  , cpcd.nome_despesa
-                                  , transferencia.cod_plano_debito
-                                  , CPCD.cod_plano
-                                  , OE.entidade
                       
                               UNION ALL
                       
                               ---------------------------------------------
                               --                  PAGAMENTOS RESTOS 
                               ---------------------------------------------
-                              SELECT
-                                plano.exercicio        
-                              , plano.dt_pagamento
-                              , plano.cod_lote
-                              , cpa.cod_plano 
-                              , plano.cod_plano_credito
-                              , plano.vl_pago
-                              , plano.tipo_despesa
-                              , plano.nom_conta
-                              , plano.cod_entidade
-                              , plano.nom_entidade
-                              , plano.timestamp
-                              , CPC.cod_estrutural || ' - ' || CPC.nom_conta AS nome_despesa                
-                              , plano.cod_plano_debito
-                              FROM (
-                              SELECT
-                                    tp.exercicio_plano AS exercicio
-                                  , to_char(to_date(tp.timestamp::VARCHAR, 'YYYY-MM-DD'), 'DD/MM/YYYY') AS dt_pagamento
-                                  , cp.cod_lote
-                                  , plano_banco.cod_plano
-                                  , tp.cod_plano AS cod_plano_credito
-                                  , nlp.vl_pago AS vl_pago
-                                  , cast('RES' AS varchar) AS tipo_despesa
-                                  , plano_banco.nom_conta AS nom_conta
-                                  , oe.cod_entidade
-                                  , cgm.nom_cgm AS nom_entidade
-                                  , tp.timestamp
-                                  , '' AS nome_despesa
-                                  , contabilidade.fn_recupera_conta_lancamento( CP.exercicio
-                                                      , CP.cod_entidade
-                                                      , CP.cod_lote
-                                                      , CP.tipo
-                                                      , CP.sequencia
-                                                      , 'D') AS cod_plano_debito
-                              FROM
-                                  (
-                                  SELECT
-                                      CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
-                                      , cpa.cod_plano AS cod_plano
-                                      , cpa.exercicio
-                                  FROM
-                                        contabilidade.plano_conta AS cpc
-                                      , contabilidade.plano_analitica AS cpa
-                                  WHERE
-                                      cpa.cod_conta = cpc.cod_conta
-                                      AND cpc.exercicio = cpa.exercicio
-                                  ) AS plano_banco
-                                  ,tesouraria.pagamento AS TP
-                                  INNER JOIN orcamento.entidade AS oe
-                                  ON (oe.cod_entidade  = tp.cod_entidade
-                                  AND oe.exercicio = tp.exercicio
-                                  )
-                                  INNER JOIN sw_cgm AS cgm
-                                  ON (oe.numcgm = cgm.numcgm
-                                  )
-                                  JOIN empenho.nota_liquidacao_paga AS nlp
-                                  ON (    nlp.cod_nota     = tp.cod_nota
-                                  AND nlp.cod_entidade = tp.cod_entidade
-                                  AND nlp.exercicio    = tp.exercicio
-                                  AND nlp.timestamp    = tp.timestamp
-                                  )
-                                  JOIN empenho.nota_liquidacao AS nl
-                                  ON (    nl.cod_nota     = nlp.cod_nota
-                                  AND nl.exercicio    = nlp.exercicio
-                                  AND nl.cod_entidade = nlp.cod_entidade
-                                  AND nl.exercicio_empenho < '".$this->getDado('exercicio')."'
-                                  )
-                                  JOIN contabilidade.pagamento AS cp
-                                  ON (    cp.cod_entidade         = nlp.cod_entidade
-                                  AND cp.exercicio_liquidacao = nlp.exercicio
-                                  AND cp.cod_nota             = nlp.cod_nota
-                                  AND cp.timestamp            = nlp.timestamp
-                                  )
-                                  JOIN contabilidade.lancamento_empenho AS cle
-                                  ON (    cle.cod_lote     = cp.cod_lote
-                                  AND cle.cod_entidade = cp.cod_entidade
-                                  AND cle.sequencia    = cp.sequencia
-                                  AND cle.exercicio    = cp.exercicio
-                                  AND cle.tipo         = cp.tipo
-                                  )
-                              WHERE
-                                  tp.cod_plano = plano_banco.cod_plano and
-                                  tp.exercicio_plano = plano_banco.exercicio
-                                  AND TO_DATE(TO_CHAR(tp.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
-                                  AND TO_CHAR(tp.timestamp,'yyyy') = '".$this->getDado('exercicio')."' 
-                              GROUP BY
-                                    tp.exercicio
-                                  , tp.exercicio_plano
-                                  , plano_banco.cod_plano
-                                  , tp.cod_plano
-                                  , nlp.vl_pago
-                                  , plano_banco.nom_conta
-                                  , oe.cod_entidade
-                                  , cgm.nom_cgm
-                                  , tp.timestamp
-                                  , cp.exercicio
-                                  , cp.cod_entidade
-                                  , cp.tipo
-                                  , cp.sequencia
-                                  , cp.cod_lote
-                              ) AS plano
-                              JOIN contabilidade.plano_analitica AS cpa ON (
-                                      plano.cod_plano_debito   = cpa.cod_plano
-                                  AND plano.exercicio          = cpa.exercicio
-                              )
-                              JOIN contabilidade.plano_conta AS cpc ON (
-                                      cpa.cod_conta                       = cpc.cod_conta
-                                  AND cpa.exercicio                   = cpc.exercicio
-                                  AND CPC.cod_estrutural like '2.1.2.1.1%'
-                              )
-                                         
-                              UNION ALL
-                               
-                              ---------------------------------------------
-                              --       ESTORNOS DE PAGAMENTOS RESTOS
-                              ---------------------------------------------
-                              SELECT
-                                plano.exercicio
-                              , plano.dt_pagamento
-                              , plano.cod_lote
-                              , cpa.cod_plano
-                              , plano.cod_plano_credito
-                              , plano.vl_pago
-                              , plano.tipo_despesa
-                              , plano.nom_conta
-                              , plano.cod_entidade
-                              , plano.nom_entidade
-                              , plano.timestamp
-                              , CPC.cod_estrutural || ' - ' || CPC.nom_conta AS nome_despesa
-                              , plano.cod_plano_debito
-                              FROM (
-                              SELECT
-                                    tp.exercicio_plano AS exercicio
-                                  , to_char(to_date(tp.timestamp::VARCHAR, 'YYYY-MM-DD'), 'DD/MM/YYYY') AS dt_pagamento
-                                  , cp.cod_lote
-                                  , plano_banco.cod_plano
-                                  , tp.cod_plano AS cod_plano_credito
-                                  , nlpa.vl_anulado * (-1) AS vl_pago
-                                  , cast('ERE' AS varchar) AS tipo_despesa
-                                  , plano_banco.nom_conta AS nom_conta
-                                  , oe.cod_entidade
-                                  , cgm.nom_cgm AS nom_entidade
-                                  , tp.timestamp
-                                  , '' AS nome_despesa
-                                  , contabilidade.fn_recupera_conta_lancamento( CP.exercicio
-                                                      , CP.cod_entidade
-                                                      , CP.cod_lote
-                                                      , CP.tipo
-                                                      , CP.sequencia
-                                                      , 'D') AS cod_plano_debito
-                              FROM
-                                  (
-                                  SELECT
-                                      CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
-                                      , cpa.cod_plano AS cod_plano
-                                      , cpa.exercicio
-                                  FROM
-                                        contabilidade.plano_conta AS cpc
-                                      , contabilidade.plano_analitica AS cpa
-                                  WHERE
-                                      cpa.cod_conta = cpc.cod_conta
-                                      AND cpc.exercicio = cpa.exercicio
-                                  ) AS plano_banco
-                                  ,tesouraria.pagamento AS TP
-                                  INNER JOIN tesouraria.pagamento_estornado AS TPE
-                                  ON (    tpe.exercicio    = tp.exercicio
-                                  AND tpe.cod_entidade = tp.cod_entidade
-                                  AND tpe.cod_nota     = tp.cod_nota
-                                  AND tpe.timestamp    = tp.timestamp
-                                  )
-                                  INNER JOIN orcamento.entidade AS oe
-                                  ON (oe.cod_entidade  = tpe.cod_entidade
-                                  AND oe.exercicio = tpe.exercicio
-                                  )
-                                  INNER JOIN sw_cgm AS cgm
-                                  ON (oe.numcgm = cgm.numcgm
-                                  )
-                                  JOIN empenho.nota_liquidacao_paga_anulada AS nlpa on (
-                                      nlpa.cod_nota     = tp.cod_nota
-                                  AND nlpa.cod_entidade = tp.cod_entidade
-                                  AND nlpa.exercicio    = tp.exercicio
-                                  AND nlpa.timestamp    = tp.timestamp
-                                  )
-                                  JOIN empenho.nota_liquidacao_paga AS nlp
-                                  ON (    nlp.cod_nota     = nlpa.cod_nota
-                                  AND nlp.cod_entidade = nlpa.cod_entidade
-                                  AND nlp.exercicio    = nlpa.exercicio
-                                  AND nlp.timestamp    = nlpa.timestamp
-                                  )
-                                  JOIN empenho.nota_liquidacao AS nl
-                                  ON (    nl.cod_nota     = nlp.cod_nota
-                                  AND nl.exercicio    = nlp.exercicio
-                                  AND nl.cod_entidade = nlp.cod_entidade
-                                  AND nl.exercicio_empenho < '".$this->getDado('exercicio')."'
-                                  )
-                                  JOIN contabilidade.pagamento AS cp
-                                  ON (    cp.cod_entidade         = nlp.cod_entidade
-                                  AND cp.exercicio_liquidacao = nlp.exercicio
-                                  AND cp.cod_nota             = nlp.cod_nota
-                                  AND cp.timestamp            = nlp.timestamp
-                                  )
-                                  JOIN contabilidade.lancamento_empenho AS cle
-                                  ON (    cle.cod_lote     = cp.cod_lote
-                                  AND cle.cod_entidade = cp.cod_entidade
-                                  AND cle.sequencia    = cp.sequencia
-                                  AND cle.exercicio    = cp.exercicio
-                                  AND cle.tipo         = cp.tipo
-                                  )
-                              WHERE
-                                  tp.cod_plano = plano_banco.cod_plano and
-                                  tp.exercicio_plano = plano_banco.exercicio 
-                                  AND TO_DATE(TO_CHAR(tp.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
-                                  AND TO_CHAR(tp.timestamp,'yyyy') = '".$this->getDado('exercicio')."'
-                              GROUP BY
-                                    tp.exercicio
-                                  , tp.exercicio_plano
-                                  , plano_banco.cod_plano
-                                  , tp.cod_plano
-                                  , nlpa.vl_anulado
-                                  , plano_banco.nom_conta
-                                  , oe.cod_entidade
-                                  , cgm.nom_cgm
-                                  , tp.timestamp
-                                  , cp.exercicio
-                                  , cp.cod_entidade
-                                  , cp.tipo
-                                  , cp.sequencia
-                                  , cp.cod_lote
-                              ) AS plano
-                                  JOIN contabilidade.plano_analitica AS cpa ON (
-                                      plano.cod_plano_debito   = cpa.cod_plano
-                                      AND plano.exercicio          = cpa.exercicio
-                                  )
-                                  JOIN contabilidade.plano_conta AS cpc ON (
-                                      cpa.cod_conta                       = cpc.cod_conta
-                                      AND cpa.exercicio                   = cpc.exercicio
-                                      AND CPC.cod_estrutural like '2.1.2.1.1%'
-                                  )
-                              ) AS plano_debito
-                              LEFT JOIN contabilidade.plano_analitica AS cpa ON (
-                                      plano_debito.cod_plano_debito   = cpa.cod_plano
-                                  AND plano_debito.exercicio          = cpa.exercicio
-                              )
-                              LEFT JOIN contabilidade.plano_recurso AS cpr on (
-                                      cpa.exercicio      = cpr.exercicio
-                                  AND cpa.cod_plano      = cpr.cod_plano
-                              )
-                              LEFT JOIN orcamento.recurso AS orr on (
-                                      orr.exercicio      = cpr.exercicio
-                                  AND orr.cod_recurso    = cpr.cod_recurso
-                              )
-                              LEFT JOIN contabilidade.plano_conta AS cpc ON (
-                                      cpa.cod_conta           = cpc.cod_conta
-                                  AND cpa.exercicio           = cpc.exercicio
-                              )
-                          GROUP BY
-                                plano_debito.dt_pagamento
-                              , plano_debito.cod_lote
-                              , cpr.cod_recurso
-                              , orr.nom_recurso
-                              , plano_debito.cod_plano
-                              , plano_debito.nom_conta
-                              , plano_debito.tipo_despesa
-                              , plano_debito.cod_plano_credito
-                              , plano_debito.cod_entidade
-                              , plano_debito.nom_entidade
-                              , plano_debito.exercicio
-                              , plano_debito.cod_plano_debito
-                              , plano_debito.nome_despesa
-                      
+                              SELECT plano.exercicio
+                                   , plano.dt_pagamento
+                                   , SUM(coalesce(plano.vl_pago,0.00)) AS vl_pago
+                                   , SUM(coalesce(plano.vl_estornado,0.00)) AS vl_estornado
+                                   , plano.tipo_despesa
+                                   , plano.nom_conta
+                                   , plano.cod_entidade
+                                   , plano.nom_entidade
+                                   , plano.timestamp_transferencia
+                                   , CPC.cod_estrutural || ' - ' || cpa.cod_plano || ' - ' || CPC.nom_conta AS nome_despesa
+                                   , plano.cgm_credor
+                                   , plano.credor
+                                   , recurso.cod_recurso
+                                   , recurso.nom_recurso
+                                   , plano.bo_estornado
+                                   , plano.cod_plano
+                                   
+                                FROM (
+                                     SELECT tp.exercicio_plano AS exercicio
+                                          , to_char(tp.timestamp::DATE, 'DD/MM/YYYY') AS dt_pagamento
+                                          , SUM(coalesce(nlp.vl_pago,0.00)) AS vl_pago
+                                          , SUM(coalesce(nota_liquidacao_paga_anulada.vl_anulado,0.00)) AS vl_estornado 
+                                          , cast('RES' AS varchar) AS tipo_despesa
+                                          , plano_banco.nom_conta AS nom_conta
+                                          , oe.cod_entidade
+                                          , cgm.nom_cgm AS nom_entidade
+                                          , tp.timestamp::DATE AS timestamp_transferencia
+                                          , contabilidade.fn_recupera_conta_lancamento( CP.exercicio
+                                                                                      , CP.cod_entidade
+                                                                                      , CP.cod_lote
+                                                                                      , CP.tipo
+                                                                                      , CP.sequencia
+                                                                                      , 'D'
+                                                                                      ) AS cod_plano_debito
+                                          , cgm_beneficiario.numcgm AS cgm_credor
+                                          , cgm_beneficiario.nom_cgm AS credor
+                                          , CASE WHEN nota_liquidacao_paga_anulada.timestamp::DATE IS NOT NULL
+                                                 THEN TRUE
+                                                 ELSE FALSE
+                                            END AS bo_estornado
+                                          , tp.cod_plano
+
+                                       FROM (
+                                             SELECT CPA.cod_plano || ' - ' || CPC.nom_conta AS nom_conta                
+                                                  , cpa.cod_plano AS cod_plano
+                                                  , cpa.exercicio
+                                               FROM contabilidade.plano_conta AS cpc
+                                         INNER JOIN contabilidade.plano_analitica AS cpa
+                                                 ON cpa.cod_conta = cpc.cod_conta
+                                                AND cpc.exercicio = cpa.exercicio
+                                            ) AS plano_banco
+                                 INNER JOIN tesouraria.pagamento AS TP
+                                         ON tp.cod_plano = plano_banco.cod_plano
+                                        AND tp.exercicio_plano = plano_banco.exercicio
+                                          
+                                 INNER JOIN orcamento.entidade AS oe
+                                         ON oe.cod_entidade  = tp.cod_entidade
+                                        AND oe.exercicio = tp.exercicio
+
+                                 INNER JOIN sw_cgm AS cgm
+                                         ON oe.numcgm = cgm.numcgm
+
+                                 INNER JOIN empenho.nota_liquidacao_paga AS nlp
+                                         ON nlp.cod_nota     = tp.cod_nota
+                                        AND nlp.cod_entidade = tp.cod_entidade
+                                        AND nlp.exercicio    = tp.exercicio
+                                        AND nlp.timestamp    = tp.timestamp
+
+                                  LEFT JOIN empenho.nota_liquidacao_paga_anulada
+                                         ON nota_liquidacao_paga_anulada.exercicio    = nlp.exercicio
+                                        AND nota_liquidacao_paga_anulada.cod_entidade = nlp.cod_entidade
+                                        AND nota_liquidacao_paga_anulada.cod_nota     = nlp.cod_nota
+                                        AND nota_liquidacao_paga_anulada.timestamp    = nlp.timestamp
+
+                                 INNER JOIN empenho.nota_liquidacao AS nl
+                                         ON nl.cod_nota     = nlp.cod_nota
+                                        AND nl.exercicio    = nlp.exercicio
+                                        AND nl.cod_entidade = nlp.cod_entidade
+                                        AND nl.exercicio_empenho < '".$this->getDado('exercicio')."'
+
+                                 INNER JOIN empenho.empenho
+                                         ON empenho.exercicio    = nl.exercicio_empenho
+                                        AND empenho.cod_entidade = nl.cod_entidade
+                                        AND empenho.cod_empenho  = nl.cod_empenho
+
+                                 INNER JOIN empenho.pre_empenho
+                                         ON empenho.exercicio       = pre_empenho.exercicio
+                                        AND empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+
+                                 INNER JOIN sw_cgm as cgm_beneficiario
+                                         ON cgm_beneficiario.numcgm = pre_empenho.cgm_beneficiario
+
+                                 INNER JOIN contabilidade.pagamento AS cp
+                                         ON cp.cod_entidade         = nlp.cod_entidade
+                                        AND cp.exercicio_liquidacao = nlp.exercicio
+                                        AND cp.cod_nota             = nlp.cod_nota
+                                        AND cp.timestamp            = nlp.timestamp
+
+                                 INNER JOIN contabilidade.lancamento_empenho AS cle
+                                         ON cle.cod_lote     = cp.cod_lote
+                                        AND cle.cod_entidade = cp.cod_entidade
+                                        AND cle.sequencia    = cp.sequencia
+                                        AND cle.exercicio    = cp.exercicio
+                                        AND cle.tipo         = cp.tipo
+
+                                      WHERE TO_DATE(TO_CHAR(tp.timestamp,'dd/mm/yyyy'),'dd/mm/yyyy') BETWEEN to_date('".$this->getDado('dt_inicial')."'::VARCHAR,'dd/mm/yyyy')  AND to_date('".$this->getDado('dt_final')."'::VARCHAR,'dd/mm/yyyy')
+                                        AND TO_CHAR(tp.timestamp,'yyyy') = '".$this->getDado('exercicio')."'
+
+                                   GROUP BY tp.exercicio_plano
+                                          , tp.timestamp::DATE
+                                          , plano_banco.nom_conta
+                                          , oe.cod_entidade
+                                          , cgm.nom_cgm
+                                          , CP.exercicio
+                                          , CP.cod_entidade
+                                          , CP.cod_lote
+                                          , CP.tipo
+                                          , CP.sequencia
+                                          , cgm_beneficiario.numcgm
+                                          , cgm_beneficiario.nom_cgm
+                                          , nota_liquidacao_paga_anulada.timestamp::DATE
+                                          , tp.cod_plano
+                                     ) AS plano
+                          INNER JOIN contabilidade.plano_analitica AS cpa
+                                  ON plano.cod_plano_debito   = cpa.cod_plano
+                                 AND plano.exercicio          = cpa.exercicio
+
+                          INNER JOIN contabilidade.plano_conta AS cpc
+                                  ON cpa.cod_conta = cpc.cod_conta
+                                 AND cpa.exercicio = cpc.exercicio
+                                 AND CPC.cod_estrutural like '2.1.2.1.1%'
+
+                           LEFT JOIN contabilidade.plano_recurso
+                                  ON plano_recurso.exercicio = cpa.exercicio
+                                 AND plano_recurso.cod_plano = cpa.cod_plano
+                                  
+                           LEFT JOIN orcamento.recurso
+                                  ON recurso.exercicio   = plano_recurso.exercicio
+                                 AND recurso.cod_recurso = plano_recurso.cod_recurso
+
+                            GROUP BY plano.exercicio
+                                   , plano.dt_pagamento
+                                   , plano.tipo_despesa
+                                   , plano.nom_conta
+                                   , plano.cod_entidade
+                                   , plano.nom_entidade
+                                   , plano.timestamp_transferencia
+                                   , CPC.cod_estrutural
+                                   , CPC.nom_conta
+                                   , cpa.cod_plano
+                                   , plano.cgm_credor
+                                   , plano.credor
+                                   , recurso.cod_recurso
+                                   , recurso.nom_recurso
+                                   , plano.bo_estornado
+                                   , plano.cod_plano
+                               ) AS plano_debito
+                      GROUP BY plano_debito.exercicio
+                             , plano_debito.dt_pagamento
+                             , plano_debito.tipo_despesa
+                             , plano_debito.nom_conta
+                             , plano_debito.cod_entidade
+                             , plano_debito.nom_entidade
+                             , plano_debito.timestamp_transferencia
+                             , plano_debito.nome_despesa
+                             , plano_debito.cgm_credor
+                             , plano_debito.credor
+                             , plano_debito.cod_recurso
+                             , plano_debito.nom_recurso
+                             , plano_debito.bo_estornado
+                             , plano_debito.cod_plano
                       ) AS tabela
+                   -- BLOCO UTILIZADO PARA BUSCAR BANCO
+            INNER JOIN contabilidade.plano_banco
+                    ON plano_banco.exercicio = tabela.exercicio
+                   AND plano_banco.cod_plano = tabela.cod_plano
+
+            INNER JOIN contabilidade.plano_recurso
+                    ON plano_recurso.exercicio = plano_banco.exercicio
+                   AND plano_recurso.cod_plano = plano_banco.cod_plano
                       
-                      -- BLOCO UTILIZADO PARA BUSCAR BANCO
-                      INNER JOIN contabilidade.plano_banco
-                          ON plano_banco.exercicio = tabela.exercicio
-                             AND plano_banco.cod_plano = tabela.cod_plano_credito
+            INNER JOIN monetario.conta_corrente
+                    ON conta_corrente.cod_banco          = plano_banco.cod_banco
+                   AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
+                   AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
                       
-                      INNER JOIN contabilidade.plano_recurso
-                          ON plano_recurso.exercicio = plano_banco.exercicio
-                             AND plano_recurso.cod_plano = plano_banco.cod_plano
+            INNER JOIN monetario.agencia
+                    ON agencia.cod_banco   = conta_corrente.cod_banco
+                   AND agencia.cod_agencia = conta_corrente.cod_agencia
                       
-                      INNER JOIN monetario.conta_corrente
-                          ON conta_corrente.cod_banco          = plano_banco.cod_banco
-                             AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
-                             AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
-                      
-                      INNER JOIN monetario.agencia
-                          ON agencia.cod_banco   = conta_corrente.cod_banco
-                             AND agencia.cod_agencia = conta_corrente.cod_agencia
-                      
-                      INNER JOIN monetario.banco
-                          ON banco.cod_banco = conta_corrente.cod_banco
-                      
-                      WHERE 1=1";
-                      
-                    if($this->getDado('cod_recurso') != '') {
-                       $stSql .= " AND tabela.cod_recurso IN (".$this->getDado('cod_recurso').")";
-                    }
-                      
-                    $stSql .=  "ORDER BY dt_pagamento";
-                    
+            INNER JOIN monetario.banco
+                    ON banco.cod_banco = conta_corrente.cod_banco
+
+                 WHERE 1=1
+        ";
+
+        if($this->getDado('cod_recurso') != '') {
+            $stSql .= " AND plano_recurso.cod_recurso IN (".$this->getDado('cod_recurso').") ";
+        }
+
+        if($this->getDado('entidade') != '') {
+            $stSql .= " AND tabela.cod_entidade IN (".$this->getDado('entidade').") ";
+        }
+
+        $stSql .=  " ORDER BY dt_transferencia ";
+
         return $stSql;
     }
     
@@ -1332,7 +1144,7 @@ class TTCEMGRelatorioRazaoDespesa extends Persistente
                    
             
           if($this->getDado('cod_recurso') != '') {
-             $stSql .= " AND relacao.cod_recurso IN (".$this->getDado('cod_recurso').")";
+             $stSql .= " AND relacao.cod_recurso::BIGINT IN (".$this->getDado('cod_recurso').")";
           }
         
         return $stSql;

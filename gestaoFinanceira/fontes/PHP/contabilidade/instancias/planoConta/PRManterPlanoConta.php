@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: PRManterPlanoConta.php 64153 2015-12-09 19:16:02Z evandro $
+    * $Id: PRManterPlanoConta.php 64365 2016-01-27 13:28:43Z franver $
 
     * Casos de uso: uc-02.02.02
 */
@@ -73,7 +73,7 @@ if($stAcao != 'excluir') {
     #23315
     Validação ao cadastrar uma nova conta com fonte de recurso o sistema deve verificar se neste grupos
     72112. 72.111, 82.111,82.112,82.113 e 82.114 já existe uma conta com esta mesma fonte de recurso.
-    Até porque já existe uma regra estabelecida como uma unica conta por fonte de recurso.    
+    Até porque já existe uma regra estabelecida como uma unica conta por fonte de recurso.
     */
 
     // Adicionada validação porque campo inCodRecurso não é obrigatório
@@ -81,8 +81,10 @@ if($stAcao != 'excluir') {
         $obTOrcamentoRecurso = new TOrcamentoRecurso;
         $obTOrcamentoRecurso->setDado('exercicio'     , Sessao::getExercicio() );
         $obTOrcamentoRecurso->setDado('cod_estrutural', $request->get('stCodClass') );
-        $obTOrcamentoRecurso->setDado('cod_recurso', $request->get('inCodRecurso') );
-        $obTOrcamentoRecurso->verificaContaRecurso($rsContaRecurso100, $boTransacao);
+        $obTOrcamentoRecurso->setDado('cod_recurso'   , $request->get('inCodRecurso') );
+        $obTOrcamentoRecurso->setDado('cod_conta'     , $request->get('inCodConta'));
+        $obErro = $obTOrcamentoRecurso->verificaContaRecurso($rsContaRecurso100, $boTransacao);
+
         if ($rsContaRecurso100->getNumLinhas() > 0) {
             SistemaLegado::exibeAviso("Já existe uma conta com o recurso ".$request->get('inCodRecurso'). " nesse grupo de contas", 'n_incluir', 'aviso');
             exit;

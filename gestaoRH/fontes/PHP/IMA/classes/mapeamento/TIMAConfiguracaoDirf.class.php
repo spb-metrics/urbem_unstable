@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: TIMAConfiguracaoDirf.class.php 62511 2015-05-15 17:45:15Z evandro $
+    $Id: TIMAConfiguracaoDirf.class.php 64485 2016-03-02 19:09:27Z evandro $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -136,39 +136,6 @@ function montaRecuperaExportarDirfPrestadorServico()
 {
     $stSql .= "    SELECT uso_declarante                 \n";
     $stSql .= "         , sequencia                      \n";
-    $stSql .= "         , nome_beneficiario              \n";
-    $stSql .= "         , beneficiario                   \n";
-    $stSql .= "         , ident_especializacao           \n";
-    $stSql .= "         , codigo_retencao                \n";
-    $stSql .= "         , ident_especie_beneficiario     \n";
-    $stSql .= "         , jan                            \n";
-    $stSql .= "         , fev                            \n";
-    $stSql .= "         , mar                            \n";
-    $stSql .= "         , abr                            \n";
-    $stSql .= "         , mai                            \n";
-    $stSql .= "         , jun                            \n";
-    $stSql .= "         , jul                            \n";
-    $stSql .= "         , ago                            \n";
-    $stSql .= "         , set                            \n";
-    $stSql .= "         , out                            \n";
-    $stSql .= "         , nov                            \n";
-    $stSql .= "         , dez                            \n";
-    $stSql .= "         , dec                            \n";
-    $stSql .= "     FROM dirf_prestadores_servico_reduzida('".Sessao::getEntidade()."','".Sessao::getCodEntidade()."',".$this->getDado("inExercicio").") \n";
-    $stSql .= " ORDER BY codigo_retencao, ident_especie_beneficiario \n";
-
-    return $stSql;
-}
-
-function recuperaExportarDirfPrestadorServicoPagamento(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
-{
-    return $this->executaRecupera("montaRecuperaExportarDirfPrestadorServicoPagamento",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
-}
-
-function montaRecuperaExportarDirfPrestadorServicoPagamento()
-{
-    $stSql .= "    SELECT uso_declarante                 \n";
-    $stSql .= "         , sequencia                      \n";
     $stSql .= "         , remove_acentos(nome_beneficiario) as nome_beneficiario              \n";
     $stSql .= "         , beneficiario                   \n";
     $stSql .= "         , ident_especializacao           \n";
@@ -211,6 +178,39 @@ function montaRecuperaExportarDirfPrestadorServicoPagamento()
     $stSql .= "         , out AS nov                    \n";
     $stSql .= "         , nov AS dez                     \n";
     $stSql .= "         , dec                         \n";
+    $stSql .= "     FROM dirf_prestadores_servico_reduzida('".Sessao::getEntidade()."','".Sessao::getCodEntidade()."',".$this->getDado("inExercicio").") \n";
+    $stSql .= " ORDER BY codigo_retencao, ident_especie_beneficiario \n";
+
+    return $stSql;
+}
+
+function recuperaExportarDirfPrestadorServicoPagamento(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+{
+    return $this->executaRecupera("montaRecuperaExportarDirfPrestadorServicoPagamento",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+}
+
+function montaRecuperaExportarDirfPrestadorServicoPagamento()
+{
+    $stSql  = "    SELECT uso_declarante                 \n";
+    $stSql .= "         , sequencia                      \n";
+    $stSql .= "         , nome_beneficiario              \n";
+    $stSql .= "         , beneficiario                   \n";
+    $stSql .= "         , ident_especializacao           \n";
+    $stSql .= "         , codigo_retencao                \n";
+    $stSql .= "         , ident_especie_beneficiario     \n";
+    $stSql .= "         , jan                            \n";
+    $stSql .= "         , fev                            \n";
+    $stSql .= "         , mar                            \n";
+    $stSql .= "         , abr                            \n";
+    $stSql .= "         , mai                            \n";
+    $stSql .= "         , jun                            \n";
+    $stSql .= "         , jul                            \n";
+    $stSql .= "         , ago                            \n";
+    $stSql .= "         , set                            \n";
+    $stSql .= "         , out                            \n";
+    $stSql .= "         , nov                            \n";
+    $stSql .= "         , dez                            \n";
+    $stSql .= "         , dec                            \n";
     $stSql .= "     FROM dirf_prestadores_servico_reduzida('".Sessao::getEntidade()."','".Sessao::getCodEntidade()."',".$this->getDado("inExercicio").") \n";
     $stSql .= " ORDER BY codigo_retencao, ident_especie_beneficiario \n";
 

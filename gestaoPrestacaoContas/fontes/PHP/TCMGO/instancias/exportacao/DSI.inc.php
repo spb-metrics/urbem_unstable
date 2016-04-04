@@ -31,10 +31,10 @@
   * @author Desenvolvedor:
   *
   * @ignore
-  * $Id: DSI.inc.php 63165 2015-07-31 12:38:16Z franver $
-  * $Date: 2015-07-31 09:38:16 -0300 (Sex, 31 Jul 2015) $
+  * $Id: DSI.inc.php 64696 2016-03-22 18:23:17Z franver $
+  * $Date: 2016-03-22 15:23:17 -0300 (Ter, 22 Mar 2016) $
   * $Author: franver $
-  * $Rev: 63165 $
+  * $Rev: 64696 $
   *
 */
 include_once CAM_GPC_TGO_MAPEAMENTO."TTGODSI.class.php";
@@ -89,7 +89,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -158,7 +158,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -244,7 +244,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -307,7 +307,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -319,15 +319,15 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_funcao");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_subfuncao");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_acao");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -355,7 +355,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(978);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(977);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -390,7 +390,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -509,7 +509,7 @@ foreach ($rsDetalhamento->getElementos() AS $stChave) {
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(12);
             
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_exercicio_processo");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -610,7 +610,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1030);
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1038);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

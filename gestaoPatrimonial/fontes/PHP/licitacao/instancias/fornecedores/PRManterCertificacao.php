@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: PRManterCertificacao.php 63432 2015-08-27 19:31:41Z arthur $
+    $Id: PRManterCertificacao.php 64487 2016-03-02 20:40:30Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -43,7 +43,8 @@ include_once TLIC."TLicitacaoParticipanteCertificacao.class.php";
 include_once TLIC."TLicitacaoCertificacaoDocumentos.class.php";
 include_once TLIC."TLicitacaoDocumentoAtributoValor.class.php";
 include_once TLIC."TLicitacaoDocumentosAtributos.class.php";
-include_once TLIC."TLicitacaoParticipanteCertificacaoLicitacao.class.php";      
+include_once TLIC."TLicitacaoParticipanteCertificacaoLicitacao.class.php";
+include_once TLIC.'TLicitacaoLicitacao.class.php';
 
 $stPrograma = "ManterCertificacao";
 $pgFilt       = "FL".$stPrograma.".php";
@@ -76,20 +77,41 @@ $obTLicitacaoParticipanteCertificacao = new TLicitacaoParticipanteCertificacao()
 $obTLicitacaoCertificacaoDocumentos   = new TLicitacaoCertificacaoDocumentos();
 $obTLicitacaoDocumentoAtributoValor   = new TLicitacaoDocumentoAtributoValor();
 $obTLicitacaoDocumentosAtributos      = new TLicitacaoDocumentosAtributos();
+$obTLicitacaoLicitacao                = new TLicitacaoLicitacao();
 $obTLicitacaoParticipanteCertificacaoLicitacao = new TLicitacaoParticipanteCertificacaoLicitacao();
 
 switch ($stAcao) {
     case "incluir":
+        
         if ( implode(array_reverse(explode('/',$request->get('dtDataRegistro')))) > implode(array_reverse(explode('/',$request->get('dtDataVigencia')))) ) {
-                $stMensagem = 'A data de registro deve ser menor que a data de vigência.';
+                $obErro->setDescricao("A data de registro deve ser menor que a data de vigência.");
         } elseif ( count( Sessao::read('arDocs') ) == 0 ) {
-                $stMensagem = 'Ao menos um documento deve ser incluído.';
-        }
+                $obErro->setDescricao("Ao menos um documento deve ser incluído.");
+        } else {
+            $obTLicitacaoLicitacao->setDado( 'exercicio'     , $request->get('stExercicioLicitacao') );
+            $obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $request->get('inCodEntidade') );
+            $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
+            
+            $stFiltro .= " AND ll.cod_licitacao IN ( SELECT cod_licitacao
+                                                       FROM licitacao.participante_certificacao_licitacao
+                                                      WHERE cod_licitacao  = ".$request->get('inCodLicitacao')."
+                                                        AND cod_modalidade = ".$request->get('inCodModalidade')."
+                                                        AND cod_entidade   = ".$request->get('inCodEntidade')."
+                                                        AND cgm_fornecedor = ".$request->get('inCodFornecedor')."
+                                                    ) ";
+            
+            $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao, $stFiltro );
 
-        if (!$stMensagem && !$obErro->ocorreu()) {
+            if ( $rsLicitacao->getNumLinhas() > 0 ) {
+                $obErro->setDescricao("Fornecedor (".$request->get('inCodFornecedor').") já foi certificado para a licitação (".$request->get('inCodLicitacao').")");
+            }
+        }
+        
+        if (!$obErro->ocorreu()) {
 
             $obTLicitacaoParticipanteCertificacao->proximocod($inNumCertificacao);
-            
+
+            $obTLicitacaoParticipanteCertificacao->setDado( 'num_certificacao', $inNumCertificacao );
             $obTLicitacaoParticipanteCertificacao->setDado( 'exercicio', Sessao::getExercicio() );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cgm_fornecedor', $request->get('inCodFornecedor') );
             $obTLicitacaoParticipanteCertificacao->setDado( 'cod_tipo_documento', 0 );
@@ -98,7 +120,7 @@ switch ($stAcao) {
             $obTLicitacaoParticipanteCertificacao->setDado( 'final_vigencia', $request->get('dtDataVigencia') );
             $obTLicitacaoParticipanteCertificacao->setDado( 'observacao', $request->get('hdnObservacao') );
             $obErro = $obTLicitacaoParticipanteCertificacao->inclusao($boTransacao);
-            
+
             if (!$obErro->ocorreu()) {
                 $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'num_certificacao'      , $inNumCertificacao );
                 $obTLicitacaoParticipanteCertificacaoLicitacao->setDado( 'exercicio_certificacao', Sessao::getExercicio() );
@@ -153,7 +175,7 @@ switch ($stAcao) {
             $stLink.= '&dtDataVigencia='.$request->get('dtDataVigencia');
             SistemaLegado::mudaFrameOculto($pgGera.'?'.Sessao::getId().$stLink);
         } else {
-            SistemaLegado::exibeAviso(urlencode($stMensagem),"n_alterar","erro");
+            SistemaLegado::exibeAviso( urlencode( $obErro->getDescricao() ) ,"n_alterar", "erro");
         }
     break;
 

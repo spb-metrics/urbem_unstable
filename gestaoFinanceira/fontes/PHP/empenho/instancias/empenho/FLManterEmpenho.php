@@ -98,7 +98,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $stMascaraRubrica = $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoClassificacaoDespesa->recuperaMascara();
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setExercicio( Sessao::getExercicio() );
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM( Sessao::read('numCgm') );
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarUsuariosEntidade( $rsEntidades, $stOrdem );
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarEntidadeRestos( $rsEntidades, $stOrdem );
 
     //****************************************//
     //Define COMPONENTES DO FORMULARIO
@@ -192,6 +192,15 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obDtFinal->setRotulo   ( "Período" );
     $obDtFinal->setTitle    ( '' );
     $obDtFinal->setNull     ( true );
+
+    if (Sessao::getExercicio() > '2015') {
+        $obCentroCusto = new TextBox;
+        $obCentroCusto->setRotulo ("Centro de Custo");
+        $obCentroCusto->setTitle ("Informe o centro de custo");
+        $obCentroCusto->setName ('inCentroCusto');
+        $obCentroCusto->setId ('inCentroCusto');
+        $obCentroCusto->setInteiro (true);
+    }
         
     $obIMontaCompraDiretaLicitacaoEmpenho = new IMontaCompraDiretaLicitacaoEmpenho($obForm);
     
@@ -204,6 +213,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addHidden         ( $obHdnCtrl );
     $obFormulario->addTitulo         ( "Dados para Filtro"  );
     $obFormulario->addComponente     ( $obCmbEntidades );
+    if (Sessao::getExercicio() > '2015') {
+        $obFormulario->addComponente     ( $obCentroCusto  );
+    }
     $obFormulario->addComponente     ( $obPopUpDotacao );
     $obFormulario->agrupaComponentes ( array( $obTxtCodAutorizacaoInicial,$obLabel, $obTxtCodAutorizacaoFinal ) );
     $obFormulario->addComponente     ( $obBscFornecedor );

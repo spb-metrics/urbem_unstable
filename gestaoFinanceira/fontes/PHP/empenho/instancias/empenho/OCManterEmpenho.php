@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterEmpenho.php 64256 2015-12-22 16:06:28Z michel $
+    $Id: OCManterEmpenho.php 64357 2016-01-25 19:06:29Z arthur $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -840,6 +840,7 @@ switch ($stCtrl) {
             $obREmpenhoAutorizacaoEmpenho->setExercicio(Sessao::getExercicio());
             $obREmpenhoAutorizacaoEmpenho->setdataEmpenho($request->get('stDtEmpenho'));
             $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+            $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
             $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho($nuSaldoDotacao);
 
             $js .= montaLabelDiverso($nuSaldoDotacao);
@@ -1504,6 +1505,7 @@ switch ($stCtrl) {
         $obREmpenhoAutorizacaoEmpenho->setExercicio(Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->setdataEmpenho($request->get('stDtEmpenho'));
         $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+        $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
         $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnteriorDataEmpenho($nuSaldoDotacao);
 
         if ($nuSaldoDotacao == "0.00") {

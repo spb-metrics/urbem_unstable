@@ -82,14 +82,19 @@ if (!($stAcao=="excluir")) {
             $obRTesourariaTerminal->roUltimoUsuario->setTimestampUsuario($stNow );
             $boResponsavel = ( $arTemp['responsavel'] == 't' ) ? 'true' : 'false';
             $obRTesourariaTerminal->roUltimoUsuario->setResponsavel( $boResponsavel );
+            
             if ($boResponsavel=='true') {
                 $inCount++;
             }
         }
-        if($inCount==0)
+        
+        if($inCount==0) {
             $stErro = "Deve haver um usuário vinculado como responsável do terminal!";
-        if($inCount>1)
-            $stErro = "Deve haver somente um usuário vinculado como responsável do terminal!";
+        }
+        
+        # Antigo teste onde permitia somente um responsável por terminal.
+        #if($inCount>1)
+        #    $stErro = "Deve haver somente um usuário vinculado como responsável do terminal!";
     } else {
         $stErro = "Deve haver pelo menos um usuário vinculado ao terminal!";
     }

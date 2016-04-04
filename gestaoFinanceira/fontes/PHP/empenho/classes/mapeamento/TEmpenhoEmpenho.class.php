@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TEmpenhoEmpenho.class.php 61680 2015-02-25 13:56:31Z arthur $
+    * $Id: TEmpenhoEmpenho.class.php 64778 2016-03-31 13:51:44Z michel $
 
     * Casos de uso: uc-02.01.23
                     uc-02.03.03
@@ -46,18 +46,8 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  EMPENHO.EMPENHO
-  * Data de Criação: 30/11/2004
-
-  * @author Analista: Jorge B. Ribarr
-  * @author Desenvolvedor: Eduardo Martins
-
-  * @package URBEM
-  * @subpackage Mapeamento
-*/
 class TEmpenhoEmpenho extends Persistente
 {
 /**
@@ -5598,5 +5588,167 @@ function montaRecuperaEmpenhosPopUp()
 
     return $stSql;
 }
+
+    function recuperaEmpenhosPorModalidade(&$rsRecordSet, $stCondicao = "", $stOrdem = "", $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+
+        if(trim($stOrdem))
+            $stOrdem = (strpos($stOrdem,"ORDER BY")===false) ? " ORDER BY ".$stOrdem : $stOrdem;
+        else{
+            $stOrdem = "
+                  ORDER BY empenho.modalidade
+                         , empenho.cod_entidade
+                         , empenho.exercicio
+                         , empenho.dt_empenho_order
+                         , empenho.cod_empenho
+                         , empenho.exercicio_nota
+                         , empenho.cod_nota
+                         , empenho.dt_nota
+            ";
+        }
+
+        $stSql = $this->montaRecuperaEmpenhosPorModalidade().$stCondicao.$stOrdem;
+
+        $this->setDebug($stSql);
+
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+        return $obErro;
+    }
+
+    function montaRecuperaEmpenhosPorModalidade()
+    {
+        $stSql = "SELECT *
+                    FROM (
+                           SELECT empenho.cod_entidade
+                                , cgm_entidade.nom_cgm AS entidade
+                                , empenho.exercicio
+                                , empenho.cod_empenho
+                                , TO_CHAR(empenho.dt_empenho,'mm') AS mes_empenho
+                                , TO_CHAR(empenho.dt_empenho,'dd/mm/yyyy') AS dt_empenho
+                                , empenho.dt_empenho AS dt_empenho_order
+                                , atributo_valor_padrao.cod_valor AS cod_modalidade
+                                , TRIM(atributo_valor_padrao.valor_padrao) AS modalidade
+                                , sw_cgm.numcgm AS cgm_credor
+                                , sw_cgm.nom_cgm AS credor
+                                , pre_empenho.descricao
+                                , item_pre_empenho.vl_empenho
+                                , nota_liquidacao.exercicio AS exercicio_nota
+                                , nota_liquidacao.cod_nota
+                                , TO_CHAR(nota_liquidacao.dt_liquidacao,'dd/mm/yyyy') AS dt_nota
+                                , nota_liquidacao_item.vl_nota
+                                , TO_CHAR(nota_liquidacao_paga.timestamp::DATE,'dd/mm/yyyy') AS dt_pagamento
+                                , SUM(nota_liquidacao_paga.vl_pago) - SUM(COALESCE(nota_liquidacao_paga_anulada.vl_anulado, 0.00)) AS vl_pagamento
+
+                             FROM empenho.empenho
+
+                       INNER JOIN empenho.pre_empenho
+                               ON pre_empenho.exercicio       = empenho.exercicio
+                              AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+
+                       INNER JOIN ( SELECT item_pre_empenho.exercicio
+                                         , item_pre_empenho.cod_pre_empenho
+                                         , SUM(item_pre_empenho.vl_total)-SUM(COALESCE(empenho_anulado_item.vl_anulado, 0.00)) AS vl_empenho
+                                      FROM empenho.item_pre_empenho
+                                 LEFT JOIN empenho.empenho_anulado_item
+                                        ON empenho_anulado_item.exercicio       = item_pre_empenho.exercicio
+                                       AND empenho_anulado_item.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                                       AND empenho_anulado_item.num_item        = item_pre_empenho.num_item
+                                  GROUP BY item_pre_empenho.exercicio
+                                         , item_pre_empenho.cod_pre_empenho
+                                    HAVING SUM(item_pre_empenho.vl_total)-SUM(COALESCE(empenho_anulado_item.vl_anulado, 0.00)) > 0
+                                  ) AS item_pre_empenho
+                               ON pre_empenho.exercicio       = item_pre_empenho.exercicio
+                              AND pre_empenho.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+
+                       INNER JOIN sw_cgm
+                               ON sw_cgm.numcgm = pre_empenho.cgm_beneficiario
+
+                       INNER JOIN empenho.atributo_empenho_valor
+                               ON pre_empenho.exercicio       = atributo_empenho_valor.exercicio
+                              AND pre_empenho.cod_pre_empenho = atributo_empenho_valor.cod_pre_empenho
+
+                       INNER JOIN administracao.atributo_dinamico
+                               ON atributo_dinamico.cod_modulo   = atributo_empenho_valor.cod_modulo
+                              AND atributo_dinamico.cod_cadastro = atributo_empenho_valor.cod_cadastro
+                              AND atributo_dinamico.cod_atributo = atributo_empenho_valor.cod_atributo
+                              AND atributo_dinamico.nom_atributo ILIKE 'modalidade%'
+
+                       INNER JOIN administracao.atributo_valor_padrao
+                               ON atributo_empenho_valor.cod_modulo     = atributo_valor_padrao.cod_modulo
+                              AND atributo_empenho_valor.cod_cadastro   = atributo_valor_padrao.cod_cadastro
+                              AND atributo_empenho_valor.cod_atributo   = atributo_valor_padrao.cod_atributo
+                              AND atributo_empenho_valor.valor          = atributo_valor_padrao.cod_valor::TEXT
+
+                       INNER JOIN empenho.nota_liquidacao
+                               ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                              AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                              AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
+
+                       INNER JOIN ( SELECT nota_liquidacao_item.exercicio
+                                         , nota_liquidacao_item.cod_nota
+                                         , nota_liquidacao_item.cod_entidade
+                                         , SUM(nota_liquidacao_item.vl_total) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) AS vl_nota
+                                      FROM empenho.nota_liquidacao_item
+                                 LEFT JOIN empenho.nota_liquidacao_item_anulado
+                                        ON nota_liquidacao_item_anulado.exercicio       = nota_liquidacao_item.exercicio
+                                       AND nota_liquidacao_item_anulado.cod_nota        = nota_liquidacao_item.cod_nota
+                                       AND nota_liquidacao_item_anulado.num_item        = nota_liquidacao_item.num_item
+                                       AND nota_liquidacao_item_anulado.exercicio_item  = nota_liquidacao_item.exercicio_item
+                                       AND nota_liquidacao_item_anulado.cod_pre_empenho = nota_liquidacao_item.cod_pre_empenho
+                                       AND nota_liquidacao_item_anulado.cod_entidade    = nota_liquidacao_item.cod_entidade
+                                  GROUP BY nota_liquidacao_item.exercicio
+                                         , nota_liquidacao_item.cod_nota
+                                         , nota_liquidacao_item.cod_entidade
+                                    HAVING SUM(nota_liquidacao_item.vl_total) - SUM(COALESCE(nota_liquidacao_item_anulado.vl_anulado, 0.00)) > 0
+                                  ) AS nota_liquidacao_item
+                               ON nota_liquidacao_item.exercicio       = nota_liquidacao.exercicio
+                              AND nota_liquidacao_item.cod_nota        = nota_liquidacao.cod_nota
+                              AND nota_liquidacao_item.cod_entidade    = nota_liquidacao.cod_entidade
+
+                       INNER JOIN empenho.nota_liquidacao_paga
+                               ON nota_liquidacao_paga.exercicio       = nota_liquidacao.exercicio
+                              AND nota_liquidacao_paga.cod_nota        = nota_liquidacao.cod_nota
+                              AND nota_liquidacao_paga.cod_entidade    = nota_liquidacao.cod_entidade
+
+                        LEFT JOIN empenho.nota_liquidacao_paga_anulada
+                               ON nota_liquidacao_paga_anulada.exercicio       = nota_liquidacao_paga.exercicio
+                              AND nota_liquidacao_paga_anulada.cod_nota        = nota_liquidacao_paga.cod_nota
+                              AND nota_liquidacao_paga_anulada.cod_entidade    = nota_liquidacao_paga.cod_entidade
+                              AND nota_liquidacao_paga_anulada.timestamp       = nota_liquidacao_paga.timestamp
+
+                       INNER JOIN orcamento.entidade
+                               ON entidade.exercicio    = empenho.exercicio
+                              AND entidade.cod_entidade = empenho.cod_entidade
+
+                       INNER JOIN sw_cgm AS cgm_entidade
+                               ON cgm_entidade.numcgm = entidade.numcgm
+
+                         GROUP BY empenho.cod_entidade
+                                , empenho.exercicio
+                                , empenho.cod_empenho
+                                , empenho.dt_empenho
+                                , sw_cgm.numcgm
+                                , sw_cgm.nom_cgm
+                                , atributo_valor_padrao.cod_valor
+                                , atributo_valor_padrao.valor_padrao
+                                , pre_empenho.descricao
+                                , item_pre_empenho.vl_empenho
+                                , nota_liquidacao.exercicio
+                                , nota_liquidacao.cod_nota
+                                , nota_liquidacao.dt_liquidacao
+                                , nota_liquidacao_item.vl_nota
+                                , nota_liquidacao_paga.timestamp::DATE
+                                , cgm_entidade.nom_cgm
+                         ) AS empenho
+                   WHERE empenho.exercicio = '".$this->getDado('exercicio')."'
+                     AND empenho.cod_entidade IN ( ".$this->getDado('entidade')." )
+        ";
+
+        return $stSql;
+    }
 
 }

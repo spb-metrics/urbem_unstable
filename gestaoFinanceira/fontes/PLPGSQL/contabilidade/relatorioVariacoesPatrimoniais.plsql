@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 17524 $
-* $Name$
-* $Author: cako $
-* $Date: 2006-11-09 13:34:45 -0200 (Qui, 09 Nov 2006) $
+* $Id: relatorioVariacoesPatrimoniais.plsql 64402 2016-02-16 20:59:49Z michel $
 *
 * Casos de uso: uc-02.02.22
                 uc-02.08.07
@@ -122,9 +119,10 @@ BEGIN
                             ON historico_contabil.exercicio     = lancamento.exercicio
                            AND historico_contabil.cod_historico = lancamento.cod_historico
                          
-                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||')
-                           AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
-                         --AND plano_analitica.exercicio IN ('|| quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) ||')
+                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||', '|| quote_literal(stExercicioAnterior) ||')
+                           AND (  ( lote.dt_lote = to_date( ''31/12/''||EXTRACT(YEAR FROM lote.dt_lote) , ''dd/mm/yyyy'' ) AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%'' )
+                               OR ( lote.dt_lote < to_date( ''31/12/''||EXTRACT(YEAR FROM lote.dt_lote) , ''dd/mm/yyyy'' ) )
+                               )
      
                       ORDER BY plano_conta.cod_estrutural
                 ) AS tabela
@@ -189,9 +187,10 @@ BEGIN
                             ON historico_contabil.exercicio     = lancamento.exercicio
                            AND historico_contabil.cod_historico = lancamento.cod_historico
                            
-                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||')
-                         --AND plano_analitica.exercicio IN ('|| quote_literal(stExercicio) || ', ' || quote_literal(stExercicioAnterior) ||')
-                           AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%''
+                         WHERE plano_analitica.exercicio IN ('|| quote_literal(stExercicio) ||', '|| quote_literal(stExercicioAnterior) ||')
+                           AND (  ( lote.dt_lote = to_date( ''31/12/''||EXTRACT(YEAR FROM lote.dt_lote) , ''dd/mm/yyyy'' ) AND (historico_contabil.cod_historico::varchar) NOT LIKE ''8%'' )
+                               OR ( lote.dt_lote < to_date( ''31/12/''||EXTRACT(YEAR FROM lote.dt_lote) , ''dd/mm/yyyy'' ) )
+                               )
                     ) AS tabela
                 WHERE cod_entidade IN (' || stEntidade || ')';
                
@@ -215,12 +214,7 @@ BEGIN
     CREATE UNIQUE INDEX unq_totaliza_credito    ON tmp_totaliza_credito (cod_estrutural varchar_pattern_ops, oid_temp);
     CREATE UNIQUE INDEX unq_totaliza_debito     ON tmp_totaliza_debito  (cod_estrutural varchar_pattern_ops, oid_temp);
     
-    IF substr(stDtInicial,1,5) =  '01/01' THEN
-        stSqlComplemento := ' dt_lote = to_date( ' || quote_literal(stDtInicial) || '::varchar,' || quote_literal('dd/mm/yyyy') || ') ';
-        stSqlComplemento := stSqlComplemento || ' AND tipo = '||quote_literal('I')||' ';
-    ELSE
-        stSqlComplemento := 'dt_lote BETWEEN to_date( ''01/01/'' || substr(to_char(to_date(' || quote_literal( stDtInicial )|| ',' || quote_literal('dd/mm/yyyy') || ') - 1,'|| quote_literal('dd/mm/yyyy') || '),7),'|| quote_literal('dd/mm/yyyy') || ') AND to_date( ' || quote_literal(stDtInicial) || '::varchar,' || quote_literal('dd/mm/yyyy') || ')-1';
-    END IF;
+    stSqlComplemento := 'exercicio = '''||stExercicioAnterior||''' ';
     stSql := 'CREATE TEMPORARY TABLE tmp_totaliza AS
         SELECT *
           FROM tmp_debito
@@ -781,16 +775,27 @@ BEGIN
                     UNION ALL
                         SELECT '||quote_literal('4.6.3.0.0.00.00')||' AS cod_estrutural
                              , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.6.3.0.0.00.00')||')) AS valores
-                             , ''Ganhos com Incorporação de Ativos por Descobertas e Nascimentos'' AS descricao
+                             , ''Ganhos com Incorporação de Ativos'' AS descricao
+                             , 7 AS grupo
+                             , 1 AS multiplicador
+                             , 0 AS borda
+                             , 0 AS linha
+                             , ''C'' AS tipo
+
+                    UNION ALL
+                        SELECT '||quote_literal('4.6.4.0.0.00.00')||' AS cod_estrutural
+                             , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.6.4.0.0.00.00')||')) AS valores
+                             , ''Ganhos com Desincorporação de Passivos'' AS descricao
                              , 7 AS grupo
                              , 1 AS multiplicador
                              , 1 AS borda
                              , 0 AS linha
                              , ''C'' AS tipo
+
                             --------------
                         UNION ALL
                         --Outras Variações Patrimoniais Aumentativas 
-                        SELECT '||quote_literal('4.6.4.0.0.00.00')||' AS cod_estrutural
+                        SELECT '||quote_literal('4.9.0.0.0.00.00')||' AS cod_estrutural
                              , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.9.2.1.2.00.00')||')) AS valores
                              , ''Outras Variações Patrimoniais Aumentativas'' AS descricao
                              , 8 AS grupo
@@ -800,7 +805,7 @@ BEGIN
                              , ''C'' AS tipo
                              
                         UNION ALL
-                        SELECT '||quote_literal('4.6.4.0.0.00.00')||' AS cod_estrutural
+                        SELECT '||quote_literal('4.9.0.0.0.00.00')||' AS cod_estrutural
                              , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.9.7.2.2.00.00')||')) AS valores
                              , ''Outras Variações Patrimoniais Aumentativas'' AS descricao
                              , 8 AS grupo
@@ -808,9 +813,17 @@ BEGIN
                              , 0 AS borda
                              , 1 AS linha
                              , ''C'' AS tipo
-                             
                         UNION ALL
-                        SELECT '||quote_literal('4.6.4.0.0.00.00')||' AS cod_estrutural
+                        SELECT '||quote_literal('4.9.0.0.0.00.00')||' AS cod_estrutural
+                             , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.9.9.0.0.00.00')||')) AS valores
+                             , ''Outras Variações Patrimoniais Aumentativas'' AS descricao
+                             , 8 AS grupo
+                             , 1 AS multiplicador
+                             , 0 AS borda
+                             , 1 AS linha
+                             , ''C'' AS tipo
+                        UNION ALL
+                        SELECT '||quote_literal('4.9.0.0.0.00.00')||' AS cod_estrutural
                              , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.9.9.1.2.00.00')||')) AS valores
                              , ''Outras Variações Patrimoniais Aumentativas'' AS descricao
                              , 8 AS grupo
@@ -820,7 +833,7 @@ BEGIN
                              , ''C'' AS tipo
                              
                         UNION ALL
-                        SELECT '||quote_literal('4.6.4.0.0.00.00')||' AS cod_estrutural
+                        SELECT '||quote_literal('4.9.0.0.0.00.00')||' AS cod_estrutural
                              , contabilidade.fn_totaliza_variacao_patrimonial(publico.fn_mascarareduzida('||quote_literal('4.9.9.4.2.00.00')||')) AS valores
                              , ''Outras Variações Patrimoniais Aumentativas'' AS descricao
                              , 8 AS grupo

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: ROrcamentoEntidade.class.php 61852 2015-03-10 16:39:19Z michel $
+    $Id: ROrcamentoEntidade.class.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     $Revision: 30824 $
     $Name$
@@ -759,6 +759,17 @@ function listarUsuariosEntidade(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
         $stFiltro .= "                     AND ac.parametro      = 'cod_entidade_camara')   \n";
     }
     $obErro = $obTEntidade->recuperaUsuariosEntidade( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
+    
+    return $obErro;
+}
+
+function listarEntidadeRestos(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
+{
+    include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
+    $obTEntidade = new TOrcamentoEntidade;
+    $obTEntidade->setDado('exercicio',  $this->stExercicio);
+    
+    $obErro = $obTEntidade->recuperaEntidadeRestos( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
 
     return $obErro;
 }

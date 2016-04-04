@@ -86,7 +86,7 @@ class TTBAResCont extends Persistente
                         , TO_CHAR(publicacao_rescisao_contrato.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao
                         , rescisao_contrato.vlr_multa
                         , rescisao_contrato.vlr_indenizacao
-                        , TO_CHAR(contrato.dt_assinatura, 'yyyymm') AS competencia
+                        , TO_CHAR(rescisao_contrato.dt_rescisao, 'yyyymm') AS competencia
                         , 'N' AS exame_previo
                         , contrato.fundamentacao_legal AS artigo
                         , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS imprensa_oficial

@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.14
 
-    $Id: OCManterConfiguracaoDirf.php 62511 2015-05-15 17:45:15Z evandro $
+    $Id: OCManterConfiguracaoDirf.php 64477 2016-03-01 14:46:38Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -782,7 +782,8 @@ function mascaraClassificacaoIRRF()
 function carregaPlanoSaude()
 {
     if ( empty($_REQUEST['inCGMPlanoSaude']) || empty($_REQUEST['inRegistro']) || empty($_REQUEST['inCodigoEventoPlanoSaude']) ) {
-        echo "alertaAviso('@Preencha todos os campos de Plano Privado de Assistência à Saúde','form','erro','".Sessao::getId()."');\n";    
+        echo "alertaAviso('@Preencha todos os campos de Plano Privado de Assistência à Saúde','form','erro','".Sessao::getId()."');\n";
+        die;
     }
 
     $arPlanoSaude = Sessao::read('arPlanoSaude');

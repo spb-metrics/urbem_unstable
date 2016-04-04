@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TTCEMGConfiguracaoOrgao.class.php 62310 2015-04-20 19:54:55Z franver $
+  $Id: TTCEMGConfiguracaoOrgao.class.php 64654 2016-03-18 14:44:48Z jean $
   $Date: $
   $Author: $
   $Rev: $
@@ -84,6 +84,7 @@ class TTCEMGConfiguracaoOrgao extends Persistente
 							WHEN 2 THEN 'Contador'
 							WHEN 3 THEN 'Controle Interno'
 							WHEN 4 THEN 'Ordenador de Despesa por Delegação'
+              WHEN 5 THEN 'Informações - Folha de Pagamento'
 		END AS nom_tipo_responsavel
 	     , TO_CHAR(configuracao_orgao.dt_inicio,'dd/mm/yyyy') AS dt_inicio
 	     , TO_CHAR(configuracao_orgao.dt_fim,'dd/mm/yyyy') AS dt_fim

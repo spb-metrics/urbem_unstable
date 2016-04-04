@@ -30,7 +30,7 @@
     *
     * @author: Evandro Melos
     *
-    $Id: TTCEALLoaDespesa.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTCEALLoaDespesa.class.php 64771 2016-03-30 19:35:02Z carlos.silva $
     *
     * @ignore
     *
@@ -73,7 +73,7 @@ class TTCEALLoaDespesa extends Persistente
                             ,cod_subfuncao
                             ,cod_programa
                             ,cod_proj_atividade
-                            ,cod_conta_despesa
+                            ,RPAD(cod_conta_despesa, 16, '0') AS cod_conta_despesa
                             ,cod_rec_vinculado
                             ,dotacao_inicial
                             ,SUM(janeiro) as janeiro

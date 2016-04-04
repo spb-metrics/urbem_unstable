@@ -59,7 +59,7 @@ $obDtImplantacao->setTitle ('Informe a data de implantação');
 $obDtImplantacao->setName  ('stDataImplantacao');
 $obDtImplantacao->setId    ('stDataImplantacao');
 $obDtImplantacao->setNull  (false);
-$stJs = "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=Dados da Despesa Pessoal','montaForm');";
+$stJs = "ajaxJavaScript('" . $pgOcul . "?stDataImplantacao='+this.value+'&stTitle=Dados da Despesa Pessoal','montaFormDespesaPessoal');";
 //$obDtImplantacao->obEvento->setOnChange("montaParametrosGET('montaForm','stDataImplantacao');");
 $obDtImplantacao->obEvento->setOnChange($stJs);
 

@@ -158,13 +158,14 @@ switch ($stCtrl) {
 
         if (!$boErro) {
             $inCount = count(Sessao::read('arUsuario'));
-            if ($_POST['boResponsavel']=="t") {
-                $cont=0;
-                while ($cont < $inCount) {
-                    $arUsuario[$cont]['responsavel'] = "f";
-                    $cont++;
-                }
-            }
+            # Antigo teste onde permitia somente um responsável por terminal.
+            #if ($_POST['boResponsavel']=="t") {
+            #    $cont=0;
+            #    while ($cont < $inCount) {
+            #        $arUsuario[$cont]['responsavel'] = "f";
+            #        $cont++;
+            #    }
+            #}
             $arUsuario[$inCount]['id_usuario']   = $inCount;
             $arUsuario[$inCount]['numcgm'  ]     = $_POST['inNumCgm'     ];
             $arUsuario[$inCount]['nom_cgm' ]     = $_POST['stNomCgm'     ];

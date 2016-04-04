@@ -648,7 +648,8 @@
                             compra_direta.cod_modalidade AS compra_cod_modalidade,
                             compra_direta.cod_compra_direta,
                             adjudicacao.cod_modalidade AS licitacao_cod_modalidade,
-                           adjudicacao.cod_licitacao
+                            adjudicacao.cod_licitacao,
+                            item_pre_empenho.cod_centro AS centro_custo
                             
                       FROM empenho.autorizacao_empenho AS AE
                       
@@ -996,6 +997,7 @@
                              ,compra_direta.cod_compra_direta
                              ,adjudicacao.cod_modalidade AS licitacao_cod_modalidade
                              ,adjudicacao.cod_licitacao
+                             ,item_pre_empenho.cod_centro AS centro_custo
              
                      FROM empenho.autorizacao_empenho AS AE
                      

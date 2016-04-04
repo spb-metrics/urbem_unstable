@@ -45,23 +45,23 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
-$obTPatrimonioDepreciacao		= new TPatrimonioDepreciacao;
-$obTContabilidadeLote 			= new TContabilidadeLote;
+$obErro	= new Erro;
+$obTPatrimonioDepreciacao	= new TPatrimonioDepreciacao;
+$obTContabilidadeLote 		= new TContabilidadeLote;
 $obTContabilidadeLancamentoDepreciacao  = new TContabilidadeLancamentoDepreciacao;
-$obErro					= new Erro;
 
-$stAcao                                 = $request->get('stAcao');
-$inCodEntidade 			        = $_REQUEST["inCodEntidade"];
-$inExercicio			        = $_REQUEST["inExercicio"];
-$inCodContaDepreciacao		        = $_REQUEST["inCodContaDepreciacao"];
-$stDescricaoContaDepreciacao	        = $_REQUEST["stDescricaoContaDepreciacao"];
-$inMesCompetencia                       = str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT);
-$inAnoMesCompetencia                    = $inExercicio.$inMesCompetencia;
+$stAcao                       = $request->get('stAcao');
+$inCodEntidade 			      = $_REQUEST["inCodEntidade"];
+$inExercicio			      = $_REQUEST["inExercicio"];
+$inCodContaDepreciacao		  = $_REQUEST["inCodContaDepreciacao"];
+$stDescricaoContaDepreciacao  = $_REQUEST["stDescricaoContaDepreciacao"];
+$inMesCompetencia             = str_pad($_REQUEST['inCompetencia'],2,'0',STR_PAD_LEFT);
+$inAnoMesCompetencia          = $inExercicio.$inMesCompetencia;
 
 switch ($stAcao) {
 
     case 'incluir':
-        
+
         $obTPatrimonioDepreciacao->setDado('competencia', $inExercicio.$inMesCompetencia);
         $obErro = $obTPatrimonioDepreciacao->recuperaDepreciacao($rsPatrimonioDepreciacao);
 
@@ -107,7 +107,7 @@ switch ($stAcao) {
                 $obErro->setDescricao("Competência ".$inMesCompetencia."/".$inExercicio." já lançada! Fazer estornos do mês antes de fazer novos lançamentos!");
             
             } else {
-                $obTContabilidadeLancamentoDepreciacao->setDado("exercicio"	 , $inExercicio       );
+                $obTContabilidadeLancamentoDepreciacao->setDado("exercicio"	     , $inExercicio       );
                 $obTContabilidadeLancamentoDepreciacao->setDado("competencia"    , $inMesCompetencia  );
                 $obTContabilidadeLancamentoDepreciacao->setDado("cod_entidade"   , $inCodEntidade     );
                 $obTContabilidadeLancamentoDepreciacao->setDado("cod_historico"  , 962                );

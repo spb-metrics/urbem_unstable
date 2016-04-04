@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 64324 2016-01-15 15:44:14Z lisiane $
+    $Id: TTCEMGConsideracaoArquivoDescricao.class.php 64671 2016-03-21 11:57:37Z jean $
     */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -62,7 +62,7 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
         $obErro      = new Erro;
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
-        $stOrdem = "ORDER BY consideracao_arquivo_descricao.cod_arquivo";
+        $stOrdem = " ORDER BY consideracao_arquivo_descricao.cod_arquivo";
         $stSql = $this->montaRecuperaDescricaoArquivos().$stFiltro.$stOrdem;
         $this->stDebug = $stSql;
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -181,6 +181,12 @@ class TTCEMGConsideracaoArquivoDescricao extends Persistente
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (44,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (57,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
             INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (41,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').", '', '".$this->getDado('modulo_sicom')."' );
+            ";
+        }
+
+        if ( $this->getDado('modulo_sicom') == 'folha' ) {
+            $stSql = "
+            INSERT INTO tcemg.consideracao_arquivo_descricao VALUES (60,".$this->getDado('periodo').",".$this->getDado('cod_entidade').",".$this->getDado('exercicio').",'','".$this->getDado('modulo_sicom')."');
             ";
         }
 

@@ -41,7 +41,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once(TLIC."TLicitacaoRescisaoContrato.class.php");
 include_once(CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 // padrão do programa
 $stPrograma = "ManterRescindirContrato";
@@ -67,7 +67,7 @@ $obHdnCtrl->setValue( "" );
 
 // cria o objeto com os dados da licitacaoRescisaoContrato
 $obTLicitacaoRescisaoContrato = new TLicitacaoRescisaoContrato;
-$obTLicitacaoRescisaoContrato->setDado('num_contrato', $_REQUEST["inNumContrato"]);
+$obTLicitacaoRescisaoContrato->setDado('num_contrato', $request->get("inNumContrato"));
 $obTLicitacaoRescisaoContrato->setDado('licitacao', false);
 $obTLicitacaoRescisaoContrato->recuperaContratoRescisao($rsRescisaoContrato);
 
@@ -119,14 +119,14 @@ $obVlMulta = new Moeda;
 $obVlMulta->setRotulo('Valor da Multa');
 $obVlMulta->setTitle('Informe o valor da multa.');
 $obVlMulta->setName('vlMulta');
-$obVlMulta->setNull(true);
+$obVlMulta->setNull(false);
 
 //monta o campo Moeda Indenizaçãos
 $obVlIndenizacao = new Moeda;
 $obVlIndenizacao->setRotulo('Valor da Indenização');
 $obVlIndenizacao->setTitle('Informe o valor da indenização.');
 $obVlIndenizacao->setName('vlIndenizacao');
-$obVlIndenizacao->setNull(true);
+$obVlIndenizacao->setNull(false);
 
 //monta a textArea Motivo
 $obVlMotivo = new TextArea;
@@ -177,3 +177,5 @@ $obFormulario->Ok();
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
+
+?>

@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.05.21
 
- $Id: PRManterAutorizacao.php 64005 2015-11-17 16:49:06Z michel $
+ $Id: PRManterAutorizacao.php 64400 2016-02-16 16:00:53Z arthur $
 
 */
 
@@ -379,6 +379,8 @@ if ($stErro) {
                 $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto($dadosItens['cod_centro']);
             }
 
+            $obAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+            $obAutorizacaoEmpenho->setTipoEmissao('R');
             $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
 
             if ($obErro->ocorreu()) {
@@ -443,8 +445,13 @@ if ($stErro) {
             # Grava no array as autorizações geradas.
             Sessao::write('arAutorizacao', $arAutorizacao);
 
-            # Exibe a mensagem e redireciona para a tela de download.
-            SistemaLegado::alertaAviso($pgGera.'?'.Sessao::getId(), $stMsg , "incluir", "aviso", Sessao::getId(), "../");
+            if ($obErro->ocorreu()) {
+                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),'n_incluir',"erro");
+            } else {
+                # Exibe a mensagem e redireciona para a tela de download.
+                SistemaLegado::alertaAviso($pgGera.'?'.Sessao::getId(), $stMsg , "incluir", "aviso", Sessao::getId(), "../");
+            }
+            
         } else {
             $stErro = $arErros[0];
             $obErro->setDescricao($stErro);

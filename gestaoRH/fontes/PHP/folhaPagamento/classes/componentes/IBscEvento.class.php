@@ -121,6 +121,11 @@ class IBscEvento
     public $stCampoCodEvento;
     
     public $stCampoNomEvento;
+    /**
+        * @access Private
+        * @var Boolean
+    */
+    public $boTextoComplementar;
 
     /**
         * @access Public
@@ -159,6 +164,13 @@ class IBscEvento
     public function setEventoSistema($valor) { $this->boEventoSistema = $valor;}
 
     public function setTodosEventos($valor) { $this->stTodosEventos = $valor;}
+
+    /**
+        * @access Public
+        * @param Boolean $valor
+    */
+
+    public function setTextoComplementar($valor) { $this->boTextoComplementar = $valor;}
 
     /**
         * @access Public
@@ -212,6 +224,12 @@ class IBscEvento
     public function getCampoNomEvento() { return $this->stCampoNomEvento; }
     
     public function setCampoNomEvento($var) { $this->stCampoNomEvento = $var; }
+
+    /**
+        * @access Public
+        * @return Boolean
+    */
+    public function getTextoComplementar() { return $this->boTextoComplementar; }
     
     /**
         * Método Construtor
@@ -228,6 +246,7 @@ class IBscEvento
         
         $this->setCampoCodEvento($stCampoCodEvento);
         $this->setCampoNomEvento($stCampoNomEvento);
+        $this->setTextoComplementar(true);
 
         //Define a mascara do campo Evento
         $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
@@ -319,7 +338,11 @@ class IBscEvento
         $this->montaFuncaoPreenche();
 
         $obFormulario->addComponente                ( $this->obBscInnerEvento          );
-        $obFormulario->addComponente                ( $this->obLblTextoComplementar    );
+        
+        if ($this->getTextoComplementar()) {
+            $obFormulario->addComponente            ( $this->obLblTextoComplementar    );
+        }
+
         $obFormulario->addSpan                      ( $this->obSpnDadosEvento          );
         $obFormulario->addHidden                    ( $this->obHdnEvalIBscEvento, true );
         $obFormulario->addHidden                    ( $this->obHdnFixado               );

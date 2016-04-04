@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGDispensaInexigibilidade.class.php 64106 2015-12-02 19:13:45Z michel $
+    $Id: TTCEMGDispensaInexigibilidade.class.php 64735 2016-03-24 17:23:11Z franver $
 
     * Casos de uso: uc-03.05.18
             uc-03.05.19
@@ -66,24 +66,30 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                                WHEN modalidade.cod_modalidade = 9 THEN 2
                           END AS tipo_processo
                         , TO_CHAR(licitacao.timestamp,'dd/mm/yyyy') AS dt_abertura
-                        , justificativa_razao.justificativa
-                        , justificativa_razao.razao
+                        , remove_acentos(justificativa_razao.justificativa) AS justificativa
+                        , remove_acentos(justificativa_razao.razao) AS razao
                         , TO_CHAR(licitacao.timestamp,'ddmmyyyy') AS dt_publicacao_termo_ratificacao
                         , CASE WHEN tipo_objeto.cod_tipo_objeto = 1 THEN
-                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 15000) THEN 2
+                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 15000)
+                                         THEN 2
                                          ELSE 99
                                     END
                                WHEN tipo_objeto.cod_tipo_objeto = 2 THEN 
-                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 8000) THEN 1
+                                    CASE WHEN (SUM(cotacao_fornecedor_item.vl_cotacao) > 8000)
+                                         THEN 1
                                          ELSE 99
                                     END
                                WHEN tipo_objeto.cod_tipo_objeto = 3 THEN 3
                                WHEN tipo_objeto.cod_tipo_objeto = 4 THEN 3
+                               WHEN tipo_objeto.cod_tipo_objeto = 6
+                               THEN 3
                           END AS natureza_objeto
-                        , objeto.descricao AS objeto
+                        , remove_acentos(objeto.descricao) AS objeto
                         , sw_cgm.nom_cgm AS veiculo_publicacao
-                        , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN 1
-                               WHEN mapa.cod_tipo_licitacao = 1 OR  mapa.cod_tipo_licitacao = 3 THEN 2
+                        , CASE WHEN mapa.cod_tipo_licitacao = 2
+                               THEN 1
+                               WHEN mapa.cod_tipo_licitacao = 1 OR mapa.cod_tipo_licitacao = 3
+                               THEN 2
                           END AS processo_por_lote
 
                     FROM licitacao.licitacao as licitacao
@@ -234,8 +240,10 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                  , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_resp
                  , config_licitacao.exercicio_licitacao AS exercicio_processo
                  , config_licitacao.num_licitacao AS num_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
+                 , CASE WHEN modalidade.cod_modalidade = 8
+                        THEN 1
+                        WHEN modalidade.cod_modalidade = 9
+                        THEN 2
                    END AS tipo_processo
                  , mapa_cotacao.cod_cotacao::INTEGER AS num_lote
                  , 'Lote n.'||mapa_cotacao.cod_cotacao::VARCHAR AS desc_lote
@@ -362,8 +370,6 @@ class TTCEMGDispensaInexigibilidade extends Persistente
         GROUP BY tipo_registro
                , cod_orgao_resp
                , cod_unidade_resp
-               , exercicio_processo
-               , num_processo
                , tipo_processo
                , num_lote
                , desc_lote
@@ -383,20 +389,19 @@ class TTCEMGDispensaInexigibilidade extends Persistente
     public function montaRecuperaExportacao12()
     {
         $stSql = "
-            SELECT 12 AS tipo_registro
-                 , LPAD(orgao.valor::VARCHAR, 2, '0') AS cod_orgao_resp
-                 , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_resp
-                 , config_licitacao.exercicio_licitacao AS exercicio_processo
-                 , config_licitacao.num_licitacao AS num_processo
-                 , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
-                        WHEN modalidade.cod_modalidade = 9 THEN 2
-                   END AS tipo_processo
-                 , mapa_item.cod_item AS cod_item
-                 , mapa_item.cod_item AS num_item
-                 , mapa_cotacao.cod_cotacao::INTEGER AS num_lote
-
+          SELECT 12 AS tipo_registro
+               , LPAD(orgao.valor::VARCHAR, 2, '0') AS cod_orgao_resp
+               , LPAD(LPAD(licitacao.num_orgao::VARCHAR, 2, '0')||LPAD(licitacao.num_unidade::VARCHAR, 2, '0'),5,'0') AS cod_unidade_resp
+               , config_licitacao.exercicio_licitacao AS exercicio_processo
+               , config_licitacao.num_licitacao AS num_processo
+               , CASE WHEN modalidade.cod_modalidade = 8
+                      THEN 1
+                      WHEN modalidade.cod_modalidade = 9
+                      THEN 2
+                  END AS tipo_processo
+               , mapa_item.cod_item AS cod_item
+               , substring(mapa_item.cod_item::VARCHAR FROM '.....$') AS num_item
             FROM licitacao.licitacao
-
       INNER JOIN (SELECT *
                     FROM administracao.configuracao_entidade
                    WHERE configuracao_entidade.cod_modulo = 55
@@ -504,15 +509,10 @@ class TTCEMGDispensaInexigibilidade extends Persistente
         GROUP BY tipo_registro
                , cod_orgao_resp
                , cod_unidade_resp
-               , exercicio_processo
-               , num_processo
-               , tipo_processo
-               , mapa_item.cod_item
-               , num_item
-               , mapa_cotacao.cod_cotacao
                , config_licitacao.exercicio_licitacao
                , config_licitacao.num_licitacao
-
+               , tipo_processo
+               , mapa_item.cod_item
         ORDER BY num_processo
         ";
         return $stSql;
@@ -534,7 +534,10 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                  , CASE WHEN modalidade.cod_modalidade = 8 THEN 1
                         WHEN modalidade.cod_modalidade = 9 THEN 2
                    END AS tipo_processo
-                 , mapa_cotacao.cod_cotacao::INTEGER AS num_lote
+                 , CASE WHEN mapa.cod_tipo_licitacao = 2
+                        THEN mapa_cotacao.cod_cotacao::VARCHAR
+                        ELSE ' '
+                    END AS num_lote
                  , mapa_item.cod_item AS cod_item
 
             FROM licitacao.licitacao
@@ -690,7 +693,6 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                    END AS tipo_processo
                  , 1 AS tipo_resp
                  , sw_cgm_pessoa_fisica.cpf AS num_cpf_resp
-                 , mapa_cotacao.cod_cotacao::INTEGER AS num_lote
 
             FROM licitacao.licitacao
 
@@ -814,15 +816,11 @@ class TTCEMGDispensaInexigibilidade extends Persistente
         GROUP BY tipo_registro
                , cod_orgao_resp
                , cod_unidade_resp
-               , exercicio_processo
-               , num_processo
+               , config_licitacao.exercicio_licitacao
+               , config_licitacao.num_licitacao
                , tipo_processo
                , tipo_resp
                , num_cpf_resp
-               , mapa_cotacao.cod_cotacao
-               , config_licitacao.exercicio_licitacao
-               , config_licitacao.num_licitacao
-
         ORDER BY num_processo
         ";
         return $stSql;
@@ -847,7 +845,8 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                , mapa_item.cod_item AS cod_item
                , TRUNC((mapa_item.vl_total/mapa_item.quantidade), 2)::NUMERIC(14,4) AS vl_cot_precos_unitario
                , mapa_item.quantidade AS quantidade
-               , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN mapa_cotacao.cod_cotacao::VARCHAR
+               , CASE WHEN mapa.cod_tipo_licitacao = 2
+                      THEN mapa_cotacao.cod_cotacao::VARCHAR
                       ELSE ' '
                  END AS num_lote
             FROM licitacao.licitacao
@@ -1028,7 +1027,6 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                , REPLACE(conta_despesa.cod_estrutural, '.', '') AS natureza_despesa
                , despesa.cod_recurso AS cod_font_recurso
                , despesa.vl_original vl_recurso
-               , mapa_cotacao.cod_cotacao::INTEGER AS num_lote
 
             FROM licitacao.licitacao
 
@@ -1192,8 +1190,8 @@ class TTCEMGDispensaInexigibilidade extends Persistente
         GROUP BY tipo_registro
                , cod_orgao_resp
                , cod_unidade_resp
-               , exercicio_processo
-               , num_processo
+               , config_licitacao.exercicio_licitacao
+               , config_licitacao.num_licitacao
                , tipo_processo
                , cod_orgao
                , cod_subunidade
@@ -1205,10 +1203,6 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                , natureza_despesa
                , cod_font_recurso
                , vl_recurso
-               , mapa_cotacao.cod_cotacao
-               , config_licitacao.exercicio_licitacao
-               , config_licitacao.num_licitacao
-
         ORDER BY num_processo";
 		
         return $stSql;
@@ -1243,7 +1237,8 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                  , CASE WHEN certificacao_documentos.cod_documento = 7 AND documento_pessoa.tipo_documento = 2 THEN certificacao_documentos.num_certificacao::VARCHAR         ELSE '' END AS num_cndt
                  , CASE WHEN certificacao_documentos.cod_documento = 7 AND documento_pessoa.tipo_documento = 2 THEN TO_CHAR(certificacao_documentos.dt_emissao,'dd/mm/yyyy')  ELSE '' END AS dt_emissao_cndt
                  , CASE WHEN certificacao_documentos.cod_documento = 7 AND documento_pessoa.tipo_documento = 2 THEN TO_CHAR(certificacao_documentos.dt_validade,'dd/mm/yyyy') ELSE '' END AS dt_validade_cndt
-                 , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN mapa_cotacao.cod_cotacao::VARCHAR
+                 , CASE WHEN mapa.cod_tipo_licitacao = 2
+                        THEN mapa_cotacao.cod_cotacao::VARCHAR
                         ELSE ' '
                     END AS num_lote
                  , mapa_item.cod_item AS cod_item
@@ -1447,7 +1442,8 @@ class TTCEMGDispensaInexigibilidade extends Persistente
                  , documento_pessoa.tipo_documento AS tipo_documento
                  , documento_pessoa.num_documento AS num_documento
                  , TO_CHAR (participante_certificacao.dt_registro, 'dd/mm/yyyy') AS dt_credenciamento
-                 , CASE WHEN mapa.cod_tipo_licitacao = 2 THEN mapa_cotacao.cod_cotacao::VARCHAR
+                 , CASE WHEN mapa.cod_tipo_licitacao = 2
+                        THEN mapa_cotacao.cod_cotacao::VARCHAR
                         ELSE ' '
                     END AS num_lote
                  , mapa_item.cod_item AS cod_item

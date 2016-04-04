@@ -28,7 +28,7 @@
     * Data de Criação   : 06/08/2004
     * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
     * @ignore
-    * $Id: FLRelatorioRazaoDespesa.php 62463 2015-05-12 20:26:16Z lisiane $
+    * $Id: FLRelatorioRazaoDespesa.php 64774 2016-03-30 22:01:05Z michel $
     * Casos de uso: uc-02.01.22
 */
 
@@ -49,6 +49,7 @@ include_once CAM_GF_ORC_NEGOCIO."ROrcamentoConfiguracao.class.php";
 include_once CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php";
 include_once CAM_GF_ORC_NEGOCIO."ROrcamentoProjetoAtividade.class.php";
 include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php";
+include_once CAM_GF_ORC_COMPONENTES.'IPopUpDotacaoFiltroClassificacao.class.php';
 
 /* includes da pagina javascript */
 include_once $pgJS;
@@ -93,12 +94,12 @@ Sessao::write('filtroNomRelatorio', $arNomFiltro);
 $rsEntidades->setPrimeiroElemento();
 
 $obForm = new Form;
-$obForm->setAction($pgOcGera);
-$obForm->setTarget("oculto");
+$obForm->setAction( CAM_FW_POPUPS."relatorio/OCRelatorio.php" );
+$obForm->setTarget( "oculto" );
 
 $obHdnCaminho = new Hidden;
 $obHdnCaminho->setName("stCaminho");
-$obHdnCaminho->setValue(CAM_GF_ORC_INSTANCIAS."relatorio/OCRelatorioRazaoDespesa.php");
+$obHdnCaminho->setValue( CAM_GPC_TCEMG_RELATORIOS.$pgOcul );
 
 //PERIODICIDADE
 $obPeriodicidade = new Periodicidade();
@@ -135,7 +136,6 @@ $obCmbEntidades->SetRecord2    ( $rsRecordset );
 $arTipoRelatorio = array(
                     '' => 'Selecione', # Campo inicial Selecione
                     'educacao_despesa_extra_orcamentaria' => 'Educação Despesa Extra Orçamentária',
-                    'educacao_receita_extra_orcamentaria' => 'Educação Receita Extra Orçamentária',
                     'fundeb_60' => 'Fundeb 60%',
                     'fundeb_40' => 'Fundeb 40%',
                     'ensino_fundamental' => 'Ensino Fundamental',
@@ -143,9 +143,6 @@ $arTipoRelatorio = array(
                     'saude' => 'Saúde',
                     'diversos' => 'Diversos',
                     'restos_pagar' => 'Restos a Pagar',
-                    'empenhado' => 'Empenhado',
-                    'liquidado' => 'Liquidado',
-                    'pago' => 'Pago',
 );
 
 $obCmbTipoRelatorio = new Select;
@@ -199,8 +196,8 @@ $obCmbUnidade->setCampoDesc("descricao");
 $obCmbUnidade->addOption   ("", "Selecione");
 
 $obTxtPao = new TextBox;
-$obTxtPao->setRotulo   ("PAO");
-$obTxtPao->setTitle    ("Selecione o PAO para filtro." );
+$obTxtPao->setRotulo   ("Ação");
+$obTxtPao->setTitle    ("Selecione o Ação para filtro." );
 $obTxtPao->setName     ("inCodPaoTxt");
 $obTxtPao->setValue    ($inCodPao);
 $obTxtPao->setSize     (6);
@@ -208,7 +205,7 @@ $obTxtPao->setMaxLength(4);
 $obTxtPao->setInteiro  (true);
 
 $obCmbPao = new Select;
-$obCmbPao->setRotulo              ( "PAO"           );
+$obCmbPao->setRotulo              ( "Ação"          );
 $obCmbPao->setName                ( "inCodPao"      );
 $obCmbPao->setValue               ( $inCodPao       );
 $obCmbPao->setStyle               ( "width: 232px"  );
@@ -247,14 +244,21 @@ $obCmbSituacao->setRotulo              ( "Situação"                     );
 $obCmbSituacao->setName                ( "inSituacao"                   );
 $obCmbSituacao->setStyle               ( "width: 200px"                 );
 $obCmbSituacao->addOption              ( "", "Selecione"                );
-$obCmbSituacao->addOption              ( "1", "Empenhados"              );
 $obCmbSituacao->addOption              ( "2", "Pagos"                   );
-$obCmbSituacao->addOption              ( "3", "Liquidados"              );
 $obCmbSituacao->setNull                ( false );
 
 //Define objeto span para componentes de filtro
 $obSpan = new Span;
 $obSpan->setId( "spnFormularioFiltro" );
+
+$obIPopUpDotacao = new IPopUpDotacaoFiltroClassificacao($obCmbEntidades);
+$obIPopUpDotacao->obCampoCod->setName('inCodDespesa');
+$obIPopUpDotacao->obCampoCod->setId  ('inCodDespesa');
+$obIPopUpDotacao->setNull            (true);
+$obIPopUpDotacao->setId              ('stNomDespesa');
+$obImagem = $obIPopUpDotacao->getImagem();
+$obImagem->setId('inImgDespesa');
+$obIPopUpDotacao->setImagem ($obImagem);
 
 $obFormularioFiltro = new Formulario;
 $obFormularioFiltro->addComponenteComposto($obTxtOrgao  , $obCmbOrgao  );
@@ -274,7 +278,7 @@ $jsOnLoad = "
     jQuery('#spnFormularioFiltro').hide();
     jQuery('#stTipoRelatorio').change(function(){
 
-        //Apresenta filtro para seleção do órgão, unidade e pao
+        //Apresenta filtro para seleção do órgão, unidade e ação
         if(    jQuery(this).val() == 'fundeb_40'
            || jQuery(this).val() == 'fundeb_60'
            || jQuery(this).val() == 'ensino_fundamental'
@@ -284,15 +288,22 @@ $jsOnLoad = "
             
            jQuery('#spnFormularioFiltro').html('".$stHtml."');
            jQuery('#spnFormularioFiltro').show();
+
+           jQuery('#inCodDespesa').attr('disabled', false);
+           jQuery('#inImgDespesa').attr('hidden', false);
         }
         
         //Apresenta caixa para seleção dos recursos
         if(   jQuery(this).val() == 'educacao_despesa_extra_orcamentaria'
-           || jQuery(this).val() == 'educacao_receita_extra_orcamentaria'
            || jQuery(this).val() == 'restos_pagar' ){
            
            jQuery('#spnFormularioFiltro').html('".$stHtmlRecurso."');
            jQuery('#spnFormularioFiltro').show();
+
+           jQuery('#inCodDespesa').val('');
+           jQuery('#stNomDespesa').html('&nbsp;');
+           jQuery('#inCodDespesa').attr('disabled', true);
+           jQuery('#inImgDespesa').attr('hidden', true);
         }
     });
 ";
@@ -308,6 +319,7 @@ $obFormulario->addComponente($obCmbTipoRelatorio);
 $obFormulario->addSpan      ($obSpan            );
 $obFormulario->addComponente($obCmbSituacao     );
 $obFormulario->addComponente($obCmbRecursos     );
+$obFormulario->addComponente($obIPopUpDotacao   );
 
 // BOTÕES DE AÇÃO DO FORMULÁRIO (OK/LIMPAR)
 $obBtnOk = new Ok();

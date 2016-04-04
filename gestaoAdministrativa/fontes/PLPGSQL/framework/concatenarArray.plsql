@@ -33,7 +33,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: concatenarArray.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: concatenarArray.plsql 64421 2016-02-19 12:14:17Z fabio $
 *
 * Casos de uso: uc-01.01.00
 */

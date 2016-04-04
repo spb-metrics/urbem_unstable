@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacao.php 64192 2015-12-14 15:51:03Z michel $
+    $Id: PRManterAutorizacao.php 64442 2016-02-23 13:48:55Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -155,8 +155,11 @@ switch ($stAcao) {
             } else
                 $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );
             
-            if ( !$obErro->ocorreu() )
+            if ( !$obErro->ocorreu() ){
+                $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+                $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
                 $obErro = $obREmpenhoAutorizacaoEmpenho->incluir($boTransacao);
+            }
             
             if ( !$obErro->ocorreu() ) {
                 SistemaLegado::alertaAviso($pgForm.'?&stAcao='.$stAcao, $obREmpenhoAutorizacaoEmpenho->getCodAutorizacao()."/".Sessao::getExercicio(), 'incluir', "aviso", Sessao::getId(), "../");
@@ -260,7 +263,7 @@ switch ($stAcao) {
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setDtValidadeFinal( $request->get('stDtValidadeFinal') );
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setDtInclusao( $request->get('stDtInclusao') );
             $obREmpenhoAutorizacaoEmpenho->setDescricao( $request->get('stDescricao') );
-            $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setVlReserva( $request->get('nuVlReserva') );
+            $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setVlReserva( $request->get('hdnVlReserva') );
 
             if ($request->get('inCodOrgao') == '' && $request->get('hdnCodOrgao') != '')
                 $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($request->get('hdnCodOrgao'));
@@ -303,6 +306,8 @@ switch ($stAcao) {
                 $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );
             
             if ( !$obErro->ocorreu() )
+                $obREmpenhoAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
+                $obREmpenhoAutorizacaoEmpenho->setTipoEmissao('R');
                 $obErro = $obREmpenhoAutorizacaoEmpenho->alterar();
 
             /* Excluir Assinaturas vinculadas ao documento */

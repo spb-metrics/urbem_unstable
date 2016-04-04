@@ -30,6 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
+$Id: TNorma.class.php 64377 2016-01-29 17:52:14Z michel $
 $Revision: 22985 $
 $Name$
 $Author: andre.almeida $
@@ -40,14 +41,6 @@ Casos de uso: uc-01.04.02, uc-02.08.01
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-/**
- * Efetua conexão com a tabela  SW_NORMA
- * Data de Criação: 26/05/2004
-
- * @author Analista: Leandro Oliveira
- * @author Desenvolvedor: Diego Barbosa Victoria
-
-*/
 class TNorma extends Persistente
 {
 /**
@@ -184,7 +177,7 @@ function recuperaDadosExportacao(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $b
     $obErro      = new Erro;
     $obConexao   = new Conexao;
     $rsRecordSet = new RecordSet;
-    $stOrdem = $stOrdem ? $stOrdem : " ORDER BY exercicio ";
+    $stOrdem = $stOrdem ? $stOrdem : " ORDER BY exercicio, dt_order, numero_da_lei ";
     $stSql  = $this->montaRecuperaDadosExportacao().$stFiltro.$stOrdem;
 
     $this->setDebug( $stSql );
@@ -195,83 +188,84 @@ function recuperaDadosExportacao(&$rsRecordSet, $stFiltro = "", $stOrdem ="", $b
 }
 function montaRecuperaDadosExportacao()
 {
-    $stSQL .= "SELECT                                                                                                       \n";
-    $stSQL .= "     numero_da_lei,                                                                                          \n";
-    $stSQL .= "     substr(data_da_lei,7,8) as exercicio_da_lei,                                                            \n";
-    $stSQL .= "     data_da_lei,                                                                                            \n";
-    $stSQL .= "     num_norma as cod_norma,                                                                                 \n";
-    $stSQL .= "     exercicio,                                                                                              \n";
-    $stSQL .= "     dt_publicacao,                                                                                          \n";
-    $stSQL .= "     valor_credito_adicional,                                                                                \n";
-    $stSQL .= "     valor_reducao_dotacoes,                                                                                 \n";
-    $stSQL .= "     tipo_credito_adicional,                                                                                 \n";
-    $stSQL .= "     origem_do_recurso                                                                                       \n";
-    $stSQL .= "FROM (                                                                                                       \n";
-    $stSQL .= "     SELECT DISTINCT                                                                                         \n";
-    $stSQL .= "        suplementacao.cod_suplementacao,                                                                                \n";
-    $stSQL .= "        norma.num_norma,                                                                                        \n";
-    $stSQL .= "        norma.exercicio,                                                                                        \n";
-    $stSQL .= "        to_char(norma.dt_publicacao,'ddmmyyyy')as dt_publicacao,                                                \n";
-    $stSQL .= "        CASE WHEN norma.cod_tipo_norma=1 THEN                                                                   \n";
-    $stSQL .= "            tcers.fn_retorno_atributo_normas(norma.cod_tipo_norma,norma.cod_norma,'Número da Lei')                 \n";
-    $stSQL .= "            ELSE                                                                                             \n";
-    $stSQL .= "            CAST(norma.num_norma as varchar)                                                                    \n";
-    $stSQL .= "        END as numero_da_lei,                                                                                \n";
-    $stSQL .= "        CASE WHEN norma.cod_tipo_norma=1 THEN                                                                   \n";
-    $stSQL .= "            tcers.fn_retorno_atributo_normas(norma.cod_tipo_norma,norma.cod_norma,'Data da Lei')                   \n";
-    $stSQL .= "            ELSE                                                                                             \n";
-    $stSQL .= "            to_char(norma.dt_publicacao,'dd/mm/yyyy')                                                           \n";
-    $stSQL .= "        END as data_da_lei,                                                                                  \n";
-    $stSQL .= "        tcers.fn_total_valor_credito('".$this->getDado("stExercicio")."',suplementacao.cod_suplementacao, '".$this->getDado("stCodEntidades")."') as valor_credito_adicional,    \n";
-    $stSQL .= "        tcers.fn_total_valor_reducao('".$this->getDado("stExercicio")."',suplementacao.cod_suplementacao, '".$this->getDado("stCodEntidades")."') as valor_reducao_dotacoes,     \n";
-    $stSQL .= "        CASE                                                                                                 \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (1,2,3,4,5,13,14,15)   THEN 1                                            \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (6,7,8,9,10)        THEN 2                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (11)                THEN 3                                               \n";
-    $stSQL .= "        END AS tipo_credito_adicional,                                                                       \n";
-    $stSQL .= "        CASE                                                                                                 \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (5,10)              THEN 1                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (4,9)               THEN 2                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (2,7)               THEN 3                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (3,8)               THEN 4                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (1,6,13)            THEN 5                                               \n";
-    $stSQL .= "                WHEN suplementacao.cod_tipo IN (14,15)             THEN 6                                               \n";
-    $stSQL .= "        END AS origem_do_recurso                                                                             \n";
-    $stSQL .= "     FROM                                                                                                    \n";
-    $stSQL .= "        normas.norma                                ,                                                   \n";
-    $stSQL .= "        orcamento.suplementacao,                                                                        \n";
-    $stSQL .= "        contabilidade.transferencia_despesa  ,                                                          \n";
-    $stSQL .= "        contabilidade.lote                                                                            \n";
-    $stSQL .= "     WHERE                                                                                                   \n";
-//  $stSQL .= "            norma.exercicio = '".$this->getDado("stExercicio")."'                                               \n";
-    $stSQL .= "               transferencia_despesa.cod_suplementacao     = suplementacao.cod_suplementacao                                                  \n";
-    $stSQL .= "        AND transferencia_despesa.exercicio             = suplementacao.exercicio                                                          \n";
-    $stSQL .= "        AND transferencia_despesa.cod_lote              = lote.cod_lote                                                           \n";
-    $stSQL .= "        AND suplementacao.cod_tipo              not in (12,16)                                                                    \n";
-    $stSQL .= "        AND transferencia_despesa.exercicio             = lote.exercicio                                                          \n";
-    $stSQL .= "        AND transferencia_despesa.tipo                  = lote.tipo                                                               \n";
-    $stSQL .= "        AND transferencia_despesa.cod_entidade          = lote.cod_entidade                                                       \n";
-    $stSQL .= "        AND lote.dt_lote between to_date('".$this->getDado("dtInicial")."','dd/mm/yyyy') AND to_date('".$this->getDado("dtFinal")."','dd/mm/yyyy')\n";
-    $stSQL .= "        AND suplementacao.dt_suplementacao between to_date('".$this->getDado("dtInicial")."','dd/mm/yyyy') AND to_date('".$this->getDado("dtFinal")."','dd/mm/yyyy')\n";
-    $stSQL .= "        AND transferencia_despesa.cod_entidade          IN (".$this->getDado("stCodEntidades").")                               \n";
-    $stSQL .= "        AND norma.cod_norma             = suplementacao.cod_norma                                                          \n";
-    $stSQL .= "        AND suplementacao.cod_suplementacao || suplementacao.exercicio NOT IN (                                                    \n";
-    $stSQL .= "           SELECT                                                                                            \n";
-    $stSQL .= "              cod_suplementacao || exercicio                                                                 \n";
-    $stSQL .= "           FROM                                                                                              \n";
-    $stSQL .= "              orcamento.suplementacao_anulada                                                                \n";
-    $stSQL .= "           WHERE                                                                                             \n";
-    $stSQL .= "              exercicio   = '".$this->getDado("stExercicio")."'                                              \n";
-    $stSQL .= "        )                                                                                                    \n";
-    $stSQL .= "        AND suplementacao.cod_suplementacao || suplementacao.exercicio NOT IN (                                                    \n";
-    $stSQL .= "           SELECT                                                                                            \n";
-    $stSQL .= "             cod_suplementacao_anulacao || exercicio                                                         \n";
-    $stSQL .= "           FROM                                                                                              \n";
-    $stSQL .= "             orcamento.suplementacao_anulada                                                                 \n";
-    $stSQL .= "           WHERE                                                                                             \n";
-    $stSQL .= "             exercicio   = '".$this->getDado("stExercicio")."'                                               \n";
-    $stSQL .= "        )                                                                                                    \n";
-    $stSQL .= ") as tabela                                                                                                  \n";
+    $stSQL .= "SELECT
+                    numero_da_lei,
+                    substr(data_da_lei,7,8) as exercicio_da_lei,
+                    data_da_lei,
+                    num_norma as cod_norma,
+                    exercicio,
+                    dt_publicacao,
+                    valor_credito_adicional,
+                    valor_reducao_dotacoes,
+                    tipo_credito_adicional,
+                    origem_do_recurso
+               FROM (
+                    SELECT DISTINCT
+                       suplementacao.cod_suplementacao,
+                       norma.num_norma,
+                       norma.exercicio,
+                       to_char(norma.dt_publicacao,'ddmmyyyy')as dt_publicacao,
+                       CASE WHEN norma.cod_tipo_norma=1 THEN
+                           tcers.fn_retorno_atributo_normas(norma.cod_tipo_norma,norma.cod_norma,'Número da Lei')
+                           ELSE
+                           CAST(norma.num_norma as varchar)
+                       END as numero_da_lei,
+                       CASE WHEN norma.cod_tipo_norma=1 THEN
+                           tcers.fn_retorno_atributo_normas(norma.cod_tipo_norma,norma.cod_norma,'Data da Lei')
+                           ELSE
+                           to_char(norma.dt_publicacao,'dd/mm/yyyy')
+                       END as data_da_lei,
+                       norma.dt_publicacao as dt_order,
+                       tcers.fn_total_valor_credito('".$this->getDado("stExercicio")."',suplementacao.cod_suplementacao, '".$this->getDado("stCodEntidades")."') as valor_credito_adicional,
+                       tcers.fn_total_valor_reducao('".$this->getDado("stExercicio")."',suplementacao.cod_suplementacao, '".$this->getDado("stCodEntidades")."') as valor_reducao_dotacoes,
+                       CASE
+                               WHEN suplementacao.cod_tipo IN (1,2,3,4,5,13,14,15) THEN 1
+                               WHEN suplementacao.cod_tipo IN (6,7,8,9,10)         THEN 2
+                               WHEN suplementacao.cod_tipo IN (11)                 THEN 3
+                       END AS tipo_credito_adicional,
+                       CASE
+                               WHEN suplementacao.cod_tipo IN (5,10)              THEN 1
+                               WHEN suplementacao.cod_tipo IN (4,9)               THEN 2
+                               WHEN suplementacao.cod_tipo IN (2,7)               THEN 3
+                               WHEN suplementacao.cod_tipo IN (3,8)               THEN 4
+                               WHEN suplementacao.cod_tipo IN (1,6,13)            THEN 5
+                               WHEN suplementacao.cod_tipo IN (14,15)             THEN 6
+                       END AS origem_do_recurso
+                    FROM
+                       normas.norma,
+                       orcamento.suplementacao,
+                       contabilidade.transferencia_despesa,
+                       contabilidade.lote
+                    WHERE
+                              transferencia_despesa.cod_suplementacao     = suplementacao.cod_suplementacao
+                       AND transferencia_despesa.exercicio             = suplementacao.exercicio
+                       AND transferencia_despesa.cod_lote              = lote.cod_lote
+                       AND suplementacao.cod_tipo              not in (12,16)
+                       AND transferencia_despesa.exercicio             = lote.exercicio
+                       AND transferencia_despesa.tipo                  = lote.tipo
+                       AND transferencia_despesa.cod_entidade          = lote.cod_entidade
+                       AND lote.dt_lote between to_date('".$this->getDado("dtInicial")."','dd/mm/yyyy') AND to_date('".$this->getDado("dtFinal")."','dd/mm/yyyy')
+                       AND suplementacao.dt_suplementacao between to_date('".$this->getDado("dtInicial")."','dd/mm/yyyy') AND to_date('".$this->getDado("dtFinal")."','dd/mm/yyyy')
+                       AND transferencia_despesa.cod_entidade          IN (".$this->getDado("stCodEntidades").")
+                       AND norma.cod_norma             = suplementacao.cod_norma
+                       AND suplementacao.cod_suplementacao || suplementacao.exercicio NOT IN (
+                          SELECT
+                             cod_suplementacao || exercicio
+                          FROM
+                             orcamento.suplementacao_anulada
+                          WHERE
+                             exercicio   = '".$this->getDado("stExercicio")."'
+                       )
+                       AND suplementacao.cod_suplementacao || suplementacao.exercicio NOT IN (
+                          SELECT
+                            cod_suplementacao_anulacao || exercicio
+                          FROM
+                            orcamento.suplementacao_anulada
+                          WHERE
+                            exercicio   = '".$this->getDado("stExercicio")."'
+                       )
+               ) as tabela
+    ";
 
     return $stSQL;
 }

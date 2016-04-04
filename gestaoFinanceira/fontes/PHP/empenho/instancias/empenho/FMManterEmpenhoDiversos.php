@@ -34,7 +34,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoDiversos.php 64256 2015-12-22 16:06:28Z michel $
+    $Id: FMManterEmpenhoDiversos.php 64697 2016-03-22 19:12:28Z carlos.silva $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -115,7 +115,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setExercicio(Sessao::getExercicio());
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->setExercicio(Sessao::getExercicio());
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM(Sessao::read('numCgm'));
-    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarUsuariosEntidade($rsEntidade);
+    $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarEntidadeRestos($rsEntidade);
+    
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->listar( $rsTipo, " cod_tipo <> 0 ");
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->listar($rsHistorico);
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->setExercicio(Sessao::getExercicio());

@@ -329,7 +329,8 @@ public function montaVerificaContaRecurso()
               AND plano_conta.escrituracao = 'analitica'
               AND plano_conta.cod_estrutural SIMILAR TO ('7.2.1.1.1%|7.2.1.1.2%|8.2.1.1.1%|8.2.1.1.2%|8.2.1.1.3%|8.2.1.1.4%')
               AND plano_conta.cod_estrutural LIKE (SELECT fn_conta_mae('".$this->getDado('cod_estrutural')."'))||'%'
-              AND plano_recurso.cod_recurso = '".$this->getDado('cod_recurso')."'   
+              AND plano_recurso.cod_recurso = '".$this->getDado('cod_recurso')."'
+              AND plano_conta.cod_conta <> ".$this->getDado('cod_conta')."
             ORDER BY cod_estrutural
         ";
     return $stSql;

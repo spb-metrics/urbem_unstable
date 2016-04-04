@@ -113,7 +113,7 @@ stQuery := '   SELECT  bem.cod_bem
                     ,  bem.dt_aquisicao
                     ,  TO_CHAR(COALESCE(reavaliacao.dt_reavaliacao,bem.dt_incorporacao,bem.dt_aquisicao),''YYYYMM'' ) AS competencia_incorporacao
                     ,  COALESCE(reavaliacao.vl_reavaliacao, bem.vl_bem ) AS vl_bem
-                    ,  CASE WHEN bem.quota_depreciacao_anual > 0
+                    ,  CASE WHEN bem_plano_depreciacao.cod_plano IS NOT NULL
                             THEN bem.quota_depreciacao_anual
                             ELSE grupo.depreciacao
                        END AS quota_depreciacao_anual

@@ -50,20 +50,14 @@ Adicionada tag Log aos arquivos
 */
 include_once '../../../../../../config.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkDB.inc.php';
-include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php"             );
-$exercicioSistema = date("Y");
-//echo $exercicioSistema;
-$obRConfiguracaoConfiguracao = new RConfiguracaoConfiguracao;
-$obRConfiguracaoConfiguracao->setParametro ( "virada_GF"        );
-$obRConfiguracaoConfiguracao->setExercicio ( Sessao::getExercicio() );
-$obRConfiguracaoConfiguracao->setCodModulo ( "10"               );
-$obErro = $obRConfiguracaoConfiguracao->consultar();
+include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
 
-if ($obRConfiguracaoConfiguracao->getValor()=="T") {
-    header( "location:".CAM_GF_INCLUDE."validadeGF.php?".Sessao::getId()."&parametroGF=2&exercicio=".Sessao::getExercicio() );
-} else {
-    if ( $exercicioSistema > Sessao::getExercicio() ) {
-//     header( "location:".CAM_GF_INCLUDE."validadeGF.php?".Sessao::getId()."&parametroGF=1&exercicio=".Sessao::getExercicio() );
-    }
+
+include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
+$obTEntidade = new TOrcamentoEntidade;
+$obTEntidade->setDado('exercicio', Sessao::getExercicio());
+$obErro = $obTEntidade->recuperaEntidadeRestos( $rsRecordSet, $boTransacao );
+
+if ($rsRecordSet->getNumLinhas() > 0) {
+    SistemaLegado::exibeAlertaTopo('Há entidades que já processaram seus Restos a Pagar para o ano de '.Sessao::getExercicio().'. Portanto, é possível que nem todas estejam disponíveis para seleção.');
 }
-?>

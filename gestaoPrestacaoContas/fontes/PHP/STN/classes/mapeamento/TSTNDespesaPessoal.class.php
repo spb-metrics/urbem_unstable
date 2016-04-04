@@ -53,11 +53,18 @@ class TSTNDespesaPessoal extends Persistente
         $this->setCampoCod        ('');
         $this->setComplementoChave('mes, ano, exercicio, cod_entidade');
 
-        $this->AddCampo('mes'          , 'integer', true, ''    , true , false);
-        $this->AddCampo('ano'          , 'varchar', true, '4'   , true , false);
-        $this->AddCampo('exercicio'    , 'varchar', true, '4'   , true , false);
-        $this->AddCampo('cod_entidade' , 'integer', true, ''    , true , true );
-        $this->AddCampo('valor'        , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('mes'                         , 'integer', true, ''    , true , false);
+        $this->AddCampo('ano'                         , 'varchar', true, '4'   , true , false);
+        $this->AddCampo('exercicio'                   , 'varchar', true, '4'   , true , false);
+        $this->AddCampo('cod_entidade'                , 'integer', true, ''    , true , true );
+        $this->AddCampo('valor_pessoal_ativo'         , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_pessoal_inativo'       , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_terceirizacao'         , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_indenizacoes'          , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_decisao_judicial'      , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_exercicios_anteriores' , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor_inativos_pensionistas' , 'numeric', true, '14,2', false, false);
+        $this->AddCampo('valor'                       , 'numeric', true, '14,2', false, false);
     }
 
     /**

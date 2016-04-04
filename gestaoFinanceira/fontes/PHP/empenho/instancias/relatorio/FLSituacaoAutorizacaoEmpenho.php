@@ -193,6 +193,15 @@ $obCmbSituacao->addOption              ( "1", "Empenhadas"              );
 $obCmbSituacao->addOption              ( "2", "Não Empenhadas"          );
 $obCmbSituacao->addOption              ( "3", "Anuladas"                );
 
+if (Sessao::getExercicio() > '2015') {
+    $obCentroCusto = new TextBox;
+    $obCentroCusto->setRotulo ("Centro de Custo");
+    $obCentroCusto->setTitle ("Informe o centro de custo");
+    $obCentroCusto->setName ('inCentroCusto');
+    $obCentroCusto->setId ('inCentroCusto');
+    $obCentroCusto->setInteiro (true);
+}
+
 include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
 $obMontaAssinaturas = new IMontaAssinaturas;
 
@@ -204,6 +213,9 @@ $obFormulario->addComponente( $obEntidadeUsuario );
 $obFormulario->addComponente( $obExercicio );
 $obFormulario->addComponente( $obPeriodicidade );
 $obFormulario->addComponente( $obDtSituacao );
+if (Sessao::getExercicio() > '2015') {
+    $obFormulario->addComponente( $obCentroCusto );
+}
 $obFormulario->addComponente( $obNumAutorizacao );
 $obFormulario->addComponenteComposto( $obTxtOrgao, $obCmbOrgao );
 $obFormulario->addComponenteComposto( $obTxtUnidade, $obCmbUnidade );

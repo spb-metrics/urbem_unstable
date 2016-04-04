@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: OCManterSolicitacaoCompra.php 64220 2015-12-18 15:34:57Z evandro $
+ $Id: OCManterSolicitacaoCompra.php 64404 2016-02-17 13:44:54Z evandro $
 
  */
 
@@ -336,7 +336,7 @@ function preencheSpnItensOutraSolicitacao()
     return $stJs;
 }
 
-function calculaValorReservadoDotacao()
+function calculaValorReservadoDotacao(Request $request)
 {
     $arValores = Sessao::read('arValores');
     $arSaldoDotacoes = array();
@@ -347,41 +347,25 @@ function calculaValorReservadoDotacao()
     $stJs .= "if(jQuery('#inVlTotal_label'))                                                                        \n";
     $stJs .= "    jQuery('#inVlTotal_label').html('0,00');                                                          \n";
 
-    if($_REQUEST['nuVlTotal']&&$_REQUEST['inCodDespesa']){
-        if ( count($arValores) > 0 ){
-            $nuTotalReservadoDotacao = mascaraValorBD($_REQUEST['nuVlTotal']);
-            foreach ($arValores as $chave => $valor) {
-                if( $valor['inCodDespesa']==$_REQUEST['inCodDespesa'] && $valor['id'] != $_REQUEST['HdnCodItem'] ){
-                    $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
-                }
+    if( $request->get('nuVlTotal') && $request->get('inCodDespesa') ){
+        $nuTotalReservadoDotacao = mascaraValorBD($request->get('nuVlTotal'));
+        foreach ($arValores as $chave => $valor) {
+            if( $valor['inCodDespesa']==$request->get('inCodDespesa') && $valor['id'] != $request->get('HdnCodItem') ){
+                $nuTotalReservadoDotacao = $nuTotalReservadoDotacao+mascaraValorBD($valor['nuVlTotal']);
             }
-            $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuTotalReservadoDotacao,true);
-            $stJs .= "jQuery('#inVlTotal').val('".mascaraValorBD($nuTotalReservadoDotacao,true)."');                    \n";
-            $stJs .= "if(jQuery('#inVlTotal_label'))                                                                    \n";
-            $stJs .= "    jQuery('#inVlTotal_label').html('".$_REQUEST['nuVlTotal']."');                                \n";
-        }else{
-            $stQuery = "SELECT SUM(vl_reserva) as saldo_reserva 
-                        FROM orcamento.reserva_saldos 
-                        WHERE exercicio = '".Sessao::getExercicio()."'
-                          AND cod_despesa = ".$_REQUEST['inCodDespesa'];
-            
-            $nuValorReserva = SistemaLegado::pegaValor($stQuery,'saldo_reserva');                       
-            $nuValorReserva = $nuValorReserva == '' ? 0.00 : $nuValorReserva;
-            $nuValorTotal = ($nuValorTotal) - ($nuValorReserva);                                    
-            $nuValorReserva = number_format(mascaraValorBD($nuValorReserva),2,',','.');
-
-            $stJs .= "jQuery('#inVlTotal').val('".$nuValorTotal."'); \n";
-            $stJs .= "if(jQuery('#inVlTotal_label')) \n";
-            $stJs .= "    jQuery('#inVlTotal_label').html('".$nuValorReserva."'); \n";
         }
+        $arSaldoDotacoes['total'][$arValores[$key]['inCodDespesa']] = mascaraValorBD($nuTotalReservadoDotacao,true);
+        $stJs .= "jQuery('#inVlTotal').val('".mascaraValorBD($nuTotalReservadoDotacao,true)."');                    \n";
+        $stJs .= "if(jQuery('#inVlTotal_label'))                                                                    \n";
+        $stJs .= "    jQuery('#inVlTotal_label').html('".$request->get('nuVlTotal')."');                                \n";
 
-    }else{
+    }else{        
         $obTConfiguracao = new TAdministracaoConfiguracao();
         $obTConfiguracao->setDado('exercicio', Sessao::getExercicio());
         $obTConfiguracao->pegaConfiguracao( $boReservaRigida,'reserva_rigida' );
         $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
 
-        if($boReservaRigida&&$_REQUEST['boRegistroPreco']=='false'&&(!isset($_REQUEST['nuVlTotal']))&&!isset($_REQUEST['inCodDespesa'])){
+        if( $boReservaRigida && $request->get('boRegistroPreco')=='false' && (!$request->get('nuVlTotal') && !$request->get('inCodDespesa')) ){
             foreach ($arValores as $value) {
                 if($value['inCodDespesa']!=''&&!isset($arDespesas[$value['inCodDespesa']])){
                     $arDespesas[$value['inCodDespesa']] = $value['inCodDespesa'];
@@ -436,7 +420,7 @@ function calculaValorReservadoDotacao()
     return $stJs;
 }
 
-switch ($_REQUEST['stCtrl']) {
+switch ( $request->get('stCtrl') ) {
     case "alterarListaItens":
         $rsRecordSetItem = new RecordSet;
         $obTComprasSolicitacaoItem = new TComprasSolicitacaoItem;
@@ -1607,7 +1591,7 @@ switch ($_REQUEST['stCtrl']) {
     break;
 
     case 'calculaValorReservadoDotacao':
-        $stJs .= calculaValorReservadoDotacao();
+        $stJs .= calculaValorReservadoDotacao($request);
     break;
 }
 

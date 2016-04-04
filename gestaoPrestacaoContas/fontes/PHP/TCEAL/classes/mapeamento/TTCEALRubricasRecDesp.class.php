@@ -88,7 +88,7 @@ class TTCEALRubricasRecDesp extends Persistente
                     ) AS codigo_ua
                     , receita_despesa.exercicio
                     , grupo_conta  
-                    , REPLACE(receita_despesa.cod_estrutural,'.','') as cod_rubrica
+                    , RPAD(REPLACE(receita_despesa.cod_estrutural,'.',''), 16, '0') as cod_rubrica
                     , descricao as especificacao
                     , tipo_nivel_conta
                     , publico.fn_nivel(receita_despesa.cod_estrutural) as num_nivel_conta    

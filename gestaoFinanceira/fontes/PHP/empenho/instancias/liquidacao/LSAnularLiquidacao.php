@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSAnularLiquidacao.php 63536 2015-09-09 18:44:23Z carlos.silva $
+    * $Id: LSAnularLiquidacao.php 64399 2016-02-15 19:00:33Z franver $
 
     * Casos de uso: uc-02.03.04
                     uc-02.03.18
@@ -82,14 +82,13 @@ $arFiltro = Sessao::read('arFiltro');
 if ($arFiltro['paginando']) {
     $arFiltro['pg']        = $request->get('pg');
     $arFiltro['pos']       = $request->get('pos');
-    $_REQUEST = $arFiltro;
+    $request = new Request($arFiltro);
 } else {
     $arFiltro = $_REQUEST;
     $arFiltro['paginando'] = true;
     $arFiltro['pg']        = $request->get('pg');
     $arFiltro['pos']       = $request->get('pos');
 }
-
 Sessao::write('arFiltro', $arFiltro);
 
 if (is_array($request->get('inCodEntidade'))) {

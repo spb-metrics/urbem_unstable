@@ -271,6 +271,7 @@ define  ( "CLA_DOCUMENTO_PDF",                      CAM_FW_PDF."DocumentoPDF.cla
 define  ( "CLA_DOCUMENTO_DINAMICO",                 CAM_FW_PDF."DocumentoDinamico.class.php" );
 
 define  ( "CLA_MPDF",                               CAM_FW_MPDF."FrameWorkMPDF.class.php");
+define  ( "CLA_LISTA_MPDF",                         CAM_FW_PDF."ListaMPDF.class.php"     );
 
 define  ( "CLA_MASCARA",                            CAM_FW_MASCARA."Mascara.class.php"     );
 define  ( "CLA_MASCARA_CEP",                        CAM_FW_MASCARA."MascaraCEP.class.php"  );

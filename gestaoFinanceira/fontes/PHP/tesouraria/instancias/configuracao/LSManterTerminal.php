@@ -121,37 +121,45 @@ if (($stSituacao=='a') or ($stAcao=='excluir')) {
 $obLista = new Lista;
 
 $obLista->setRecordSet( $rsLista );
+
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
 $obLista->ultimoCabecalho->setWidth( 5 );
 $obLista->commitCabecalho();
+
+$obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Nr. Terminal");
-$obLista->ultimoCabecalho->setWidth( 20 );
+$obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
+
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Responsável");
 $obLista->ultimoCabecalho->setWidth( 40 );
 $obLista->commitCabecalho();
+
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Situação");
 $obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
+
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
 $obLista->ultimoCabecalho->setWidth( 5 );
 $obLista->commitCabecalho();
 
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "cod_terminal" );
+$obLista->ultimoDado->setCampo( "[cod_terminal]" );
 $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
 $obLista->commitDado();
+
 $obLista->addDado();
 $obLista->ultimoDado->setCampo( "[cgm_usuario]-[nom_cgm]" );
 $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
 $obLista->commitDado();
+
 $obLista->addDado();
-$obLista->ultimoDado->setCampo( "situacao" );
-$obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+$obLista->ultimoDado->setCampo( "[situacao]" );
+$obLista->ultimoDado->setAlinhamento( 'CENTRO' );
 $obLista->commitDado();
 
 $obLista->addAcao();

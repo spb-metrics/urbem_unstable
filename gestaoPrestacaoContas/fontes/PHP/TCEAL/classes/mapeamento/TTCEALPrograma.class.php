@@ -30,7 +30,7 @@
     *
     * @author: Franver Sarmento de Moraes
     *
-    * $Id: TTCEALPrograma.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTCEALPrograma.class.php 64731 2016-03-23 20:32:26Z arthur $
     *
     * @ignore
     *
@@ -72,57 +72,56 @@ class TTCEALPrograma extends Persistente {
     public function montaRecuperaPrograma()
     {
         $stSql = "
-    SELECT (SELECT PJ.cnpj
-              FROM orcamento.entidade
-              JOIN sw_cgm
-                ON sw_cgm.numcgm=entidade.numcgm
-              JOIN sw_cgm_pessoa_juridica AS PJ
-                ON sw_cgm.numcgm=PJ.numcgm
-             WHERE entidade.exercicio=consulta.exercicio
-               AND entidade.cod_entidade=consulta.cod_entidade
-            ) AS cod_und_gestora
-           
-            , ( SELECT LPAD(COALESCE(valor, '0'),4,'0') AS valor
-                 FROM administracao.configuracao_entidade
-                WHERE configuracao_entidade.cod_modulo = 62
-                  AND configuracao_entidade.exercicio ='".$this->getDado('exercicio')."'
-                  AND configuracao_entidade.parametro like 'tceal_configuracao_unidade_autonoma'
-                  AND configuracao_entidade.cod_entidade =  ".$this->getDado('cod_entidade')."
-              ) AS codigo_ua
-           
-         , exercicio
-         , LPAD(cod_programa::varchar,4,'0') AS cod_programa
-         , nome
-         , objetivo
-         , publico_alvo
-      FROM (SELECT despesa.exercicio
-                 , ppa_programa.num_programa AS cod_programa
-                 , SUBSTR(programa_dados.identificacao, 0, 100) AS nome 
-                 , SUBSTR(programa_dados.objetivo, 0, 255) AS objetivo 
-                 , SUBSTR(programa_dados.publico_alvo, 0, 255) AS publico_alvo
-                 , despesa.cod_entidade
-              FROM orcamento.programa
-              JOIN orcamento.programa_ppa_programa
-                ON programa_ppa_programa.exercicio = programa.exercicio
-               AND programa_ppa_programa.cod_programa = programa.cod_programa
-              JOIN orcamento.despesa
-                ON despesa.exercicio = programa.exercicio
-               AND despesa.cod_programa = programa.cod_programa
-              JOIN ppa.programa AS ppa_programa
-                ON ppa_programa.cod_programa = programa_ppa_programa.cod_programa_ppa
-              JOIN ppa.programa_dados
-                ON programa_dados.cod_programa = ppa_programa.cod_programa
-             WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
-               AND despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
-             GROUP BY despesa.exercicio
-                 , despesa.cod_entidade
-                 , ppa_programa.num_programa
-                 , programa_dados.identificacao
-                 , programa_dados.objetivo
-                 , programa_dados.publico_alvo
-             ORDER BY ppa_programa.num_programa
-           ) AS consulta
-        ";
+            SELECT ( SELECT PJ.cnpj
+                       FROM orcamento.entidade
+                 INNER JOIN sw_cgm
+                         ON sw_cgm.numcgm = entidade.numcgm
+                 INNER JOIN sw_cgm_pessoa_juridica AS PJ
+                         ON sw_cgm.numcgm = PJ.numcgm
+                      WHERE entidade.exercicio    = '".$this->getDado('exercicio')."'
+                        AND entidade.cod_entidade = ".$this->getDado('cod_entidade')."
+                    ) AS cod_und_gestora
+                 , ( SELECT LPAD(COALESCE(valor, '0'),4,'0') AS valor
+                       FROM administracao.configuracao_entidade
+                      WHERE configuracao_entidade.cod_modulo   = 62
+                        AND configuracao_entidade.exercicio    = '".$this->getDado('exercicio')."'
+                        AND configuracao_entidade.parametro like 'tceal_configuracao_unidade_autonoma'
+                        AND configuracao_entidade.cod_entidade =  ".$this->getDado('cod_entidade')."
+                      ) AS codigo_ua
+                 , ".$this->getDado('exercicio')." AS exercicio
+                 , cod_programa
+                 , nome
+                 , objetivo
+                 , publico_alvo
+            
+            FROM (
+	               SELECT LPAD( programa.num_programa::VARCHAR, 4, '0000' ) AS cod_programa
+                        , SUBSTR( programa_dados.identificacao, 0, 100 ) AS nome 
+                        , SUBSTR( programa_dados.objetivo, 0, 255 ) AS objetivo 
+			            , SUBSTR ( programa_dados.publico_alvo, 0, 255 ) AS publico_alvo
+
+                    FROM ppa.programa
+                        
+              INNER JOIN ppa.programa_dados
+                      ON programa_dados.timestamp_programa_dados = programa.ultimo_timestamp_programa_dados
+                     AND programa_dados.cod_programa             = programa.cod_programa
+
+              INNER JOIN ppa.tipo_programa
+                      ON tipo_programa.cod_tipo_programa = programa_dados.cod_tipo_programa
+
+              INNER JOIN orcamento.programa_ppa_programa
+                      ON programa_ppa_programa.cod_programa_ppa = programa.cod_programa 
+
+              INNER JOIN orcamento.programa AS orcamento_programa
+                      ON programa_ppa_programa.exercicio    = orcamento_programa.exercicio
+                     AND programa_ppa_programa.cod_programa = orcamento_programa.cod_programa
+
+                GROUP BY programa.num_programa
+                       , programa_dados.identificacao
+                       , programa_dados.objetivo
+                       , programa_dados.publico_alvo
+
+              ) AS consulta ";
         
         return $stSql;
     }

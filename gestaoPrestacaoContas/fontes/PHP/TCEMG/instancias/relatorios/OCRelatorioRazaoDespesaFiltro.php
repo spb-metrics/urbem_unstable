@@ -51,10 +51,10 @@ Adicionada tag Log aos arquivos
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php"   );
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoRelatorioBalanceteDespesa.class.php"   );
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php");
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoRecurso.class.php"                     );
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoRelatorioBalanceteDespesa.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenho.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoRecurso.class.php";
 
 include_once 'JSRelatorioRazaoDespesa.js';
 $obRegra = new ROrcamentoRelatorioBalanceteDespesa();
@@ -337,6 +337,12 @@ switch ($_REQUEST["stCtrl"]) {
             $js = 'd.getElementById("stDescricaoDespesaFinal").innerHTML = "'.$null.'";';
             echo SistemaLegado::executaFrameOculto($js);
         }
+    break;
+    default:
+        include_once CAM_FW_PDF."RRelatorio.class.php";
+
+        $obRRelatorio = new RRelatorio;
+        $obRRelatorio->executaFrameOculto( "OCGeraRelatorioRazaoDespesa.php" );
     break;
 }
 

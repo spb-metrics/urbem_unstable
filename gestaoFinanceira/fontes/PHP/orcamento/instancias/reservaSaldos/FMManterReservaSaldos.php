@@ -32,34 +32,15 @@
 
     * @ignore
 
-    $Revision: 30668 $
-    $Name$
-    $Autor: $
-    $Date: 2007-08-14 11:42:00 -0300 (Ter, 14 Ago 2007) $
+    $Id: FMManterReservaSaldos.php 64392 2016-02-10 16:06:09Z michel $
 
     * Casos de uso: uc-02.01.08
 */
 
-/*
-$Log$
-Revision 1.14  2007/08/14 14:41:45  bruce
-Bug#9908#
-
-Revision 1.13  2006/08/08 13:20:09  jose.eduardo
-Bug #6691#
-
-Revision 1.12  2006/07/17 19:52:41  andre.almeida
-Bug #6414#
-
-Revision 1.11  2006/07/05 20:43:33  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once( CAM_GF_INCLUDE."validaGF.inc.php");
+include_once CAM_GF_INCLUDE."validaGF.inc.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoReservaSaldos.class.php" );
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoReservaSaldos.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma      = "ManterReservaSaldos";
@@ -70,10 +51,7 @@ $pgProc          = "PR".$stPrograma.".php";
 $pgOcul          = "OC".$stPrograma.".php";
 $pgJs            = "JS".$stPrograma.".js";
 
-$stAcao = $request->get('stAcao');
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 // DEFINE OBJETOS DAS CLASSES
 $obROrcamentoReservaSaldos = new ROrcamentoReservaSaldos;
@@ -91,12 +69,12 @@ $dtDataValidade = "31/12/".Sessao::getExercicio();
 
 // OBJETOS HIDDEN
 $obHdnCtrl = new Hidden;
-$obHdnCtrl->setName  ( "stCtrl"            );
-$obHdnCtrl->setValue ( $_REQUEST["stCtrl"] );
+$obHdnCtrl->setName  ( "stCtrl" );
+$obHdnCtrl->setValue ( $request->get('stCtrl') );
 
 $obHdnAcao = new Hidden;
-$obHdnAcao->setName  ( "stAcao"            );
-$obHdnAcao->setValue ( $_REQUEST["stAcao"] );
+$obHdnAcao->setName  ( "stAcao" );
+$obHdnAcao->setValue ( $request->get('stAcao') );
 
 //Define o Hidden para armazenar o cod despesa antes de abrir a popup para alterar o mesmo
 $obHdnCodDespesa = new Hidden;
@@ -109,11 +87,12 @@ $obHdnCodDespesa->setValue  ( "" );
 $obTxtCodigoEntidade = new TextBox;
 $obTxtCodigoEntidade->setName        ( "inCodigoEntidade"             );
 $obTxtCodigoEntidade->setId          ( "inCodigoEntidade"             );
-if ($rsEntidade->getNumLinhas()==1) {
-       $obTxtCodigoEntidade->setValue   ( $rsEntidade->getCampo("cod_entidade") );
-} else $obTxtCodigoEntidade->setValue   ( $inCodigoEntidade              );
+if ($rsEntidade->getNumLinhas()==1)
+    $obTxtCodigoEntidade->setValue   ( $rsEntidade->getCampo("cod_entidade") );
+else
+    $obTxtCodigoEntidade->setValue   ( $inCodigoEntidade              );
 $obTxtCodigoEntidade->setRotulo      ( "Entidade"                     );
-$obTxtCodigoEntidade->setTitle       ( "Selecione a entidade."         );
+$obTxtCodigoEntidade->setTitle       ( "Selecione a entidade."        );
 $obTxtCodigoEntidade->obEvento->setOnChange( "limparCampos();"        );
 $obTxtCodigoEntidade->setInteiro     ( true                           );
 $obTxtCodigoEntidade->setNull        ( false                          );
@@ -174,16 +153,16 @@ $obDtDataValidade->setSize          ( 10                            );
 $obDtDataValidade->setNull          ( false                         );
 
 $obTxtValor = new Moeda;
-$obTxtValor->setName             ( "flValor"                    );
-$obTxtValor->setId               ( "flValor"                    );
-$obTxtValor->setRotulo           ( "Valor"                      );
-$obTxtValor->setTitle            ( "Informe o valor."           );
-$obTxtValor->setValue            ( $_REQUEST["flValorPagar"]    );
-$obTxtValor->setSize             ( 12                           );
-$obTxtValor->setMaxLength        ( 12                           );
-$obTxtValor->setFloat            ( true                         );
-$obTxtValor->setDecimais         ( 2                            );
-$obTxtValor->setNull             ( false                        );
+$obTxtValor->setName             ( "flValor"                     );
+$obTxtValor->setId               ( "flValor"                     );
+$obTxtValor->setRotulo           ( "Valor"                       );
+$obTxtValor->setTitle            ( "Informe o valor."            );
+$obTxtValor->setValue            ( $request->get('flValorPagar') );
+$obTxtValor->setSize             ( 12                            );
+$obTxtValor->setMaxLength        ( 18                            );
+$obTxtValor->setFloat            ( true                          );
+$obTxtValor->setDecimais         ( 2                             );
+$obTxtValor->setNull             ( false                         );
 
 $obTxtMotivo = new TextArea;
 $obTxtMotivo->setName             ( "stMotivo"          );
@@ -198,7 +177,7 @@ $obOk->obEvento->setOnClick( "Salvar();if ( validaValor() ) {BloqueiaFrames(true
 $obLimpar = new Limpar();
 $obLimpar->obEvento->setOnClick( "limparTodos();" );
 
-if ($_REQUEST["stAcao"] == "incluir") {
+if ($request->get('stAcao') == "incluir") {
     $js .= "document.frm.inCodigoEntidade.focus();";
     SistemaLegado::executaFramePrincipal($js);
 }
@@ -216,7 +195,7 @@ $obFormulario->addHidden     ( $obHdnAcao           );
 $obFormulario->addHidden     ( $obHdnCodDespesa     );
 $obFormulario->setAjuda ( 'UC-02.01.08' );
 
-if ($_REQUEST["stAcao"] == "incluir") {
+if ($request->get('stAcao') == "incluir") {
     $obFormulario->addTitulo     ( "Dados para Reserva de Saldos" );
     $obFormulario->addComponenteComposto( $obTxtCodigoEntidade , $obCmbNomeEntidade );
     $obFormulario->addComponente ( $obDtDataReserva       );

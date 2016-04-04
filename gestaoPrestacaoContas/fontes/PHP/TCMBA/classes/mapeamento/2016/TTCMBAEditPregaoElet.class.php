@@ -89,6 +89,7 @@ class TTCMBAEditPregaoElet extends Persistente
                             , REPLACE(edital.hora_final_entrega_propostas,':','')::varchar as hora_final_entrega
                             , TO_CHAR(edital.dt_abertura_propostas,'ddmmyyyy') as data_sessao_disputa
                             , REPLACE(edital.hora_abertura_propostas,':','') as hora_inicio_disputa
+                            , TO_CHAR(edital.dt_aprovacao_juridico,'yyyydd') AS competencia
 
                     FROM licitacao.edital
 

@@ -32,7 +32,7 @@
 
     * Casos de uso: uc-03.05.15
 
-    $Id: TLicitacaoLicitacao.class.php 64205 2015-12-15 20:31:55Z michel $
+    $Id: TLicitacaoLicitacao.class.php 64411 2016-02-18 15:55:59Z arthur $
 
 */
 
@@ -927,8 +927,7 @@ function montaRecuperaLicitacaoNaoHomologada()
                             , homologacao.exercicio_cotacao
                             , cod_despesa_empenho
                             , cod_conta_empenho
-
-                       HAVING coalesce(cotacao_item.quantidade, 0.00) - sum(coalesce(item_pre_empenho.quantidade, 0.00)) > 0 ";
+                            , pre_empenho_despesa.total_quantidade_despesa ";
       $stSql = $this->montaRecuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao().$stFiltro.$stGroupBy.$stOrdem;
       $this->stDebug = $stSql;
       $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
@@ -949,7 +948,9 @@ function montaRecuperaLicitacaoNaoHomologada()
                         ELSE
                             mapa_item.lote::varchar
                   END AS lote
-                , cotacao_item.quantidade
+                , COALESCE(cotacao_item.quantidade, 0) AS quantidade
+                , COALESCE(mapa_item_dotacao.quantidade, 0.00) - COALESCE(mapa_item_anulacao.quantidade,0)::numeric(14,2) as quantidade_total_autorizada_dotacao
+                , (COALESCE(mapa_item_dotacao.quantidade, 0.00) - COALESCE(mapa_item_anulacao.quantidade,0)::numeric(14,2)) - COALESCE(pre_empenho_despesa.total_quantidade_despesa, 0.00) AS quantidade_restante_dotacao 
                 , cotacao_fornecedor_item.vl_cotacao::numeric(14,2) AS vl_total
                 , ( cotacao_fornecedor_item.vl_cotacao / cotacao_item.quantidade )::numeric(14,2) AS vl_unitario
                 , sum(coalesce(item_pre_empenho.quantidade, 0.00)) as quantidade_autorizacoes
@@ -983,11 +984,11 @@ function montaRecuperaLicitacaoNaoHomologada()
 
              FROM licitacao.licitacao
 
-             JOIN compras.mapa
+       INNER JOIN compras.mapa
                ON licitacao.cod_mapa = mapa.cod_mapa
               AND licitacao.exercicio_mapa = mapa.exercicio
 
-             JOIN compras.mapa_item
+       INNER JOIN compras.mapa_item
                ON mapa_item.cod_mapa = mapa.cod_mapa
               AND mapa_item.exercicio = mapa.exercicio
 
@@ -1013,7 +1014,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND mapa_item_anulacao.cod_conta             = mapa_item_dotacao.cod_conta
               AND mapa_item_anulacao.cod_despesa           = mapa_item_dotacao.cod_despesa
 
-             JOIN compras.mapa_cotacao
+       INNER JOIN compras.mapa_cotacao
                ON mapa_cotacao.cod_mapa       = mapa.cod_mapa
               AND mapa_cotacao.exercicio_mapa = mapa.exercicio
 
@@ -1023,14 +1024,14 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND julgamento_item.cod_item    = mapa_item.cod_item
               AND julgamento_item.lote        = mapa_item.lote
 
-             JOIN compras.cotacao_fornecedor_item
+       INNER JOIN compras.cotacao_fornecedor_item
                ON cotacao_fornecedor_item.exercicio      = julgamento_item.exercicio
               AND cotacao_fornecedor_item.cod_item       = julgamento_item.cod_item
               AND cotacao_fornecedor_item.lote           = julgamento_item.lote
               AND cotacao_fornecedor_item.cod_cotacao    = julgamento_item.cod_cotacao
               AND cotacao_fornecedor_item.cgm_fornecedor = julgamento_item.cgm_fornecedor
 
-             JOIN compras.solicitacao_item
+       INNER JOIN compras.solicitacao_item
                ON solicitacao_item.cod_solicitacao = mapa_item.cod_solicitacao
               AND solicitacao_item.exercicio       = mapa_item.exercicio_solicitacao
               AND solicitacao_item.cod_entidade    = mapa_item.cod_entidade
@@ -1045,7 +1046,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND solicitacao_item_dotacao.cod_item        = solicitacao_item.cod_item
               AND solicitacao_item_dotacao.cod_despesa     = mapa_item_dotacao.cod_despesa
 
-             JOIN compras.cotacao_item
+       INNER JOIN compras.cotacao_item
                ON cotacao_item.cod_item    = cotacao_fornecedor_item.cod_item
               AND cotacao_item.exercicio   = cotacao_fornecedor_item.exercicio
               AND cotacao_item.cod_cotacao = cotacao_fornecedor_item.cod_cotacao
@@ -1065,15 +1066,15 @@ function montaRecuperaLicitacaoNaoHomologada()
 
         LEFT JOIN orcamento.conta_despesa as conta_despesa_atual
                ON conta_despesa_atual.cod_estrutural  = conta_despesa.cod_estrutural
-              AND conta_despesa_atual.exercicio  = '".Sessao::getExercicio()."'
+              AND conta_despesa_atual.exercicio       = '".Sessao::getExercicio()."'
 
         LEFT JOIN orcamento.despesa as despesa_atual
-               ON despesa_atual.cod_conta 	= conta_despesa_atual.cod_conta
-              AND despesa_atual.exercicio   	= conta_despesa_atual.exercicio
-              AND despesa_atual.cod_recurso 	= despesa.cod_recurso
-              AND despesa_atual.cod_programa 	= despesa.cod_programa
-              AND despesa_atual.num_pao		= despesa.num_pao
-              AND despesa_atual.cod_funcao 	= despesa.cod_funcao
+               ON despesa_atual.cod_conta 	 = conta_despesa_atual.cod_conta
+              AND despesa_atual.exercicio    = conta_despesa_atual.exercicio
+              AND despesa_atual.cod_recurso  = despesa.cod_recurso
+              AND despesa_atual.cod_programa = despesa.cod_programa
+              AND despesa_atual.num_pao		 = despesa.num_pao
+              AND despesa_atual.cod_funcao 	 = despesa.cod_funcao
 
         LEFT JOIN empenho.item_pre_empenho_julgamento
                ON item_pre_empenho_julgamento.exercicio_julgamento = cotacao_fornecedor_item.exercicio
@@ -1090,13 +1091,23 @@ function montaRecuperaLicitacaoNaoHomologada()
                          , array_length(publico.concatenar_array( pre_empenho_despesa.cod_despesa ), 1) AS countDespesa
                          , publico.concatenar_array( pre_empenho_despesa.cod_despesa ) AS cod_despesa
                          , publico.concatenar_array( pre_empenho_despesa.cod_conta ) AS cod_conta
+                         , SUM(item_pre_empenho.quantidade) AS total_quantidade_despesa
+                      
                       FROM empenho.item_pre_empenho_julgamento
+                      
                 INNER JOIN empenho.pre_empenho_despesa
                         ON pre_empenho_despesa.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
                        AND pre_empenho_despesa.exercicio       = item_pre_empenho_julgamento.exercicio
+                       
                 INNER JOIN empenho.autorizacao_empenho
                         ON autorizacao_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
                        AND autorizacao_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
+                       
+                INNER JOIN empenho.item_pre_empenho 
+                        ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
+                       AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio 
+                       AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+
                      /*
                       *ESTÁ COMENTADO, POIS FOI DEFINIDO, POR HORA, QUE OS ITENS DE AUTORIZAÇÕES ANULADAS
                       *NÃO FICAM DISPONIVEIS NOVAMENTE PARA AUTORIZAÇÃO DE EMPENHO.
@@ -1105,7 +1116,13 @@ function montaRecuperaLicitacaoNaoHomologada()
                        AND autorizacao_anulada.cod_entidade    = autorizacao_empenho.cod_entidade
                        AND autorizacao_anulada.cod_autorizacao = autorizacao_empenho.cod_autorizacao
                       WHERE autorizacao_anulada.cod_autorizacao IS NULL
-                     */
+                     */ \n";
+            
+        if ($this->getDado('inCodDespesa')) {
+            $stSql .= " WHERE pre_empenho_despesa.cod_despesa = ".$this->getDado('inCodDespesa')." \n";
+        }
+
+        $stSql .= "
                   GROUP BY item_pre_empenho_julgamento.exercicio_julgamento
                          , item_pre_empenho_julgamento.cod_cotacao
                          , item_pre_empenho_julgamento.cod_item 
@@ -1122,9 +1139,10 @@ function montaRecuperaLicitacaoNaoHomologada()
                ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
               AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
               AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
-               /*
-                *ESTÁ COMENTADO, POIS FOI DEFINIDO, POR HORA, QUE OS ITENS DE AUTORIZAÇÕES ANULADAS
-                *NÃO FICAM DISPONIVEIS NOVAMENTE PARA AUTORIZAÇÃO DE EMPENHO.
+        
+        /*
+        *ESTÁ COMENTADO, POIS FOI DEFINIDO, POR HORA, QUE OS ITENS DE AUTORIZAÇÕES ANULADAS
+        *NÃO FICAM DISPONIVEIS NOVAMENTE PARA AUTORIZAÇÃO DE EMPENHO.
         LEFT JOIN empenho.autorizacao_empenho
                ON autorizacao_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
               AND autorizacao_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
@@ -1133,12 +1151,12 @@ function montaRecuperaLicitacaoNaoHomologada()
                ON autorizacao_anulada.exercicio       = autorizacao_empenho.exercicio
               AND autorizacao_anulada.cod_entidade    = autorizacao_empenho.cod_entidade
               AND autorizacao_anulada.cod_autorizacao = autorizacao_empenho.cod_autorizacao
-               */
+        */
 
-             JOIN almoxarifado.centro_custo
+       INNER JOIN almoxarifado.centro_custo
                ON centro_custo.cod_centro = mapa_item.cod_centro
 
-             JOIN licitacao.cotacao_licitacao
+       INNER JOIN licitacao.cotacao_licitacao
                ON cotacao_licitacao.cod_licitacao 	    = licitacao.cod_licitacao
               AND cotacao_licitacao.cod_modalidade 	    = licitacao.cod_modalidade
               AND cotacao_licitacao.cod_entidade 	    = licitacao.cod_entidade
@@ -1149,7 +1167,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND cotacao_licitacao.exercicio_cotacao   = cotacao_fornecedor_item.exercicio
               AND cotacao_licitacao.lote                = cotacao_fornecedor_item.lote
 
-             JOIN licitacao.adjudicacao
+       INNER JOIN licitacao.adjudicacao
                ON adjudicacao.cod_licitacao         = cotacao_licitacao.cod_licitacao
               AND adjudicacao.cod_modalidade        = cotacao_licitacao.cod_modalidade
               AND adjudicacao.cod_entidade          = cotacao_licitacao.cod_entidade
@@ -1160,7 +1178,7 @@ function montaRecuperaLicitacaoNaoHomologada()
               AND adjudicacao.exercicio_cotacao     = cotacao_licitacao.exercicio_cotacao
               AND adjudicacao.cgm_fornecedor        = cotacao_licitacao.cgm_fornecedor
 
-             JOIN licitacao.homologacao
+       INNER JOIN licitacao.homologacao
                ON homologacao.num_adjudicacao       = adjudicacao.num_adjudicacao
               AND homologacao.cod_entidade          = adjudicacao.cod_entidade
               AND homologacao.cod_modalidade        = adjudicacao.cod_modalidade

@@ -414,3 +414,4 @@ INSERT INTO tceal.ocorrencia_funcional (cod_ocorrencia, descricao, exercicio) VA
 INSERT INTO tceal.ocorrencia_funcional (cod_ocorrencia, descricao, exercicio) VALUES (14, '14 – Licença por Enlace Matrimonial'                             , '2013');
 INSERT INTO tceal.ocorrencia_funcional (cod_ocorrencia, descricao, exercicio) VALUES (99, '99 – Outras Ausências'                                           , '2013');
 
+

@@ -97,6 +97,7 @@ $obIPopUpBemInicio->setObrigatorioBarra( true );
 $obIPopUpBemInicio->obCampoCod->setName( 'inCodBemInicio' );
 $obIPopUpBemInicio->obCampoCod->setId  ( 'inCodBemInicio' );
 $obIPopUpBemInicio->setTipoBusca       ( 'bemNaoBaixado' );
+$obIPopUpBemInicio->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".CAM_GP_PAT_POPUPS.'bem/OCManterBem.php?'.Sessao::getId()."&boBemBaixado=false&stNomCampoCod=".$obIPopUpBemInicio->obCampoCod->getName()."&boMostrarDescricao=".$obIPopUpBemInicio->getMostrarDescricao()."&stIdCampoDesc=".$obIPopUpBemInicio->getId()."&stNomForm=".$obIPopUpBemInicio->obForm->getName()."&inCodigo='+this.value+'&inTipoBaixa='+inTipoBaixa.value, 'buscaPopupTipoBaixa');". $obIPopUpBemInicio->obCampoCod->obEvento->getOnChange());
 
 //instancia um IPopUpBem Final
 $obIPopUpBemFim = new IPopUpBem( $obForm );
@@ -107,6 +108,7 @@ $obIPopUpBemFim->setNull  ( true );
 $obIPopUpBemFim->obCampoCod->setName( 'inCodBemFim' );
 $obIPopUpBemFim->obCampoCod->setId  ( 'inCodBemFim' );
 $obIPopUpBemFim->setTipoBusca       ( 'bemNaoBaixado' );
+$obIPopUpBemFim->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".CAM_GP_PAT_POPUPS.'bem/OCManterBem.php?'.Sessao::getId()."&boBemBaixado=false&stNomCampoCod=".$obIPopUpBemFim->obCampoCod->getName()."&boMostrarDescricao=".$obIPopUpBemFim->getMostrarDescricao()."&stIdCampoDesc=".$obIPopUpBemFim->getId()."&stNomForm=".$obIPopUpBemFim->obForm->getName()."&inCodigo='+this.value+'&inTipoBaixa='+inTipoBaixa.value, 'buscaPopupTipoBaixa');". $obIPopUpBemFim->obCampoCod->obEvento->getOnChange());
 
 //cria os botões de acoes para os bens
 $obBtnOk = new Ok;

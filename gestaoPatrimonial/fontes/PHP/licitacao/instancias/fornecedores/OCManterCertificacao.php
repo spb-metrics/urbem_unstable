@@ -33,7 +33,7 @@
 
     * Casos de uso: uc-03.05.13
 
-    $Id: OCManterCertificacao.php 63516 2015-09-08 13:48:28Z michel $
+    $Id: OCManterCertificacao.php 64452 2016-02-23 21:03:45Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -272,6 +272,42 @@ function preencheLicitacao($rsRecordSet, $stComponente, $inCodLicitacao)
         }
         
         $rsRecordSet->proximo();
+    }
+
+    return $stJs;
+}
+
+function validaFornecedorLicitacao () {
+    global $request;
+    
+    $stJs = "";
+    
+    $stExercicioLicitacao = $request->get('stExercicioLicitacao');
+    $inCodModalidade      = $request->get('inCodModalidade');
+    $inCodEntidade        = $request->get('inCodEntidade');
+    $inCodLicitacao       = $request->get('inCodLicitacao');
+    $inCodFornecedor      = $request->get('inCodFornecedor');
+    
+    if (!empty($stExercicioLicitacao) && !empty($inCodModalidade) && !empty($inCodEntidade) && !empty($inCodLicitacao) && !empty($inCodFornecedor) ) {
+    
+        $obTLicitacaoLicitacao = new TLicitacaoLicitacao();
+        $obTLicitacaoLicitacao->setDado( 'exercicio'     , $stExercicioLicitacao );
+        $obTLicitacaoLicitacao->setDado( 'cod_entidade'  , $inCodEntidade );
+        $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $inCodModalidade );
+        
+        $stFiltro .= " AND ll.cod_licitacao IN ( SELECT cod_licitacao
+                                                   FROM licitacao.participante_certificacao_licitacao
+                                                  WHERE cod_licitacao  = ".$inCodLicitacao."
+                                                    AND cod_modalidade = ".$inCodModalidade."
+                                                    AND cod_entidade   = ".$inCodEntidade."
+                                                    AND cgm_fornecedor = ".$inCodFornecedor."
+                                                ) ";
+        
+        $obTLicitacaoLicitacao->recuperaLicitacao( $rsLicitacao, $stFiltro );
+
+        if ( $rsLicitacao->getNumLinhas() > 0 ) {
+            $stJs .= "alertaAviso('Fornecedor (".$inCodFornecedor.") já foi certificado para a licitação (".$inCodLicitacao.").','form','erro','".Sessao::getId()."');";
+        }
     }
 
     return $stJs;
@@ -520,16 +556,6 @@ switch ($request->get('stCtrl')) {
             $obTLicitacaoLicitacao->setDado( 'cod_modalidade', $request->get('inCodModalidade') );
 
             $stFiltro = "";
-            
-            // verifica se a licitação já não foi vinculada a outro fornecedor.
-            if ($request->get('stFiltraLicitacao') == "true") {
-                $stFiltro .= " AND ll.cod_licitacao NOT IN ( SELECT cod_licitacao
-                                                               FROM licitacao.participante_certificacao_licitacao
-                                                              WHERE cod_licitacao  = ll.cod_licitacao
-                                                                AND cod_modalidade = ".$request->get('inCodModalidade')."
-                                                                AND cod_entidade   = ".$request->get('inCodEntidade')."
-                                                            ) ";
-            }
 
             if ($request->get('stCtrl') == 'carregaLicitacaoContrato') {
                 $stFiltro.="
@@ -656,7 +682,13 @@ switch ($request->get('stCtrl')) {
             $stJs = "f.inCodLicitacao.value = '';           \n";
             $stJs.= "limpaSelect(f.inCodLicitacao,1);       \n";
         }
+        
     break;
+
+    case "validaFornecedorLicitacao":
+        $stJs = validaFornecedorLicitacao();
+    break;
+    
 }
 
 echo $stJs;

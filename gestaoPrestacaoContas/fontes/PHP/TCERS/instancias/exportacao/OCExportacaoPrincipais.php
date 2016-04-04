@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoPrincipais.php 62149 2015-03-31 19:56:33Z arthur $
+    $Id: OCExportacaoPrincipais.php 64594 2016-03-17 17:01:31Z jean $
 
     * Casos de uso: uc-02.08.01
 */
@@ -388,6 +388,7 @@ if (in_array("BAL_VER.TXT",$arFiltro["arArquivosSelecionados"])) {
     if ($arRecordSet["BAL_VER.TXT"]->getNumLinhas() >= 1) {
         $arElementos = $arRecordSet["BAL_VER.TXT"]->getElementos();
         $arDadosArquivo = array();
+        
         $inCount = 0;
         foreach ($arElementos as $key => $array) {
               $arDadosArquivo[$inCount]['cod_estrutural'] =             $array['cod_estrutural'];
@@ -404,6 +405,11 @@ if (in_array("BAL_VER.TXT",$arFiltro["arArquivosSelecionados"])) {
               $arDadosArquivo[$inCount]['branco'] =                     '';
               $arDadosArquivo[$inCount]['escrituracao'] =               $array['escrituracao'];
               $arDadosArquivo[$inCount]['indicador_superavit'] =        $array['indicador_superavit'];
+              $arDadosArquivo[$inCount]['natureza_informacao'] =        $array['natureza_informacao'];
+              if(Sessao::getExercicio() >= '2016') {
+                $arDadosArquivo[$inCount]['cod_recurso'] =              $array['cod_recurso'];
+              }
+              
 
               if ($array['cod_entidade'] != '') {
                 switch ($array['cod_entidade']) {
@@ -483,13 +489,20 @@ if (in_array("BAL_VER.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_sistema");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_informacao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("indicador_superavit");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+        
+        if(Sessao::getExercicio() >= '2016') {
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_recurso");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+        }
+              
 
     } else {
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_sistema");
@@ -564,6 +577,12 @@ if (in_array("PAGAMENT.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(400);
     }
 
+    if (Sessao::getExercicio() > '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_liquidacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+    }
+
 }
 if (in_array("LIQUIDAC.TXT",$arFiltro["arArquivosSelecionados"])) {
     $obExportador->addArquivo("LIQUIDAC.TXT");
@@ -630,6 +649,20 @@ if (in_array("LIQUIDAC.TXT",$arFiltro["arArquivosSelecionados"])) {
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("exercicio_contrato");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+    }
+
+    if (Sessao::getExercicio() > '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("existe_nf");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_nota");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(9);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_serie");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
     }
 
 }
@@ -791,6 +824,8 @@ if (in_array("BVER_ENC.TXT",$arFiltro["arArquivosSelecionados"])) {
               $arDadosArquivo[$inCount]['branco']                   = '';
               $arDadosArquivo[$inCount]['escrituracao']             = $array['escrituracao'];
               $arDadosArquivo[$inCount]['indicador_superavit']      = $array['indicador_superavit'];
+              $arDadosArquivo[$inCount]['natureza']                 = $array['nom_sistema'];
+              $arDadosArquivo[$inCount]['cod_recurso']              = $array['cod_recurso'];
 
               if ($array['cod_entidade'] != '') {
                 switch ($array['cod_entidade']) {
@@ -878,6 +913,12 @@ if (in_array("BVER_ENC.TXT",$arFiltro["arArquivosSelecionados"])) {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("indicador_superavit");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    if (Sessao::getExercicio() > '2015') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_recurso");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+    }
 }
 
 if ($arFiltro['stTipoExport'] == 'compactados') {

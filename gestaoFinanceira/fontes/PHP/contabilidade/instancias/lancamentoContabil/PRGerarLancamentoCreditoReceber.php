@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRGerarLancamentoCreditoReceber.php 60322 2014-10-14 12:49:08Z silvia $
+    $Id: PRGerarLancamentoCreditoReceber.php 64362 2016-01-26 19:45:10Z michel $
 
     * Casos de uso: uc-02.02.02
 */
@@ -65,6 +65,38 @@ $obTOrcamentoReceita->recuperaLancamentosCreditosReceber( $rsLista );
 //Inicia nova transação
 $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
+// Limpa registros 2015 Tipo 'I', #23505.
+if(Sessao::getExercicio() == '2015'){
+    foreach ($rsLista->getElementos() as $registro) {
+        $obTContabilidadeLote = new TContabilidadeLote;
+        
+        $stFiltro = " WHERE lote.cod_entidade = ".$registro["cod_entidade"]."
+                       AND lote.exercicio = '".$registro["exercicio"]."'
+                       AND lote.dt_lote = '".$registro["exercicio"]."-01-02'
+                       AND lote.tipo = 'I'
+                       AND lote.nom_lote = 'Previsão de crédito tributário a receber'";
+                       
+        $obErro = $obTContabilidadeLote->recuperaTodos($rsLote, $stFiltro);
+        
+        foreach ($rsLote->getElementos() as $lote) {
+            $obTContabilidadeLancamento = new TContabilidadeLancamento;
+            $obTContabilidadeLancamento->setDado('exercicio', $lote['exercicio']);
+            $obTContabilidadeLancamento->setDado('cod_lote', $lote['cod_lote']);
+            $obTContabilidadeLancamento->setDado('tipo', 'I');
+            $obTContabilidadeLancamento->setDado('cod_entidade', $lote['cod_entidade']);
+            $obTContabilidadeLancamento->setDado('cod_historico', 850);
+            $obTContabilidadeLancamento->excluiLancamentosAberturaAnteriores($boTransacao);
+        }
+        
+        $obTContabilidadeLote->setDado('exercicio'   , $registro['exercicio']);
+        $obTContabilidadeLote->setDado('cod_entidade', $registro['cod_entidade']);
+        $obTContabilidadeLote->setDado('tipo'        , 'I');
+        $obTContabilidadeLote->setDado('dt_lote'     , $registro['exercicio'].'-01-02');
+        $obTContabilidadeLote->setDado('nom_lote'    , 'Previsão de crédito tributário a receber');
+        $obErro = $obTContabilidadeLote->excluirLote($boTransacao);
+    }
+}
+
 // Deleta registros
 foreach ($rsLista->getElementos() as $registro) {
     $obTContabilidadeLote = new TContabilidadeLote;
@@ -72,7 +104,7 @@ foreach ($rsLista->getElementos() as $registro) {
     $stFiltro = " WHERE lote.cod_entidade = ".$registro["cod_entidade"]."
                    AND lote.exercicio = '".$registro["exercicio"]."'
                    AND lote.dt_lote = '".$registro["exercicio"]."-01-02'
-                   AND lote.tipo = 'I'
+                   AND lote.tipo = 'M'
                    AND lote.nom_lote = 'Previsão de crédito tributário a receber'";
                    
     $obErro = $obTContabilidadeLote->recuperaTodos($rsLote, $stFiltro);
@@ -81,7 +113,7 @@ foreach ($rsLista->getElementos() as $registro) {
         $obTContabilidadeLancamento = new TContabilidadeLancamento;
         $obTContabilidadeLancamento->setDado('exercicio', $lote['exercicio']);
         $obTContabilidadeLancamento->setDado('cod_lote', $lote['cod_lote']);
-        $obTContabilidadeLancamento->setDado('tipo', 'I');
+        $obTContabilidadeLancamento->setDado('tipo', 'M');
         $obTContabilidadeLancamento->setDado('cod_entidade', $lote['cod_entidade']);
         $obTContabilidadeLancamento->setDado('cod_historico', 850);
         $obTContabilidadeLancamento->excluiLancamentosAberturaAnteriores($boTransacao);
@@ -89,7 +121,7 @@ foreach ($rsLista->getElementos() as $registro) {
     
     $obTContabilidadeLote->setDado('exercicio'   , $registro['exercicio']);
     $obTContabilidadeLote->setDado('cod_entidade', $registro['cod_entidade']);
-    $obTContabilidadeLote->setDado('tipo'        , 'I');
+    $obTContabilidadeLote->setDado('tipo'        , 'M');
     $obTContabilidadeLote->setDado('dt_lote'     , $registro['exercicio'].'-01-02');
     $obTContabilidadeLote->setDado('nom_lote'    , 'Previsão de crédito tributário a receber');
     $obErro = $obTContabilidadeLote->excluirLote($boTransacao);
@@ -100,13 +132,13 @@ foreach ($rsLista->getElementos() as $registro) {
     $obTContabilidadeLote = new TContabilidadeLote;
     $obTContabilidadeLote->setDado('exercicio'   , "'".$registro['exercicio']."'");
     $obTContabilidadeLote->setDado('cod_entidade', $registro['cod_entidade']);
-    $obTContabilidadeLote->setDado('tipo'    , 'I');
+    $obTContabilidadeLote->setDado('tipo'    , 'M');
     $obTContabilidadeLote->recuperaUltimoLotePorEntidade($rsRecordset);
     
     $obTContabilidadeLote = new TContabilidadeLote;
     $obTContabilidadeLote->setDado('exercicio'   , $registro['exercicio']);
     $obTContabilidadeLote->setDado('cod_entidade', $registro['cod_entidade']);
-    $obTContabilidadeLote->setDado('tipo'        , 'I');
+    $obTContabilidadeLote->setDado('tipo'        , 'M');
     $obTContabilidadeLote->setDado('cod_lote'    , $rsRecordset->getCampo('cod_lote')+1);
     $obTContabilidadeLote->setDado('dt_lote'     , '02/01/'.$registro['exercicio']);
     $obTContabilidadeLote->setDado('nom_lote'    , 'Previsão de crédito tributário a receber');

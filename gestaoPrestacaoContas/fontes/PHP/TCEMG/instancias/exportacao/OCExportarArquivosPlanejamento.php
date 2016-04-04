@@ -709,6 +709,38 @@ if (in_array("MTFIS.csv",$arFiltro["arArquivosSelecionados"])) {
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(7);
+
+    if (Sessao::getExercicio() >= '2016') {
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_corrente_receita_primaria_adv");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_corrente_despesa_primaria_gerada");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_constante_receita_primaria_adv");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_constante_despesa_primaria_gerada");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("percentual_pib_receita_primaria_adv");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(7);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("percentual_pib_despesa_primaria_adv");
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(7);
+    }
 }
 
 /**

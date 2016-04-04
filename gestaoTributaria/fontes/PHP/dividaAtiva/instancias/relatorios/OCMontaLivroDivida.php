@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Vitor Hugo 
     * @ignore
     
-    * $Id: OCMontaLivroDivida.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: OCMontaLivroDivida.php 64409 2016-02-18 11:48:46Z franver $
 
     * Casos de uso: uc-05.04.10
 */
@@ -149,7 +149,7 @@ $inFolhaFinal   = $_REQUEST['inFolhaFinal'];
 
     if ( ( $inExercicioInicial != "") and ( $inExercicioFinal != ""  ) )
     {
-        $stFiltro = " dda.exercicio between '".$inExercicioInicial."' AND  '".$inExercicioFinal."' AND \n";
+        $stFiltro .= " dda.exercicio between '".$inExercicioInicial."' AND  '".$inExercicioFinal."' AND \n";
     }
     elseif ( ( $inExercicioInicial != "") and ( $inExercicioFinal == ""  ) )
     {
@@ -162,11 +162,11 @@ $inFolhaFinal   = $_REQUEST['inFolhaFinal'];
 
     if ($stFiltro) 
     {
-        $stFiltro = "\r\n WHERE " . substr($stFiltro, 0, -5);
+        $stFiltro = " WHERE " . substr($stFiltro, 0, -5);
     }
 
     $stFiltro .= " ) as consulta ";
-    
+
     $preview = new PreviewBirt(5,33,1);
     $preview->setVersaoBirt('2.5.0');
     $preview->setTitulo('Livro de Dívida Ativa');

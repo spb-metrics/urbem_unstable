@@ -61,11 +61,10 @@ BEGIN
            , liquidado.cod_empenho
            , liquidado.cod_entidade
            , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
-                  THEN recurso_restos.nom_recurso
-                  ELSE busca_recurso.nom_recurso
+                  THEN (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = restos_pre_empenho.recurso)
+                  ELSE (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = busca_recurso.cod_recurso)
               END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
-
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
                   THEN (  CASE WHEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),1,2) = ''00''
                                THEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),5,2)
@@ -260,14 +259,8 @@ BEGIN
              , sw_cgm.nom_cgm
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural
-
-
-
---        HAVING ( SUM(COALESCE(liquidado.vl_liquidado,0.00)) - SUM(COALESCE(pago.vl_pago,0.00)) ) > 0 
-
   ';
   
- 
   EXECUTE stSql;
 
   -- cria a tabela temporaria para o valor processado no exercicio anterior
@@ -281,11 +274,10 @@ BEGIN
            , liquidado.cod_empenho
            , liquidado.cod_entidade
            , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
-                  THEN recurso_restos.nom_recurso
-                  ELSE busca_recurso.nom_recurso
+                  THEN (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = restos_pre_empenho.recurso)
+                  ELSE (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = busca_recurso.cod_recurso)
               END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
-
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
                   THEN (  CASE WHEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),1,2) = ''00''
                                THEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),5,2)
@@ -479,11 +471,10 @@ BEGIN
              , restos_pre_empenho.cod_estrutural
              , conta_despesa.cod_estrutural
 
---        HAVING ( SUM(COALESCE(liquidado.vl_liquidado,0.00)) - SUM(COALESCE(pago.vl_pago,0.00)) ) > 0
   ';
 
   EXECUTE stSql;
-
+  
   -- cria a tabela temporaria para o valor nao processado em exercicios anteriores
   StSql := '
     CREATE TEMPORARY TABLE tmp_recursos_nao_processados_exercicios_anteriores AS
@@ -495,11 +486,10 @@ BEGIN
            , empenhado.cod_empenho
            , empenhado.cod_entidade
            , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
-                  THEN recurso_restos.nom_recurso
-                  ELSE busca_recurso.nom_recurso
-              END AS nom_recurso
+                 THEN (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = restos_pre_empenho.recurso)
+                 ELSE (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = busca_recurso.cod_recurso)
+             END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
-
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
                   THEN (  CASE WHEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),1,2) = ''00''
                                THEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),5,2)
@@ -668,8 +658,6 @@ BEGIN
              , conta_despesa.cod_estrutural
              , empenhado.cod_empenho
              , empenhado.cod_entidade
-
---        HAVING (SUM(COALESCE(empenhado.vl_empenhado,0.00)) - SUM(COALESCE(liquidado.vl_liquidado,0.00)) ) > 0
   ';
   
   EXECUTE stSql;
@@ -685,11 +673,10 @@ BEGIN
            , empenhado.cod_empenho
            , empenhado.cod_entidade
            , CASE WHEN restos_pre_empenho.recurso IS NOT NULL
-                  THEN recurso_restos.nom_recurso
-                  ELSE busca_recurso.nom_recurso
-              END AS nom_recurso
+                 THEN (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = restos_pre_empenho.recurso)
+                 ELSE (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = busca_recurso.cod_recurso)
+             END AS nom_recurso
            , sw_cgm.nom_cgm as nom_entidade
-
            , CASE WHEN restos_pre_empenho.cod_estrutural IS NOT NULL 
                   THEN (  CASE WHEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),1,2) = ''00''
                                THEN SUBSTR(REPLACE(restos_pre_empenho.cod_estrutural,''.'',''''),5,2)
@@ -856,12 +843,8 @@ BEGIN
              , conta_despesa.cod_estrutural
              , empenhado.cod_empenho
              , empenhado.cod_entidade
+';
 
-
-
---        HAVING (SUM(COALESCE(empenhado.vl_empenhado,0.00)) - SUM(COALESCE(liquidado.vl_liquidado,0.00)) ) > 0
-  ';
-  
   EXECUTE stSql;
 
 UPDATE tmp_recursos_processados_exercicios_anteriores     SET cod_recurso = 0, nom_recurso = 'Não Informado' WHERE cod_recurso is null;
@@ -947,7 +930,7 @@ UPDATE tmp_recursos_nao_processados_exercicio_anterior    SET cod_recurso = 0, n
     UNION ALL
 
     SELECT tmp_recursos_orgao.cod_recurso AS cod_recurso
-         , tmp_recursos_orgao.nom_recurso AS tipo
+         , (SELECT nom_recurso FROM orcamento.recurso('''||stExercicio||''') WHERE cod_recurso = tmp_recursos_orgao.cod_recurso) AS tipo
          , tmp_recursos_orgao.cod_entidade
          , sum(coalesce(trpeas.vl_total,0.00))  AS tmp_recursos_processados_exercicios_anteriores
          , sum(coalesce(trpea.vl_total,0.00))   AS tmp_recursos_processados_exercicio_anterior
@@ -990,7 +973,7 @@ UPDATE tmp_recursos_nao_processados_exercicio_anterior    SET cod_recurso = 0, n
         ON trnpea.cod_recurso  = tmp_recursos_orgao.cod_recurso
        AND trnpea.cod_entidade = tmp_recursos_orgao.cod_entidade
 
-   GROUP BY tmp_recursos_orgao.cod_recurso, tmp_recursos_orgao.nom_recurso,tmp_recursos_orgao.cod_entidade
+   GROUP BY tmp_recursos_orgao.cod_recurso, tipo, tmp_recursos_orgao.cod_entidade
 
   ';
 

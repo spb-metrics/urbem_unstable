@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.03.07
 
-    $Id: LSManterCentroCusto.php 64005 2015-11-17 16:49:06Z michel $
+    $Id: LSManterCentroCusto.php 64582 2016-03-16 17:12:24Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -84,7 +84,9 @@ $obRegra = new RAlmoxarifadoCentroDeCustos;
 if ($request->get('stHdnDescricao')) {
    $obRegra->setDescricao($request->get('stHdnDescricao'));
 }
-if ( $request->get('inCodEntidade') ) {
+
+if ( is_array($request->get('inCodEntidade')) ) {
+   
    foreach ($request->get('inCodEntidade') as $inCodEntidade) {
       $obRegra->addEntidade();
       $obRegra->roUltimaEntidade->setCodigoEntidade($inCodEntidade);

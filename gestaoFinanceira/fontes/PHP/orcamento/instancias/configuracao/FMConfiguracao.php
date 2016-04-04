@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Roberto Pawelski Rodrigues
 
-    $Id: FMConfiguracao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMConfiguracao.php 64548 2016-03-11 18:28:10Z evandro $
 
     * Casos de uso: uc-02.01.01
 */
@@ -383,6 +383,23 @@ if ($obRConfiguracaoOrcamento->getDestinacaoRecurso() == 'true') {
 $obSpnRec = new Span;
 $obSpnRec->setId ( 'spnRec' );
 
+$obPorcLimiteSuplementacaoDecreto = new Porcentagem();
+$obPorcLimiteSuplementacaoDecreto->setTitle('Percentual Autorizado na LOA para Suplementações por Decreto');
+$obPorcLimiteSuplementacaoDecreto->setRotulo('Limite Suplementação Decreto');
+$obPorcLimiteSuplementacaoDecreto->setName('nuLimiteSuplementacaoDecreto');
+$obPorcLimiteSuplementacaoDecreto->setId('nuLimiteSuplementacaoDecreto');
+$obPorcLimiteSuplementacaoDecreto->setNull(false);
+$obPorcLimiteSuplementacaoDecreto->obEvento->setOnChange(' validaPorcentagem(this.value); ');
+$obPorcLimiteSuplementacaoDecreto->setValue($obRConfiguracaoOrcamento->getLimiteSuplementacaoDecreto());
+
+//a partir de 2016 e para MG
+$obRdSuplementacaoRigidaRecurso = new SimNao;
+$obRdSuplementacaoRigidaRecurso->setRotulo ( 'Utilizar o padrão Suplementação Rigida por Fonte de Recurso' );
+$obRdSuplementacaoRigidaRecurso->setName   ( 'stSuplementacaoRegidaRecurso' );
+$obRdSuplementacaoRigidaRecurso->setId     ( 'stSuplementacaoRegidaRecurso' );
+$obRdSuplementacaoRigidaRecurso->setChecked( ($obRConfiguracaoOrcamento->getSuplementacaoRigidaRecurso() == 'sim' ? 'S' : 'N') );
+$obRdSuplementacaoRigidaRecurso->setNull   (false);
+
 // Define Objeto Hidden para Posição do Digito de Identificação
 $obHdnPosicaoDigitoID = new Hidden();
 $obHdnPosicaoDigitoID->setName  ( "inPosicaoDigitoID"                                   );
@@ -511,6 +528,11 @@ $obFormulario->addComponente            ( $obTxtMascaraPosicaoDespesa   );
 $obFormulario->addComponente            ( $obTxtMascaraDespesa          );
 $obFormulario->addComponente            ( $obRdDestinacao               );
 $obFormulario->addSpan                  ( $obSpnRec                     );
+$obFormulario->addComponente            ( $obPorcLimiteSuplementacaoDecreto );
+
+if ( Sessao::getExercicio() > 2015 && SistemaLegado::isTCEMG($boTransacao) )
+    $obFormulario->addComponente            ( $obRdSuplementacaoRigidaRecurso );
+
 
 $obFormulario->addTitulo                ( "Projeto, Atividade, Operação Especial" );
 $obFormulario->addComponente            ( $obLblPosicaoDigitoID         );

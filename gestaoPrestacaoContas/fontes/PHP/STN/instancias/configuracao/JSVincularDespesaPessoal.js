@@ -37,6 +37,13 @@
     function limpaFormularioAux(){
         jq('#flValor').val('');
         jq('#stPeriodo').selectOptions('', true);
+        jq('#nuValorPessoalAtivo').val('0,00');
+        jq('#nuValorPessoalInativo').val('0,00');
+        jq('#nuValorOutrasDespesas').val('0,00');
+        jq('#nuValorIndenizacoes').val('0,00');
+        jq('#nuValorDecisaoJudicial').val('0,00');
+        jq('#nuValorExercicioAnterior').val('0,00');
+        jq('#nuValorInativosPensionista').val('0,00');
     }
     
     function LimparForm(){

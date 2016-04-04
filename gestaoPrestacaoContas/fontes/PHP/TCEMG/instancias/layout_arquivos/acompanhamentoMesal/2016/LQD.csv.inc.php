@@ -47,9 +47,11 @@ $rsRecordSetLQD11 = new RecordSet();
 $rsRecordSetLQD12 = new RecordSet();
 
 $obTTCEMGLQD = new TTCEMGLQD();
-$obTTCEMGLQD->setDado('exercicio', Sessao::getExercicio());
-$obTTCEMGLQD->setDado('entidades', $stEntidades);
-$obTTCEMGLQD->setDado('mes', $stMes);
+$obTTCEMGLQD->setDado('exercicio' , Sessao::getExercicio());
+$obTTCEMGLQD->setDado('entidades' , $stEntidades);
+$obTTCEMGLQD->setDado('mes'       , $stMes);
+$obTTCEMGLQD->setDado('dt_inicial', $stDataInicial);
+$obTTCEMGLQD->setDado('dt_final'  , $stDataFinal);
 
 //Tipo Registro 10
 $obTTCEMGLQD->recuperaExportacao10($rsRecordSetLQD10);
@@ -190,7 +192,6 @@ if (count($rsRecordSetLQD10->getElementos()) > 0) {
                                     if ($inCodReduzido11 ===  $arLQD12['cod_reduzido'] ) {
                                         $stChave12 = $arLQD12['tipo_registro']
                                                        .$arLQD12['cod_reduzido']
-                                                       .$arLQD12['cod_unidade']
                                                        .$arLQD12['num_empenho']
                                                        .$arLQD12['dt_empenho']
                                                        .$arLQD12['num_liquidacao']

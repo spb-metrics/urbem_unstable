@@ -83,6 +83,12 @@ class  IPopUpCGM extends BuscaInner
 
     public function setTipo($stTipo='geral')
     {
+        /*
+        Permite colocar seguintes tipos:
+            fisica - permite apenas pessoa física.
+            juridica - permite apenas pessoa jurídica.
+            geral - permite qualquer campo de pessoa tanto física ou jurídica ou ambos.
+        */
         $this->stTipo = $stTipo;
     }
 

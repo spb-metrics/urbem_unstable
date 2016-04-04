@@ -96,8 +96,8 @@ class TTCMBAContrataMdo extends Persistente
                          ) AS contratado
                       ON contratado.numcgm = obra_contratos.numcgm
 
-                   WHERE obra_contratos.data_final > TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')
-                     AND obra_contratos.data_inicio < TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
+                   WHERE obra_contratos.data_final >= TO_DATE('".$this->getDado('data_inicial')."','dd/mm/yyyy')
+                     AND obra_contratos.data_inicio <= TO_DATE('".$this->getDado('data_final')."','dd/mm/yyyy')
                      AND obra_contratos.cod_entidade IN (".$this->getDado('entidades').")
                      AND obra_contratos.exercicio  = '".$this->getDado('exercicio')."'
                 ";

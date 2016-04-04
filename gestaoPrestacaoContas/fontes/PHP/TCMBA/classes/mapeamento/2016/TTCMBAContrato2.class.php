@@ -76,6 +76,91 @@ class TTCMBAContrato2 extends Persistente
 
     public function montaRecuperaDadosTribunal()
     {
+      $stSql = "
+                SELECT
+                        1 AS tipo_registro
+                      , ".$this->getDado('unidade_gestora')." AS unidade_gestora
+                      , licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo
+                      , contrato.numero_contrato
+                      , 1 as tipo_moeda
+                      , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN 1 
+                             WHEN sw_cgm_pessoa_juridica.cnpj IS NOT NULL THEN 2
+                             ELSE NULL
+                      END AS pessoa_contratado
+                      , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN sw_cgm_pessoa_fisica.cpf 
+                             ELSE sw_cgm_pessoa_juridica.cnpj
+                      END AS cic_contratado
+                      , cgm_contratado.nom_cgm AS nom_contratado
+                      , TO_CHAR(contrato.dt_assinatura, 'dd/mm/yyyy') AS dt_assinatura
+                      , TO_CHAR(contrato.vencimento, 'dd/mm/yyyy') AS dt_vencimento
+                      , SUBSTR(TRIM(cgm_imprensa.nom_cgm), 1, 50) AS diario_oficial
+                      , TO_CHAR(publicacao_contrato.dt_publicacao, 'dd/mm/yyyy') AS dt_publicacao
+                      , contrato.valor_contratado AS vl_contrato
+                      , TO_CHAR(contrato.dt_assinatura, 'yyyymm') AS competencia
+                      , '' AS num_processo_dispensa
+                      , TO_CHAR(contrato.inicio_execucao, 'dd/mm/yyyy') AS dt_inicio_execucao
+                      , 'N' AS exame_previo
+                      , '1' AS anterior_siga
+                      , tipo_contrato.tipo_tc AS tipo_contrato
+                      , 'S' AS indicador_licitacao -- (forçado por enquanto)
+                      , 'N' AS indicador_dispensa -- (forçado por enquanto)
+                      , patrimonio.fn_soma_valor_item_servico('".$this->getDado('exercicio')."', mapa_cotacao.cod_mapa) AS custo_pessoal -- PL para calcular custo dos itens de serviço
+
+                  FROM
+                        licitacao.contrato
+
+            INNER JOIN licitacao.contrato_licitacao
+                    ON contrato_licitacao.num_contrato = contrato.num_contrato
+                   AND contrato_licitacao.cod_entidade = contrato.cod_entidade
+                   AND contrato_licitacao.exercicio = contrato.exercicio
+
+            INNER JOIN licitacao.licitacao
+                    ON contrato_licitacao.cod_licitacao = licitacao.cod_licitacao
+                   AND contrato_licitacao.cod_modalidade = licitacao.cod_modalidade
+                   AND contrato_licitacao.cod_entidade = licitacao.cod_entidade
+                   AND contrato_licitacao.exercicio = licitacao.exercicio
+
+            INNER JOIN sw_cgm AS cgm_contratado
+                    ON contrato.cgm_contratado = cgm_contratado.numcgm
+
+             LEFT JOIN sw_cgm_pessoa_fisica
+                    ON cgm_contratado.numcgm = sw_cgm_pessoa_fisica.numcgm
+                     
+             LEFT JOIN sw_cgm_pessoa_juridica
+                    ON cgm_contratado.numcgm = sw_cgm_pessoa_juridica.numcgm
+
+            INNER JOIN licitacao.publicacao_contrato
+                    ON contrato.num_contrato = publicacao_contrato.num_contrato
+                   AND contrato.exercicio = publicacao_contrato.exercicio
+                   AND contrato.cod_entidade = publicacao_contrato.cod_entidade
+
+            INNER JOIN sw_cgm AS cgm_imprensa
+                    ON publicacao_contrato.numcgm = cgm_imprensa.numcgm
+
+            INNER JOIN licitacao.tipo_contrato
+                    ON tipo_contrato.cod_tipo = contrato.cod_tipo_contrato
+
+            INNER JOIN compras.mapa
+                    ON licitacao.exercicio_mapa = mapa.exercicio
+                   AND licitacao.cod_mapa = mapa.cod_mapa
+
+            INNER JOIN compras.mapa_cotacao
+                    ON mapa.exercicio = mapa_cotacao.exercicio_mapa
+                   AND mapa.cod_mapa = mapa_cotacao.cod_mapa
+
+             LEFT JOIN licitacao.contrato_anulado
+                    ON contrato_anulado.num_contrato = contrato.num_contrato
+                   AND contrato_anulado.exercicio = contrato.exercicio
+                   AND contrato_anulado.cod_entidade = contrato.cod_entidade
+
+                 WHERE contrato_anulado.num_contrato IS NULL
+                   AND licitacao.cod_entidade IN (".$this->getDado('entidades').")
+                   AND licitacao.exercicio = '".$this->getDado('exercicio')."'
+                   AND contrato.dt_assinatura BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
+                                                  AND TO_DATE('".$this->getDado('dt_final')."', 'dd/mm/yyyy')
+              ";
+
+      /* COMENTADO POR TER OCORRIDO UMA MODIFICAÇÃO, MAS SER POSSÍVEL A NECESSIDADE DE REUTILIZAR ELEMENTOS DESSA CONSULTA
         $stSql = " SELECT 1 AS tipo_registro 
                         , ".$this->getDado('unidade_gestora')." AS unidade_gestora
                         , licitacao.exercicio||LPAD(licitacao.cod_entidade::VARCHAR,2,'0')||LPAD(licitacao.cod_modalidade::VARCHAR,2,'0')||LPAD(licitacao.cod_licitacao::VARCHAR,4,'0') AS num_processo 
@@ -254,6 +339,7 @@ class TTCMBAContrato2 extends Persistente
                           mapa_cotacao.cod_mapa,
                           tipo_contrato.tipo_tc
         ";
+        */
         return $stSql;
     }
 

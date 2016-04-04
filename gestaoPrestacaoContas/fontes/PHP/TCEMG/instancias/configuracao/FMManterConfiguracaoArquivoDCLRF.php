@@ -31,11 +31,11 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
 
   * @ignore
-  * $Id: FMManterConfiguracaoArquivoDCLRF.php 59612 2014-09-02 12:00:51Z gelson $
+  * $Id: FMManterConfiguracaoArquivoDCLRF.php 64770 2016-03-30 19:33:22Z lisiane $
   *   
-  * $Rev: 59612 $
-  * $Author: gelson $
-  * $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+  * $Rev: 64770 $
+  * $Author: lisiane $
+  * $Date: 2016-03-30 16:33:22 -0300 (Qua, 30 Mar 2016) $
 */
 include_once("../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php");
 include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php");
@@ -55,8 +55,7 @@ $obTTCEMGConfiguracaoArquivoDCLRF->setDado('exercicio',$request->get('inExercici
 $obTTCEMGConfiguracaoArquivoDCLRF->setDado('mes_referencia',$request->get('inMes'));
 $obTTCEMGConfiguracaoArquivoDCLRF->recuperaValoresArquivoDCLRF($rsTTCEMGConfiguracaoArquivoDCLRF);
 
-if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0)
-{
+if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0) {
     $vlSaldoAtualConcessoesGarantia               = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_concessoes_garantia'), '2', ',', '.');
     $vlReceitaPrivatizacao                        = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('receita_privatizacao'), '2', ',', '.');
     $vlLiquidadoIncentivoContribuinte             = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_liquidado_incentivo_contribuinte'), '2', ',', '.');
@@ -65,9 +64,20 @@ if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0)
     $vlInscritoRPNPIncentivoInstituicaoFinanceiro = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_inscrito_rpnp_incentivo_instituicao_financeira'), '2', ',', '.');
     $vlCompromissado                              = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_compromissado'), '2', ',', '.');
     $vlRecursosNaoAplicados                       = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_recursos_nao_aplicados'), '2', ',', '.');
+    $inPublicacaoRelatorioLRF                     = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('publicacao_relatorio_lrf');
+    $dtPublicacaoRelatorioLRF                     = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('dt_publicacao_relatorio_lrf');
+    $inBimestre                                   = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('bimestre');
+    $inMetaBimestral                              = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('meta_bimestral');
+    $stMedidasAdotadas                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('medida_adotada');
+    $inContOpCredito                              = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('cont_op_credito');
+    $stMedidasAdotadas                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('desc_cont_op_credito');
+    $inRealizOpCredito                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('realiz_op_credito');
+    $inTipoRealizOpCreditoCapta                   = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_capta');
+    $inTipoRealizOpCreditoReceb                   = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_receb');
+    $inTipoRealizOpCreditoAssunDir                = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_assun_dir');
+    $inTipoRealizOpCreditoAssunObg                = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_assun_obg');
 
-} else
-{
+} else {
     $vlSaldoAtualConcessoesGarantia = "0,00";
     $vlReceitaPrivatizacao = "0,00";
     $vlLiquidadoIncentivoContribuinte = "0,00";
@@ -189,6 +199,196 @@ $obFlValorRecursosNaoAplicados->setDecimais(2);
 $obFlValorRecursosNaoAplicados->setMaxLength(15);
 $obFlValorRecursosNaoAplicados->setSize(17);
 $obFlValorRecursosNaoAplicados->setValue($vlRecursosNaoAplicados);
+
+
+$obRdPublicacaoRelatorioLRF_S = new Radio;
+$obRdPublicacaoRelatorioLRF_S->setId('inPublicacaoRelatorioLRF');
+$obRdPublicacaoRelatorioLRF_S->setName('inPublicacaoRelatorioLRF');
+$obRdPublicacaoRelatorioLRF_S->setRotulo('O poder deu publicidade aos relatórios (RGF e/ou RREO) da LRF?');
+$obRdPublicacaoRelatorioLRF_S->setLabel("Sim");
+$obRdPublicacaoRelatorioLRF_S->setValue(1);
+$obRdPublicacaoRelatorioLRF_S->setChecked($inPublicacaoRelatorioLRF==1);
+$obRdPublicacaoRelatorioLRF_S->setNull(true);
+
+$obRdPublicacaoRelatorioLRF_N = new Radio;
+$obRdPublicacaoRelatorioLRF_N->setId('inPublicacaoRelatorioLRF');
+$obRdPublicacaoRelatorioLRF_N->setName('inPublicacaoRelatorioLRF');
+$obRdPublicacaoRelatorioLRF_N->setRotulo('O poder deu publicidade aos relatórios (RGF e/ou RREO) da LRF?');
+$obRdPublicacaoRelatorioLRF_N->setLabel("Não");
+$obRdPublicacaoRelatorioLRF_N->setValue(0);
+$obRdPublicacaoRelatorioLRF_N->setChecked($inPublicacaoRelatorioLRF==0 or !$inPublicacaoRelatorioLRF);
+$obRdPublicacaoRelatorioLRF_N->setNull(true);
+
+$obDtPublicacaoRelatorioLRF = new Data;
+$obDtPublicacaoRelatorioLRF->setId("dtPublicacaoRelatorioLRF");
+$obDtPublicacaoRelatorioLRF->setName("dtPublicacaoRelatorioLRF");
+$obDtPublicacaoRelatorioLRF->setRotulo("Data de publicação dos relatórios da LRF");
+$obDtPublicacaoRelatorioLRF->setValue($dtPublicacaoRelatorioLRF);
+$obDtPublicacaoRelatorioLRF->setNull(true);
+
+$obCmbBimestre = new Select;
+$obCmbBimestre->setId( "inBimestre" );
+$obCmbBimestre->setName( "inBimestre" );
+$obCmbBimestre->setRotulo( "Periodo a que se refere a data de publicação da LRF" );
+$obCmbBimestre->addOption( "", "Selecione" );
+$obCmbBimestre->addOption( "1", "1º Bimestre" );
+$obCmbBimestre->addOption( "2", "2º Bimestre" );
+$obCmbBimestre->addOption( "3", "3º Bimestre" );
+$obCmbBimestre->addOption( "4", "4º Bimestre" );
+$obCmbBimestre->addOption( "5", "5º Bimestre" );
+$obCmbBimestre->addOption( "6", "6º Bimestre" );
+$obCmbBimestre->setNull( true );
+$obCmbBimestre->setValue( $inBimestre);
+$obCmbBimestre->setStyle( "width: 220px" );
+
+$obRdMetaBimestral_S = new Radio;
+$obRdMetaBimestral_S->setId('inMetaBimestral');
+$obRdMetaBimestral_S->setName('inMetaBimestral');
+$obRdMetaBimestral_S->setRotulo('A meta bimestral de arrecadação informada no arquivo MTBIARREC do Instrumento de Planejamento foi cumprida em relação à receita arrecadada no bimestre em questão?');
+$obRdMetaBimestral_S->setLabel("Sim");
+$obRdMetaBimestral_S->setValue(1);
+$obRdMetaBimestral_S->setChecked($inMetaBimestral==1);
+$obRdMetaBimestral_S->setNull(true);
+                  
+$obRdMetaBimestral_N = new Radio;
+$obRdMetaBimestral_N->setId('inMetaBimestral');
+$obRdMetaBimestral_N->setName('inMetaBimestral');
+$obRdMetaBimestral_N->setRotulo('A meta bimestral de arrecadação informada no arquivo MTBIARREC do Instrumento de Planejamento foi cumprida em relação à receita arrecadada no bimestre em questão?');
+$obRdMetaBimestral_N->setLabel("Não");
+$obRdMetaBimestral_N->setValue(2);
+$obRdMetaBimestral_N->setChecked($inMetaBimestral==2 or !$inMetaBimestral);
+$obRdMetaBimestral_N->setNull(true);
+
+$obTxtMedidasAdotadas = new TextArea();
+$obTxtMedidasAdotadas->setName('stMedidasAdotadas');
+$obTxtMedidasAdotadas->setId('stMedidasAdotadas');
+$obTxtMedidasAdotadas->setRotulo('Deverá ser indicado as medidas adotadas para a recuperação dos créditos e as ações de combate à evasão e sonegação das receitas.');
+$obTxtMedidasAdotadas->setMaxCaracteres(4000);
+$obTxtMedidasAdotadas->setRows(3);
+$obTxtMedidasAdotadas->setValue($stMedidasAdotadas);
+$obTxtMedidasAdotadas->setNull(true);
+
+if($_REQUEST['inMes'] == 12) {
+    $obRdContOpCredito_S = new Radio;
+    $obRdContOpCredito_S->setId('inContOpCredito');
+    $obRdContOpCredito_S->setName('inContOpCredito');
+    $obRdContOpCredito_S->setRotulo('Houve contratação de operação de crédito junto a instituição financeira que não atendeu às condições e limites estabelecidos pelo artigo 33 da Lei Complementar n° 101/2000?');
+    $obRdContOpCredito_S->setLabel("Sim");
+    $obRdContOpCredito_S->setValue(1);
+    $obRdContOpCredito_S->setChecked($inContOpCredito==1);
+    $obRdContOpCredito_S->setNull(false);
+                      
+    $obRdContOpCredito_N = new Radio;
+    $obRdContOpCredito_N->setId('inContOpCredito');
+    $obRdContOpCredito_N->setName('inContOpCredito');
+    $obRdContOpCredito_N->setRotulo('Houve contratação de operação de crédito junto a instituição financeira que não atendeu às condições e limites estabelecidos pelo artigo 33 da Lei Complementar n° 101/2000?');
+    $obRdContOpCredito_N->setLabel("Não");
+    $obRdContOpCredito_N->setValue(2);
+    $obRdContOpCredito_N->setChecked($inContOpCredito==2 or !$inContOpCredito);
+    $obRdContOpCredito_N->setNull(false);
+    
+    $obTxtDescContOpCredito = new TextArea();
+    $obTxtDescContOpCredito->setName('stDescContOpCredito');
+    $obTxtDescContOpCredito->setId('stDescContOpCredito');
+    $obTxtDescContOpCredito->setRotulo('Informe a ocorrência de cancelamento, amortização ou constituição de reserva, de acordo com o artigo 33 da Lei Complementar n°101/2000.');
+    $obTxtDescContOpCredito->setMaxCaracteres(1000);
+    $obTxtDescContOpCredito->setRows(3);
+    $obTxtDescContOpCredito->setValue($stMedidasAdotadas);
+    $obTxtDescContOpCredito->setNull(true);
+    
+    $obRdRealizOpCredito_S = new Radio;
+    $obRdRealizOpCredito_S->setId('inRealizOpCredito');
+    $obRdRealizOpCredito_S->setName('inRealizOpCredito');
+    $obRdRealizOpCredito_S->setRotulo('Foram realizadas operações de crédito vedadas pelo artigo 37 da Lei Complementar n° 101/2000?');
+    $obRdRealizOpCredito_S->setLabel("Sim");
+    $obRdRealizOpCredito_S->setValue(1);
+    $obRdRealizOpCredito_S->setChecked($inRealizOpCredito==1);
+    $obRdRealizOpCredito_S->setNull(false);
+                      
+    $obRdRealizOpCredito_N = new Radio;
+    $obRdRealizOpCredito_N->setId('inRealizOpCredito');
+    $obRdRealizOpCredito_N->setName('inRealizOpCredito');
+    $obRdRealizOpCredito_N->setRotulo('Foram realizadas operações de crédito vedadas pelo artigo 37 da Lei Complementar n° 101/2000?');
+    $obRdRealizOpCredito_N->setLabel("Não");
+    $obRdRealizOpCredito_N->setValue(2);
+    $obRdRealizOpCredito_N->setChecked($inRealizOpCredito==2 or !$inRealizOpCredito);
+    $obRdRealizOpCredito_N->setNull(false);
+    
+    $obRdTipoRealizOpCreditoCapta_S = new Radio;
+    $obRdTipoRealizOpCreditoCapta_S->setId('inTipoRealizOpCreditoCapta');
+    $obRdTipoRealizOpCreditoCapta_S->setName('inTipoRealizOpCreditoCapta');
+    $obRdTipoRealizOpCreditoCapta_S->setRotulo('Houve captação de recursos a título de antecipação de receita de tributo ou contribuição cujo fato gerador ainda não tenha ocorrido, sem prejuízo do disposto no § 7° do artigo 150 da Constituição?');
+    $obRdTipoRealizOpCreditoCapta_S->setLabel("Sim");
+    $obRdTipoRealizOpCreditoCapta_S->setValue(1);
+    $obRdTipoRealizOpCreditoCapta_S->setChecked($inTipoRealizOpCreditoCapta==1);
+    $obRdTipoRealizOpCreditoCapta_S->setNull(true);
+                      
+    $obRdTipoRealizOpCreditoCapta_N = new Radio;
+    $obRdTipoRealizOpCreditoCapta_N->setId('inTipoRealizOpCreditoCapta');
+    $obRdTipoRealizOpCreditoCapta_N->setName('inTipoRealizOpCreditoCapta');
+    $obRdTipoRealizOpCreditoCapta_N->setRotulo('Houve captação de recursos a título de antecipação de receita de tributo ou contribuição cujo fato gerador ainda não tenha ocorrido, sem prejuízo do disposto no § 7° do artigo 150 da Constituição?');
+    $obRdTipoRealizOpCreditoCapta_N->setLabel("Não");
+    $obRdTipoRealizOpCreditoCapta_N->setValue(2);
+    $obRdTipoRealizOpCreditoCapta_N->setChecked($inTipoRealizOpCreditoCapta==2 or !$inTipoRealizOpCreditoCapta);
+    $obRdTipoRealizOpCreditoCapta_N->setNull(true);
+    
+    $obRdTipoRealizOpCreditoReceb_S = new Radio;
+    $obRdTipoRealizOpCreditoReceb_S->setId('inTipoRealizOpCreditoReceb');
+    $obRdTipoRealizOpCreditoReceb_S->setName('inTipoRealizOpCreditoReceb');
+    $obRdTipoRealizOpCreditoReceb_S->setRotulo('Houve recebimento antecipado de valores de empresa em que o Poder Público detenha, direta ou indiretamente, a maioria do capital social com direito à voto, salvo lucros e dividendos, na forma da legislação?');
+    $obRdTipoRealizOpCreditoReceb_S->setLabel("Sim");
+    $obRdTipoRealizOpCreditoReceb_S->setValue(1);
+    $obRdTipoRealizOpCreditoReceb_S->setChecked($inTipoRealizOpCreditoReceb==1);
+    $obRdTipoRealizOpCreditoReceb_S->setNull(true);
+                      
+    $obRdTipoRealizOpCreditoReceb_N = new Radio;
+    $obRdTipoRealizOpCreditoReceb_N->setId('inTipoRealizOpCreditoReceb');
+    $obRdTipoRealizOpCreditoReceb_N->setName('inTipoRealizOpCreditoReceb');
+    $obRdTipoRealizOpCreditoReceb_N->setRotulo('Houve recebimento antecipado de valores de empresa em que o Poder Público detenha, direta ou indiretamente, a maioria do capital social com direito à voto, salvo lucros e dividendos, na forma da legislação?');
+    $obRdTipoRealizOpCreditoReceb_N->setLabel("Não");
+    $obRdTipoRealizOpCreditoReceb_N->setValue(2);
+    $obRdTipoRealizOpCreditoReceb_N->setChecked($inTipoRealizOpCreditoReceb==2 or !$inTipoRealizOpCreditoReceb);
+    $obRdTipoRealizOpCreditoReceb_N->setNull(true);
+    
+    $obRdTipoRealizOpCreditoAssunDir_S = new Radio;
+    $obRdTipoRealizOpCreditoAssunDir_S->setId('inTipoRealizOpCreditoAssunDir');
+    $obRdTipoRealizOpCreditoAssunDir_S->setName('inTipoRealizOpCreditoAssunDir');
+    $obRdTipoRealizOpCreditoAssunDir_S->setRotulo('Houve assunção direta de compromisso, confissão de dívida ou operação assemelhada, com fornecedor de bens, mercadorias ou serviços, mediante emissão, aceite ou aval de título de crédito, não se aplicando a
+empresas estatais dependentes?');
+    $obRdTipoRealizOpCreditoAssunDir_S->setLabel("Sim");
+    $obRdTipoRealizOpCreditoAssunDir_S->setValue(1);
+    $obRdTipoRealizOpCreditoAssunDir_S->setChecked($inTipoRealizOpCreditoAssunDir==1);
+    $obRdTipoRealizOpCreditoAssunDir_S->setNull(true);
+                      
+    $obRdTipoRealizOpCreditoAssunDir_N = new Radio;
+    $obRdTipoRealizOpCreditoAssunDir_N->setId('inTipoRealizOpCreditoAssunDir');
+    $obRdTipoRealizOpCreditoAssunDir_N->setName('inTipoRealizOpCreditoAssunDir');
+    $obRdTipoRealizOpCreditoAssunDir_N->setRotulo('Houve assunção direta de compromisso, confissão de dívida ou operação assemelhada, com fornecedor de bens, mercadorias ou serviços, mediante emissão, aceite ou aval de título de crédito, não se aplicando a
+empresas estatais dependentes?');
+    $obRdTipoRealizOpCreditoAssunDir_N->setLabel("Não");
+    $obRdTipoRealizOpCreditoAssunDir_N->setValue(2);
+    $obRdTipoRealizOpCreditoAssunDir_N->setChecked($inTipoRealizOpCreditoAssunDir==2 or !$inTipoRealizOpCreditoAssunDir);
+    $obRdTipoRealizOpCreditoAssunDir_N->setNull(true);
+    
+    $obRdTipoRealizOpCreditoAssunObg_S = new Radio;
+    $obRdTipoRealizOpCreditoAssunObg_S->setId('inTipoRealizOpCreditoAssunObg');
+    $obRdTipoRealizOpCreditoAssunObg_S->setName('inTipoRealizOpCreditoAssunObg');
+    $obRdTipoRealizOpCreditoAssunObg_S->setRotulo('Houve assunção de obrigação, sem autorização orçamentária, com fornecedores para pagamento a posteriori de bens e serviços?');
+    $obRdTipoRealizOpCreditoAssunObg_S->setLabel("Sim");
+    $obRdTipoRealizOpCreditoAssunObg_S->setValue(1);
+    $obRdTipoRealizOpCreditoAssunObg_S->setChecked($inTipoRealizOpCreditoAssunObg==1);
+    $obRdTipoRealizOpCreditoAssunObg_S->setNull(true);
+                      
+    $obRdTipoRealizOpCreditoAssunObg_N = new Radio;
+    $obRdTipoRealizOpCreditoAssunObg_N->setId('inTipoRealizOpCreditoAssunObg');
+    $obRdTipoRealizOpCreditoAssunObg_N->setName('inTipoRealizOpCreditoAssunObg');
+    $obRdTipoRealizOpCreditoAssunObg_N->setRotulo('Houve assunção de obrigação, sem autorização orçamentária, com fornecedores para pagamento a posteriori de bens e serviços?');
+    $obRdTipoRealizOpCreditoAssunObg_N->setLabel("Não");
+    $obRdTipoRealizOpCreditoAssunObg_N->setValue(2);
+    $obRdTipoRealizOpCreditoAssunObg_N->setChecked($inTipoRealizOpCreditoAssunObg==2 or !$inTipoRealizOpCreditoAssunObg);
+    $obRdTipoRealizOpCreditoAssunObg_N->setNull(true);
+}
+
 //****************************************//
 //Monta FORMULARIO
 //****************************************//
@@ -210,6 +410,24 @@ $obFormulario->addComponente   ( $obFlValorInscritoRPNPIncentivoInstituicaoFinan
 $obFormulario->addComponente   ( $obFlValorCompromissado );
 $obFormulario->addComponente   ( $obFlValorRecursosNaoAplicados );
 
+if(Sessao::getExercicio() >= 2016) {
+    $obFormulario->agrupaComponentes ( array($obRdPublicacaoRelatorioLRF_S, $obRdPublicacaoRelatorioLRF_N ));
+    $obFormulario->addComponente     ( $obDtPublicacaoRelatorioLRF );
+    $obFormulario->addComponente     ( $obCmbBimestre );
+    $obFormulario->agrupaComponentes ( array($obRdMetaBimestral_S, $obRdMetaBimestral_N ));
+    $obFormulario->addComponente     ( $obTxtMedidasAdotadas );
+
+    if($_REQUEST['inMes'] == 12) {
+        $obFormulario->addTitulo    ( ' Informações Sobre Operações de Crédito' );
+        $obFormulario->agrupaComponentes ( array($obRdContOpCredito_S, $obRdContOpCredito_N ));
+        $obFormulario->addComponente ( $obTxtDescContOpCredito );
+        $obFormulario->agrupaComponentes ( array($obRdRealizOpCredito_S, $obRdRealizOpCredito_N ));
+        $obFormulario->agrupaComponentes ( array($obRdTipoRealizOpCreditoCapta_S, $obRdTipoRealizOpCreditoCapta_N ));
+        $obFormulario->agrupaComponentes ( array($obRdTipoRealizOpCreditoReceb_S, $obRdTipoRealizOpCreditoReceb_N ));
+        $obFormulario->agrupaComponentes ( array($obRdTipoRealizOpCreditoAssunDir_S, $obRdTipoRealizOpCreditoAssunDir_N ));
+        $obFormulario->agrupaComponentes ( array($obRdTipoRealizOpCreditoAssunObg_S, $obRdTipoRealizOpCreditoAssunObg_N ));
+    }
+}
 $obFormulario->OK();
 $obFormulario->show();
 

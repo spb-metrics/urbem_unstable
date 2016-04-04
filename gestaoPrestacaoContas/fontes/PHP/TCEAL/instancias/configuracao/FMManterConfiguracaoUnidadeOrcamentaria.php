@@ -234,12 +234,15 @@ if ($rsUnidadeOrcamento->getNumLinhas() != 0) {
         $obBscCGM = new BuscaInner;
         $obBscCGM->setRotulo              ( "CGM"                          );
         $obBscCGM->setTitle               ( "Selecione o CGM"              );
+        $obBscCGM->setValue               ( "nom_cgm"         );
+        $obBscCGM->setName                ( 'stNomCGMConversao'                    );
         $obBscCGM->setNull                ( false                          );
         $obBscCGM->obCampoCod->setSize    ( 5                              );
+        $obBscCGM->obCampoCod->setId      ( "inNumCGMConversao_"           );
         $obBscCGM->obCampoCod->setName    ( "inNumCGMConversao_"           );
         $obBscCGM->obCampoCod->setValue   ( "numcgm"                       );
         $obBscCGM->setValoresBusca(CAM_GPC_TCEAL_INSTANCIAS.'configuracao/OCManterConfiguracaoUnidadeOrcamentaria.php?'.Sessao::getId(),$obForm->getName(),'validaCGM');
-        $obBscCGM->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumCGMConversao','','juridica','".Sessao::getId()."','800','550')" );
+        $obBscCGM->setFuncaoBusca("abrePopUp('".CAM_GA_CGM_POPUPS."cgm/FLProcurarCgm.php','frm','inNumCGMConversao','stNomCGMConversao','juridica','".Sessao::getId()."','800','550')" );
 
         $obLista->addDadoComponente( $obBscCGM );
         $obLista->commitDadoComponente();

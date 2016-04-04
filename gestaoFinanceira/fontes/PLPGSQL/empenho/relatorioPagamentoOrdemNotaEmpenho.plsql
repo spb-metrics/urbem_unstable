@@ -26,7 +26,7 @@
 * Data de Criação : 03/11/2015
 * @author Analista : Dagiane Vieira
 * @author Desenvolvedor : Michel Teixeira
-* $Id: relatorioPagamentoOrdemNotaEmpenho.plsql 63896 2015-11-03 19:03:23Z michel $
+* $Id: relatorioPagamentoOrdemNotaEmpenho.plsql 64385 2016-02-03 16:36:00Z michel $
 */
 
 CREATE OR REPLACE FUNCTION empenho.fn_relatorio_pagamento_ordem_nota_empenho(VARCHAR,VARCHAR,VARCHAR,INTEGER,VARCHAR,INTEGER,VARCHAR,INTEGER,BOOLEAN,BOOLEAN) RETURNS SETOF colunasRelatorioPagamentoOrdemNotaEmpenho AS $$
@@ -132,8 +132,8 @@ BEGIN
                                     FALSE
                            END AS bo_ordem_estornada
                          , ordem_pagamento_anulada.timestamp AS timestamp_ordem_anulada
-                         , pre_empenho_despesa.cod_conta_dotacao
-                         , pre_empenho_despesa.desdobramento
+                         , conta_despesa_empenho.cod_conta AS cod_conta_dotacao
+                         , conta_despesa_empenho.cod_estrutural AS desdobramento
                          , pagamento.exercicio_plano AS exercicio_plano_pagamento
                          , pagamento.cod_plano AS cod_plano_pagamento
                          , plano_conta.cod_conta AS cod_conta_plano_pagamento
@@ -166,10 +166,10 @@ BEGIN
                        AND nota_liquidacao_paga.timestamp       = pagamento.timestamp
                        
                 INNER JOIN contabilidade.pagamento AS pagamento_contabilidade
-                        ON pagamento_contabilidade.exercicio    = nota_liquidacao_paga.exercicio
-                       AND pagamento_contabilidade.cod_nota     = nota_liquidacao_paga.cod_nota
-                       AND pagamento_contabilidade.cod_entidade = nota_liquidacao_paga.cod_entidade
-                       AND pagamento_contabilidade.timestamp    = nota_liquidacao_paga.timestamp
+                        ON pagamento_contabilidade.exercicio_liquidacao = nota_liquidacao_paga.exercicio
+                       AND pagamento_contabilidade.cod_nota             = nota_liquidacao_paga.cod_nota
+                       AND pagamento_contabilidade.cod_entidade         = nota_liquidacao_paga.cod_entidade
+                       AND pagamento_contabilidade.timestamp            = nota_liquidacao_paga.timestamp
                        
                 INNER JOIN contabilidade.lancamento
                         ON lancamento.exercicio     = pagamento_contabilidade.exercicio
@@ -220,19 +220,24 @@ BEGIN
                        AND transferencia_ordem_pagamento_retencao.cod_entidade  = ordem_pagamento_retencao.cod_entidade
                        AND transferencia_ordem_pagamento_retencao.cod_ordem     = ordem_pagamento_retencao.cod_ordem
                        AND transferencia_ordem_pagamento_retencao.cod_plano     = ordem_pagamento_retencao.cod_plano
-                       AND transferencia_ordem_pagamento_retencao.sequencial    = ordem_pagamento_retencao.sequencial   
-            
-                INNER JOIN (SELECT pre_empenho_despesa.*
-                                 , conta_despesa.cod_conta      AS cod_conta_dotacao
-                                 , conta_despesa.cod_estrutural AS desdobramento
-                                 , conta_despesa.descricao      AS descricao_desdobramento
-                             FROM empenho.pre_empenho_despesa
-                             JOIN orcamento.conta_despesa   
-                               ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
-                              AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
-                           ) AS pre_empenho_despesa
+                       AND transferencia_ordem_pagamento_retencao.sequencial    = ordem_pagamento_retencao.sequencial
+
+                 LEFT JOIN empenho.pre_empenho_despesa
                         ON pre_empenho_despesa.exercicio        = empenho.exercicio
                        AND pre_empenho_despesa.cod_pre_empenho  = empenho.cod_pre_empenho
+
+                 LEFT JOIN empenho.restos_pre_empenho
+                        ON restos_pre_empenho.exercicio        = empenho.exercicio
+                       AND restos_pre_empenho.cod_pre_empenho  = empenho.cod_pre_empenho
+
+                INNER JOIN orcamento.conta_despesa AS conta_despesa_empenho
+                        ON (    conta_despesa_empenho.exercicio = pre_empenho_despesa.exercicio
+                            AND conta_despesa_empenho.cod_conta = pre_empenho_despesa.cod_conta
+                           )
+                        OR (    pre_empenho_despesa.cod_pre_empenho IS NULL
+                            AND conta_despesa_empenho.exercicio = '''||stExercicio||'''
+                            AND REPLACE(conta_despesa_empenho.cod_estrutural::varchar,''.'','''') = restos_pre_empenho.cod_estrutural
+                           )
             
                 INNER JOIN contabilidade.plano_analitica
                         ON plano_analitica.cod_plano = pagamento.cod_plano
@@ -269,7 +274,7 @@ BEGIN
                        AND ordem_pagamento_anulada.cod_ordem    = ordem_pagamento.cod_ordem
                        AND ordem_pagamento_anulada.cod_entidade = ordem_pagamento.cod_entidade
                 
-                     WHERE pagamento.exercicio = ''' || stExercicio || '''
+                     WHERE DATE_PART(''YEAR'', pagamento.timestamp)::VARCHAR = ''' || stExercicio || '''
                        '|| stFiltro ||'
 
                   GROUP BY  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11

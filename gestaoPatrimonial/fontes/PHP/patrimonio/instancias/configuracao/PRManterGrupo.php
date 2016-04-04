@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.04
 
- * $Id: PRManterGrupo.php 64184 2015-12-11 14:09:44Z arthur $
+ * $Id: PRManterGrupo.php 64439 2016-02-23 13:10:47Z arthur $
 
  */
 
@@ -96,8 +96,6 @@ switch ($stAcao) {
                     SistemaLegado::exibeAviso(urlencode('Como o campo Conta Contábil de Depreciação Acumulada está preenchido, é obrigatório o preenchimento do campo Quota Depreciação Anual.'),"n_incluir","erro");
                     Sessao::encerraExcecao(); die;
                 }
-            }else{
-                $inDepreciacao = '0.00';
             }
             
             $obTPatrimonioGrupo->setDado( 'depreciacao', $inDepreciacao );
@@ -172,12 +170,11 @@ switch ($stAcao) {
             }
             
             $obTPatrimonioGrupo->setDado( 'cod_natureza', $request->get('inCodNatureza') );
-            $obTPatrimonioGrupo->proximoCod( $inCodGrupo );
             $obTPatrimonioGrupo->setDado( 'cod_grupo'   , $request->get('inCodGrupo') );
             $obTPatrimonioGrupo->setDado( 'nom_grupo'   , $request->get('stDescricaoGrupo') );
             
             $inDepreciacao = $request->get('inDepreciacao');
-            
+                        
             $inDepreciacao = ($inDepreciacao != "" ) ? number_format(str_replace(',','.',$inDepreciacao),2,'.','') : '0.00';
             
             if($request->get('inCodContaDepreciacao') != ""){
@@ -185,8 +182,6 @@ switch ($stAcao) {
                     SistemaLegado::exibeAviso(urlencode('Como o campo Conta Contábil de Depreciação Acumulada está preenchido, é obrigatório o preenchimento do campo Quota Depreciação Anual.'),"n_incluir","erro");
                     Sessao::encerraExcecao(); die;
                 }
-            }else{
-                $inDepreciacao = '0.00';
             }
             
             $obTPatrimonioGrupo->setDado( 'depreciacao', $inDepreciacao );

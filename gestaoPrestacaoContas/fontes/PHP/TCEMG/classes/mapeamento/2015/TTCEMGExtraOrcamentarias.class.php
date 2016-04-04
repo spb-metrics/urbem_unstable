@@ -715,10 +715,17 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                    ELSE pagamento_tipo_documento.cod_tipo_documento::VARCHAR
                               END AS tipo_documento_op                            
                             , pagamento_tipo_documento.num_documento AS num_documento
-                            , CASE WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101' THEN ''
-                                   ELSE cod_ctb_transferencia.cod_ctb_anterior::varchar
+                            , CASE WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101'
+                                   THEN ''
+                                   ELSE CASE WHEN cod_ctb_transferencia.cod_ctb_anterior IS NULL
+                                             THEN transferencia.cod_plano_credito::VARCHAR
+                                             ELSE cod_ctb_transferencia.cod_ctb_anterior::varchar
+                                         END
                               END AS cod_ctb   
-                            , COALESCE(plano_recurso.cod_recurso,'100') AS cod_fonte_ctb
+                            , CASE WHEN cod_ctb_transferencia.cod_recurso IS NOT NULL
+                                   THEN cod_ctb_transferencia.cod_recurso
+                                   ELSE COALESCE(plano_recurso.cod_recurso,'100')
+                               END AS cod_fonte_ctb
                             , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 AND SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) <> '1111101' THEN 'Outros'
                                    WHEN pagamento_tipo_documento.cod_tipo_documento IS NULL AND SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) <> '1111101' THEN 'Outros'
                                    WHEN SUBSTR(cod_ctb_transferencia.cod_estrutural, 1, 7) = '1111101' THEN ''
@@ -804,6 +811,7 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
 			                         , conta_debito.tipo
 			                         , conta_debito.exercicio
 			                         , conta_debito.cod_entidade
+                                     , plano_recurso.cod_recurso
 			                         , conta_bancaria.cod_ctb_anterior
 			                         , transferencia.cod_plano_credito
 			                         , transferencia.cod_plano_debito
@@ -832,6 +840,10 @@ class TTCEMGExtraOrcamentarias extends TOrcamentoContaReceita
                                 INNER JOIN contabilidade.plano_conta
                                     ON plano_analitica.exercicio = plano_conta.exercicio
                                     AND plano_analitica.cod_conta = plano_conta.cod_conta
+                                    
+                                    LEFT JOIN contabilidade.plano_recurso
+                                           ON plano_recurso.exercicio = plano_analitica.exercicio
+                                          AND plano_recurso.cod_plano = plano_analitica.cod_plano
                         
                                 LEFT JOIN tcemg.conta_bancaria
 			                        ON conta_bancaria.cod_conta = plano_analitica.cod_conta

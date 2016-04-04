@@ -403,8 +403,8 @@ class TTCEMGOPS extends Persistente
                                             , pre_empenho_despesa.exercicio
 					                        , recurso.cod_recurso AS recurso
                                             , CASE WHEN substr(conta_despesa.cod_estrutural, 1, 3) = '4.6'
-                                                   THEN '1'
-                                                   ELSE '2'
+                                                   THEN '2'
+                                                   ELSE '1'
                                             END AS pagamento
                                          FROM orcamento.conta_despesa
                                          JOIN empenho.pre_empenho_despesa
@@ -532,7 +532,10 @@ class TTCEMGOPS extends Persistente
                                         ELSE
                                                 pagamento_tipo_documento.num_documento 
                              END AS nrodocumento
-                             , conta_bancaria.cod_ctb_anterior AS codctb
+                             , CASE WHEN conta_bancaria.cod_ctb_anterior IS NULL
+                                    THEN plano_analitica.cod_plano
+                                    ELSE conta_bancaria.cod_ctb_anterior
+                                END AS codctb
                              , CASE WHEN pagamento_tipo_documento.cod_tipo_documento = 99 THEN 
                                             (SELECT td.descricao FROM tcemg.tipo_documento AS td WHERE td.cod_tipo = pagamento_tipo_documento.cod_tipo_documento)
 									ELSE	' '

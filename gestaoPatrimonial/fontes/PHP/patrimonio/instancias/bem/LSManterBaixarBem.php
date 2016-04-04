@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.01.06
 
-  $Id: LSManterBaixarBem.php 64184 2015-12-11 14:09:44Z arthur $
+  $Id: LSManterBaixarBem.php 64578 2016-03-15 20:25:48Z arthur $
 
   */
 
@@ -49,6 +49,8 @@ $pgForm		= "FM".$stPrograma.".php";
 $pgProc		= "PR".$stPrograma.".php";
 $pgOcul		= "OC".$stPrograma.".php";
 $pgJs		= "JS".$stPrograma.".js";
+
+include_once( $pgJs );
 
 $stAcao = $request->get('stAcao');
 
@@ -79,37 +81,37 @@ if ($arFiltro) {
 Sessao::write('paginando',true);
 Sessao::write('filtro',$arFiltro);
 
-//seta os filtros
-
-if ($request->get('inCodBemInicio') != '' AND $request->get('inCodBemFinal') == '') {
-    $stFiltro .= " bem.cod_bem = ".$request->get('inCodBemInicio')." AND ";
+if ($request->get('inCodBemInicio') != '' && $request->get('inCodBemFinal') == '') {
+    $stFiltro .= " bem_baixado.cod_bem = ".$request->get('inCodBemInicio')." AND ";
 }
 
-if ($request->get('inCodBemInicio') != '' AND $request->get('inCodBemFinal') != '') {
-    $stFiltro .= " bem.cod_bem BETWEEN ".$request->get('inCodBemInicio')." AND ".$request->get('inCodBemFinal')." AND ";
+if ($request->get('inCodBemInicio') != '' && $request->get('inCodBemFinal') != '') {
+    $stFiltro .= " bem_baixado.cod_bem BETWEEN ".$request->get('inCodBemInicio')." AND ".$request->get('inCodBemFinal')." AND ";
 }
 
-if ($request->get('stDataInicial') != '' AND $request->get('stDataFinal')) {
-    $stFiltro .= " bem_baixado.dt_baixa BETWEEN TO_DATE('".$request->get('stDataInicial')."','dd/mm/yyyy') AND TO_DATE('".$request->get('stDataFinal')."','dd/mm/yyyy') AND ";
+if ($request->get('stDataInicial') != '' && $request->get('stDataFinal')) {
+    $stFiltro .= " bem_baixado.dt_baixa BETWEEN TO_DATE('".$request->get('stDataInicial')."','DD/MM/YYYY') AND TO_DATE('".$request->get('stDataFinal')."','DD/MM/YYYY') AND ";
 }
 
-if ($stAcao == 'excluir') {
-    $stFiltro .= " EXISTS
-                   (
-                        SELECT  1
-                          FROM  patrimonio.bem_baixado
-                         WHERE  bem_baixado.cod_bem = bem.cod_bem
-                   ) AND ";
+if ($request->get('inTipoBaixa') != '' ) {
+    $stFiltro .= " bem_baixado.tipo_baixa = ".$request->get('inTipoBaixa')." AND ";
 }
 
 if ($stFiltro != '') {
     $stFiltro = " WHERE ".substr($stFiltro,0,-4);
 }
 
-$stOrder = ' ORDER BY  bem.cod_bem ';
+$stGrupo = " \n GROUP BY bem_baixado.dt_baixa
+                       , bem_baixado.motivo
+                       , bem_baixado.tipo_baixa 
+                       , descricao_baixa
+                       , somatorio_bem_baixado.valor_atualizado ";
+
+$stOrder = " \n ORDER BY bem_baixado.dt_baixa
+                       , bem_baixado.tipo_baixa ";
 
 $obTPatrimonioBemBaixado = new TPatrimonioBemBaixado();
-$obTPatrimonioBemBaixado->recuperaRelacionamento( $rsBem, $stFiltro, $stOrder );
+$obTPatrimonioBemBaixado->recuperaBemBaixadoResumo( $rsBem, $stFiltro, $stGrupo, $stOrder);
 
 //instancia uma nova lista
 $obLista = new Lista;
@@ -125,13 +127,13 @@ $obLista->ultimoCabecalho->setWidth( 5 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "Bem" );
-$obLista->ultimoCabecalho->setWidth( 40 );
+$obLista->ultimoCabecalho->addConteudo( "Data da Baixa" );
+$obLista->ultimoCabecalho->setWidth( 10 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "Data de Baixa" );
-$obLista->ultimoCabecalho->setWidth( 10 );
+$obLista->ultimoCabecalho->addConteudo( "Tipo de Baixa" );
+$obLista->ultimoCabecalho->setWidth( 30 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
@@ -140,14 +142,14 @@ $obLista->ultimoCabecalho->setWidth( 40 );
 $obLista->commitCabecalho();
 
 $obLista->addCabecalho();
-$obLista->ultimoCabecalho->addConteudo( "Ação" );
-$obLista->ultimoCabecalho->setWidth( 10 );
+$obLista->ultimoCabecalho->addConteudo( "Valor do Lançamento" );
+$obLista->ultimoCabecalho->setWidth( 30 );
 $obLista->commitCabecalho();
 
-$obLista->addDado();
-$obLista->ultimoDado->setAlinhamento("ESQUERDA");
-$obLista->ultimoDado->setCampo( "[cod_bem] - [descricao]" );
-$obLista->commitDado();
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "Ação" );
+$obLista->ultimoCabecalho->setWidth( 20 );
+$obLista->commitCabecalho();
 
 $obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("CENTRO");
@@ -155,22 +157,38 @@ $obLista->ultimoDado->setCampo( "dt_baixa" );
 $obLista->commitDado();
 
 $obLista->addDado();
+$obLista->ultimoDado->setAlinhamento("CENTRO");
+$obLista->ultimoDado->setCampo( "descricao_baixa" );
+$obLista->commitDado();
+
+$obLista->addDado();
 $obLista->ultimoDado->setAlinhamento("ESQUERDA");
 $obLista->ultimoDado->setCampo( "motivo" );
 $obLista->commitDado();
 
+$obLista->addDado();
+$obLista->ultimoDado->setAlinhamento("CENTRO");
+$obLista->ultimoDado->setCampo( "valor_atualizado" );
+$obLista->commitDado();
+
+$obLista->addAcao();
+$obLista->ultimaAcao->setAcao( "consultar" );
+$obLista->ultimaAcao->setFuncao( true );
+$obLista->ultimaAcao->setLink( "javascript:consultarBensBaixados();" );
+$obLista->ultimaAcao->addCampo("1", "cod_tipo");
+$obLista->ultimaAcao->addCampo("2", "dt_baixa");
+$obLista->ultimaAcao->addCampo("3", "motivo");
+$obLista->commitAcao();
+
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( $stAcao );
-$obLista->ultimaAcao->addCampo( "&inCodBem", "cod_bem" );
-$obLista->ultimaAcao->addCampo( "&stDescQuestao" , "cod_bem" );
-
-if ($stAcao == "alterar") {
-    $obLista->ultimaAcao->setLink($stCaminho.$pgForm."?".Sessao::getId().$stLink);
-} else {
-    $obLista->ultimaAcao->setLink($stCaminho.$pgProc.'?'.Sessao::getId().$stLink);
-}
-
+$obLista->ultimaAcao->addCampo( "&inCodTipoBaixa" , "tipo_baixa" );
+$obLista->ultimaAcao->addCampo( "&stDataBaixa"    , "dt_baixa"   );
+$obLista->ultimaAcao->addCampo( "&stMotivo"       , "motivo" );
+$obLista->ultimaAcao->addCampo( "&stDescQuestao"  , "motivo" );
+$obLista->ultimaAcao->setLink($stCaminho.$pgProc.'?'.Sessao::getId().$stLink);
 $obLista->commitAcao();
+
 $obLista->show();
 
 ?>

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacaoParcial.php 64205 2015-12-15 20:31:55Z michel $
+    $Id: OCManterAutorizacaoParcial.php 64413 2016-02-18 16:21:52Z arthur $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -57,23 +57,32 @@ $pgProc	= "PR".$stPrograma.".php";
 $pgOcul	= "OC".$stPrograma.".php";
 $pgJs	= "JS".$stPrograma.".js";
 
-function alterarItem($inCodItem, $inCodCotacao){
-    $stHtml = "";
-    $arItens            = Sessao::read('arItens');
-    $arLicitacao        = Sessao::read('arLicitacao');
-
+function alterarItemDotacao(Request $request){
+    $stHtml       = "";
+    $arItens      = Sessao::read('arItens');
+    $arLicitacao  = Sessao::read('arLicitacao');
+    $inCodItem    = $request->get('codItem');
+    $inCodCotacao = $request->get('codCotacao');
+    $inCodDespesa = $request->get('codDespesa');
+    
     $boMontaDespesa = false;
-
+    
     if(!empty($inCodItem) && !empty($inCodCotacao)){
         foreach( $arItens as $chaveItem => $arItem) {
             if ( $arItem["cod_item"] == $inCodItem && $arItem["cod_cotacao"] == $inCodCotacao ) {
                 foreach( $arLicitacao as $arLicitacaoTemp) {
-                    $stFiltro  = " and licitacao.cod_licitacao  = ".$arLicitacaoTemp['inCodLicitacao'];
-                    $stFiltro .= " and licitacao.cod_modalidade = ".$arLicitacaoTemp['inCodModalidade'];
-                    $stFiltro .= " and licitacao.cod_entidade   = ".$arLicitacaoTemp['inCodEntidade'];
-                    $stFiltro .= " and mapa_item.cod_item       = ".$arItem["cod_item"];
+                    $stFiltro  = " AND licitacao.cod_licitacao  = ".$arLicitacaoTemp['inCodLicitacao'];
+                    $stFiltro .= " AND licitacao.cod_modalidade = ".$arLicitacaoTemp['inCodModalidade'];
+                    $stFiltro .= " AND licitacao.cod_entidade   = ".$arLicitacaoTemp['inCodEntidade'];
+                    $stFiltro .= " AND mapa_item.cod_item       = ".$arItem["cod_item"];
+                    if (!empty($inCodDespesa))
+                        $stFiltro .= " AND mapa_item_dotacao.cod_despesa = ".$inCodDespesa;
 
                     $obTLicitacao = new TLicitacaoLicitacao();
+
+                    if (!empty($inCodDespesa))
+                        $obTLicitacao->setDado('inCodDespesa', $inCodDespesa);
+                        
                     $obTLicitacao->recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao( $rsDetalheItens , $stFiltro);
 
                     $obTComprasCotacaoFornecedorItem = new TComprasCotacaoFornecedorItem ();
@@ -92,8 +101,8 @@ function alterarItem($inCodItem, $inCodCotacao){
                 }
 
                 $qtdItem            = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
+                
                 $inCgmFornecedor    = $arItem['inCgmFornecedor'];
-                $inCodDespesa       = $arItem['inCodDespesa'];
                 $stCodClassificacao = $arItem['stCodClassificacao'];
 
                 foreach ($rsCotacaoItens->getElementos() as $key => $cotacaoItem) {
@@ -125,12 +134,12 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obLblQtdTotalItem->setValue ( number_format($rsDetalheItens->getCampo('quantidade'), 4, ",", ".") );
 
                 $obLblQtdAutorizadaItem = new Label();
-                $obLblQtdAutorizadaItem->setRotulo( 'Quantidade Autorizada' );
-                $obLblQtdAutorizadaItem->setValue ( number_format($rsDetalheItens->getCampo('quantidade_autorizacoes'), 4, ",", ".") );
+                $obLblQtdAutorizadaItem->setRotulo( 'Quantidade Total para Dotação' );
+                $obLblQtdAutorizadaItem->setValue ( number_format($rsDetalheItens->getCampo('quantidade_total_autorizada_dotacao'), 4, ",", ".") );
 
                 $obLblSaldoAutorizarItem = new Label();
                 $obLblSaldoAutorizarItem->setRotulo( 'Saldo a Autorizar' );
-                $obLblSaldoAutorizarItem->setValue ( number_format($rsDetalheItens->getCampo('quantidade_saldo'), 4, ",", ".") );
+                $obLblSaldoAutorizarItem->setValue ( number_format($rsDetalheItens->getCampo('quantidade_restante_dotacao'), 4, ",", ".") );
 
                 $obIntQtdeItem = new Quantidade();
                 $obIntQtdeItem->setRotulo   ( 'Quantidade para Esta Autorização'    );
@@ -139,7 +148,8 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obIntQtdeItem->setValue    ( number_format($qtdItem, 4, ",", ".")  );
                 $obIntQtdeItem->setMaxLength( 16                                    );
                 $obIntQtdeItem->setSize     ( 23                                    );
-                $obIntQtdeItem->obEvento->setOnChange( "montaParametrosGET('verificaQuantidadeItem', 'inCodItem,inCodCotacao,nuQtdeItem,hdnNuQtdeItem,inCgmFornecedor');" );
+                if (!empty($inCodDespesa))
+                    $obIntQtdeItem->obEvento->setOnChange( "montaParametrosGET('verificaQuantidadeItem', 'inCodItem,inCodCotacao,nuQtdeItem,hdnNuQtdeItem,hdnNuQtdeAutorizada,inCgmFornecedor,inCodDespesa');" );
 
                 $obVlrPrecoUnitario = new Moeda();
                 $obVlrPrecoUnitario->setRotulo  ( 'Valor Unitário'                          );
@@ -187,6 +197,11 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obHdnNomCentroCusto->setName   ( 'stNomCentroCusto'                        );
                 $obHdnNomCentroCusto->setId     ( 'stNomCentroCusto'                        );
                 $obHdnNomCentroCusto->setValue  ( $rsDetalheItens->getCampo('nom_centro')   );
+                
+                $obHdnCodDespesa = new Hidden;
+                $obHdnCodDespesa->setName   ( 'inCodDespesa' );
+                $obHdnCodDespesa->setId     ( 'inCodDespesa' );
+                $obHdnCodDespesa->setValue  ( $request->get('codDespesa') );
 
                 $boMontaDesdobramento = true;
 
@@ -249,8 +264,13 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obHdnNuQtdeItem = new Hidden;
                 $obHdnNuQtdeItem->setName   ( 'hdnNuQtdeItem' );
                 $obHdnNuQtdeItem->setId     ( 'hdnNuQtdeItem' );
-                $obHdnNuQtdeItem->setValue  ( $arItem['quantidade_saldo'] );
-
+                $obHdnNuQtdeItem->setValue  ( $rsDetalheItens->getCampo('quantidade_restante_dotacao') );
+                
+                $obHdnNuQtdAutorizada = new Hidden;
+                $obHdnNuQtdAutorizada->setName   ( 'hdnNuQtdeAutorizada' );
+                $obHdnNuQtdAutorizada->setId     ( 'hdnNuQtdeAutorizada' );
+                $obHdnNuQtdAutorizada->setValue  ( $rsDetalheItens->getCampo('quantidade_total_autorizada_dotacao') );               
+                
                 $obHdnCGMCentroCusto = new Hidden;
                 $obHdnCGMCentroCusto->setName   ( 'hdnInCodCentroCusto' );
                 $obHdnCGMCentroCusto->setId     ( 'hdnInCodCentroCusto' );
@@ -277,6 +297,9 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obBtnAlterarItem->setValue ("Alterar Item");
                 $obBtnAlterarItem->setTipo  ("button");
                 $obBtnAlterarItem->obEvento->setOnClick("montaParametrosGET('alterarListaItem');");
+                if($rsDetalheItens->getCampo('quantidade_restante_dotacao') <= 0 ){
+                    $obBtnAlterarItem->setDisabled ( true );
+                }
 
                 $obFormularioItem = new Formulario();
                 $obFormularioItem->setId('sw_table_parcial');
@@ -287,42 +310,47 @@ function alterarItem($inCodItem, $inCodCotacao){
                 $obFormularioItem->addHidden( $obHdnCGMCentroCusto      );
                 $obFormularioItem->addHidden( $obHdnExercicioMapa       );
                 $obFormularioItem->addHidden( $obHdnCodMapa             );
-                $obFormularioItem->addComponente( $obIntCodItem                 );
-                $obFormularioItem->addComponente( $obLblNomItem                 );
+                $obFormularioItem->addComponente( $obIntCodItem         );
+                $obFormularioItem->addComponente( $obLblNomItem         );
 
                 if($boMontaDesdobramento){
-                    $obFormularioItem->addHidden( $obInCodClassificacao         );
-                    $obMontaDotacao->geraFormulario ( $obFormularioItem         );
+                    $obFormularioItem->addHidden( $obInCodClassificacao );
+                    $obMontaDotacao->geraFormulario ( $obFormularioItem );
                 }else{
-                    $obFormularioItem->addHidden( $obInCodDespesa               );
-                    $obFormularioItem->addHidden( $obStCodClassificacao         );
-                    $obFormularioItem->addComponente( $obLblDotacao             );
-                    $obFormularioItem->addComponente( $obLblDesdobramento       );
-                    $obFormularioItem->addComponente( $obLblSaldoDotacao        );
+                    $obFormularioItem->addHidden( $obInCodDespesa         );
+                    $obFormularioItem->addHidden( $obStCodClassificacao   );
+                    $obFormularioItem->addComponente( $obLblDotacao       );
+                    $obFormularioItem->addComponente( $obLblDesdobramento );
+                    $obFormularioItem->addComponente( $obLblSaldoDotacao  );
                 }
 
-                $obFormularioItem->addComponente( $obLblQtdTotalItem            );
-                $obFormularioItem->addComponente( $obLblQtdAutorizadaItem       );
-                $obFormularioItem->addComponente( $obLblSaldoAutorizarItem      );
-                $obFormularioItem->addComponente( $obIntQtdeItem                );
-                $obFormularioItem->addComponente( $obVlrPrecoUnitario           );
-                $obFormularioItem->addComponente( $obLblVlrTotalItem            );
-                $obFormularioItem->addComponente( $obISelectFornecedor          );
-                $obFormularioItem->addSpan      ( $obSpnAlteraFornecedorItem    );
-                $obFormularioItem->addComponente( $obLblCentroCusto             );
-                $obFormularioItem->addHidden( $obHdnIdCentroCusto               );
-                $obFormularioItem->addHidden( $obHdnNomCentroCusto              );
-
+                $obFormularioItem->addComponente( $obLblQtdTotalItem         );
+                $obFormularioItem->addComponente( $obLblQtdAutorizadaItem    );
+                $obFormularioItem->addComponente( $obLblSaldoAutorizarItem   );
+                $obFormularioItem->addComponente( $obIntQtdeItem             );
+                $obFormularioItem->addComponente( $obVlrPrecoUnitario        );
+                $obFormularioItem->addComponente( $obLblVlrTotalItem         );
+                $obFormularioItem->addComponente( $obISelectFornecedor       );
+                $obFormularioItem->addSpan      ( $obSpnAlteraFornecedorItem );
+                $obFormularioItem->addComponente( $obLblCentroCusto          );
+                $obFormularioItem->addHidden    ( $obHdnIdCentroCusto        );
+                $obFormularioItem->addHidden    ( $obHdnNomCentroCusto       );
+                $obFormularioItem->addHidden    ( $obHdnNuQtdAutorizada      );
+                
                 $obFormularioItem->addComponente( $obBtnAlterarItem );
 
                 $obFormularioItem->montaInnerHTML();
-                $stHtml = $obFormularioItem->getHTML();
+                $stHTMLAlteraItem = $obFormularioItem->getHTML();
+                $stHTMLAlteraItem = str_replace("\'","\\'",$stHTMLAlteraItem);
+                $stHTMLAlteraItem = str_replace("\n","",$stHTMLAlteraItem);
+                $stHTMLAlteraItem = str_replace("  ","",$stHTMLAlteraItem);
+                $stHTMLAlteraItem = str_replace('"','\\"',$stHTMLAlteraItem);
 
-                $arMontaFornecedor[0]['inCgmFornecedor'] = $inCgmFornecedor;
+                $arMontaFornecedor[0]['inCgmFornecedor']    = $inCgmFornecedor;
                 $arMontaFornecedor[0]['hdnInCGMFornecedor'] = $rsDetalheItens->getCampo('cgm_fornecedor');
-                $arMontaFornecedor[0]['inCodCotacao'] = $arItem['cod_cotacao'];
-                $arMontaFornecedor[0]['inCodItem'] = $arItem['cod_item'];
-                $arMontaFornecedor[0]['nuQtdeItem'] = number_format($qtdItem, 4, ",", ".");
+                $arMontaFornecedor[0]['inCodCotacao']       = $arItem['cod_cotacao'];
+                $arMontaFornecedor[0]['inCodItem']          = $arItem['cod_item'];
+                $arMontaFornecedor[0]['nuQtdeItem']         = number_format($qtdItem, 4, ",", ".");
 
                 Sessao::write('arMontaFornecedor', $arMontaFornecedor);
 
@@ -339,8 +367,9 @@ function alterarItem($inCodItem, $inCodCotacao){
             }
         }
     }
-
-    return $stHtml;
+    
+    $stJs = "jQuery('#spnDetalheDotacao').html('".$stHTMLAlteraItem."');  \n";
+    return $stJs;
 }
 
 function montaSpanItens($rsRecordSet)
@@ -429,9 +458,10 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     $arItens = Sessao::read('arItens');
     $arItens = (is_array($arItens)) ? $arItens : array();
 
-    foreach ($arItensDetalhes as $chaveItemDetalhe => $valorItemDetalhe) {
+    foreach ($arItensDetalhes as $chaveItemDetalhe => $valorItemDetalhe) {        
         foreach( $arItens as $chaveItem => $arItem) {
             if ( $arItem["cod_item"] == $valorItemDetalhe['cod_item'] && $arItem["cod_cotacao"] == $valorItemDetalhe['cod_cotacao'] ) {
+
                 if(empty($valorItemDetalhe['desdobramento']) && !empty($arItem['stCodClassificacao'])){
                     include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoContaDespesa.class.php";
                     $obTOrcamentoContaDespesa = new TOrcamentoContaDespesa();
@@ -439,13 +469,15 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
                     $obTOrcamentoContaDespesa->setDado("exercicio", Sessao::getExercicio());
                     $obTOrcamentoContaDespesa->recuperaPorChave( $rsOrcamentoContaDespesa );
 
-                    if ( $rsOrcamentoContaDespesa->getNumLinhas() == 1 )
+                    if ( $rsOrcamentoContaDespesa->getNumLinhas() == 1 ){
                         $arItensDetalhes[$chaveItemDetalhe]['desdobramento'] = $rsOrcamentoContaDespesa->getCampo('cod_estrutural');
+                    }
                 }
                 
                 $vlUnitarioItem = $arItensDetalhes[$chaveItemDetalhe]['vl_unitario'];
 
                 $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
+                
                 foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
                     if($cotacaoItem['cgm_fornecedor'] == $arItem['inCgmFornecedor']){
                         $vlUnitarioItem = $cotacaoItem['vl_cotacao'] / $cotacaoItem['quantidade'];
@@ -455,10 +487,13 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
 
                 $arItensDetalhes[$chaveItemDetalhe]['vl_unitario']      = $vlUnitarioItem;
                 $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
-                if($arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo']==0)
+                
+                if($arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] == 0){
                     $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = '0,00';
-                else
-                    $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = $vlUnitarioItem*$arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'];
+                } else {
+                    $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = $vlUnitarioItem * $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'];
+                }
+                
                 $arItensDetalhes[$chaveItemDetalhe]['cgm_fornecedor']   = $arItem['inCgmFornecedor'];
                 $arItensDetalhes[$chaveItemDetalhe]['fornecedor']       = sistemalegado::pegaDado("nom_cgm", "sw_cgm", "WHERE numcgm = '".$arItem['inCgmFornecedor']."' ");
                 break;
@@ -473,28 +508,35 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     $rsRegistros->addFormatacao ( 'quantidade_saldo'    , 'NUMERIC_BR_4');
     $rsRegistros->addFormatacao ( 'vl_cotacao_saldo'    , 'NUMERIC_BR'  );
 
+    $obRdSelecione = new Radio;
+    $obRdSelecione->setName               ( "rd_dotacao" );
+    $obRdSelecione->setId                 ( "" );
+    $obRdSelecione->obEvento->setOnChange ( "selecionaDotacao(this)" );
+    $obRdSelecione->setValue              ( "[cod_item],[cod_cotacao],[cod_despesa]" );
+    
     $table = new Table();
-
     $table->setRecordset( $rsRegistros );
-    $table->setSummary('Itens');
+    $table->setSummary('Dotação');
 
-    $table->Head->addCabecalho( 'Fornecedor'            , 30    );
-    $table->Head->addCabecalho( 'Solicitação'           , 8     );
-    $table->Head->addCabecalho( 'Lote'                  , 5     );
-    $table->Head->addCabecalho( 'Centro de Custo'       , 10    );
-    $table->Head->addCabecalho( 'Dotação Orçamentária'  , 14    );
-    $table->Head->addCabecalho( 'Valor Unitário'        , 10    );
-    $table->Head->addCabecalho( 'Quantidade'            , 10    );
-    $table->Head->addCabecalho( 'Valor Total'           , 14    );
+    $table->Head->addCabecalho( 'Fornecedor'          , 30 );
+    $table->Head->addCabecalho( 'Solicitação'         , 8  );
+    $table->Head->addCabecalho( 'Lote'                , 5  );
+    $table->Head->addCabecalho( 'Centro de Custo'     , 10 );
+    $table->Head->addCabecalho( 'Dotação Orçamentária', 14 );
+    $table->Head->addCabecalho( 'Valor Unitário'      , 10 );
+    $table->Head->addCabecalho( 'Quantidade'          , 8  );
+    $table->Head->addCabecalho( 'Valor Total'         , 10 );
+    $table->Head->addCabecalho( 'Selecione'           , 5  );
 
-    $table->Body->addCampo( '[cgm_fornecedor] - [fornecedor]'   , 'C');
-    $table->Body->addCampo( 'cod_solicitacao'                   , 'C');
-    $table->Body->addCampo( 'lote'                              , 'C');
-    $table->Body->addCampo( 'cod_centro'                        , 'C');
-    $table->Body->addCampo( 'desdobramento'                     , 'C');
-    $table->Body->addCampo( 'vl_unitario'                       , 'D');
-    $table->Body->addCampo( 'quantidade_saldo'                  , 'D');
-    $table->Body->addCampo( 'vl_cotacao_saldo'                  , 'D');
+    $table->Body->addCampo( '[cgm_fornecedor] - [fornecedor]', 'E');
+    $table->Body->addCampo( 'cod_solicitacao'                , 'C');
+    $table->Body->addCampo( 'lote'                           , 'C');
+    $table->Body->addCampo( 'cod_centro'                     , 'C');
+    $table->Body->addCampo( 'desdobramento'                  , 'C');
+    $table->Body->addCampo( 'vl_unitario'                    , 'D');
+    $table->Body->addCampo( 'quantidade_saldo'               , 'D');
+    $table->Body->addCampo( 'vl_cotacao_saldo'               , 'D');
+    $table->Body->addComponente( $obRdSelecione );
 
     $table->montaHTML();
     $stHTMLDetalhe = $table->getHtml();
@@ -503,7 +545,15 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     $stHTMLDetalhe = str_replace('"','\\"',$stHTMLDetalhe);
     $stHTMLDetalhe = str_replace("'","\\'",$stHTMLDetalhe);
 
-    $stHTMLAlteraItem = alterarItem($inCodItem, $inCodCotacao);
+    $obSpnDetalheDotacao = new Span;
+    $obSpnDetalheDotacao->setId       ( 'spnDetalheDotacao' );
+    
+    $obFormulario = new Formulario();
+    $obFormulario->addSpan   ( $obSpnDetalheDotacao );
+
+    $obFormulario->montaInnerHTML();
+    $stHTMLAlteraItem = $obFormulario->getHTML();
+    
     $stHTMLAlteraItem = str_replace("\'","\\'",$stHTMLAlteraItem);
     $stHTMLAlteraItem = str_replace("\n","",$stHTMLAlteraItem);
     $stHTMLAlteraItem = str_replace("  ","",$stHTMLAlteraItem);
@@ -531,7 +581,7 @@ function montaListaItens()
 
     $inCount = 1;
 
-    $js = "var onClickRow;                                                                                              \n";
+    $js = " var onClickRow; \n";
     $stJsTableTree = "BloqueiaFrames(true,false); ";
 
     foreach ($arItens as $chaveItem => $valorItem) {
@@ -558,6 +608,7 @@ function montaListaItens()
     $rsItens->preenche($arItens);
     $rsItens->addFormatacao ( 'nuQtdeItem'          , 'NUMERIC_BR_4' );
     $rsItens->addFormatacao ( 'quantidade_saldo'    , 'NUMERIC_BR_4' );
+    $rsItens->addFormatacao ( 'quantidade'          , 'NUMERIC_BR_4' );
     $rsItens->addFormatacao ( 'vl_cotacao_saldo'    , 'NUMERIC_BR'   );
 
     $table->setRecordset( $rsItens );
@@ -576,16 +627,17 @@ function montaListaItens()
     $table->setComplementoParametros( $stParamAdicionais );
 
     $table->Head->addCabecalho( 'Item'                              , 50 );
-    $table->Head->addCabecalho( 'Quantidade Disponível'             , 15 );
-    $table->Head->addCabecalho( 'Quantidade para Esta Autorização'  , 15 );
+    $table->Head->addCabecalho( 'Quantidade Total'                  , 10 );
+    $table->Head->addCabecalho( 'Quantidade Autorizada'             , 10 );
+    $table->Head->addCabecalho( 'Quantidade para Esta Autorização'  , 10 );
     $table->Head->addCabecalho( 'Valor Total'                       , 15 );
-
+    
     $table->Body->addCampo( '[cod_item] - [descricao_completa]<br>[complemento]', 'E' );
+    $table->Body->addCampo( 'quantidade'                                        , 'C' );
     $table->Body->addCampo( 'quantidade_saldo'                                  , 'C' );
     $table->Body->addCampo( 'nuQtdeItem'                                        , 'C' );
     $table->Body->addCampo( 'vl_cotacao_saldo'                                  , 'D' );
-
-    $table->Foot->addSoma( 'vl_cotacao_saldo'                                   , 'D' );
+    $table->Foot->addSoma ( 'vl_cotacao_saldo'                                  , 'D' );
 
     $table->montaHTML();
     $stHTML = $table->getHtml();
@@ -601,6 +653,7 @@ function montaListaItens()
 }
 
 function montaVlUnitario($inCgmFornecedor = null, $nuQtdeItem = 0, $inCodItem, $inCodCotacao){
+    
     if($inCgmFornecedor){
         $arItens = Sessao::read('arItens');
         $arItens = (is_array($arItens)) ? $arItens : array();
@@ -828,6 +881,7 @@ switch ($request->get('stCtrl')) {
 
             $arItens = array();
             $inCount = 0;
+            
             foreach($rsMapaItens->getElementos() as $key => $itemMapa){
                 $arItens[$inCount] = $itemMapa;
 
@@ -840,6 +894,7 @@ switch ($request->get('stCtrl')) {
                 $obTLicitacao->recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao( $rsDetalheItens , $stFiltro);
 
                 while ( !$rsDetalheItens->eof() ) {
+                    $arItens[$inCount]['indice']                = $inCount;
                     $arItens[$inCount]['nuQtdeItem']            = 0;
                     $arItens[$inCount]['vl_cotacao_saldo']      = '0,00';
                     $arItens[$inCount]['inCgmFornecedor']       = $itemMapa['cgm_fornecedor'];
@@ -892,9 +947,9 @@ switch ($request->get('stCtrl')) {
 
         $obTLicitacao = new TLicitacaoLicitacao();
         $obTLicitacao->recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao( $rsDetalheItens , $stFiltro);
-
+        
         Sessao::write('arItensDetalhes', $rsDetalheItens->getElementos());
-
+        
         $stHtmlDetalhe = montaListaItensDetalhe($request->get("cod_item"), $rsDetalheItens->getCampo('cod_cotacao'));
 
         $arMontaFornecedor = Sessao::read('arMontaFornecedor');
@@ -971,6 +1026,8 @@ switch ($request->get('stCtrl')) {
         $obErro = new Erro;
         $arItens = Sessao::read('arItens');
         $arItens = (is_array($arItens)) ? $arItens : array();
+        
+        $arItensDetalhes = Sessao::read('arItensDetalhes');
 
         $nuQtdeItem = str_replace(",",".",str_replace(".","",$request->get('nuQtdeItem')));
 
@@ -1042,8 +1099,10 @@ switch ($request->get('stCtrl')) {
                         $arItens[$chaveItem]['vl_cotacao_saldo'] = $vlUnitarioItem * $nuQtdeItem;
                     }
                 }
+
             }
 
+            Sessao::write('arItensDetalhes', $arItensDetalhes);
             Sessao::write('arItens', $arItens);
 
             $stJs  = montaListaItens();
@@ -1051,9 +1110,12 @@ switch ($request->get('stCtrl')) {
     break;
 
     case 'verificaQuantidadeItem':
+        
         $nuQtdeItem = str_replace(",",".",str_replace(".","",$request->get('nuQtdeItem')));
-        $hdnNuQtdeItem = $request->get('hdnNuQtdeItem');
-        if($nuQtdeItem > $hdnNuQtdeItem){
+        $hdnNuQtdeItem       = $request->get('hdnNuQtdeItem');
+        $hdnNuQtdeAutorizada = $request->get('hdnNuQtdeAutorizada');
+        
+        if(($nuQtdeItem > $hdnNuQtdeItem) || ($nuQtdeItem > $hdnNuQtdeAutorizada)){
             $nuQtdeItem = 0;
             $stJs  = "jQuery('#nuQtdeItem').val(''); \n";
             $stJs .= "jQuery('#nuQtdeItem').focus(); \n";
@@ -1100,6 +1162,10 @@ switch ($request->get('stCtrl')) {
 
     case 'montaListaItens':
         $stJs = montaListaItens();
+    break;
+
+    case 'alterarItemDotacao':
+        $stJs = alterarItemDotacao($request);
     break;
 }
 

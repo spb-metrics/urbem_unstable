@@ -34,77 +34,83 @@
  $Id:$
  */
 
-CREATE OR REPLACE FUNCTION consultar_total_retencoes_cgm(INTEGER,INTEGER,INTEGER,INTEGER,VARCHAR) RETURNS NUMERIC AS $$
+CREATE OR REPLACE FUNCTION consultar_total_retencoes_cgm(INTEGER,INTEGER,INTEGER,INTEGER,VARCHAR,VARCHAR) RETURNS NUMERIC AS $$
 DECLARE
     inExercicio                ALIAS FOR $1;
     inCodCGM                   ALIAS FOR $2;
     inCodEntidade              ALIAS FOR $3;
     inCodConta                 ALIAS FOR $4;
     stEntidade                 ALIAS FOR $5;
+    stTipoConta                ALIAS FOR $6;
     nuValor                    NUMERIC := 0.00;
+    reRecord                   RECORD;
     stSql                      VARCHAR;
 BEGIN
 
-    stSql := '      SELECT COALESCE(sum(empenho.ordem_pagamento_retencao.vl_retencao),0.00)
-                      FROM ima'||stEntidade||'.configuracao_dirf_prestador
-                INNER JOIN orcamento.conta_despesa
-                        ON configuracao_dirf_prestador.exercicio = conta_despesa.exercicio
-                        AND configuracao_dirf_prestador.cod_conta = conta_despesa.cod_conta                
-                INNER JOIN empenho.pre_empenho_despesa
-                        ON configuracao_dirf_prestador.exercicio = pre_empenho_despesa.exercicio
-                        AND configuracao_dirf_prestador.cod_conta = pre_empenho_despesa.cod_conta
-                INNER JOIN empenho.pre_empenho
-                        ON pre_empenho_despesa.exercicio = pre_empenho.exercicio
-                       AND pre_empenho_despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                INNER JOIN empenho.empenho
-                        ON pre_empenho.exercicio = empenho.exercicio
-                       AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                INNER JOIN empenho.nota_liquidacao
-                        ON empenho.exercicio = nota_liquidacao.exercicio 
-                       AND empenho.cod_entidade = nota_liquidacao.cod_entidade 
-                       AND empenho.cod_empenho = nota_liquidacao.cod_empenho
-                INNER JOIN empenho.pagamento_liquidacao
-                        ON nota_liquidacao.exercicio = pagamento_liquidacao.exercicio 
-                       AND nota_liquidacao.cod_entidade = pagamento_liquidacao.cod_entidade 
-                       AND nota_liquidacao.cod_nota = pagamento_liquidacao.cod_nota
-                INNER JOIN empenho.nota_liquidacao_paga
-                        ON nota_liquidacao.exercicio = nota_liquidacao_paga.exercicio
-                       AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
-                       AND nota_liquidacao.cod_nota = nota_liquidacao_paga.cod_nota
-                INNER JOIN ( SELECT exercicio
-                                , cod_nota
-                                , cod_entidade
-                                , max(timestamp) as timestamp
-                            FROM empenho.nota_liquidacao_paga
-                        GROUP BY exercicio
-                                , cod_nota
-                                , cod_entidade ) as max_nota_liquidacao_paga
-                        ON max_nota_liquidacao_paga.exercicio = nota_liquidacao_paga.exercicio
-                       AND max_nota_liquidacao_paga.cod_entidade = nota_liquidacao_paga.cod_entidade
-                       AND max_nota_liquidacao_paga.cod_nota = nota_liquidacao_paga.cod_nota
-                       AND max_nota_liquidacao_paga.timestamp = nota_liquidacao_paga.timestamp 
-                INNER JOIN empenho.ordem_pagamento
-                        ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
-                       AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
-                       AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
-                INNER JOIN empenho.ordem_pagamento_retencao
-                        ON ordem_pagamento.cod_ordem = ordem_pagamento_retencao.cod_ordem
-                       AND ordem_pagamento.exercicio = ordem_pagamento_retencao.exercicio
-                       AND ordem_pagamento.cod_entidade = ordem_pagamento_retencao.cod_entidade
-                INNER JOIN contabilidade.plano_analitica
-                        ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
-                       AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
-                     WHERE ordem_pagamento_retencao.exercicio = '''||inExercicio||'''
-                       AND ordem_pagamento_retencao.cod_entidade = '||inCodEntidade||'
-                       AND contabilidade.plano_analitica.cod_conta = '||inCodConta||'
-                       AND pre_empenho.cgm_beneficiario = '||inCodCGM||'';
+   stSql :='
+    SELECT DISTINCT
+        SUM(coalesce(empenho.ordem_pagamento_retencao.vl_retencao,0)) as valor          
 
-    nuValor := selectIntoNumeric(stSql);
+          FROM empenho.ordem_pagamento_retencao
+                    
+    INNER JOIN empenho.ordem_pagamento 
+            ON ordem_pagamento.cod_ordem = ordem_pagamento_retencao.cod_ordem
+           AND ordem_pagamento.exercicio = ordem_pagamento_retencao.exercicio
+           AND ordem_pagamento.cod_entidade = ordem_pagamento_retencao.cod_entidade
+           
+    INNER JOIN empenho.pagamento_liquidacao
+            ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
+           AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
+           AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+           
+    INNER JOIN empenho.nota_liquidacao
+            ON nota_liquidacao.exercicio = pagamento_liquidacao.exercicio_liquidacao 
+           AND nota_liquidacao.cod_entidade = pagamento_liquidacao.cod_entidade 
+           AND nota_liquidacao.cod_nota = pagamento_liquidacao.cod_nota
+    
+    INNER JOIN empenho.nota_liquidacao_paga
+            ON nota_liquidacao_paga.exercicio       = nota_liquidacao.exercicio
+            AND nota_liquidacao_paga.cod_entidade   = nota_liquidacao.cod_entidade
+            AND nota_liquidacao_paga.cod_nota       = nota_liquidacao.cod_nota
 
-    IF nuValor IS NULL THEN
-        nuValor := 0.00;
-    END IF;
+    INNER JOIN empenho.empenho
+            ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
+           AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
+           AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+    
+    INNER JOIN empenho.pre_empenho
+            ON pre_empenho.exercicio       = empenho.exercicio
+           AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho        
+    
+    LEFT JOIN empenho.restos_pre_empenho
+            ON restos_pre_empenho.cod_pre_empenho   = pre_empenho.cod_pre_empenho
+            AND restos_pre_empenho.exercicio        = pre_empenho.exercicio
 
-    RETURN nuValor;
+    LEFT JOIN empenho.nota_liquidacao_paga_anulada
+            ON nota_liquidacao_paga_anulada.exercicio       = nota_liquidacao_paga.exercicio
+            AND nota_liquidacao_paga_anulada.cod_nota       = nota_liquidacao_paga.cod_nota
+            AND nota_liquidacao_paga_anulada.cod_entidade   = nota_liquidacao_paga.cod_entidade
+            AND nota_liquidacao_paga_anulada.timestamp      = nota_liquidacao_paga.timestamp
+
+    LEFT JOIN empenho.ordem_pagamento_anulada           
+            ON ordem_pagamento_anulada.exercicio        = ordem_pagamento.exercicio
+            AND ordem_pagamento_anulada.cod_entidade    = ordem_pagamento.cod_entidade
+            AND ordem_pagamento_anulada.cod_ordem       = ordem_pagamento.cod_ordem
+    
+         WHERE ordem_pagamento_retencao.exercicio = '''||inExercicio||'''
+           AND ordem_pagamento_retencao.cod_entidade = '||inCodEntidade||'
+           AND nota_liquidacao_paga_anulada.cod_nota IS NULL
+           AND ordem_pagamento_anulada.cod_ordem IS NULL
+           AND pre_empenho.cgm_beneficiario = '||inCodCGM;
+
+    FOR reRecord IN EXECUTE stSql
+    LOOP        
+        IF reRecord.valor IS NULL THEN            
+            reRecord.valor := 0.00;
+        END IF;
+        
+        RETURN reRecord.valor;
+    END LOOP;
+
 END;
 $$ LANGUAGE 'plpgsql';

@@ -109,7 +109,7 @@ $obPopUpContraPartida->setName                   ( 'innerContraPartida'         
 $obPopUpContraPartida->obCampoCod->setName       ( "inCodContraPartida"                                               );
 $obPopUpContraPartida->setRotulo                 ( 'Contrapartida Contábil'                                           );
 $obPopUpContraPartida->setTitle                  ( 'Informe o código da conta do Passivo Compensado'                  );
-$obPopUpContraPartida->setTipoBusca              ( 'tes_contrapartida_lancamento'                                     );
+$obPopUpContraPartida->setTipoBusca              ( 'plano_contas_PCASP'                                               );
 $obPopUpContraPartida->setNull                   ( false                                                              );
 $obPopUpContraPartida->obCampoCod->obEvento->setOnBlur( "montaParametrosGET('carregaResponsavelAdiantamento');" );
 $obPopUpContraPartida->obImagem->setId('btContraPartida');
