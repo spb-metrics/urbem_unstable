@@ -20,95 +20,101 @@
     *                                                                                *
     **********************************************************************************
 */
+/**
+    * Script de função PLPGSQL - Relatório STN - RGF - Anexo 1.
+    * Data de Criação: 30/04/2013
+
+    * @author Eduardo Paculski Schitz
+
+    * Casos de uso:
+
+    $Id: plSubConsultaNova.plsql 65047 2016-04-20 14:50:13Z michel $
+
+*/
+
 CREATE OR REPLACE FUNCTION stn.sub_consulta_rcl_novo (varchar, varchar, integer) RETURNS SETOF RECORD AS $$
 DECLARE
     dtData          ALIAS FOR $1;
     cod_estrutural  ALIAS FOR $2;
     inNivel         ALIAS FOR $3;
 
-    stDataIni   varchar;
-    stDataFim   varchar;
-    stMes       varchar;
-    inAno       integer;
-    inMes       integer;
-    inDia       integer;    
-    inExercicio integer;
-    i           integer;
-        
-    arDatas varchar[];
-
-    reRegistro        RECORD;
-    stSql             VARCHAR :='';
-
+    stDataIni   VARCHAR;
+    stDataFim   VARCHAR;
+    stMes       VARCHAR;
+    inAno       INTEGER;
+    inMes       INTEGER;
+    inDia       INTEGER;
+    inExercicio INTEGER;
+    i           INTEGER;
+    arDatas     VARCHAR[];
+    reRegistro  RECORD;
+    stSql       VARCHAR :='';
 BEGIN
+    inAno := SUBSTR(dtData, 7, 4);
+    inMes := SUBSTR(dtData, 4, 2); 
 
-    inAno :=  substr(dtData, 7, 4 ) ;
-    inMes :=  substr(dtData, 4, 2 ) ; 
-    
     inExercicio := inAno;
-    
+
     i := 1;
-    while i <= 12 loop
-        if ( inMes < 10 ) then
+    WHILE i <= 12 LOOP
+        IF ( inMes < 10 ) THEN
             stMes := '0' || inMes;
-        else
+        ELSE
             stMes := inMes;
-        end if;
-    
-        arDatas[i] :=  '01/' || stMes || '/'|| inAno;
-    
+        END IF;
+
+        arDatas[i] :=  '01/'||stMes||'/'||inAno;
+
         i := i +1;
         inMes := inMes -1;
-        if ( inMes = 0 ) then
+        IF ( inMes = 0 ) THEN
             inAno := inAno -1;
             inMes := 12;
-        end if;
-    end loop;
-    
-    stDataIni :=  '01' || substr(dtData,3,8) ;
+        END IF;
+    END LOOP;
+
+    stDataIni :=  '01'||SUBSTR(dtData,3,8);
     stDataFim := dtData;
-    
-    stSql := ' select cast ( conta_receita.cod_conta                      as varchar ) as cod_conta
-                     ,cast ( 
 
-                        coalesce(  stn.tituloRCL( publico.fn_mascarareduzida(conta_receita.cod_estrutural))
-                                 , conta_receita.descricao )              as varchar ) as nom_conta
+    stSql := '
+              SELECT CAST(conta_receita.cod_conta AS VARCHAR) AS cod_conta
+                   , CAST(COALESCE(stn.tituloRCL(publico.fn_mascarareduzida(conta_receita.cod_estrutural)), conta_receita.descricao) AS VARCHAR) AS nom_conta
+                   , CAST(conta_receita.cod_estrutural AS VARCHAR) AS cod_estrutural
+    ';
 
-                     ,cast ( conta_receita.cod_estrutural                 as varchar ) as cod_estrutural ';
-    
     i := 12;
-    while i >= 1 loop
-            stDataIni := arDatas[i];
-            inDia := stn.calculaNrDiasAnoMes(  substr(stDataIni,7,4)::integer, substr(stDataIni,4,2)::integer );
-            stDataFim := inDia ||  substr(stDataIni,3,8);
 
-            
-            IF inNivel = 2 AND cod_estrutural = '4.1' THEN
+    WHILE i >= 1 LOOP
+        stDataIni := arDatas[i];
+        inDia := stn.calculaNrDiasAnoMes(SUBSTR(stDataIni,7,4)::INTEGER, SUBSTR(stDataIni,4,2)::INTEGER);
+        stDataFim := inDia||SUBSTR(stDataIni,3,8);
+
+        IF inNivel = 2 AND cod_estrutural = '4.1' THEN
+            --SE contabilidade.lancamento_receita NÃO POSSUI VALORES, O VALOR RCL DO MÊS É O DA CONFIGURAÇÃO: Vincular Receita Corrente Líquida
             stSql = stSql || '
-            , CASE WHEN COALESCE( CAST( orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida( conta_receita.cod_estrutural ), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0) = 0 AND '||substr(stDataIni,7,4)::integer||' < 2014
-                   THEN (SELECT COALESCE(SUM(valor), 0) FROM stn.receita_corrente_liquida WHERE mes = '||substr(stDataIni,4,2)::integer||' AND ano = '''||substr(stDataIni,7,4)::integer||''')
-                   ELSE COALESCE( CAST( orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida( conta_receita.cod_estrutural ), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0)
-               END AS mes_'||i;
-            ELSE
+                   , CASE WHEN COALESCE(CAST(orcamento.fn_somatorio_balancete_receita(publico.fn_mascarareduzida(conta_receita.cod_estrutural), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0.00) = 0.00
+                          THEN (SELECT COALESCE(SUM(valor), 0.00) FROM stn.receita_corrente_liquida WHERE mes ='||SUBSTR(stDataIni,4,2)::INTEGER||' AND ano = '''||SUBSTR(stDataIni,7,4)::INTEGER||''')
+                          ELSE COALESCE(CAST(orcamento.fn_somatorio_balancete_receita(publico.fn_mascarareduzida(conta_receita.cod_estrutural), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0.00)
+                      END AS mes_'||i;
+        ELSE
             stSql = stSql || '
-            , COALESCE( CAST( orcamento.fn_somatorio_balancete_receita( publico.fn_mascarareduzida( conta_receita.cod_estrutural ), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0) AS mes_'||i ;
-            END IF;
-            i := i - 1;
-    end loop;
-    
-    stSql := stSql ||'  from orcamento.conta_receita
-               where
-                    conta_receita.cod_estrutural like ''' || substr( cod_estrutural, 3,16)||'%''
-                and publico.fn_nivel(conta_receita.cod_estrutural) = ' || inNivel-1 || '
-                and conta_receita.exercicio = '||quote_literal(inExercicio) ||'
-            ';
+                   , COALESCE(CAST(orcamento.fn_somatorio_balancete_receita(publico.fn_mascarareduzida(conta_receita.cod_estrutural), '''||stDataIni||''', '''||stDataFim||''') * -1  AS NUMERIC(14,2)), 0.00) AS mes_'||i;
+        END IF;
+        i := i - 1;
+    END LOOP;
+
+    stSql := stSql ||'
+                FROM orcamento.conta_receita
+               WHERE conta_receita.cod_estrutural LIKE ''' || substr( cod_estrutural, 3,16)||'%''
+                 AND publico.fn_nivel(conta_receita.cod_estrutural) = '||inNivel-1||'
+                 AND conta_receita.exercicio = '''||inExercicio||'''
+    ';
+
     FOR reRegistro IN EXECUTE stSql
     LOOP
-       RETURN next reRegistro;        
+       RETURN next reRegistro;
     END LOOP;
-   
-    
-RETURN;
 
+RETURN;
 END;
 $$ LANGUAGE 'plpgsql';

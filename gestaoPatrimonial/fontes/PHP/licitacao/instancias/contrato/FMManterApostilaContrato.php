@@ -35,7 +35,7 @@
     
     * @ignore
     
-    $Id: FMManterApostilaContrato.php 64464 2016-02-26 14:04:45Z carlos.silva $
+    $Id: FMManterApostilaContrato.php 64923 2016-04-13 17:45:44Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -43,7 +43,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once CAM_GA_CGM_COMPONENTES.'IPopUpCGMVinculado.class.php';
 include_once TLIC."TLicitacaoContratoApostila.class.php";
 
-$stAcao = $_REQUEST['stAcao'];
+$stAcao = $request->get('stAcao');
 
 $stPrograma = "ManterApostilaContrato";
 $pgFilt = "FL".$stPrograma.".php";
@@ -72,15 +72,15 @@ $obHdnCodApostila->setValue( '' );
 
 $obHdnExercicioContrato= new Hidden;
 $obHdnExercicioContrato->setName( "stExercicioContrato" );
-$obHdnExercicioContrato->setValue( $_REQUEST['stExercicioContrato'] );
+$obHdnExercicioContrato->setValue( $request->get('stExercicioContrato') );
 
 $obHdnNumContrato= new Hidden;
 $obHdnNumContrato->setName( "inNumContrato" );
-$obHdnNumContrato->setValue( $_REQUEST['inNumContrato'] );
+$obHdnNumContrato->setValue( $request->get('inNumContrato') );
 
 $obHdnCodEntidadeContrato= new Hidden;
 $obHdnCodEntidadeContrato->setName( "inCodEntidadeContrato" );
-$obHdnCodEntidadeContrato->setValue( $_REQUEST['inCodEntidade'] );
+$obHdnCodEntidadeContrato->setValue( $request->get('inCodEntidade') );
 
 $obHdnNumOrgao= new Hidden;
 $obHdnNumOrgao->setName( "inNumOrgao" );
@@ -88,20 +88,18 @@ $obHdnNumOrgao->setName( "inNumOrgao" );
 $obHdnNumUnidade= new Hidden;
 $obHdnNumUnidade->setName( "inNumUnidade" );
 
-//$obHdnCodContrato= new Hidden;
-//$obHdnCodContrato->setName( "inCodContrato" );
-
 //Consulta de Existencia do Contrato
 $obTLicitacaoContratoApostila = new TLicitacaoContratoApostila;
-$stFiltro  = " AND contrato.exercicio = '".$_REQUEST['stExercicioContrato']."'";
-$stFiltro .= " AND contrato.num_contrato = ".$_REQUEST['inNumContrato'];
-$stFiltro .= " AND contrato.cod_entidade = ".$_REQUEST['inCodEntidade'];
+$stFiltro  = " AND contrato.exercicio = '".$request->get('stExercicioContrato')."'";
+$stFiltro .= " AND contrato.num_contrato = ".$request->get('inNumContrato');
+$stFiltro .= " AND contrato.cod_entidade = ".$request->get('inCodEntidade');
 
-if($_REQUEST['stExercicioContrato']!=''&&$_REQUEST['inNumContrato']!=''&&$_REQUEST['inCodEntidade']!='')
+if($request->get('stExercicioContrato') != '' && $request->get('inNumContrato') != '' && $request->get('inCodEntidade') != '') {
     $obTLicitacaoContratoApostila->recuperaDadosContrato($rsContratos, $stFiltro, $stOrder);
+}
     
 //Montando Valores do Contrato
-if($rsContratos->inNumLinhas==1){
+if($rsContratos->getNumLinhas() == 1){
     //Preenche os Hiddens do contrato
     $obHdnNumOrgao->setValue( $rsContratos->arElementos[0]['num_orgao'] );
     $obHdnNumUnidade->setValue( $rsContratos->arElementos[0]['num_unidade'] );
@@ -170,11 +168,17 @@ $obLblVlContrato->setValue      ( $vlContrato               );
 
 /* Início Apostilamento */
 $obTLicitacaoContratoApostila = new TLicitacaoContratoApostila;
-$obTLicitacaoContratoApostila->setDado('cod_apostila', $_REQUEST['inCodApostila']);
-$obTLicitacaoContratoApostila->setDado('num_contrato', $_REQUEST['inNumContrato']);
-$obTLicitacaoContratoApostila->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
-$obTLicitacaoContratoApostila->setDado('exercicio', $_REQUEST['stExercicioApostila']);
+$obTLicitacaoContratoApostila->setDado('cod_apostila', $request->get('inCodApostila'));
+$obTLicitacaoContratoApostila->setDado('num_contrato', $request->get('inNumContrato'));
+$obTLicitacaoContratoApostila->setDado('cod_entidade', $request->get('inCodEntidade'));
+$obTLicitacaoContratoApostila->setDado('exercicio'   , $request->get('stExercicioApostila'));
 $obTLicitacaoContratoApostila->recuperaPorChave($recordSet);
+
+if ($stAcao == "alterar") {
+    $valorApostila = SistemaLegado::formataValorDecimal($recordSet->getCampo('valor_apostila'),true);
+} else {
+    $valorApostila = "";
+}
 
 //Nro Sequencial da Apostila
 $obTxtCodApostila = new TextBox;
@@ -263,7 +267,6 @@ $obTxtDscApostila->setRotulo        ( "Descrição da Apostila"   );
 $obTxtDscApostila->setNull          ( false );
 $obTxtDscApostila->setRows          ( 3     );
 $obTxtDscApostila->setCols          ( 100   );
-$obTxtDscApostila->setMaxCaracteres ( 250   );
 $obTxtDscApostila->setValue         ( $recordSet->getCampo('descricao')   );
 
 //Valor Apostila
@@ -277,7 +280,7 @@ $obTxtVlApostila->setTitle      ( ""    );
 $obTxtVlApostila->setMaxLength  ( 19    );
 $obTxtVlApostila->setSize       ( 21    );
 $obTxtVlApostila->setNull       ( false );
-$obTxtVlApostila->setValue      ( $recordSet->getCampo('valor_apostila') );
+$obTxtVlApostila->setValue      ( $valorApostila );
 /* Fim Apostilamento */
 
 //define o formulário

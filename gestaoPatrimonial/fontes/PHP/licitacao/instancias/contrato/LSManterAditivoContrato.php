@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: LSManterAditivoContrato.php 64214 2015-12-17 16:13:13Z michel $
+    $Id: LSManterAditivoContrato.php 65046 2016-04-20 14:10:18Z jean $
 
     * Casos de uso : uc-03.05.24
 */
@@ -60,7 +60,7 @@ if ($_REQUEST['inNumContrato']) {
    $stFiltro .= " contrato.numero_contrato = ". $_REQUEST['inNumContrato']." and ";
 }
 if ($_REQUEST['stExercicioContrato']) {
-   $stFiltro .= " contrato.exercicio = ". $_REQUEST['stExercicioContrato']." and ";
+   $stFiltro .= " contrato.exercicio = '". $_REQUEST['stExercicioContrato']."' and ";
 }
 if ($_REQUEST['dtContrato']) {
    $stFiltro .= " contrato.dt_assinatura = to_date('". $_REQUEST['dtContrato']."','dd/mm/yyyy') and ";
@@ -77,7 +77,7 @@ if ($stAcao == "alterar") {
         $stFiltro .= " contrato_aditivos.num_aditivo = ".$_REQUEST["inNumeroAditivo"]." \n and ";
     }
     if ($_REQUEST["stExercioAditivo"]) {
-        $stFiltro .= " contrato_aditivos.exercicio = ".$_REQUEST["stExercioAditivo"]." \n and ";
+        $stFiltro .= " contrato_aditivos.exercicio = '".$_REQUEST["stExercioAditivo"]."' \n and ";
     }
 }
 

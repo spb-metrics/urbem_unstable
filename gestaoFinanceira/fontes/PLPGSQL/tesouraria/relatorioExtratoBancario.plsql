@@ -26,13 +26,9 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 29152 $
-* $Name:  $
-* $Author: eduardoschitz $
-* $Date: 2008-04-11 16:07:46 -0300 (Sex, 11 Abr 2008) $
+* $Id: relatorioExtratoBancario.plsql 64978 2016-04-18 14:43:54Z michel $
 *
 * Casos de uso: uc-02.04.10
-
 */
 
 CREATE OR REPLACE FUNCTION tesouraria.fn_relatorio_extrato_bancario(integer, varchar, varchar, varchar,varchar, boolean) RETURNS SETOF RECORD AS '
@@ -59,7 +55,6 @@ DECLARE
 
 BEGIN
 
---SELECT tesouraria.fn_listar_arrecadacao('''','''') INTO boTabela;
 SELECT tesouraria.fn_listar_arrecadacao_conciliacao('''','''',stDtFinal,stDtInicial,inCodPlano, stEntidade ,stExercicio, boTCEMS) INTO boTabela;
 
 IF (stDtInicial = stDtFinal ) THEN
@@ -96,23 +91,29 @@ SELECT
     cod_situacao
 FROM (
     SELECT
-        to_char(ta.timestamp_arrecadacao, ''''HH:mm:ss'''') as hora,
+        to_char(ta.timestamp_arrecadacao, ''''HH:mm:ss'''') AS hora,
         tbl.dt_boletim AS data,
-        cast(CASE WHEN TRIM(tbl.numeracao) = '''''''' THEN
-            ''''Arrecadação '''' || tbl.cod_receita || '''' - '''' || tbl.cod_entidade || ''''/'''' || tbl.exercicio
+        cast(
+        CASE WHEN tbl.cod_historico = 926 THEN
+            ''''Estorno de Arrecadação Receita Dedutora '''' || tbl.cod_receita || '''' - '''' || tbl.cod_entidade || ''''/'''' || tbl.exercicio
         ELSE
-            ''''Arrecadação '''' || tbl.numeracao || '''' - '''' || tbl.cod_entidade || ''''/'''' || tbl.exercicio
-        END || '''' - '''' || replace(trim(substring(coalesce(TA.observacao,''''''''),1,60)),''''\r\n'''','''''''') as varchar) AS descricao,
+            CASE WHEN TRIM(tbl.numeracao) = '''''''' THEN
+                        ''''Arrecadação '''' || tbl.cod_receita || '''' - '''' || tbl.cod_entidade || ''''/'''' || tbl.exercicio
+                 ELSE
+                        ''''Arrecadação '''' || tbl.numeracao || '''' - '''' || tbl.cod_entidade || ''''/'''' || tbl.exercicio
+            END
+        END
+        || '''' - '''' || replace(trim(substring(coalesce(TA.observacao,''''''''),1,60)),''''\r\n'''','''''''') AS varchar) AS descricao,
         cast(CASE WHEN tbl.numeracao = '''''''' THEN
             tbl.valor
         ELSE
             (tbl.valor*(-1))
         END as numeric) AS valor,
-        cast(0 as numeric) as cod_lote,
-        cast(ta.cod_arrecadacao as numeric) as cod_arrecadacao,
-        cast(''''D'''' as varchar) as tipo_valor,
-        cast(1 as varchar) as situacao,
-        1::varchar as cod_situacao
+        cast(0 as numeric) AS cod_lote,
+        cast(ta.cod_arrecadacao as numeric) AS cod_arrecadacao,
+        cast(''''D'''' as varchar) AS tipo_valor,
+        cast(1 as varchar) AS situacao,
+        1::varchar AS cod_situacao
     FROM
         tmp_arrecadacao AS tbl
        ,tesouraria.arrecadacao AS TA
@@ -124,7 +125,7 @@ FROM (
 
         tbl.exercicio               = '''''' || stExercicio || ''''''  AND
         tbl.conta_debito            = '' || inCodPlano || ''           AND
-        tbl.cod_entidade IN ('' || stEntidade || '')
+        tbl.cod_entidade            IN ('' || stEntidade || '')
         '' || stAuxA || ''
 UNION ALL
 

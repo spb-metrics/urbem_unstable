@@ -145,7 +145,6 @@ BEGIN
            , d.cod_despesa
            , d.cod_recurso
     );';
-    
     EXECUTE stSQL;
 
 
@@ -205,7 +204,7 @@ BEGIN
            , pedcd.cod_subfuncao
            , pedcd.cod_estrutural
     )';
-    
+
     EXECUTE stSQL;
     
     /*
@@ -286,7 +285,7 @@ BEGIN
            , pedcd.cod_subfuncao
            , pedcd.cod_estrutural
     )';
-    
+ 
     EXECUTE stSQL;
 
     -- --------------------------------------------
@@ -702,9 +701,9 @@ BEGIN
                   SELECT CAST(23 AS INTEGER) AS grupo
                        , CAST(1 AS INTEGER) AS nivel
                        , CAST(''Despesas Custeadas com Recursos do FUNDEB'' AS VARCHAR) AS descricao
-                       , COALESCE(SUM(tdl.vl_original), 0.00) AS dot_ini
-                       , (COALESCE(SUM(tdl.vl_original), 0.00) + COALESCE(SUM(tdl.vl_credito_adicional), 0.00)) AS dot_atu
-                       , (COALESCE(SUM(tt.vl_liquidado), 0.00) - COALESCE(SUM(test_tot.vl_estornado), 0.00)) AS liq_tot
+                       , COALESCE(tdl.vl_original, 0.00) AS dot_ini
+                       , (COALESCE(tdl.vl_original, 0.00) + COALESCE(tdl.vl_credito_adicional, 0.00)) AS dot_atu
+                       , (COALESCE(tt.vl_liquidado, 0.00) - COALESCE(test_tot.vl_estornado, 0.00)) AS liq_tot
                        , CAST(0.00 AS NUMERIC(14,2)) AS pct_liquidado
                        , CAST(0.00 AS NUMERIC(14,2)) AS pct_empenhado
                        , COALESCE((SELECT *
@@ -763,6 +762,9 @@ BEGIN
                 GROUP BY cdd.cod_recurso
                        , cdd.cod_estrutural
                        , cdd.cod_subfuncao
+                       , liq_tot
+                       , dot_ini
+                       , dot_atu
                 ORDER BY grupo
                        , nivel
                      ) AS tbl23_a
@@ -885,9 +887,9 @@ BEGIN
                   SELECT CAST(24 AS INTEGER) AS grupo
                        , CAST(1 AS INTEGER) AS nivel
                        , CAST(''Despesas Custeadas com Recursos do FUNDEB'' AS VARCHAR) AS descricao
-                       , COALESCE(SUM(tdl.vl_original), 0.00) AS dot_ini
-                       , (COALESCE(SUM(tdl.vl_original), 0.00) + COALESCE(SUM(tdl.vl_credito_adicional), 0.00)) AS dot_atu
-                       , (COALESCE(SUM(tt.vl_liquidado), 0.00) - COALESCE(SUM(test_tot.vl_estornado), 0.00)) AS liq_tot
+                       , COALESCE(tdl.vl_original, 0.00) AS dot_ini
+                       , (COALESCE(tdl.vl_original, 0.00) + COALESCE(tdl.vl_credito_adicional, 0.00)) AS dot_atu
+                       , (COALESCE(tt.vl_liquidado, 0.00) - COALESCE(test_tot.vl_estornado, 0.00)) AS liq_tot
                        , CAST(0.00 AS NUMERIC(14,2)) AS pct_liquidado
                        , CAST(0.00 AS NUMERIC(14,2)) AS pct_empenhado
                        , COALESCE((SELECT * FROM stn.fn_rreo_despesa_empenhada_funcao_subfuncao( publico.fn_mascarareduzida(cdd.cod_estrutural)
@@ -944,6 +946,9 @@ BEGIN
                 GROUP BY cdd.cod_recurso
                        , cdd.cod_estrutural
                        , cdd.cod_subfuncao
+                       , dot_ini
+                       , dot_atu
+                       , liq_tot
                 ORDER BY grupo
                        , nivel
                      ) AS tbl24_a

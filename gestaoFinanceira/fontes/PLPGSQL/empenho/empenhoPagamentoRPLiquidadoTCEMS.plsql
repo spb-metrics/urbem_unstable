@@ -67,6 +67,7 @@ BEGIN
                                            AND despesa.exercicio   = pre_empenho_despesa.exercicio
                                          WHERE nota_liquidacao.cod_nota = ' || CodNota || '
                                            AND nota_liquidacao.exercicio = '''||ExercLiquidacao||'''
+                                           AND nota_liquidacao.cod_entidade = ' || CodEntidade || '
                                            ');
 
     boImplantado := selectIntoBoolean(' SELECT pre_empenho.implantado
@@ -80,6 +81,7 @@ BEGIN
                                            AND pre_empenho.exercicio       = empenho.exercicio
                                          WHERE nota_liquidacao.cod_nota = ' || CodNota || '
                                            AND nota_liquidacao.exercicio = '''||ExercLiquidacao||'''
+                                           AND nota_liquidacao.cod_entidade = ' || CodEntidade || '
                                            ');
 
     IF ExercLiquidacao < Exercicio THEN
@@ -209,6 +211,7 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CodNota || '
                        AND nota_liquidacao.exercicio = '''||ExercLiquidacao||'''
+                       AND nota_liquidacao.cod_entidade = ' || CodEntidade || '
                        AND nota_liquidacao.cod_empenho::TEXT =  split_part(''' || Complemento || ''',''/'', 1)
                        AND nota_liquidacao.exercicio_empenho::TEXT =  split_part(''' || Complemento || ''',''/'', 2);
             ';
@@ -272,6 +275,7 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CodNota || '
                        AND nota_liquidacao.exercicio = '''||ExercLiquidacao||'''
+                       AND nota_liquidacao.cod_entidade = ' || CodEntidade || '
             ';
     END IF;
 

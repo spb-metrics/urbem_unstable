@@ -34,7 +34,7 @@
     * @subpackage tesouraria
     * @ignore conciliacao
 
-    * $Id: OCManterConciliacao.php 60529 2014-10-27 16:35:50Z jean $
+    * $Id: OCManterConciliacao.php 65087 2016-04-22 14:27:07Z carlos.silva $
 
     * Casos de uso: uc-02.04.19
 
@@ -44,6 +44,7 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CAM_GF_TES_NEGOCIO."RTesourariaConciliacao.class.php";
 include_once CAM_FW_COMPONENTES."/Table/TableTree.class.php";
+include_once CAM_GPC_TCMBA_MAPEAMENTO."/TTCMBATipoConciliacaoLancamentoContabil.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConciliacao";
@@ -54,8 +55,6 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
-
-//include_once( $pgJS );
 
 function montaLista($arRecordSet , $boExecuta = true)
 {
@@ -72,7 +71,7 @@ function montaLista($arRecordSet , $boExecuta = true)
         }
         $inCount++;
     }
-
+    
     $rsLista = new RecordSet;
     $rsLista->preenche( $arLista );
 
@@ -92,11 +91,11 @@ function montaLista($arRecordSet , $boExecuta = true)
     $obLista->commitCabecalho();
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo( "Descrição" );
-    $obLista->ultimoCabecalho->setWidth( 50 );
+    $obLista->ultimoCabecalho->setWidth( 45 );
     $obLista->commitCabecalho();
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Valor");
-    $obLista->ultimoCabecalho->setWidth( 15 );
+    $obLista->ultimoCabecalho->setWidth( 10 );
     $obLista->commitCabecalho();
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Data Conciliação");
@@ -106,6 +105,14 @@ function montaLista($arRecordSet , $boExecuta = true)
     $obLista->ultimoCabecalho->addConteudo("Conciliar");
     $obLista->ultimoCabecalho->setWidth( 10 );
     $obLista->commitCabecalho();
+    
+    if(SistemaLegado::isTCMBA($boTransacao)) {
+        $obLista->addCabecalho();
+        $obLista->ultimoCabecalho->addConteudo("Tipo de Conciliação");
+        $obLista->ultimoCabecalho->setWidth( 10 );
+        $obLista->commitCabecalho();
+    }
+    
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
     $obLista->ultimoCabecalho->setWidth( 1 );
@@ -127,16 +134,37 @@ function montaLista($arRecordSet , $boExecuta = true)
     $obLista->ultimoDado->setCampo( "dt_conciliacao" );
     $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
     $obLista->commitDado();
+    
     $obChkConciliar = new CheckBox;
     $obChkConciliar->setName ( "boConciliar_[id]_");
+    $obChkConciliar->setClass( "boConciliar" );
     $obChkConciliar->setValue( "true" );
     $obChkConciliar->obEvento->setOnChange( "ajustaSaldo(this.name);ajaxJavaScript('OCManterConciliacao.php?id='+this.id+'&conciliar='+this.checked,'conciliarMovimentacao');" );
-
+    
     $obLista->addDadoComponente( $obChkConciliar );
     $obLista->ultimoDado->setCampo( "[conciliar]" );
     $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
     $obLista->commitDadoComponente();
-
+    
+    if(SistemaLegado::isTCMBA($boTransacao)) {
+        $obTTCMBATipoConciliacaoLancamentoContabil = new TTCMBATipoConciliacaoLancamentoContabil();
+        $obTTCMBATipoConciliacaoLancamentoContabil->recuperaTodos( $rsTipoConciliacaoLancamentoContabil, ' ORDER BY cod_tipo_conciliacao ' );
+        
+        $obSelectTipoConciliacao = new Select();
+        $obSelectTipoConciliacao->setName   ( "idTipoConciliacao_[id]_" );
+        $obSelectTipoConciliacao->addOption ( "","Selecione" );
+        $obSelectTipoConciliacao->setCampoID( "cod_tipo_conciliacao" );
+        $obSelectTipoConciliacao->setCampoDesc( "descricao" );
+        $obSelectTipoConciliacao->preencheCombo( $rsTipoConciliacaoLancamentoContabil );
+        $obSelectTipoConciliacao->setStyle  ( "width:180px;" );
+        $obSelectTipoConciliacao->setValue  ( "[cod_tipo_conciliacao]" );
+    
+        $obLista->addDadoComponente( $obSelectTipoConciliacao );
+        $obLista->ultimoDado->setCampo( "cod_tipo_conciliacao" );
+        $obLista->ultimoDado->setAlinhamento( 'CENTRO' );
+        $obLista->commitDadoComponente();
+    }
+    
     $obLista->addDado();
     $obLista->ultimoDado->setCampo("<div id=HboConciliar_[id] style='display: none' >[vl_lancamento]</div>");
     $obLista->commitDadoComponente();
@@ -457,7 +485,7 @@ case "montaListaMovimentacao":
         $i = 1;
         foreach ($arMovimentacao as $inKey => $arValue) {
             if ((substr(implode('',array_reverse(explode('/',$arValue['dt_conciliacao']))),0,6) != $_REQUEST['stExercicio'].$_REQUEST['inMes']) AND ($arValue['conciliar'] == 'true')) {
-            $stJs .= "jq('#layer_2 #boConciliar_".$arValue['id']."_".$i."').attr('disabled',true);";
+            //$stJs .= "jq('#layer_2 #boConciliar_".$arValue['id']."_".$i."').attr('disabled',true);";
             }
             $i++;
         }

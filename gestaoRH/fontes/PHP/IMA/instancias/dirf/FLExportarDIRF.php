@@ -31,13 +31,16 @@
 
     * Casos de uso: uc-04.08.15
 
-    $Id: FLExportarDIRF.php 62430 2015-05-07 20:35:00Z evandro $
+    $Id: FLExportarDIRF.php 64913 2016-04-12 20:16:19Z michel $
 
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php"                             );
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                       );
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php";
+
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao( new RFolhaPagamentoPeriodoMovimentacao );
 $stTitulo = $obRFolhaPagamentoFolhaSituacao->consultarCompetencia();
 
@@ -52,19 +55,18 @@ $pgJS        = "JS".$stPrograma.".js";
 
 Sessao::write('link', '');
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 //DEFINICAO DOS COMPONENTES
 $obHdnAcao =  new Hidden;
-$obHdnAcao->setName                                 ( "stAcao"                                          );
-$obHdnAcao->setValue                                ( $stAcao                                           );
+$obHdnAcao->setName( "stAcao" );
+$obHdnAcao->setValue( $stAcao );
 
 //DEFINICAO DO FORM
 $obForm = new Form;
 $obForm->setTarget("oculto");
-$obForm->setAction                                  ( $pgProc                                           );
+$obForm->setAction( $pgProc );
 
-include_once(CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php");
 $obIFiltroComponentes = new IFiltroComponentes();
 $obIFiltroComponentes->setMatricula();
 $obIFiltroComponentes->setCGMMatricula();
@@ -75,7 +77,6 @@ $obIFiltroComponentes->setAtributoServidor();
 $obIFiltroComponentes->setAtributoPensionista();
 $obIFiltroComponentes->setTodos();
 
-include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
 $arCompetencia = explode("/",$rsPeriodoMovimentacao->getCampo("dt_final"));
@@ -98,10 +99,8 @@ if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ) {
     $obISelectAnoCompetencia->setNull(false);
     $obISelectAnoCompetencia->obEvento->setOnChange("montaParametrosGET('gerarSpanNumeroRecibo','stIndicador,inAnoCompetencia');");
     $obISelectAnoCompetencia->setStyle      ( "width: 60"           );
-
 }else{
-    
-    include_once(CAM_GRH_PES_COMPONENTES."ISelectAnoCompetencia.class.php");
+    include_once CAM_GRH_PES_COMPONENTES."ISelectAnoCompetencia.class.php";
     $obISelectAnoCompetencia = new ISelectAnoCompetencia();
     $obISelectAnoCompetencia->obCmbAnoCompetencia->setValue($arCompetencia[2]-1);
     $obISelectAnoCompetencia->obCmbAnoCompetencia->setRotulo("Ano-Calendário");
@@ -145,6 +144,16 @@ if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ){
     $obCkbPrestadorServico->setNull(false);
     $obCkbPrestadorServico->setChecked(true);
 }
+$obCkbPrestadorServico->obEvento->setOnChange("montaParametrosGET('desabilitaPagamentoSemRetencao','boPrestadoresServico');");
+
+$obCkbPrestadorServicoTodos = new CheckBox();
+$obCkbPrestadorServicoTodos->setRotulo("Informar todos inclusive sem retenção");
+$obCkbPrestadorServicoTodos->setName("boPrestadoresServicoTodos");
+$obCkbPrestadorServicoTodos->setId("boPrestadoresServicoTodos");
+$obCkbPrestadorServicoTodos->setValue(true);
+$obCkbPrestadorServicoTodos->setTitle("Marque para que seja adicionado no arquivo valores pagos aos prestadores de serviço inclusive sem retenções.");
+$obCkbPrestadorServicoTodos->setChecked(FALSE);
+
 $obBtnOk = new Ok();
 $obBtnOk->obEvento->setOnClick("montaParametrosGET('submeter','',true);");
 
@@ -152,9 +161,9 @@ $obBtnLimpar = new Limpar();
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addTitulo                            ( $stTitulo ,"right"  );
-$obFormulario->addForm                              ( $obForm                                           );
-$obFormulario->addHidden                            ( $obHdnAcao                                        );
+$obFormulario->addTitulo( $stTitulo ,"right"  );
+$obFormulario->addForm  ( $obForm    );
+$obFormulario->addHidden( $obHdnAcao );
 
 if ( $rsPeriodoMovimentacao->getNumLinhas() < 0 ){
     $obFormulario->addComponente($obISelectAnoCompetencia);
@@ -167,6 +176,7 @@ $obFormulario->agrupaComponentes(array($obRdoNormal,$obRdoRetificadora));
 $obFormulario->addSpan($obSpnNumeroRecibo);
 $obFormulario->addHidden($obHdnNumeroRecibo,true);
 $obFormulario->addComponente($obCkbPrestadorServico);
+$obFormulario->addComponente($obCkbPrestadorServicoTodos);
 $obFormulario->defineBarra(array($obBtnOk,$obBtnLimpar));
 $obFormulario->show();
 

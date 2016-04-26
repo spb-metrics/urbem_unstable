@@ -64,13 +64,14 @@ Adicionada tag Log aos arquivos
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoBanco.class.php"         );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoContabil.class.php"    );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoArrecadacao.class.php" );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoManual.class.php"      );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaAssinatura.class.php"             );
-include_once( CAM_GF_TES_NEGOCIO."RTesourariaSaldoTesouraria.class.php"        );
-include_once( CAM_GT_MON_NEGOCIO."RMONContaCorrente.class.php"                 );
+include_once( CAM_GF_CONT_NEGOCIO."RContabilidadePlanoBanco.class.php"                     );
+include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoContabil.class.php"                );
+include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoArrecadacao.class.php"             );
+include_once( CAM_GF_TES_NEGOCIO."RTesourariaConciliacaoManual.class.php"                  );
+include_once( CAM_GF_TES_NEGOCIO."RTesourariaAssinatura.class.php"                         );
+include_once( CAM_GF_TES_NEGOCIO."RTesourariaSaldoTesouraria.class.php"                    );
+include_once( CAM_GT_MON_NEGOCIO."RMONContaCorrente.class.php"                             );
+include_once(CAM_GPC_TCMBA_MAPEAMENTO."/TTCMBAConciliacaoLancamentoContabil.class.php" );
 
 /**
     * Classe de Regra de Negócios Conciliação Bancária
@@ -406,7 +407,18 @@ function salvarMovimentacoes($arConciliar, $boTransacao = "")
                     $obTTesourariaConciliacaoManual->setDado("exercicio", $this->obRContabilidadePlanoBanco->getExercicio() );
                     $obTTesourariaConciliacaoManual->setDado("mes"      , $this->inMes );
                     $obErro = $obTTesourariaConciliacaoManual->exclusao( $boTransacao );
-                }
+                    
+                    if(SistemaLegado::isTCMBA($boTransacao)) {
+                        if( !$obErro->ocorreu() ) {
+                            $obTTCMBAConciliacaoLancamentoContabil = new TTCMBAConciliacaoLancamentoContabil;
+                            $obTTCMBAConciliacaoLancamentoContabil->setDado( "cod_plano"   , $this->obRContabilidadePlanoBanco->getCodPlano() );
+                            $obTTCMBAConciliacaoLancamentoContabil->setDado( "exercicio_conciliacao", $this->obRContabilidadePlanoBanco->getExercicio());
+                            $obTTCMBAConciliacaoLancamentoContabil->setDado( "exercicio"   , $this->obRContabilidadePlanoBanco->getExercicio() );
+                            $obTTCMBAConciliacaoLancamentoContabil->setDado( "mes"         , $this->inMes );
+                            $obErro = $obTTCMBAConciliacaoLancamentoContabil->exclusao( $boTransacao );
+                        }
+                    } // Fim do if isTCMBA
+                } 
             }
         }
     
@@ -439,6 +451,7 @@ function salvarMovimentacoes($arConciliar, $boTransacao = "")
                         $obErro = $obTTesourariaConciliacaoContabil->inclusao( $boTransacao );
                     }
                 }
+                
                 if( $obErro->ocorreu() )
                     break;
             }
@@ -483,28 +496,28 @@ function salvarMovimentacoes($arConciliar, $boTransacao = "")
                     }
                 } elseif ($arMovimentacao['tipo_movimentacao'] == 'M') {
                     if ( $arConciliar["boPendencia_".($key+1)]=="on") {
-                        $obTTesourariaConciliacaoManual->setDado("cod_plano"      , $arMovimentacao['cod_plano']                      );
-                        $obTTesourariaConciliacaoManual->setDado("exercicio"      , $stExercicio );
-                        $obTTesourariaConciliacaoManual->setDado("mes"            , $arMovimentacao['mes']                            );
-                        $obTTesourariaConciliacaoManual->setDado("sequencia"      , $arMovimentacao['sequencia']                      );
-                        $obTTesourariaConciliacaoManual->setDado("dt_lancamento"  , $arMovimentacao['dt_lancamento']                  );
-                        $obTTesourariaConciliacaoManual->setDado("vl_lancamento"  , $arMovimentacao['vl_lancamento']                  );
-                        $obTTesourariaConciliacaoManual->setDado("tipo_valor"     , $arMovimentacao['tipo_valor']                     );
-                        $obTTesourariaConciliacaoManual->setDado("descricao"      , $arMovimentacao['descricao']                      );
-                        $obTTesourariaConciliacaoManual->setDado("conciliado"     , 'true'                                            );
-                        $obTTesourariaConciliacaoManual->setDado("dt_conciliacao" , $this->getDataExtrato()                           );
-                        $obErro = $obTTesourariaConciliacaoManual->alteracao( $boTransacao );
-                    } else {
-                        $obTTesourariaConciliacaoManual->setDado("cod_plano"      , $arMovimentacao['cod_plano']                      );
-                        $obTTesourariaConciliacaoManual->setDado("exercicio"      , $stExercicio );
-                        $obTTesourariaConciliacaoManual->setDado("mes"            , $arMovimentacao['mes']                            );
-                        $obTTesourariaConciliacaoManual->setDado("sequencia"      , $arMovimentacao['sequencia']                      );
-                        $obTTesourariaConciliacaoManual->setDado("dt_lancamento"  , $arMovimentacao['dt_lancamento']                  );
-                        $obTTesourariaConciliacaoManual->setDado("vl_lancamento"  , $arMovimentacao['vl_lancamento']                  );
-                        $obTTesourariaConciliacaoManual->setDado("tipo_valor"     , $arMovimentacao['tipo_valor']                     );
-                        $obTTesourariaConciliacaoManual->setDado("descricao"      , $arMovimentacao['descricao']                      );
-                        $obTTesourariaConciliacaoManual->setDado("conciliado"     , 'false'                                           );
-                        $obTTesourariaConciliacaoManual->setDado("dt_conciliacao" , ''                                                 );
+                        $obTTesourariaConciliacaoManual->setDado("cod_plano"      , $arMovimentacao['cod_plano']     );
+                        $obTTesourariaConciliacaoManual->setDado("exercicio"      , $stExercicio                     );                  
+                        $obTTesourariaConciliacaoManual->setDado("mes"            , $arMovimentacao['mes']           );
+                        $obTTesourariaConciliacaoManual->setDado("sequencia"      , $arMovimentacao['sequencia']     );
+                        $obTTesourariaConciliacaoManual->setDado("dt_lancamento"  , $arMovimentacao['dt_lancamento'] );
+                        $obTTesourariaConciliacaoManual->setDado("vl_lancamento"  , $arMovimentacao['vl_lancamento'] );
+                        $obTTesourariaConciliacaoManual->setDado("tipo_valor"     , $arMovimentacao['tipo_valor']    );
+                        $obTTesourariaConciliacaoManual->setDado("descricao"      , $arMovimentacao['descricao']     );
+                        $obTTesourariaConciliacaoManual->setDado("conciliado"     , 'true'                           );
+                        $obTTesourariaConciliacaoManual->setDado("dt_conciliacao" , $this->getDataExtrato()          );
+                        $obErro = $obTTesourariaConciliacaoManual->alteracao( $boTransacao );                        
+                    } else {                                                                                         
+                        $obTTesourariaConciliacaoManual->setDado("cod_plano"      , $arMovimentacao['cod_plano']     );
+                        $obTTesourariaConciliacaoManual->setDado("exercicio"      , $stExercicio                     );                  
+                        $obTTesourariaConciliacaoManual->setDado("mes"            , $arMovimentacao['mes']           );
+                        $obTTesourariaConciliacaoManual->setDado("sequencia"      , $arMovimentacao['sequencia']     );
+                        $obTTesourariaConciliacaoManual->setDado("dt_lancamento"  , $arMovimentacao['dt_lancamento'] );
+                        $obTTesourariaConciliacaoManual->setDado("vl_lancamento"  , $arMovimentacao['vl_lancamento'] );
+                        $obTTesourariaConciliacaoManual->setDado("tipo_valor"     , $arMovimentacao['tipo_valor']    );
+                        $obTTesourariaConciliacaoManual->setDado("descricao"      , $arMovimentacao['descricao']     );
+                        $obTTesourariaConciliacaoManual->setDado("conciliado"     , 'false'                          );
+                        $obTTesourariaConciliacaoManual->setDado("dt_conciliacao" , ''                               );
                         $obErro = $obTTesourariaConciliacaoManual->alteracao( $boTransacao );
                     }
                 }
@@ -543,6 +556,25 @@ function salvarMovimentacoes($arConciliar, $boTransacao = "")
                 $obErro = $obTTesourariaConciliacaoManual->inclusao( $boTransacao );
                 if( $obErro->ocorreu() )
                     break;
+            }
+        }
+        
+        if(SistemaLegado::isTCMBA($boTransacao)) {
+            foreach ($this->arMovimentacao as $key => $arMovimentacao) {
+                if($arMovimentacao['cod_tipo_conciliacao'] != '') {
+                    $obTTCMBAConciliacaoLancamentoContabil = new TTCMBAConciliacaoLancamentoContabil;
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "cod_plano"   , $this->obRContabilidadePlanoBanco->getCodPlano()  );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "exercicio_conciliacao", $this->obRContabilidadePlanoBanco->getExercicio());
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "exercicio"   , $this->obRContabilidadePlanoBanco->getExercicio() );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "mes"         , $this->inMes );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "cod_lote"    , $arMovimentacao['cod_lote']     );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "tipo"        , $arMovimentacao['tipo']         );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "sequencia"   , $arMovimentacao['sequencia']    );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "cod_entidade", $arMovimentacao['cod_entidade'] );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "tipo_valor"  , $arMovimentacao['tipo_valor']   );
+                    $obTTCMBAConciliacaoLancamentoContabil->setDado( "cod_tipo_conciliacao", $arMovimentacao['cod_tipo_conciliacao'] );
+                    $obErro = $obTTCMBAConciliacaoLancamentoContabil->inclusao( $boTransacao );
+                }
             }
         }
         
@@ -738,8 +770,12 @@ function listarMovimentacao(&$rsRecordSet, $stFiltro = "", $stOrder = " ORDER BY
 
     $obTTesourariaConciliacao->setDado('stFiltro', $stFiltro);
 
-    $obErro = $obTTesourariaConciliacao->recuperaMovimentacao( $rsRecordSet, '', '', $boTransacao );
-
+    if(SistemaLegado::isTCMBA($boTransacao)) {
+        $obErro = $obTTesourariaConciliacao->recuperaMovimentacaoTCMBA( $rsRecordSet, '', '', $boTransacao );
+    } else {
+        $obErro = $obTTesourariaConciliacao->recuperaMovimentacao( $rsRecordSet, '', '', $boTransacao );    
+    }
+    
     return $obErro;
 }
 

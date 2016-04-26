@@ -32,62 +32,6 @@
 */
 
 ----------------
--- Ticket #23548
-----------------
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-SELECT 3100
-     , 209
-     , 'FLResumoExecucaoRP.php'
-     , 'imprimir'
-     , 16
-     , ''
-     , 'Resumo Execução de Restos a Pagar'
-     , TRUE
- WHERE 0 = (
-             SELECT COUNT(1)
-               FROM administracao.acao
-              WHERE cod_acao           = 3100
-                AND cod_funcionalidade = 209
-           );
-
-
-----------------
--- Ticket #23549
-----------------
-
-INSERT
-  INTO administracao.relatorio
-     ( cod_gestao
-     , cod_modulo
-     , cod_relatorio
-     , nom_relatorio
-     , arquivo )
-SELECT 2
-     , 10
-     , 12
-     , 'Relação de Empenhos'
-     , 'relacaoDeEmpenho2016.rptdesign'
- WHERE 0 = (
-             SELECT COUNT(1)
-               FROM administracao.relatorio
-              WHERE cod_gestao    = 2
-                AND cod_modulo    = 10
-                AND cod_relatorio = 12
-           );
-
-
-----------------
 -- Ticket #23471
 ----------------
 
@@ -5942,44 +5886,6 @@ SELECT manutencao();
 DROP FUNCTION manutencao();
 
 
-----------------
--- Ticket #23436
-----------------
-
-INSERT
-  INTO administracao.configuracao
-     ( cod_modulo
-     , exercicio
-     , parametro
-     , valor
-     )
-VALUES
-     ( 8
-     , '2016'
-     , 'limite_suplementacao_decreto'
-     , '100'
-     );
-
-
-----------------
--- Ticket #23436
-----------------
-
-INSERT
-  INTO administracao.configuracao
-     ( cod_modulo
-     , exercicio
-     , parametro
-     , valor
-     )
-VALUES
-     ( 8
-     , '2016'
-     , 'suplementacao_rigida_recurso'
-     , 'nao'
-     );
-
-
 -------------------------------------------------------------------------------------
 -- MANUTENCAO PARA CRIACAO DE RECURSOS COM cod_fonte EM BRANCO (2016 e 2017 - FRANVER
 -------------------------------------------------------------------------------------
@@ -6071,13 +5977,17 @@ INSERT
      , complemento
      , historico_interno
      )
-VALUES
-     ( 925
+SELECT 925
      , '2016'
      , 'Vlr. Ref. Arrecadação Receita Dedutora'
      , true
      , true
-     );
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM contabilidade.historico_contabil
+              WHERE cod_historico = 925
+                AND exercicio     = '2016'
+           );
 
 INSERT
   INTO contabilidade.historico_contabil
@@ -6087,40 +5997,81 @@ INSERT
      , complemento
      , historico_interno
      )
-VALUES
-     ( 926
+SELECT 926
      , '2016'
      , 'Vlr. Ref. Estorno Arrecadação Receita Dedutora'
      , true
      , true
-     );
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM contabilidade.historico_contabil
+              WHERE cod_historico = 926
+                AND exercicio     = '2016'
+           );
 
 
 ----------------
--- Ticket #23586
+-- Ticket #20395
+----------------
+
+UPDATE administracao.acao
+   SET nom_acao         = 'Demostrativo de Fluxo de Caixa'
+     , complemento_acao = 'Relatório Demostrativo de Fluxo Caixa'
+ WHERE cod_acao = 2893
+     ;
+
+
+----------------
+-- Ticket #23436
 ----------------
 
 INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
+  INTO administracao.configuracao
+     ( cod_modulo
+     , exercicio
      , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
+     , valor
      )
-VALUES
-     ( 3112
-     , 209
-     , 'FLRelatorioEmpenhoModalidade.php'
-     , 'imprimir'
-     , 17
-     , ''
-     , 'Empenhos por Modalidade'
-     , TRUE
-     );
+SELECT 8
+     , '2016'
+     , 'limite_suplementacao_decreto'
+     , '100'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.configuracao
+              WHERE cod_modulo = 8
+                AND exercicio  = '2016'
+                AND parametro  = 'limite_suplementacao_decreto'
+           );
+
+
+----------------
+-- Ticket #23438
+----------------
+
+INSERT
+  INTO administracao.configuracao
+     ( cod_modulo
+     , exercicio
+     , parametro
+     , valor
+     )
+SELECT 8
+     , '2016'
+     , 'suplementacao_rigida_recurso'
+     , 'nao'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.configuracao
+              WHERE cod_modulo = 8
+                AND exercicio  = '2016'
+                AND parametro  = 'suplementacao_rigida_recurso'
+           );
+
+
+----------------
+-- Ticket #23549
+----------------
 
 INSERT
   INTO administracao.relatorio
@@ -6129,11 +6080,16 @@ INSERT
      , cod_relatorio
      , nom_relatorio
      , arquivo )
-VALUES
-     ( 2
+SELECT 2
      , 10
-     , 13
-     , 'Empenhos por Modalidade'
-     , 'LHEmpenhoModalidade.php'
-     );
+     , 12
+     , 'Relação de Empenhos'
+     , 'relacaoDeEmpenhoNovo.rptdesign'
+ WHERE 0 = (
+             SELECT COUNT(1)
+               FROM administracao.relatorio
+              WHERE cod_gestao    = 2
+                AND cod_modulo    = 10
+                AND cod_relatorio = 12
+           );
 

@@ -26,41 +26,35 @@
 -- URBEM Soluções de Gestão Pública Ltda
 -- www.urbem.cnm.org.br
 --
--- $Revision: 23095 $
--- $Name$
--- $Autor: Marcia $
--- Date: 2006/06/13 $
+-- $Id: pega1CodigoPadrao.plsql 64931 2016-04-14 14:26:47Z michel $
 --
 -- Caso de uso: uc-04.05.48
 --
 -- Objetivo: a partido dos dados do buffer retorna o codigo do padrao do servidor
 --
 
-
-CREATE OR REPLACE FUNCTION pega1CodigoPadrao() RETURNS Integer as '
+CREATE OR REPLACE FUNCTION pega1CodigoPadrao() RETURNS Integer as $$
 
 DECLARE
     inCodContrato             INTEGER;
-
     inCodPadrao               INTEGER;
+    stEntidade VARCHAR := recuperarBufferTexto('stEntidade');
 
-stEntidade VARCHAR := recuperarBufferTexto(''stEntidade'');
- BEGIN
-
-
-     inCodContrato := recuperarBufferInteiro(''inCodContrato'');
+BEGIN
+     inCodContrato := recuperarBufferInteiro('inCodContrato');
      inCodContrato := recuperaContratoServidorPensionista(inCodContrato);
-     inCodPadrao := selectIntoInteger(''
-      ( SELECT cod_padrao
-          FROM pessoal''||stEntidade||''.contrato_servidor_padrao
-      	  WHERE cod_contrato = ''||inCodContrato||''
-          ORDER BY timestamp desc 
-          LIMIT 1 '') ;
+     inCodPadrao   := selectIntoInteger('
+                                        ( SELECT cod_padrao
+                                            FROM pessoal'||stEntidade||'.contrato_servidor_padrao
+                                           WHERE cod_contrato = '||inCodContrato||'
+                                        ORDER BY timestamp desc 
+                                         LIMIT 1
+                                        )
+                                       ');
 
-    RETURN inCodPadrao  ;
-
+    RETURN inCodPadrao;
 END;
 
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 

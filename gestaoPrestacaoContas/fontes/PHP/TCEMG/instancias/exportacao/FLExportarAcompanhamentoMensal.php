@@ -29,7 +29,7 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: FLExportarAcompanhamentoMensal.php 64559 2016-03-14 19:03:33Z jean $
+ * $Id: FLExportarAcompanhamentoMensal.php 65079 2016-04-20 18:19:53Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -153,12 +153,17 @@ $arNomeArquivos = array(
     'REGLIC.csv',
     'RESPLIC.csv',
     'RSP.csv',
-    'TEREM.csv'
 );
 
 if (Sessao::getExercicio() == '2015'){
     $arNomeArquivos[] = 'SUPDEF.csv';
 }
+
+if (Sessao::getExercicio() >= '2016'){
+    $arNomeArquivos[] = 'METAREAL.csv';
+}
+
+sort($arNomeArquivos);
 
 // Preenche array
 for ($inCounter=0;$inCounter < count($arNomeArquivos);$inCounter++) {

@@ -94,7 +94,7 @@ class TPessoalContratoServidorOrgao extends Persistente
 
     public function recuperaContratoServidorLotacaoComSubDivisaoAssentamento(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
     {
-        $stFiltro .= " GROUP BY contrato_servidor_orgao.cod_contrato
+        $stFiltro .= "\n GROUP BY contrato_servidor_orgao.cod_contrato
                               , contrato_servidor_orgao.cod_orgao
                               , contrato_servidor_orgao.timestamp
                               , contrato.registro
@@ -106,27 +106,36 @@ class TPessoalContratoServidorOrgao extends Persistente
 
     public function montaRecuperaContratoServidorLotacaoComSubDivisaoAssentamento()
     {
-        $stSql  = "SELECT contrato_servidor_orgao.*                                                                 \n";
-        $stSql .= "     , contrato.registro                                                                         \n";
-        $stSql .= "     , recuperaDescricaoOrgao(orgao.cod_orgao, '".Sessao::getExercicio()."-01-01') as descricao  \n";
-        $stSql .= "     , orgao.orgao as cod_estrutural                                                             \n";
-        $stSql .= "  FROM pessoal.contrato_servidor_orgao                                                           \n";
-        $stSql .= "     , ( SELECT cod_contrato                                                                     \n";
-        $stSql .= "              , max(timestamp) as timestamp                                                      \n";
-        $stSql .= "           FROM pessoal.contrato_servidor_orgao                                                  \n";
-        $stSql .= "       GROUP BY cod_contrato) as max_orgao                                                       \n";
-        $stSql .= "     , pessoal.contrato_servidor                                                                 \n";
-        $stSql .= "     , pessoal.contrato                                                                          \n";
-        $stSql .= "     , organograma.vw_orgao_nivel as orgao                                                       \n";
-        $stSql .= "     , pessoal.contrato_servidor_sub_divisao_funcao                                              \n";
-        $stSql .= "     , pessoal.assentamento_sub_divisao                                                          \n";
-        $stSql .= " WHERE contrato_servidor_orgao.cod_contrato = contrato_servidor.cod_contrato                     \n";
-        $stSql .= "   AND contrato.cod_contrato = contrato_servidor.cod_contrato                                    \n";
-        $stSql .= "   AND contrato_servidor_orgao.cod_contrato = max_orgao.cod_contrato                             \n";
-        $stSql .= "   AND contrato_servidor_orgao.timestamp    = max_orgao.timestamp                                \n";
-        $stSql .= "   AND contrato_servidor_orgao.cod_orgao    = orgao.cod_orgao                                    \n";
-        $stSql .= "   AND contrato_servidor_sub_divisao_funcao.cod_contrato = contrato_servidor_orgao.cod_contrato  \n";
-        $stSql .= "   AND assentamento_sub_divisao.cod_sub_divisao = contrato_servidor_sub_divisao_funcao.cod_sub_divisao \n";
+        $stSql  = "SELECT contrato_servidor_orgao.*
+                         , contrato.registro
+                         , recuperaDescricaoOrgao(orgao.cod_orgao, '".Sessao::getExercicio()."-01-01') as descricao
+                         , orgao.orgao as cod_estrutural
+                      FROM pessoal.contrato_servidor_orgao
+                         , ( SELECT cod_contrato
+                                  , max(timestamp) as timestamp
+                               FROM pessoal.contrato_servidor_orgao
+                           GROUP BY cod_contrato) as max_orgao
+                         , pessoal.contrato_servidor
+                         , pessoal.contrato
+                         , organograma.vw_orgao_nivel as orgao
+                         , pessoal.contrato_servidor_sub_divisao_funcao
+                         , pessoal.assentamento_sub_divisao
+                         , pessoal.contrato_servidor_situacao
+                     WHERE contrato_servidor_orgao.cod_contrato = contrato_servidor.cod_contrato
+                       AND contrato.cod_contrato = contrato_servidor.cod_contrato
+                       AND contrato_servidor_orgao.cod_contrato = max_orgao.cod_contrato
+                       AND contrato_servidor_orgao.timestamp    = max_orgao.timestamp
+                       AND contrato_servidor_orgao.cod_orgao    = orgao.cod_orgao
+                       AND contrato_servidor_sub_divisao_funcao.cod_contrato = contrato_servidor_orgao.cod_contrato
+                       AND assentamento_sub_divisao.cod_sub_divisao = contrato_servidor_sub_divisao_funcao.cod_sub_divisao
+                       AND contrato_servidor_situacao.cod_contrato = contrato.cod_contrato
+                       AND contrato_servidor_situacao.timestamp = (SELECT timestamp
+                                                                   FROM pessoal.contrato_servidor_situacao
+                                                                   WHERE cod_contrato = contrato_servidor.cod_contrato                                                               
+                                                                   ORDER BY timestamp desc
+                                                                   LIMIT 1)
+                       AND contrato_servidor_situacao.situacao = 'A'
+                ";
 
         return $stSql;
     }

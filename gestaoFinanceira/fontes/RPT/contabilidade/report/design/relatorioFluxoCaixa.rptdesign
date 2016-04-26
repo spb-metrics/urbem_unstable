@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="author">Franver Sarmento de Moraes</property>
     <property name="comments">Analista: Tonismar Régis Bernardo &lt;tonismar.bernardo@cnm.org.br>
 Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property>
     <property name="createdBy">Eclipse BIRT Designer Version 4.4.0.v201405191524 Build &lt;4.4.0.v20140606-1451></property>
+    <text-property name="title">Demostração dos Fluxos de Caixa</text-property>
     <html-property name="description">Template para o formato A4 retrato</html-property>
     <property name="units">in</property>
+    <property name="theme">urbem_250.defaultTheme</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
     <list-property name="libraries">
         <structure>
             <property name="fileName">../../../../../../gestaoAdministrativa/fontes/RPT/framework/library/urbem_250.rptlibrary</property>
@@ -17,6 +21,17 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
     <parameters>
         <scalar-parameter name="term_user" id="6666">
             <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="exercicio" id="1151" extends="urbem_250.exercicio">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <property name="paramType">simple</property>
@@ -118,32 +133,6 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="exercicio" id="3556">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="distinct">true</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="nom_entidade" id="3557">
-            <property name="valueType">static</property>
-            <property name="isRequired">false</property>
-            <property name="dataType">string</property>
-            <property name="distinct">true</property>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="numero_assinatura" id="4852" extends="urbem_250.numero_assinatura"/>
-        <scalar-parameter name="timestamp_assinatura" id="4853" extends="urbem_250.timestamp_assinatura"/>
-        <scalar-parameter name="numcgm_assinatura" id="4854" extends="urbem_250.numcgm_assinatura"/>
-        <scalar-parameter name="entidade_assinatura" id="4855" extends="urbem_250.entidade_assinatura"/>
         <scalar-parameter name="data_inicial_nota" id="6668">
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
@@ -166,10 +155,18 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="entidade_assinatura" id="6922" extends="urbem_250.entidade_assinatura"/>
+        <scalar-parameter name="numcgm_assinatura" id="6923" extends="urbem_250.numcgm_assinatura"/>
+        <scalar-parameter name="timestamp_assinatura" id="6924" extends="urbem_250.timestamp_assinatura"/>
+        <scalar-parameter name="numero_assinatura" id="6925" extends="urbem_250.numero_assinatura"/>
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1150"
  extends="urbem_250.postgres">
+            <property name="odaDriverClass">org.postgresql.Driver</property>
+            <property name="odaURL">jdbc:postgresql://[ip]:[port]/[data_base]</property>
+            <property name="odaUser">birt</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">NmM0Mzk0MmJjY2U0MzA3ZjA4NTc1ZjhlODM4YWUzZWY=</encrypted-property>
         </oda-data-source>
     </data-sources>
     <data-sets>
@@ -319,21 +316,11 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
             <property name="rightMargin">10mm</property>
             <page-header>
                 <grid name="cabecalho" id="1158" extends="urbem_250.cabecalho_retrato">
-                    <property name="height">0.8958333333333334in</property>
-                    <property name="width">7.395833333333333in</property>
                     <overridden-values>
-                        <ref-entry baseId="1051" id="1051">
-                            <property name="width">0.9583333333333334in</property>
-                        </ref-entry>
-                        <ref-entry baseId="1052" id="1052">
-                            <property name="width">2.6875in</property>
-                        </ref-entry>
-                        <ref-entry baseId="1053" id="1053">
-                            <property name="width">3.75in</property>
-                        </ref-entry>
-                        <ref-entry baseId="1054" id="1054">
-                            <property name="height">0.8958333333333334in</property>
-                        </ref-entry>
+                        <ref-entry baseId="1051" id="1051"/>
+                        <ref-entry baseId="1052" id="1052"/>
+                        <ref-entry baseId="1053" id="1053"/>
+                        <ref-entry baseId="1054" id="1054"/>
                         <ref-entry baseId="1055" id="1055"/>
                         <ref-entry baseId="1397" name="NewText61221" id="1397"/>
                         <ref-entry baseId="1398" name="NewText612111" id="1398"/>
@@ -431,337 +418,185 @@ Desenvolvedor: Henrique Boaventura &lt;henrique.boaventura@cnm.org.br></property
         </simple-master-page>
     </page-setup>
     <body>
-        <label id="2742">
-            <property name="fontSize">9pt</property>
-            <property name="fontWeight">bold</property>
-            <property name="paddingLeft">170pt</property>
-            <property name="textAlign">left</property>
-            <text-property name="text">DEMONSTRAÇÃO DOS FLUXOS DE CAIXA</text-property>
-        </label>
-        <table id="1403">
-            <property name="borderBottomColor">#000000</property>
-            <property name="borderBottomStyle">solid</property>
-            <property name="borderBottomWidth">thin</property>
-            <property name="borderLeftColor">#000000</property>
-            <property name="borderLeftStyle">solid</property>
-            <property name="borderLeftWidth">thin</property>
-            <property name="borderRightColor">#000000</property>
-            <property name="borderRightStyle">solid</property>
-            <property name="borderRightWidth">thin</property>
-            <property name="borderTopColor">#000000</property>
-            <property name="borderTopStyle">solid</property>
-            <property name="borderTopWidth">thin</property>
-            <property name="pageBreakAfter">auto</property>
-            <property name="pageBreakBefore">auto</property>
-            <property name="pageBreakInside">auto</property>
-            <property name="width">7.4375in</property>
+        <table id="6673">
+            <property name="style">padrão_urbem</property>
+            <property name="pageBreakAfter">avoid</property>
+            <property name="pageBreakBefore">avoid</property>
+            <property name="pageBreakInside">avoid</property>
             <property name="dataSet">fluxo_exericio</property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">descricao</property>
-                    <expression name="expression">dataSetRow["descricao"]</expression>
+                    <expression name="expression" type="javascript">dataSetRow["descricao"]</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">valor</property>
-                    <expression name="expression">dataSetRow["valor"]</expression>
+                    <expression name="expression" type="javascript">dataSetRow["valor"]</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
-                    <property name="name">valor_anterior</property>
-                    <expression name="expression">dataSetRow["valor_anterior"]</expression>
+                    <property name="name">Valor Anterior</property>
+                    <expression name="expression" type="javascript">dataSetRow["valor_anterior"]</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">nivel</property>
-                    <expression name="expression">dataSetRow["nivel"]</expression>
+                    <expression name="expression" type="javascript">dataSetRow["nivel"]</expression>
                     <property name="dataType">integer</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
-                    <property name="name">ordem</property>
-                    <expression name="expression">dataSetRow["ordem"]</expression>
-                    <property name="dataType">integer</property>
+                    <property name="name">valor_anterior</property>
+                    <expression name="expression" type="javascript">dataSetRow["valor_anterior"];</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
-            <property name="pageBreakInterval">46</property>
-            <column id="1416">
-                <property name="verticalAlign">middle</property>
-                <property name="width">5.25in</property>
+            <property name="pageBreakInterval">60</property>
+            <column id="6686">
+                <property name="width">4.90625in</property>
             </column>
-            <column id="1417">
-                <property name="width">1.125in</property>
+            <column id="6687">
+                <property name="width">1.28125in</property>
             </column>
-            <column id="1418">
-                <property name="width">1.0625in</property>
+            <column id="6688">
+                <property name="width">1.28125in</property>
             </column>
             <header>
-                <row id="2480">
-                    <property name="backgroundColor">#E5E5E5</property>
-                    <property name="height">0.3854166666666667in</property>
-                    <cell id="2481">
-                        <property name="fontSize">9pt</property>
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
+                <row id="6674">
+                    <property name="backgroundColor">#F5F5F5</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">1px</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">1px</property>
+                    <property name="verticalAlign">middle</property>
+                    <property name="height">0.385in</property>
+                    <cell id="6675">
+                        <label id="6689">
+                            <property name="fontFamily">sans-serif</property>
+                            <text-property name="text">DEMONSTRAÇÃO DOS FLUXOS DE CAIXA</text-property>
+                        </label>
                     </cell>
-                    <cell id="2482">
-                        <property name="fontSize">9pt</property>
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
+                    <cell id="6676">
+                        <property name="fontFamily">sans-serif</property>
                         <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
+                        <property name="borderLeftWidth">1px</property>
                         <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <property name="verticalAlign">middle</property>
-                        <label id="2489">
-                            <property name="fontSize">7pt</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="textAlign">center</property>
+                        <property name="borderRightWidth">1px</property>
+                        <label id="6690">
                             <text-property name="text">Exercício Atual</text-property>
                         </label>
                     </cell>
-                    <cell id="2483">
-                        <property name="fontSize">9pt</property>
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <property name="verticalAlign">middle</property>
-                        <label id="2490">
-                            <property name="fontSize">7pt</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="textAlign">center</property>
+                    <cell id="6677">
+                        <property name="style">padrão_urbem</property>
+                        <label id="6691">
                             <text-property name="text">Exercício Anterior</text-property>
                         </label>
                     </cell>
                 </row>
             </header>
             <detail>
-                <row id="5109">
-                    <method name="onRender"><![CDATA[
-]]></method>
-                    <cell id="5110">
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <list-property name="highlightRules">
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <property name="fontWeight">normal</property>
-                                <property name="textUnderline">none</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>1</value>
-                                </simple-property-list>
-                            </structure>
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>4</value>
-                                </simple-property-list>
-                            </structure>
-                        </list-property>
-                        <data id="5113">
-                            <property name="backgroundColor">#FFFFFF</property>
-                            <property name="fontSize">7pt</property>
-                            <property name="fontWeight">normal</property>
-                            <list-property name="highlightRules">
-                                <structure>
-                                    <property name="operator">eq</property>
-                                    <property name="backgroundColor">#E5E5E5</property>
-                                    <property name="fontWeight">bold</property>
-                                    <property name="textUnderline">underline</property>
-                                    <expression name="testExpr">row["nivel"]</expression>
-                                    <simple-property-list name="value1">
-                                        <value>1</value>
-                                    </simple-property-list>
-                                </structure>
-                                <structure>
-                                    <property name="operator">eq</property>
-                                    <property name="fontWeight">bold</property>
-                                    <expression name="testExpr">row["nivel"]</expression>
-                                    <simple-property-list name="value1">
-                                        <value>2</value>
-                                    </simple-property-list>
-                                </structure>
-                                <structure>
-                                    <property name="operator">eq</property>
-                                    <property name="backgroundColor">#E5E5E5</property>
-                                    <expression name="testExpr">row["nivel"]</expression>
-                                    <simple-property-list name="value1">
-                                        <value>4</value>
-                                    </simple-property-list>
-                                </structure>
-                            </list-property>
+                <row id="6678">
+                    <cell id="6679">
+                        <data id="6692">
                             <method name="onCreate"><![CDATA[if(this.getRowData().getColumnValue('nivel') == 1){
-	this.getStyle().paddingLeft = '25mm';
+	this.getStyle().marginLeft = '5mm';
 }
-if(this.getRowData().getColumnValue('nivel') == 3){
+if(this.getRowData().getColumnValue('nivel') == 2){
 	this.getStyle().marginLeft = '10mm';
 }
-
+if(this.getRowData().getColumnValue('nivel') == 3){
+	this.getStyle().marginLeft = '15mm';
+}
+if(this.getRowData().getColumnValue('nivel') == 4){
+	this.getStyle().marginLeft = '20mm';
+}
+if(this.getRowData().getColumnValue('nivel') == 5){
+	this.getStyle().marginLeft = '25mm';
+}
 ]]></method>
                             <property name="resultSetColumn">descricao</property>
                         </data>
                     </cell>
-                    <cell id="5111">
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
+                    <cell id="6680">
                         <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
+                        <property name="borderLeftWidth">1px</property>
                         <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <list-property name="highlightRules">
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>1</value>
-                                </simple-property-list>
-                            </structure>
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>4</value>
-                                </simple-property-list>
-                            </structure>
-                        </list-property>
-                        <data id="5114">
-                            <property name="fontSize">7pt</property>
+                        <property name="borderRightWidth">1px</property>
+                        <data id="6693">
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">#,##0.00</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                <property name="locale">pt_BR</property>
                             </structure>
                             <property name="textAlign">right</property>
                             <method name="onCreate"><![CDATA[if(this.getRowData().getColumnValue('nivel') == 1){
-	if(this.getRowData().getColumnValue('valor') <= 0){
+	if(this.getRowData().getColumnValue('valor') == 0){
 		this.setDisplayValue('');
 	}
 }]]></method>
                             <property name="resultSetColumn">valor</property>
                         </data>
                     </cell>
-                    <cell id="5112">
-                        <property name="borderBottomColor">#000000</property>
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">thin</property>
-                        <property name="borderLeftColor">#000000</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">thin</property>
-                        <property name="borderRightColor">#000000</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">thin</property>
-                        <property name="borderTopColor">#000000</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <list-property name="highlightRules">
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>1</value>
-                                </simple-property-list>
-                            </structure>
-                            <structure>
-                                <property name="operator">eq</property>
-                                <property name="backgroundColor">#E5E5E5</property>
-                                <expression name="testExpr">row["nivel"]</expression>
-                                <simple-property-list name="value1">
-                                    <value>4</value>
-                                </simple-property-list>
-                            </structure>
-                        </list-property>
-                        <data id="5115">
-                            <property name="fontSize">7pt</property>
+                    <cell id="6681">
+                        <data id="6695">
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">#,##0.00</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                <property name="locale">pt_BR</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <method name="onCreate"><![CDATA[if(this.getRowData().getColumnValue('nivel') == 1){
-	if(this.getRowData().getColumnValue('valor_anterior') <= 0){
-		this.setDisplayValue('');
-	}
+                            <method name="onCreate"><![CDATA[if(this.getRowData().getColumnValue("nivel") == 1 ) {
+    if(this.getRowData().getColumnValue("valor_anterior") == 0.00){
+        this.setDisplayValue('');
+    }
 }]]></method>
                             <property name="resultSetColumn">valor_anterior</property>
                         </data>
                     </cell>
                 </row>
             </detail>
+            <footer>
+                <row id="6682">
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">1px</property>
+                    <cell id="6683"/>
+                    <cell id="6684"/>
+                    <cell id="6685"/>
+                </row>
+            </footer>
         </table>
-        <table id="1591">
-            <property name="width">100%</property>
+        <table id="6904">
+            <property name="style">padrão_urbem</property>
             <property name="dataSet">dsNotaExplicativa</property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">nota</property>
-                    <expression name="expression">if (dataSetRow["nota_explicativa"] != null){
+                    <expression name="expression" type="javascript">if (dataSetRow["nota_explicativa"] != null){
 	'NOTAS EXPLICATIVAS';
 } else {
 	'';
 }</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">nota_explicativa</property>
                     <text-property name="displayName">nota_explicativa</text-property>
-                    <expression name="expression">dataSetRow["nota_explicativa"]</expression>
+                    <expression name="expression" type="javascript">dataSetRow["nota_explicativa"]</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
-            <column id="6903"/>
+            <column id="6911"/>
             <header>
-                <row id="1592">
-                    <cell id="1593">
-                        <data id="6680">
-                            <property name="fontFamily">sans-serif</property>
-                            <property name="fontSize">7pt</property>
-                            <property name="paddingTop">6pt</property>
+                <row id="6905">
+                    <cell id="6906">
+                        <data id="6913">
                             <property name="textAlign">left</property>
                             <property name="resultSetColumn">nota</property>
                         </data>
@@ -769,31 +604,27 @@ if(this.getRowData().getColumnValue('nivel') == 3){
                 </row>
             </header>
             <detail>
-                <row id="1594">
-                    <cell id="1595">
-                        <data id="1602">
-                            <property name="fontFamily">sans-serif</property>
-                            <property name="fontSize">6pt</property>
-                            <property name="textAlign">left</property>
+                <row id="6907">
+                    <cell id="6908">
+                        <data id="6914">
                             <property name="resultSetColumn">nota_explicativa</property>
                         </data>
                     </cell>
                 </row>
             </detail>
             <footer>
-                <row id="1598">
-                    <cell id="1599"/>
+                <row id="6909">
+                    <cell id="6910"/>
                 </row>
             </footer>
         </table>
-        <grid name="assinaturas" id="3558" extends="urbem_250.assinaturas">
-            <property name="marginTop">50pt</property>
-            <property name="marginRight">200pt</property>
+        <grid name="assinaturas" id="6916" extends="urbem_250.assinaturas">
+            <property name="style">padrão_urbem</property>
             <overridden-values>
                 <ref-entry baseId="1215" id="1215"/>
-                <ref-entry baseId="1150" id="3559"/>
-                <ref-entry baseId="1151" id="1151"/>
-                <ref-entry baseId="1152" id="3560"/>
+                <ref-entry baseId="1150" id="6917"/>
+                <ref-entry baseId="1151" id="6918"/>
+                <ref-entry baseId="1152" id="6919"/>
                 <ref-entry baseId="1218" id="1218"/>
                 <ref-entry baseId="1179" id="1179"/>
                 <ref-entry baseId="1213" id="1213"/>
@@ -805,17 +636,17 @@ if(this.getRowData().getColumnValue('nivel') == 3){
                 <ref-entry baseId="1189" name="NewData132" id="1189"/>
                 <ref-entry baseId="1192" id="1192"/>
                 <ref-entry baseId="1216" id="1216"/>
-                <ref-entry baseId="1153" id="3561"/>
+                <ref-entry baseId="1153" id="1153"/>
                 <ref-entry baseId="1214" id="1214"/>
-                <ref-entry baseId="1154" id="3562"/>
-                <ref-entry baseId="1157" name="NewTable" id="3563"/>
+                <ref-entry baseId="1154" id="6920"/>
+                <ref-entry baseId="1157" name="NewTable" id="6921"/>
                 <ref-entry baseId="1160" id="1160"/>
                 <ref-entry baseId="1161" id="1161"/>
                 <ref-entry baseId="1167" name="NewData12" id="1167"/>
                 <ref-entry baseId="1168" name="NewData13" id="1168"/>
                 <ref-entry baseId="1164" id="1164"/>
-                <ref-entry baseId="1155" id="3564"/>
-                <ref-entry baseId="1156" id="3565"/>
+                <ref-entry baseId="1155" id="1155"/>
+                <ref-entry baseId="1156" id="1156"/>
                 <ref-entry baseId="1169" name="NewTable1" id="1169"/>
                 <ref-entry baseId="1172" id="1172"/>
                 <ref-entry baseId="1173" id="1173"/>

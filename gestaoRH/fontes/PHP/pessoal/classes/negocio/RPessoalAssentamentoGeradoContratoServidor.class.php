@@ -92,7 +92,7 @@ function RPessoalAssentamentoGeradoContratoServidor()
     * @access Public
     * @param  Object $obTransacao
 */
-function addRPessoalGeracaoAssentamento($boTransacao = "")
+function addRPessoalGeracaoAssentamento()
 {
     $this->roRPessoalGeracaoAssentamento   = new RPessoalGeracaoAssentamento();
     $this->arRPessoalGeracaoAssentamento[] = $this->roRPessoalGeracaoAssentamento;

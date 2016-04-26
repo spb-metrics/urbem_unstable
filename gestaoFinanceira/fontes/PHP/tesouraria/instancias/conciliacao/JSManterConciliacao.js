@@ -33,7 +33,7 @@
 
     * @ignore
     
-    * $Id: JSManterConciliacao.js 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    * $Id: JSManterConciliacao.js 65087 2016-04-22 14:27:07Z carlos.silva $
     
     * Casos de uso: uc-02.04.19
 */
@@ -328,7 +328,6 @@ function ajustaSaldoTodos(conciliar)
     if(parent.frames['telaPrincipal'].document.frm.nuSaldoExtrato.value != ''){
         calculaSaldo();
     }
-
 }
 
-</script>           
+</script>

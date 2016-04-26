@@ -30,7 +30,7 @@
     * @author Analista: Lucas Leusin Oaigen
     * @author Desenvolvedor: Cleisson da Silva Barboza
 
-    $Id: TTesourariaConciliacao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTesourariaConciliacao.class.php 65087 2016-04-22 14:27:07Z carlos.silva $
 
     * Casos de uso: uc-02.04.19
 */
@@ -163,6 +163,85 @@ function montaRecuperaMovimentacao()
                       id                    VARCHAR,
                       exercicio_conciliacao VARCHAR
                ) ";
+
+    return $stSql;
+}
+
+/**
+    * Executa um Select no banco de dados a partir do comando SQL
+    * @access Public
+    * @param  Object  $rsRecordSet Objeto RecordSet
+    * @param  String  $stCondicao  String de condição do SQL (WHERE)
+    * @param  Boolean $boTransacao
+    * @return Object  Objeto Erro
+*/
+function recuperaMovimentacaoTCMBA(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if ($stOrder != "") {
+        if( !strstr( $stOrder, "ORDER BY" ) )
+            $stOrder = " ORDER BY ".$stOrder;
+    }
+    $stSql = $this->montaRecuperaMovimentacaoTCMBA().$stCondicao.$stOrder;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaMovimentacaoTCMBA()
+{
+    $stSql = "SELECT
+                    retorno.*
+                  , conciliacao_lancamento_contabil.cod_tipo_conciliacao
+                FROM tesouraria.fn_conciliacao_movimentacao_corrente( '".$this->getDado('exercicio')."'
+                                                                        ,'".$this->getDado('inCodEntidade')."'
+                                                                        ,'".$this->getDado('stDtInicial')."'
+                                                                        ,'".$this->getDado('stDtFinal')."'
+                                                                        ,'".$this->getDado('stFiltro')."'
+                                                                        ,'".$this->getDado('stFiltroArrecadacao')."'
+                                                                        ,".$this->getDado('inCodPlano')."
+                                                                        ,'".$this->getDado('inMes')."'
+                                                                       ) AS
+                                                                    retorno
+
+               (
+                    ordem                 VARCHAR,
+                    dt_lancamento         VARCHAR,
+                    dt_conciliacao        VARCHAR,
+                    descricao             VARCHAR,
+                    vl_lancamento         DECIMAL,
+                    vl_original           DECIMAL,
+                    tipo_valor            VARCHAR,
+                    conciliar             VARCHAR,
+                    cod_lote              INTEGER,
+                    tipo                  VARCHAR,
+                    sequencia             INTEGER,
+                    cod_entidade          INTEGER,
+                    tipo_movimentacao     VARCHAR,
+                    cod_plano             INTEGER,
+                    cod_arrecadacao       INTEGER,
+                    cod_receita           INTEGER,
+                    cod_bordero           INTEGER,
+                    timestamp_arrecadacao VARCHAR,
+                    timestamp_estornada   VARCHAR,
+                    tipo_arrecadacao      VARCHAR,
+                    mes                   VARCHAR,
+                    id                    VARCHAR,
+                    exercicio_conciliacao VARCHAR
+               )
+
+    LEFT JOIN tcmba.conciliacao_lancamento_contabil
+           ON conciliacao_lancamento_contabil.cod_plano = retorno.cod_plano
+          AND conciliacao_lancamento_contabil.exercicio = '".$this->getDado('exercicio')."'
+          AND conciliacao_lancamento_contabil.cod_lote = retorno.cod_lote
+          AND conciliacao_lancamento_contabil.tipo = retorno.tipo
+          AND conciliacao_lancamento_contabil.sequencia = retorno.sequencia
+          AND conciliacao_lancamento_contabil.cod_entidade = retorno.cod_entidade
+          AND conciliacao_lancamento_contabil.tipo_valor = retorno.tipo_valor ";
 
     return $stSql;
 }

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterLote.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: LSManterLote.php 65099 2016-04-25 17:37:56Z jean $
 
     * Casos de uso: uc-05.01.08
 */
@@ -108,7 +108,7 @@ if ($_REQUEST["funcionalidade"] == 178) {
 } elseif ($_REQUEST["funcionalidade"] == 193) {
     $obRCIMLote = new RCIMLoteRural;
 }
-$stLink = "&funcionalidade=".$_REQUEST["funcionalidade"];
+$stLink = "&funcionalidade=".$request->get("funcionalidade")."&stChaveLocalizacao=".$request->get("stChaveLocalizacao")."&stNumeroLote=".$request->get("stNumeroLote");
 
 //MANTEM FILTRO E PAGINACAO
 $stLink .= "&stAcao=".$stAcao;

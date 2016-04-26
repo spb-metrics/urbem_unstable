@@ -26,7 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: relatorioCadastroImobiliario.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: relatorioCadastroImobiliario.plsql 64894 2016-04-12 18:12:52Z evandro $
 *
 * Casos de uso: uc-05.01.09
 */
@@ -44,6 +44,7 @@ DECLARE
     stTEMPAtribEdif     VARCHAR   := '';
     stInscricao         VARCHAR   := '';
     stSql               VARCHAR   := '';
+    stAuxJoin           VARCHAR   := 'LEFT JOIN';
     reRegistro          RECORD;
     arRetorno           NUMERIC[];
     --crCursor            REFCURSOR;
@@ -59,6 +60,7 @@ BEGIN
         stTEMPAtribLote := ' GROUP BY cod_lote ';
     ELSE
         stTEMPAtribLote := stFiltAtribLote;
+        stAuxJoin := 'INNER JOIN';
     END IF;
 
     IF ( stFiltAtribEdif IS NULL ) OR ( stFiltAtribEdif = '' ) THEN 
@@ -113,7 +115,7 @@ BEGIN
                     ON LL.cod_lote = IL.cod_lote 
             INNER JOIN imobiliario.localizacao AS LOC
                     ON LL.cod_localizacao = LOC.cod_localizacao
-             LEFT JOIN ( SELECT DISTINCT tmp.cod_lote
+            '||stAuxJoin||' ( SELECT DISTINCT tmp.cod_lote
                            FROM imobiliario.atributo_lote_urbano_valor AS tmp
                      INNER JOIN ( SELECT max(timestamp) AS timestamp
                                        , cod_lote
@@ -167,7 +169,7 @@ BEGIN
                         ON LL.cod_lote = IL.cod_lote 
                 INNER JOIN imobiliario.localizacao AS LOC
                         ON LL.cod_localizacao = LOC.cod_localizacao
-                 LEFT JOIN ( SELECT DISTINCT tmp.cod_lote
+                '||stAuxJoin||' ( SELECT DISTINCT tmp.cod_lote
                                FROM imobiliario.atributo_lote_rural_valor AS tmp
                          INNER JOIN ( SELECT max(timestamp) AS timestamp
                                            , cod_lote

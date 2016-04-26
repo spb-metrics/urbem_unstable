@@ -210,8 +210,6 @@
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
             <property name="distinct">true</property>
-            <property name="odaDriverClass">org.eclipse.birt.report.data.oda.sampledb.Driver</property>
-            <property name="odaURL">jdbc:classicmodels:sampledb</property>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
@@ -223,10 +221,12 @@
             <property name="isRequired">false</property>
             <property name="dataType">decimal</property>
             <property name="distinct">true</property>
+            <list-property name="selectionList"/>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
-                <property name="category">Unformatted</property>
+                <property name="category">Currency</property>
+                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="entidade_assinatura" id="2858" extends="urbem_231.entidade_assinatura">
@@ -638,8 +638,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_231.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_231.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsDespesa" id="1197">
@@ -2053,17 +2053,19 @@ params["total_restos"] = ( y - x );
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">total_geral</property>
-                    <expression name="expression">dataSetRow["total_geral"]</expression>
+                    <expression name="expression" type="javascript">dataSetRow["total_geral"]</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">dtp_sobre_rcl</property>
-                    <expression name="expression">if (isNaN( (params["total_com_pessoal"] / row["total_geral"]) * 100)){
- 	'0,00';
+                    <expression name="expression" type="javascript">if (isNaN( (params["total_com_pessoal"] / row["total_geral"]) * 100)){
+	0;
 }else{
-	 (params["total_com_pessoal"] / row["total_geral"]) * 100
+	(params["total_com_pessoal"] / row["total_geral"]) * 100;
 }</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">limite_maximo</property>
@@ -2094,8 +2096,77 @@ params["total_restos"] = ( y - x );
                 </structure>
                 <structure>
                     <property name="name">total_pessoal</property>
-                    <expression name="expression">params["total_com_pessoal"] = params["total_liquidado"] + params["total_restos"]</expression>
-                    <property name="dataType">float</property>
+                    <expression name="expression" type="javascript">params["total_com_pessoal"] = params["total_liquidado"] + params["total_restos"];</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">despesa_total_pessoal_rcl</property>
+                    <expression name="expression" type="javascript">if (isNaN( (row["dtp_sobre_rcl"]/ row["total_geral"] ) * 100) ){
+	0;
+}else{
+	(params["total_com_pessoal"] / row["total_geral"]) * 100;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">limite_max_rcl</property>
+                    <expression name="expression" type="javascript">if (params["poder"] == "Executivo") {
+	if (	(row["limite_maximo"]) > 0 )
+		0.54 * 100;
+	else
+		0;
+} else if (params["poder"] == "Legislativo") {
+		if (	(row["limite_maximo"] * 0.06) > 0 )
+			0.06 * 100;	
+		else
+		0;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">lim_prudencial_rcl</property>
+                    <expression name="expression" type="javascript">if (params["poder"] == "Executivo") {
+	0.513 * 100;
+} else if (params["poder"] == "Legislativo") {
+	0.057 * 100;	
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">limite_alerta_rcl</property>
+                    <expression name="expression" type="javascript">if (params["poder"] == "Executivo") {
+	if (row["limite_alerta"] > 0)
+		0.486 * 100;
+	else
+		0;
+} else if (params["poder"] == "Legislativo") {
+	if (row["limite_alerta"] > 0)
+		0.054 * 100;	
+	else
+		0;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">limite_prudencial_rcl</property>
+                    <expression name="expression" type="javascript">if (params["poder"] == "Executivo") {
+	if (row["limite_prudencial"] > 0)
+		0.513 * 100;
+	else
+		0;
+} else if (params["poder"] == "Legislativo") {
+		if (row["limite_prudencial"] > 0)
+			0.057 * 100;
+		else
+			0;
+}</expression>
+                    <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
             <property name="pageBreakInterval">50</property>
@@ -2295,6 +2366,16 @@ params["total_restos"] = ( y - x );
                         <property name="borderBottomColor">#000000</property>
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
+                        <data id="6687">
+                            <property name="fontSize">6pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <structure name="toc"/>
+                            <property name="resultSetColumn">despesa_total_pessoal_rcl</property>
+                        </data>
                     </cell>
                 </row>
                 <row id="2829">
@@ -2339,6 +2420,15 @@ params["total_restos"] = ( y - x );
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
                         <property name="verticalAlign">middle</property>
+                        <data id="6688">
+                            <property name="fontSize">6pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">limite_max_rcl</property>
+                        </data>
                     </cell>
                 </row>
             </detail>
@@ -2385,6 +2475,15 @@ params["total_restos"] = ( y - x );
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
                         <property name="verticalAlign">middle</property>
+                        <data id="6691">
+                            <property name="fontSize">6pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">limite_prudencial_rcl</property>
+                        </data>
                     </cell>
                 </row>
                 <row id="3999">
@@ -2439,6 +2538,15 @@ params["total_restos"] = ( y - x );
                         <property name="borderBottomStyle">solid</property>
                         <property name="borderBottomWidth">thin</property>
                         <property name="verticalAlign">middle</property>
+                        <data id="6690">
+                            <property name="fontSize">6pt</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">limite_alerta_rcl</property>
+                        </data>
                     </cell>
                 </row>
             </footer>

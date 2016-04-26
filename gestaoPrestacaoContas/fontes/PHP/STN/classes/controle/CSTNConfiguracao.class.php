@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: CSTNConfiguracao.class.php 64883 2016-04-11 12:23:01Z evandro $
+ * $Id: CSTNConfiguracao.class.php 65034 2016-04-19 20:58:40Z michel $
  */
 
 include CAM_FW_COMPONENTES . 'Table/TableTree.class.php';
@@ -386,6 +386,7 @@ class CSTNConfiguracao
                 $obSlPeriodo->addOption($stKey, $stValue);
             }
             $obSlPeriodo->setObrigatorioBarra(true);
+            $obSlPeriodo->obEvento->setOnChange("montaParametrosGET('habilitaDespesaPessoal');");
 
             $obLblTotalBrutaPessoal = new Label();
             $obLblTotalBrutaPessoal->setId('lblTotalBrutaPessoal');
@@ -479,18 +480,49 @@ class CSTNConfiguracao
             $obNuValorInativosPensionista->setObrigatorioBarra(true);
             $obNuValorInativosPensionista->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
+            $obLblTotalDP = new Label();
+            $obLblTotalDP->setId('lblTotalDP');
+            $obLblTotalDP->setRotulo('TOTAL DA DESPESA MENSAL ');
+
+            #DESPESA BRUTA COM PESSOAL
+            $obFormularioDB = new Formulario();
+            $obFormularioDB->setForm(FALSE);
+            $obFormularioDB->addComponente( $obLblTotalBrutaPessoal );
+            $obFormularioDB->addComponente( $obNuValorPessoalAtivo );
+            $obFormularioDB->addComponente( $obNuValorPessoalInativo );
+            $obFormularioDB->addComponente( $obNuValorOutrasDespesas );
+            $obFormularioDB->addComponente( $obLblTotalNaoComputadas );
+            $obFormularioDB->addComponente( $obNuValorIndenizacoes );
+            $obFormularioDB->addComponente( $obNuValorDecisaoJudicial );
+            $obFormularioDB->addComponente( $obNuValorExercicioAnterior );
+            $obFormularioDB->addComponente( $obNuValorInativosPensionista );
+            $obFormularioDB->addComponente( $obLblTotalDP );
+            $obFormularioDB->montaHTML();
+
+            $obSpanDespesaBruta= new Span;
+            $obSpanDespesaBruta->setId( 'spnDespesaBruta' );
+            $obSpanDespesaBruta->setValue( $obFormularioDB->getHTML());
+            $obSpanDespesaBruta->setStyle( "display: none; visibility: hidden;" );
+
             //Valor total de campos
             $obNumValorTotal = new Numerico();
             $obNumValorTotal->setName            ('flValor');
             $obNumValorTotal->setId              ('flValor');
-            $obNumValorTotal->setRotulo          ('Total da Despesa Mensal');
-            $obNumValorTotal->setTitle           ('Total da Despesa Mensal');
+            $obNumValorTotal->setRotulo          ('Valor');
+            $obNumValorTotal->setTitle           ('Valor da Despesa Mensal');
             $obNumValorTotal->setSize            (20);
             $obNumValorTotal->setNegativo        (true);
-            $obNumValorTotal->setReadOnly        (true);
-            $obNumValorTotal->setDisabled        (true);
             $obNumValorTotal->setValue           ('0,00');
             $obNumValorTotal->setObrigatorioBarra(true);
+            
+            $obFormularioValor = new Formulario();
+            $obFormularioValor->setForm(FALSE);
+            $obFormularioValor->addComponente  ( $obNumValorTotal );
+            $obFormularioValor->montaHTML();
+
+            $obSpanValor= new Span;
+            $obSpanValor->setId( 'spnValorDP' );
+            $obSpanValor->setValue( $obFormularioValor->getHTML());
 
             //Instancia um botao incluir para incluir os dados do formulario na lista
             $obBtnIncluir = new Button();
@@ -508,19 +540,8 @@ class CSTNConfiguracao
             $obFormulario->addTitulo    ( utf8_decode($arParam['stTitle']) );
             $obFormulario->addComponente( $obITextBoxSelectEntidadeGeral );
             $obFormulario->addComponente( $obSlPeriodo );
-            if (Sessao::getExercicio() >= '2016') {
-                $obFormulario->addComponente( $obLblTotalBrutaPessoal );
-                $obFormulario->addComponente( $obNuValorPessoalAtivo );
-                $obFormulario->addComponente( $obNuValorPessoalInativo );
-                $obFormulario->addComponente( $obNuValorOutrasDespesas );
-                $obFormulario->addComponente( $obLblTotalNaoComputadas );
-                $obFormulario->addComponente( $obNuValorIndenizacoes );
-                $obFormulario->addComponente( $obNuValorDecisaoJudicial );
-                $obFormulario->addComponente( $obNuValorExercicioAnterior );
-                $obFormulario->addComponente( $obNuValorInativosPensionista );
-            }
-            $obFormulario->addComponente( $obNumValorTotal );
-            
+            $obFormulario->addSpan        ($obSpanDespesaBruta);
+            $obFormulario->addSpan        ($obSpanValor);
             $obFormulario->defineBarra    (array($obBtnIncluir,$obBtnLimpar));
 
             $obFormulario->montaInnerHTML();
@@ -539,10 +560,10 @@ class CSTNConfiguracao
         $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorPessoalAtivo'],false );
         $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorPessoalInativo'],false );
         $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorOutrasDespesas'],false );
-        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorIndenizacoes'],false );
-        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorDecisaoJudicial'],false );
-        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorExercicioAnterior'],false );
-        $nuSomaTotal += $this->mascaraValor( $_REQUEST['nuValorInativosPensionista'],false );
+        $nuSomaTotal -= $this->mascaraValor( $_REQUEST['nuValorIndenizacoes'],false );
+        $nuSomaTotal -= $this->mascaraValor( $_REQUEST['nuValorDecisaoJudicial'],false );
+        $nuSomaTotal -= $this->mascaraValor( $_REQUEST['nuValorExercicioAnterior'],false );
+        $nuSomaTotal -= $this->mascaraValor( $_REQUEST['nuValorInativosPensionista'],false );
         
         $nuSomaTotal = $this->mascaraValor($nuSomaTotal,true);
          
@@ -681,7 +702,7 @@ class CSTNConfiguracao
     }
     
     public function habilitaReceitaCorrente()
-    {   
+    {
         $obNumValor = new Numerico();
         $obNumValor->setName            ('flValor');
         $obNumValor->setId              ('flValor');
@@ -717,6 +738,47 @@ class CSTNConfiguracao
         $stJs .= " jq('#spnValor').html('".$obFormularioValor->getHTML()."'); ";
         if($inExercicio>=2016)
             $stJs .= " montaParametrosGET('somaValoresRCL'); ";
+
+        echo $stJs;
+    }
+
+    public function habilitaDespesaPessoal()
+    {
+        $obNumValor = new Numerico();
+        $obNumValor->setName            ('flValor');
+        $obNumValor->setId              ('flValor');
+        $obNumValor->setObrigatorioBarra(true);
+        $obNumValor->setNegativo        (true);
+
+        $arPeriodo = explode('/', $_REQUEST['stDataImplantacao']);
+        $inExercicio = $arPeriodo[2];
+
+        if($inExercicio>=2016){
+            $stJs  = " jq('#spnDespesaBruta').css('display', 'inline'); ";
+            $stJs .= " jq('#spnDespesaBruta').css('visibility', 'visible'); ";
+
+            $obNumValor->setRotulo          ('Total da Despesa Mensal');
+            $obNumValor->setTitle           ('Total da Despesa Mensal');
+            $obNumValor->setSize            (20);
+            $obNumValor->setReadOnly        (true);
+            $obNumValor->setDisabled        (true);
+            $obNumValor->setValue           ('0,00');
+        }else{
+            $stJs  = " jq('#spnDespesaBruta').css('display', 'none'); ";
+            $stJs .= " jq('#spnDespesaBruta').css('visibility', 'hidden'); ";
+
+            $obNumValor->setRotulo          ('Valor');
+            $obNumValor->setTitle           ('Valor da Receita Corrente Líquida');
+        }
+
+        $obFormularioValor = new Formulario();
+        $obFormularioValor->setForm(FALSE);
+        $obFormularioValor->addComponente  ( $obNumValor );
+        $obFormularioValor->montaInnerHTML();
+
+        $stJs .= " jq('#spnValorDP').html('".$obFormularioValor->getHTML()."'); ";
+        if($inExercicio>=2016)
+            $stJs .= " montaParametrosGET('somaValores'); ";
 
         echo $stJs;
     }
@@ -843,12 +905,15 @@ class CSTNConfiguracao
 
         $inCount = count($arPeriodo);
         if (!$obErro->ocorreu()) {
-            $arData = explode('/',$arParam['stDataImplantacao']);            
+            $arData = explode('/',$arParam['stPeriodo']);
+            $arDataImplantacao = explode("/",$arParam["stDataImplantacao"]);
+
             $arPeriodo[$inCount]['id'          ] = $inCount;
             $arPeriodo[$inCount]['cod_entidade'] = $arParam['inCodEntidade'];
-            $arPeriodo[$inCount]['mes'         ] = $arData[1];
-            $arPeriodo[$inCount]['ano'         ] = $arData[2];
-            if ( $arPeriodo[$inCount]['ano'] >= '2016' ) {
+            $arPeriodo[$inCount]['mes'         ] = $arData[0];
+            $arPeriodo[$inCount]['ano'         ] = $arData[1];
+
+            if ( $arDataImplantacao[2] >= '2016' ) {
                 $arPeriodo[$inCount]['valor_receita_tributaria']       = $this->mascaraValor($arParam['nuValorReceitaTributaria']    ,false);
                 $arPeriodo[$inCount]['valor_receita_contribuicoes']    = $this->mascaraValor($arParam['nuValorReceitaContribuicoes'] ,false);
                 $arPeriodo[$inCount]['valor_receita_patrimonial']      = $this->mascaraValor($arParam['nuValorReceitaPatrominial']   ,false);
@@ -862,7 +927,7 @@ class CSTNConfiguracao
                 $arPeriodo[$inCount]['valor_deducao_fundeb']           = $this->mascaraValor($arParam['nuValorDeducaoFundeb']        ,false);
             }
             $arPeriodo[$inCount]['valor'       ] = str_replace(',','.',str_replace('.','',$arParam['flValor'  ]));
-            $arPeriodo[$inCount]['descricao'   ] = $this->arMes[abs($arData[1])] . '/' . $arData[2];
+            $arPeriodo[$inCount]['descricao'   ] = $this->arMes[abs($arData[0])] . '/' . $arData[1];
 
             Sessao::write('arPeriodo',$arPeriodo);
 
@@ -897,12 +962,13 @@ class CSTNConfiguracao
         $inCount = count($arPeriodo);
         if (!$obErro->ocorreu()) {
             $arData = explode('/',$arParam['stPeriodo']);
+            $arDataImplantacao = explode("/",$arParam['stDataImplantacao']);
             $arPeriodo[$inCount]['id']           = $inCount;
             $arPeriodo[$inCount]['cod_entidade'] = $arParam['inCodEntidade'];
             $arPeriodo[$inCount]['mes']          = $arData[0];
             $arPeriodo[$inCount]['ano']          = $arData[1];
             $arPeriodo[$inCount]['descricao']    = $this->arMes[$arData[0]] . '/' . $arData[1];
-            if ( Sessao::getExercicio() >= '2016' ) {
+            if ( $arDataImplantacao[2] >= '2016' ) {
                 $arPeriodo[$inCount]['valor_pessoal_ativo']         = $this->mascaraValor($arParam['nuValorPessoalAtivo'],false);
                 $arPeriodo[$inCount]['valor_pessoal_inativo']       = $this->mascaraValor($arParam['nuValorPessoalInativo'],false);
                 $arPeriodo[$inCount]['valor_terceirizacao']         = $this->mascaraValor($arParam['nuValorOutrasDespesas'],false);
@@ -911,7 +977,7 @@ class CSTNConfiguracao
                 $arPeriodo[$inCount]['valor_exercicios_anteriores'] = $this->mascaraValor($arParam['nuValorExercicioAnterior'],false);
                 $arPeriodo[$inCount]['valor_inativos_pensionistas'] = $this->mascaraValor($arParam['nuValorInativosPensionista'],false);
             }
-            
+
             $arPeriodo[$inCount]['valor'] = $this->mascaraValor($arParam['flValor'],false);
 
             Sessao::write('arPeriodo',$arPeriodo);
@@ -1196,7 +1262,7 @@ class CSTNConfiguracao
                 $this->obModel->listValorDP($rsPeriodo);
                 break;
             }
-
+            
             if ($rsPeriodo->getNumLinhas() > 0) {
                 while (!$rsPeriodo->eof()) {
                     $arPeriodo[] = array(  'id'           => count($arPeriodo)
@@ -1377,17 +1443,17 @@ class CSTNConfiguracao
                 if (!isset($arPeriodoDB[$arAux['mes'] . '-' . $arAux['ano'] . '-' . $arAux['valor']])) {
                     $this->obModel->inMes                                  = $arAux['mes'];
                     $this->obModel->inAno                                  = $arAux['ano'];
-                    $this->obModel->nuValorReceitaTributaria     = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_tributaria']       : 0.00;
-                    $this->obModel->nuValorReceitaContribuicoes  = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_contribuicoes']    : 0.00;
-                    $this->obModel->nuValorReceitaPatrimonial    = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_patrimonial']      : 0.00;
-                    $this->obModel->nuValorReceitaAgropecuaria   = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_agropecuaria']     : 0.00;
-                    $this->obModel->nuValorReceitaIndustrial     = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_industrial']       : 0.00;
-                    $this->obModel->nuValorReceitaServicos       = ($arAux['ano'] >= '2016') ? $arAux['valor_receita_servicos']         : 0.00;
-                    $this->obModel->nuValorTransferenciaCorrente = ($arAux['ano'] >= '2016') ? $arAux['valor_transferencias_correntes'] : 0.00;
-                    $this->obModel->nuValorOutrasReceitas        = ($arAux['ano'] >= '2016') ? $arAux['valor_outras_receitas']          : 0.00;
-                    $this->obModel->nuValorContribPlanoSSS       = ($arAux['ano'] >= '2016') ? $arAux['valor_contrib_plano_sss']        : 0.00;
-                    $this->obModel->nuValorCompensacaoFinanceira = ($arAux['ano'] >= '2016') ? $arAux['valor_compensacao_financeira']   : 0.00;
-                    $this->obModel->nuValorDeducaoFundeb         = ($arAux['ano'] >= '2016') ? $arAux['valor_deducao_fundeb']           : 0.00;
+                    $this->obModel->nuValorReceitaTributaria     = ($arData[2] >= '2016') ? $arAux['valor_receita_tributaria']       : 0.00;
+                    $this->obModel->nuValorReceitaContribuicoes  = ($arData[2] >= '2016') ? $arAux['valor_receita_contribuicoes']    : 0.00;
+                    $this->obModel->nuValorReceitaPatrimonial    = ($arData[2] >= '2016') ? $arAux['valor_receita_patrimonial']      : 0.00;
+                    $this->obModel->nuValorReceitaAgropecuaria   = ($arData[2] >= '2016') ? $arAux['valor_receita_agropecuaria']     : 0.00;
+                    $this->obModel->nuValorReceitaIndustrial     = ($arData[2] >= '2016') ? $arAux['valor_receita_industrial']       : 0.00;
+                    $this->obModel->nuValorReceitaServicos       = ($arData[2] >= '2016') ? $arAux['valor_receita_servicos']         : 0.00;
+                    $this->obModel->nuValorTransferenciaCorrente = ($arData[2] >= '2016') ? $arAux['valor_transferencias_correntes'] : 0.00;
+                    $this->obModel->nuValorOutrasReceitas        = ($arData[2] >= '2016') ? $arAux['valor_outras_receitas']          : 0.00;
+                    $this->obModel->nuValorContribPlanoSSS       = ($arData[2] >= '2016') ? $arAux['valor_contrib_plano_sss']        : 0.00;
+                    $this->obModel->nuValorCompensacaoFinanceira = ($arData[2] >= '2016') ? $arAux['valor_compensacao_financeira']   : 0.00;
+                    $this->obModel->nuValorDeducaoFundeb         = ($arData[2] >= '2016') ? $arAux['valor_deducao_fundeb']           : 0.00;
                     $this->obModel->flValor = $arAux['valor'];
 
                     $obErro = $this->obModel->vincularReceitaCorrenteLiquida(false, $boTransacao);
@@ -1466,18 +1532,15 @@ class CSTNConfiguracao
                 if (!isset($arPeriodoDB[$arAux['mes'] . '-' . $arAux['ano'] . '-' . $arAux['valor']])) {
                     $this->obModel->inMes                      = $arAux['mes'];
                     $this->obModel->inAno                      = $arAux['ano'];
-                    if (Sessao::getExercicio() >= '2016') {
-                        $this->obModel->nuValorPessoalAtivo        = $arAux['valor_pessoal_ativo'];
-                        $this->obModel->nuValorPessoalInativo      = $arAux['valor_pessoal_inativo'];
-                        $this->obModel->nuValorOutrasDespesas      = $arAux['valor_terceirizacao'];
-                        $this->obModel->nuValorIndenizacoes        = $arAux['valor_indenizacoes'];
-                        $this->obModel->nuValorDecisaoJudicial     = $arAux['valor_decisao_judicial'];
-                        $this->obModel->nuValorExercicioAnterior   = $arAux['valor_exercicios_anteriores'];
-                        $this->obModel->nuValorInativosPensionista = $arAux['valor_inativos_pensionistas'];    
-                    }
-                    
+                    $this->obModel->nuValorPessoalAtivo        = ($arData[2] >= '2016') ? $arAux['valor_pessoal_ativo']          : 0.00;
+                    $this->obModel->nuValorPessoalInativo      = ($arData[2] >= '2016') ? $arAux['valor_pessoal_inativo']        : 0.00;
+                    $this->obModel->nuValorOutrasDespesas      = ($arData[2] >= '2016') ? $arAux['valor_terceirizacao']          : 0.00;
+                    $this->obModel->nuValorIndenizacoes        = ($arData[2] >= '2016') ? $arAux['valor_indenizacoes']           : 0.00;
+                    $this->obModel->nuValorDecisaoJudicial     = ($arData[2] >= '2016') ? $arAux['valor_decisao_judicial']       : 0.00;
+                    $this->obModel->nuValorExercicioAnterior   = ($arData[2] >= '2016') ? $arAux['valor_exercicios_anteriores']  : 0.00;
+                    $this->obModel->nuValorInativosPensionista = ($arData[2] >= '2016') ? $arAux['valor_inativos_pensionistas']  : 0.00;
                     $this->obModel->flValor                    = $arAux['valor'];
-                    
+
                     $obErro = $this->obModel->vincularDespesaPessoal(false, $boTransacao);
                     if ($obErro->ocorreu()) {
                         break;

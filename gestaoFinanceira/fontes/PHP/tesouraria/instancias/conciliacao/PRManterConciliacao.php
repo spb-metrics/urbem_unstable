@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: PRManterConciliacao.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: PRManterConciliacao.php 65087 2016-04-22 14:27:07Z carlos.silva $
 
     * Casos de uso: uc-02.04.19
 */
@@ -40,6 +40,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CAM_GF_TES_NEGOCIO."RTesourariaConciliacao.class.php";
+include_once CAM_GPC_TCMBA_MAPEAMENTO."/TTCMBATipoConciliacaoLancamentoContabil.class.php";
 
 $stAcao = $request->get('stAcao');
 
@@ -83,7 +84,16 @@ if ($stAcao == "incluir") {
                 $arConciliar["boConciliar_".($inIndice+1)] = $_REQUEST["boConciliar_".$arMovimentacao['id']."_".($key+1)];
             }
         }
-
+    }
+    
+    if(SistemaLegado::isTCMBA($boTransacao)) {
+        $arTipoConciliacaoAux = Sessao::read('arMovimentacaoAux');
+        
+        for($i=0; $i<count($arTipoConciliacaoAux); $i++) {
+            $arTipoConciliacaoAux[$i]['cod_tipo_conciliacao'] = $_REQUEST["idTipoConciliacao_".$arTipoConciliacaoAux[$i]['id']."_".($i+1)];
+        }
+        
+        Sessao::write('arMovimentacaoAux', $arTipoConciliacaoAux);
     }
 
     $arMovimentacaoPendenciaAuxSessao = Sessao::read('arMovimentacaoPendenciaAux');
@@ -93,6 +103,7 @@ if ($stAcao == "incluir") {
             $stMesConciliacao = $arDataConciliacao[1];
             $arConciliar['boPendencia_'.($arMovimentacaoAux['indices']+1)] = ($arMovimentacaoAux['conciliar'] AND ((integer) $stMesConciliacao == (integer) $_REQUEST['inMes'] OR  $arMovimentacaoAux['dt_conciliacao'] == '')) ? 'on' : '';
         }
+        
         $arMovimentacaoPendenciaSessao = Sessao::read('arMovimentacaoPendencia');
         $arMovimentacaoPendenciaListagem = Sessao::read('arMovimentacaoPendenciaListagem');
         foreach ($arMovimentacaoPendenciaListagem as $stChave => $arListagem) {
@@ -107,14 +118,8 @@ if ($stAcao == "incluir") {
                 }
             }
         }
-        /*foreach ($arMovimentacaoPendenciaSessao as $key => $arMovimentacao) {
-            $arIndice = explode( ',', $arMovimentacao['indices'] );
-            foreach ($arIndice as $inIndice) {
-                echo "<br>boPendencia_".$arMovimentacao['tipo']."-".$arMovimentacao['sequencia']."_".$inIndice;
-                $arConciliar["boPendencia_".($inIndice+1)] = $_REQUEST["boPendencia_".$arMovimentacao['tipo']."-".$arMovimentacao['sequencia']."_".$inIndice];
-            }
-        }*/
     }
+    
     $arMovimentacaoManualSessao = Sessao::read('arMovimentacaoManual');
     if ( is_array( $arMovimentacaoManualSessao ) ) {
          foreach ($arMovimentacaoManualSessao as $key => $arMovimentacaoManualAux) {
@@ -151,7 +156,6 @@ if ($stAcao == "incluir") {
 
     $arvoltaBusca = Sessao::read('voltaBusca');
 
-//die;
 
     if($arvoltaBusca!="")
      SistemaLegado::alertaAviso($arvoltaBusca,'Conta '.$_REQUEST['inCodPlano'],'incluir','aviso',Sessao::getId(),'../');

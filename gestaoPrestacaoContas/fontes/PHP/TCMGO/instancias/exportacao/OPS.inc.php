@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OPS.inc.php 64230 2015-12-21 13:22:11Z jean $
+    $Id: OPS.inc.php 65015 2016-04-19 12:32:42Z franver $
 
     * Casos de uso: uc-06.04.00
 */
@@ -56,12 +56,14 @@
     if (Sessao::getExercicio() > 2008) {
         $obTMapeamento->recuperaOrdemPagamentoMovimentacao2009($rsOrdemPagamentoMovimentacao);
         $obTMapeamento->recuperaOrdemPagamentoRetencao($rsOrdemPagamentoRetencao);
-
         if (Sessao::getExercicio() > 2010) {
             $obTMapeamento->recuperaOrdemPagamentoLiquidacoes($rsOrdemPagamentoLiquidacoes);
-            $obTMapeamento->recuperaOrdemPagamentoFonteRecursos($rsOrdemPagamentoFonteRecursos);
+            if ( Sessao::getExercicio() >= 2016 ) {
+                $obTMapeamento->recuperaOrdemPagamentoFonteRecursos2016($rsOrdemPagamentoFonteRecursos);
+            } else {
+                $obTMapeamento->recuperaOrdemPagamentoFonteRecursos($rsOrdemPagamentoFonteRecursos);
+            }
         }
-		
 		foreach($rsOrdemPagamentoMovimentacao->getElementos() AS $arMovimentacao) {
 			if ( $arMovimentacao["banco"] == 999 AND $arMovimentacao["agencia"] == 999999 AND $arMovimentacao["contacorrente"] == 999999999999 AND $arMovimentacao["nrdocumento"] == 999999999999999 ) {
 				$vlTotalCaixa = $vlTotalCaixa + $arMovimentacao["vldocumento"];

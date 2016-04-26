@@ -71,7 +71,7 @@ switch ($stAcao) {
             $obErro = $obTTCEMGConfigurarIDE->inclusao($boTransacao);
 
             if (!$obErro->ocorreu()) {
-                SistemaLegado::alertaAviso($pgForm."?".Sessao::getId(),"Confiduração IDE","incluir","aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgForm."?".Sessao::getId(),"Configuração IDE","incluir","aviso", Sessao::getId(), "../");
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
@@ -92,7 +92,7 @@ switch ($stAcao) {
             $obErro = $obTTCEMGConfigurarIDE->alteracao($boTransacao);
 
             if (!$obErro->ocorreu()) {
-                SistemaLegado::alertaAviso($pgForm."?".Sessao::getId(),"Confiduração IDE","alterar","aviso", Sessao::getId(), "../");
+                SistemaLegado::alertaAviso($pgForm."?".Sessao::getId(),"Configuração IDE","alterar","aviso", Sessao::getId(), "../");
             } else {
                 SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }

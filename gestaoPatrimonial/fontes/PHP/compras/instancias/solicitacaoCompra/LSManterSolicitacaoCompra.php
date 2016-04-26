@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.04.01
 
-    $Id: LSManterSolicitacaoCompra.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterSolicitacaoCompra.php 65105 2016-04-25 19:30:38Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -290,6 +290,7 @@ $obLista->ultimaAcao->addCampo( "stDescQuestao"     , "cod_solicitacao" );
 $obLista->ultimaAcao->addCampo( "exercicio"  	    , "exercicio"       );
 $obLista->ultimaAcao->addCampo( "dtSolicitacao"     , "data"            );
 $obLista->ultimaAcao->addCampo( "stHoraSolicitacao" , "hora"            );
+$obLista->ultimaAcao->addCampo( "boRegistroPreco"   , "registro_precos" );
 
 if ($stAcao == "consultar") {
     $obLista->ultimaAcao->setLink( $stCaminho.$pgCons."?".Sessao::getId().$stLink );

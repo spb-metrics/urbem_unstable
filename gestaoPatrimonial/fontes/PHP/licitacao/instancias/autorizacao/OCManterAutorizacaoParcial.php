@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacaoParcial.php 64413 2016-02-18 16:21:52Z arthur $
+    $Id: OCManterAutorizacaoParcial.php 64900 2016-04-12 18:44:26Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -89,6 +89,10 @@ function alterarItemDotacao(Request $request){
                     $stFiltro = " WHERE mapa_cotacao.exercicio_mapa = '".$arItem["exercicio"]."'
                                     AND mapa_cotacao.cod_mapa       = ".$arItem["cod_mapa"]."
                                     AND cotacao_item.cod_item       = ".$arItem["cod_item"]." \n";
+
+                    if (!empty($inCodDespesa))
+                        $stFiltro .= " AND mapa_item_dotacao.cod_despesa = ".$inCodDespesa;
+
                     $stOrder = " ORDER BY cotacao_item.cod_item, sw_cgm.nom_cgm";
                     $obTComprasCotacaoFornecedorItem->recuperaItensCotacaoJulgadosAutorizacaoParcial ( $rsCotacaoItens, $stFiltro );
 
@@ -100,8 +104,11 @@ function alterarItemDotacao(Request $request){
                     $obROrcamentoDespesa->listarContaDespesa($rsDotacao);
                 }
 
-                $qtdItem            = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
-                
+                if (!empty($inCodDespesa))
+                    $qtdItem            = str_replace(",",".",str_replace(".","",$arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem']));
+                else
+                    $qtdItem            = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
+
                 $inCgmFornecedor    = $arItem['inCgmFornecedor'];
                 $stCodClassificacao = $arItem['stCodClassificacao'];
 
@@ -458,7 +465,7 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     $arItens = Sessao::read('arItens');
     $arItens = (is_array($arItens)) ? $arItens : array();
 
-    foreach ($arItensDetalhes as $chaveItemDetalhe => $valorItemDetalhe) {        
+    foreach ($arItensDetalhes as $chaveItemDetalhe => $valorItemDetalhe) {
         foreach( $arItens as $chaveItem => $arItem) {
             if ( $arItem["cod_item"] == $valorItemDetalhe['cod_item'] && $arItem["cod_cotacao"] == $valorItemDetalhe['cod_cotacao'] ) {
 
@@ -473,11 +480,11 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
                         $arItensDetalhes[$chaveItemDetalhe]['desdobramento'] = $rsOrcamentoContaDespesa->getCampo('cod_estrutural');
                     }
                 }
-                
+
                 $vlUnitarioItem = $arItensDetalhes[$chaveItemDetalhe]['vl_unitario'];
 
                 $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
-                
+
                 foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
                     if($cotacaoItem['cgm_fornecedor'] == $arItem['inCgmFornecedor']){
                         $vlUnitarioItem = $cotacaoItem['vl_cotacao'] / $cotacaoItem['quantidade'];
@@ -485,15 +492,18 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
                     }
                 }
 
+                $inCodDespesa = $valorItemDetalhe['cod_despesa'];
+                $nuQtdeItem = isset($arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem']) ? $arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem'] : $arItem['nuQtdeItem'];
+
                 $arItensDetalhes[$chaveItemDetalhe]['vl_unitario']      = $vlUnitarioItem;
-                $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
-                
+                $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] = str_replace(",",".",str_replace(".","",$nuQtdeItem));
+
                 if($arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'] == 0){
                     $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = '0,00';
                 } else {
                     $arItensDetalhes[$chaveItemDetalhe]['vl_cotacao_saldo'] = $vlUnitarioItem * $arItensDetalhes[$chaveItemDetalhe]['quantidade_saldo'];
                 }
-                
+
                 $arItensDetalhes[$chaveItemDetalhe]['cgm_fornecedor']   = $arItem['inCgmFornecedor'];
                 $arItensDetalhes[$chaveItemDetalhe]['fornecedor']       = sistemalegado::pegaDado("nom_cgm", "sw_cgm", "WHERE numcgm = '".$arItem['inCgmFornecedor']."' ");
                 break;
@@ -513,25 +523,27 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
     $obRdSelecione->setId                 ( "" );
     $obRdSelecione->obEvento->setOnChange ( "selecionaDotacao(this)" );
     $obRdSelecione->setValue              ( "[cod_item],[cod_cotacao],[cod_despesa]" );
-    
+
     $table = new Table();
     $table->setRecordset( $rsRegistros );
     $table->setSummary('Dotação');
 
     $table->Head->addCabecalho( 'Fornecedor'          , 30 );
-    $table->Head->addCabecalho( 'Solicitação'         , 8  );
+    $table->Head->addCabecalho( 'Solicitação'         , 6  );
     $table->Head->addCabecalho( 'Lote'                , 5  );
-    $table->Head->addCabecalho( 'Centro de Custo'     , 10 );
-    $table->Head->addCabecalho( 'Dotação Orçamentária', 14 );
-    $table->Head->addCabecalho( 'Valor Unitário'      , 10 );
-    $table->Head->addCabecalho( 'Quantidade'          , 8  );
-    $table->Head->addCabecalho( 'Valor Total'         , 10 );
+    $table->Head->addCabecalho( 'Centro de Custo'     , 6  );
+    $table->Head->addCabecalho( 'Reduzido Dotação'    , 7  );
+    $table->Head->addCabecalho( 'Dotação Orçamentária', 12 );
+    $table->Head->addCabecalho( 'Valor Unitário'      , 7  );
+    $table->Head->addCabecalho( 'Quantidade'          , 9  );
+    $table->Head->addCabecalho( 'Valor Total'         , 9  );
     $table->Head->addCabecalho( 'Selecione'           , 5  );
 
     $table->Body->addCampo( '[cgm_fornecedor] - [fornecedor]', 'E');
     $table->Body->addCampo( 'cod_solicitacao'                , 'C');
     $table->Body->addCampo( 'lote'                           , 'C');
     $table->Body->addCampo( 'cod_centro'                     , 'C');
+    $table->Body->addCampo( 'cod_despesa'                    , 'C');
     $table->Body->addCampo( 'desdobramento'                  , 'C');
     $table->Body->addCampo( 'vl_unitario'                    , 'D');
     $table->Body->addCampo( 'quantidade_saldo'               , 'D');
@@ -547,13 +559,13 @@ function montaListaItensDetalhe($inCodItem, $inCodCotacao)
 
     $obSpnDetalheDotacao = new Span;
     $obSpnDetalheDotacao->setId       ( 'spnDetalheDotacao' );
-    
+
     $obFormulario = new Formulario();
     $obFormulario->addSpan   ( $obSpnDetalheDotacao );
 
     $obFormulario->montaInnerHTML();
     $stHTMLAlteraItem = $obFormulario->getHTML();
-    
+
     $stHTMLAlteraItem = str_replace("\'","\\'",$stHTMLAlteraItem);
     $stHTMLAlteraItem = str_replace("\n","",$stHTMLAlteraItem);
     $stHTMLAlteraItem = str_replace("  ","",$stHTMLAlteraItem);
@@ -569,7 +581,7 @@ function montaListaItens()
 {
     $arItens = Sessao::read('arItens');
     $arItens = (is_array($arItens)) ? $arItens : array();
-    
+
     $arLicitacao = Sessao::read('arLicitacao');
     $arLicitacao = (is_array($arLicitacao)) ? $arLicitacao : array();
 
@@ -601,7 +613,20 @@ function montaListaItens()
         $js .= "jQuery('#".$idLinhaTableTree."_mais').attr('onclick', \"".$stJsTableTreeItem."\");   \n";
 
         $arItens[$chaveItem]['id'] = $inCount++;
-        $arItens[$chaveItem]['nuQtdeItem'] = str_replace(",",".",str_replace(".","",$valorItem['nuQtdeItem']));
+
+        $nuQtdeItem = 0;
+        $vlTotalItem = 0;
+
+        if( is_array($valorItem['arItemDespesa']) && count($valorItem['arItemDespesa']) > 0 ){
+            foreach( $valorItem['arItemDespesa'] as $inDespesa => $arItemDespesa) {
+                $nuQtdeItem += str_replace(",",".",str_replace(".","",$arItemDespesa['nuQtdeItem']));
+                $vlTotalItem += $arItemDespesa['vl_cotacao_saldo'];
+            }
+        }else
+            $nuQtdeItem = str_replace(",",".",str_replace(".","",$valorItem['nuQtdeItem']));
+
+        $arItens[$chaveItem]['nuQtdeItem'] = $nuQtdeItem;
+        $arItens[$chaveItem]['vl_cotacao_saldo'] = $vlTotalItem;
     }
 
     $rsItens = new RecordSet();
@@ -631,7 +656,7 @@ function montaListaItens()
     $table->Head->addCabecalho( 'Quantidade Autorizada'             , 10 );
     $table->Head->addCabecalho( 'Quantidade para Esta Autorização'  , 10 );
     $table->Head->addCabecalho( 'Valor Total'                       , 15 );
-    
+
     $table->Body->addCampo( '[cod_item] - [descricao_completa]<br>[complemento]', 'E' );
     $table->Body->addCampo( 'quantidade'                                        , 'C' );
     $table->Body->addCampo( 'quantidade_saldo'                                  , 'C' );
@@ -653,7 +678,7 @@ function montaListaItens()
 }
 
 function montaVlUnitario($inCgmFornecedor = null, $nuQtdeItem = 0, $inCodItem, $inCodCotacao){
-    
+
     if($inCgmFornecedor){
         $arItens = Sessao::read('arItens');
         $arItens = (is_array($arItens)) ? $arItens : array();
@@ -670,7 +695,7 @@ function montaVlUnitario($inCgmFornecedor = null, $nuQtdeItem = 0, $inCodItem, $
                         $qtdItem = str_replace(",",".",str_replace(".","",$nuQtdeItem));
                         $stJs .= "jQuery('#nuVlTotal').val('".number_format($qtdItem * $nuVlUnitario, 2, ",", ".")."'); \n";
                         $stJs .= "jQuery('#nuVlTotal').html('".number_format($qtdItem * $nuVlUnitario, 2, ",", ".")."');\n";
-                
+
                         break;
                     }
                 }
@@ -732,7 +757,7 @@ function montaFornecedor(Request $request){
         $obTxtJustificativa->setTitle   ( 'Informe a justificativa.'    );
         $obTxtJustificativa->setNull    ( true                          );
         $obTxtJustificativa->setValue   ( $stJustificativa              );
-        
+
         $obFormularioFornecedor = new Formulario();
         $obFormularioFornecedor->addComponente ( $obBscCGMResponsavel );
         $obIPopUpNorma->geraFormulario         ( $obFormularioFornecedor );
@@ -881,7 +906,7 @@ switch ($request->get('stCtrl')) {
 
             $arItens = array();
             $inCount = 0;
-            
+
             foreach($rsMapaItens->getElementos() as $key => $itemMapa){
                 $arItens[$inCount] = $itemMapa;
 
@@ -893,7 +918,26 @@ switch ($request->get('stCtrl')) {
                 $obTLicitacao = new TLicitacaoLicitacao();
                 $obTLicitacao->recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao( $rsDetalheItens , $stFiltro);
 
+                $arItensDespesa = array();
                 while ( !$rsDetalheItens->eof() ) {
+                    $inCodDespesa = $rsDetalheItens->getCampo('cod_despesa_atual');
+
+                    if(!empty($inCodDespesa)){
+                        $arItensDespesa[$inCodDespesa]['nuQtdeItem']            = 0;
+                        $arItensDespesa[$inCodDespesa]['vl_cotacao_saldo']      = '0,00';
+                        $arItensDespesa[$inCodDespesa]['inCgmFornecedor']       = $itemMapa['cgm_fornecedor'];
+                        $arItensDespesa[$inCodDespesa]['inCodCentroCusto']      = $rsDetalheItens->getCampo('cod_centro');
+                        $arItensDespesa[$inCodDespesa]['stNomCentroCusto']      = $rsDetalheItens->getCampo('nom_centro');
+                        $arItensDespesa[$inCodDespesa]['inCodDespesa']          = $inCodDespesa;
+                        $arItensDespesa[$inCodDespesa]['stCodClassificacao']    = $rsDetalheItens->getCampo('cod_desdobramento');
+                        $arItensDespesa[$inCodDespesa]['inNumCGMResponsavel']   = '';
+                        $arItensDespesa[$inCodDespesa]['inNomCGMResponsavel']   = '';
+                        $arItensDespesa[$inCodDespesa]['inCodNorma']            = '';
+                        $arItensDespesa[$inCodDespesa]['stNorma']               = '';
+                        $arItensDespesa[$inCodDespesa]['stJustificativa']       = '';
+                        $arItensDespesa[$inCodDespesa]['boDespesaMapaItem']     = '';
+                    }
+
                     $arItens[$inCount]['indice']                = $inCount;
                     $arItens[$inCount]['nuQtdeItem']            = 0;
                     $arItens[$inCount]['vl_cotacao_saldo']      = '0,00';
@@ -909,6 +953,7 @@ switch ($request->get('stCtrl')) {
                     $arItens[$inCount]['stJustificativa']       = '';
                     $arItens[$inCount]['boDespesaMapaItem']     = '';
                     $arItens[$inCount]['arCotacaoItem']         = array();
+                    $arItens[$inCount]['arItemDespesa']         = $arItensDespesa;
 
                     $rsDetalheItens->proximo();
                 }
@@ -932,7 +977,7 @@ switch ($request->get('stCtrl')) {
             $stJs .= "LiberaFrames(true,true);                      \n";
         }
     break;
-    
+
     case 'listarDetalheItem':
         Sessao::write('arMontaFornecedor', array());
         Sessao::write('arMontaDespesa'   , array());
@@ -947,9 +992,9 @@ switch ($request->get('stCtrl')) {
 
         $obTLicitacao = new TLicitacaoLicitacao();
         $obTLicitacao->recuperaItensDetalhesAutorizacaoEmpenhoParcialLicitacao( $rsDetalheItens , $stFiltro);
-        
+
         Sessao::write('arItensDetalhes', $rsDetalheItens->getElementos());
-        
+
         $stHtmlDetalhe = montaListaItensDetalhe($request->get("cod_item"), $rsDetalheItens->getCampo('cod_cotacao'));
 
         $arMontaFornecedor = Sessao::read('arMontaFornecedor');
@@ -1026,7 +1071,7 @@ switch ($request->get('stCtrl')) {
         $obErro = new Erro;
         $arItens = Sessao::read('arItens');
         $arItens = (is_array($arItens)) ? $arItens : array();
-        
+
         $arItensDetalhes = Sessao::read('arItensDetalhes');
 
         $nuQtdeItem = str_replace(",",".",str_replace(".","",$request->get('nuQtdeItem')));
@@ -1056,6 +1101,8 @@ switch ($request->get('stCtrl')) {
         if ( $obErro->ocorreu() )
             $stJs = "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."'); \n";
         else{
+            $inCodDespesa = $request->get('inCodDespesa');
+
             foreach( $arItens as $chaveItem => $arItem) {
                 if ( $arItem["cod_item"] == $request->get('inCodItem') && $arItem["cod_cotacao"] == $request->get('inCodCotacao') ) {
                     $stNorma = $request->get('stNorma');
@@ -1067,36 +1114,75 @@ switch ($request->get('stCtrl')) {
                         $stNorma = $rsNorma->getCampo('nom_tipo_norma')." ".$rsNorma->getCampo('num_norma_exercicio')." - ".$rsNorma->getCampo('nom_norma');
                     }
 
-                    $arItens[$chaveItem]['nuQtdeItem']           = $request->get('nuQtdeItem');
-                    $arItens[$chaveItem]['inCgmFornecedor']      = $request->get('inCgmFornecedor');
-                    $arItens[$chaveItem]['inCodCentroCusto']     = $request->get('inCodCentroCusto');
-                    $arItens[$chaveItem]['stNomCentroCusto']     = $request->get('stNomCentroCusto');
-                    $arItens[$chaveItem]['inCodDespesa']         = $request->get('inCodDespesa');
-                    $arItens[$chaveItem]['stCodClassificacao']   = $request->get('stCodClassificacao');
-                    $arItens[$chaveItem]['inNumCGMResponsavel']  = $request->get('inNumCGMResponsavel');
-                    $arItens[$chaveItem]['inNomCGMResponsavel']  = $request->get('inNomCGMResponsavel');
-                    $arItens[$chaveItem]['inCodNorma']           = $request->get('inCodNorma');
-                    $arItens[$chaveItem]['stNorma']              = $stNorma;
-                    $arItens[$chaveItem]['stJustificativa']      = $request->get('stJustificativa');
-                    if( $codClassificacao != 'FALSE' &&  $nuQtdeItem > 0)
-                        $arItens[$chaveItem]['boDespesaMapaItem']= 'FALSE';
-                    else
-                        $arItens[$chaveItem]['boDespesaMapaItem']= 'TRUE';
+                    if(empty($inCodDespesa)){
+                        $arItens[$chaveItem]['nuQtdeItem']           = $request->get('nuQtdeItem');
+                        $arItens[$chaveItem]['inCgmFornecedor']      = $request->get('inCgmFornecedor');
+                        $arItens[$chaveItem]['inCodCentroCusto']     = $request->get('inCodCentroCusto');
+                        $arItens[$chaveItem]['stNomCentroCusto']     = $request->get('stNomCentroCusto');
+                        $arItens[$chaveItem]['inCodDespesa']         = $request->get('inCodDespesa');
+                        $arItens[$chaveItem]['stCodClassificacao']   = $request->get('stCodClassificacao');
+                        $arItens[$chaveItem]['inNumCGMResponsavel']  = $request->get('inNumCGMResponsavel');
+                        $arItens[$chaveItem]['inNomCGMResponsavel']  = $request->get('inNomCGMResponsavel');
+                        $arItens[$chaveItem]['inCodNorma']           = $request->get('inCodNorma');
+                        $arItens[$chaveItem]['stNorma']              = $stNorma;
+                        $arItens[$chaveItem]['stJustificativa']      = $request->get('stJustificativa');
+                        if( $codClassificacao != 'FALSE' &&  $nuQtdeItem > 0)
+                            $arItens[$chaveItem]['boDespesaMapaItem']= 'FALSE';
+                        else
+                            $arItens[$chaveItem]['boDespesaMapaItem']= 'TRUE';
 
-                    if($nuQtdeItem==0)
-                        $arItens[$chaveItem]['vl_cotacao_saldo'] = '0,00';
-                    else{
-                        $vlUnitarioItem = $arItem['vl_cotacao'] / $nuQtdeItem;
+                        if($nuQtdeItem==0)
+                            $arItens[$chaveItem]['vl_cotacao_saldo'] = '0,00';
+                        else{
+                            $vlUnitarioItem = $arItem['vl_cotacao'] / $nuQtdeItem;
 
-                        $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
-                        foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
-                            if($cotacaoItem['cgm_fornecedor'] == $request->get('inCgmFornecedor')){
-                                $vlUnitarioItem = $cotacaoItem['vl_cotacao'] / $cotacaoItem['quantidade'];
-                                break;
+                            $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
+                            foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
+                                if($cotacaoItem['cgm_fornecedor'] == $request->get('inCgmFornecedor')){
+                                    $vlUnitarioItem = $cotacaoItem['vl_cotacao'] / $cotacaoItem['quantidade'];
+                                    break;
+                                }
+                            }
+
+                            $arItens[$chaveItem]['vl_cotacao_saldo'] = $vlUnitarioItem * $nuQtdeItem;
+                        }
+                    }else{
+                        foreach( $arItem['arItemDespesa'] as $inDespesa => $arItemDespesa) {
+                            if($inCodDespesa == $inDespesa){
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['nuQtdeItem']           = $request->get('nuQtdeItem');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inCgmFornecedor']      = $request->get('inCgmFornecedor');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inCodCentroCusto']     = $request->get('inCodCentroCusto');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['stNomCentroCusto']     = $request->get('stNomCentroCusto');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inCodDespesa']         = $request->get('inCodDespesa');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['stCodClassificacao']   = $request->get('stCodClassificacao');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inNumCGMResponsavel']  = $request->get('inNumCGMResponsavel');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inNomCGMResponsavel']  = $request->get('inNomCGMResponsavel');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['inCodNorma']           = $request->get('inCodNorma');
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['stNorma']              = $stNorma;
+                                $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['stJustificativa']      = $request->get('stJustificativa');
+                                if( $codClassificacao != 'FALSE' &&  $nuQtdeItem > 0)
+                                    $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['boDespesaMapaItem']= 'FALSE';
+                                else
+                                    $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['boDespesaMapaItem']= 'TRUE';
+
+                                if($nuQtdeItem==0)
+                                    $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['vl_cotacao_saldo'] = '0,00';
+                                else{
+                                    $vlUnitarioItem = $arItem['vl_cotacao'] / $nuQtdeItem;
+
+                                    $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
+                                    foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
+                                        if($cotacaoItem['cgm_fornecedor'] == $request->get('inCgmFornecedor')){
+                                            $vlUnitarioItem = $cotacaoItem['vl_cotacao'] / $cotacaoItem['quantidade'];
+                                            break;
+                                        }
+                                    }
+
+                                    $arItens[$chaveItem]['arItemDespesa'][$inDespesa]['vl_cotacao_saldo'] = $vlUnitarioItem * $nuQtdeItem;
+                                }
                             }
                         }
 
-                        $arItens[$chaveItem]['vl_cotacao_saldo'] = $vlUnitarioItem * $nuQtdeItem;
                     }
                 }
 

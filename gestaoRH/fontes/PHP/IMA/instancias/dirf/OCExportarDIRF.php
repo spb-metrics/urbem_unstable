@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.08.15
 
-    $Id: OCExportarDIRF.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportarDIRF.php 64913 2016-04-12 20:16:19Z michel $
 
 */
 
@@ -46,11 +46,11 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-function gerarSpanNumeroRecibo()
+function gerarSpanNumeroRecibo(Request $request)
 {
     $stHtml = "";
     $stEval = "";
-    if ($_GET["stIndicador"] == "1" and $_GET["inAnoCompetencia"] >= 2002) {
+    if ($request->get('stIndicador') == "1" and $request->get('inAnoCompetencia') >= 2002) {
         $obIntNumeroEntrega = new Inteiro();
         $obIntNumeroEntrega->setRotulo("Número do Recibo da Última Declaração Entregue");
         $obIntNumeroEntrega->setName("inNumeroRecibo");
@@ -78,13 +78,29 @@ function submeter()
     return $stJs;
 }
 
-switch ($_GET['stCtrl']) {
+function desabilitaPagamentoSemRetencao()
+{
+    $stJs .= "  if(jq('#boPrestadoresServico').is(':checked')){
+                    jq('#boPrestadoresServicoTodos').removeAttr('disabled');
+                }else{
+                    jq('#boPrestadoresServicoTodos').attr('checked',false);
+                    jq('#boPrestadoresServicoTodos').attr('disabled',true);
+                }
+            ";
+
+    return $stJs;
+}
+
+switch ($request->get('stCtrl')) {
     case "gerarSpanNumeroRecibo":
-        $stJs .= gerarSpanNumeroRecibo();
-        break;
+        $stJs .= gerarSpanNumeroRecibo($request);
+    break;
     case "submeter":
         $stJs = submeter();
-        break;
+    break;
+    case "desabilitaPagamentoSemRetencao":
+        $stJs = desabilitaPagamentoSemRetencao();
+    break;
 }
 
 if ($stJs) {

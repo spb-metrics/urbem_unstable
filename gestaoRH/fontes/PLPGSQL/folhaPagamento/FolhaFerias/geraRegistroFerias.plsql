@@ -28,10 +28,7 @@
 -- URBEM Solugues de Gestco Pzblica Ltda
 -- www.urbem.cnm.org.br
 --
--- $Revision: 27883 $
--- $Name$
--- $Autor: Marcia $
--- Date: 2006/07/25 10:50:00 $
+-- $Id: geraRegistroFerias.plsql 64943 2016-04-15 12:22:43Z michel $
 --
 -- Caso de uso: uc-04.04.22
 -- Caso de uso: uc-04.05.53
@@ -147,7 +144,6 @@ BEGIN
     
     stDataFinalCompetencia := pega0DataFinalCompetenciaDoPeriodoMovimento(inCodPeriodoMovimentacao);
 
-
     IF inControleExecucaoRescisaoFerias = 1 THEN
         boGerandoRescisao       := 't';
     ELSE
@@ -156,10 +152,9 @@ BEGIN
     END IF;
     boGerandoRescisao := criarBufferTexto('boGerandoRescisao',boGerandoRescisao); 
 
-    inCodSubDivisao := pega0SubDivisaoDoContratoNaData( inCodContrato, stDataFinalCompetencia );
-    inCodFuncao := pega0FuncaoDoContratoNaData( inCodContrato, stDataFinalCompetencia );
+    inCodSubDivisao    := pega0SubDivisaoDoContratoNaData   ( inCodContrato, stDataFinalCompetencia );
+    inCodFuncao        := pega0FuncaoDoContratoNaData       ( inCodContrato, stDataFinalCompetencia );
     inCodEspecialidade := pega0EspecialidadeDoContratoNaData( inCodContrato, stDataFinalCompetencia );
-
 
     -- *******************busca os dados do cadastro de ferias
     -- busca os dados do cadastro das ferias e retorna o periodo aquisitivo
@@ -173,46 +168,46 @@ BEGIN
     ELSE
         stDataComparacao := stDataFinalCompetencia;
     END IF;
-    
-    stSql := 'SELECT  ferias.dt_inicial_aquisitivo
-                     , ferias.dt_final_aquisitivo
-                     , ferias.cod_forma
-                     , ferias.dias_ferias
-                     , ferias.dias_abono
-                     , to_char(lancamento_ferias.dt_inicio,''yyyy-mm-dd'') as dt_inicio
-                     , to_char(lancamento_ferias.dt_fim,''yyyy-mm-dd'')    as dt_fim
-                     , forma_pagamento_ferias.dias     
-                     , forma_pagamento_ferias.abono     
-                     , lancamento_ferias.ano_competencia
-                     , lancamento_ferias.mes_competencia
-                     , lancamento_ferias.cod_ferias
+
+    stSql := ' SELECT ferias.dt_inicial_aquisitivo
+                    , ferias.dt_final_aquisitivo
+                    , ferias.cod_forma
+                    , ferias.dias_ferias
+                    , ferias.dias_abono
+                    , to_char(lancamento_ferias.dt_inicio,''yyyy-mm-dd'') as dt_inicio
+                    , to_char(lancamento_ferias.dt_fim,''yyyy-mm-dd'')    as dt_fim
+                    , forma_pagamento_ferias.dias     
+                    , forma_pagamento_ferias.abono     
+                    , lancamento_ferias.ano_competencia
+                    , lancamento_ferias.mes_competencia
+                    , lancamento_ferias.cod_ferias
                  FROM pessoal'||stEntidade||'.ferias                 as ferias
-    
-                JOIN pessoal'||stEntidade||'.lancamento_ferias       as lancamento_ferias
+
+          INNER JOIN pessoal'||stEntidade||'.lancamento_ferias       as lancamento_ferias
                   ON ferias.cod_ferias = lancamento_ferias.cod_ferias
-    
-                JOIN pessoal'||stEntidade||'.forma_pagamento_ferias  as forma_pagamento_ferias   
+
+          INNER JOIN pessoal'||stEntidade||'.forma_pagamento_ferias  as forma_pagamento_ferias   
                   ON forma_pagamento_ferias.cod_forma = ferias.cod_forma
-    
+
                WHERE cod_contrato = '||inCodContrato||'
                  AND ( 
-                      ( substr('|| quote_literal(stDataComparacao) ||',1,4) = lancamento_ferias.ano_competencia
+                      (     substr('|| quote_literal(stDataComparacao) ||',1,4) = lancamento_ferias.ano_competencia
                         AND substr('|| quote_literal(stDataComparacao) ||',6,2) = lancamento_ferias.mes_competencia
                       )
-                      or
+                      OR
                       ( substr('|| quote_literal(stDataComparacao) ||',1,7) = substr(lancamento_ferias.dt_inicio::varchar,1,7)
                       )
-                      or
+                      OR
                       ( substr('|| quote_literal(stDataComparacao) ||',1,7) = substr(lancamento_ferias.dt_fim::varchar,1,7)
                       )
-                      or 
+                      OR 
                       ( substr('|| quote_literal(stDataComparacao) ||',1,7) 
-                         between substr(lancamento_ferias.dt_inicio::varchar,1,7)
+                         BETWEEN substr(lancamento_ferias.dt_inicio::varchar,1,7)
                              AND substr(lancamento_ferias.dt_fim::varchar,1,7)
                       )
                      )
-               ORDER BY dt_inicial_aquisitivo desc
-               LIMIT 1
+            ORDER BY dt_inicial_aquisitivo desc
+              LIMIT 1
              ';
              -- testar - verificar ainda o caso de gozo de ferias que inicia em janeiro
              --  e termina em março. Fevereiro precisa de tratamento especial. 
@@ -231,11 +226,11 @@ BEGIN
                            , stMesPagamento
          ;
     CLOSE crCursor;
-    stAnoPagamento := criarBufferTexto('stAnoPagamento',stAnoPagamento);
-    stMesPagamento := criarBufferTexto('stMesPagamento',stMesPagamento);
-    inDiasAbono    := criarBufferInteiro('inDiasAbono',inDiasAbono);
-    stInicio       := criarBufferTexto('stInicio',stInicio);
-    stFim          := criarBufferTexto('stFim',stFim);
+    stAnoPagamento := criarBufferTexto  ('stAnoPagamento',stAnoPagamento);
+    stMesPagamento := criarBufferTexto  ('stMesPagamento',stMesPagamento);
+    inDiasAbono    := criarBufferInteiro('inDiasAbono'   ,inDiasAbono);
+    stInicio       := criarBufferTexto  ('stInicio'      ,stInicio);
+    stFim          := criarBufferTexto  ('stFim'         ,stFim);
     IF (dtFinalAquisitivo-dtInicialAquisitivo+1) < 365 THEN
         IF inDiasAbono > 0 THEN
             inDiasAbono := inDiasGozoFeriasContrato * inDiasAbono / (inDiasGozo+inDiasAbono);
@@ -246,45 +241,48 @@ BEGIN
     IF dtInicialAquisitivo IS NULL THEN
         stContagemInicial := selectIntoVarchar
                     ('SELECT valor
-                       FROM administracao.configuracao
-                      WHERE parametro = ''dtContagemInicial'||stEntidade||'
-                        AND exercicio = '|| quote_literal(stExercicioAtual) ||'
-                        AND cod_modulo = 22');   
+                        FROM administracao.configuracao
+                       WHERE parametro = ''dtContagemInicial'||stEntidade||'
+                         AND exercicio = '|| quote_literal(stExercicioAtual) ||'
+                         AND cod_modulo = 22');
         IF stContagemInicial = 'dtPosse' THEN
             dtInicialAquisitivo := selectIntoVarchar('SELECT dt_posse
-                                                 FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                    , (SELECT cod_contrato
-                                                            , max(timestamp) as timestamp
-                                                         FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                       GROUP BY cod_contrato) as max_contrato_servidor_nomeacao_posse
-                                                WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
-                                                  AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
-                                                  AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
+                                                        FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                           , (SELECT cod_contrato
+                                                                   , max(timestamp) as timestamp
+                                                                FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                            GROUP BY cod_contrato
+                                                             ) AS max_contrato_servidor_nomeacao_posse
+                                                       WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
+                                                         AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
+                                                         AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
         END IF;
         IF stContagemInicial = 'dtAdmissao' THEN
             dtInicialAquisitivo := selectIntoVarchar('SELECT dt_admissao
-                                                 FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                    , (SELECT cod_contrato
-                                                            , max(timestamp) as timestamp
-                                                         FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                       GROUP BY cod_contrato) as max_contrato_servidor_nomeacao_posse
-                                                WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
-                                                  AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
-                                                  AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
-        END IF;        
+                                                        FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                           , (SELECT cod_contrato
+                                                                   , max(timestamp) as timestamp
+                                                                FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                            GROUP BY cod_contrato
+                                                             ) AS max_contrato_servidor_nomeacao_posse
+                                                       WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
+                                                         AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
+                                                         AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
+        END IF;
         IF stContagemInicial = 'dtNomeacao' THEN
             dtInicialAquisitivo := selectIntoVarchar('SELECT dt_nomeacao
-                                                 FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                    , (SELECT cod_contrato
-                                                            , max(timestamp) as timestamp
-                                                         FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
-                                                       GROUP BY cod_contrato) as max_contrato_servidor_nomeacao_posse
-                                                WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
-                                                  AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
-                                                  AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
+                                                        FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                           , (SELECT cod_contrato
+                                                                   , max(timestamp) as timestamp
+                                                                FROM pessoal'||stEntidade||'.contrato_servidor_nomeacao_posse
+                                                            GROUP BY cod_contrato
+                                                             ) AS max_contrato_servidor_nomeacao_posse
+                                                       WHERE contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
+                                                         AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp
+                                                         AND contrato_servidor_nomeacao_posse.cod_contrato = '||inCodContrato);
         END IF;
     END IF;
-    
+
     -- o sql ja verifica se deve ou nao gerar o registro de ferias.
     -- caso nao coincida o mes e ano ou o periodo de gozo cai fora da funcao.
     IF dtInicialAquisitivo IS NOT NULL THEN
@@ -292,39 +290,37 @@ BEGIN
         -- ou seja, proporcionalizar o ponto de salario para o nr. de dias de gozo de ferias
         -- dentro desta competencia . Ver isto apos a geracao da variavei inGeraGozo
 
-        stSql := 'SELECT * FROM folhapagamento'||stEntidade||'.periodo_movimentacao as pm
-                        JOIN  folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as pms
-                          ON pms.cod_periodo_movimentacao = pm.cod_periodo_movimentacao
-                        WHERE '|| quote_literal(dtInicialAquisitivo) ||' between dt_inicial AND dt_final';
-                        
+        stSql := 'SELECT *
+                    FROM folhapagamento'||stEntidade||'.periodo_movimentacao as pm
+              INNER JOIN folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as pms
+                      ON pms.cod_periodo_movimentacao = pm.cod_periodo_movimentacao
+                   WHERE '|| quote_literal(dtInicialAquisitivo) ||' between dt_inicial AND dt_final';
+
         IF boGerandoRescisao = 'f' THEN
             stSql := stSql || '   AND pms.situacao = '|| quote_literal(stSituacao);
         END IF;
         -- busca o periodo de movimentacao para inicio de avaliacao
-    
+
         OPEN crCursor FOR EXECUTE stSql;
              FETCH crCursor INTO inCodPeriodoInicialLeitura, dtInicialPeriodo,dtFinalPeriodo ;
         CLOSE crCursor;
         IF inCodPeriodoInicialLeitura IS NOT NULL THEN
             inDiasPeriodo := ( dtFinalPeriodo - dtInicialPeriodo) +1 ;
-          
+
             -- gera o nr. de dias de ferias levando em conta o periodo de efetividade
             -- e a data inicial do periodo aquisitivo.
             inDiasAquisitivoPeriodoInicial := ((dtFinalPeriodo - dtInicialAquisitivo )+1 );
-          
-          
+
             -- tratamento especial para mes de fevereiro
-            IF inDiasAquisitivoPeriodoInicial < 15 
-                  or ( inDiasPeriodo < 30 AND inDiasAquisitivoPeriodoInicial = 15 )  
-            THEN
-               -- ignora o periodo de movimentacao inicial e comeca no proximo             
-          
+            IF inDiasAquisitivoPeriodoInicial < 15 OR ( inDiasPeriodo < 30 AND inDiasAquisitivoPeriodoInicial = 15 ) THEN
+               -- ignora o periodo de movimentacao inicial e comeca no proximo
+
                inCodPeriodoInicialLeitura := inCodPeriodoInicialLeitura + 1;
-          
+
                -- aqui estou apenas passando para o proximo periodo mas nao estou 
                -- sequer testando se este proximo existe ou se esta pendente de 
                -- fechamento ainda.
-          
+
             END if;
     
             -- verifica o nr. de avos ( item acessorio - ainda nao utilizado )
@@ -333,8 +329,7 @@ BEGIN
             END IF;
             -- tem que ver o caso de periodo aquisitivo que ultrapassa o mes atual
             inAvos := criarBufferInteiro( 'inAvos', inAvos );  
-    
-    
+
             --*****************************************************
             -- criacao de temporario que ira conter a lista dos eventos dos meses de 
             -- leitura (periodo aquisitivo) e mais o "ponto fixo" do servidor, do
@@ -342,7 +337,7 @@ BEGIN
             --
             -- inicialmente, cria a tabela com a leitura das calculadas em salario
             -- do periodo aquisitivo pois representam o maior volume
-    
+
             CREATE TEMPORARY TABLE tmp_registro_evento_ferias 
                      (cod_evento               INTEGER,
                       valor                    NUMERIC(14,2),
@@ -355,222 +350,217 @@ BEGIN
                       parcela                  INTEGER,
                       lido_de                  VARCHAR
                      );
-                      
-    
-            
+
             -- Nota para futuro - observar que nos casos em que a quantidade do registro
             -- do evento FOR alterada em relacao a gravacao da quantidade no calculado.
             -- Para a execucao destas media seria necessario pegar a qtd do registro.
-            
+
             -- salario
             stSql := ' INSERT INTO tmp_registro_evento_ferias 
                           SELECT
-                                fpec.cod_evento                 as cod_evento
-                               ,COALESCE(fpec.valor,0.00)       as valor
-                               ,COALESCE(fpec.quantidade,0.00)  as quantidade
-                               ,fprepe.cod_periodo_movimentacao as cod_periodo_movimentacao
-                               ,fpe.natureza                    as natureza
-                               ,fpe.fixado                      as fixado
-                               ,fpee.unidade_quantitativa       as unidade_quantitativa
-                               ,fpcec.proporcao_abono           as proporcao_abono
-                               ,(SELECT parcela FROM folhapagamento'||stEntidade||'.registro_evento_parcela WHERE fprepe.cod_registro     = registro_evento_parcela.cod_registro) as parcela
-                               ,''evento_calculado''        as lido_de
-    
-                          FROM                                                     
-                                folhapagamento'||stEntidade||'.registro_evento_periodo   as fprepe             
+                                 fpec.cod_evento                 as cod_evento
+                               , COALESCE(fpec.valor,0.00)       as valor
+                               , COALESCE(fpec.quantidade,0.00)  as quantidade
+                               , fprepe.cod_periodo_movimentacao as cod_periodo_movimentacao
+                               , fpe.natureza                    as natureza
+                               , fpe.fixado                      as fixado
+                               , fpee.unidade_quantitativa       as unidade_quantitativa
+                               , fpcec.proporcao_abono           as proporcao_abono
+                               , (SELECT parcela FROM folhapagamento'||stEntidade||'.registro_evento_parcela WHERE fprepe.cod_registro     = registro_evento_parcela.cod_registro) as parcela
+                               , ''evento_calculado''        as lido_de
 
-                          JOIN folhapagamento'||stEntidade||'.evento_calculado           as fpec
-                            ON  fpec.cod_registro = fprepe.cod_registro
-    
-                          JOIN  folhapagamento'||stEntidade||'.evento                    as fpe
-                            ON  fpe.cod_evento = fpec.cod_evento
-                           AND  fpe.natureza IN ( ''P'',''D'' )         
-    
-                          JOIN  ( SELECT distinct ON (cod_evento) cod_evento 
-                                        ,timestamp
-                                        ,COALESCE(unidade_quantitativa,0) as unidade_quantitativa
-                                    FROM folhapagamento'||stEntidade||'.evento_evento
-                                   ORDER BY evento_evento.cod_evento, evento_evento.timestamp desc
-                                   ) as fpee
-                            ON  fpee.cod_evento = fpe.cod_evento
-    
-                          JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso   as fpcec
-                            ON fpcec.cod_evento = fpee.cod_evento
-                           AND fpcec.timestamp  = fpee.timestamp
-                           AND fpcec.cod_configuracao = 2
-                    
-                          JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media as fptecm
-                            ON fptecm.cod_configuracao = 2
-                           AND fptecm.timestamp = fpcec.timestamp 
-                           AND fptecm.cod_evento = fpcec.cod_evento
-                           AND fptecm.cod_caso = fpcec.cod_caso
-    
-                          JOIN ( SELECT 
-                                   cod_periodo_movimentacao
-                                  ,max(timestamp) as timestamp 
-                                 FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao
-                                GROUP BY 1 
-                               ) as fppms
-                            ON fppms.cod_periodo_movimentacao = fprepe.cod_periodo_movimentacao
-                           AND ( SELECT situacao 
-                                  FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as fppms_
-                                 WHERE fppms_.cod_periodo_movimentacao = fppms.cod_periodo_movimentacao
-                                   AND fppms_.timestamp = fppms.timestamp
-                               ) = ''f''
-    
-                         WHERE fprepe.cod_periodo_movimentacao 
+                            FROM folhapagamento'||stEntidade||'.registro_evento_periodo   as fprepe
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento_calculado           as fpec
+                              ON fpec.cod_registro = fprepe.cod_registro
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento                    as fpe
+                              ON fpe.cod_evento = fpec.cod_evento
+                             AND fpe.natureza IN ( ''P'',''D'' )
+
+                      INNER JOIN ( SELECT distinct ON (cod_evento) cod_evento 
+                                        , timestamp
+                                        , COALESCE(unidade_quantitativa,0) as unidade_quantitativa
+                                     FROM folhapagamento'||stEntidade||'.evento_evento
+                                 ORDER BY evento_evento.cod_evento, evento_evento.timestamp desc
+                                 ) as fpee
+                              ON fpee.cod_evento = fpe.cod_evento
+
+                      INNER JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso   as fpcec
+                              ON fpcec.cod_evento = fpee.cod_evento
+                             AND fpcec.timestamp  = fpee.timestamp
+                             AND fpcec.cod_configuracao = 2
+
+                      INNER JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media as fptecm
+                              ON fptecm.cod_configuracao = 2
+                             AND fptecm.timestamp = fpcec.timestamp 
+                             AND fptecm.cod_evento = fpcec.cod_evento
+                             AND fptecm.cod_caso = fpcec.cod_caso
+
+                      INNER JOIN ( SELECT cod_periodo_movimentacao
+                                        , max(timestamp) as timestamp 
+                                     FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao
+                                 GROUP BY 1 
+                                 ) as fppms
+                              ON fppms.cod_periodo_movimentacao = fprepe.cod_periodo_movimentacao
+                             AND ( SELECT situacao 
+                                     FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as fppms_
+                                    WHERE fppms_.cod_periodo_movimentacao = fppms.cod_periodo_movimentacao
+                                      AND fppms_.timestamp = fppms.timestamp
+                                 ) = ''f''
+
+                           WHERE fprepe.cod_periodo_movimentacao 
                                    between '||inCodPeriodoInicialLeitura||' 
                                        AND '||inCodPeriodoInicialLeitura + 11||'
-                           
-                           AND fprepe.cod_registro = fpec.cod_registro
-                           AND fprepe.cod_contrato = '||inCodContrato||'
-    
-                           AND fpec.valor > 0
-                      ORDER BY fpec.cod_evento';
-                      
+
+                             AND fprepe.cod_registro = fpec.cod_registro
+                             AND fprepe.cod_contrato = '||inCodContrato||'
+
+                             AND fpec.valor > 0
+                        ORDER BY fpec.cod_evento';
+
             EXECUTE stSql;
-    
-    
+
             -- complementar
             stSql := ' INSERT INTO tmp_registro_evento_ferias 
                           SELECT
-                                fpecc.cod_evento                 as cod_evento
-                               ,COALESCE(fpecc.valor,0.00)       as valor
-                               ,COALESCE(fpecc.quantidade,0.00)  as quantidade
-                               ,fprec.cod_periodo_movimentacao   as cod_periodo_movimentacao
-                               ,fpe.natureza                     as natureza
-                               ,fpe.fixado                       as fixado
-                               ,fpee.unidade_quantitativa        as unidade_quantitativa
-                               ,fpcec.proporcao_abono            as proporcao_abono
-                               ,registro_evento_complementar_parcela.parcela 
-                               ,''evento_calculado_complementar''        as lido_de
-    
-                          FROM                                                     
-                                folhapagamento'||stEntidade||'.registro_evento_complementar   as fprec             
-    
-                            LEFT JOIN folhapagamento'||stEntidade||'.registro_evento_complementar_parcela
-                                   ON fprec.cod_registro     = registro_evento_complementar_parcela.cod_registro
-                                  AND fprec.cod_evento     = registro_evento_complementar_parcela.cod_evento
-                                  AND fprec.cod_configuracao     = registro_evento_complementar_parcela.cod_configuracao
-                                  AND fprec.timestamp     = registro_evento_complementar_parcela.timestamp
+                                 fpecc.cod_evento                 as cod_evento
+                               , COALESCE(fpecc.valor,0.00)       as valor
+                               , COALESCE(fpecc.quantidade,0.00)  as quantidade
+                               , fprec.cod_periodo_movimentacao   as cod_periodo_movimentacao
+                               , fpe.natureza                     as natureza
+                               , fpe.fixado                       as fixado
+                               , fpee.unidade_quantitativa        as unidade_quantitativa
+                               , fpcec.proporcao_abono            as proporcao_abono
+                               , registro_evento_complementar_parcela.parcela 
+                               , ''evento_calculado_complementar''        as lido_de
 
-                          JOIN folhapagamento'||stEntidade||'.evento_complementar_calculado     as fpecc
-                            ON  fpecc.cod_registro = fprec.cod_registro
-    
-                          JOIN  folhapagamento'||stEntidade||'.evento                    as fpe
-                            ON  fpe.cod_evento = fpecc.cod_evento
-                           AND  fpe.natureza IN ( ''P'',''D'' )         
-    
-                          JOIN  ( SELECT distinct ON (cod_evento) cod_evento 
-                                        ,timestamp
-                                        ,COALESCE(unidade_quantitativa,0) as unidade_quantitativa
-                                    FROM folhapagamento'||stEntidade||'.evento_evento
-                                   ORDER BY evento_evento.cod_evento, evento_evento.timestamp desc
-                                   ) as fpee
-                            ON  fpee.cod_evento = fpe.cod_evento
-    
-                          JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso   as fpcec
-                            ON fpcec.cod_evento = fpee.cod_evento
-                           AND fpcec.timestamp  = fpee.timestamp
-                           AND fpcec.cod_configuracao = 2
-                    
-                         JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media as fptecm
-                           ON fptecm.cod_configuracao = 2
-                          AND fptecm.timestamp = fpcec.timestamp 
-                          AND fptecm.cod_evento = fpcec.cod_evento
-                          AND fptecm.cod_caso = fpcec.cod_caso
-    
-                          JOIN ( SELECT 
-                                   cod_periodo_movimentacao
-                                  ,max(timestamp) as timestamp 
-                                 FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao
-                                GROUP BY 1 
-                               ) as fppms
-                            ON fppms.cod_periodo_movimentacao = fprec.cod_periodo_movimentacao
-                           AND ( SELECT situacao 
-                                  FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as fppms_
-                                 WHERE fppms_.cod_periodo_movimentacao = fppms.cod_periodo_movimentacao
-                                   AND fppms_.timestamp = fppms.timestamp
-                               ) = ''f''
-    
-                         WHERE  fprec.cod_periodo_movimentacao 
+                            FROM folhapagamento'||stEntidade||'.registro_evento_complementar   as fprec
+
+                       LEFT JOIN folhapagamento'||stEntidade||'.registro_evento_complementar_parcela
+                              ON fprec.cod_registro     = registro_evento_complementar_parcela.cod_registro
+                             AND fprec.cod_evento       = registro_evento_complementar_parcela.cod_evento
+                             AND fprec.cod_configuracao = registro_evento_complementar_parcela.cod_configuracao
+                             AND fprec.timestamp        = registro_evento_complementar_parcela.timestamp
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento_complementar_calculado     as fpecc
+                              ON fpecc.cod_registro = fprec.cod_registro
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento                    as fpe
+                              ON fpe.cod_evento = fpecc.cod_evento
+                             AND fpe.natureza IN ( ''P'',''D'' )
+
+                      INNER JOIN ( SELECT distinct ON (cod_evento) cod_evento 
+                                        , timestamp
+                                        , COALESCE(unidade_quantitativa,0) as unidade_quantitativa
+                                     FROM folhapagamento'||stEntidade||'.evento_evento
+                                 ORDER BY evento_evento.cod_evento, evento_evento.timestamp desc
+                                 ) as fpee
+                              ON fpee.cod_evento = fpe.cod_evento
+
+                      INNER JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso   as fpcec
+                              ON fpcec.cod_evento = fpee.cod_evento
+                             AND fpcec.timestamp  = fpee.timestamp
+                             AND fpcec.cod_configuracao = 2
+
+                      INNER JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media as fptecm
+                              ON fptecm.cod_configuracao = 2
+                             AND fptecm.timestamp = fpcec.timestamp 
+                             AND fptecm.cod_evento = fpcec.cod_evento
+                             AND fptecm.cod_caso = fpcec.cod_caso
+
+                      INNER JOIN ( SELECT cod_periodo_movimentacao
+                                        , max(timestamp) as timestamp 
+                                     FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao
+                                 GROUP BY 1 
+                                 ) as fppms
+                              ON fppms.cod_periodo_movimentacao = fprec.cod_periodo_movimentacao
+                             AND ( SELECT situacao 
+                                     FROM folhapagamento'||stEntidade||'.periodo_movimentacao_situacao as fppms_
+                                    WHERE fppms_.cod_periodo_movimentacao = fppms.cod_periodo_movimentacao
+                                      AND fppms_.timestamp = fppms.timestamp
+                                 ) = ''f''
+
+                           WHERE fprec.cod_periodo_movimentacao 
                                     between '||inCodPeriodoInicialLeitura||' 
                                         AND '||inCodPeriodoInicialLeitura + 11||'
-                           AND  fprec.cod_registro             = fpecc.cod_registro
-                           AND  fprec.cod_contrato             = '||incodContrato||'
-    
-                           AND  fpecc.valor > 0 
-                      ORDER BY  fpecc.cod_evento';
+                             AND fprec.cod_registro             = fpecc.cod_registro
+                             AND fprec.cod_contrato             = '||incodContrato||'
+
+                             AND fpecc.valor > 0 
+                        ORDER BY fpecc.cod_evento';
             EXECUTE stSql;
-    
-    
+
             -- leitura e insercao do "ponto fixo" na tabela temporaria
             stSql := ' INSERT INTO tmp_registro_evento_ferias 
-                             SELECT registro_evento.cod_evento                
-                                    , COALESCE(registro_evento.valor,0.00)       as valor
-                                    , COALESCE(registro_evento.quantidade,0.00)  as quantidade
-                                    , registro_evento_periodo.cod_periodo_movimentacao
-                                    , evento.natureza                
-                                    , evento.fixado                  
-                                    , COALESCE(evento_evento.unidade_quantitativa,0) as unidade_quantitativa
-                                    , configuracao_evento_caso.proporcao_abono    
-                                    , registro_evento_parcela.parcela
-                                    , ''fixo_atual'' as lido_de
-                                 FROM folhapagamento'||stEntidade||'.registro_evento_periodo
-                                 JOIN folhapagamento'||stEntidade||'.ultimo_registro_evento        
-                                   ON registro_evento_periodo.cod_registro = ultimo_registro_evento.cod_registro
+                          SELECT
+                                 registro_evento.cod_evento
+                               , COALESCE(registro_evento.valor,0.00)       as valor
+                               , COALESCE(registro_evento.quantidade,0.00)  as quantidade
+                               , registro_evento_periodo.cod_periodo_movimentacao
+                               , evento.natureza
+                               , evento.fixado
+                               , COALESCE(evento_evento.unidade_quantitativa,0) as unidade_quantitativa
+                               , configuracao_evento_caso.proporcao_abono
+                               , registro_evento_parcela.parcela
+                               , ''fixo_atual'' as lido_de
 
-                                 JOIN folhapagamento'||stEntidade||'.registro_evento
-                                   ON ultimo_registro_evento.cod_registro = registro_evento.cod_registro
-                                  AND ultimo_registro_evento.timestamp    = registro_evento.timestamp
+                            FROM folhapagamento'||stEntidade||'.registro_evento_periodo
 
-                                 JOIN folhapagamento'||stEntidade||'.evento
-                                   ON evento.cod_evento = registro_evento.cod_evento
-                                  AND evento.natureza IN ( ''P'',''D'' )
-                            
-                                 JOIN folhapagamento'||stEntidade||'.evento_evento
-                                   ON evento_evento.cod_evento = evento.cod_evento
-                            
-                                 JOIN (  SELECT cod_evento
-                                              , max(timestamp) as timestamp
-                                           FROM folhapagamento'||stEntidade||'.evento_evento
-                                       GROUP BY cod_evento) as max_evento_evento
-                                   ON evento_evento.cod_evento = max_evento_evento.cod_evento
-                                  AND evento_evento.timestamp = max_evento_evento.timestamp
-                            
-                                 JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso
-                                   ON configuracao_evento_caso.cod_evento = evento_evento.cod_evento
-                                  AND configuracao_evento_caso.timestamp  = evento_evento.timestamp
-                                  AND configuracao_evento_caso.cod_configuracao = 2
-                            
-                                 JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media
-                                   ON tipo_evento_configuracao_media.cod_configuracao = 2
-                                  AND tipo_evento_configuracao_media.timestamp = configuracao_evento_caso.timestamp
-                                  AND tipo_evento_configuracao_media.cod_evento = configuracao_evento_caso.cod_evento
-                                  AND tipo_evento_configuracao_media.cod_caso = configuracao_evento_caso.cod_caso
-                            
-                            LEFT JOIN folhapagamento'||stEntidade||'.registro_evento_parcela
-                                   ON registro_evento.cod_registro = registro_evento_parcela.cod_registro
-                            
-                                WHERE registro_evento_periodo.cod_contrato             = '||inCodContrato||'
-                                  AND registro_evento_periodo.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao||'
-                                  AND registro_evento.proporcional = FALSE
-                                  AND (evento.tipo = ''F'' OR registro_evento_parcela.parcela is not null)
-                             ORDER BY registro_evento.cod_evento';
+                      INNER JOIN folhapagamento'||stEntidade||'.ultimo_registro_evento
+                              ON registro_evento_periodo.cod_registro = ultimo_registro_evento.cod_registro
+
+                      INNER JOIN folhapagamento'||stEntidade||'.registro_evento
+                              ON ultimo_registro_evento.cod_registro = registro_evento.cod_registro
+                             AND ultimo_registro_evento.timestamp    = registro_evento.timestamp
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento
+                              ON evento.cod_evento = registro_evento.cod_evento
+                             AND evento.natureza IN ( ''P'',''D'' )
+
+                      INNER JOIN folhapagamento'||stEntidade||'.evento_evento
+                              ON evento_evento.cod_evento = evento.cod_evento
+
+                      INNER JOIN (  SELECT cod_evento
+                                         , max(timestamp) as timestamp
+                                      FROM folhapagamento'||stEntidade||'.evento_evento
+                                  GROUP BY cod_evento
+                                 ) as max_evento_evento
+                              ON evento_evento.cod_evento = max_evento_evento.cod_evento
+                             AND evento_evento.timestamp = max_evento_evento.timestamp
+
+                      INNER JOIN folhapagamento'||stEntidade||'.configuracao_evento_caso
+                              ON configuracao_evento_caso.cod_evento = evento_evento.cod_evento
+                             AND configuracao_evento_caso.timestamp  = evento_evento.timestamp
+                             AND configuracao_evento_caso.cod_configuracao = 2
+
+                      INNER JOIN folhapagamento'||stEntidade||'.tipo_evento_configuracao_media
+                              ON tipo_evento_configuracao_media.cod_configuracao = 2
+                             AND tipo_evento_configuracao_media.timestamp = configuracao_evento_caso.timestamp
+                             AND tipo_evento_configuracao_media.cod_evento = configuracao_evento_caso.cod_evento
+                             AND tipo_evento_configuracao_media.cod_caso = configuracao_evento_caso.cod_caso
+
+                       LEFT JOIN folhapagamento'||stEntidade||'.registro_evento_parcela
+                              ON registro_evento.cod_registro = registro_evento_parcela.cod_registro
+
+                           WHERE registro_evento_periodo.cod_contrato             = '||inCodContrato||'
+                             AND registro_evento_periodo.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao||'
+                             AND registro_evento.proporcional = FALSE
+                             AND (evento.tipo = ''F'' OR registro_evento_parcela.parcela is not null)
+                        ORDER BY registro_evento.cod_evento';
             EXECUTE stSql;
-    
-    
+
             -- ***************** cria tabela distinct eventos 
             -- so executa o resto se existir dados no temporario
             stSql := 'SELECT count(cod_evento) FROM tmp_registro_evento_ferias';
-    
+
             OPEN crCursor FOR EXECUTE stSql;
                  FETCH crCursor INTO inNrRegistros ;
             CLOSE crCursor;
             IF inNrRegistros > 0 THEN
                 -- organiza tabela com distinct e verifica tipo de avaliacao pra media 
                 -- em uma nova tabela temporaria . 
-    
+
                 CREATE TEMPORARY TABLE tmp_registro_evento_ferias_medias 
                       (cod_evento               INTEGER,
                        codigo                   VARCHAR,
@@ -586,72 +576,73 @@ BEGIN
                        natureza                 CHAR(1),
                        evento_sistema           BOOLEAN 
                       );
-    
-    
-    
+
                 --testes
                 --     inCodSubDivisao    := 1;
                 --     inCodFuncao        := 1;
                 --     inCodEspecialidade := 1;
                 --
-    
-    
+
                 stSql := ' INSERT INTO tmp_registro_evento_ferias_medias 
-                         SELECT  distinct tmp_registro_evento_ferias.cod_evento as cod_evento
-                                , fpe.codigo                                    as codigo
-                                , fpe.descricao                                 as descricao
-                                , COALESCE(fpee.unidade_quantitativa,0)         as unidade_quantitativa
-                                , fpe.fixado                                    as fixado
-                                , ''0.0.0''                                 as formula
-                                , 0.00                                          as valor
-                                , 0.00                                          as quantidade
-                                , COALESCE(parcela,0) as parcela
-                                , 0                                             as avos
-                                , 0                                             as nr_ocorrencias
-                                ,fpe.natureza                                   as natureza
-                                ,fpe.evento_sistema                             as evento_sistema
-                           FROM tmp_registro_evento_ferias
-    
-                           LEFT OUTER JOIN folhapagamento'||stEntidade||'.evento  as fpe 
-                             ON fpe.cod_evento = tmp_registro_evento_ferias.cod_evento
-    
-                           LEFT OUTER JOIN 
-                                ( SELECT distinct ON (cod_evento) cod_evento
-                                   , unidade_quantitativa 
-                                   FROM folhapagamento'||stEntidade||'.evento_evento
-                                     ORDER BY folhapagamento'||stEntidade||'.evento_evento.cod_evento, folhapagamento'||stEntidade||'.evento_evento.timestamp desc
-                                    ) as fpee
-                             ON fpee.cod_evento = fpe.cod_evento
-    
-                         ORDER BY tmp_registro_evento_ferias.cod_evento';
-    
-    
+                          SELECT
+                                 distinct tmp_registro_evento_ferias.cod_evento as cod_evento
+                               , fpe.codigo                                     as codigo
+                               , fpe.descricao                                  as descricao
+                               , COALESCE(fpee.unidade_quantitativa,0)          as unidade_quantitativa
+                               , fpe.fixado                                     as fixado
+                               , ''0.0.0''                                      as formula
+                               , 0.00                                           as valor
+                               , 0.00                                           as quantidade
+                               , COALESCE(parcela,0)                            as parcela
+                               , 0                                              as avos
+                               , 0                                              as nr_ocorrencias
+                               , fpe.natureza                                   as natureza
+                               , fpe.evento_sistema                             as evento_sistema
+
+                            FROM tmp_registro_evento_ferias
+
+                       LEFT JOIN folhapagamento'||stEntidade||'.evento  as fpe 
+                              ON fpe.cod_evento = tmp_registro_evento_ferias.cod_evento
+
+                       LEFT JOIN ( SELECT distinct ON (cod_evento) cod_evento
+                                        , unidade_quantitativa 
+                                     FROM folhapagamento'||stEntidade||'.evento_evento
+                                 ORDER BY folhapagamento'||stEntidade||'.evento_evento.cod_evento, folhapagamento'||stEntidade||'.evento_evento.timestamp desc
+                                 ) as fpee
+                              ON fpee.cod_evento = fpe.cod_evento
+
+                           WHERE tmp_registro_evento_ferias.cod_periodo_movimentacao = ( SELECT MAX(eventos_ferias.cod_periodo_movimentacao) AS cod_periodo_movimentacao
+                                                                                           FROM tmp_registro_evento_ferias AS eventos_ferias
+                                                                                          WHERE eventos_ferias.cod_evento = fpe.cod_evento
+                                                                                       )
+
+                        ORDER BY tmp_registro_evento_ferias.cod_evento';
                 EXECUTE stSql;
-    
+
                 --*************************************************
                 -- so executa o resto se existir dados no temporario
-    
+
                 -- executa as formulas de cada um dos eventos, faz o desdobramento 
                 -- necessario e grava o registro
-    
+
                 stSql := 'SELECT count(cod_evento)
-                                             FROM tmp_registro_evento_ferias_medias
-                                            WHERE formula is not null';
-                           
+                            FROM tmp_registro_evento_ferias_medias
+                           WHERE formula is not null';
+
                 OPEN crCursor FOR EXECUTE stSql;
                      FETCH crCursor INTO inNrRegistros;
                 CLOSE crCursor;
-    
+
                 IF inNrRegistros IS NOT NULL THEN
                     -- ****************desdobramento*******************************************
                     -- aqui ja indica que existem eventos para este contrato 
                     -- parte que gera a relacao de proporcionalidade para definir o desdobramento
-    
+
                     -- tratar desdobramento
                     -- , pois as medias obtem o valor/quantidade 
                     -- do todo, tendo que avaliar a proporcao entre F (ferias gozo)
                     -- A(abono) e D(adiantamneto pagamento gozo ferias)
-    
+
                     --       , inCodForma
                     --       , inDiasGozoFeriasContrato
                     --       , inDiasAbonoContrato 
@@ -661,76 +652,72 @@ BEGIN
                     --     , inDiasAbono
                     --     , stAnoPagamento
                     --     , stMesPagamento
-    
-    
+
                     -- abono sempre e gerado pois precisa ser calculado no mes do pagamento
                     -- e recalculado no mes de gozo, se FOR o caso, para verificar a existencia 
                     -- de diferenca em relacao a ferias
                     -- ha controversias neste caso  pode ser necessario nao recalcular o abono.
                     inGeraAbono := inDiasAbonoContrato;
-            
+
                     -- avaliacoes do mes de pagamento
                     IF ( stAnoPagamento = substr(stDataFinalCompetencia::varchar,1,4) AND stMesPagamento = substr(stDataFinalCompetencia::varchar,6,2) ) THEN
-    
+
                         -- se o pagamento FOR todo adiantado, nao havendo gozo neste mes.
                         IF stInicio > stDataFinalCompetencia THEN
                            -- verifica quantos dias, de cada tipo devem ser gerados 
                            -- para esta situacao 
                            inGeraGozo         := 0;
                            inGeraAdiantamento := inDiasGozoFeriasContrato;
-    
-    
+
                            -- o inicio do gozo esta dentro do mes de pagamento
                         ELSE
                            -- gozo de ferias todo dentro do mes
                            IF stFim <= stDataFinalCompetencia THEN
                               inGeraGozo         := inDiasGozoFeriasContrato;
                               inGeraAdiantamento := 0;
-    
-    
+
                            ELSE 
                                -- se inicia no mes e continua no proximo, o gozo de ferias
                                inGeraGozo         := ( to_number(substr(stDataFinalCompetencia,9,2),'99') - to_number(substr(stInicio,9,2),'99') + 1 );
                                inGeraAdiantamento := inDiasGozoFeriasContrato - inGeraGozo;
-    
+
                                -- ainda nao esta sendo tratado o caso de ferias 
                                -- em fevereiro, caso inicie em janeiro e termine 
                                -- em marco.
-    
+
                            END IF;
                         END IF;
-    
+
                     ELSE
                         -- esta fora do mes de pagamento mas ha necessidade de 
                         -- regeracao das ferias em funcao das datas de gozo de 
                         -- ferias, tanto considerando o inicio do gozo como o 
                         -- final do gozo.
-    
+
                         inGeraAdiantamento := 0;
                         --inGeraAbono        := inDiasAbono;
-    
-    
+
                         -- se no ano/mes atual houve o inicio do gozo de ferias
                         IF substr(stInicio::varchar,1,7) = substr(stDataFinalCompetencia::varchar,1,7) THEN 
-    
+
                            -- inicio e fim no mesmo mes.
                            IF substr(stFim::varchar,1,7) = substr(stInicio::varchar,1,7) THEN 
                               inGeraGozo := to_number(substr(stFim,9,2),'99') - to_number(substr(stInicio::varchar,9,2),'99') + 1;
                            ELSE
                               inGeraGozo := to_number(substr(stDataFinalCompetencia,9,2),'99') - to_number(substr(stInicio,9,2),'99') + 1 ;
                            END IF;
-    
+
                         ELSE
-    
+
                            -- caso especial de inicio de ferias no mes anterior e termino no proximo (fevereiro)
                            IF (    substr(stFim::varchar,1,7) > substr(stDataFinalCompetencia::varchar,1,7) 
                                AND substr(stInicio::varchar,1,7) < substr(stDataFinalCompetencia::varchar,1,7) 
                               ) THEN 
-                               
+
                               inGeraGozo := to_number(substr(stDataFinalCompetencia,9,2),'99');
-    
+
                            ELSE
-    
+
                               -- se nao FOR o mes de inicio de gozo, verifica entao,
                               -- se o final esta neste mes.
                               IF substr(stFim::varchar,1,7) = substr(stDataFinalCompetencia::varchar,1,7) THEN 
@@ -743,18 +730,17 @@ BEGIN
                         -- necessario verificar os pagamentos de ferias efetuados 
                         -- em meses anteriores pois aqui precisam ser descontados
                         -- para a geracao das diferencas de ferias.
-    
+
                         -- calculaNrDiasAnoMes( ano, mes ) 
                         --   ( calculaNrDiasAnoMes( 
                         --     to_number(substr(stInicio,1,4),9999)
                         --   , to_number(substr(stInicio,6,2),99)
                         --                     )
-                    END IF;                  
+                    END IF;
 
                     -- *********************** fim definicao desdobramento
-    
-                    inDiasGozo := criarBufferInteiro('inDiasGozo',inDiasGozo);
 
+                    inDiasGozo := criarBufferInteiro('inDiasGozo',inDiasGozo);
 
                     --***************************************************
                     -- Para os casos de gozo de ferias ( existindo na legislacao)
@@ -764,7 +750,7 @@ BEGIN
                     -- Esta relacao deve ser com a forma de pagamento e nao em relacao aos 
                     -- dias de ferias do contrato.
                     nuProporcaoForma := 1;
-        
+
                     --CRIAR IF PARA NAO ENTRAR NESSA PROPORCAO CASO FOR cod_forma 3 ou 4
                     --Deve ser armazenada no banco a quantidade do registro do evento como 30 sempre
                     IF inCodForma = 3 THEN
@@ -779,21 +765,21 @@ BEGIN
                        nuProporcaoForma := ((inDiasGozo + inDiasAbono)/nuProporcaoDivisao) ;
                     END IF;
                     --**************************** fim proporcao forma
-    
-    
+
                     --Exclui da tabela temporia evento de desconto que não são automáticos
                     IF boNaoGerarDesconto IS TRUE THEN
                        stSql1 := ' DELETE 
-                                      FROM tmp_registro_evento_ferias_medias
-                                     WHERE evento_sistema = false
-                                       AND natureza =''D''  ';
+                                     FROM tmp_registro_evento_ferias_medias
+                                    WHERE evento_sistema = false
+                                      AND natureza =''D''  ';
                        EXECUTE stSql1;
                     END IF;
                     --*******************************************************************
-    
+
                     -- executa e grava o resultado das formulas
-                    stSql1 := 'SELECT * FROM tmp_registro_evento_ferias_medias
-                                 WHERE formula is not null              ';
+                    stSql1 := 'SELECT *
+                                 FROM tmp_registro_evento_ferias_medias
+                                WHERE formula is not null ';
                     --  *****************************************************************
                     FOR reRegistro1 IN  EXECUTE stSql1 LOOP
                        inCodEvento := reRegistro1.cod_evento;
@@ -846,8 +832,8 @@ BEGIN
                                         -- depois avaliar se deve ser gravado no tmp..medias
                                         -- ou se gravar diretamente no registro_evento_ferias 
                                         stSql2 := ' UPDATE tmp_registro_evento_ferias_medias 
-                                                    SET valor = '||nuExecutaFormula||'
-                                                    WHERE cod_evento = '||reRegistro1.cod_evento||'
+                                                       SET valor = '||nuExecutaFormula||'
+                                                     WHERE cod_evento = '||reRegistro1.cod_evento||'
                                                 '; 
                                         EXECUTE stSql2;
                                         -- fim so para teste
@@ -858,12 +844,12 @@ BEGIN
                                         nuValorFormula := 0;
                                         -- so para testes
                                         stSql2 := ' UPDATE tmp_registro_evento_ferias_medias 
-                                                    SET quantidade = '||nuExecutaFormula||'
-                                                    WHERE cod_evento = '||reRegistro1.cod_evento||'
+                                                       SET quantidade = '||nuExecutaFormula||'
+                                                     WHERE cod_evento = '||reRegistro1.cod_evento||'
                                                 '; 
                                         EXECUTE stSql2;
                                         -- fim so para teste
-            
+
                                     END IF;
                                 END IF;
 
@@ -872,7 +858,7 @@ BEGIN
                                  -- desdobra os valores/quantidades e grava                 
                                  nuTotalValor := 0;
                                  nuTotalQuantidade := 0;
-    
+
                                  --Validação necessário para não proporcionalizar eventos de desconto
                                  IF reRegistro1.natureza != 'D' THEN
                                     inGeraAbono := inDiasAbono;
@@ -901,7 +887,7 @@ BEGIN
                                  END IF;
 
                                  IF inGeraAdiantamento > 0 THEN
-                                     IF pega0ProporcaoAbonoFerias() IS TRUE THEN    
+                                     IF pega0ProporcaoAbonoFerias() IS TRUE THEN
                                          nuValor := arredondar( (nuValorFormula*inGeraAdiantamento)/(inDiasGozo+inDiasAbono),2 ); 
                                          nuQuantidade := arredondar( (nuQuantidadeFormula*inGeraAdiantamento)/(inDiasGozo+inDiasAbono),2 ); 
                                      ELSE
@@ -920,7 +906,7 @@ BEGIN
                                      -- gravando o registro 
                                      boGravouRegistro := gravaRegistroEventoFerias( inCodContrato,inCodPeriodoMovimentacao,inCodEvento, nuValor, nuQuantidade, stDesdobramento,reRegistro1.parcela );
                                  END IF;
-    
+
                                  IF inGeraGozo > 0 THEN
                                      IF pega0ProporcaoAbonoFerias() IS TRUE THEN
                                          nuValor := arredondar( (nuValorFormula*inGeraGozo)/(inDiasGozo+inDiasAbono),2 ); 
@@ -948,7 +934,7 @@ BEGIN
 
                                      -- gravando o registro 
                                      boGravouRegistro := gravaRegistroEventoFerias( inCodContrato,inCodPeriodoMovimentacao,inCodEvento, nuValor, nuQuantidade, stDesdobramento,reRegistro1.parcela );
-    
+
                                  END IF;
                                ELSE
                                      stDesdobramento  := recuperarBufferTexto('stSituacaFerias');
@@ -963,7 +949,7 @@ BEGIN
                                                      AND registro_evento_rescisao.cod_periodo_movimentacao = '||inCodPeriodoMovimentacao||'
                                                      AND registro_evento_rescisao.cod_evento = '||inCodEvento||'
                                                      AND registro_evento_rescisao.desdobramento = '|| quote_literal(stDesdobramento);
-                                                     
+
                                     OPEN crCursor FOR EXECUTE stSql;
                                         FETCH crCursor INTO reRegistroRescisao;
                                     CLOSE crCursor; 
@@ -978,11 +964,11 @@ BEGIN
                     END LOOP;
                 END IF;
                 DROP TABLE tmp_registro_evento_ferias_medias;
-    
+
             END IF;
             DROP TABLE tmp_registro_evento_ferias;
             boRetorno := removerBufferInteiro('inAvos');
-    
+
         END IF;
     END IF;
     IF inControleExecucaoRescisaoFerias < 1 THEN

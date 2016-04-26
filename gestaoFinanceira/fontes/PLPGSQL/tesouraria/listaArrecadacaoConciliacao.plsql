@@ -23,35 +23,11 @@
 /*
 * Script de função PLPGSQL
 *
-
-	$Id: listaArrecadacaoConciliacao.plsql 64809 2016-04-05 12:38:56Z lisiane $
-
+	$Id: listaArrecadacaoConciliacao.plsql 64978 2016-04-18 14:43:54Z michel $
 *
 * Casos de uso: uc-02.04.07,uc-02.04.19,uc-02.04.04,uc-02.04.10
 */
-/*
 
-$Log$
-Revision 1.7  2007/09/14 21:02:47  cako
-Ticket#9496#
-
-Revision 1.6  2007/09/12 16:10:01  cako
-Ticket#10037#
-
-Revision 1.5  2007/08/14 21:43:59  cako
-Bug#9921#
-
-Revision 1.4  2007/06/20 19:30:06  gris
-Bug#9116#
-
-Revision 1.3  2007/05/30 19:26:22  bruce
-Bug #9116#
-
-Revision 1.2  2006/12/20 13:29:07  cako
-add tag log
-
-
-*/
 CREATE OR REPLACE FUNCTION tesouraria.fn_listar_arrecadacao_conciliacao( varchar, varchar, varchar, varchar, integer, varchar, varchar, boolean ) RETURNS BOOLEAN AS '
 DECLARE
     stFiltroCarne       ALIAS FOR $1;
@@ -161,9 +137,7 @@ BEGIN
     stSql := ''
         CREATE TEMPORARY TABLE tmp_deducao_estornada AS (
             SELECT TB.cod_boletim
-   --             ,TO_CHAR( TB.dt_boletim, ''''dd/mm/yyyy'''' ) AS dt_boletim
                   ,TO_CHAR( arde.timestamp_dedutora_estornada, ''''dd/mm/yyyy'''') as dt_boletim
-   --             ,TO_CHAR( TA.timestamp_arrecadacao, ''''HH24:mi:ss'''' ) as hora
                   ,TO_CHAR( ARDE.timestamp_dedutora_estornada, ''''HH24:mi:ss'''' ) as hora
                   ,TA.cod_entidade
                   ,TA.cod_arrecadacao
@@ -250,15 +224,6 @@ BEGIN
               AND CPC.exercicio             = CPA.exercicio
               AND CPC.cod_conta             = CPA.cod_conta '';
 
-/*      IF (stDtFinal != '''') THEN
-              stSql := stSql|| '' AND to_date(to_char(ARDE.timestamp_dedutora_estornada,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') <= TO_DATE(''''''||stDtFinal||'''''',''''dd/mm/yyyy'''') '';
-        END IF;
-
-        IF (stDtInicial != '''') THEN
-              stSql := stSql|| '' AND to_date(to_char(ARDE.timestamp_dedutora_estornada,''''dd/mm/yyyy''''),''''dd/mm/yyyy'''') >= TO_DATE(''''''||stDtInicial||'''''',''''dd/mm/yyyy'''') '';
-        END IF;
-*/
-
         stSql := stSql ||''
               AND ta.cod_plano = ''||inCodPlano||''
               AND ta.cod_entidade in ( ''||inCodEntidade||'' )
@@ -269,7 +234,7 @@ BEGIN
             ORDER BY exercicio
                     ,cod_entidade
                     ,cod_receita)'';
-         
+
     EXECUTE stSql;
 
     stSql := ''
@@ -303,6 +268,7 @@ BEGIN
                   ,tbl.porcentagem_valor
                   ,TA.cgm_usuario
                   ,''''A'''' AS tipo_arrecadacao
+                  ,NULL::INTEGER AS cod_historico
             FROM tesouraria.boletim     AS TB
                 ,tesouraria.arrecadacao AS TA
                 ,tesouraria.arrecadacao_carne AS TAC
@@ -373,7 +339,7 @@ BEGIN
               AND CPA.cod_conta           = CPC.cod_conta
               '';
                  IF boTCEMS <> ''true'' THEN
-                    stSql := stSql || '' 
+                    stSql := stSql || ''
                       -- Join com orcamento.conta_receita
                       AND CPC.exercicio           = OCR.exercicio
                       -- ref. novo plano de contas para 2008 | Dedutoras com 15 dígitos no orçamento
@@ -426,6 +392,7 @@ BEGIN
                   ,0 as porcentagem_valor
                   ,TA.cgm_usuario
                   ,''''A'''' AS tipo_arrecadacao
+                  ,NULL::INTEGER AS cod_historico
             FROM tesouraria.boletim             AS TB
                 ,tesouraria.arrecadacao         AS TA
                 ,tesouraria.arrecadacao_receita AS TAR
@@ -451,7 +418,7 @@ BEGIN
                     stSql := stSql || '' AND TA.exercicio = CPA.exercicio
                                          AND TA.cod_plano = CPA.cod_plano '';
                  ELSE
-                    stSql := stSql || '' 
+                    stSql := stSql || ''
                       -- Join com orcamento.receita
                       AND TAR.exercicio            = ORE.exercicio
                       AND TAR.cod_receita          = ORE.cod_receita
@@ -478,7 +445,6 @@ BEGIN
 
               '' || stFiltroReceita || ''
 
-
             UNION
 
             SELECT TD.cod_boletim
@@ -501,6 +467,7 @@ BEGIN
                   ,0 as porcentagem_valor
                   ,TD.cgm_usuario
                   ,''''D'''' AS tipo_arrecadacao
+                  ,926 AS cod_historico
             FROM tmp_deducao_estornada            AS TD
                 ,tesouraria.arrecadacao_estornada AS TAE
                 ,tesouraria.arrecadacao           AS TA
@@ -604,7 +571,7 @@ BEGIN
                   AND ORE.cod_conta            = OCR.cod_conta
                   -- Join com contabilidade.conta_plano
                   AND OCR.exercicio            = CPC.exercicio
-                  -- ref. novo plano de contas para 2008 | Dedutoras com 15 dígitos no orçamento  
+                  -- ref. novo plano de contas para 2008 | Dedutoras com 15 dígitos no orçamento
                   AND CASE WHEN ( OCR.exercicio > ''''2007'''' AND SUBSTR(ocr.cod_estrutural,1,1) = ''''9'''' )
                             THEN OCR.cod_estrutural = CPC.cod_estrutural
                             ELSE ''''4.''''||OCR.cod_estrutural = CPC.cod_estrutural
@@ -763,7 +730,6 @@ END LOOP;
            AND TA.cod_arrecadacao       = TD.cod_arrecadacao
            AND TA.timestamp_arrecadacao = TD.timestamp
 
-
     UNION
     /* Devolução de Receitas -- Devem aparecer como Estorno de dedução para que os lançamentos sejam efetuados na contabilidade
                              -- de forma inversa e também demonstrados como estorno nos relatórios.
@@ -780,7 +746,7 @@ END LOOP;
                   ,'''''''' as numeracao
                   ,TA.timestamp_arrecadacao as timestamp
                   ,TA.timestamp_arrecadacao
-                  ,TAR.vl_arrecadacao AS valor    
+                  ,TAR.vl_arrecadacao AS valor
                   ,CAST( 0.00 AS NUMERIC ) as vl_desconto
                   ,CAST( 0.00 AS NUMERIC ) as vl_multa
                   ,CAST( 0.00 AS NUMERIC ) as vl_juros
@@ -791,19 +757,19 @@ END LOOP;
                   ,CAST( ''''D'''' AS VARCHAR) as tipo_arrecadacao
                   ,NULL::INTEGER AS cod_historico
             FROM tesouraria.boletim               AS TB 
-                 JOIN tesouraria.arrecadacao AS TA 
+                 JOIN tesouraria.arrecadacao AS TA
                  ON (   TB.exercicio   = TA.exercicio
                     AND TB.cod_boletim = TA.cod_boletim
                     AND TB.cod_entidade= TA.cod_entidade
                  )
                  JOIN tesouraria.arrecadacao_receita AS TAR
-                 ON (   ta.cod_arrecadacao       = tar.cod_arrecadacao  
+                 ON (   ta.cod_arrecadacao       = tar.cod_arrecadacao
                     AND ta.exercicio             = tar.exercicio
                     AND ta.timestamp_arrecadacao = tar.timestamp_arrecadacao
                  )
                  '';
                  IF boTCEMS = ''true'' THEN
-                    stSql := stSql || '' 
+                    stSql := stSql || ''
                          JOIN contabilidade.plano_analitica AS CPA
                          ON (   TA.exercicio = CPA.exercicio
                             AND TA.cod_plano = CPA.cod_plano
@@ -817,7 +783,7 @@ END LOOP;
                     stSql := stSql || ''
                          JOIN orcamento.receita AS ORE
                          ON (   TAR.exercicio    = ORE.exercicio
-                            AND TAR.cod_receita  = ORE.cod_receita                    
+                            AND TAR.cod_receita  = ORE.cod_receita
                          )
                          JOIN orcamento.conta_receita AS OCR
                          ON (   ORE.exercicio = OCR.exercicio
@@ -832,14 +798,13 @@ END LOOP;
                          )
                          JOIN contabilidade.plano_analitica AS CPA
                          ON (   CPC.exercicio = CPA.exercicio
-                            AND CPC.cod_conta = CPA.cod_conta    
+                            AND CPC.cod_conta = CPA.cod_conta
                          ) '';
                 END IF;
             stSql := stSql || ''
             WHERE ta.devolucao = true
-            
-              '' || stFiltroReceita || ''
 
+              '' || stFiltroReceita || ''
 
            ORDER BY exercicio
                    ,cod_entidade

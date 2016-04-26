@@ -258,178 +258,36 @@ CREATE TABLE contabilidade.lancamento_baixa_patrimonio_depreciacao(
 GRANT ALL ON contabilidade.lancamento_baixa_patrimonio_depreciacao TO urbem;
 
 
-----------------
--- Ticket #23482
-----------------
-
-CREATE TABLE licitacao.contrato_apostila(
-    cod_apostila        INTEGER         NOT NULL,
-    num_contrato        INTEGER         NOT NULL,
-    cod_entidade        INTEGER         NOT NULL,
-    exercicio           CHAR(4)         NOT NULL,
-    cod_tipo            INTEGER         NOT NULL,
-    cod_alteracao       INTEGER         NOT NULL,
-    descricao           VARCHAR(250)    NOT NULL,
-    data_apostila       DATE            NOT NULL,
-    valor_apostila      NUMERIC(14,2)   NOT NULL,
-    CONSTRAINT pk_contrato_apostila     PRIMARY KEY     (cod_apostila, num_contrato, cod_entidade, exercicio),
-    CONSTRAINT fk_contrato_apostila_1   FOREIGN KEY                   (num_contrato, cod_entidade, exercicio)
-                                        REFERENCES licitacao.contrato (num_contrato, cod_entidade, exercicio)
-);
-GRANT ALL ON licitacao.contrato_apostila TO urbem;
-
-
-UPDATE administracao.acao SET ordem = 11 WHERE cod_acao = 3087;
-
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3105
-     , 342
-     , 'FLManterApostilaContrato.php' 
-     , 'incluir'
-     , 15
-     , ''
-     , 'Incluir Apostila de Contrato'
-     , TRUE
-     );
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3106
-     , 342
-     , 'FLManterApostilaContrato.php'
-     , 'alterar'
-     , 16
-     , ''
-     , 'Alterar Apostila de Contrato'
-     , TRUE
-     );
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3107
-     , 342
-     , 'FLManterApostilaContrato.php'
-     , 'excluir'
-     , 17
-     , ''
-     , 'Excluir Apostila de Contrato'
-     , TRUE
-     );
-
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3108
-     , 428
-     , 'FLManterApostilaContrato.php' 
-     , 'incluir'
-     , 9
-     , ''
-     , 'Incluir Apostila de Contrato'
-     , TRUE
-     );
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3109
-     , 428
-     , 'FLManterApostilaContrato.php'
-     , 'alterar'
-     , 10
-     , ''
-     , 'Alterar Apostila de Contrato'
-     , TRUE
-     );
-
-INSERT
-  INTO administracao.acao
-     ( cod_acao
-     , cod_funcionalidade
-     , nom_arquivo
-     , parametro
-     , ordem
-     , complemento_acao
-     , nom_acao
-     , ativo
-     )
-VALUES
-     ( 3110
-     , 428
-     , 'FLManterApostilaContrato.php'
-     , 'excluir'
-     , 11
-     , ''
-     , 'Excluir Apostila de Contrato'
-     , TRUE
-     );
-
-
-----------------
+--------------
 -- Ticket #22396
 ----------------
 
-CREATE TYPE participante_documentos AS (
-    cod_licitacao       INTEGER,
-    cod_documento       INTEGER,
-    dt_validade         DATE,
-    cgm_fornecedor      INTEGER,
-    cod_modalidade      INTEGER,
-    cod_entidade        INTEGER,
-    exercicio           CHAR,
-    num_documento       VARCHAR,
-    dt_emissao          DATE,
-    timestamp           TIMESTAMP
- );
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+
+BEGIN
+    PERFORM 1
+       FROM pg_type
+      WHERE typname = 'participante_documentos'
+          ;
+    IF NOT FOUND THEN
+        CREATE TYPE participante_documentos AS (
+            cod_licitacao       INTEGER,
+            cod_documento       INTEGER,
+            dt_validade         DATE,
+            cgm_fornecedor      INTEGER,
+            cod_modalidade      INTEGER,
+            cod_entidade        INTEGER,
+            exercicio           CHAR,
+            num_documento       VARCHAR,
+            dt_emissao          DATE,
+            timestamp           TIMESTAMP
+         );
+    END IF;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT        manutencao();
+DROP FUNCTION manutencao();
+
  

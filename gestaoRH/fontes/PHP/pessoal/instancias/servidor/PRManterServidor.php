@@ -34,23 +34,21 @@ inCategoriaCertificado
 
 * @ignore
 
-$Revision: 32866 $
-$Name$
-$Author: souzadl $
-$Date: 2008-03-24 11:59:05 -0300 (Seg, 24 Mar 2008) $
+$Id: PRManterServidor.php 65096 2016-04-22 19:46:59Z michel $
 
 * Casos de uso: uc-04.04.07
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GRH_PES_NEGOCIO."RPessoalServidor.class.php");
-include_once(CAM_GRH_PES_NEGOCIO."RConfiguracaoPessoal.class.php");
-include_once(CAM_GA_NORMAS_NEGOCIO."RNorma.class.php");
-include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
+include_once CAM_GRH_PES_NEGOCIO."RPessoalServidor.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RConfiguracaoPessoal.class.php";
+include_once CAM_GA_NORMAS_NEGOCIO."RNorma.class.php";
+include_once CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php";
+include_once CAM_GA_CGM_MAPEAMENTO."TCGM.class.php";
 
 $stAcao = $request->get('stAcao');
-$inAba  = $_REQUEST["inAba"];
+$inAba  = $request->get('inAba');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterServidor";
@@ -67,25 +65,29 @@ $obAtributos = new MontaAtributos;
 $obAtributos->setName      ( "Atributo_" );
 $obAtributos->recuperaVetor( $arChave    );
 
-$obRConfiguracaoPessoal->Consultar( $boTransacao );
+$boTransacao = "";
 $obErro = new Erro;
 
-include_once( CAM_GA_CGM_MAPEAMENTO."TCGM.class.php");
-$obTCGM = new TCGM;
-$stFiltro = " AND cgm.numcgm = ".$_REQUEST["inNumCGM"];
-$obTCGM->recuperaRelacionamentoSintetico( $rsCGM, $stFiltro, '', $boTransacao );
+$obErro = $obRConfiguracaoPessoal->Consultar( $boTransacao );
+
+if (!$obErro->ocorreu()){
+    $obTCGM = new TCGM;
+    $stFiltro = " AND cgm.numcgm = ".$request->get('inNumCGM');
+    $obErro = $obTCGM->recuperaRelacionamentoSintetico( $rsCGM, $stFiltro, '', $boTransacao );
+}
+
+if ( $obErro->ocorreu() ){
+    sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_".$stAcao,"erro");
+    exit();
+}
 
 if (trim($stAcao)=="alterar_servidor") {
     // Quando incluir mais de uma matrícula para o mesmo CGM voltar para a tela de inclusão
-    $_POST['actVoltar'] = "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=incluir";
+    $request->set('actVoltar', "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=incluir");
 }
 
 switch ($stAcao) {
     case "incluir":
-        $obTransacao = new Transacao;
-        $boFlagTransacao = false;
-        $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
-
         $nomeFoto = Sessao::read('FOTO_NAME');
         if ($nomeFoto) {
             //NOME DO ARQUIVO DA MINIATURA
@@ -96,510 +98,516 @@ switch ($stAcao) {
             if(!copy(Sessao::read('FOTO_URL'), $imagem_gerada)){
                 $obErro->setDescricao("Erro ao gravar foto. Contactar o administrador do sistema.");
             }
+        }
+
+        $obErro = $obRPessoalServidor->recuperaTodosRaca( $rsRaca, $boTransacao );
+
+        if (!$obErro->ocorreu()){
+            $obRPessoalServidor->setCodUF                          ( $request->get('inCodUF'));
+            $obRPessoalServidor->setCodMunicipio                   ( $request->get('inCodMunicipio') );
+            $obRPessoalServidor->setCodEstadoCivil                 ( $request->get('inCodEstadoCivil'));
+            $obRPessoalServidor->setCodRais                        ( $request->get('inCodRaca'));
+            $obRPessoalServidor->setCodRaca                        ( $rsRaca->getCampo('cod_raca') );
+            $obRPessoalServidor->obRPessoalCID->setCodCID          ( $request->get('inCodCID'));
+            $obRPessoalServidor->setCodEdital                      ( '0' );
+            $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM     ( $request->get('inNumCGM') );
+            $obRPessoalServidor->obRCGMPessoaFisica->setCPF        ( $request->get('stCPF') );
+            $obRPessoalServidor->setDataNascimento                 ( $request->get('stDataNascimento') );
+            $obRPessoalServidor->setNomePai                        ( $request->get('stNomePai') );
+            $obRPessoalServidor->setNomeMae                        ( $request->get('stNomeMae') );
+            $obRPessoalServidor->obRCGMPessoaFisicaConjuge->setNumCgm( $request->get('inCGMConjuge') );
+
+            //dados aba documentacao
+            if (!$obErro->ocorreu() && !checkPIS($request->get('stPisPasep'), false)) {
+                $obErro->setDescricao("Campo PIS/PASEP da guia Documentação é inválido(".$request->get('stPisPasep').").");
+            }
+    
+            if (!$obErro->ocorreu()){
+                $obRPessoalServidor->setPisPasep                       ( $request->get('stPisPasep')                  );
+                $obRPessoalServidor->setDataPisPasep                   ( $request->get('dtCadastroPis')               );
+                $obRPessoalServidor->setCarteiraReservista             ( $request->get('stCertificadoReservista')     );
+                $obRPessoalServidor->setCategoriaReservista            ( $request->get('inCategoriaCertificado')      );
+                $obRPessoalServidor->setOrigemReservista               ( $request->get('inOrgaoExpedidorCertificado') );
+                $obRPessoalServidor->setNrTituloEleitor                ( $request->get('inTituloEleitor')             );
+                $obRPessoalServidor->setZonaTitulo                     ( $request->get('inZonaTitulo')                );
+                $obRPessoalServidor->setSecaoTitulo                    ( $request->get('inSecaoTitulo')               );
+                $obRPessoalServidor->setCaminhoFoto                    ( $nome_foto                                   );
+
+                $arrCTPS = Sessao::read('CTPS');
+                if (is_array($arrCTPS) ) {
+                    foreach ($arrCTPS as $arCTPS) {
+                        $obRPessoalServidor->addRPessoalCTPS();
+                        $obRPessoalServidor->roRPessoalCTPS->setNumero          ( $arCTPS['inNumeroCTPS']           );
+                        $obRPessoalServidor->roRPessoalCTPS->setOrgaoExpedidor  ( $arCTPS['stOrgaoExpedidorCTPS']   );
+                        $obRPessoalServidor->roRPessoalCTPS->setSerie           ( $arCTPS['stSerieCTPS']            );
+                        $obRPessoalServidor->roRPessoalCTPS->setEmissao         ( $arCTPS['dtDataCTPS']             );
+                        $obRPessoalServidor->roRPessoalCTPS->setUfCTPS          ( $arCTPS['inCodUF']                );
+                    }
+                }
+                if ( !$obErro->ocorreu() and $stAcao != 'incluir' ) {
+                    // verificando se a data de alteração da função é maior que a data de nomeação
+                    if ($request->get('stContagemInicial') == 'dtNomeacao') {
+                        if ( compData($request->get('dtDataAlteracaoFuncao') , $request->get('dtDataNomeacao') ) == 2 ) {
+                            $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data de Nomeação!");
+                        }
+                    } else {
+                        $dtDataAlteracaoFuncao = ( $request->get("dtDataAlteracaoFuncao") != "" ) ? $request->get("dtDataAlteracaoFuncao") : $request->get("hdnDataAlteracaoFuncao");
+                        if ( compData( $dtDataAlteracaoFuncao, $request->get('dtDataPosse')) == 2 ) {
+                            $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data da Posse!");
+                        }
+                    }
+                }
+
+                if ( !$obErro->ocorreu() ) {
+                    //Dados aba contrato
+                    //Informações contratuais
+                    $obRPessoalServidor->addContratoServidor();
+
+                    if ( $obRConfiguracaoPessoal->getGeracaoRegistro() == 'A' ) {
+                        include_once CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php";
+                        $obIContratoDigitoVerificadorAutomatico = new IContratoDigitoVerificador("", false, false, $boTransacao);
+                        $obErro = $obIContratoDigitoVerificadorAutomatico->obRPessoalContrato->proximoRegistro($boTransacao);
+                        if ( !$obErro->ocorreu() ) {
+                            $inContratoAutomatico = $obIContratoDigitoVerificadorAutomatico->obRPessoalContrato->getRegistro();
+                            $inContrato =  explode("-",$inContratoAutomatico);
+                        }
+                    } else {
+                        $inContrato =  explode("-",$request->get("inContrato"));
+                    }
+
+                    if ( !$obErro->ocorreu() ) {
+                        //Verifica Norma
+                        $arCodNorma = explode("/",$request->get('stCodNorma'));
+                        if (count($arCodNorma)>0) {
+                            $stNumNorma = ltrim($arCodNorma[0],'0');
+                            if ($stNumNorma == "") {
+                                $stNumNorma = "0";
+                            }
+                            $obRNorma = new RNorma();
+                            $obRNorma->setNumNorma( $stNumNorma );
+                            $obRNorma->setExercicio( $arCodNorma[1] );
+                            $obRNorma->listar($rsNorma, $boTransacao);
+                            $stCodNorma = $rsNorma->getCampo('cod_norma');
+                        }
+
+                        $obRPessoalServidor->roUltimoContratoServidor->setRegistro                                              ( $inContrato[0]                             );
+                        $obRPessoalServidor->roUltimoContratoServidor->setNroCartaoPonto                                        ( $request->get('inCartaoPonto')             );
+                        $obRPessoalServidor->roUltimoContratoServidor->setAtivo                                                 ( "true"                                     );
+                        $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                              ( $request->get('dtDataNomeacao')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                    ( $stCodNorma                                );
+                        $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                 ( $request->get('dtDataPosse')               );
+                        $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                              ( $request->get('dtAdmissao')                );
+                        $obRPessoalServidor->roUltimoContratoServidor->setValidadeExameMedico                                   ( $request->get('dtValidadeExameMedico')     );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao               ( $request->get('inCodTipoAdmissao')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $request->get('inCodVinculoEmpregaticio')  );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                     ( $request->get('inCodCategoria')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->setCodConselho                                           ( $request->get('inCodConselho')             );
+                        $obRPessoalServidor->roUltimoContratoServidor->setNroConselho                                           ( $request->get('inNumeroConselho')          );
+                        $obRPessoalServidor->roUltimoContratoServidor->setValidadeConselho                                      ( $request->get('dtDataValidadeConselho')    );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->setCodOcorrencia                   ( $request->get('stNumClassificacao')        );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                      ( $request->get('inCodGradeHorario')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                                       ( $request->get('dtVigenciaSalario')         );
+
+                        //Informações do cargo
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime                 ( $request->get('inCodRegime')                 );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $request->get('inCodSubDivisao'));
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo                   ( $request->get('inCodCargo')                  );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addEspecialidade();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade( $request->get('inCodEspecialidadeCargo')   );
+
+                        //Informações da Função
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime         ( $request->get('inCodRegimeFuncao')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo           ( $request->get('inCodFuncao')               );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $request->get('inCodEspecialidadeFuncao')  );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $request->get('inCodSubDivisaoFuncao'));
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoSalario->setNumBanco        ( $request->get('inCodBancoSalario')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaSalario->setCodAgencia    ( $request->get('inCodAgenciaSalario')       );
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoFGTS->setNumBanco           ( $request->get('inCodBancoFGTS')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaFGTS->setCodAgencia       ( $request->get('inCodAgenciaFGTS')          );
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM( $request->get('inNumCGMSindicato')         );
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaOrgao->setCodOrgao             ( $request->get("hdnUltimoOrgaoSelecionado") );
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaLocal->setCodLocal               ( $request->get('inCodLocal')                );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento ( $request->get('inCodFormaPagamento')       );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento   ( $request->get('inCodTipoPagamento')        );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario       ( $request->get('inCodTipoSalario')          );
+                        $obRPessoalServidor->roUltimoContratoServidor->setDataBase                                    ( $request->get('dtDataBase')                );
+                        $obRPessoalServidor->roUltimoContratoServidor->setOpcaoFgts                                   ( $request->get('dtDataFGTS')                );
+                        $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteFgts                           ( $request->get('inContaCreditoFGTS')        );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao( $request->get('inCodPadrao'));
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->roUltimoNivelPadrao->setCodNivelPadrao( $request->get('inCodProgressao') );
+                        $obRPessoalServidor->roUltimoContratoServidor->setSalario                                     ( $request->get('inSalario')                 );
+                        $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                    ( $request->get('stHorasMensais')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                   ( $request->get('stHorasSemanais')           );
+                        $obRPessoalServidor->roUltimoContratoServidor->setInicioProgressao                            ( $request->get('dtDataProgressao')          );
+                        $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteSalario                        ( $request->get('inContaSalario')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                ( $request->get('boAdiantamento')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                ( $request->get('boAdiantamento')            );
+
+                        //dados aba dependente
+                        $arDependentes = Sessao::read('DEPENDENTE');
+                        if ( is_array($arDependentes) ) {
+                            for ($inCount=0; $inCount<count($arDependentes); $inCount++) {
+                                $arDependente = $arDependentes[$inCount];
+                                $obRPessoalServidor->addRPessoalDependente();
+
+                                $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setNumCgm            ( $arDependente['inCGMDependente']                                    );
+                                $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento    ( $arDependente['stDataNascimentoDependente']                         );
             
-        }
+                                $obRPessoalServidor->roRPessoalDependente->setCodGrau                               ( $arDependente['stGrauParentesco']                                   );
+                                $obRPessoalServidor->roRPessoalDependente->setDependenteInvalido                    ( ($arDependente['boFilhoEquiparado'] == 't') ? true : false          );
+                                $obRPessoalServidor->roRPessoalDependente->setCarteiraVacinacao                     ( ($arDependente['boCarteiraVacinacao'] == 't') ? true : false        );
+                                $obRPessoalServidor->roRPessoalDependente->setComprovanteMatricula                  ( ($arDependente['boComprovanteMatricula'] == 't') ? true : false     );
+                                $obRPessoalServidor->roRPessoalDependente->setDependentePrev                  	    ( ($arDependente['boDependentePrev'] == 't') ? true : false           );
 
-        $obRPessoalServidor->recuperaTodosRaca( $rsRaca, $boTransacao );
+                                $obRPessoalServidor->roRPessoalDependente->setCodVinculo                            ( $arDependente['inCodDependenteIR']                                  );
+                                $obRPessoalServidor->roRPessoalDependente->setDataInicioSalarioFamilia              ( $arDependente['dtInicioSalarioFamilia']                             ); 
+                                $obRPessoalServidor->roRPessoalDependente->setDependenteSalarioFamilia              ( ($arDependente['boDependenteSalarioFamilia'] == 't') ? true : false );
+                                $obRPessoalServidor->roRPessoalDependente->obRPessoalCID->setCodCid                 ( $arDependente['inCodCIDDependente']                                 );
 
-        $obRPessoalServidor->setCodUF                          ( $_POST['inCodUF']);
-        $obRPessoalServidor->setCodMunicipio                   ( $_POST['inCodMunicipio'] );
-        $obRPessoalServidor->setCodEstadoCivil                 ( $_POST['inCodEstadoCivil']);
-        $obRPessoalServidor->setCodRais                        ( $_POST['inCodRaca']);
-        $obRPessoalServidor->setCodRaca                        ( $rsRaca->getCampo('cod_raca') );
-        $obRPessoalServidor->obRPessoalCID->setCodCID          ( $_POST['inCodCID']);
-        $obRPessoalServidor->setCodEdital                      ( '0' );
-        $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM     ( $_POST['inNumCGM'] );
-        $obRPessoalServidor->obRCGMPessoaFisica->setCPF        ( $_POST['stCPF'] );
-        $obRPessoalServidor->setDataNascimento                 ( $_POST['stDataNascimento'] );
-        $obRPessoalServidor->setNomePai                        ( $_POST['stNomePai'] );
-        $obRPessoalServidor->setNomeMae                        ( $_POST['stNomeMae'] );
-        $obRPessoalServidor->obRCGMPessoaFisicaConjuge->setNumCgm( $_POST['inCGMConjuge'] );
+                                if ($arDependente['boincluirDataNascimentoDespendente']) {
+                                    $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento( $arDependente['stDataNascimentoDependente'] );
+                                }
 
-        //dados aba documentacao
-        if (!$obErro->ocorreu() && !checkPIS($_POST['stPisPasep'], false)) {
-            $obErro->setDescricao("Campo PIS/PASEP da guia Documentação é inválido(".$_POST['stPisPasep'].").");
-        }
+                                $arVacinacoes = $arDependente['VACINACAO'];
+                                for ($inCounter=0; $inCounter<count($arVacinacoes); $inCounter++) {
+                                    $arVacinacao = $arVacinacoes[$inCounter];
+                                    $obRPessoalServidor->roRPessoalDependente->addRPessoalCarteiraVacinacao();
+                                    $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setDataApresentacao( $arVacinacao['dtApresentacaoCarteiraVacinacao'] );
+                                    $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setApresentada     ( $arVacinacao['boApresentadaVacinacao'] );
+                                }
+                                $arMatriculas = $arDependente['MATRICULA'];
+                                for ($inCounter=0; $inCounter<count($arMatriculas); $inCounter++) {
+                                    $arMatricula = $arMatriculas[$inCounter];
+                                    $obRPessoalServidor->roRPessoalDependente->addRPessoalComprovanteMatricula();
+                                    $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setDataApresentacao( $arMatricula['dtApresentacaoComprovanteMatricula']);
+                                    $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setApresentada     ( $arMatricula['boApresentadaMatricula']);
+                                }
+                            }
+                        }
 
-        $obRPessoalServidor->setPisPasep                       ( $_POST['stPisPasep']                  );
-        $obRPessoalServidor->setDataPisPasep                   ( $_POST['dtCadastroPis']               );
-        $obRPessoalServidor->setCarteiraReservista             ( $_POST['stCertificadoReservista']     );
-        $obRPessoalServidor->setCategoriaReservista            ( $_POST['inCategoriaCertificado']      );
-        $obRPessoalServidor->setOrigemReservista               ( $_POST['inOrgaoExpedidorCertificado'] );
-        $obRPessoalServidor->setNrTituloEleitor                ( $_POST['inTituloEleitor']             );
-        $obRPessoalServidor->setZonaTitulo                     ( $_POST['inZonaTitulo']                );
-        $obRPessoalServidor->setSecaoTitulo                    ( $_POST['inSecaoTitulo']               );
-        $obRPessoalServidor->setCaminhoFoto                    ( $nome_foto                            );
+                        //monta array de atributos dinamicos
+                        foreach ($arChave as $key => $value) {
+                            $arChaves = preg_split( "/[^a-zA-Z0-9]/" , $key );
+                            $inCodAtributo = $arChaves[0];
+                            if ( is_array($value) ) {
+                                $value = implode( "," , $value );
+                            }
+                            $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
+                        }
 
-        $arrCTPS = Sessao::read('CTPS');
-        if (is_array($arrCTPS) ) {
-            foreach ($arrCTPS as $arCTPS) {
-                $obRPessoalServidor->addRPessoalCTPS();
-                $obRPessoalServidor->roRPessoalCTPS->setNumero          ( $arCTPS['inNumeroCTPS']           );
-                $obRPessoalServidor->roRPessoalCTPS->setOrgaoExpedidor  ( $arCTPS['stOrgaoExpedidorCTPS']   );
-                $obRPessoalServidor->roRPessoalCTPS->setSerie           ( $arCTPS['stSerieCTPS']            );
-                $obRPessoalServidor->roRPessoalCTPS->setEmissao         ( $arCTPS['dtDataCTPS']             );
-                $obRPessoalServidor->roRPessoalCTPS->setUfCTPS          ( $arCTPS['inCodUF']                );
-            }
-        }
-        if ( !$obErro->ocorreu() and $stAcao != 'incluir' ) {
-            // verificando se a data de alteração da função é maior que a data de nomeação
-            if ($_POST['stContagemInicial'] == 'dtNomeacao') {
-                if ( compData($_REQUEST['dtDataAlteracaoFuncao'] , $_POST['dtDataNomeacao'] ) == 2 ) {
-                    $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data de Nomeação!");
-                }
-            } else {
-                $dtDataAlteracaoFuncao = ( $_REQUEST["dtDataAlteracaoFuncao"] != "" ) ? $_REQUEST["dtDataAlteracaoFuncao"] : $_REQUEST["hdnDataAlteracaoFuncao"];
-                if ( compData( $dtDataAlteracaoFuncao, $_POST['dtDataPosse']) == 2 ) {
-                     $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data da Posse!");
-                }
-            }
-        }
-
-        if ( !$obErro->ocorreu() ) {
-            //Dados aba contrato
-            //Informações contratuais
-            $obRPessoalServidor->addContratoServidor();
-
-            if ( $obRConfiguracaoPessoal->getGeracaoRegistro() == 'A' ) {
-
-                include_once ( CAM_GRH_PES_COMPONENTES."IContratoDigitoVerificador.class.php"                               );
-                $obIContratoDigitoVerificadorAutomatico = new IContratoDigitoVerificador("", false, false, $boTransacao);
-                $obIContratoDigitoVerificadorAutomatico->obRPessoalContrato->proximoRegistro($boTransacao);
-                $inContratoAutomatico = $obIContratoDigitoVerificadorAutomatico->obRPessoalContrato->getRegistro();
-
-                $inContrato =  explode("-",$inContratoAutomatico);
-
-            } else {
-                $inContrato =  explode("-",$_POST["inContrato"]);
-            }
-
-            //Verifica Norma
-            $arCodNorma = explode("/",$_POST['stCodNorma']);
-            if (count($arCodNorma)>0) {
-                $stNumNorma = ltrim($arCodNorma[0],'0');
-                if ($stNumNorma == "") {
-                    $stNumNorma = "0";
-                }
-                $obRNorma = new RNorma();
-                $obRNorma->setNumNorma( $stNumNorma );
-                $obRNorma->setExercicio( $arCodNorma[1] );
-                $obRNorma->listar($rsNorma, $boTransacao);
-                $stCodNorma = $rsNorma->getCampo('cod_norma');
-            }
-
-            $obRPessoalServidor->roUltimoContratoServidor->setRegistro                                              ( $inContrato[0]                      );
-            $obRPessoalServidor->roUltimoContratoServidor->setNroCartaoPonto                                        ( $_POST['inCartaoPonto']             );
-            $obRPessoalServidor->roUltimoContratoServidor->setAtivo                                                 ( "true"                              );
-            $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                              ( $_POST['dtDataNomeacao']            );
-            $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                    ( $stCodNorma                         );
-            $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                 ( $_POST['dtDataPosse']               );
-            $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                              ( $_POST['dtAdmissao']                );
-            $obRPessoalServidor->roUltimoContratoServidor->setValidadeExameMedico                                   ( $_POST['dtValidadeExameMedico']     );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao               ( $_POST['inCodTipoAdmissao']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $_POST['inCodVinculoEmpregaticio']  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                     ( $_POST['inCodCategoria']            );
-            $obRPessoalServidor->roUltimoContratoServidor->setCodConselho                                           ( $_POST['inCodConselho']             );
-            $obRPessoalServidor->roUltimoContratoServidor->setNroConselho                                           ( $_POST['inNumeroConselho']          );
-            $obRPessoalServidor->roUltimoContratoServidor->setValidadeConselho                                      ( $_POST['dtDataValidadeConselho']    );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->setCodOcorrencia                   ( $_POST['stNumClassificacao']        );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                      ( $_POST['inCodGradeHorario']         );
-            $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                                       ( $_POST['dtVigenciaSalario']         );
-
-            //Informações do cargo
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime                 ( $_POST['inCodRegime']                 );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $_POST['inCodSubDivisao']);
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo                   ( $_POST['inCodCargo']                  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addEspecialidade();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade( $_POST['inCodEspecialidadeCargo']   );
-
-            //Informações da Função
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime         ( $_POST['inCodRegimeFuncao']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo           ( $_POST['inCodFuncao']               );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $_POST['inCodEspecialidadeFuncao']  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $_POST['inCodSubDivisaoFuncao']);
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoSalario->setNumBanco        ( $_POST['inCodBancoSalario']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaSalario->setCodAgencia    ( $_POST['inCodAgenciaSalario']       );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoFGTS->setNumBanco           ( $_POST['inCodBancoFGTS']            );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaFGTS->setCodAgencia       ( $_POST['inCodAgenciaFGTS']          );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM( $_POST['inNumCGMSindicato']       );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaOrgao->setCodOrgao           ( $_POST["hdnUltimoOrgaoSelecionado"] );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaLocal->setCodLocal               ( $_POST['inCodLocal']                );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento ( $_POST['inCodFormaPagamento']       );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento   ( $_POST['inCodTipoPagamento']        );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario       ( $_POST['inCodTipoSalario']          );
-            $obRPessoalServidor->roUltimoContratoServidor->setDataBase                                    ( $_POST['dtDataBase']                );
-            $obRPessoalServidor->roUltimoContratoServidor->setOpcaoFgts                                   ( $_POST['dtDataFGTS']                );
-            $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteFgts                           ( $_POST['inContaCreditoFGTS']        );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao( $_POST['inCodPadrao']);
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->roUltimoNivelPadrao->setCodNivelPadrao( $_POST['inCodProgressao'] );
-            $obRPessoalServidor->roUltimoContratoServidor->setSalario                                     ( $_POST['inSalario']                 );
-            $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                    ( $_POST['stHorasMensais']            );
-            $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                   ( $_POST['stHorasSemanais']           );
-            $obRPessoalServidor->roUltimoContratoServidor->setInicioProgressao                            ( $_POST['dtDataProgressao']        );
-            $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteSalario                        ( $_POST['inContaSalario']            );
-            $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                ( $_POST['boAdiantamento']            );
-            $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                ( $_POST['boAdiantamento']      );
-            
-            //dados aba dependente
-            $arDependentes = Sessao::read('DEPENDENTE');
-            if ( is_array($arDependentes) ) {
-                for ($inCount=0; $inCount<count($arDependentes); $inCount++) {
-                    $arDependente = $arDependentes[$inCount];
-                    $obRPessoalServidor->addRPessoalDependente();
-
-                    $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setNumCgm            ( $arDependente['inCGMDependente']                                    );
-                    $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento    ( $arDependente['stDataNascimentoDependente']                         );
-
-                    $obRPessoalServidor->roRPessoalDependente->setCodGrau                               ( $arDependente['stGrauParentesco']                                   );
-                    $obRPessoalServidor->roRPessoalDependente->setDependenteInvalido                    ( ($arDependente['boFilhoEquiparado'] == 't') ? true : false          );
-                    $obRPessoalServidor->roRPessoalDependente->setCarteiraVacinacao                     ( ($arDependente['boCarteiraVacinacao'] == 't') ? true : false        );
-                    $obRPessoalServidor->roRPessoalDependente->setComprovanteMatricula                  ( ($arDependente['boComprovanteMatricula'] == 't') ? true : false     );
-                    $obRPessoalServidor->roRPessoalDependente->setDependentePrev                  	( ($arDependente['boDependentePrev'] == 't') ? true : false           );
-
-                    $obRPessoalServidor->roRPessoalDependente->setCodVinculo                            ( $arDependente['inCodDependenteIR']                                  );
-                    $obRPessoalServidor->roRPessoalDependente->setDataInicioSalarioFamilia              ( $arDependente['dtInicioSalarioFamilia']                             ); 
-                    $obRPessoalServidor->roRPessoalDependente->setDependenteSalarioFamilia              ( ($arDependente['boDependenteSalarioFamilia'] == 't') ? true : false );
-                    $obRPessoalServidor->roRPessoalDependente->obRPessoalCID->setCodCid                 ( $arDependente['inCodCIDDependente']                                 );
-                   
-                    if ($arDependente['boincluirDataNascimentoDespendente']) {
-                        $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento( $arDependente['stDataNascimentoDependente'] );
-                    }
-                    
-                    $arVacinacoes = $arDependente['VACINACAO'];
-                    for ($inCounter=0; $inCounter<count($arVacinacoes); $inCounter++) {
-                        $arVacinacao = $arVacinacoes[$inCounter];
-                        $obRPessoalServidor->roRPessoalDependente->addRPessoalCarteiraVacinacao();
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setDataApresentacao( $arVacinacao['dtApresentacaoCarteiraVacinacao'] );
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setApresentada     ( $arVacinacao['boApresentadaVacinacao'] );
-                    }
-                    $arMatriculas = $arDependente['MATRICULA'];
-                    for ($inCounter=0; $inCounter<count($arMatriculas); $inCounter++) {
-                        $arMatricula = $arMatriculas[$inCounter];
-                        $obRPessoalServidor->roRPessoalDependente->addRPessoalComprovanteMatricula();
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setDataApresentacao( $arMatricula['dtApresentacaoComprovanteMatricula']);
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setApresentada     ( $arMatricula['boApresentadaMatricula']);
+                        $obErro = $obRPessoalServidor->incluirServidor($boTransacao);
                     }
                 }
             }
-
-            //monta array de atributos dinamicos
-            foreach ($arChave as $key => $value) {
-                $arChaves = preg_split( "/[^a-zA-Z0-9]/" , $key );
-                $inCodAtributo = $arChaves[0];
-                if ( is_array($value) ) {
-                    $value = implode( "," , $value );
-                }
-                $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
-            }
-
-            $obErro = $obRPessoalServidor->incluirServidor($boTransacao);
-
         }
 
         if (!$obErro->ocorreu()) {
-            $obTransacao->commitAndClose();
             sistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$obRPessoalServidor->roUltimoContratoServidor->getRegistro()." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
         } else {
-            $obTransacao->rollbackAndClose();
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
         }
-
     break;
 
     case "alterar":
     case "alterar_servidor":
-        
-        $obErro = new Erro;
-        
         $nomeFoto = Sessao::read('FOTO_NAME');
         if ($nomeFoto) {
             //NOME DO ARQUIVO DA MINIATURA
             $nome_foto = sistemaLegado::getmicrotime() . "_" . rand(0, getrandmax());
             $imagem_gerada = CAM_GRH_PES_ANEXOS. $nome_foto . "_mini.jpg";
             $nome_foto = $nome_foto ."_mini.jpg";
-            
+
             if (!copy(Sessao::read('FOTO_URL'), $imagem_gerada)){
                 $obErro->setDescricao("Erro ao gravar foto. Contactar o administrador do sistema.");
             }
         }
-        
-        $obRPessoalServidor->setCodServidor                         ( $_REQUEST['inCodServidor']);
-        $obRPessoalServidor->setCodUF                               ( $_POST['inCodUF']);
-        $obRPessoalServidor->setCodMunicipio                        ( $_POST['inCodMunicipio'] );
-        $obRPessoalServidor->setCodEstadoCivil                      ( $_POST['inCodEstadoCivil']);
-        $obRPessoalServidor->setCodRais                             ( $_POST['inCodRaca']);
-        $obRPessoalServidor->recuperaTodosRaca                      ( $rsRaca, $boTransacao );
-        $obRPessoalServidor->setCodRaca                             ( $rsRaca->getCampo('cod_raca') );
-        $obRPessoalServidor->obRPessoalCID->setCodCID               ( $_POST['inCodCID']);
-        $obRPessoalServidor->setCodEdital                           ( '0' );
-        $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM          ( $_POST['inNumCGM'] );
-        $obRPessoalServidor->obRCGMPessoaFisica->setCPF             ( $_POST['stCPF'] );
-        $obRPessoalServidor->setNomePai                             ( $_POST['stNomePai'] );
-        $obRPessoalServidor->setNomeMae                             ( $_POST['stNomeMae'] );
-        $obRPessoalServidor->obRCGMPessoaFisicaConjuge->setNumCgm   ( $_POST['inCGMConjuge'] );
-        $obRPessoalServidor->setDataNascimento                      ( $_POST['stDataNascimento'] );
-        $obRPessoalServidor->setDataLaudo                           ( $_POST['dtDataLaudo'] );
 
-        //dados aba documentacao
-        if (!$obErro->ocorreu() && isset($_POST['stPisPasep']) && !checkPIS($_POST['stPisPasep'], false)) {
-            $obErro->setDescricao("Campo PIS/PASEP da guia Documentação é inválido(".$_POST['stPisPasep'].").");
-        }
-        $obRPessoalServidor->setPisPasep            ( $_POST['stPisPasep']                  );
-        $obRPessoalServidor->setDataPisPasep        ( $_POST['dtCadastroPis']               );
-        $obRPessoalServidor->setCarteiraReservista  ( $_POST['stCertificadoReservista']     );
-        $obRPessoalServidor->setCategoriaReservista ( $_POST['inCategoriaCertificado']      );
-        $obRPessoalServidor->setOrigemReservista    ( $_POST['inOrgaoExpedidorCertificado'] );
-        $obRPessoalServidor->setNrTituloEleitor     ( $_POST['inTituloEleitor']             );
-        $obRPessoalServidor->setZonaTitulo          ( $_POST['inZonaTitulo']                );
-        $obRPessoalServidor->setSecaoTitulo         ( $_POST['inSecaoTitulo']               );
-        $obRPessoalServidor->setCaminhoFoto         ( $nome_foto                            );
+        if ( !$obErro->ocorreu() ){
+            $obRPessoalServidor->setCodServidor                         ( $request->get('inCodServidor'));
+            $obRPessoalServidor->setCodUF                               ( $request->get('inCodUF'));
+            $obRPessoalServidor->setCodMunicipio                        ( $request->get('inCodMunicipio') );
+            $obRPessoalServidor->setCodEstadoCivil                      ( $request->get('inCodEstadoCivil'));
+            $obRPessoalServidor->setCodRais                             ( $request->get('inCodRaca'));
+            $obErro = $obRPessoalServidor->recuperaTodosRaca            ( $rsRaca, $boTransacao );
+            if ( !$obErro->ocorreu() ){
+                $obRPessoalServidor->setCodRaca                             ( $rsRaca->getCampo('cod_raca') );
+                $obRPessoalServidor->obRPessoalCID->setCodCID               ( $request->get('inCodCID'));
+                $obRPessoalServidor->setCodEdital                           ( '0' );
+                $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM          ( $request->get('inNumCGM') );
+                $obRPessoalServidor->obRCGMPessoaFisica->setCPF             ( $request->get('stCPF') );
+                $obRPessoalServidor->setNomePai                             ( $request->get('stNomePai') );
+                $obRPessoalServidor->setNomeMae                             ( $request->get('stNomeMae') );
+                $obRPessoalServidor->obRCGMPessoaFisicaConjuge->setNumCgm   ( $request->get('inCGMConjuge') );
+                $obRPessoalServidor->setDataNascimento                      ( $request->get('stDataNascimento') );
+                $obRPessoalServidor->setDataLaudo                           ( $request->get('dtDataLaudo') );
 
-        $arrCTPS = Sessao::read('CTPS');
-        if (is_array($arrCTPS) ) {
-            foreach ($arrCTPS as $arCTPS) {
-                $obRPessoalServidor->addRPessoalCTPS();
-                $obRPessoalServidor->roRPessoalCTPS->setCodCTPS         ( $arCTPS['inCodCTPS']              );
-                $obRPessoalServidor->roRPessoalCTPS->setNumero          ( $arCTPS['inNumeroCTPS']           );
-                $obRPessoalServidor->roRPessoalCTPS->setOrgaoExpedidor  ( $arCTPS['stOrgaoExpedidorCTPS']   );
-                $obRPessoalServidor->roRPessoalCTPS->setSerie           ( $arCTPS['stSerieCTPS']            );
-                $obRPessoalServidor->roRPessoalCTPS->setEmissao         ( $arCTPS['dtDataCTPS']             );
-                $obRPessoalServidor->roRPessoalCTPS->setUfCTPS          ( $arCTPS['inCodUF']                );
-
-            }
-        }
-        if ( !$obErro->ocorreu() ) {
-            // verificando se a data de alteração da função é maior que a data de nomeação
-            $dtDataAlteracaoFuncao = ( $_REQUEST["dtDataAlteracaoFuncao"] != "" ) ? $_REQUEST["dtDataAlteracaoFuncao"] : $_REQUEST["hdnDataAlteracaoFuncao"];
-            if ($dtDataAlteracaoFuncao == "") {
-
-                $dtPosse    = implode('',array_reverse(explode('/',$_POST['dtDataPosse'])));
-                $dtAdmissao = implode('',array_reverse(explode('/',$_POST['dtAdmissao'])));
-                $dtNomeacao = implode('',array_reverse(explode('/',$_POST['dtDataNomeacao'])));
-
-                $dtDataAlteracaoFuncao = $_POST['dtDataPosse'];
-
-                if ($dtNomeacao > $dtPosse) {
-                    $dtDataAlteracaoFuncao = $_POST['dtDataNomeacao'];
+                //dados aba documentacao
+                if ( !$obErro->ocorreu() && $request->get('stPisPasep', '') != '' && !checkPIS($request->get('stPisPasep'), false) ) {
+                    $obErro->setDescricao("Campo PIS/PASEP da guia Documentação é inválido(".$request->get('stPisPasep').").");
                 }
-                if ($dtAdmissao > $dtPosse) {
-                    $dtDataAlteracaoFuncao = $_POST['dtAdmissao'];
-                }
-                if ($dtNomeacao > $dtAdmissao) {
-                    $dtDataAlteracaoFuncao = $_POST['dtDataNomeacao'];
-                }
-            }
 
-            if ($_POST['stContagemInicial'] == 'dtNomeacao') {
-                if ( compData($dtDataAlteracaoFuncao , $_POST['dtDataNomeacao'] ) == 2 ) {
-                    $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data de Nomeação!");
-                }
-            } else {
-                if ( compData( $dtDataAlteracaoFuncao, $_POST['dtDataPosse']) == 2 ) {
-                     $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data da Posse!");
-                }
-            }
-        }//
+                if ( !$obErro->ocorreu() ){
+                    $obRPessoalServidor->setPisPasep            ( $request->get('stPisPasep')                  );
+                    $obRPessoalServidor->setDataPisPasep        ( $request->get('dtCadastroPis')               );
+                    $obRPessoalServidor->setCarteiraReservista  ( $request->get('stCertificadoReservista')     );
+                    $obRPessoalServidor->setCategoriaReservista ( $request->get('inCategoriaCertificado')      );
+                    $obRPessoalServidor->setOrigemReservista    ( $request->get('inOrgaoExpedidorCertificado') );
+                    $obRPessoalServidor->setNrTituloEleitor     ( $request->get('inTituloEleitor')             );
+                    $obRPessoalServidor->setZonaTitulo          ( $request->get('inZonaTitulo')                );
+                    $obRPessoalServidor->setSecaoTitulo         ( $request->get('inSecaoTitulo')               );
+                    $obRPessoalServidor->setCaminhoFoto         ( $nome_foto                                   );
 
-        if ( !$obErro->ocorreu() ) {
-            //dados aba contrato
-            $obRPessoalServidor->addContratoServidor();
-            $obRPessoalServidor->roUltimoContratoServidor->setCodContrato                                           ( $_REQUEST["inCodContrato"]          );
-            $obRPessoalServidor->roUltimoContratoServidor->setAlteracaoFuncao                                       ( $dtDataAlteracaoFuncao              );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoSalario->setNumBanco                    ( $_POST['inCodBancoSalario']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaSalario->setCodAgencia                ( $_POST['inCodAgenciaSalario']       );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $_POST['inCodVinculoEmpregaticio']  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoFGTS->setNumBanco                       ( $_POST['inCodBancoFGTS']            );
-            $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaFGTS->setCodAgencia                   ( $_POST['inCodAgenciaFGTS']          );
-            $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM            ( $_POST['inNumCGMSindicato']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->setCodOcorrencia                   ( $_POST['stNumClassificacao']        );
-            $obRPessoalServidor->roUltimoContratoServidor->setCodConselho                                           ( $_POST['inCodConselho']             );
-            $obRPessoalServidor->roUltimoContratoServidor->setNroConselho                                           ( $_POST['inNumeroConselho']          );
-            $obRPessoalServidor->roUltimoContratoServidor->setValidadeConselho                                      ( $_POST['dtDataValidadeConselho']    );
-
-            if ($_POST["inCodCargo"]) {
-                $inCodCargoTMP = $_POST['inCodCargo'];
-            } else {
-                $inCodCargoTMP = $_POST['inHdnCodCargo'];
-            }
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($inCodCargoTMP);
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addEspecialidade();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade( $_POST['inCodEspecialidadeCargo']   );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
-
-            if ($_POST['inHdnCodSubDivisao'] != "") {
-                $inCodSubDivisao = $_POST['inHdnCodSubDivisao'];
-            } else {
-                $inCodSubDivisao = $_POST['inCodSubDivisao'];
-            }
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $inCodSubDivisao );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsCargo, $boTransacao);
-
-            if ($rsCargo->getNumLinhas() < 1) {
-                sistemaLegado::exibeAviso('Cargo Inválido. Norma não está mais em vigor.', 'n_alterar', 'erro');
-                exit;
-            }
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime ( $_POST['inCodRegimeFuncao']         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo   ( $_POST['inCodFuncao']               );
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($_POST['inCodFuncao']);
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsFuncao, $boTransacao);
-
-            if ($rsFuncao->getNumLinhas() < 1) {
-                sistemaLegado::exibeAviso('Função Inválida. Norma não está mais em vigor.', 'n_alterar', 'erro');
-                exit;
-            }
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($inCodCargoTMP);
-
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $_POST['inCodEspecialidadeFuncao']  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $_POST['inCodSubDivisaoFuncao']);
-
-            if ($_POST['inHdnCodRegime'] != "") {
-                $inCodRegime = $_POST['inHdnCodRegime'];
-            } else {
-                $inCodRegime = $_POST['inCodRegime'];
-            }
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime ( $inCodRegime );
-
-            //Verifica Norma
-            $arCodNorma = explode("/",$_POST['stCodNorma']);
-            if (count($arCodNorma)>0) {
-                $stNumNorma = ltrim($arCodNorma[0],'0');
-                if ($stNumNorma == "") {
-                    $stNumNorma = "0";
-                }
-                $obRNorma = new RNorma();
-                $obRNorma->setNumNorma( $stNumNorma );
-                $obRNorma->setExercicio( $arCodNorma[1] );
-                $obRNorma->listar($rsNorma, $boTransacao);
-                $stCodNorma = $rsNorma->getCampo('cod_norma');
-            }
-
-            $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaOrgao->setCodOrgao                                                 ( $_POST["hdnUltimoOrgaoSelecionado"]          );
-            $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaLocal->setCodLocal                                                 ( $_POST['inCodLocal']                         );
-            $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                                            ( $stCodNorma                                  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao                                       ( $_POST['inCodTipoAdmissao']                  );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento                                   ( $_POST['inCodFormaPagamento']                );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento                                     ( $_POST['inCodTipoPagamento']        	       );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario                                         ( $_POST['inCodTipoSalario']          	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setRegistro                                                                      ( $_POST['inContrato']                	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setNroCartaoPonto                                                                ( $_POST['inCartaoPonto']             	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setAtivo                                                                         ( ( $_POST['stSituacao'] == 1 ) ? true : false );
-            $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                                                      ( $_POST['dtDataNomeacao']                     );
-            $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                                         ( $_POST['dtDataPosse']                        );
-            $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                                                      ( $_POST['dtAdmissao']                         );
-            $obRPessoalServidor->roUltimoContratoServidor->setDataBase                                                                      ( $_POST['dtDataBase']                         );
-            $obRPessoalServidor->roUltimoContratoServidor->setValidadeExameMedico                                                           ( $_POST['dtValidadeExameMedico']              );
-            $obRPessoalServidor->roUltimoContratoServidor->setOpcaoFgts                                                                     ( $_POST['dtDataFGTS']                         );
-            $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteFgts                                                             ( $_POST['inContaCreditoFGTS']                 );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao                           ( $_POST['inCodPadrao']                        );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->roUltimoNivelPadrao->setCodNivelPadrao ( $_POST['inCodProgressao'] );
-            $obRPessoalServidor->roUltimoContratoServidor->setSalario                                                                       ( $_POST['inSalario']                          );
-            $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                                                      ( $_POST['stHorasMensais']            	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                                                     ( $_POST['stHorasSemanais']          	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setInicioProgressao                                                              ( $_POST['dtDataProgressao']          	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteSalario                                                          ( $_POST['inContaSalario']            	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                                                  ( $_POST['boAdiantamento']            	       );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                                             ( $_POST['inCodCategoria']            	       );
-            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                                              ( $_POST['inCodGradeHorario']       	       );
-            $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                                                               ( $_POST['dtVigenciaSalario'] 				   );
-
-            //dados aba dependente
-            $arDependentes = Sessao::read('DEPENDENTE');
-            if ( is_array($arDependentes) ) {
-                for ($inCount=0; $inCount<count($arDependentes); $inCount++) {
-                    $arDependente = $arDependentes[$inCount];
-                    $obRPessoalServidor->addRPessoalDependente();
-                    $obRPessoalServidor->roRPessoalDependente->setCodDependente              ( $arDependente['inCodDependente']                                    );
-                    $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setNumCgm ( $arDependente['inCGMDependente']                                    );
-                    $obRPessoalServidor->roRPessoalDependente->setCodGrau                    ( $arDependente['stGrauParentesco']                                   );
-                    $obRPessoalServidor->roRPessoalDependente->setDependenteInvalido         ( ($arDependente['boFilhoEquiparado'] == 't') ? true : false          );
-                    $obRPessoalServidor->roRPessoalDependente->setCarteiraVacinacao          ( ($arDependente['boCarteiraVacinacao'] == 't') ? true : false        );
-                    $obRPessoalServidor->roRPessoalDependente->setComprovanteMatricula       ( ($arDependente['boComprovanteMatricula'] == 't') ? true : false     );
-                    $obRPessoalServidor->roRPessoalDependente->setDependentePrev             ( ($arDependente['boDependentePrev'] == 't') ? true : false           );
-
-                    $obRPessoalServidor->roRPessoalDependente->setCodVinculo                 ( $arDependente['inCodDependenteIR']                                  );
-                    $obRPessoalServidor->roRPessoalDependente->setDataInicioSalarioFamilia   ( $arDependente['dtInicioSalarioFamilia']                             );
-                    $obRPessoalServidor->roRPessoalDependente->setDependenteSalarioFamilia   ( ($arDependente['boDependenteSalarioFamilia'] == 't') ? true : false );
-                    $obRPessoalServidor->roRPessoalDependente->obRPessoalCID->setCodCid      ( $arDependente['inCodCIDDependente']                                 );
-                    
-                    if ($arDependente['boincluirDataNascimentoDespendente']) {
-                        $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento( $arDependente['stDataNascimentoDependente'] );
+                    $arrCTPS = Sessao::read('CTPS');
+                    if (is_array($arrCTPS) ) {
+                        foreach ($arrCTPS as $arCTPS) {
+                            $obRPessoalServidor->addRPessoalCTPS();
+                            $obRPessoalServidor->roRPessoalCTPS->setCodCTPS         ( $arCTPS['inCodCTPS']              );
+                            $obRPessoalServidor->roRPessoalCTPS->setNumero          ( $arCTPS['inNumeroCTPS']           );
+                            $obRPessoalServidor->roRPessoalCTPS->setOrgaoExpedidor  ( $arCTPS['stOrgaoExpedidorCTPS']   );
+                            $obRPessoalServidor->roRPessoalCTPS->setSerie           ( $arCTPS['stSerieCTPS']            );
+                            $obRPessoalServidor->roRPessoalCTPS->setEmissao         ( $arCTPS['dtDataCTPS']             );
+                            $obRPessoalServidor->roRPessoalCTPS->setUfCTPS          ( $arCTPS['inCodUF']                );
+                        }
                     }
+                    if ( !$obErro->ocorreu() ) {
+                        // verificando se a data de alteração da função é maior que a data de nomeação
+                        $dtDataAlteracaoFuncao = ( $request->get("dtDataAlteracaoFuncao", '') != '' ) ? $request->get("dtDataAlteracaoFuncao") : $request->get("hdnDataAlteracaoFuncao");
+                        if ($dtDataAlteracaoFuncao == "") {
+                            $dtPosse    = implode('',array_reverse(explode('/',$request->get('dtDataPosse'))));
+                            $dtAdmissao = implode('',array_reverse(explode('/',$request->get('dtAdmissao'))));
+                            $dtNomeacao = implode('',array_reverse(explode('/',$request->get('dtDataNomeacao'))));
+
+                            $dtDataAlteracaoFuncao = $request->get('dtDataPosse');
+
+                            if ($dtNomeacao > $dtPosse) {
+                                $dtDataAlteracaoFuncao = $request->get('dtDataNomeacao');
+                            }
+                            if ($dtAdmissao > $dtPosse) {
+                                $dtDataAlteracaoFuncao = $request->get('dtAdmissao');
+                            }
+                            if ($dtNomeacao > $dtAdmissao) {
+                                $dtDataAlteracaoFuncao = $request->get('dtDataNomeacao');
+                            }
+                        }
+
+                        if ($request->get('stContagemInicial') == 'dtNomeacao') {
+                            if ( compData($dtDataAlteracaoFuncao , $request->get('dtDataNomeacao') ) == 2 ) {
+                                $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data de Nomeação!");
+                            }
+                        } else {
+                            if ( compData( $dtDataAlteracaoFuncao, $request->get('dtDataPosse')) == 2 ) {
+                                 $obErro->setDescricao("A data de Alteração da função deve ser maior ou igual a Data da Posse!");
+                            }
+                        }
+                    }//
+
+                    if ( !$obErro->ocorreu() ) {
+                        //dados aba contrato
+                        $obRPessoalServidor->addContratoServidor();
+                        $obRPessoalServidor->roUltimoContratoServidor->setCodContrato                                           ( $request->get("inCodContrato")             );
+                        $obRPessoalServidor->roUltimoContratoServidor->setAlteracaoFuncao                                       ( $dtDataAlteracaoFuncao                     );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoSalario->setNumBanco                    ( $request->get('inCodBancoSalario')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaSalario->setCodAgencia                ( $request->get('inCodAgenciaSalario')       );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $request->get('inCodVinculoEmpregaticio')  );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioBancoFGTS->setNumBanco                       ( $request->get('inCodBancoFGTS')            );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRMonetarioAgenciaFGTS->setCodAgencia                   ( $request->get('inCodAgenciaFGTS')          );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM            ( $request->get('inNumCGMSindicato')         );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalOcorrencia->setCodOcorrencia                   ( $request->get('stNumClassificacao')        );
+                        $obRPessoalServidor->roUltimoContratoServidor->setCodConselho                                           ( $request->get('inCodConselho')             );
+                        $obRPessoalServidor->roUltimoContratoServidor->setNroConselho                                           ( $request->get('inNumeroConselho')          );
+                        $obRPessoalServidor->roUltimoContratoServidor->setValidadeConselho                                      ( $request->get('dtDataValidadeConselho')    );
+
+                        if ($request->get("inCodCargo")) {
+                            $inCodCargoTMP = $request->get('inCodCargo');
+                        } else {
+                            $inCodCargoTMP = $request->get('inHdnCodCargo');
+                        }
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($inCodCargoTMP);
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addEspecialidade();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade( $request->get('inCodEspecialidadeCargo')   );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
+
+                        if ($request->get('inHdnCodSubDivisao', '') != "") {
+                            $inCodSubDivisao = $request->get('inHdnCodSubDivisao');
+                        } else {
+                            $inCodSubDivisao = $request->get('inCodSubDivisao');
+                        }
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $inCodSubDivisao );
+
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
+                        $obErro = $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsCargo, $boTransacao);
+
+                        if ( !$obErro->ocorreu() ) {
+                            if ($rsCargo->getNumLinhas() < 1) {
+                                sistemaLegado::exibeAviso('Cargo Inválido. Norma não está mais em vigor.', 'n_alterar', 'erro');
+                                exit;
+                            }
+
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime ( $request->get('inCodRegimeFuncao')         );
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo   ( $request->get('inCodFuncao')               );
+
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($request->get('inCodFuncao'));
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
+                            $obErro = $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsFuncao, $boTransacao);
+
+                            if ( !$obErro->ocorreu() ) {
+                                if ($rsFuncao->getNumLinhas() < 1) {
+                                    sistemaLegado::exibeAviso('Função Inválida. Norma não está mais em vigor.', 'n_alterar', 'erro');
+                                    exit;
+                                }
+
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo($inCodCargoTMP);
                     
-                    $arVacinacoes = $arDependente['VACINACAO'];
-                    for ($inCounter=0; $inCounter<count($arVacinacoes); $inCounter++) {
-                        $arVacinacao = $arVacinacoes[$inCounter];
-                        $obRPessoalServidor->roRPessoalDependente->addRPessoalCarteiraVacinacao();
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setDataApresentacao ( $arVacinacao['dtApresentacaoCarteiraVacinacao'] );
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setApresentada      ( $arVacinacao['boApresentadaVacinacao'] );
-                    }
-                    
-                    $arMatriculas = $arDependente['MATRICULA'];
-                    for ($inCounter=0; $inCounter<count($arMatriculas); $inCounter++) {
-                        $arMatricula = $arMatriculas[$inCounter];
-                        $obRPessoalServidor->roRPessoalDependente->addRPessoalComprovanteMatricula();
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setDataApresentacao ( $arMatricula['dtApresentacaoComprovanteMatricula']);
-                        $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setApresentada      ( $arMatricula['boApresentadaMatricula']);
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $request->get('inCodEspecialidadeFuncao')  );
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $request->get('inCodSubDivisaoFuncao'));
+
+                                if ($request->get('inHdnCodRegime', '') != "") {
+                                    $inCodRegime = $request->get('inHdnCodRegime');
+                                } else {
+                                    $inCodRegime = $request->get('inCodRegime');
+                                }
+                                $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime ( $inCodRegime );
+
+                                //Verifica Norma
+                                $arCodNorma = explode("/",$request->get('stCodNorma'));
+                                if (count($arCodNorma)>0) {
+                                    $stNumNorma = ltrim($arCodNorma[0],'0');
+                                    if ($stNumNorma == "") {
+                                        $stNumNorma = "0";
+                                    }
+                                    $obRNorma = new RNorma();
+                                    $obRNorma->setNumNorma( $stNumNorma );
+                                    $obRNorma->setExercicio( $arCodNorma[1] );
+                                    $obErro = $obRNorma->listar($rsNorma, $boTransacao);
+                                    $stCodNorma = $rsNorma->getCampo('cod_norma');
+                                }
+
+                                if ( !$obErro->ocorreu() ) {
+                                    $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaOrgao->setCodOrgao                                                 ( $request->get("hdnUltimoOrgaoSelecionado")          );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obROrganogramaLocal->setCodLocal                                                 ( $request->get('inCodLocal')                         );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                                            ( $stCodNorma                                  );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao                                       ( $request->get('inCodTipoAdmissao')                  );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento                                   ( $request->get('inCodFormaPagamento')                );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento                                     ( $request->get('inCodTipoPagamento')        	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario                                         ( $request->get('inCodTipoSalario')          	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setRegistro                                                                      ( $request->get('inContrato')                	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setNroCartaoPonto                                                                ( $request->get('inCartaoPonto')             	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setAtivo                                                                         ( ( $request->get('stSituacao') == 1 ) ? true : false );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                                                      ( $request->get('dtDataNomeacao')                     );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                                         ( $request->get('dtDataPosse')                        );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                                                      ( $request->get('dtAdmissao')                         );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setDataBase                                                                      ( $request->get('dtDataBase')                         );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setValidadeExameMedico                                                           ( $request->get('dtValidadeExameMedico')              );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setOpcaoFgts                                                                     ( $request->get('dtDataFGTS')                         );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteFgts                                                             ( $request->get('inContaCreditoFGTS')                 );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao                           ( $request->get('inCodPadrao')                        );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->roUltimoNivelPadrao->setCodNivelPadrao ( $request->get('inCodProgressao') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setSalario                                                                       ( $request->get('inSalario')                          );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                                                      ( $request->get('stHorasMensais')            	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                                                     ( $request->get('stHorasSemanais')          	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setInicioProgressao                                                              ( $request->get('dtDataProgressao')          	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setContaCorrenteSalario                                                          ( $request->get('inContaSalario')            	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setAdiantamento                                                                  ( $request->get('boAdiantamento')            	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                                             ( $request->get('inCodCategoria')            	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                                              ( $request->get('inCodGradeHorario')       	       );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                                                               ( $request->get('dtVigenciaSalario') 				   );
+
+                                    //dados aba dependente
+                                    $arDependentes = Sessao::read('DEPENDENTE');
+                                    if ( is_array($arDependentes) ) {
+                                        for ($inCount=0; $inCount<count($arDependentes); $inCount++) {
+                                            $arDependente = $arDependentes[$inCount];
+                                            $obRPessoalServidor->addRPessoalDependente();
+                                            $obRPessoalServidor->roRPessoalDependente->setCodDependente              ( $arDependente['inCodDependente']                                    );
+                                            $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setNumCgm ( $arDependente['inCGMDependente']                                    );
+                                            $obRPessoalServidor->roRPessoalDependente->setCodGrau                    ( $arDependente['stGrauParentesco']                                   );
+                                            $obRPessoalServidor->roRPessoalDependente->setDependenteInvalido         ( ($arDependente['boFilhoEquiparado'] == 't') ? true : false          );
+                                            $obRPessoalServidor->roRPessoalDependente->setCarteiraVacinacao          ( ($arDependente['boCarteiraVacinacao'] == 't') ? true : false        );
+                                            $obRPessoalServidor->roRPessoalDependente->setComprovanteMatricula       ( ($arDependente['boComprovanteMatricula'] == 't') ? true : false     );
+                                            $obRPessoalServidor->roRPessoalDependente->setDependentePrev             ( ($arDependente['boDependentePrev'] == 't') ? true : false           );
+
+                                            $obRPessoalServidor->roRPessoalDependente->setCodVinculo                 ( $arDependente['inCodDependenteIR']                                  );
+                                            $obRPessoalServidor->roRPessoalDependente->setDataInicioSalarioFamilia   ( $arDependente['dtInicioSalarioFamilia']                             );
+                                            $obRPessoalServidor->roRPessoalDependente->setDependenteSalarioFamilia   ( ($arDependente['boDependenteSalarioFamilia'] == 't') ? true : false );
+                                            $obRPessoalServidor->roRPessoalDependente->obRPessoalCID->setCodCid      ( $arDependente['inCodCIDDependente']                                 );
+
+                                            if ($arDependente['boincluirDataNascimentoDespendente']) {
+                                                $obRPessoalServidor->roRPessoalDependente->obRCGMPessoaFisica->setDataNascimento( $arDependente['stDataNascimentoDependente'] );
+                                            }
+
+                                            $arVacinacoes = $arDependente['VACINACAO'];
+                                            for ($inCounter=0; $inCounter<count($arVacinacoes); $inCounter++) {
+                                                $arVacinacao = $arVacinacoes[$inCounter];
+                                                $obRPessoalServidor->roRPessoalDependente->addRPessoalCarteiraVacinacao();
+                                                $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setDataApresentacao ( $arVacinacao['dtApresentacaoCarteiraVacinacao'] );
+                                                $obRPessoalServidor->roRPessoalDependente->roRPessoalCarteiraVacinacao->setApresentada      ( $arVacinacao['boApresentadaVacinacao'] );
+                                            }
+
+                                            $arMatriculas = $arDependente['MATRICULA'];
+                                            for ($inCounter=0; $inCounter<count($arMatriculas); $inCounter++) {
+                                                $arMatricula = $arMatriculas[$inCounter];
+                                                $obRPessoalServidor->roRPessoalDependente->addRPessoalComprovanteMatricula();
+                                                $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setDataApresentacao ( $arMatricula['dtApresentacaoComprovanteMatricula']);
+                                                $obRPessoalServidor->roRPessoalDependente->roRPessoalComprovanteMatricula->setApresentada      ( $arMatricula['boApresentadaMatricula']);
+                                            }
+                                        }
+                                    }
+
+                                    //monta array de atributos dinamicos
+                                    foreach ($arChave as $key => $value) {
+                                        $arChaves = preg_split( "/[^a-zA-Z0-9]/" , $key );
+                                        $inCodAtributo = $arChaves[0];
+
+                                        if ( is_array($value) ) {
+                                            $Newvalue = implode(",",$value);
+                                            $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $Newvalue );
+                                        } else {
+                                            $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
+                                        }
+                                    }
+
+                                    $obErro = $obRPessoalServidor->alterarServidor($boTransacao);
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-            //monta array de atributos dinamicos
-            foreach ($arChave as $key => $value) {
-                $arChaves = preg_split( "/[^a-zA-Z0-9]/" , $key );
-                $inCodAtributo = $arChaves[0];
-
-                if ( is_array($value) ) {
-                    $Newvalue = implode(",",$value);
-                    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $Newvalue );
-                } else {
-                    $obRPessoalServidor->roUltimoContratoServidor->obRCadastroDinamico->addAtributosDinamicos( $inCodAtributo , $value );
-                }
-            }
-
-            $obErro = $obRPessoalServidor->alterarServidor($boTransacao);
         }
-        
-        if ( !$obErro->ocorreu() )
-            if ($_POST['actVoltar']) {
+
+        if ( !$obErro->ocorreu() ){
+            if ($request->get('actVoltar')) {
                 // a variavel actVoltar contém o nome do programa que chamou a tela de servidor,
                 // pra onde o sistema deve retornar se ela estiver vazia o sistema retorno para
                 // a listagem de servidores
-                sistemaLegado::alertaAviso($_POST['actVoltar'] . '?inNumCGM='.$_POST['inNumCGM'].'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$_REQUEST['inContratoAlterar']." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
-            } else {
-                sistemaLegado::alertaAviso($pgList .'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$_REQUEST['inContratoAlterar']." - ".$rsCGM->getCampo("nom_cgm"),"alterar","aviso", Sessao::getId(), "../");
+                sistemaLegado::alertaAviso($request->get('actVoltar') . '?inNumCGM='.$request->get('inNumCGM').'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$request->get('inContratoAlterar')." - ".$rsCGM->getCampo("nom_cgm"),"incluir","aviso", Sessao::getId(), "../");
             } else
+                sistemaLegado::alertaAviso($pgList .'&inContrato='. $obRPessoalServidor->roUltimoContratoServidor->getRegistro(), "Matrícula: ".$request->get('inContratoAlterar')." - ".$rsCGM->getCampo("nom_cgm"),"alterar","aviso", Sessao::getId(), "../");
+        } else
             sistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_alterar","erro");
-
     break;
 
     case "excluir":
-
-        $obRPessoalServidor->setCodServidor                          ( $_REQUEST['inCodServidor'] );
+        $obRPessoalServidor->setCodServidor                          ( $request->get('inCodServidor') );
         $obRPessoalServidor->addContratoServidor();
-        $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $_REQUEST['inCodContrato']   );
+        $obRPessoalServidor->roUltimoContratoServidor->setCodContrato( $request->get('inCodContrato') );
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addEspecialidade();
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
         $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
@@ -607,10 +615,9 @@ switch ($stAcao) {
         $obRPessoalServidor->addRPessoalDependente();
         $obErro = $obRPessoalServidor->excluirServidor($boTransacao);
         if ( !$obErro->ocorreu() )
-            sistemaLegado::alertaAviso($pgList,"Servidor: ".$_REQUEST['inNumCGM']." - ".$rsCGM->getCampo("nom_cgm"),"excluir","aviso", Sessao::getId(), "../");
+            sistemaLegado::alertaAviso($pgList,"Servidor: ".$request->get('inNumCGM')." - ".$rsCGM->getCampo("nom_cgm"),"excluir","aviso", Sessao::getId(), "../");
         else
             sistemaLegado::alertaAviso( $pgList."?stAcao=excluir&".$stFiltro, urlencode($obErro->getDescricao()), "n_excluir","erro",Sessao::getId(),"../" );
-
     break;
 }
 

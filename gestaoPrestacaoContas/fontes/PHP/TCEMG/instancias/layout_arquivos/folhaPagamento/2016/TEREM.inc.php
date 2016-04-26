@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Jean
   *
   * @ignore
-  * $Id: TEREM.inc.php 64811 2016-04-05 13:50:46Z evandro $
-  * $Date: 2016-04-05 10:50:46 -0300 (Ter, 05 Abr 2016) $
+  * $Id: TEREM.inc.php 64921 2016-04-13 13:24:54Z evandro $
+  * $Date: 2016-04-13 10:24:54 -0300 (Qua, 13 Abr 2016) $
   * $Author: evandro $
-  * $Rev: 64811 $
+  * $Rev: 64921 $
   *
 */
 /**
@@ -45,9 +45,9 @@ require_once CAM_GPC_TCEMG_MAPEAMENTO.Sessao::getExercicio()."/TTCEMGTEREM.class
 $rsRecordSet = new RecordSet();
 $obTTCEMGTEREM = new TTCEMGTEREM();
 $obTTCEMGTEREM->setDado('unidade_gestora', $inCodUnidadeGestora);
-$obTTCEMGTEREM->setDado('entidades', $stEntidades);
-$obTTCEMGTEREM->setDado('exercicio', Sessao::getExercicio());
-$obTTCEMGTEREM->setDado('mes', $inMes);
+$obTTCEMGTEREM->setDado('entidades'      , $stEntidades);
+$obTTCEMGTEREM->setDado('exercicio'      , $stExercicioFiltro );
+$obTTCEMGTEREM->setDado('mes'            , $inMes);
 
 //Tipo Registro 10
 $obTTCEMGTEREM->recuperaDados($rsRecordSet);
@@ -61,19 +61,19 @@ if ( count($rsRecordSet->getElementos()) > 0 ) {
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlparateto");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipocadastro");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("justalteracao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 } else {
     //Tipo Registro 99
     //99 - Declaração de Inexistência de Informações
@@ -85,5 +85,6 @@ if ( count($rsRecordSet->getElementos()) > 0 ) {
     $obExportador->roUltimoArquivo->addBloco($rsRecord99);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);    
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');   
 }

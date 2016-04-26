@@ -76,7 +76,9 @@ switch( $request->get('stAcao') ){
 			$obTLicitacaoContratoApostila->setDado( 'descricao'     , $request->get('stDscApostila')     		  );
 			$obTLicitacaoContratoApostila->setDado( 'data_apostila' , $request->get('dtApostila')      		      );
 			
-			$nuVlApostila= number_format($request->get('nuVlApostila'),2,'.',',');
+			$nuVlApostila = str_replace(".", "", $request->get('nuVlApostila'));
+			$nuVlApostila = str_replace(",", ".", $nuVlApostila);
+
 			$nuVlApostila=(isset($nuVlApostila)) ? $nuVlApostila : 0;
 			$obTLicitacaoContratoApostila->setDado( 'valor_apostila', $nuVlApostila );
 			
@@ -129,7 +131,9 @@ switch( $request->get('stAcao') ){
                 $obTLicitacaoContratoApostila->setDado( 'descricao'     ,  $request->get('stDscApostila')     		  );
                 $obTLicitacaoContratoApostila->setDado( 'data_apostila' ,  $request->get('dtApostila')      		      );
 				
-				$nuVlApostila= number_format( $request->get('nuVlApostila'),2,'.',',');
+				$nuVlApostila = str_replace(".", "", $request->get('nuVlApostila'));
+				$nuVlApostila = str_replace(",", ".", $nuVlApostila);
+
 			    $nuVlApostila=(isset($nuVlApostila)) ? $nuVlApostila : 0;
 				$obTLicitacaoContratoApostila->setDado( 'valor_apostila', $nuVlApostila );
 				

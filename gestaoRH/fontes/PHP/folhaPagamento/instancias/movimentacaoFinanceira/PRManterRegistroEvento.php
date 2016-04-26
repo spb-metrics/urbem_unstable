@@ -32,24 +32,21 @@
 
     * @ignore
 
-    $Revision: 30840 $
-    $Name$
-    $Author: souzadl $
-    $Date: 2007-12-26 16:05:46 -0200 (Qua, 26 Dez 2007) $
+    $Id: PRManterRegistroEvento.php 65095 2016-04-22 19:44:59Z michel $
 
     * Casos de uso: uc-04.05.07
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php"                  );
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                      );
-include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php"                                   );
-include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEvento.class.php"                                );
-include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculado.class.php"                       );
-include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculadoDependente.class.php"             );
-include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculo.class.php"                        );
-include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php"               );
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEvento.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculado.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculadoDependente.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoLogErroCalculo.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php";
 
 $link = Sessao::read("link");
 $stLink = "&pg=".$link["pg"]."&pos=".$link["pos"]."&stAcao=alterar";
@@ -61,7 +58,7 @@ $pgForm = "FM".$stPrograma.".php?";
 $pgProc = "PR".$stPrograma.".php?";
 $pgOcul = "OC".$stPrograma.".php?";
 $pgJS   = "JS".$stPrograma.".js";
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 $obRFolhaPagamentoPeriodoContratoServidor = new RFolhaPagamentoPeriodoContratoServidor( new RFolhaPagamentoPeriodoMovimentacao );
 switch ($stAcao) {
@@ -70,6 +67,10 @@ switch ($stAcao) {
         $obTPessoalContrato = new TPessoalContrato;
         $stFiltro = " WHERE registro = ".Sessao::read('inContrato');
         $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
+
+        Sessao::getTransacao()->setMapeamento( $obTPessoalContrato );
+        $obTPessoalContrato->setDado('cod_contrato', $rsContrato->getCampo("cod_contrato"));
+
         $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao;
         $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsUltimaMovimentacao);
 
@@ -138,10 +139,10 @@ switch ($stAcao) {
                 $stFiltro = " WHERE codigo = '".$arEvento["inCodigo"]."'";
                 $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento;
                 $obTFolhaPagamentoEvento->recuperaTodos($rsEvento,$stFiltro);
-                
+
                 $nuValor        = ( $arEvento['nuValor']        != "" ) ? $arEvento['nuValor']      : 0;
                 $nuQuantidade   = ( $arEvento['nuQuantidade']   != "" ) ? $arEvento['nuQuantidade'] : 0;
-                
+
                 $obTFolhaPagamentoRegistroEvento->setDado("cod_evento"  ,$rsEvento->getCampo("cod_evento"));
                 $obTFolhaPagamentoRegistroEvento->setDado("valor"       ,$nuValor);
                 $obTFolhaPagamentoRegistroEvento->setDado("quantidade"  ,$nuQuantidade);
@@ -151,7 +152,7 @@ switch ($stAcao) {
                 $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
                 if ($arEvento['inQuantidadeParc'] != "") {
                     $inMesCarencia  = ( $arEvento['inMesCarencia']   != "" ) ? $arEvento['inMesCarencia'] : 0;
-                    
+
                     $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela"      , $arEvento['inQuantidadeParc']);
                     $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia" , $inMesCarencia);
                     $obTFolhaPagamentoRegistroEventoParcela->inclusao();
@@ -178,10 +179,10 @@ switch ($stAcao) {
                 $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
                 $obTFolhaPagamentoRegistroEvento->inclusao();
                 $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
-                
+
                 if ($arEvento['inQuantidadeParc'] != "") {
                     $inMesCarencia  = ( $arEvento['inMesCarencia']   != "" ) ? $arEvento['inMesCarencia'] : 0;
-                    
+
                     $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela"  ,$arEvento['inQuantidadeParc']);
                     $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia" , $inMesCarencia);
                     $obTFolhaPagamentoRegistroEventoParcela->inclusao();

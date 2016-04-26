@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCIMImovel.class.php 64728 2016-03-23 19:49:02Z jean $
+    * $Id: RCIMImovel.class.php 64894 2016-04-12 18:12:52Z evandro $
 
     * Casos de uso: uc-05.01.09
 */
@@ -1572,6 +1572,193 @@ function listarImoveisConsulta(&$rsRecordSet, $boTransacao = "", $stOrder = " in
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbEdf" , $stFiltroAtrbEdf );
     $obErro = $this->obFCIMRelatorioCadastroImobiliario->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
     
+    return $obErro;
+}
+
+function listarConsultaCadastroImobilario(&$rsRecordSet, $boTransacao = "", $stOrder = " inscricao_municipal ")
+{
+    $stFiltro = "";
+    $stFiltroLote = empty($stFiltroLote) ? "" : $stFiltroLote;
+    $stFiltroImovel = empty($stFiltroImovel) ? "" : $stFiltroImovel;
+    if ($this->inNumeroInscricao) {
+        $stFiltroLote .= " AND I.inscricao_municipal = ".$this->inNumeroInscricao;
+    }
+    if ($this->inNumeroInscricaoInicial && $this->inNumeroInscricaoFinal =='') {
+        $stFiltroLote .= " AND I.inscricao_municipal = ".$this->inNumeroInscricaoInicial;
+    } elseif (!$this->inNumeroInscricaoInicial && $this->inNumeroInscricaoFinal) {
+        $stFiltroLote .= " AND I.inscricao_municipal = ".$this->inNumeroInscricaoFinal;
+    } elseif ($this->inNumeroInscricaoInicial && $this->inNumeroInscricaoFinal) {
+        $stFiltroLote .= " AND I.inscricao_municipal BETWEEN ".$this->inNumeroInscricaoInicial." AND ".$this->inNumeroInscricaoFinal;
+    }
+    if ( $this->roRCIMLote->getNumeroLote() ) {
+        $stFiltroLote .= " AND ltrim(LL.valor,''0'') = ''".ltrim($this->roRCIMLote->getNumeroLote(),'0')."'' ";
+    }
+    if ( $this->roRCIMLote->obRCIMLocalizacao->getCodigoLocalizacao() ) {
+        $stFiltroLote .= " AND LOC.codigo_composto like ''".$this->roRCIMLote->obRCIMLocalizacao->getCodigoLocalizacao()."%''";
+    }
+    if ($this->roUltimoProprietario) {
+        if ( $this->roUltimoProprietario->getNumeroCGM() ) {
+            $stFiltroLote .= " AND C.numcgm = ".$this->roUltimoProprietario->getNumeroCGM();
+        }
+        if ($this->roUltimoProprietario->inNumeroCGMInicial && $this->roUltimoProprietario->inNumeroCGMFinal) {
+            $stFiltroLote .= " AND C.numcgm BETWEEN  ".$this->roUltimoProprietario->inNumeroCGMInicial." AND ".$this->roUltimoProprietario->inNumeroCGMFinal;
+        }
+        if ( $this->roUltimoProprietario->obRCGM->getNomCGM() ) {
+            $stFiltroLote .= " AND UPPER( C.nom_cgm ) like UPPER( ''".$this->roUltimoProprietario->obRCGM->getNomCGM()."%'' )";
+        }
+    }
+
+    if ( $this->getNumeroImovel() ) {
+        $novoNumero = ltrim ( $this->getNumeroImovel() , '0');
+        $stFiltroLote .= " AND ltrim ( I.numero, ''0'' ) = ''". $novoNumero ."''";
+    }
+
+    if ( $this->getComplementoImovel() ) {
+        $stFiltroLote .= " AND UPPER( I.complemento ) like UPPER( ''".$this->getComplementoImovel()."%'' )";
+    }
+    if ( $this->obRCIMLogradouro->getCodigoLogradouro() ) {
+        $stFiltroImovel .= " AND LO.cod_logradouro = ".$this->obRCIMLogradouro->getCodigoLogradouro();
+    }
+    if ( $this->obRCIMBairro->getCodigoBairro() ) {
+        $stFiltroImovel .= " AND B.cod_bairro = ".$this->obRCIMBairro->getCodigoBairro();
+    }
+    if ( $this->obRCIMImobiliaria->getRegistroCreci() ) {
+        $stFiltroImovel .= " AND II.creci = ".$this->obRCIMImobiliaria->getRegistroCreci();
+    }
+    if ( $this->obRCIMCondominio->getCodigoCondominio() ) {
+        $stFiltroImovel .= " AND ICO.cod_condominio = ".$this->obRCIMCondominio->getCodigoCondominio();
+    }
+    if ( $this->getLogradouro() ) {
+        $stFiltro = " WHERE UPPER( logradouro ) like UPPER ('%".$this->getLogradouro()."%')";
+    }
+
+    $stFiltroAtrbImovel = "";
+    $stFiltroAtrbEdf = "";
+    $stFiltroAtrbLote = "";
+    $inTotalEdf = 0;
+    $inTotalLote = 0;
+    $inTotalImovel = 0;
+    $boLoteUrbano = true;
+
+    if ($this->arAtributosDinamicosConsultaImob) {
+        for ( $inX=0; $inX<count( $this->arAtributosDinamicosConsultaImob ); $inX++ ) {
+            switch ($this->arAtributosDinamicosConsultaImob[$inX]["cod_cadastro"]) {
+                case 5: //edificacao
+                    $stFiltroAtrbEdf .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."'' ) OR ";
+                    $stFiltroImovel .= "
+                        AND atev.inscricao_municipal = I.inscricao_municipal
+                    ";
+                    $inTotalEdf++;
+                    break;
+
+                case 4: //imovel
+                    $stFiltroAtrbImovel .= " ( atributo_imovel_valor.cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND atributo_imovel_valor.valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."' ) OR ";
+                    $stFiltroImovel .= "
+                        AND aiv.inscricao_municipal = I.inscricao_municipal
+                    ";
+
+                    $inTotalImovel++;
+                    break;
+
+                case 3: //lote rural
+                    $boLoteUrbano = false;
+                    $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor = ''".$this->arAtributosDinamicosConsultaImob[$inX]["valor"]."'' ) OR ";
+                    $inTotalLote++;
+                    break;
+
+                case 2: //lote urbano                                        
+                    if ( trim($this->arAtributosDinamicosConsultaImob[$inX]["valor"]) != '' ){
+                        $arValoresAtributo = explode(',',trim($this->arAtributosDinamicosConsultaImob[$inX]["valor"]));
+                        if (count($arValoresAtributo) > 0){
+                            foreach ($arValoresAtributo as $key => $value) {
+                                $stFiltroAtrbLote .= " ( cod_atributo = ".$this->arAtributosDinamicosConsultaImob[$inX]["cod_atributo"]." AND valor ilike ''%".$value."%'' ) OR ";
+                                $inTotalLote++;
+                            }
+                        }
+                    }                    
+                    break;
+            }
+        }
+
+        if ($stFiltroAtrbEdf) {
+            $stFiltroAtrbEdf = "
+                WHERE
+                    cod_cadastro = 5
+                    AND cod_modulo = 12
+                    AND ( ".substr( $stFiltroAtrbEdf, 0, strlen( $stFiltroAtrbEdf ) - 4 )." )
+
+                GROUP BY
+                    cod_construcao,
+                    cod_tipo
+
+                HAVING COUNT (cod_construcao) >= ".$inTotalEdf;
+        } else {
+            $stFiltroAtrbEdf = "
+                GROUP BY
+                    cod_construcao,
+                    cod_tipo
+            ";
+        }
+
+        if ($stFiltroAtrbImovel) {
+            $stFiltroAtrbImovel = "
+                WHERE
+                    cod_cadastro = 4
+                    AND cod_modulo = 12
+                    AND ( ".substr( $stFiltroAtrbImovel, 0, strlen( $stFiltroAtrbImovel ) - 4 )." )
+
+                GROUP BY
+                    inscricao_municipal
+
+                HAVING COUNT (inscricao_municipal) >= ".$inTotalImovel;
+        } else {
+            $stFiltroAtrbImovel = "
+                GROUP BY
+                    inscricao_municipal
+            ";
+        }
+
+        if ($stFiltroAtrbLote) {
+            $stFiltroAtrbLote = "
+                WHERE
+                    cod_modulo = 12
+                    AND  ".substr( $stFiltroAtrbLote, 0, strlen( $stFiltroAtrbLote ) - 4 )." 
+            ";
+
+            $stFiltroAtrbLote .= "
+                    AND cod_cadastro = ".($boLoteUrbano?2:3)."
+
+                GROUP BY
+                    cod_lote
+
+                --HAVING COUNT (cod_lote) >= ".$inTotalLote;
+        }
+    } else {
+        $stFiltroAtrbImovel = "
+            GROUP BY
+                inscricao_municipal
+        ";
+
+        $stFiltroAtrbLote .= "
+            GROUP BY
+                cod_lote
+        ";
+
+        $stFiltroAtrbEdf = "
+            GROUP BY
+                cod_construcao,
+                cod_tipo
+        ";
+    }
+
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stDistinct"     , 'TRUE'              );
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroLote"   , $stFiltroLote       );
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroImovel" , $stFiltroImovel     );
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbImovel" , $stFiltroAtrbImovel );
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbLote" , $stFiltroAtrbLote );
+    $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbEdf" , $stFiltroAtrbEdf );
+    $obErro = $this->obFCIMRelatorioCadastroImobiliario->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
+        
     return $obErro;
 }
 

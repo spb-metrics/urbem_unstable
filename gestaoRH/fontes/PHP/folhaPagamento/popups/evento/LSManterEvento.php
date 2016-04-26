@@ -64,7 +64,7 @@ $stFncJavaScript .= " var sNom;                                                 
 $stFncJavaScript .= " var sTexto;                                                           \n";
 $stFncJavaScript .= " sNum = num;                                                           \n";
 $stFncJavaScript .= " sNom = nom;                                                           \n";
-$stFncJavaScript .= " sTexto = texto; alert(sNum); alert(sNom); alert(sTexto);                                                      \n";
+$stFncJavaScript .= " sTexto = texto;                                                       \n";
 $stFncJavaScript .= " d = window.opener.parent.frames['telaPrincipal'].document ;           \n";
 $stFncJavaScript .= " d.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom;       \n";
 $stFncJavaScript .= " d.".$_REQUEST["nomForm"].".Hdn".$_REQUEST["campoNum"].".value = sNom; \n";

@@ -81,7 +81,7 @@ $stLink .= '&stDataInicial='     .$_REQUEST['stDataInicial'];
 $stLink .= '&stDataFinal='       .$_REQUEST['stDataFinal'];
 $stLink .= '&stModoGeracao='     .$_REQUEST['stModoGeracao'];
 $stLink .= '&HdninCodLotacao='   .$_REQUEST['HdninCodLotacao'];
-$stLink .= "&stAcao=".$stAcao;
+
 
 $stFiltroPaginacao = '';
 //MANTEM FILTRO E PAGINACAO
@@ -109,17 +109,19 @@ $arFiltros['inCodLotacao']       = $_REQUEST['inCodLotacao'];
 $arFiltros['dtPeriodoInicial2']  = $_REQUEST['stDataInicial'];
 $arFiltros['dtPeriodoFinal2']    = $_REQUEST['stDataFinal'];
 
-//$stOrdem = " to_date(periodo_inicial,'dd/mm/yyyy')";
+$obRPessoalGeracaoAssentamento->listarAssentamentoServidor( $rsLista,$arFiltros,$stOrdem );
+$request->set('dtInicial', $rsLista->getCampo('dt_inicial') );
+$request->set('dtFinal',$rsLista->getCampo('dt_final') );
+
+$stLink .= "&dtInicial=".$rsLista->getCampo('dt_inicial');
+$stLink .= "&dtFinal=".$rsLista->getCampo('dt_final');
+
 $stOrdem = " nom_cgm,cod_contrato,assentamento_gerado.periodo_inicial";
 
-$obRPessoalGeracaoAssentamento->listarAssentamentoServidor( $rsLista,$arFiltros,$stOrdem );
-
+$stLink .= "&stAcao=".$stAcao;
 $obLista = new Lista;
-//$stTitulo = ' </div></td></tr><tr><td colspan="5" class="alt_dados">Período Aberto';
 $obLista->setTitulo             ('<div align="right">'.$obRFolhaPagamentoFolhaSituacao->consultarCompetencia());
-
 $obLista->obPaginacao->setFiltro("&stLink=".$stLink );
-
 $obLista->setRecordSet( $rsLista );
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");

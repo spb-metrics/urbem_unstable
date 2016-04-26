@@ -31,7 +31,7 @@
 * Calculo Valor de Juros Especial (Mata)
 */
 
-CREATE OR REPLACE FUNCTION fn_acrescimo_indice_mata_composto (date,date,numeric,integer,integer) RETURNS numeric as '
+CREATE OR REPLACE FUNCTION fn_acrescimo_indice_mata_composto (date,date,numeric,integer,integer) RETURNS numeric as $$
 
     DECLARE
         dtVencimento    ALIAS FOR $1;
@@ -57,10 +57,10 @@ CREATE OR REPLACE FUNCTION fn_acrescimo_indice_mata_composto (date,date,numeric,
         nuJuroTotal := 0.00;
         inDiff := diff_datas_em_meses(dtVencimento,dtDataCalculo);
 
-        inMesInicio := date_part(''month'' , dtVencimento )::integer ;
-        inMesFim := date_part(''month'' , dtVencimento )::integer + ( inDiff );
+        inMesInicio := date_part('month' , dtVencimento )::integer ;
+        inMesFim := date_part('month' , dtVencimento )::integer + ( inDiff );
 
-        inAno := date_part(''year'' , dtVencimento )::integer;
+        inAno := date_part('year' , dtVencimento )::integer;
 
         inTotalMes := inMesInicio;
         nuValCalculado := nuValor;
@@ -72,8 +72,8 @@ CREATE OR REPLACE FUNCTION fn_acrescimo_indice_mata_composto (date,date,numeric,
                   from monetario.valor_acrescimo
                  where valor_acrescimo.cod_acrescimo = inCodAcrescimo
                    and valor_acrescimo.cod_tipo = inCodTipo
-                   and date_part(''month'' , valor_acrescimo.inicio_vigencia ) = inMesInicio
-                   and date_part(''year'' , valor_acrescimo.inicio_vigencia ) = inAno;
+                   and date_part('month' , valor_acrescimo.inicio_vigencia ) = inMesInicio
+                   and date_part('year' , valor_acrescimo.inicio_vigencia ) = inAno;
                 nuJuroCorrente := coalesce (nuJuroCorrente, 0);
                 nuJuroAnterior := nuJuroCorrente;
 
@@ -95,5 +95,5 @@ CREATE OR REPLACE FUNCTION fn_acrescimo_indice_mata_composto (date,date,numeric,
 
         RETURN nuRetorno::numeric(14,2);
     END;
-'language 'plpgsql';
+$$ language 'plpgsql';
            

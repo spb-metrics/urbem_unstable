@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
+    $Id: PRManterOrdemCompra.php 64927 2016-04-13 19:45:13Z evandro $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -87,18 +87,20 @@ if ( strpos($stAcao,"anular")===false && strpos($stAcao,"reemitir")===false ) {
                 $boCodItem = true;
                 $obErro = true;   
             }else{
-                if( empty($arItensAlmoxarifado[$dados['num_item']]['inCodItem']       ) ||
-                    empty($arItensAlmoxarifado[$dados['num_item']]['inCodCentroCusto']) ||
-                    empty($arItensAlmoxarifado[$dados['num_item']]['inMarca']         )
-                )
-                {
-                    SistemaLegado::exibeAviso("Preencha todos os campos do Vínculo do Almoxarifado do Item ".$i." da lista!");
-                    $boCodItem = true;
-                    $obErro = true;
-                    break;
+                if($stTipoOrdem == 'C'){
+                    if( empty($arItensAlmoxarifado[$dados['num_item']]['inCodItem']       ) ||
+                        empty($arItensAlmoxarifado[$dados['num_item']]['inCodCentroCusto']) ||
+                        empty($arItensAlmoxarifado[$dados['num_item']]['inMarca']         )
+                    )
+                    {
+                        SistemaLegado::exibeAviso("Preencha todos os campos do Vínculo do Almoxarifado do Item ".$i." da lista!");
+                        $boCodItem = true;
+                        $obErro = true;
+                        break;
+                    }
+                    else
+                        $arItens[$i-1]['cod_item'] = $arItensAlmoxarifado[$dados['num_item']]['inCodItem'];
                 }
-                else
-                    $arItens[$i-1]['cod_item'] = $arItensAlmoxarifado[$dados['num_item']]['inCodItem'];
             }
         }
         $i++;

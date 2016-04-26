@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
+    * $Id: LSManterOrdemCompra.php 64922 2016-04-13 17:04:50Z evandro $
 
     * Casos de uso: uc-03.04.24
 */
@@ -145,7 +145,7 @@ if ( ($request->get('inCodAutorizacaoInicial', '') != "") && ($request->get('inC
 }
 
 if ($request->get('inCodFornecedor', '') != "") {
-    $stFiltro .= " item_pre_empenho_julgamento.cgm_fornecedor = ".$request->get('inCodFornecedor')." \nAND ";
+    $stFiltro .= " pre_empenho.cgm_beneficiario = ".$request->get('inCodFornecedor')." \nAND ";
 }
 
 // idem ao caso do codEmpenhoInicial e codEmpenhoFinal

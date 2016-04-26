@@ -32,7 +32,7 @@
 
   * Casos de uso: uc-03.04.05, uc-03.03.05, uc-03.03.06
 
-  $Id: OCIMontaSolicitacao.php 63099 2015-07-24 18:30:55Z franver $
+  $Id: OCIMontaSolicitacao.php 65107 2016-04-25 20:55:16Z jean $
 
   */
 
@@ -171,7 +171,7 @@ switch ($_REQUEST["stCtrl"]) {
                     }
 
                     if ($inTotalDisponivel == 0) {
-                        $stMsgAviso = "As Solcitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas Não devem ser de Registro de Preços.";
+                        $stMsgAviso = "As Solicitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas NÃO devem ser de Registro de Preços.";
                     }
                     
                     if (empty($stMsgAviso)) {
@@ -186,7 +186,7 @@ switch ($_REQUEST["stCtrl"]) {
                         $obTComprasSolicitacao->recuperaSolicitacoesNaoAtendidas( $rsLista, $stFiltro);
                         
                         if ($rsLista->getNumLinhas() != 1) {
-                            $stMsgAviso = "As Solcitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas Não devem ser de Registro de Preços.";
+                            $stMsgAviso = "As Solicitações do Mapa de Compras devem ser compatíveis. Ou todas devem ser de Registro de Preços ou todas NÃO devem ser de Registro de Preços.";
                         }
                     }
 

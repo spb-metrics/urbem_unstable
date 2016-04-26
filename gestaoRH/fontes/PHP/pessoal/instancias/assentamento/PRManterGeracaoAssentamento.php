@@ -64,19 +64,19 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 include_once ( CAM_GRH_PES_NEGOCIO."RPessoalAssentamentoGeradoContratoServidor.class.php"               );
 
 $arLink  = Sessao::read('link');
-$stAcao  = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao  = $request->get('stAcao');
 $stLink  = "&pg=".$arLink["pg"]."&pos=".$arLink["pos"];
 
-$stLink .= '&inCodLotacao='      .$_GET['inCodLotacao'];
-$stLink .= '&inCodAssentamento=' .$_GET['inCodAssentamento'];
-$stLink .= '&inContrato='        .$_GET['inContrato'];
-$stLink .= '&boCargoExercido='   .$_GET['boCargoExercido'];
-$stLink .= '&inCodCargo='        .$_GET['inCodCargo'];
-$stLink .= '&inCodEspecialidade='.$_GET['inCodEspecialidade'];
-$stLink .= '&boFuncaoExercida='  .$_GET['boFuncaoExercida'];
-$stLink .= '&stDataInicial='     .$_GET['stDataInicial'];
-$stLink .= '&stDataFinal='       .$_GET['stDataFinal'];
-$stLink .= '&stModoGeracao='     .$_GET['stModoGeracao'];
+$stLink .= '&inCodLotacao='      .$request->get('inCodLotacao');
+$stLink .= '&inCodAssentamento=' .$request->get('inCodAssentamento');
+$stLink .= '&inContrato='        .$request->get('inContrato');
+$stLink .= '&boCargoExercido='   .$request->get('boCargoExercido');
+$stLink .= '&inCodCargo='        .$request->get('inCodCargo');
+$stLink .= '&inCodEspecialidade='.$request->get('inCodEspecialidade');
+$stLink .= '&boFuncaoExercida='  .$request->get('boFuncaoExercida');
+$stLink .= '&stDataInicial='     .$request->get('stDataInicial');
+$stLink .= '&stDataFinal='       .$request->get('stDataFinal');
+$stLink .= '&stModoGeracao='     .$request->get('stModoGeracao');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterGeracaoAssentamento";
@@ -87,21 +87,26 @@ $pgOcul     = "OC".$stPrograma.".php?stAcao=$stAcao".$stLink;
 $pgList     = "LS".$stPrograma.".php?stAcao=$stAcao".$stLink;
 $pgJS       = "JS".$stPrograma.".js";
 
+$obErro = new Erro();
+$obTransacao = new Transacao;
+$boFlagTransacao = false;
+$obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );        
+
 $obRPessoalAssentametoGeradoContratoServidor = new RPessoalAssentamentoGeradoContratoServidor;
 $obRPessoalAssentametoGeradoContratoServidor->addRPessoalGeracaoAssentamento();
-$obErro = new Erro();
 
 switch ($stAcao) {
     case "incluir":
         $arAssentamentos = Sessao::read('arAssentamentos');
         $arContratos = array();
         $stModoGeracao = ( $_POST['stModoGeracao'] ) ? $_POST['stModoGeracao'] : $_POST['hdnModoGeracao'];
+        
         switch ($stModoGeracao) {
             case "contrato";
             case "cgm/contrato";
                 foreach ($arAssentamentos as $arAssentamento) {
                     $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->setRegistro($arAssentamento['inRegistro']);
-                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->consultarContrato();
+                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->consultarContrato($boTransacao);
                     $arTemp['cod_contrato']             = $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->getCodContrato();
                     $arTemp['cod_assentamento']         = $arAssentamento['inCodAssentamento'];
                     $arTemp['periodo_inicial']          = $arAssentamento['stDataInicial'];
@@ -148,24 +153,25 @@ switch ($stAcao) {
                         if ($arAssentamento['inCodEspecialidade']) {
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->addEspecialidade();
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade($arAssentamento['inCodEspecialidade']);
-                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosCargoExercidoComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento']);
+                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosCargoExercidoComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento'],$boTransacao);
                         } else {
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->setCodCargo($arAssentamento['inCodCargo']);
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->addEspecialidade();
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade("");
-                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosCargoExercidoComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento']);
+                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosCargoExercidoComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento'],$boTransacao);
                         }
                     }
                     while ( !$rsContratos->eof() ) {
                         if ( array_search($rsContratos->getCampo('cod_contrato'),$arContratosSearch) === false ) {
-                            $arTemp['cod_contrato']     = $rsContratos->getCampo('cod_contrato');
-                            $arTemp['cod_assentamento'] = $arAssentamento['inCodAssentamento'];
-                            $arTemp['periodo_inicial']  = $arAssentamento['stDataInicial'];
-                            $arTemp['periodo_final']    = $arAssentamento['stDataFinal'];
-                            $arTemp['dt_inicial']       = $arAssentamento['dtInicial'];
-                            $arTemp['dt_final']         = $arAssentamento['dtFinal'];
-                            $arTemp['observacao']       = $arAssentamento['stObservacao'];
-                            $arTemp['arNormas']         = $arAssentamento['arNormas'];
+                            $arTemp['cod_contrato']       = $rsContratos->getCampo('cod_contrato');
+                            $arTemp['cod_assentamento']   = $arAssentamento['inCodAssentamento'];
+                            $arTemp['inCodClassificacao'] = $arAssentamento['inCodClassificacao'];
+                            $arTemp['periodo_inicial']    = $arAssentamento['stDataInicial'];
+                            $arTemp['periodo_final']      = $arAssentamento['stDataFinal'];
+                            $arTemp['dt_inicial']         = $arAssentamento['dtInicial'];
+                            $arTemp['dt_final']           = $arAssentamento['dtFinal'];
+                            $arTemp['observacao']         = $arAssentamento['stObservacao'];
+                            $arTemp['arNormas']           = $arAssentamento['arNormas'];
                             $arContratos[] = $arTemp;
                         }
                         $arContratosSearch[] = $rsContratos->getCampo('cod_contrato');
@@ -176,25 +182,26 @@ switch ($stAcao) {
                         if ($arAssentamento['inCodEspecialidade']) {
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->addEspecialidade();
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade($arAssentamento['inCodEspecialidade']);
-                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosFuncaoExercidaComSubDivisaoAssentamento($rsContratos,$arAssentamento['inCodAssentamento']);
+                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosFuncaoExercidaComSubDivisaoAssentamento($rsContratos,$arAssentamento['inCodAssentamento'],$boTransacao);
                         } else {
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->addEspecialidade();
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->setCodCargo($arAssentamento['inCodCargo']);
                             $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade("");
-                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosFuncaoExercidaComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento']);
+                            $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratosFuncaoExercidaComSubDivisaoAssentamento($rsContratos, $arAssentamento['inCodAssentamento'],$boTransacao);
                         }
                     }
 
                     while ( !$rsContratos->eof() ) {
                         if ( array_search($rsContratos->getCampo('cod_contrato'),$arContratosSearch) === false ) {
-                            $arTemp['cod_contrato']     = $rsContratos->getCampo('cod_contrato');
-                            $arTemp['cod_assentamento'] = $arAssentamento['inCodAssentamento'];
-                            $arTemp['periodo_inicial']  = $arAssentamento['stDataInicial'];
-                            $arTemp['periodo_final']    = $arAssentamento['stDataFinal'];
-                            $arTemp['dt_inicial']       = $arAssentamento['dtInicial'];
-                            $arTemp['dt_final']         = $arAssentamento['dtFinal'];
-                            $arTemp['observacao']       = $arAssentamento['stObservacao'];
-                            $arTemp['arNormas']         = $arAssentamento['arNormas'];
+                            $arTemp['cod_contrato']       = $rsContratos->getCampo('cod_contrato');
+                            $arTemp['cod_assentamento']   = $arAssentamento['inCodAssentamento'];
+                            $arTemp['inCodClassificacao'] = $arAssentamento['inCodClassificacao'];
+                            $arTemp['periodo_inicial']    = $arAssentamento['stDataInicial'];
+                            $arTemp['periodo_final']      = $arAssentamento['stDataFinal'];
+                            $arTemp['dt_inicial']         = $arAssentamento['dtInicial'];
+                            $arTemp['dt_final']           = $arAssentamento['dtFinal'];
+                            $arTemp['observacao']         = $arAssentamento['stObservacao'];
+                            $arTemp['arNormas']           = $arAssentamento['arNormas'];
                             $arContratos[] = $arTemp;
                         }
                         $arContratosSearch[] = $rsContratos->getCampo('cod_contrato');
@@ -205,19 +212,20 @@ switch ($stAcao) {
             case "lotacao";
                 foreach ($arAssentamentos as $arAssentamento) {
                     $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obROrganogramaOrgao->setCodOrgaoEstruturado($arAssentamento['inCodLotacao']);
-                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obROrganogramaOrgao->listarOrgaoReduzido($rsOrgranogramaOrgao);
+                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obROrganogramaOrgao->listarOrgaoReduzido($rsOrgranogramaOrgao,'','',$boTransacao);
                     $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->obROrganogramaOrgao->setCodOrgao($rsOrgranogramaOrgao->getCampo('cod_orgao'));
-                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratoServidorLotacaoComSubDivisaoAssentamento($rsContrato, $arAssentamento['inCodAssentamento']);
+                    $obRPessoalAssentametoGeradoContratoServidor->roRPessoalGeracaoAssentamento->obRPessoalContratoServidor->listarContratoServidorLotacaoComSubDivisaoAssentamento($rsContrato, $arAssentamento['inCodAssentamento'],$boTransacao);
 
                     while ( !$rsContrato->eof() ) {
-                        $arTemp['cod_contrato']     = $rsContrato->getCampo('cod_contrato');
-                        $arTemp['cod_assentamento'] = $arAssentamento['inCodAssentamento'];
-                        $arTemp['periodo_inicial']  = $arAssentamento['stDataInicial'];
-                        $arTemp['periodo_final']    = $arAssentamento['stDataFinal'];
-                        $arTemp['dt_inicial']       = $arAssentamento['dtInicial'];
-                        $arTemp['dt_final']         = $arAssentamento['dtFinal'];
-                        $arTemp['observacao']       = $arAssentamento['stObservacao'];
-                        $arTemp['arNormas']         = $arAssentamento['arNormas'];
+                        $arTemp['cod_contrato']       = $rsContrato->getCampo('cod_contrato');
+                        $arTemp['cod_assentamento']   = $arAssentamento['inCodAssentamento'];
+                        $arTemp['inCodClassificacao'] = $arAssentamento['inCodClassificacao'];
+                        $arTemp['periodo_inicial']    = $arAssentamento['stDataInicial'];
+                        $arTemp['periodo_final']      = $arAssentamento['stDataFinal'];
+                        $arTemp['dt_inicial']         = $arAssentamento['dtInicial'];
+                        $arTemp['dt_final']           = $arAssentamento['dtFinal'];
+                        $arTemp['observacao']         = $arAssentamento['stObservacao'];
+                        $arTemp['arNormas']           = $arAssentamento['arNormas'];
                         $arContratos[] = $arTemp;
 
                         $rsContrato->proximo();
@@ -231,16 +239,12 @@ switch ($stAcao) {
         $obRPessoalServidor = new RPessoalServidor;
         $obRPessoalServidor->addContratoServidor();
 
-        $boTransacao = "";
-        $boFlagTransacao = false;
-        $obTransacao = new Transacao;
-        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );        
-
         if ( !$obErro->ocorreu() ) {
             foreach ($arContratos as $keyArContrato => $arContrato) {
                 $inCodMotivo = SistemaLegado::pegaDado("cod_motivo","pessoal.assentamento_assentamento"
                                                             ,"WHERE cod_assentamento = ".$arContrato['cod_assentamento']." 
-                                                            AND cod_classificacao = ".$arContrato["inCodClassificacao"]."");
+                                                            AND cod_classificacao = ".$arContrato["inCodClassificacao"].""
+                                                            ,$boTransacao);
 
                 //Verifica se o cod_motivo é '18 - Readaptação' ou '14 - Alteração de Cargo'
                 if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) ){
@@ -252,65 +256,71 @@ switch ($stAcao) {
                     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->addEspecialidadeSubDivisao();
                     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoEspecialidade->setCodEspecialidade( $arContrato["inCodEspecialidadeCargo"]   );
                     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->addCargoSubDivisao();
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $arContrato["inCodSubDivisao"] );            
+                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $arContrato["inCodSubDivisao"] );
                     $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsCargo);
+                    $obErro = $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsCargo,$boTransacao);
+                    if ( !$obErro->ocorreu() ) {
+                        if ($rsCargo->getNumLinhas() < 1) {
+                            sistemaLegado::exibeAviso('Cargo Inválido. Norma não está mais em vigor.', 'n_alterar', 'erro');
+                            exit;
+                        }
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime( $arContrato["inCodRegimeFuncao"] );
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo  ( $arContrato["inCodFuncao"]       );
+                
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo( $arContrato["inCodFuncao"]);
+                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
+                        $obErro = $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsFuncao,$boTransacao);
+                        
+                        if ( !$obErro->ocorreu() ) {
+                            if ($rsFuncao->getNumLinhas() < 1) {
+                                sistemaLegado::exibeAviso('Função Inválida. Norma não está mais em vigor.', 'n_alterar', 'erro');
+                                exit;
+                            }
 
-                    if ($rsCargo->getNumLinhas() < 1) {
-                        sistemaLegado::exibeAviso('Cargo Inválido. Norma não está mais em vigor.', 'n_alterar', 'erro');
-                        exit;
-                    }
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegimeFuncao->setCodRegime( $arContrato["inCodRegimeFuncao"] );
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->setCodCargo  ( $arContrato["inCodFuncao"]       );
-                
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo( $arContrato["inCodFuncao"]);
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setBuscarCargosNormasVencidas(false);
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->listarCargosPorSubDivisaoServidor($rsFuncao);
     
-                    if ($rsFuncao->getNumLinhas() < 1) {
-                        sistemaLegado::exibeAviso('Função Inválida. Norma não está mais em vigor.', 'n_alterar', 'erro');
-                        exit;
-                    }
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo( $arContrato["stCargo"] );
     
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->setCodCargo( $arContrato["stCargo"] );
-    
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $arContrato["inCodEspecialidadeFuncao"]  );
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $arContrato["inCodSubDivisaoFuncao"]);
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addEspecialidade();
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->addEspecialidadeSubDivisao();
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoEspecialidade->setCodEspecialidade( $arContrato["inCodEspecialidadeFuncao"]  );
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->addCargoSubDivisao();
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargoFuncao->roUltimoCargoSubDivisao->obRPessoalSubDivisao->setCodSubDivisao( $arContrato["inCodSubDivisaoFuncao"]);
                 
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime( $arContrato["inCodRegime"] );
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalRegime->setCodRegime( $arContrato["inCodRegime"] );
                 
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao( $arContrato["inCodPadrao"]);
-                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->setCodPadrao( $arContrato["inCodPadrao"]);
+                            $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCargo->obRFolhaPagamentoPadrao->addNivelPadrao();
                 
-                    $obRPessoalServidor->roUltimoContratoServidor->setSalario                                     ( $arContrato["inSalario"] );
-                    $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                    ( $arContrato["stHorasMensais"]                   );
-                    $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                   ( $arContrato["stHorasSemanais"]                  );
-                    $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                             ( $arContrato["dtVigenciaSalario"]                );
+                            $obRPessoalServidor->roUltimoContratoServidor->setSalario                                     ( $arContrato["inSalario"] );
+                            $obRPessoalServidor->roUltimoContratoServidor->setHrMensal                                    ( $arContrato["stHorasMensais"]                   );
+                            $obRPessoalServidor->roUltimoContratoServidor->setHrSemanal                                   ( $arContrato["stHorasSemanais"]                  );
+                            $obRPessoalServidor->roUltimoContratoServidor->setVigenciaSalario                             ( $arContrato["dtVigenciaSalario"]                );
                     
-                    $obRPessoalServidor->roUltimoContratoServidor->listarDadosAbaContratoServidor($rsCargoServidor);
+                            $obErro = $obRPessoalServidor->roUltimoContratoServidor->listarDadosAbaContratoServidor($rsCargoServidor,$boTransacao);
                     
-                    while ( !$rsCargoServidor->eof() ) {
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento             ( $rsCargoServidor->getCampo('cod_tipo_pagamento') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario                 ( $rsCargoServidor->getCampo('cod_tipo_salario') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao               ( $rsCargoServidor->getCampo('cod_tipo_admissao') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $rsCargoServidor->getCampo('cod_vinculo') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                     ( $rsCargoServidor->getCampo('cod_categoria') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                      ( $rsCargoServidor->getCampo('cod_grade') );
-                        $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                              ( $rsCargoServidor->getCampo('dt_nomeacao') );
-                        $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                 ( $rsCargoServidor->getCampo('dt_posse') );
-                        $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                              ( $rsCargoServidor->getCampo('dt_admissao') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM            ( $rsCargoServidor->getCampo('numcgm_sindicato') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento           ( $rsCargoServidor->getCampo('cod_forma_pagamento') );
-                        $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                    ( $rsCargoServidor->getCampo('cod_norma') );
+                            if ( !$obErro->ocorreu() ) {
+
+                                while ( !$rsCargoServidor->eof() ) {
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoPagamento->setCodTipoPagamento             ( $rsCargoServidor->getCampo('cod_tipo_pagamento') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoSalario->setCodTipoSalario                 ( $rsCargoServidor->getCampo('cod_tipo_salario') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalTipoAdmissao->setCodTipoAdmissao               ( $rsCargoServidor->getCampo('cod_tipo_admissao') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalVinculoEmpregaticio->setCodVinculoEmpregaticio ( $rsCargoServidor->getCampo('cod_vinculo') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalCategoria->setCodCategoria                     ( $rsCargoServidor->getCampo('cod_categoria') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalGradeHorario->setCodGrade                      ( $rsCargoServidor->getCampo('cod_grade') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setNomeacao                                              ( $rsCargoServidor->getCampo('dt_nomeacao') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setPosse                                                 ( $rsCargoServidor->getCampo('dt_posse') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->setAdmissao                                              ( $rsCargoServidor->getCampo('dt_admissao') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRFolhaPagamentoSindicato->obRCGM->setNumCGM            ( $rsCargoServidor->getCampo('numcgm_sindicato') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRPessoalFormaPagamento->setCodFormaPagamento           ( $rsCargoServidor->getCampo('cod_forma_pagamento') );
+                                    $obRPessoalServidor->roUltimoContratoServidor->obRNorma->setCodNorma                                    ( $rsCargoServidor->getCampo('cod_norma') );
     
-                        $rsCargoServidor->proximo();
-                    }
-                    
-                    $obErro = $obRPessoalServidor->roUltimoContratoServidor->alterarContrato($boTransacao);
-                
+                                    $rsCargoServidor->proximo();
+                                }
+
+                                $obErro = $obRPessoalServidor->roUltimoContratoServidor->alterarContrato($boTransacao);
+                            }
+                        }
+                    }                
                 }
 
                 $obRPessoalAssentametoGeradoContratoServidor = new RPessoalAssentamentoGeradoContratoServidor;
@@ -334,7 +344,7 @@ switch ($stAcao) {
                     break;
             }
         }
-        
+                
         $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPessoalAssentametoGeradoContratoServidor->obTPessoalConselho );
 
         if ( !$obErro->ocorreu() ) {

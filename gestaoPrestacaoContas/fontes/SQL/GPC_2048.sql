@@ -5662,3 +5662,11 @@ ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN valor_saldo_atual_contra
 ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN valor_saldo_atual_contra_concessoes_garantia_externa NUMERIC(14,2);
 ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN medidas_corretivas TEXT;
 
+
+----------------
+-- Ticket #23510
+----------------
+
+UPDATE administracao.acao SET nom_acao = 'Vincular Dedutora Para RCL Anexo 8' WHERE cod_acao = 2887;
+UPDATE administracao.relatorio SET arquivo = 'RREOAnexo8novo.rptdesign' WHERE cod_gestao = 6 AND cod_modulo = 36 AND cod_relatorio = 63;
+

@@ -34,15 +34,16 @@
 */
 CREATE OR REPLACE FUNCTION tceal.recupera_codigo_orgao(VARCHAR, INTEGER, VARCHAR) RETURNS INTEGER AS $$ 
 DECLARE
-    stExercicio ALIAS FOR $1;
-    inEntidade  ALIAS FOR $2;
-    stTipoDados ALIAS FOR $3;
-    stSql       VARCHAR := '';
-    stParametro VARCHAR := '';
+    stExercicio       ALIAS FOR $1;
+    inEntidade        ALIAS FOR $2;
+    stTipoDados       ALIAS FOR $3;
+    
+    stSql             VARCHAR := '';
+    stParametro       VARCHAR := '';
     stFiltroParametro VARCHAR := '';
-    inCodOrgao  INTEGER := 0;
+    inCodOrgao        INTEGER := 0;
 BEGIN
-
+    
     SELECT substr(parametro, 14)
       INTO stParametro
       FROM administracao.configuracao
@@ -51,39 +52,21 @@ BEGIN
        AND cod_modulo = 8
        AND parametro ILIKE 'cod_entidade_%';
     
-    IF stParametro = 'prefeitura' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_prefeitura';
-    ELSIF stParametro = 'camara' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_camara';
-    ELSIF stParametro = 'rpps' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_rpps';
-        
-    ELSIF stParametro = 'educacao' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_educacao';
-    ELSIF stParametro = 'saude' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_saude';
-    ELSIF stParametro = 'assistencia' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_assistencia';
-    ELSIF stParametro = 'smtt' THEN
-        stFiltroParametro := 'tceal_'||stTipoDados||'_smtt';
-        
-    ELSE
-        stFiltroParametro := 'tceal_'||stTipoDados||'_outros';
-    END IF;
-    
     SELECT CASE WHEN valor = ''
-                          THEN 0::INTEGER 
-                          ELSE valor::INTEGER
-                          END AS valor
+                THEN 0::INTEGER 
+                ELSE valor::INTEGER
+                END AS valor
       INTO inCodOrgao
       FROM administracao.configuracao
      WHERE exercicio = stExercicio
        AND cod_modulo = 62
-       AND parametro = stFiltroParametro;
+       AND parametro = 'tceal_' || stTipoDados || '_' || stParametro;
     
     IF inCodOrgao IS NULL THEN
         inCodOrgao := 0;
     END IF;
+    
     RETURN inCodOrgao;
+    
 END;
 $$ LANGUAGE 'plpgsql';

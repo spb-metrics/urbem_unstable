@@ -34,7 +34,7 @@
     * @package    URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContratoApostila.class.php 64464 2016-02-26 14:04:45Z carlos.silva $
+    $Id: TLicitacaoContratoApostila.class.php 64923 2016-04-13 17:45:44Z jean $
 
     */
 
@@ -52,9 +52,9 @@ class TLicitacaoContratoApostila extends Persistente {
         $this->setComplementoChave('num_contrato, cod_entidade, exercicio');
         
         $this->AddCampo('cod_apostila'   , 'integer' , true , ''     , true  , false );
-        $this->AddCampo('num_contrato'   , 'integer' , true , ''     , false , false );
-        $this->AddCampo('cod_entidade'   , 'integer' , true , '4'    , false , false );
-        $this->AddCampo('exercicio'      , 'varchar' , true , '4'    , false , false );
+        $this->AddCampo('num_contrato'   , 'integer' , true , ''     , true  , true  );
+        $this->AddCampo('cod_entidade'   , 'integer' , true , '4'    , true  , true  );
+        $this->AddCampo('exercicio'      , 'varchar' , true , '4'    , true  , true  );
         $this->AddCampo('cod_tipo'       , 'integer' , true , ''     , false , false );
         $this->AddCampo('cod_alteracao'  , 'integer' , true , ''     , false , false );
         $this->AddCampo('descricao'      , 'text'    , true , ''     , false , false );

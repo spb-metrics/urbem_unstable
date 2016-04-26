@@ -60,13 +60,13 @@ $stLink = "&stAcao=".$stAcao;
 
 $stFiltro = " WHERE ";
 if ($_REQUEST['inNumContrato']) {
-   $stFiltro .= " contrato.nro_contrato = ". $_REQUEST['inNumContrato']." \nAND ";
+   $stFiltro .= " contrato.num_contrato = ". $_REQUEST['inNumContrato']." \nAND ";
 }
 if ($_REQUEST['stExercicioContrato']) {
    $stFiltro .= " contrato.exercicio = '". $_REQUEST['stExercicioContrato']."' \nAND ";
 }
 if ($_REQUEST['dtContrato']) {
-   $stFiltro .= " contrato.data_assinatura = to_date('". $_REQUEST['dtContrato']."','dd/mm/yyyy') \nAND ";
+   $stFiltro .= " contrato.dt_assinatura = to_date('". $_REQUEST['dtContrato']."','dd/mm/yyyy') \nAND ";
 }
 if ($_REQUEST["inCodEntidade"]) {
    $stFiltro .= " contrato.cod_entidade in (".implode(",", $_REQUEST["inCodEntidade"]).") \nAND ";

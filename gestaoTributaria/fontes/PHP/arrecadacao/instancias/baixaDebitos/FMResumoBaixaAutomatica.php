@@ -29,7 +29,7 @@
 
     * @ignore
 
-    * $Id: FMResumoBaixaAutomatica.php 64341 2016-01-15 20:11:16Z evandro $
+    * $Id: FMResumoBaixaAutomatica.php 64995 2016-04-18 18:40:22Z evandro $
     * Casos de uso: uc-05.03.19
 
 */
@@ -225,21 +225,20 @@ while ( !$rsListaOrigem->eof() ) {
             $stFiltro3 .= "\n AND acgc.cod_grupo = ".$rsListaOrigem->getCampo('origem');
             $stFiltro3 .= "\n and acgc.cod_grupo is not null ";
 
-            $stFiltro3 .= "\n AND c.exercicio = '".$rsListaOrigem->getCampo ('origem_exercicio')."'";
         } else {
 
-            $stFiltro3 .= "\n AND c.exercicio = '".$rsListaOrigem->getCampo('origem_exercicio')."'";
             $arCredito = explode ('.', $rsListaOrigem->getCampo('origem') );
-            $stFiltro3 .= "\n AND c.cod_credito = ".$arCredito[0];
-            $stFiltro3 .= "\n AND c.cod_especie = ".$arCredito[1];
-            $stFiltro3 .= "\n AND c.cod_genero = ".$arCredito[2];
-            $stFiltro3 .= "\n AND c.cod_natureza = ".$arCredito[3];
+            $stFiltro3 .= "\n AND calculo.cod_credito = ".$arCredito[0];
+            $stFiltro3 .= "\n AND calculo.cod_especie = ".$arCredito[1];
+            $stFiltro3 .= "\n AND calculo.cod_genero = ".$arCredito[2];
+            $stFiltro3 .= "\n AND calculo.cod_natureza = ".$arCredito[3];
             $stFiltro3 .= "\n AND acgc.cod_grupo is null ";
         }
 
         $stFiltro3 .= " AND pagamento.cod_convenio != -1 ";
+        $stFiltro3 .= " AND pagamento_calculo.valor > 0 ";
 
-        $obTARRPagamento->recuperaListaPagamentosLoteAnalitico ( $rsListaCreditos, $stFiltro3, "", "", false );
+        $obTARRPagamento->recuperaListaResumoBaixaAutomatica ( $rsListaCreditos, $stFiltro3, "", "", false );
 
         $arTMP = $rsListaCreditos->getElementos();
         $inTot = 0;
@@ -474,19 +473,15 @@ $obListaInconsistente->show();
 
 $rsListaCreditos->setPrimeiroElemento();
 $nuTotalBaixados = 0.00;
-foreach ($rsListaCreditos->arElementos as $value) {
-    $stValor = str_replace(".","",$value['somatorio']);
-    $stValor = str_replace(",",".",$value['somatorio']);
-    $nuTotalBaixados += $stValor;
+foreach ($rsListaCreditos->getElementos() as $value) {
+    $nuTotalBaixados += $value['somatorio'];
 }
 // total inconsistente
 $rsListaInconsistente->setPrimeiroElemento();
 $nuTotalInconsistente = 0.00;
 if ( $rsListaInconsistente->getNumLinhas() > 0 ) {
-    foreach ($rsListaInconsistente->arElementos as $value) {
-        $stValor = str_replace(".","",$value['valor']);
-        $stValor = str_replace(",",".",$value['valor']);
-        $nuTotalInconsistente += $stValor;
+    foreach ($rsListaInconsistente->getElementos() as $value) {
+        $nuTotalInconsistente += $value['valor'];
     }
 }
 // total do lote

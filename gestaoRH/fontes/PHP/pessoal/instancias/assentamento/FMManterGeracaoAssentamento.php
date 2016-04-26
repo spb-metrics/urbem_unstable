@@ -32,7 +32,7 @@
 
  * @ignore
 
- $Id: FMManterGeracaoAssentamento.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+ $Id: FMManterGeracaoAssentamento.php 64918 2016-04-13 13:05:36Z evandro $
 
  * Casos de uso: uc-04.04.14
  */
@@ -63,6 +63,8 @@ $stLink .= '&boFuncaoExercida='  .$request->get('boFuncaoExercida');
 $stLink .= '&stDataInicial='     .$request->get('stDataInicial');
 $stLink .= '&stDataFinal='       .$request->get('stDataFinal');
 $stLink .= '&stModoGeracao='     .$request->get('stModoGeracao');
+$stLink .= "&dtInicial="         .$request->get('dt_inicial');
+$stLink .= "&dtFinal="           .$request->get('dt_final');
 $stLink .= "&stAcao=".$stAcao;
 $stLink .= "&pg=".$request->get('pg');
 $stLink .= "&pos=".$request->get('pos');
@@ -101,7 +103,7 @@ $obHdnCtrl->setValue ( "" );
 
 if ($stAcao == "excluir" or $stAcao == "alterar" or $stAcao == "consultar") {
     $arFiltros['inCodAssentamentoGerado'] = $_REQUEST['inCodAssentamentoGerado'];
-    $obRPessoalGeracaoAssentamento->listarAssentamentoServidor($rsGeracaoAssentamento,$arFiltros);
+    $obRPessoalGeracaoAssentamento->listarAssentamentoServidor($rsGeracaoAssentamento,$arFiltros);    
     $inRegistro                 = $rsGeracaoAssentamento->getCampo('registro');
     $stCgm                      = $rsGeracaoAssentamento->getCampo('numcgm')."-".$rsGeracaoAssentamento->getCampo('nom_cgm');
     $inCodClassificacao         = $rsGeracaoAssentamento->getCampo('cod_classificacao');
@@ -114,8 +116,8 @@ if ($stAcao == "excluir" or $stAcao == "alterar" or $stAcao == "consultar") {
     $stTimestamp                = $rsGeracaoAssentamento->getCampo('timestamp');
     $dtPeriodoInicial           = $rsGeracaoAssentamento->getCampo('periodo_inicial');
     $dtPeriodoFinal             = $rsGeracaoAssentamento->getCampo('periodo_final');
-    $_POST["dtInicial"]         = $rsGeracaoAssentamento->getCampo('dt_inicial');
-    $_POST["dtFinal"]           = $rsGeracaoAssentamento->getCampo('dt_final');
+    $_REQUEST["dtInicial"]      = $rsGeracaoAssentamento->getCampo('dt_inicial');
+    $_REQUEST["dtFinal"]        = $rsGeracaoAssentamento->getCampo('dt_final');
     $stObservacao               = $rsGeracaoAssentamento->getCampo('observacao');
 
     if ($stAcao != "alterar") {

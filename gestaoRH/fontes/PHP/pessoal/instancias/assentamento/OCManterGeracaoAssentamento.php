@@ -31,7 +31,7 @@
     * @author Desenvolvedor: Andre Almeida
 
     * @ignore
-    $Id: OCManterGeracaoAssentamento.php 61778 2015-03-03 17:49:22Z michel $
+    $Id: OCManterGeracaoAssentamento.php 65033 2016-04-19 20:31:30Z jean $
 
     * Caso de uso: uc-04.04.14
 
@@ -411,7 +411,7 @@ function preencherAssentamento($boExecuta=false)
     switch ($stModoGeracao) {
         case 'contrato':
         case 'cgm/contrato':
-            $obRPessoalAssentamento->listarAssentamentoPorContrato( $rsAssentamentos, $_REQUEST['inContrato'], '', 'contrato' );
+            $obRPessoalAssentamento->listarAssentamentoPorContrato( $rsAssentamentos, $_REQUEST['inContrato'], '', 'contrato' );                        
             break;
         case 'cargo':
             if ($_REQUEST['boCargoExercido']) {
@@ -441,7 +441,7 @@ function preencherAssentamento($boExecuta=false)
         $rsAssentamentos->proximo();
     }
 
-    $stJs .= "f.inCodAssentamento.value='".$inAuxCodAssentamento."';\n";
+    $stJs .= "f.inCodAssentamento.value='".$inAuxCodAssentamento."';\n";    
     $stJs .= gerarSpanLicencaPremio();
 
     if ($boExecuta) {
@@ -951,6 +951,7 @@ function montaAlterarAssentamento($boExecuta=false)
 //    $stJs .= "f.inCodNorma.value           = '".$arAssentamento['inCodNorma']."';\n";
 //    $stJs .= "f.inCodNormaTxt.value           = '".$arAssentamento['inCodNorma']."';\n";
     $_REQUEST["inCodClassificacao"] = $arAssentamento['inCodClassificacao'];
+    $_REQUEST["inCodClassificacaoTxt"] = $arAssentamento['inCodClassificacao'];
     $_REQUEST["inCodAssentamento"]  = $arAssentamento['inCodAssentamento'];
     $_REQUEST["dtInicial"]          = $arAssentamento["dtInicial"];
     $_REQUEST["dtFinal"]            = $arAssentamento["dtFinal"];
@@ -1244,7 +1245,7 @@ function processarTriadi($inCampo,$boSpan=false)
                 $obTPessoalContratoServidorCasoCausa->recuperaCasoCausaRegistro($rsContratoServidorCasoCausa,$stFiltro);
             }
 
-            if ($rsContratoServidorCasoCausa->getNumLinhas() > 0 && $stTipoClassificacao != '1') {
+            if ($rsContratoServidorCasoCausa->getNumLinhas() > 0 && $stTipoClassificacao == '1') {
                 $stMensagem = "@Data do afastamento não deve ser posterior a ".SistemaLegado::dataToBr($rsContratoServidorCasoCausa->getCampo("dt_rescisao"))." para o contrato ".$rsContratoServidorCasoCausa->getCampo("registro");
                 break;
             }
@@ -1783,6 +1784,7 @@ function gerarSpanLicencaPremio()
     $stEval = "";
     $rsAssentamento  = new RecordSet();
     $rsClassificacao = new RecordSet();
+    $inCodClassificacao = ( $_REQUEST["inCodClassificacao"] != '') ? $_REQUEST["inCodClassificacao"] : Sessao::read('inCodClassificacao');
 
     if ($_REQUEST["inCodAssentamento"] != "") {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoAssentamento.class.php");
@@ -1791,12 +1793,13 @@ function gerarSpanLicencaPremio()
         $stFiltro .= " AND assentamento_assentamento.cod_motivo = 9";
         $obTPessoalAssentamentoAssentamento->recuperaAssentamento($rsAssentamento,$stFiltro);
     }
-    if ($_REQUEST["inCodClassificacao"] != "") {
+    
+    if ($inCodClassificacao != "" ) {
         include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalClassificacaoAssentamento.class.php");
         $obTPessoalClassificacaoAssentamento = new TPessoalClassificacaoAssentamento();
-        $stFiltro  = " AND ca.cod_classificacao = ".$_REQUEST["inCodClassificacao"];
+        $stFiltro  = " AND ca.cod_classificacao = ".$inCodClassificacao;
         $stFiltro .= " AND ca.cod_tipo = 2";
-        $obTPessoalClassificacaoAssentamento->recuperaRelacionamento($rsClassificacao,$stFiltro);
+        $obTPessoalClassificacaoAssentamento->recuperaRelacionamento($rsClassificacao,$stFiltro);        
     }
 
     if ($rsAssentamento->getNumLinhas() == 1 AND $rsClassificacao->getNumLinhas() == 1) {
@@ -1824,7 +1827,8 @@ function gerarSpanLicencaPremio()
         $obFormulario->montaInnerHTML();
         $stHtml = $obFormulario->getHTML();
     }
-    $stJs  = "d.getElementById('spnLicencaPremio').innerHTML = '$stHtml';\n";
+
+    $stJs  = "d.getElementById('spnLicencaPremio').innerHTML = '".$stHtml."';\n";
     $stJs .= "LiberaFrames();\n";
 
     return $stJs;

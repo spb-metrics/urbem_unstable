@@ -29,7 +29,7 @@
 
     * @ignore
 
-    $Id: LSManterPlanoConta.php 61444 2015-01-16 17:32:17Z franver $
+    $Id: LSManterPlanoConta.php 64903 2016-04-12 19:44:50Z michel $
 
     * Casos de uso: uc-02.02.02
 */
@@ -52,10 +52,7 @@ $stCaminho   = CAM_GF_CONT_INSTANCIAS."planoConta/";
 $obRContabilidadePlanoBanco = new RContabilidadePlanoBanco;
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if ( empty( $stAcao ) ) {
-    $stAcao = "alterar";
-}
+$stAcao = $request->get('stAcao', 'alterar');
 
 //Define arquivos PHP para cada acao
 switch ($stAcao) {
@@ -67,43 +64,44 @@ switch ($stAcao) {
 
 $arFiltro = Sessao::read('filtro');
 if ( !Sessao::read('paginando')) {
-    foreach ($_POST as $stCampo => $stValor) {
+    foreach ($request->getAll() as $stCampo => $stValor) {
         $arFiltro[$stCampo] = $stValor;
     }
+
     Sessao::write('filtro', $arFiltro);
-    Sessao::write('pg', $_GET['pg'] ? $_GET['pg'] : 0);
-    Sessao::write('pos', $_GET['pos']? $_GET['pos'] : 0);
+    Sessao::write('pg', $request->get('pg') ? $request->get('pg') : 0);
+    Sessao::write('pos', $request->get('pos') ? $request->get('pos') : 0);
     Sessao::write('paginando', true);
 } else {
-    Sessao::write('pg', $_GET['pg']);
-    Sessao::write('pos', $_GET['pos']);
-    $_REQUEST['inCodReduzido'] = $arFiltro['inCodReduzido'];
-    $_REQUEST['stCodClass'   ] = $arFiltro['stCodClass'   ];
-    $_REQUEST['stDescricao'  ] = $arFiltro['stDescricao'  ];
-    $_REQUEST['inCodEntidade'] = $arFiltro['inCodEntidade'];
+    Sessao::write('pg', $request->get('pg'));
+    Sessao::write('pos', $request->get('pos'));
+    $request->set('inCodReduzido', $arFiltro['inCodReduzido']);
+    $request->set('stCodClass'   , $arFiltro['stCodClass'   ]);
+    $request->set('stDescricao'  , $arFiltro['stDescricao'  ]);
+    $request->set('inCodEntidade', $arFiltro['inCodEntidade']);
 }
 
-if ($_REQUEST['inCodEntidade']) {
-   foreach ($_REQUEST['inCodEntidade'] as $value) {
+if ($request->get('inCodEntidade')) {
+   foreach ($request->get('inCodEntidade') as $value) {
        $stCodEntidade .= $value . " , ";
    }
 }
 $stCodEntidade = substr($stCodEntidade,0,strlen($stCodEntidade)-2);
 
-$obRContabilidadePlanoBanco->setExercicio            ( Sessao::getExercicio()       );
-$obRContabilidadePlanoBanco->setCodPlano             ( $_REQUEST['inCodReduzido']   );
-$obRContabilidadePlanoBanco->setCodEstrutural        ( $_REQUEST['stCodClass']      );
-$obRContabilidadePlanoBanco->setNomConta             ( $_REQUEST['stDescricao']     );
-$obRContabilidadePlanoBanco->setCodigoEntidade       ( $stCodEntidade               );
-$obRContabilidadePlanoBanco->setNumAgencia           ( $_REQUEST['inNumAgencia']    );
-$obRContabilidadePlanoBanco->setNumBanco             ( $_REQUEST['inNumBanco']      );
-$obRContabilidadePlanoBanco->setContaCorrente        ( $_REQUEST['stContaCorrente'] );
-$obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($_REQUEST['inCodRecurso']);
-$obRContabilidadePlanoBanco->listarPlanoContaEntidade( $rsLista , 'cod_estrutural'  );
+$obRContabilidadePlanoBanco->setExercicio            ( Sessao::getExercicio()                );
+$obRContabilidadePlanoBanco->setCodPlano             ( $request->get('inCodReduzido')        );
+$obRContabilidadePlanoBanco->setCodEstrutural        ( $request->get('stCodClass')           );
+$obRContabilidadePlanoBanco->setNomConta             ( $request->get('stDescricao')          );
+$obRContabilidadePlanoBanco->setCodigoEntidade       ( $stCodEntidade                        );
+$obRContabilidadePlanoBanco->setNumAgencia           ( $request->get('inNumAgencia')         );
+$obRContabilidadePlanoBanco->setNumBanco             ( $request->get('inNumBanco')           );
+$obRContabilidadePlanoBanco->setContaCorrente        ( $request->get('stContaCorrente')      );
+$obRContabilidadePlanoBanco->obROrcamentoRecurso->setCodRecurso($request->get('inCodRecurso'));
+$obRContabilidadePlanoBanco->listarPlanoContaEntidade( $rsLista, 'cod_estrutural' );
 
 $stLink .= "&stAcao=".$stAcao;
-if ($_GET["pg"] and  $_GET["pos"]) {
-    $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
+if ($request->get('pg') and  $request->get('pos')) {
+    $stLink.= "&pg=".$request->get('pg')."&pos=".$request->get('pos');
 }
 
 $obRContabilidadePlanoBanco->obROrcamentoEntidade->obRCGM->setNumCGM(Sessao::read('numCgm'));
@@ -131,7 +129,11 @@ $obLista->ultimoCabecalho->setWidth( 15 );
 $obLista->commitCabecalho();
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Código Reduzido");
-$obLista->ultimoCabecalho->setWidth( 15 );
+$obLista->ultimoCabecalho->setWidth( 9 );
+$obLista->commitCabecalho();
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo("Código Recurso");
+$obLista->ultimoCabecalho->setWidth( 9 );
 $obLista->commitCabecalho();
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("Descrição ");
@@ -148,6 +150,10 @@ $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
 $obLista->commitDado();
 $obLista->addDado();
 $obLista->ultimoDado->setCampo( "cod_plano" );
+$obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+$obLista->commitDado();
+$obLista->addDado();
+$obLista->ultimoDado->setCampo( "cod_recurso" );
 $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
 $obLista->commitDado();
 $obLista->addDado();
@@ -178,7 +184,7 @@ if ($stAcao == "excluir") {
     $obLista->ultimaAcao->addCampo("&stDescQuestao", "nom_conta");
     $obLista->ultimaAcao->setLink( $stCaminho.$pgProx."?".Sessao::getId().$stLink."&frameDestino=oculto&" );
 } else {
-    $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink."&dtSaldo=".$_REQUEST['dtSaldo']."&" );
+    $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink."&dtSaldo=".$request->get('dtSaldo')."&" );
 }
 
 $obLista->commitAcao();

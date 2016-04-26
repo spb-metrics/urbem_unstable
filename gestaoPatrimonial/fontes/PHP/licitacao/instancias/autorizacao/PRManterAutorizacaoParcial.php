@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacaoParcial.php 64364 2016-01-27 13:17:11Z arthur $
+    $Id: PRManterAutorizacaoParcial.php 64900 2016-04-12 18:44:26Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -75,33 +75,39 @@ $arListaExcluidos = array();
 $arListaDespesaFornecedor = array();
 
 foreach ($arItens as $key => $arItem) {
-    $nuQtdeItem = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
-    $arItens[$key]['nuQtdeItem'] = $nuQtdeItem;
 
-    if($nuQtdeItem==0)
-        $arListaExcluidos[] = $arItem['cod_item'];
-    else{
+    if(is_array($arItem['arItemDespesa']) && count($arItem['arItemDespesa']) > 1){
+        foreach( $arItem['arItemDespesa'] as $inDespesa => $arItemDespesa) {
+            $nuQtdeItemDespesa = str_replace(",",".",str_replace(".","",$arItemDespesa['nuQtdeItem']));
+            $stChaveDespesaFornecedor = $inDespesa.'.'.$arItem['stCodClassificacao'].'.'.$arItem['inCgmFornecedor'];
+
+            $arItens[$key]['arItemDespesa'][$inDespesa]['nuQtdeItem'] = $nuQtdeItemDespesa;
+
+            if($nuQtdeItemDespesa > 0){
+                if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] ))
+                    $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'].','.$arItem['cod_item'];
+                else
+                    $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arItem['cod_item'];
+            }else{
+                $arListaExcluidos[$stChaveDespesaFornecedor][] = $arItem['cod_item'];
+            }
+        }
+    }else{
+        $nuQtdeItem = str_replace(",",".",str_replace(".","",$arItem['nuQtdeItem']));
         $stChaveDespesaFornecedor = $arItem['inCodDespesa'].'.'.$arItem['stCodClassificacao'].'.'.$arItem['inCgmFornecedor'];
 
-        if($arItem['boDespesaMapaItem'] == 'TRUE'){
-            if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] ))
-                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'].','.$arItem['cod_item'];
-            else
-                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesa'] = $arItem['cod_item'];
-        }else{
-            if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] ))
-                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'].','.$arItem['cod_item'];
-            else
-                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['itensDespesaAjustada'] = $arItem['cod_item'];
-        }
+        $arItens[$key]['nuQtdeItem'] = $nuQtdeItem;
 
-        if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] ))
-            $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'].','.$arItem['cod_item'];
-        else
-            $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arItem['cod_item'];
+        if($nuQtdeItem==0)
+            $arListaExcluidos[$stChaveDespesaFornecedor][] = $arItem['cod_item'];
+        else{
+            if(isset($arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] ))
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'].','.$arItem['cod_item'];
+            else
+                $arListaDespesaFornecedor[$stChaveDespesaFornecedor]['Itens'] = $arItem['cod_item'];
+        }
     }
 }
-$stListaExcluidos = implode(",",$arListaExcluidos);
 
 if(count($arListaDespesaFornecedor)==0){
     $obErro->setDescricao("Informe no mínimo um(01) item para emitir autorização de empenho.");
@@ -117,8 +123,10 @@ if(count($arListaDespesaFornecedor)==0){
         $stFiltroHomologacao .= " AND licitacao.cod_entidade   = ".$request->get('inCodEntidade')."                 \n";
         $stFiltroHomologacao .= " AND licitacao.cod_modalidade = ".$request->get('inCodModalidade')."               \n";
         $stFiltroHomologacao .= " AND homologacao.homologado = true                                                 \n";
-        if(count($arListaExcluidos)>0)
+        if(count($arListaExcluidos[$chaveDespesaFornecedor])>0){
+            $stListaExcluidos = implode(",",$arListaExcluidos[$chaveDespesaFornecedor]);
             $stFiltroHomologacao .= " AND solicitacao_item_dotacao.cod_item NOT IN (".$stListaExcluidos.")          \n";
+        }
 
         $stFiltroHomologacao .= " AND (  (    solicitacao_item_dotacao.cod_despesa IS NOT NULL                      \n";
         $stFiltroHomologacao .= "         AND solicitacao_item_dotacao.cod_despesa = ".$inCodDespesa." )            \n";
@@ -162,19 +170,9 @@ if(count($arListaDespesaFornecedor)==0){
 
         $arCountItensAderidos = explode(',',$arItensDespesaFornecedor['Itens']);
 
+        $stNomFornecedor = SistemaLegado::pegaDado("nom_cgm","sw_cgm","where numcgm=".$inCgmFornecedor);
+
         if($rsAutEmpenho->eof()){
-            foreach ($arItens as $key => $arItem) {
-                if($arItem['inCodDespesa'] == $inCodDespesa && $arItem['stCodClassificacao'] == $inCodConta && $arItem['inCgmFornecedor']==$inCgmFornecedor){
-                    $arCotacaoItem = (is_array($arItem['arCotacaoItem'])) ? $arItem['arCotacaoItem'] : array();
-                    foreach ($arCotacaoItem as $chaveCotacao => $cotacaoItem) {
-                        if($cotacaoItem['cgm_fornecedor'] == $inCgmFornecedor){
-                            $stNomFornecedor = $cotacaoItem['fornecedor'];
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
             $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para os itens(".$arItensDespesaFornecedor['Itens'].").");
         }elseif($rsAutEmpenho->getCampo('qtd_itens_homologados') <> count($arCountItensAderidos)){
             $obErro->setDescricao("Fornecedor ".$inCgmFornecedor." - ".$stNomFornecedor.", Não possui Cotações Homologadas para todos os itens(".$arItensDespesaFornecedor['Itens'].").");
@@ -237,22 +235,14 @@ if(count($arListaDespesaFornecedor)==0){
                                                            AND  cotacao_anulada.exercicio   = mapa_cotacao.exercicio_cotacao
                                                    )            \n";
 
+                $stFiltroHomologacao_item .= $stFiltroItens;
+
                 $stOrdem = " ORDER BY catalogo_item.descricao   \n";
 
-                if( isset($arItensDespesaFornecedor['itensDespesa']) ){
-                    $stFiltroHomologacao_item .= " AND mapa_item.cod_item IN (".$arItensDespesaFornecedor['itensDespesa'].") \n";
-                    $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacao( $rsItensAutEmpenho, $stFiltroHomologacao_item, $stOrdem );
-                }else
-                    $rsItensAutEmpenho = new RecordSet();
-
-                $boReservaRigida = SistemaLegado::pegaConfiguracao('reserva_rigida', '35', Sessao::getExercicio());
-                $boReservaRigida = ($boReservaRigida == 'true') ? true : false;
-
-                $boReservaAutorizacao = SistemaLegado::pegaConfiguracao('reserva_autorizacao', '35', Sessao::getExercicio());
-                $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
+                $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacao( $rsItensAutEmpenho, $stFiltroHomologacao_item, $stOrdem );
 
                 #Reserva de Saldos por Autorização
-                if( $rsItensAutEmpenho->eof() && isset($arItensDespesaFornecedor['itensDespesa']) ){
+                if( $rsItensAutEmpenho->eof() ){
                     $obTLicHomologacao->recuperaItensAgrupadosSolicitacaoLicitacaoMapa($rsSolicitacaoReserva, $stFiltroHomologacao_item, $stOrdem );
 
                     while (!$rsSolicitacaoReserva->eof() && !$obErro->ocorreu()) {
@@ -267,8 +257,9 @@ if(count($arListaDespesaFornecedor)==0){
                                         break;
                                     }
                                 }
-    
-                                $vlCotacao = $vlUnitarioItem * $arItem['nuQtdeItem'];
+
+                                $nuQtdeItem = isset($arItem['arItemDespesa'][$inCodDespesa]) ? $arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem'] : $arItem['nuQtdeItem'];                               
+                                $vlCotacao = $vlUnitarioItem * $nuQtdeItem;
                                 break;
                             }
                         }
@@ -326,7 +317,7 @@ if(count($arListaDespesaFornecedor)==0){
                             $obErro = $obTComprasMapaItemReserva->inclusao( Sessao::getTransacao() );
                         } else{
                             $stSolicitacao = $rsSolicitacaoReserva->getCampo('cod_solicitacao').'/'.$rsSolicitacaoReserva->getCampo('exercicio_solicitacao');
-                            $obErro->setDescricao('Não foi possível reservar saldo para o item '.$rsSolicitacaoReserva->getCampo('cod_item').' da Solicitação '.$stSolicitacao.". Saldo da Dotação: ".number_format($arSaldoDotacao[$inCodDespesa]['saldo_inicial'],2,',','.'));
+                            $obErro->setDescricao('Não foi possível reservar saldo para o item '.$rsSolicitacaoReserva->getCampo('cod_item').', dotação '.$inCodDespesa.', solicitação '.$stSolicitacao.". Saldo da Dotação: ".number_format($arSaldoDotacao[$inCodDespesa]['saldo_inicial'],2,',','.'));
                             break;
                         }
 
@@ -465,7 +456,7 @@ if(count($arListaDespesaFornecedor)==0){
                                 }
                             }
 
-                            $qtdCotacao = $arItem['nuQtdeItem'];
+                            $qtdCotacao = isset($arItem['arItemDespesa'][$inCodDespesa]) ? $arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem'] : $arItem['nuQtdeItem']; 
                             $vlCotacao = $vlUnitarioItem * $qtdCotacao;
 
                             break;
@@ -534,7 +525,7 @@ if(count($arListaDespesaFornecedor)==0){
                                     }
                                 }
 
-                                $qtdCotacao = $arItem['nuQtdeItem'];
+                                $qtdCotacao = isset($arItem['arItemDespesa'][$inCodDespesa]) ? $arItem['arItemDespesa'][$inCodDespesa]['nuQtdeItem'] : $arItem['nuQtdeItem']; 
                                 $vlCotacao = $vlUnitarioItem * $qtdCotacao;
                                 $inFornecedor = $arItem['inCgmFornecedor'];
 
@@ -570,7 +561,7 @@ if(count($arListaDespesaFornecedor)==0){
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $dadosItens['cod_grandeza']   );
                         $obAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade  ( $dadosItens['simbolo']                                    );
                     }
-                    
+
                     $obAutorizacaoEmpenho->setCodEntidade($request->get('inCodEntidade'));
                     $obAutorizacaoEmpenho->setTipoEmissao('R');
                     $obErro = $obAutorizacaoEmpenho->incluir(Sessao::getTransacao());
@@ -611,12 +602,12 @@ if(count($arListaDespesaFornecedor)==0){
 
                         # Armazena os dados da autorização em array para depois ser usado na impressão.
                         $arAutorizacao[$inCont++] = array(
-                                                        "inCodAutorizacao"	=> $obAutorizacaoEmpenho->getCodAutorizacao(),
-                                                        "inCodPreEmpenho" 	=> $obAutorizacaoEmpenho->getCodPreEmpenho(),
-                                                        "inCodEntidade" 	=> $obAutorizacaoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
-                                                        "stDtAutorizacao" 	=> $obAutorizacaoEmpenho->getDtAutorizacao(),
-                                                        "inCodDespesa" 		=> $obAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa(),
-                                                        "stExercicio"       => $obAutorizacaoEmpenho->getExercicio());
+                                                        "inCodAutorizacao"      => $obAutorizacaoEmpenho->getCodAutorizacao(),
+                                                        "inCodPreEmpenho"       => $obAutorizacaoEmpenho->getCodPreEmpenho(),
+                                                        "inCodEntidade"         => $obAutorizacaoEmpenho->obROrcamentoEntidade->getCodigoEntidade(),
+                                                        "stDtAutorizacao"       => $obAutorizacaoEmpenho->getDtAutorizacao(),
+                                                        "inCodDespesa"          => $obAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa(),
+                                                        "stExercicio"           => $obAutorizacaoEmpenho->getExercicio());
                     }
                     $inCountAutorizacao++;
                     $rsAutEmpenho->proximo();

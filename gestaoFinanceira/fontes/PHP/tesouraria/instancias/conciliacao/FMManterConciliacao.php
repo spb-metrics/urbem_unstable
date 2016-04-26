@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: FMManterConciliacao.php 60529 2014-10-27 16:35:50Z jean $
+    * $Id: FMManterConciliacao.php 65087 2016-04-22 14:27:07Z carlos.silva $
 
     * Casos de uso: uc-02.04.19
 */
@@ -60,8 +60,8 @@ Sessao::remove('arMovimentacaoPendenciaAux');
 Sessao::remove('arMovimentacaoManual');
 Sessao::remove('arMovimentacaoPendenciaListagem');
 Sessao::remove('arPendenciasMarcadas');
+Sessao::remove('arMovimentacaoAuxSessao');
 
-$jsOnload = "montaParametrosGET('montaListaMovimentacao','stExercicio,inMes');";
 $arFiltro = Sessao::read('filtro');
 
 $mes = $arFiltro['inMes'];
@@ -89,7 +89,6 @@ $obRTesourariaConciliacao->obRTesourariaAssinatura->listar($rsRecordSetAssinatur
 
 $obRTesourariaConciliacao->listarMovimentacao($rsLista);
 $obRTesourariaConciliacao->listarMovimentacaoPendente($rsListaPendencia);
-//$rsListaPendencia = new RecordSet();
 
 $obRTesourariaConciliacao->addLancamentoManual();
 $obRTesourariaConciliacao->roUltimoLancamentoManual->listar( $rsListaManual );
@@ -103,6 +102,7 @@ $obRTesourariaConciliacao->obRTesourariaSaldoTesouraria->consultarSaldoTesourari
 $arMovimentacaoAuxSessao = array();
 $arMovimentacaoAuxSessao = ( !$rsLista->eof() ) ? $rsLista->getElementos() : array();
 sort($arMovimentacaoAuxSessao);
+Sessao::write('arMovimentacaoAuxSessao', $arMovimentacaoAuxSessao);
 unset( $rsLista );
 
 $inCount = 0;
@@ -118,6 +118,7 @@ for ( $x = 0; $x<count($arMovimentacaoAuxSessao); $x++ ) {
             $inCount++;
         }
     }
+    
     if (!$arMovimentacaoAuxSessao[$x]['conciliar']) {
         $nuSaldoContabilConciliado = bcadd( $nuSaldoContabilConciliado, $arMovimentacaoAuxSessao[$x]['vl_lancamento'], 4);
     } else {
@@ -125,7 +126,6 @@ for ( $x = 0; $x<count($arMovimentacaoAuxSessao); $x++ ) {
             $nuSaldoContabilConciliado = bcadd( $nuSaldoContabilConciliado, ($arMovimentacaoAuxSessao[$x]['vl_lancamento']), 4 );
         }
     }
-
 }
 
 $arMovimentacaoSessao = array();
@@ -817,6 +817,32 @@ else
     Sessao::write('voltaBusca',"");
 
 $obFormulario->show();
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
-?>
+$jsOnload = 'montaParametrosGET("montaListaMovimentacao","stExercicio,inMes", true);';
+
+if(SistemaLegado::isTCMBA($boTransacao)) {
+    $jsOnload.= 'jq(document).ready(function(){
+        jq.each(jq(".boConciliar"), function (i, checkbox) {
+            if(jq(checkbox).attr("checked")) {
+                var name = "idTipoConciliacao" + jq(checkbox).attr("name").substr(11, 100);
+                jq("select[name*="+ name +"]").attr("disabled", true);
+            }
+        });
+        
+        jq(".boConciliar").change(function(){
+            if(jq(this).attr("checked")) {
+                var name = "idTipoConciliacao" + jq(this).attr("name").substr(11, 100);
+                jq("select[name*="+ name +"]").val("");
+                jq("select[name*="+ name +"]").attr("disabled", true);
+            }
+            
+            if(!jq(this).attr("checked")) {
+                var name = "idTipoConciliacao" + jq(this).attr("name").substr(11, 100);
+                jq("select[name*="+ name +"]").val("");
+                jq("select[name*="+ name +"]").attr("disabled", false);
+            }
+        });
+    });';
+}
+
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

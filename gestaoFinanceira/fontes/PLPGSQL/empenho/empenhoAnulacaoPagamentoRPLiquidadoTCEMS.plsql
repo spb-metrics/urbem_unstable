@@ -32,7 +32,7 @@ CODNOTA ALIAS FOR $7;
 CONTAPG ALIAS FOR $8;
 EXERCICIORP ALIAS FOR $9;
 EXERCICIOLIQUIDACAO ALIAS FOR $10;
-                                                                                                                                                                       
+
     SEQEXERCICIO INTEGER;
     SEQUENCIA INTEGER;
     inCodDespesa INTEGER;
@@ -67,6 +67,7 @@ BEGIN
                                            AND despesa.exercicio   = pre_empenho_despesa.exercicio
                                          WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
                                            AND nota_liquidacao.exercicio = '''||EXERCICIOLIQUIDACAO||'''
+                                           AND nota_liquidacao.cod_entidade = ' || CODENTIDADE || '
                                            ');
 
     boImplantado := selectIntoBoolean(' SELECT pre_empenho.implantado
@@ -80,6 +81,7 @@ BEGIN
                                            AND pre_empenho.exercicio       = empenho.exercicio
                                          WHERE nota_liquidacao.cod_nota = ' || CODNOTA || '
                                            AND nota_liquidacao.exercicio = '''||EXERCICIOLIQUIDACAO||'''
+                                           AND nota_liquidacao.cod_entidade = ' || CODENTIDADE || '
                                            ');
 
     IF EXERCICIOLIQUIDACAO < EXERCICIO THEN
@@ -210,6 +212,7 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CODNOTA || '
                        AND nota_liquidacao.exercicio = '''||EXERCICIOLIQUIDACAO||'''
+                       AND nota_liquidacao.cod_entidade = ' || CODENTIDADE || '
                        AND nota_liquidacao.cod_empenho::TEXT =  split_part(''' || COMPLEMENTO || ''',''/'', 1)
                        AND nota_liquidacao.exercicio_empenho::TEXT =  split_part(''' || COMPLEMENTO || ''',''/'', 2);
             ';
@@ -273,6 +276,7 @@ BEGIN
                        AND configuracao_lancamento_credito.tipo = ''liquidacao''
                        AND nota_liquidacao.cod_nota = ' || CODNOTA || '
                        AND nota_liquidacao.exercicio = '''||EXERCICIOLIQUIDACAO||'''
+                       AND nota_liquidacao.cod_entidade = ' || CODENTIDADE || '
             ';
     END IF;
 

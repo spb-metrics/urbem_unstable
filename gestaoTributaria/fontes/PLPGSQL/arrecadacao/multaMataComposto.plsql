@@ -35,7 +35,7 @@
      - Dado data de vencimento e de calculo, a função deve retornor o percentual a ser aplicado
 */
 
-CREATE OR REPLACE FUNCTION fn_multa_mora_composto(date,date,float,integer,integer) RETURNS numeric as '
+CREATE OR REPLACE FUNCTION fn_multa_mora_composto(date,date,float,integer,integer) RETURNS numeric as $$
 
     DECLARE
         dtVencimento    ALIAS FOR $1;
@@ -58,7 +58,7 @@ CREATE OR REPLACE FUNCTION fn_multa_mora_composto(date,date,float,integer,intege
 
         -- recupera diferença em dias das datas
         inDiff := diff_datas_em_dias(dtVencimento,dtDataCalculo);
-        inAno  := date_part(''year'' , dtVencimento )::integer;
+        inAno  := date_part('year' , dtVencimento )::integer;
 
         IF dtVencimento <= dtDataCalculo  THEN                
              
@@ -87,4 +87,4 @@ CREATE OR REPLACE FUNCTION fn_multa_mora_composto(date,date,float,integer,intege
     
         RETURN flMulta::numeric(14,2);
     END;
-'language 'plpgsql';
+$$ language 'plpgsql';

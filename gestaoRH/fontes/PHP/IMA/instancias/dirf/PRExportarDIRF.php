@@ -28,24 +28,29 @@
     * Data de Criação: 22/11/2007
 
     * @author Diego Lemos de Souza
-2
+
     * Casos de uso: uc-04.08.15
 
-    $Id: PRExportarDIRF.php 64485 2016-03-02 19:09:27Z evandro $
+    $Id: PRExportarDIRF.php 64913 2016-04-12 20:16:19Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CLA_EXPORTADOR                  );
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php";
+include_once CAM_GA_CGM_MAPEAMENTO."TCGMPessoaJuridica.class.php";
+include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php";
+include_once CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php";
+include_once CLA_EXPORTADOR;
 
-$stAcao = $_REQUEST["stAcao"] ? $_REQUEST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 $arSessaoLink = Sessao::read('link');
 if (!empty($arSessaoLink)) {
     $stLink = "&pg=".$arSessaoLink["pg"]."&pos=".$arSessaoLink["pos"];
 }
 
-foreach ($_POST as $key=>$value) {
+foreach ($request->getAll() as $key=>$value) {
     //Retira o JS que é inserido na URL
     if ($key != 'hdnValidaMatriculas') {
         $stLink .= $key."=".$value."&";
@@ -61,7 +66,6 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgJS   = "JS".$stPrograma.".js";
 
-include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
 $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
 $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
 $arDtFinal = explode("/",$rsPeriodoMovimentacao->getCampo("dt_final"));
@@ -74,27 +78,23 @@ $obExportador->roUltimoArquivo->setTipoDocumento("DIRF");
 
 #Registro do tipo um
 #Informações do declarante
-include_once(CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php");
 $obTEntidade = new TEntidade();
 $stFiltro  = " AND cod_entidade = ".Sessao::getCodEntidade();
 $obTEntidade->recuperaEntidades($rsEntidade,$stFiltro);
 
-include_once(CAM_GA_CGM_MAPEAMENTO."TCGMPessoaJuridica.class.php");
 $obTCGMPessoaJuridica = new TCGMPessoaJuridica();
 $stFiltro = " AND CGM.numcgm = ".$rsEntidade->getCampo("numcgm");
 $obTCGMPessoaJuridica->recuperaRelacionamento($rsCGM,$stFiltro);
 
-include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php");
 $obTIMAConfiguracaoDIRF = new TIMAConfiguracaoDirf();
-$obTIMAConfiguracaoDIRF->setDado("exercicio",$_POST["inAnoCompetencia"]);
+$obTIMAConfiguracaoDIRF->setDado("exercicio",$request->get('inAnoCompetencia'));
 $obTIMAConfiguracaoDIRF->recuperaPorChave($rsConfiguracao);
 
 if ($rsConfiguracao->getNumLinhas() == -1) {
     SistemaLegado::LiberaFrames();
-    Sessao::getExcecao()->setDescricao("A configuração da DIRF no exercício ".$_POST["inAnoCompetencia"]." não foi realizada, essa configuração é necessária para a geração do arquivo.");
+    Sessao::getExcecao()->setDescricao("A configuração da DIRF no exercício ".$request->get('inAnoCompetencia')." não foi realizada, essa configuração é necessária para a geração do arquivo.");
 }
 
-include_once(CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php");
 $obTCGMPessoaFisica = new TCGMPessoaFisica();
 $stFiltro = " AND CGM.numcgm = ".$rsConfiguracao->getCampo("responsavel_entrega");
 $obTCGMPessoaFisica->recuperaRelacionamento($rsCGMResponsavel,$stFiltro);
@@ -108,21 +108,21 @@ $arRegistroTipoUm[0]["sequencia"]                       = $inSequencia;
 $arRegistroTipoUm[0]["tipo"]                            = "1";
 $arRegistroTipoUm[0]["cnpj_declarante"]                 = $rsCGM->getCampo("cnpj");
 $arRegistroTipoUm[0]["nome_arquivo"]                    = "Dirf";
-$arRegistroTipoUm[0]["ano_calendario"]                  = $_POST["inAnoCompetencia"];
-$arRegistroTipoUm[0]["or"]                              = $_POST["stIndicador"];
+$arRegistroTipoUm[0]["ano_calendario"]                  = $request->get('inAnoCompetencia');
+$arRegistroTipoUm[0]["or"]                              = $request->get('stIndicador');
 $arRegistroTipoUm[0]["situacao_declaracao"]             = "1";
 $arRegistroTipoUm[0]["tipo_declarante"]                 = "2";
 $arRegistroTipoUm[0]["natureza_declarante"]             = $rsConfiguracao->getCampo("cod_natureza");
 $arRegistroTipoUm[0]["tipo_rendimento"]                 = "0";
 $arRegistroTipoUm[0]["ano_referencia"]                  = "2010";
 $arRegistroTipoUm[0]["indicador_declarante"]            = "0";
-$arRegistroTipoUm[0]["filer1"]                          = ($_POST["inAnoCompetencia"] >= 2007 and $_POST["inAnoCompetencia"] <= 2010)?'0':'';
+$arRegistroTipoUm[0]["filer1"]                          = ($request->get('inAnoCompetencia') >= 2007 and $request->get('inAnoCompetencia') <= 2010)?'0':'';
 $arRegistroTipoUm[0]["nome_empresarial"]                = $rsCGM->getCampo("nom_cgm");
 $arRegistroTipoUm[0]["cpf_responsavel_prefeitura"]      = $rsCGMResponsavelPrefeitura->getCampo("cpf");
 $arRegistroTipoUm[0]["data_evento"]                     = "";
 $arRegistroTipoUm[0]["tipo_evento"]                     = "";
 $arRegistroTipoUm[0]["filer2"]                          = "";
-$arRegistroTipoUm[0]["numero_recibo"]                   = $_POST["inNumeroRecibo"];
+$arRegistroTipoUm[0]["numero_recibo"]                   = $request->get('inNumeroRecibo');
 $arRegistroTipoUm[0]["filer3"]                          = "";
 $arRegistroTipoUm[0]["cpf_responsavel"]                 = $rsCGMResponsavel->getCampo("cpf");
 $arRegistroTipoUm[0]["nome_responsavel"]                = $rsCGMResponsavel->getCampo("nom_cgm");
@@ -231,10 +231,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1)
 
 #Registro do tipo dois
 #Informações do beneficiário
-include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirf.class.php");
 $obTIMAConfiguracaoDirf = new TIMAConfiguracaoDirf();
 $inCodAtributo = 0;
-switch ($_POST["stTipoFiltro"]) {
+switch ($request->get('stTipoFiltro')) {
     case "contrato_todos":
     case "cgm_contrato_todos":
         $stCodContratos = "";
@@ -245,42 +244,42 @@ switch ($_POST["stTipoFiltro"]) {
         $stCodigos = $stCodContratos;
         break;
     case "lotacao":
-        $stCodOrgao = implode(",",$_POST["inCodLotacaoSelecionados"]);
+        $stCodOrgao = implode(",",$request->get('inCodLotacaoSelecionados'));
         $stCodigos = $stCodOrgao;
         break;
     case "local":
-        $stCodLocal = implode(",",$_POST["inCodLocalSelecionados"]);
+        $stCodLocal = implode(",",$request->get('inCodLocalSelecionados'));
         $stCodigos = $stCodLocal;
         break;
     case "atributo_servidor":
     case "atributo_pensionista":
-        $inCodAtributo = $_POST["inCodAtributo"];
-        $inCodCadastro = $_POST["inCodCadastro"];
+        $inCodAtributo = $request->get('inCodAtributo');
+        $inCodCadastro = $request->get('inCodCadastro');
         $stNomeAtributo = "Atributo_".$inCodAtributo."_".$inCodCadastro;
-        if (is_array(($_POST)&&($stNomeAtributo."_Selecionados"))) {
+        if ( is_array($request->get($stNomeAtributo."_Selecionados")) ) {
             $inArray = 1;
-            $stValores = implode(",",$_POST[$stNomeAtributo."_Selecionados"]);
+            $stValores = implode(",",$request->get($stNomeAtributo."_Selecionados"));
         } else {
             $inArray = 0;
-            $stValores = pg_escape_string($_POST[$stNomeAtributo]);
+            $stValores = pg_escape_string($request->get($stNomeAtributo));
         }
         $stCodigos = $inArray."#".$inCodAtributo."#".$stValores;
         break;
     case "reg_sub_fun_esp":
-        $stCodigos  = implode(",",$_REQUEST["inCodRegimeSelecionadosFunc"])."#";
-        $stCodigos .= implode(",",$_REQUEST["inCodSubDivisaoSelecionadosFunc"])."#";
-        $stCodigos .= implode(",",$_REQUEST["inCodFuncaoSelecionados"])."#";
-        if (is_array($_REQUEST["inCodEspecialidadeSelecionadosFunc"])) {
-            $stCodigos .= implode(",",$_REQUEST["inCodEspecialidadeSelecionadosFunc"]);
+        $stCodigos  = implode(",",$request->get('inCodRegimeSelecionadosFunc'))."#";
+        $stCodigos .= implode(",",$request->get('inCodSubDivisaoSelecionadosFunc'))."#";
+        $stCodigos .= implode(",",$request->get('inCodFuncaoSelecionados'))."#";
+        if (is_array($request->get('inCodEspecialidadeSelecionadosFunc'))) {
+            $stCodigos .= implode(",",$request->get('inCodEspecialidadeSelecionadosFunc'));
         }
         break;
 }
 
-    $stFiltroConfig = " AND exercicio = '". $_POST['inAnoCompetencia']."'";
+    $stFiltroConfig = " AND exercicio = '". $request->get('inAnoCompetencia')."'";
     $obTIMAConfiguracaoDirf->recuperaRelacionamento($rsConfigDirf, $stFiltroConfig);
-    $obTIMAConfiguracaoDirf->setDado("stTipoFiltro",$_POST["stTipoFiltro"]);
+    $obTIMAConfiguracaoDirf->setDado("stTipoFiltro",$request->get('stTipoFiltro'));
     $obTIMAConfiguracaoDirf->setDado("stCodigos",$stCodigos);
-    $obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
+    $obTIMAConfiguracaoDirf->setDado("inExercicio",$request->get('inAnoCompetencia'));
 
 if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {    
     $obTIMAConfiguracaoDirf->recuperaExportarDirfPagamento($rsTemp1);
@@ -288,12 +287,15 @@ if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
     $obTIMAConfiguracaoDirf->recuperaExportarDirf($rsTemp1);
 }
 
-if ($_POST["boPrestadoresServico"]) {
-    $obTIMAConfiguracaoDirf->setDado("inExercicio",$_POST["inAnoCompetencia"]);
+if ($request->get('boPrestadoresServico')) {
+    $obTIMAConfiguracaoDirf->setDado("inExercicio",$request->get('inAnoCompetencia'));
     if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {
-        $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamento($rsTemp2);        
-    } else {        
-        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($_POST['inAnoCompetencia']-1));        
+        if($request->get('boPrestadoresServicoTodos'))
+            $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamentoComESemRetencao($rsTemp2);
+        else
+            $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServicoPagamento($rsTemp2);
+    } else {
+        $obTIMAConfiguracaoDirf->setDado('inExercicioAnterior', ($request->get('inAnoCompetencia')-1));
         $obTIMAConfiguracaoDirf->recuperaExportarDirfPrestadorServico($rsTemp2);
     }
 } else {
@@ -301,14 +303,6 @@ if ($_POST["boPrestadoresServico"]) {
 }
 
 $rsRegistroTipoDois1 = new RecordSet;
-//$arTipoDois1 = array_merge ($rsTemp1->getElementos(), $rsTemp2->getElementos() );
-
-//$rsRegistroTipoDois1->preenche( $arTipoDois1 );
-//$rsRegistroTipoDois1->setCampo("tipo","2",true);
-//$rsRegistroTipoDois1->setCampo("cnpj_declarante",$rsCGM->getCampo("cnpj"),true);
-//$rsRegistroTipoDois1->setCampo("ident_situacao","0",true);
-//$rsRegistroTipoDois1->setCampo("uso_rfb","",true);
-//$rsRegistroTipoDois1->setCampo("uso_declatante2","9",true);
 
 $inSequencia = $rsRegistroTipoDois1->getNumLinhas()+2;
 $obExportador->roUltimoArquivo->addBloco($rsRegistroTipoDois1);
@@ -486,7 +480,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1)
 
 //$obExportador->Show();
 
-dirf2010($rsRegistroTipoUm, $rsTemp1, $rsTemp2, ($_REQUEST['stIndicador'] == 'O' ? 'N' : 'S'), $_REQUEST['boPrestadoresServico']);
+dirf2010($rsRegistroTipoUm, $rsTemp1, $rsTemp2, ($request->get('stIndicador') == 'O' ? 'N' : 'S'), $request->get('boPrestadoresServico'));
 
 $arArquivosDownload[0]['stNomeArquivo'] = 'DIRF.TXT';
 $arArquivosDownload[0]['stLink'       ] = '/tmp/DIRF.TXT';
@@ -507,10 +501,12 @@ function formataValor($nuEntrada)
 function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresServico = false)
 {
     global $rsConfigDirf;
+    global $request;
+
     /* Plano de Saúde */
-    include_once(CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php");
+    include_once CAM_GRH_IMA_MAPEAMENTO."TIMAConfiguracaoDirfPlano.class.php";
     $obTIMAConfiguracaoDirfPlano = new TIMAConfiguracaoDirfPlano();
-    $stFiltro = " WHERE exercicio = '".$_POST['inAnoCompetencia']."' ";
+    $stFiltro = " WHERE exercicio = '".$request->get('inAnoCompetencia')."' ";
     $obTIMAConfiguracaoDirfPlano->recuperaTodos($rsChecaPlano, $stFiltro);
     if ( $rsChecaPlano->getNumLinhas() > 0 ) {
         $hasPlano = 'S';
@@ -678,15 +674,6 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
                 if( doEscrever($linhaRTIRF) ) fputs($file, $linhaRTIRF);
 
             } elseif ( $rsTipo3->getCampo('ident_especializacao') == 1 ) {
-                // $linhaRTPO = 'RTPO|'.substr($rsTipo3->getCampo('jan'),0,13).'|'.substr($rsTipo3->getCampo('fev'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('mar'),0,13).'|'.substr($rsTipo3->getCampo('abr'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('mai'),0,13).'|'.substr($rsTipo3->getCampo('jun'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('jul'),0,13).'|'.substr($rsTipo3->getCampo('ago'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('set'),0,13).'|'.substr($rsTipo3->getCampo('out'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('nov'),0,13).'|'.substr($rsTipo3->getCampo('dez'),0,13).'|'.
-                //     substr($rsTipo3->getCampo('dec'),0,13)."|\n";
-                // if( doEscrever($linhaRTPO) ) fputs($file, $linhaRTPO);
-
                 $linhaRTDP = 'RTDP|'.substr($rsTipo3->getCampo('jan'),13,13).'|'.substr($rsTipo3->getCampo('fev'),13,13).'|'.
                     substr($rsTipo3->getCampo('mar'),13,13).'|'.substr($rsTipo3->getCampo('abr'),13,13).'|'.
                     substr($rsTipo3->getCampo('mai'),13,13).'|'.substr($rsTipo3->getCampo('jun'),13,13).'|'.
@@ -716,7 +703,7 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
     /* Plano de Saúde */
     $CPFs = implode('\',\'',$arCPFs);
     $CPFs = '\''.$CPFs.'\'';
-    $stFiltro = " WHERE configuracao_dirf_plano.exercicio = '".$_POST['inAnoCompetencia']."'";
+    $stFiltro = " WHERE configuracao_dirf_plano.exercicio = '".$request->get('inAnoCompetencia')."'";
     $obTIMAConfiguracaoDirfPlano->recuperaRelacionamento($rsPlanoSaude, $stFiltro);
     //$obTIMAConfiguracaoDirfPlano->setDado('stTipoFiltro', 'cgm_contrato_todos');
     $obTIMAConfiguracaoDirfPlano->setDado('inCodEvento', $rsPlanoSaude->getCampo('cod_evento'));
@@ -726,7 +713,6 @@ function dirf2010($rsTipo1, $rsTipo2, $rsTipo3, $boRetificadora, $boPrestadoresS
     if( $rsPlanoSaude->getNumLinhas() > 0 ) fputs($file, "PSE|\n");
 
     while ( !$rsPlanoSaude->eof() ) {
-
         $linha = 'OPSE|'.str_pad($rsPlanoSaude->getCampo('cnpj'),14,0,STR_PAD_LEFT).'|'.trim($rsPlanoSaude->getCampo('nom_cgm')).'|'.str_pad($rsPlanoSaude->getCampo('registro_ans'),6,0,STR_PAD_LEFT)."|\n";
         fputs($file, $linha);
         if ( $rsConfigDirf->getCampo('pagamento_mes_competencia') == 't') {

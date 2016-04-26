@@ -35,7 +35,7 @@
 
   * Casos de uso: uc-03.04.01
 
-  $Id: TComprasSolicitacao.class.php 63032 2015-07-17 18:04:12Z michel $
+  $Id: TComprasSolicitacao.class.php 65105 2016-04-25 19:30:38Z jean $
 
   */
 
@@ -261,6 +261,7 @@ class TComprasSolicitacao extends Persistente
         $stSql.= "          ,  TO_CHAR(solicitacao.timestamp,'dd/mm/yyyy') AS data               \n";
         $stSql.= "          ,  sw_cgm.nom_cgm                                                    \n";
         $stSql.= "          ,  solicitante.nom_cgm AS solicitante                                \n";
+        $stSql.= "          ,  solicitacao.registro_precos                                       \n";
         $stSql.= "       FROM  compras.solicitacao                                               \n";
         $stSql.= "  LEFT JOIN  sw_cgm as solicitante                                             \n";
         $stSql.= "         ON  (solicitante.numcgm = compras.solicitacao.cgm_solicitante)        \n";

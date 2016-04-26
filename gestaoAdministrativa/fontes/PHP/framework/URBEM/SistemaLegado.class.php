@@ -35,7 +35,7 @@
 
  Casos de uso: uc-01.01.00
 
- $Id: SistemaLegado.class.php 64697 2016-03-22 19:12:28Z carlos.silva $
+ $Id: SistemaLegado.class.php 65087 2016-04-22 14:27:07Z carlos.silva $
 
  */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/dataBaseLegado.class.php';
@@ -229,6 +229,33 @@ public static function isTCEMG($boTransacao = '')
         return false;
     }
     if ( ( trim($rsRecordSet->getCampo('valor')) == trim('11') ) ) {
+        return true;
+    }
+
+    return false;
+}
+
+public static function isTCMBA($boTransacao = '')
+{
+    $stSql = "SELECT
+                valor
+              FROM
+                administracao.configuracao
+              WHERE
+                    cod_modulo = 2
+                AND parametro  = 'cod_uf'
+                AND exercicio  = '".Sessao::getExercicio()."'
+            ";
+    
+    $obConexao   = new Conexao;
+    $obErro      = new Erro;
+    $obRecordSet = new RecordSet;
+    
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    if ( $obErro->ocorreu() ) {
+        return false;
+    }
+    if ( ( trim($rsRecordSet->getCampo('valor')) == trim('5') ) ) {
         return true;
     }
 

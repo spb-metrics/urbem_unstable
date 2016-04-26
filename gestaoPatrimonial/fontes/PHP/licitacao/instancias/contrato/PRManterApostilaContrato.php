@@ -35,7 +35,7 @@
     
     * @ignore
     
-    $Id: PRManterApostilaContrato.php 64856 2016-04-07 19:08:08Z lisiane $
+    $Id: PRManterApostilaContrato.php 64936 2016-04-14 17:11:06Z jean $
 */
 include_once ( '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php'        );
 include_once ( '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php'  );
@@ -76,7 +76,9 @@ switch( $request->get('stAcao') ){
 			$obTLicitacaoContratoApostila->setDado( 'descricao'     , $request->get('stDscApostila')     		  );
 			$obTLicitacaoContratoApostila->setDado( 'data_apostila' , $request->get('dtApostila')      		      );
 			
-			$nuVlApostila= number_format($request->get('nuVlApostila'),2,'.',',');
+			$nuVlApostila = str_replace(".", "", $request->get('nuVlApostila'));
+			$nuVlApostila = str_replace(",", ".", $nuVlApostila);
+
 			$nuVlApostila=(isset($nuVlApostila)) ? $nuVlApostila : 0;
 			$obTLicitacaoContratoApostila->setDado( 'valor_apostila', $nuVlApostila );
 			
@@ -129,7 +131,9 @@ switch( $request->get('stAcao') ){
                 $obTLicitacaoContratoApostila->setDado( 'descricao'     ,  $request->get('stDscApostila')     		  );
                 $obTLicitacaoContratoApostila->setDado( 'data_apostila' ,  $request->get('dtApostila')      		      );
 				
-				$nuVlApostila= number_format( $request->get('nuVlApostila'),2,'.',',');
+				$nuVlApostila = str_replace(".", "", $request->get('nuVlApostila'));
+				$nuVlApostila = str_replace(",", ".", $nuVlApostila);
+
 			    $nuVlApostila=(isset($nuVlApostila)) ? $nuVlApostila : 0;
 				$obTLicitacaoContratoApostila->setDado( 'valor_apostila', $nuVlApostila );
 				

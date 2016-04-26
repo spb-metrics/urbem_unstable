@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: OCReceita.php 63518 2015-09-08 17:27:56Z franver $
+    $Id: OCReceita.php 64893 2016-04-12 17:45:58Z franver $
 
     $Revision: 30824 $
     $Name$
@@ -252,7 +252,11 @@ switch ($stCtrl) {
 
         $stOrdem = " ORDER BY pc.cod_estrutural ";
 
-        $stFiltroArrecadacaoDireta = " AND pc.exercicio = '".Sessao::getExercicio()."' AND  ( pc.cod_estrutural like '1.1.2.1.1.%' ) ";
+        if ( Sessao::getExercicio() < 2016 ) {
+            $stFiltroArrecadacaoDireta = " AND pc.exercicio = '".Sessao::getExercicio()."' AND  ( pc.cod_estrutural like '1.1.2.1.1.%' ) ";
+        } else {
+            $stFiltroArrecadacaoDireta = " AND pc.exercicio = '".Sessao::getExercicio()."' AND  ( pc.cod_estrutural like '1.1.2.%' ) ";
+        }
         //recupera contas empenho debito
         $obTContabilidadePlanoConta->recuperaContaPlanoAnalitica($rsArrecadacaoReceitaCredito, $stFiltroArrecadacaoDireta, $stOrdem);
 

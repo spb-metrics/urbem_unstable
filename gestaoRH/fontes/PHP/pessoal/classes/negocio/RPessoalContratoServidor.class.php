@@ -1823,7 +1823,10 @@ function alterarContrato($boTransacao = "")
             $obErro = $obTPessoalContratoServidorLocal->inclusao( $boTransacao );
         } else {
             $rsLocal = new RecordSet();
-            $obTPessoalContratoServidorLocal->recuperaTodos($rsLocal, " WHERE cod_contrato = ".$this->getCodContrato(), "", $boTransacao);
+            $obErro = $obTPessoalContratoServidorLocal->recuperaTodos($rsLocal, " WHERE cod_contrato = ".$this->getCodContrato(), "", $boTransacao);
+            if ($obErro->ocorreu()) {
+                break;
+            }
             while (!$rsLocal->eof()) {
                 $obTPessoalContratoServidorLocalHistorico->setDado('cod_contrato', $this->getCodContrato());
                 $obTPessoalContratoServidorLocalHistorico->setDado('cod_local',    $rsLocal->getCampo('cod_local'));
@@ -1927,7 +1930,7 @@ function alterarContrato($boTransacao = "")
     if ( !$obErro->ocorreu() ) {
         $stFiltro  = " WHERE contrato_servidor_forma_pagamento.cod_forma_pagamento = ".$this->obRPessoalFormaPagamento->getCodFormaPagamento();
         $stFiltro .= "   AND contrato_servidor_forma_pagamento.cod_contrato = ".$this->getCodContrato();
-        $obTPessoalContratoServidorFormaPagamento->recuperaUltimaFormaPagamento($rsContratoServidorFormaPagamento, $stFiltro, "", $boTransacao);
+        $obErro = $obTPessoalContratoServidorFormaPagamento->recuperaUltimaFormaPagamento($rsContratoServidorFormaPagamento, $stFiltro, "", $boTransacao);
 
         if ($rsContratoServidorFormaPagamento->getCampo("cod_forma_pagamento") != $this->obRPessoalFormaPagamento->getCodFormaPagamento()) {
             $obTPessoalContratoServidorFormaPagamento->setDado("cod_contrato", $this->getCodContrato());
@@ -1938,7 +1941,7 @@ function alterarContrato($boTransacao = "")
 
     if ( !$obErro->ocorreu() ) {//2
         $stFiltro = " AND cs.cod_contrato = ". $this->getCodContrato() ."";
-        $obTPessoalContratoServidor->recuperaRelacionamentoCargo( $rsCargoAlterar,$stFiltro, "", $boTransacao );
+        $obErro = $obTPessoalContratoServidor->recuperaRelacionamentoCargo( $rsCargoAlterar,$stFiltro, "", $boTransacao );
         if( $rsCargoAlterar->getCampo('cod_funcao')               != $_POST['inCodFuncao'] or
             $rsCargoAlterar->getCampo('cod_especialidade_funcao') != $_POST['inCodEspecialidadeFuncao'] or
             $rsCargoAlterar->getCampo('cod_sub_divisao_funcao')   != $_POST['inCodSubDivisaoFuncao'] ) {

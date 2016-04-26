@@ -31,28 +31,21 @@
 
     * Caso de uso: uc-04.04.07
 
-    $Id: RPessoalServidor.class.php 63818 2015-10-19 20:02:07Z evandro $
+    * @package URBEM
+    * @subpackage Regra
+
+    $Id: RPessoalServidor.class.php 65096 2016-04-22 19:46:59Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GA_CGM_NEGOCIO."RCGM.class.php"                                                       );
-include_once ( CAM_GA_CGM_NEGOCIO."RCGMPessoaFisica.class.php"                                           );
-include_once ( CAM_GRH_PES_NEGOCIO."RPessoalCID.class.php"                                               );
-include_once ( CAM_GRH_PES_NEGOCIO."RPessoalConselho.class.php"                                          );
-include_once ( CAM_GRH_PES_NEGOCIO."RPessoalDependente.class.php"                                        );
-include_once ( CAM_GRH_PES_NEGOCIO."RPessoalContratoServidor.class.php"                                  );
-include_once ( CAM_GRH_PES_NEGOCIO."RPessoalCTPS.class.php"                                              );
+include_once CAM_GA_CGM_NEGOCIO."RCGM.class.php";
+include_once CAM_GA_CGM_NEGOCIO."RCGMPessoaFisica.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RPessoalCID.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RPessoalConselho.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RPessoalDependente.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RPessoalContratoServidor.class.php";
+include_once CAM_GRH_PES_NEGOCIO."RPessoalCTPS.class.php";
 
-/**
-    * Classe de Regra de Negócio Pessoal Servidor
-    * Data de Criação   : 14/12/2004
-
-    * @author Analista: Leandro Oliveira.
-    * @author Desenvolvedor: Rafael Almeida
-
-    * @package URBEM
-    * @subpackage Regra
-*/
 class RPessoalServidor
 {
 /**
@@ -525,23 +518,19 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
     **/
     public function incluirServidor($boTransacao = "")
     {
-        $boFlagTransacao = false;
-        
-        $obTransacao = new Transacao;
-        $obTransacao->begin();
-        $boTransacao = $obTransacao->getTransacao();
-        
         $obErro = new Erro;
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        $obTransacao = new Transacao();
+        $boFlagTransacao = false;
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php"                              );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php"                    );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php"                      );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php"                       );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php"                           );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php"              );
-        include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php"                               );
-        
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php";
+        include_once CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php";
+
         $obTPessoalServidor                 = new TPessoalServidor;
         $obTPessoalServidorReservista       = new TPessoalServidorReservista;
         $obTPessoalServidorPisPasep         = new TPessoalServidorPisPasep;
@@ -565,38 +554,14 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
         if ( !$obErro->ocorreu() and $this->getDataNascimento()) {
             $stFiltro = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
 
-            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+            $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
 
-            $obTCGMPessoaFisica->setDado("dt_nascimento",       $this->getDataNascimento());
-            $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
-            $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
-            $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
-            $obTCGMPessoaFisica->setDado("cpf",                 $rsCGM->getCampo('cpf'));
-            $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
-            $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
-
-            $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
-        }
-
-        if ( !$obErro->ocorreu() and $this->obRCGMPessoaFisica->getCPF() ) {
-            $inCPF = str_replace(".","", $this->obRCGMPessoaFisica->getCPF());
-            $inCPF = str_replace("-","", $inCPF);
-            $stFiltro = " WHERE cpf = '".$inCPF."'";
-
-            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
-
-            if ( $rsCGM->getNumLinhas() > 0 ) {
-                $obErro->setDescricao("CPF já cadastrado para outro servidor.");
-            } else {
-                $stFiltro  = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
-
-                $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
-
-                $obTCGMPessoaFisica->setDado("dt_nascimento",       $rsCGM->getCampo('dt_nascimento'));
+            if ( !$obErro->ocorreu() ){
+                $obTCGMPessoaFisica->setDado("dt_nascimento",       $this->getDataNascimento());
                 $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
                 $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
                 $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
-                $obTCGMPessoaFisica->setDado("cpf",                 $inCPF);
+                $obTCGMPessoaFisica->setDado("cpf",                 $rsCGM->getCampo('cpf'));
                 $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
                 $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
 
@@ -604,10 +569,37 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
             }
         }
 
+        if ( !$obErro->ocorreu() and $this->obRCGMPessoaFisica->getCPF() ) {
+            $inCPF = str_replace(".","", $this->obRCGMPessoaFisica->getCPF());
+            $inCPF = str_replace("-","", $inCPF);
+            $stFiltro = " WHERE cpf = '".$inCPF."'";
+            $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+
+            if ( !$obErro->ocorreu() ){
+                if ( $rsCGM->getNumLinhas() > 0 ) {
+                    $obErro->setDescricao("CPF já cadastrado para outro servidor.");
+                } else {
+                    $stFiltro  = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
+                    $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+
+                    if ( !$obErro->ocorreu() ){
+                        $obTCGMPessoaFisica->setDado("dt_nascimento",       $rsCGM->getCampo('dt_nascimento'));
+                        $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
+                        $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
+                        $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
+                        $obTCGMPessoaFisica->setDado("cpf",                 $inCPF);
+                        $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
+                        $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
+
+                        $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+                    }
+                }
+            }
+        }
+
         // inclui dados para o servidor
         if ( !$obErro->ocorreu() ) {
-
-            $obTPessoalServidor->proximoCod( $inCodServidor , $boTransacao );
+            $obErro = $obTPessoalServidor->proximoCod( $inCodServidor , $boTransacao );
             $this->setCodServidor( $inCodServidor );
 
             if ( !$obErro->ocorreu() ) {
@@ -618,7 +610,7 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                 $obTPessoalServidor->setDado("cod_uf"                 , $this->getCodUF()                         );
                 $obTPessoalServidor->setDado("cod_municipio"          , $this->getCodMunicipio()                  );
                 $obTPessoalServidor->setDado("cod_edital"             , $this->getCodEdital()                     );
-                $obTPessoalServidor->setDado("nr_titulo_eleitor"      , $this->getNrTituloEleitor()                     );
+                $obTPessoalServidor->setDado("nr_titulo_eleitor"      , $this->getNrTituloEleitor()               );
                 $obTPessoalServidor->setDado("zona_titulo"            , $this->getZonaTitulo()                    );
                 $obTPessoalServidor->setDado("secao_titulo"           , $this->getSecaoTitulo()                   );
                 $obTPessoalServidor->setDado("caminho_foto"           , $this->getCaminhoFoto()                   );
@@ -649,11 +641,13 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                 if ( !$obErro->ocorreu() and $this->getPisPasep() != "") {
                     $obTCGMPessoaFisica->setDado("numcgm",$this->obRCGMPessoaFisica->getNumCgm());
 
-                    $obTCGMPessoaFisica->consultar($boTransacao);
+                    $obErro = $obTCGMPessoaFisica->consultar($boTransacao);
 
-                    $obTCGMPessoaFisica->setDado("servidor_pis_pasep",$this->getPisPasep());
+                    if ( !$obErro->ocorreu() ) {
+                        $obTCGMPessoaFisica->setDado("servidor_pis_pasep",$this->getPisPasep());
 
-                    $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+                        $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+                    }
                 }
 
                 //inclui dados para Estado Civil
@@ -665,17 +659,18 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                 }
 
                 // inclui dados CID servidor
-                if ( $this->obRPessoalCID->getCodCid() != "") {
-                    if ( !$obErro->ocorreu() ) {
+                if ( !$obErro->ocorreu() ) {
+                    if ( $this->obRPessoalCID->getCodCid() != "") {
                         $obTPessoalServidorCid->setDado("cod_servidor" , $this->getCodServidor() );
                         $obTPessoalServidorCid->setDado("cod_cid"      , $this->obRPessoalCID->getCodCID());
                         $obTPessoalServidorCid->setDado("data_laudo", $this->getDataLaudo());
                         $stFiltro = " WHERE cod_servidor = ".$this->getCodServidor()." and cod_cid = ".$this->obRPessoalCID->getCodCid()."";
-                        $obTPessoalServidorCid->recuperaCid( $rsCid, $stFiltro, "",$boTransacao );
-                        
-                        if ( $rsCid->getCampo( "cod_cid") != $this->obRPessoalCID->getCodCID() ) {
-                            $obErro = $obTPessoalServidorCid->inclusao( $boTransacao );
-                            $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidorCid );
+                        $obErro = $obTPessoalServidorCid->recuperaCid( $rsCid, $stFiltro, "",$boTransacao );
+
+                        if ( !$obErro->ocorreu() ) {
+                            if ( $rsCid->getCampo( "cod_cid") != $this->obRPessoalCID->getCodCID() ) {
+                                $obErro = $obTPessoalServidorCid->inclusao( $boTransacao );
+                            }
                         }
                     }
                 }
@@ -722,11 +717,10 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                         $obErro = $this->roUltimoContratoServidor->gerarAssentamento( $boTransacao );
                     }
                 }
-
             }
         }
 
-        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidor );
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidor );
 
         return $obErro;
     }
@@ -740,18 +734,19 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
     **/
     public function alterarServidor($boTransacao = "")
     {
+        $obErro = new Erro;
+        $obTransacao = new Transacao();
         $boFlagTransacao = false;
-        $obTransacao = new Transacao;
-        $obTransacao->begin();
-        $boTransacao = $obTransacao->getTransacao();
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php"                   );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php"         );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php"           );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php"        );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php"                );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php"   );
-        include_once ( CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php");
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php";
+        include_once CAM_GA_CGM_MAPEAMENTO."TCGMPessoaFisica.class.php";
+
         $obTPessoalServidor                 = new TPessoalServidor;
         $obTPessoalServidorReservista       = new TPessoalServidorReservista;
         $obTPessoalServidorPisPasep         = new TPessoalServidorPisPasep;
@@ -759,6 +754,7 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
         $obTPessoalServidorCid              = new TPessoalServidorCid;
         $obTPessoalServidorContratoServidor = new TPessoalServidorContratoServidor;
         $obTCGMPessoaFisica                 = new TCGMPessoaFisica;
+
         if ( !$obErro->ocorreu() and ($this->getCarteiraReservista() or $this->getCategoriaReservista() or $this->getOrigemReservista()) ) {
             if ( $this->getCarteiraReservista() == "" ) {
                 $obErro->setDescricao("Campo Certificado de Reservista da guia Documentação inválido!()");
@@ -770,36 +766,45 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                 $obErro->setDescricao("Campo Órgão Expedidor do Certificado da guia Documentação inválido!()");
             }
         }
+
         if ( !$obErro->ocorreu() and $this->getDataNascimento() ) {
             $stFiltro = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
-            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
-            $obTCGMPessoaFisica->setDado("dt_nascimento",       $this->getDataNascimento());
-            $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
-            $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
-            $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
-            $obTCGMPessoaFisica->setDado("cpf",                 $rsCGM->getCampo('cpf'));
-            $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
-            $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
-            $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+            $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+
+            if ( !$obErro->ocorreu() ){
+                $obTCGMPessoaFisica->setDado("dt_nascimento",       $this->getDataNascimento());
+                $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
+                $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
+                $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
+                $obTCGMPessoaFisica->setDado("cpf",                 $rsCGM->getCampo('cpf'));
+                $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
+                $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
+                $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+            }
         }
+
         if ( !$obErro->ocorreu() and $this->obRCGMPessoaFisica->getCPF() ) {
             $inCPF = str_replace(".","", $this->obRCGMPessoaFisica->getCPF());
             $inCPF = str_replace("-","", $inCPF);
             $stFiltro = " WHERE cpf    = '".$inCPF."'";
-            $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
-            if ( $rsCGM->getNumLinhas() > 0 ) {
-                $obErro->setDescricao("CPF já cadastrado para outro servidor.");
-            } else {
-                $stFiltro  = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
-                $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
-                $obTCGMPessoaFisica->setDado("dt_nascimento",       $rsCGM->getCampo('dt_nascimento'));
-                $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
-                $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
-                $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
-                $obTCGMPessoaFisica->setDado("cpf",                 $inCPF);
-                $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
-                $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
-                $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+            $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+            if ( !$obErro->ocorreu() ){
+                if ( $rsCGM->getNumLinhas() > 0 ) {
+                    $obErro->setDescricao("CPF já cadastrado para outro servidor.");
+                } else {
+                    $stFiltro  = " WHERE numcgm = ".$this->obRCGMPessoaFisica->getNumCgm();
+                    $obErro = $obTCGMPessoaFisica->recuperaTodos($rsCGM,$stFiltro,$stOrdem,$boTransacao);
+                    if ( !$obErro->ocorreu() ){
+                        $obTCGMPessoaFisica->setDado("dt_nascimento",       $rsCGM->getCampo('dt_nascimento'));
+                        $obTCGMPessoaFisica->setDado("numcgm",              $this->obRCGMPessoaFisica->getNumCgm());
+                        $obTCGMPessoaFisica->setDado("cod_categoria_cnh",   $rsCGM->getCampo('cod_categoria_cnh'));
+                        $obTCGMPessoaFisica->setDado("orgao_emissor",       $rsCGM->getCampo('orgao_emissor'));
+                        $obTCGMPessoaFisica->setDado("cpf",                 $inCPF);
+                        $obTCGMPessoaFisica->setDado("num_cnh",             $rsCGM->getCampo('num_cnh'));
+                        $obTCGMPessoaFisica->setDado("cod_nacionalidade",   $rsCGM->getCampo('cod_nacionalidade'));
+                        $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+                    }
+                }
             }
         }
         if ( !$obErro->ocorreu() ) {
@@ -821,15 +826,17 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
         //altera dados para reservista
         if ( !$obErro->ocorreu() ) {
               $stFiltro  = " WHERE cod_servidor = ".$_POST['inCodServidor'];
-                $obTPessoalServidorReservista->recuperaTodos($rsResultado, $stFiltro,"",$boTransacao);
-              $obTPessoalServidorReservista->setDado("cod_servidor"     ,$this->getCodServidor()            );
-              $obTPessoalServidorReservista->setDado("nr_carteira_res"  ,$this->getCarteiraReservista()     );
-              $obTPessoalServidorReservista->setDado("cat_reservista"   ,$this->getCategoriaReservista()    );
-              $obTPessoalServidorReservista->setDado("origem_reservista",$this->getOrigemReservista()       );
-              if (!$rsResultado->eof()) {
-                      $obErro = $obTPessoalServidorReservista->alteracao( $boTransacao );
-              } else {
-                      $obErro = $obTPessoalServidorReservista->inclusao( $boTransacao );
+              $obErro = $obTPessoalServidorReservista->recuperaTodos($rsResultado, $stFiltro,"",$boTransacao);
+              if ( !$obErro->ocorreu() ) {
+                $obTPessoalServidorReservista->setDado("cod_servidor"     ,$this->getCodServidor()            );
+                $obTPessoalServidorReservista->setDado("nr_carteira_res"  ,$this->getCarteiraReservista()     );
+                $obTPessoalServidorReservista->setDado("cat_reservista"   ,$this->getCategoriaReservista()    );
+                $obTPessoalServidorReservista->setDado("origem_reservista",$this->getOrigemReservista()       );
+                if (!$rsResultado->eof()) {
+                    $obErro = $obTPessoalServidorReservista->alteracao( $boTransacao );
+                } else {
+                    $obErro = $obTPessoalServidorReservista->inclusao( $boTransacao );
+                }
               }
         }
         //inclui dados para PisPasep
@@ -838,13 +845,14 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
             //$obTPessoalServidorPisPasep->setDado("servidor_pis_pasep" ,$this->getPisPasep()       );
             $obTPessoalServidorPisPasep->setDado("dt_pis_pasep"       ,$this->getDataPisPasep()   );
             $obErro = $obTPessoalServidorPisPasep->inclusao( $boTransacao );
-
         }
         if ( !$obErro->ocorreu() and $this->getPisPasep() != "") {
             $obTCGMPessoaFisica->setDado("numcgm",$this->obRCGMPessoaFisica->getNumCgm());
-            $obTCGMPessoaFisica->consultar($boTransacao);
-            $obTCGMPessoaFisica->setDado("servidor_pis_pasep",$this->getPisPasep());
-            $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+            $obErro = $obTCGMPessoaFisica->consultar($boTransacao);
+            if ( !$obErro->ocorreu() ) {
+                $obTCGMPessoaFisica->setDado("servidor_pis_pasep",$this->getPisPasep());
+                $obErro = $obTCGMPessoaFisica->alteracao($boTransacao);
+            }
         }
         //inclui dados para Estado Civil
         if ( !$obErro->ocorreu() ) {
@@ -855,30 +863,28 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
             } else {
                 $stFiltro = " AND servidor_conjuge.cod_servidor = ".$this->getCodServidor();
                 $obErro = $obTPessoalServidorConjuge->recuperaConjuge($rsConjuge,$stFiltro,"",$boTransacao);
-                if ( $rsConjuge->getNumLinhas() > 0 ) {
-                    $obTPessoalServidorConjuge->setDado("cod_servidor"            ,$rsConjuge->getCampo("cod_servidor")    );
-                    $obTPessoalServidorConjuge->setDado("numcgm"                  ,$rsConjuge->getCampo("numcgm")          );
-                    $obTPessoalServidorConjuge->setDado("bo_excluido"             ,true);
-                    $obErro = $obTPessoalServidorConjuge->inclusao( $boTransacao );
+                if ( !$obErro->ocorreu() ) {
+                    if ( $rsConjuge->getNumLinhas() > 0 ) {
+                        $obTPessoalServidorConjuge->setDado("cod_servidor"            ,$rsConjuge->getCampo("cod_servidor")    );
+                        $obTPessoalServidorConjuge->setDado("numcgm"                  ,$rsConjuge->getCampo("numcgm")          );
+                        $obTPessoalServidorConjuge->setDado("bo_excluido"             ,true);
+                        $obErro = $obTPessoalServidorConjuge->inclusao( $boTransacao );
+                    }
                 }
             }
         }
         // inclui dados CID servidor
-        if ( $this->obRPessoalCID->getCodCid() != "") {
-            if ( !$obErro->ocorreu() ) {
+        if ( !$obErro->ocorreu() ) {
+            if ( $this->obRPessoalCID->getCodCid() != "") {
                 $obTPessoalServidorCid->setDado("cod_servidor" , $this->getCodServidor() );
                 $obTPessoalServidorCid->setDado("cod_cid"      , $this->obRPessoalCID->getCodCID());
                 $obTPessoalServidorCid->setDado("data_laudo", $this->getDataLaudo());
                 $obErro = $obTPessoalServidorCid->inclusao( $boTransacao );
-                $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidorCid );
-            }
-        //Se nenhum CID for imformado ele insere com o Câdigo zero (nâo informado)
-        } else {
-            if ( !$obErro->ocorreu() ) {
+            //Se nenhum CID for imformado ele insere com o Câdigo zero (nâo informado)
+            } else {
                 $obTPessoalServidorCid->setDado("cod_servidor" , $this->getCodServidor() );
                 $obTPessoalServidorCid->setDado("cod_cid"      , "0");
                 $obErro = $obTPessoalServidorCid->inclusao( $boTransacao );
-                $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidorCid );
             }
         }
         // alterar dados CTPS servidor
@@ -921,7 +927,7 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
                 }
             }
         }
-        // aleterar dados servidor dependente
+        // alterar dados servidor dependente
         if ( !$obErro->ocorreu() ) {
             $this->addRPessoalDependente();
             $obErro = $this->roRPessoalDependente->listarPessoalDependente($rsDependente,"",$boTransacao);
@@ -949,10 +955,9 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
             array_pop($this->arRPessoalDependente);
         }
         if ( !$obErro->ocorreu() ) {
-                        
             for ($inIndex=0;$inIndex<count($this->arRPessoalDependente);$inIndex++) {
                 $obRPessoalDependente = &$this->arRPessoalDependente[$inIndex];
-                
+
                 $obRPessoalDependente->obRPessoalCID->setCodCid($obRPessoalDependente->obRPessoalCID->getCodCid());
 
                 if ( $obRPessoalDependente->getCodDependente() ) {
@@ -984,7 +989,8 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
             }
 
         }
-        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidor );
+
+        $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidor );
 
         return $obErro;
     }
@@ -997,153 +1003,170 @@ function getRPessoalConselho() { return $this->obRPessoalConselho;     }
     */
     public function excluirServidor($boTransacao = "")
     {
+        $obErro = new Erro;
+        $obTransacao = new Transacao();
         $boFlagTransacao = false;
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php"                              );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php"                    );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php"                      );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php"                       );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php"                           );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php"              );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoContratoServidor.class.php"    );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGerado.class.php"                    );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorContaSalarioHistorico.class.php" );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoNorma.class.php"               );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoExcluido.class.php"            );        
-        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoConcessaoDecimo.class.php"              );
-        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorComplementar.class.php" );
-        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php"      );
-        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoIRRF.class.php"          );
-        include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoPrevidencia.class.php"   );
-        include_once ( CAM_GRH_PES_MAPEAMENTO."TPessoalContratoPensionista.class.php"                 );
+        $obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidor.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorReservista.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorPisPasep.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorConjuge.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorCid.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoContratoServidor.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGerado.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorContaSalarioHistorico.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoNorma.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalAssentamentoGeradoExcluido.class.php";        
+        include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoConcessaoDecimo.class.php";
+        include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorComplementar.class.php";
+        include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoContratoServidorPeriodo.class.php";
+        include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoIRRF.class.php";
+        include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoDescontoExternoPrevidencia.class.php";
+        include_once CAM_GRH_PES_MAPEAMENTO."TPessoalContratoPensionista.class.php";
 
         //Inicio da verificações da exclusão do servidor
         $stMensagem = "Exclusão não permitida, servidor possui histórico de dados no sistema.";
         $stFiltro = " WHERE cod_contrato = ".$this->roUltimoContratoServidor->getCodContrato();
 
         $obTPessoalAssentamentoGeradoNorma = new TPessoalAssentamentoGeradoNorma();
-        $obTPessoalAssentamentoGeradoNorma->excluirAssentamentoGeradoNorma($stFiltro, $boTransacao);
+        $obErro = $obTPessoalAssentamentoGeradoNorma->excluirAssentamentoGeradoNorma($stFiltro, $boTransacao);
 
-        $obTPessoalAssentamentoGeradoExcluido = new TPessoalAssentamentoGeradoExcluido();
-        $obTPessoalAssentamentoGeradoExcluido->excluirAssentamentoGeradoExcluido($stFiltro, $boTransacao);
+        if ( !$obErro->ocorreu() ) {
+            $obTPessoalAssentamentoGeradoExcluido = new TPessoalAssentamentoGeradoExcluido();
+            $obErro = $obTPessoalAssentamentoGeradoExcluido->excluirAssentamentoGeradoExcluido($stFiltro, $boTransacao);
 
-        $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGerado();
-        $obTPessoalAssentamentoGeradoContratoServidor->excluirAssentamentoGerado($stFiltro, $boTransacao);
-        
-        $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGeradoContratoServidor;
-        $obTPessoalAssentamentoGeradoContratoServidor->excluirAssentamentoGeradoContratoServidor($stFiltro, $boTransacao);
-        
-        $obTPessoalContratoServidorContaSalarioHistorico = new TPessoalContratoServidorContaSalarioHistorico;
-        $obTPessoalContratoServidorContaSalarioHistorico->excluirContratoServidorContaSalarioHistorico($stFiltro, $boTransacao);
-        
-        $arTabelasVerificacao = array("Adido Cedido"                    => "TPessoalAdidoCedido",
-                                      "Aposentadoria"                   => "TPessoalAposentadoria",
-                                      "Assentamento Gerado"             => "TPessoalAssentamentoGeradoContratoServidor",
-                                      "Caso Causa"                      => "TPessoalContratoServidorCasoCausa",
-                                      "Cedencia"                        => "TPessoalContratoServidorCedencia",
-                                      "Férias"                          => "TPessoalFerias",
-                                      "Pensionista"                     => "TPessoalContratoPensionista",
-                                      "Concessão de Décimo"             => "TFolhaPagamentoConcessaoDecimo",
-                                      "Complementar"                    => "TFolhaPagamentoContratoServidorComplementar",
-                                      "Folha Salário"                   => "TFolhaPagamentoContratoServidorPeriodo",
-                                      "Desconto Externo IRRF"           => "TFolhaPagamentoDescontoExternoIRRF",
-                                      "Desconto Externo Previdência"    => "TFolhaPagamentoDescontoExternoPrevidencia",
-                                      "Concessão de Vale-Transporte"    => "TBeneficioContratoServidorConcessaoValeTransporte",
-                                      "Concessão de Vale-Transporte"    => "TBeneficioContratoServidorGrupoConcessaoValeTransporte",);
-        
-        foreach ($arTabelasVerificacao as $stDescricaoTabela => $stTabela) {
             if ( !$obErro->ocorreu() ) {
-                if (strpos($stTabela,"TPessoal") === 0) {
-                    include_once(CAM_GRH_PES_MAPEAMENTO.$stTabela.".class.php");
-                }
-                if (strpos($stTabela,"TBeneficio") === 0) {
-                    include_once(CAM_GRH_BEN_MAPEAMENTO.$stTabela.".class.php");
-                }
-                if (strpos($stTabela,"TFolhaPagamento") === 0) {
-                    include_once(CAM_GRH_FOL_MAPEAMENTO.$stTabela.".class.php");
-                }
-                $obTVerificacaoExclusao = new $stTabela;
-                $obTVerificacaoExclusao->recuperaTodos($rsVerificacao,$stFiltro,"",$boTransacao);
-                if ($rsVerificacao->getNumLinhas() > 0) {
-                    $obErro->setDescricao($stMensagem."(".$stDescricaoTabela.")");
-                    break;
-                }
-            }
-        }
-        //Fim da verificação da exclusão do servidor
+                $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGerado();
+                $obErro = $obTPessoalAssentamentoGeradoContratoServidor->excluirAssentamentoGerado($stFiltro, $boTransacao);
 
-        $obTPessoalServidor                 = new TPessoalServidor;
-        $obTPessoalServidorReservista       = new TPessoalServidorReservista;
-        $obTPessoalServidorPisPasep         = new TPessoalServidorPisPasep;
-        $obTPessoalServidorConjuge          = new TPessoalServidorConjuge;
-        $obTPessoalServidorCid              = new TPessoalServidorCid;
-        $obTPessoalServidorContratoServidor = new TPessoalServidorContratoServidor;
-        if ( !$obErro->ocorreu() ) {
-            $stFiltro = " WHERE cod_servidor = ".$this->getCodServidor();
-            $obErro = $obTPessoalServidorContratoServidor->recuperaTodos( $rsServidorContratoServidor,$stFiltro,"",$boTransacao );
-        }
-        if ( !$obErro->ocorreu() ) {
-            $obErro = $this->roUltimoContratoServidor->excluirContratoServidor( $boTransacao );
-        }
-        //excluir dados para reservista
-        if ( !$obErro->ocorreu() ) {
-            $obTPessoalServidorReservista->setDado("cod_servidor"     ,$this->getCodServidor()            );
-            $obErro = $obTPessoalServidorReservista->exclusao( $boTransacao );
-        }
-        //excluir dados para PisPasep
-        if ( !$obErro->ocorreu() ) {
-            $obTPessoalServidorPisPasep->setDado("cod_servidor"       ,$this->getCodServidor()    );
-            $obErro = $obTPessoalServidorPisPasep->exclusao( $boTransacao );
-        }
-        //excluir dados para Estado Civil
-        if ( !$obErro->ocorreu() ) {
-            $obTPessoalServidorConjuge->setDado("cod_servidor"            ,$this->getCodServidor()    );
-            $obErro = $obTPessoalServidorConjuge->exclusao( $boTransacao );
-        }
-        // exclui dados CID servidor
-        if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
-            $obTPessoalServidorCid->setDado("cod_servidor" , $this->getCodServidor() );
-            $obErro = $obTPessoalServidorCid->exclusao( $boTransacao );
-        }
-        // exclui dados CTPS servidor
-        if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
-            $obErro = $this->roRPessoalCTPS->listarCTPS($rsCTPS,$boTransacao);
-            if ( !$obErro->ocorreu() ) {
-                while ( !$rsCTPS->eof() ) {
-                    $this->roRPessoalCTPS->setCodCTPS($rsCTPS->getCampo('cod_ctps'));
-                    $obErro = $this->roRPessoalCTPS->excluirCTPS( $boTransacao );
-                    if ( $obErro->ocorreu() ) {
-                        break;
+                if ( !$obErro->ocorreu() ) {
+                    $obTPessoalAssentamentoGeradoContratoServidor = new TPessoalAssentamentoGeradoContratoServidor;
+                    $obErro = $obTPessoalAssentamentoGeradoContratoServidor->excluirAssentamentoGeradoContratoServidor($stFiltro, $boTransacao);
+
+                    if ( !$obErro->ocorreu() ) {
+                        $obTPessoalContratoServidorContaSalarioHistorico = new TPessoalContratoServidorContaSalarioHistorico;
+                        $obErro = $obTPessoalContratoServidorContaSalarioHistorico->excluirContratoServidorContaSalarioHistorico($stFiltro, $boTransacao);
+
+                        if ( !$obErro->ocorreu() ) {
+                            $arTabelasVerificacao = array("Adido Cedido"                    => "TPessoalAdidoCedido",
+                                                          "Aposentadoria"                   => "TPessoalAposentadoria",
+                                                          "Assentamento Gerado"             => "TPessoalAssentamentoGeradoContratoServidor",
+                                                          "Caso Causa"                      => "TPessoalContratoServidorCasoCausa",
+                                                          "Cedencia"                        => "TPessoalContratoServidorCedencia",
+                                                          "Férias"                          => "TPessoalFerias",
+                                                          "Pensionista"                     => "TPessoalContratoPensionista",
+                                                          "Concessão de Décimo"             => "TFolhaPagamentoConcessaoDecimo",
+                                                          "Complementar"                    => "TFolhaPagamentoContratoServidorComplementar",
+                                                          "Folha Salário"                   => "TFolhaPagamentoContratoServidorPeriodo",
+                                                          "Desconto Externo IRRF"           => "TFolhaPagamentoDescontoExternoIRRF",
+                                                          "Desconto Externo Previdência"    => "TFolhaPagamentoDescontoExternoPrevidencia",
+                                                          "Concessão de Vale-Transporte"    => "TBeneficioContratoServidorConcessaoValeTransporte",
+                                                          "Concessão de Vale-Transporte"    => "TBeneficioContratoServidorGrupoConcessaoValeTransporte",);
+
+                            foreach ($arTabelasVerificacao as $stDescricaoTabela => $stTabela) {
+                                if ( !$obErro->ocorreu() ) {
+                                    if (strpos($stTabela,"TPessoal") === 0) {
+                                        include_once(CAM_GRH_PES_MAPEAMENTO.$stTabela.".class.php");
+                                    }
+                                    if (strpos($stTabela,"TBeneficio") === 0) {
+                                        include_once(CAM_GRH_BEN_MAPEAMENTO.$stTabela.".class.php");
+                                    }
+                                    if (strpos($stTabela,"TFolhaPagamento") === 0) {
+                                        include_once(CAM_GRH_FOL_MAPEAMENTO.$stTabela.".class.php");
+                                    }
+                                    $obTVerificacaoExclusao = new $stTabela;
+                                    $obErro = $obTVerificacaoExclusao->recuperaTodos($rsVerificacao,$stFiltro,"",$boTransacao);
+
+                                    if ( !$obErro->ocorreu() ){
+                                        if ($rsVerificacao->getNumLinhas() > 0)
+                                            $obErro->setDescricao($stMensagem."(".$stDescricaoTabela.")");
+                                    }
+
+                                    if ( $obErro->ocorreu() )
+                                        break;
+                                }
+                            }
+                            //Fim da verificação da exclusão do servidor
+
+                            $obTPessoalServidor                 = new TPessoalServidor;
+                            $obTPessoalServidorReservista       = new TPessoalServidorReservista;
+                            $obTPessoalServidorPisPasep         = new TPessoalServidorPisPasep;
+                            $obTPessoalServidorConjuge          = new TPessoalServidorConjuge;
+                            $obTPessoalServidorCid              = new TPessoalServidorCid;
+                            $obTPessoalServidorContratoServidor = new TPessoalServidorContratoServidor;
+                            if ( !$obErro->ocorreu() ) {
+                                $stFiltro = " WHERE cod_servidor = ".$this->getCodServidor();
+                                $obErro = $obTPessoalServidorContratoServidor->recuperaTodos( $rsServidorContratoServidor,$stFiltro,"",$boTransacao );
+                            }
+                            if ( !$obErro->ocorreu() ) {
+                                $obErro = $this->roUltimoContratoServidor->excluirContratoServidor( $boTransacao );
+                            }
+                            //excluir dados para reservista
+                            if ( !$obErro->ocorreu() ) {
+                                $obTPessoalServidorReservista->setDado("cod_servidor"     ,$this->getCodServidor()            );
+                                $obErro = $obTPessoalServidorReservista->exclusao( $boTransacao );
+                            }
+                            //excluir dados para PisPasep
+                            if ( !$obErro->ocorreu() ) {
+                                $obTPessoalServidorPisPasep->setDado("cod_servidor"       ,$this->getCodServidor()    );
+                                $obErro = $obTPessoalServidorPisPasep->exclusao( $boTransacao );
+                            }
+                            //excluir dados para Estado Civil
+                            if ( !$obErro->ocorreu() ) {
+                                $obTPessoalServidorConjuge->setDado("cod_servidor"            ,$this->getCodServidor()    );
+                                $obErro = $obTPessoalServidorConjuge->exclusao( $boTransacao );
+                            }
+                            // exclui dados CID servidor
+                            if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
+                                $obTPessoalServidorCid->setDado("cod_servidor" , $this->getCodServidor() );
+                                $obErro = $obTPessoalServidorCid->exclusao( $boTransacao );
+                            }
+                            // exclui dados CTPS servidor
+                            if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
+                                $obErro = $this->roRPessoalCTPS->listarCTPS($rsCTPS,$boTransacao);
+                                if ( !$obErro->ocorreu() ) {
+                                    while ( !$rsCTPS->eof() ) {
+                                        $this->roRPessoalCTPS->setCodCTPS($rsCTPS->getCampo('cod_ctps'));
+                                        $obErro = $this->roRPessoalCTPS->excluirCTPS( $boTransacao );
+                                        if ( $obErro->ocorreu() ) {
+                                            break;
+                                        }
+                                        $rsCTPS->proximo();
+                                    }
+                                }
+                            }
+                            // exclui dados servidor dependente
+                            if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
+                                $obErro = $this->roRPessoalDependente->listarPessoalDependente($rsDependentes,"",$boTransacao);
+                                if ( !$obErro->ocorreu() ) {
+                                    while ( !$rsDependentes->eof() ) {
+                                        $this->roRPessoalDependente->setCodDependente( $rsDependentes->getCampo('cod_dependente') );
+                                        $obErro = $this->roRPessoalDependente->excluirDependente( $boTransacao );
+                                        if ( $obErro->ocorreu() ) {
+                                            break;
+                                        }
+                                        $rsDependentes->proximo();
+                                    }
+                                }
+                            }
+                            // exclui dados servidor contrato
+                            if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
+                                $obTPessoalServidorContratoServidor->setDado( "cod_servidor", $this->getCodServidor() );
+                                if ( !$obErro->ocorreu() ) {
+                                    $obErro = $obTPessoalServidorContratoServidor->exclusao( $boTransacao );
+                                }
+                            }
+
+                            if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
+                                $obTPessoalServidor->setDado("cod_servidor",$this->getCodServidor());
+                                $obErro = $obTPessoalServidor->exclusao($boTransacao);
+                            }
+                        }
                     }
-                    $rsCTPS->proximo();
                 }
             }
-        }
-        // exclui dados servidor dependente
-        if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
-            $obErro = $this->roRPessoalDependente->listarPessoalDependente($rsDependentes,"",$boTransacao);
-            if ( !$obErro->ocorreu() ) {
-                while ( !$rsDependentes->eof() ) {
-                    $this->roRPessoalDependente->setCodDependente( $rsDependentes->getCampo('cod_dependente') );
-                    $obErro = $this->roRPessoalDependente->excluirDependente( $boTransacao );
-                    if ( $obErro->ocorreu() ) {
-                        break;
-                    }
-                    $rsDependentes->proximo();
-                }
-            }
-        }
-        // exclui dados servidor contrato
-        if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
-            $obTPessoalServidorContratoServidor->setDado( "cod_servidor", $this->getCodServidor() );
-            if ( !$obErro->ocorreu() ) {
-                $obErro = $obTPessoalServidorContratoServidor->exclusao( $boTransacao );
-            }
-        }
-
-        if ( !$obErro->ocorreu() and $rsServidorContratoServidor->getNumLinhas() == 1 ) {
-            $obTPessoalServidor->setDado("cod_servidor",$this->getCodServidor());
-            $obErro = $obTPessoalServidor->exclusao($boTransacao);
         }
         $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTPessoalServidor );
 

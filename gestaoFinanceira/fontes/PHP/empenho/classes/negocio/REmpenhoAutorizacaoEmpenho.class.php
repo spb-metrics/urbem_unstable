@@ -34,12 +34,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: $
-
-    $Revision: 32545 $
-    $Name$
-    $Author: cako $
-    $Date: 2007-12-05 15:12:56 -0200 (Qua, 05 Dez 2007) $
+    $Id: REmpenhoAutorizacaoEmpenho.class.php 64900 2016-04-12 18:44:26Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.03.03
@@ -51,13 +46,13 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoPreEmpenho.class.php"               );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoPermissaoAutorizacao.class.php"     );
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php"               );
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoReserva.class.php"                );
-include_once ( CAM_GF_ORC_NEGOCIO."ROrcamentoReservaSaldos.class.php"          );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php"             );
-include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaAutorizacao.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPreEmpenho.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoPermissaoAutorizacao.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoEntidade.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoReserva.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoReservaSaldos.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaAutorizacao.class.php";
 
 /**
     * Classe de Regra de Tipo de Empenho
@@ -1275,13 +1270,15 @@ function buscaProximoCod($boTransacao = "")
 */
 function incluir($boTransacao = "")
 {
-    include_once ( CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenho.class.php"  );
+    include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenho.class.php";
     $obTEmpenhoAutorizacaoEmpenho = new TEmpenhoAutorizacaoEmpenho;
+
     $boFlagTransacao = false;
     $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao);
-    if ( !$obErro->ocorreu() ) {
 
+    if ( !$obErro->ocorreu() ) {
         $obErro = $this->listarMaiorData( $rsMaiorData, "",$boTransacao);
+
         if (!$obErro->ocorreu()) {
             $stMaiorData = $rsMaiorData->getCampo( "data_autorizacao" );
             if (SistemaLegado::comparaDatas($stMaiorData,$this->stDtAutorizacao)) {
@@ -1289,72 +1286,69 @@ function incluir($boTransacao = "")
             }
 
             if ( !$obErro->ocorreu() ) {
-
                 if (SistemaLegado::comparaDatas($this->stDtAutorizacao, date("d/m/Y"))) {
                     $obErro->setDescricao( "Data da Autorização deve ser menor ou igual a data atual!" );
                 }
+
                 if ( !$obErro->ocorreu() ) {
-                $obErro = $this->checarFormaExecucaoOrcamento( $boDetalhadoExecucao , $boTransacao );
-                if ( $boDetalhadoExecucao and !$obErro->ocorreu() ) {
-                    if( $this->obROrcamentoDespesa->getCodDespesa() and !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() )
-                        $obErro->setDescricao( "Campo Desdobramento inválido!()" );
-                }
-                
-                if ( !$obErro->ocorreu() ) {
+                    $obErro = $this->checarFormaExecucaoOrcamento( $boDetalhadoExecucao , $boTransacao );
 
-                    if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
-
-                        $obErro = $this->consultaSaldoAnteriorDataEmpenho($nuSaldoAnterior, '', $boTransacao);
-
-                        if ( !$obErro->ocorreu() ) {
-                            if ( $nuSaldoAnterior >= $this->obROrcamentoReserva->getVlReserva() ) {
-                                $obErro = $this->checarPermissaoAutorizacao( $boTransacao );
-                            } else {
-                                $obErro->setDescricao( "Valor da autorização é superior ao da dotação." );
-                            }
-                        }
+                    if ( $boDetalhadoExecucao and !$obErro->ocorreu() ) {
+                        if( $this->obROrcamentoDespesa->getCodDespesa() and !$this->obROrcamentoClassificacaoDespesa->getMascClassificacao() )
+                            $obErro->setDescricao( "Campo Desdobramento inválido!()" );
                     }
 
                     if ( !$obErro->ocorreu() ) {
-                        $obErro = parent::incluir( $boTransacao ); 
+                        if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
+                            $obErro = $this->consultaSaldoAnteriorDataEmpenho($nuSaldoAnterior, '', $boTransacao);
+
+                            if ( !$obErro->ocorreu() ) {
+                                if ( $nuSaldoAnterior >= $this->obROrcamentoReserva->getVlReserva() )
+                                    $obErro = $this->checarPermissaoAutorizacao( $boTransacao );
+                                else
+                                    $obErro->setDescricao( "Valor da autorização é superior ao da dotação ".$this->obROrcamentoDespesa->getCodDespesa().". Saldo da Dotação: ".number_format($nuSaldoAnterior,2,',','.'));
+                            }
+                        }
 
                         if ( !$obErro->ocorreu() ) {
-                            if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
-                                $obErro = $this->getMascaraDespesaReduzida( $boTransacao );
+                            $obErro = parent::incluir( $boTransacao );
 
-                                list( $dia,$mes,$ano ) = explode( '/', $this->obROrcamentoReserva->getDtValidadeFinal() );
-                                if ( $this->stExercicio.date('md') > "$ano$mes$dia" ) {
-                                    $obErro->setDescricao("A data de validade final deve ser maior ou igual ao dia de hoje!");
-                                }
-                            }
-                            
                             if ( !$obErro->ocorreu() ) {
-                                $obErro = $this->buscaProximoCod($boTransacao );
-                                if ( !$obErro->ocorreu() ) {
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_pre_empenho", $this->inCodPreEmpenho                           );
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_autorizacao", $this->inCodAutorizacao                          );
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "exercicio"      , $this->stExercicio                               );
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_entidade"   , $this->obROrcamentoEntidade->getCodigoEntidade() );
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "dt_autorizacao" , $this->stDtAutorizacao                           );
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "num_orgao"      , $this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao());
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "num_unidade"    , $this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->getNumeroUnidade());
-                                    $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_categoria"  , $this->inCodCategoria                            );
+                                if ( $this->obROrcamentoDespesa->getCodDespesa() ) {
+                                    $obErro = $this->getMascaraDespesaReduzida( $boTransacao );
 
-                                    $obErro = $obTEmpenhoAutorizacaoEmpenho->inclusao( $boTransacao );
-                                if ( !$obErro->ocorreu() and $this->obROrcamentoDespesa->getCodDespesa() and !$this->boAutViaPatrimonial ) {
-                                        $obErro = $this->reservarDotacao( $boTransacao );
+                                    list( $dia,$mes,$ano ) = explode( '/', $this->obROrcamentoReserva->getDtValidadeFinal() );
+                                    if ( $this->stExercicio.date('md') > "$ano$mes$dia" )
+                                        $obErro->setDescricao("A data de validade final deve ser maior ou igual ao dia de hoje!");
                                 }
 
-                                    // Inclui a contrapartida se o empenho for de adiantamentos/subvencoes
-                                    if ($this->inCodCategoria == 2 || $this->inCodCategoria == 3) {
-                                        if (!$obErro->ocorreu()) {
-                                            $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_autorizacao'       , $this->inCodAutorizacao );
-                                            $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'exercicio'             , $this->stExercicio      );
-                                            $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_entidade'          , $this->obROrcamentoEntidade->getCodigoEntidade() );
-                                            $obErro = $this->obTEmpenhoContrapartidaAutorizacao->inclusao( $boTransacao );
-                                        }
-                                    }
+                                if ( !$obErro->ocorreu() ) {
+                                    $obErro = $this->buscaProximoCod($boTransacao );
 
+                                    if ( !$obErro->ocorreu() ) {
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_pre_empenho", $this->inCodPreEmpenho                           );
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_autorizacao", $this->inCodAutorizacao                          );
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "exercicio"      , $this->stExercicio                               );
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_entidade"   , $this->obROrcamentoEntidade->getCodigoEntidade() );
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "dt_autorizacao" , $this->stDtAutorizacao                           );
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "num_orgao"      , $this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->getNumeroOrgao());
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "num_unidade"    , $this->obROrcamentoDespesa->obROrcamentoUnidadeOrcamentaria->getNumeroUnidade());
+                                        $obTEmpenhoAutorizacaoEmpenho->setDado( "cod_categoria"  , $this->inCodCategoria                            );
+
+                                        $obErro = $obTEmpenhoAutorizacaoEmpenho->inclusao( $boTransacao );
+
+                                        if ( !$obErro->ocorreu() and $this->obROrcamentoDespesa->getCodDespesa() and !$this->boAutViaPatrimonial )
+                                            $obErro = $this->reservarDotacao( $boTransacao );
+
+                                        // Inclui a contrapartida se o empenho for de adiantamentos/subvencoes
+                                        if ($this->inCodCategoria == 2 || $this->inCodCategoria == 3) {
+                                            if (!$obErro->ocorreu()) {
+                                                $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_autorizacao'       , $this->inCodAutorizacao );
+                                                $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'exercicio'             , $this->stExercicio      );
+                                                $this->obTEmpenhoContrapartidaAutorizacao->setDado( 'cod_entidade'          , $this->obROrcamentoEntidade->getCodigoEntidade() );
+                                                $obErro = $this->obTEmpenhoContrapartidaAutorizacao->inclusao( $boTransacao );
+                                            }
+                                        }
                                     }
                                 }
                             }

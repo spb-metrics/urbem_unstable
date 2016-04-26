@@ -525,8 +525,8 @@ reportContext.setGlobalVariable('total_rcl',0);]]></method>
                 </structure>
             </list-property>
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[this.queryText += " WHERE publico.fn_nivel(cod_estrutural) < 4 ";
-params['query'] = this.queryText;]]></method>
+            <method name="beforeOpen"><![CDATA[this.queryText += " WHERE publico.fn_nivel(cod_estrutural) < 4 OR cod_estrutural ILIKE '9.%' ";
+//params['query'] = this.queryText;]]></method>
             <method name="onFetch"><![CDATA[//params['exercicio'] = inputParams['param_1'];
 //params['dt_final_periodo'] = inputParams['param_2'];]]></method>
             <property name="dataSource">Data Source</property>
@@ -833,7 +833,7 @@ select
                     GROUP BY conta_receita.cod_estrutural
                              , conta_receita.exercicio ) as cons
                WHERE (
-                            SELECT true
+                            SELECT DISTINCT true
                               FROM stn.vinculo_stn_receita
                         INNER JOIN orcamento.receita 
                                 ON vinculo_stn_receita.cod_receita = receita.cod_receita
@@ -870,7 +870,7 @@ select
                             cons.cod_estrutural LIKE ('1.2.1.0.29%')
                       WHEN rcl.cod_estrutural = '4.9.6.0.0.00.00.00.00.00' THEN 
                         (
-                            SELECT true
+                            SELECT DISTINCT true
                               FROM stn.vinculo_stn_receita
                         INNER JOIN orcamento.receita
                                 ON vinculo_stn_receita.cod_receita = receita.cod_receita

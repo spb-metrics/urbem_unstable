@@ -30,7 +30,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: FMManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
+    * $Id: FMManterOrdemCompra.php 65097 2016-04-25 14:44:53Z jean $
 
 */
 
@@ -383,7 +383,11 @@ if ((strpos($stAcao,'anular') === false) and (strpos($stAcao,'consultar') === fa
 }
 
 if ( strpos($stAcao,'consultar') === false ) {
-    $obFormulario->Cancelar($stLocation);
+    if ($stAcao == "anular") {
+        $obFormulario->Cancelar($stLocation,true);
+    } else {
+        $obFormulario->Cancelar($stLocation,true);
+    }
 } else {
     $obBtnClean = new Button;
     $obBtnClean->setName             ( "btnVoltar" );
@@ -394,6 +398,7 @@ if ( strpos($stAcao,'consultar') === false ) {
 
     $obFormulario->defineBarra(array($obBtnClean));
 }
+
 $obFormulario->Show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

@@ -29,7 +29,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TARRPagamento.class.php 64341 2016-01-15 20:11:16Z evandro $
+    * $Id: TARRPagamento.class.php 64995 2016-04-18 18:40:22Z evandro $
 
 * Casos de uso: uc-05.03.10
 */
@@ -1148,6 +1148,138 @@ function montaRecuperaListaPagamentosLoteAnalitico($inLote = false, $stFiltro)
     return $stSql;
 
 }
+
+function recuperaListaResumoBaixaAutomatica(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "" , $inLote)
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaListaResumoBaixaAutomatica( $inLote, $stFiltro ).$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaListaResumoBaixaAutomatica($inLote = false, $stFiltro)
+{
+    $stSql = "
+            SELECT 
+                tabela.*        
+                ,valor_pago_calculo + juros + multa + diferenca + correcao as valor_pago_normal
+            FROM (
+            SELECT distinct
+
+                pagamento.numeracao
+                , calculo.cod_credito ||'.'|| calculo.cod_especie ||'.'|| calculo.cod_genero ||'.'|| calculo.cod_natureza as origem
+                , mc.descricao_credito
+                 ,coalesce (( SELECT SUM(valor) as juros
+                        FROM
+                            arrecadacao.pagamento_acrescimo
+                        WHERE
+                            cod_tipo = 1
+                            and numeracao = pagamento.numeracao
+                            and ocorrencia_pagamento = pagamento.ocorrencia_pagamento
+                            and cod_convenio = pagamento.cod_convenio
+                        and cod_calculo = pagamento_calculo.cod_calculo
+                            
+                    ),0.00) as correcao
+
+                    ,coalesce ( ( SELECT SUM(valor) as juros
+                        FROM
+                            arrecadacao.pagamento_acrescimo
+                        WHERE
+                            cod_tipo = 2
+                            and numeracao = pagamento.numeracao
+                            and ocorrencia_pagamento = pagamento.ocorrencia_pagamento
+                            and cod_convenio = pagamento.cod_convenio
+                        and cod_calculo = pagamento_calculo.cod_calculo
+                            
+                    ),0.00) as juros
+
+                    ,coalesce ( ( select SUM(valor) as multa
+                        from arrecadacao.pagamento_acrescimo
+                        where cod_tipo = 3
+                        and numeracao = pagamento.numeracao
+                        and ocorrencia_pagamento = pagamento.ocorrencia_pagamento
+                        and cod_convenio = pagamento.cod_convenio
+                        and cod_calculo = pagamento_calculo.cod_calculo
+                    ),0.00) as multa
+
+                , COALESCE(
+                                ( SELECT
+                                        SUM(valor)
+                                    FROM
+                                        arrecadacao.pagamento_diferenca
+                                    WHERE
+                                        pagamento_diferenca.numeracao = pagamento.numeracao
+                                        AND pagamento_diferenca.cod_convenio = pagamento.cod_convenio
+                                        AND pagamento_diferenca.ocorrencia_pagamento = pagamento.ocorrencia_pagamento  
+                                        and pagamento_diferenca.cod_calculo = pagamento_calculo.cod_calculo
+                                ), 0.00
+                )AS diferenca
+
+                ,pagamento_calculo.valor as valor_pago_calculo
+
+                FROM
+
+                            arrecadacao.lote
+
+                            INNER JOIN arrecadacao.pagamento_lote
+                            ON pagamento_lote.cod_lote = lote.cod_lote
+                            AND pagamento_lote.exercicio = lote.exercicio
+
+                            INNER JOIN arrecadacao.pagamento
+                            ON pagamento.numeracao              = pagamento_lote.numeracao
+                            AND pagamento.ocorrencia_pagamento  = pagamento_lote.ocorrencia_pagamento
+                            AND pagamento.cod_convenio          = pagamento_lote.cod_convenio
+
+                          INNER JOIN arrecadacao.tipo_pagamento as atp
+                            ON atp.cod_tipo = pagamento.cod_tipo
+
+                        INNER JOIN sw_cgm as cgm
+                            ON cgm.numcgm = pagamento.numcgm
+                        
+                        inner join arrecadacao.pagamento_calculo
+                                ON pagamento_calculo.numeracao                  = pagamento.numeracao
+                                AND pagamento_calculo.ocorrencia_pagamento      = pagamento.ocorrencia_pagamento
+                                AND pagamento_calculo.cod_convenio              = pagamento.cod_convenio
+
+                        INNER JOIN arrecadacao.calculo
+                                on calculo.cod_calculo = pagamento_calculo.cod_calculo
+
+                        INNER JOIN arrecadacao.lancamento_calculo as alc
+                                ON alc.cod_calculo = calculo.cod_calculo
+
+                        INNER JOIN arrecadacao.lancamento
+                                ON lancamento.cod_lancamento = alc.cod_lancamento
+
+                        INNER JOIN monetario.credito as mc
+                            ON mc.cod_credito = calculo.cod_credito
+                            AND mc.cod_especie = calculo.cod_especie
+                            AND mc.cod_genero = calculo.cod_genero
+                            AND mc.cod_natureza = calculo.cod_natureza
+
+                        LEFT JOIN arrecadacao.lote_inconsistencia as ali
+                            ON ali.cod_lote = lote.cod_lote
+                            AND ali.exercicio = lote.exercicio
+
+                            LEFT JOIN arrecadacao.calculo_grupo_credito as acgc
+                                ON acgc.cod_calculo = calculo.cod_calculo
+
+                            LEFT JOIN arrecadacao.grupo_credito as agc
+                                ON agc.cod_grupo = acgc.cod_grupo
+                                AND agc.ano_exercicio = acgc.ano_exercicio ";
+
+    $stSql .= "         ". $stFiltro ."                                                         
+                        ) as tabela                                                                 
+                            ORDER BY                                                                            
+                            numeracao                            \n";
+
+    return $stSql;
+
+}
+
 
 function recuperaListaPagamentosLoteDA(&$rsRecordSet, $stCodLote = "", $boTransacao = "")
 {

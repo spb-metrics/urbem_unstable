@@ -27,7 +27,7 @@
 
     * Casos de uso: 
 
-    $Id: relatorioRREOAnexo8_receitas.plsql 61214 2014-12-16 19:49:31Z evandro $
+    $Id: relatorioRREOAnexo8_receitas.plsql 64924 2016-04-13 19:18:55Z lisiane $
 
 */
 
@@ -573,7 +573,7 @@ BEGIN
         INSERT INTO tmp_rreo_an8_receita VALUES (2, 1, 1, ''Parcela referente à CF, art. 159, I, alínea b'');
         
         UPDATE tmp_rreo_an8_receita SET ini = tbl.ini, atu = tbl.atu, no_bi = tbl.no_bi, ate_bi = tbl.ate_bi, pct = tbl.pct 
-        FROM stn.fn_rreo_valor_conta(''' || stExercicio || ''', ''R'', ''1.7.2.1.01.02.00.00.00'', ''' || stEntidades || ''', '''||stDtIni||''','''|| stDtFim||''', true, 2, 1, 1) tbl
+        FROM stn.fn_rreo_valor_conta(''' || stExercicio || ''', ''R'', ''1.7.2.1.01.02.01.00.00|1.7.2.1.01.02.02.00.00|1.7.2.1.01.02.04.00.00|1.7.2.1.01.02.06.00.00'', ''' || stEntidades || ''', '''||stDtIni||''','''|| stDtFim||''', true, 2, 1, 1) tbl
         WHERE tmp_rreo_an8_receita.grupo = tbl.grupo
         AND tmp_rreo_an8_receita.subgrupo = tbl.subgrupo
         AND tmp_rreo_an8_receita.item = tbl.item;
@@ -583,7 +583,7 @@ BEGIN
         INSERT INTO tmp_rreo_an8_receita VALUES (2, 1, 2, ''Parcela referente à CF, art. 159, I, alínea d'');
 
         UPDATE tmp_rreo_an8_receita SET ini = tbl.ini, atu = tbl.atu, no_bi = tbl.no_bi, ate_bi = tbl.ate_bi, pct = tbl.pct 
-        FROM stn.fn_rreo_valor_conta(''' || stExercicio || ''', ''R'', ''1.7.2.1.01.02.07.00.00'', ''' || stEntidades || ''', '''||stDtIni||''','''|| stDtFim||''', true, 2, 1, 2) tbl
+        FROM stn.fn_rreo_valor_conta(''' || stExercicio || ''', ''R'', ''1.7.2.1.01.02.07.00.00|1.7.2.1.01.02.04.00.00'', ''' || stEntidades || ''', '''||stDtIni||''','''|| stDtFim||''', true, 2, 1, 2) tbl
         WHERE tmp_rreo_an8_receita.grupo = tbl.grupo
         AND tmp_rreo_an8_receita.subgrupo = tbl.subgrupo
         AND tmp_rreo_an8_receita.item = tbl.item;
@@ -634,7 +634,7 @@ BEGIN
         --INSERT INTO tmp_rreo_an8_receita VALUES (3, 0, 0, ''TOTAL DA RECEITA BRUTA DE IMPOSTOS'', 0.00, 0.00, 0.00, 0.00, 0.00) ;
 
         ';
-        
+       
         EXECUTE stSQL;
     
         -- 

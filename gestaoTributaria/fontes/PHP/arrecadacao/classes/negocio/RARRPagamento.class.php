@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRPagamento.class.php 64341 2016-01-15 20:11:16Z evandro $
+    * $Id: RARRPagamento.class.php 64995 2016-04-18 18:40:22Z evandro $
 
    * Casos de uso: uc-05.03.10
 */
@@ -493,14 +493,17 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
 
         if ( $this->obRARRTipoPagamento->getPagamento() == "t" ) {
             // Verifica se a diferença do valor da parcela com o valor pago esta entre o limite
-            // de valor minimo/maximo definido na configuracao
+            // de valor minimo/maximo definido na configuracao                        
             $nuDifPagamento = (double) $nuValorTotalParcela - (double) $this->getValorPagamento();
-            if ($boPagamentoAutomatico == TRUE) {
-                if ($nuDifPagamento > 0) {
-                    $obErro = $this->salvarInconsistencia( $boTransacao );
-                    $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTARRPagamento );
-
-                    return $obErro;
+            if (!empty($vlValorMaximo) ) {
+                $vlValorMaximo = SistemaLegado::formataValorDecimal($vlValorMaximo, false);
+                $nuDifPagamentoMais = $nuDifPagamento * -1;
+                if ( ($nuDifPagamentoMais > 0) && ($nuDifPagamentoMais > $vlValorMaximo) ) {
+                    if ($boPagamentoAutomatico == TRUE) {
+                        $obErro = $this->salvarInconsistencia( $boTransacao );
+                        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTARRPagamento );
+                        return $obErro;
+                    }                
                 }
             }
 
@@ -510,7 +513,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                 $nuValorDifMaximo = $vlValorMaximo;
             }
 
-            //se pagou menos
+            //SE PAGOU MENOS
             $boExecutaLancamento = FALSE;
             $boPagamentoMenor    = FALSE;
             if ( (double) $this->getValorPagamento() < (double) $nuValorTotalParcela ) {
@@ -531,6 +534,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                 if ( (double) $this->getValorPagamento() < (double) $rsConsultaCredito->getCampo("vlr_parcela") ) {
                     $boPagamentoMenor = TRUE;
                 }
+            //SE PAGOU MAIS
             } else
                 if ( (double) $this->getValorPagamento() > (double) $nuValorTotalParcela ) {
                     $nuDifPagamento = $nuDifPagamento * -1;
@@ -578,11 +582,15 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
         $obTDATDividaParcela->setDado( "num_parcelamento", $rsConsultaCredito->getCampo("num_parcelamento") );
         $obTDATDividaParcela->setDado( "num_parcela", $rsConsultaCredito->getCampo("num_parcela") );
         $this->obRARRTipoPagamento->listarTipoPagamento( $rsListaTipo, $boTransacao );
-        if ( $this->obRARRTipoPagamento->getPagamento() == 't' )
-            $obTDATDividaParcela->setDado( "paga", true );
-        else
+        if ( $this->obRARRTipoPagamento->getPagamento() == 't' ){
+            $obTDATDividaParcela->setDado( "paga", true );        
+        }else{
             $obTDATDividaParcela->setDado( "cancelada", true );
-        $obTDATDividaParcela->alteracao( $boTransacao );
+        }
+        
+        $obErro = $obTDATDividaParcela->alteracao( $boTransacao );
+        if ( $obErro->ocorreu() )
+            return $obErro;
 
         //insere informaçoes do lote de pagamento manual
         if ($boPagamentoAutomatico == FALSE) {
@@ -627,21 +635,23 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
             $rsListaCalculos->proximo();
         }
 
-        $nuValorPagamentoCalculo = round( $rsListaValorParcela->getCampo("vlr_parcela") / $rsListaCalculos->getNumLinhas(), 2 );
+        $nuValorPagamentoCalculo = round( $rsListaValorParcela->getCampo("vlr_parcela") / $rsListaCalculos->getNumLinhas(), 2 );        
         $flValorReducao = $rsListaValorParcela->getCampo("vlr_parcela") - ( $nuValorPagamentoCalculo * $rsListaCalculos->getNumLinhas() );
 
         $rsListaCalculos->setPrimeiroElemento();
         while ( !$rsListaCalculos->Eof() ) {
             $flValorPorCredito = $rsListaCalculos->getCampo( "vl_credito" );
-            if ( $flValorPorCredito > 0.00 )
+            if ( $flValorPorCredito > 0.00 ){
                 $flValorAcrescimoPercent = ($flValorPorCredito * 100) / $flSomaCreditos;
-            else
+            }else{
                 $flValorAcrescimoPercent = 0.00;
+            }
 
             if ( $rsListaCalculos->getNumLinhas() < $rsListaCalculos->getCorrente()+1 ) {
                 $flValorFinal = $rsListaValorParcela->getCampo("vlr_parcela") - $flSomaValores;
-            }else
+            }else{
                 $flValorFinal = round( ($rsListaValorParcela->getCampo("vlr_parcela") * $flValorAcrescimoPercent) / 100, 2 );
+            }
 
             $flSomaValores += $flValorFinal;
             $inQtdCalculos++;
@@ -652,6 +662,8 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
             $this->obTARRPagamentoCalculo->setDado( "cod_convenio"         , $this->obRARRCarne->obRMONConvenio->getCodigoConvenio() );
             $this->obTARRPagamentoCalculo->setDado( "valor"                , $flValorFinal );
             $obErro = $this->obTARRPagamentoCalculo->inclusao( $boTransacao );
+            if ( $obErro->ocorreu() )
+                return $obErro;
 
             $nuTotal += $this->obTARRPagamentoCalculo->getDado("valor");
 
@@ -897,33 +909,35 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                             $vlValorMaximo = str_replace('.','',$vlValorMaximo);
                             $vlValorMaximo = number_format((double)$vlValorMaximo,2,'.','');                            
                             $nuValorDifMaximo = ( $nuValorTotalParcela * $vlValorMaximo) / 100;
-                        } else {
+                        } else {//absoluto
                             $nuValorDifMaximo = $vlValorMaximo;
                         }
 
                         //se pagou menos
                         $boExecutaLancamento = FALSE;
                         $boPagamentoMenor    = FALSE;
-
+                        //SE pagou o valor MENOR da parcela com os acrescimos para esta parcela
                         if ( $this->getValorPagamento() < $nuValorTotalParcela ) {
-                            if ($nuDifPagamento < $nuValorDifMaximo) {
+                            $nuValorDifMaximo = SistemaLegado::formataValorDecimal($nuValorDifMaximo, false);
+                            if ($nuDifPagamento < $nuValorDifMaximo) {                                
                                 if ($boPagamentoAutomatico) {
                                     $this->obRARRTipoPagamento->setCodigoTipo(6);
-                                    if( $this->obRARRConfiguracao->getMinimoLancamentoAutomatico() )
+                                    if( $this->obRARRConfiguracao->getMinimoLancamentoAutomatico() ){
                                         $boExecutaLancamento = TRUE;
+                                    }
                                 } else {
                                     if ($vlBaixaManual == 'bloqueia') {
                                         $obErro->setDescricao("O valor pago está abaixo da diferença de pagamento ( $nuDifPagamento ).");
                                     }
                                 }
                             }
+                            //Se pagou menos do valor da parcela sem acrescimos
                             if ( $this->getValorPagamento() < $rsLancamento->getCampo("valor_parcela") ) {
                                 $boPagamentoMenor = TRUE;
                             }                            
                             
-                        } elseif ( $this->getValorPagamento() > $nuValorTotalParcela ) {
-
-                            //$boPagamentoAcrescimo = TRUE;
+                        } elseif ( $this->getValorPagamento() > $nuValorTotalParcela ) {//SE pagou o valor MAIOR da parcela com os acrescimos para esta parcela
+                            
                             $nuDifPagamento = $nuDifPagamento * -1;
                             if ($nuDifPagamento > $nuValorDifMaximo) {
                                 if ($boPagamentoAutomatico == TRUE) {
@@ -1123,7 +1137,6 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
 
                             } else {
 
-                                //$boPagamentoAcrescimo = FALSE;
                                 $boParamentoIgual     = FALSE;
                                 $nuValorCalculo       = $rsLancamento->getCampo('valor');                                
 
@@ -1188,6 +1201,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                                 }
                                             }
                                         }
+
                                         if ( $rsLancamento->getCampo('valor') == 0 ) {
                                             $nuValorCalculo = 0;
                                         }
@@ -1249,7 +1263,10 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                 }
 
                                 $nuTotal += $this->obTARRPagamentoCalculo->getDado("valor");
-                                $obErro = $this->obTARRPagamentoCalculo->inclusao( $boTransacao );
+                                $obErro = $this->obTARRPagamentoCalculo->inclusao( $boTransacao );                                
+                                if ( $obErro->ocorreu() ){
+                                    return $obErro;
+                                }
                             }
                             $rsLancamento->proximo();
                         }
@@ -1358,7 +1375,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                                     $this->obTARRPagamentoAcrescimo->setDado( "valor" , $rsConsultaCredito->getCampo('valor_credito_correcao') );
                                     $nuTotalCaluloPagamentoDiff = $rsConsultaCredito->getCampo('valor_credito_correcao');
                                 }else{
-                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , (floor($nuValorPagoTmp*100)/100) );
+                                    $this->obTARRPagamentoAcrescimo->setDado( "valor" , (round(($nuValorPagoTmp*100),8)/100) );
                                     $nuTotalCaluloPagamentoDiff = $nuValorPagoTmp;
                                 }
                                 $nuValorPagoTmp -= $rsConsultaCredito->getCampo('valor_credito_correcao');

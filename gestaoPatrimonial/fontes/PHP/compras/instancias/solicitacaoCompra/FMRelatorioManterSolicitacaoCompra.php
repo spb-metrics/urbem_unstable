@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: FMRelatorioManterSolicitacaoCompra.php 62979 2015-07-14 16:18:54Z michel $
+  $Id: FMRelatorioManterSolicitacaoCompra.php 65105 2016-04-25 19:30:38Z jean $
 
   Caso de uso: uc-03.04.01
 
@@ -61,7 +61,7 @@ $obBirtPreview->addParametro ("exercicio"               , Sessao::getExercicio()
 $obBirtPreview->addParametro ("exercicio_solicitacao"   , $_REQUEST['exercicio'] );
 $obBirtPreview->addParametro ("cod_acao"                , 1580 );
 $obBirtPreview->addParametro ("incluir_assinaturas"     , $boIncluirAssinaturas);
-$obBirtPreview->addParametro ("boRegistroPreco"         , ($_REQUEST['boRegistroPreco']=='true') ? 'Sim' : 'Não' );
+$obBirtPreview->addParametro ("boRegistroPreco"         , ($_REQUEST['boRegistroPreco']=='t') ? 'Sim' : 'Não' );
 $obBirtPreview->addAssinaturas( Sessao::read('assinaturas'));
 
 $obBirtPreview->preview();

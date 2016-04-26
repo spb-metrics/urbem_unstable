@@ -36,7 +36,7 @@
     * Casos de uso: uc-03.05.25
                     uc-03.05.26
 
-    $Id: TComprasCotacaoFornecedorItem.class.php 64411 2016-02-18 15:55:59Z arthur $
+    $Id: TComprasCotacaoFornecedorItem.class.php 64900 2016-04-12 18:44:26Z michel $
 
 */
 
@@ -626,6 +626,16 @@ class TComprasCotacaoFornecedorItem extends Persistente
                        AND mapa_solicitacao.cod_mapa              = mapa_item.cod_mapa
                        AND mapa_solicitacao.exercicio_solicitacao = mapa_item.exercicio_solicitacao
 
+                 LEFT JOIN compras.mapa_item_dotacao
+                        ON mapa_item.exercicio             = mapa_item_dotacao.exercicio
+                       AND mapa_item.cod_mapa              = mapa_item_dotacao.cod_mapa
+                       AND mapa_item.exercicio_solicitacao = mapa_item_dotacao.exercicio_solicitacao
+                       AND mapa_item.cod_entidade          = mapa_item_dotacao.cod_entidade
+                       AND mapa_item.cod_solicitacao       = mapa_item_dotacao.cod_solicitacao
+                       AND mapa_item.cod_centro            = mapa_item_dotacao.cod_centro
+                       AND mapa_item.cod_item              = mapa_item_dotacao.cod_item
+                       AND mapa_item.lote                  = mapa_item_dotacao.lote  
+
                  LEFT JOIN empenho.item_pre_empenho_julgamento
                         ON item_pre_empenho_julgamento.exercicio_julgamento = adjudicacao.exercicio_cotacao
                        AND item_pre_empenho_julgamento.cod_cotacao          = adjudicacao.cod_cotacao
@@ -633,10 +643,19 @@ class TComprasCotacaoFornecedorItem extends Persistente
                        AND item_pre_empenho_julgamento.lote                 = adjudicacao.lote
                        AND item_pre_empenho_julgamento.cgm_fornecedor       = adjudicacao.cgm_fornecedor
 
-                 LEFT JOIN empenho.item_pre_empenho
+                 LEFT JOIN ( SELECT item_pre_empenho.*
+                                  , pre_empenho_despesa.cod_despesa
+                               FROM empenho.item_pre_empenho
+                         INNER JOIN empenho.pre_empenho_despesa
+                                 ON pre_empenho_despesa.cod_pre_empenho = item_pre_empenho.cod_pre_empenho
+                                AND pre_empenho_despesa.exercicio       = item_pre_empenho.exercicio
+                           ) AS item_pre_empenho
                         ON item_pre_empenho.cod_pre_empenho = item_pre_empenho_julgamento.cod_pre_empenho
                        AND item_pre_empenho.exercicio       = item_pre_empenho_julgamento.exercicio
                        AND item_pre_empenho.num_item        = item_pre_empenho_julgamento.num_item
+                       AND (     mapa_item_dotacao.cod_despesa IS NULL
+                             OR  item_pre_empenho.cod_despesa  = mapa_item_dotacao.cod_despesa
+                           )
 
                 INNER JOIN sw_cgm
                         ON sw_cgm.numcgm = julgamento_item.cgm_fornecedor

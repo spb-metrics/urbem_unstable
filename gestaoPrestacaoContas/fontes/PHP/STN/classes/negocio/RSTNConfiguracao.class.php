@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: RSTNConfiguracao.class.php 64789 2016-03-31 20:15:38Z michel $
+ * $Id: RSTNConfiguracao.class.php 65034 2016-04-19 20:58:40Z michel $
  */
 
 include_once CAM_FW_INCLUDE         . 'valida.inc.php';
@@ -236,16 +236,13 @@ class RSTNConfiguracao
             $this->obTSTNDespesaPessoal->setDado           ('cod_entidade', $this->obROrcamentoEntidade->inCodigoEntidade);
             $this->obTSTNDespesaPessoal->setDado           ('mes'         , $this->inMes);
             $this->obTSTNDespesaPessoal->setDado           ('ano'         , $this->inAno);
-            if ($this->obROrcamentoEntidade->stExercicio >= '2016') {
-                $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_ativo'        , $this->nuValorPessoalAtivo );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_inativo'      , $this->nuValorPessoalInativo );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_terceirizacao'        , $this->nuValorOutrasDespesas );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_indenizacoes'         , $this->nuValorIndenizacoes );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_decisao_judicial'     , $this->nuValorDecisaoJudicial );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_exercicios_anteriores', $this->nuValorExercicioAnterior );
-                $this->obTSTNDespesaPessoal->setDado           ('valor_inativos_pensionistas', $this->nuValorInativosPensionista );
-            }
-            
+            $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_ativo'        , $this->nuValorPessoalAtivo );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_pessoal_inativo'      , $this->nuValorPessoalInativo );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_terceirizacao'        , $this->nuValorOutrasDespesas );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_indenizacoes'         , $this->nuValorIndenizacoes );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_decisao_judicial'     , $this->nuValorDecisaoJudicial );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_exercicios_anteriores', $this->nuValorExercicioAnterior );
+            $this->obTSTNDespesaPessoal->setDado           ('valor_inativos_pensionistas', $this->nuValorInativosPensionista );
             $this->obTSTNDespesaPessoal->setDado           ('valor'                      , $this->flValor );
 
             //Verifica se ja existe o registro na base

@@ -33,10 +33,10 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 60510 $
+    $Revision: 65015 $
     $Name$
     $Author: franver $
-    $Date: 2014-10-24 16:49:48 -0200 (Sex, 24 Out 2014) $
+    $Date: 2016-04-19 09:32:42 -0300 (Ter, 19 Abr 2016) $
 
     * Casos de uso: uc-06.04.00
     $Id : $
@@ -818,11 +818,11 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                 AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
 
          INNER JOIN empenho.pagamento_liquidacao
-                 ON pagamento_liquidacao_nota_liquidacao_paga.exercicio    = pagamento_liquidacao.exercicio_liquidacao
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade = pagamento_liquidacao.cod_entidade
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota     = pagamento_liquidacao.cod_nota
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem    = pagamento_liquidacao.cod_ordem
-                AND pagamento_liquidacao_nota_liquidacao_paga.exercicio    = pagamento_liquidacao.exercicio
+                 ON pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = pagamento_liquidacao.exercicio_liquidacao
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = pagamento_liquidacao.cod_entidade
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = pagamento_liquidacao.cod_nota
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem            = pagamento_liquidacao.cod_ordem
+                AND pagamento_liquidacao_nota_liquidacao_paga.exercicio            = pagamento_liquidacao.exercicio
 
          INNER JOIN empenho.ordem_pagamento
                  ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
@@ -1152,11 +1152,11 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                 AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
 
          INNER JOIN empenho.pagamento_liquidacao
-                 ON pagamento_liquidacao_nota_liquidacao_paga.exercicio    = pagamento_liquidacao.exercicio_liquidacao
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade = pagamento_liquidacao.cod_entidade
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota     = pagamento_liquidacao.cod_nota
-                AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem    = pagamento_liquidacao.cod_ordem
-                AND pagamento_liquidacao_nota_liquidacao_paga.exercicio    = pagamento_liquidacao.exercicio
+                 ON pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = pagamento_liquidacao.exercicio_liquidacao
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = pagamento_liquidacao.cod_entidade
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = pagamento_liquidacao.cod_nota
+                AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem            = pagamento_liquidacao.cod_ordem
+                AND pagamento_liquidacao_nota_liquidacao_paga.exercicio            = pagamento_liquidacao.exercicio
 
          INNER JOIN empenho.ordem_pagamento
                  ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
@@ -2278,5 +2278,514 @@ function recuperaOrdemPagamentoRetencao(&$rsRecordSet,$stFiltro="",$stOrder="",$
 {
     return $this->executaRecupera('montaRecuperaOrdemPagamentoRetencao',$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
 }
-
+    
+    public function recuperaOrdemPagamentoFonteRecursos2016(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera('montaRecuperaOrdemPagamentoFonteRecursos2016',$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+    
+    public function montaRecuperaOrdemPagamentoFonteRecursos2016()
+    {
+        $stSql = "
+          SELECT *
+            FROM (
+                  SELECT '13' AS TipoRegistro
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN LPAD(programa.num_programa::varchar, 4, '0')
+                                         ELSE LPAD(programa.num_programa::varchar, 4, '0')
+                                     END)
+                              ELSE '0000'
+                          END AS CodPrograma
+                       , LPAD(despesa.num_orgao::varchar, 2, '0') AS CodOrgao
+                       , LPAD(despesa.num_unidade::varchar, 2, '0') AS CodUnidade
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN LPAD(despesa.cod_funcao::varchar, 2, '0')
+                                         ELSE LPAD(despesa.cod_funcao::varchar, 2, '0')
+                                     END)
+                              ELSE '00'
+                          END AS CodFuncao
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN despesa.cod_subfuncao::varchar
+                                         ELSE LPAD(despesa.cod_subfuncao::varchar, 03, '0')
+                                     END)
+                              ELSE '000'
+                          END AS CodSubFuncao
+                       , LPAD(SUBSTR(LPAD(acao.num_acao::varchar, 4, '0'), 1, 1), 6, '0') AS NaturezaAcao
+                       , SUBSTR(LPAD(acao.num_acao::varchar, 4, '0'), 2, 3) AS NroProjAtiv
+                       , SUBSTR(REPLACE(conta_despesa.cod_estrutural,'.',''),1,6) AS elementodespesa
+                       , CASE WHEN( elemento_de_para.estrutural IS NOT NULL )
+                              THEN SUBSTR(REPLACE(elemento_de_para.estrutural,'.',''),7,2)
+                              ELSE '00'
+                          END AS subelemento
+                       , CASE WHEN nota_liquidacao.exercicio_empenho <= '2001' AND pre_empenho.implantado
+                              THEN LPAD(despesa.num_unidade::varchar  , 4, '0')
+                                || LPAD(despesa.cod_funcao::varchar   , 2, '0')
+                                || LPAD(despesa.cod_programa::varchar , 2, '0')
+                                || LPAD(despesa.cod_subfuncao::varchar, 3, '0')
+                                || LPAD(despesa.num_pao::varchar      , 6, '0')
+                                || SUBSTR(REPLACE( conta_despesa.cod_estrutural, '.', ''),1, 6)
+                              ELSE LPAD('', 21, '0')
+                          END AS DotOrigp2001
+                       , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroEmpenho
+                       , ordem_pagamento.cod_ordem AS nroop 
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999'
+                              ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
+                          END AS Banco
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999'
+                              ELSE LPAD(BTRIM(REPLACE(COALESCE(agencia.num_agencia, '0'),'-','')), 6, '0')
+                          END AS Agencia
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999999999'
+                              ELSE LPAD(BTRIM(REPLACE(SPLIT_PART(COALESCE(conta_corrente.num_conta_corrente,'0'), '-', 1), '-', '')), 12, '0')
+                          END AS ContaCorrente
+                       , LTRIM(split_part(conta_corrente.num_conta_corrente,'-',2),'0') AS contaCorrenteDigVerif
+                       , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
+                              THEN '03'
+                              WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
+                              THEN '02'
+                              ELSE '01'
+                          END as tipo_conta 
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999999999999'
+                              ELSE nota_liquidacao_paga.nrdocumento
+                          END AS nrdocumento
+                       , recurso.cod_fonte AS codFonteRecurso
+                       , pagamento_liquidacao.vl_pagamento
+                       , '' AS Brancos
+                       , 0 AS numero_sequencial
+                       , (sum(pagamento_liquidacao.vl_pagamento) -  coalesce(sum(vl_retencao),0.00)) as vl_retencao
+                       , FALSE AS tipo_retencao
+                    FROM ( SELECT nlp.exercicio
+                                , nlp.cod_nota
+                                , nlp.cod_entidade
+                                , vl_pago as valor
+                                , nlcp.exercicio AS exercicio_plano
+                                , nlcp.cod_plano
+                                , tipo_documento.cod_tipo as tipo_doc
+                                , tipo_documento.descricao as descricao_doc
+                                , pagamento_tipo_documento.num_documento as nrDocumento
+                                , nlp.timestamp
+                             FROM empenho.nota_liquidacao_paga as nlp
+                        LEFT JOIN empenho.nota_liquidacao_paga_anulada as nlpa
+                               ON nlp.exercicio    = nlpa.exercicio
+                              AND nlp.cod_nota     = nlpa.cod_nota
+                              AND nlp.cod_entidade = nlpa.cod_entidade
+                              AND nlp.timestamp    = nlpa.timestamp
+                       INNER JOIN empenho.nota_liquidacao_conta_pagadora as nlcp
+                               ON nlp.exercicio    = nlcp.exercicio_liquidacao
+                              AND nlp.cod_nota     = nlcp.cod_nota
+                              AND nlp.cod_entidade = nlcp.cod_entidade
+                              AND nlp.timestamp    = nlcp.timestamp
+                        LEFT JOIN contabilidade.pagamento
+                               ON pagamento.exercicio_liquidacao = nlp.exercicio
+                              AND pagamento.cod_entidade         = nlp.cod_entidade
+                              AND pagamento.cod_nota             = nlp.cod_nota
+                              AND pagamento.timestamp            = nlp.timestamp
+                        LEFT JOIN contabilidade.lancamento
+                               ON lancamento.exercicio    = pagamento.exercicio
+                              AND lancamento.cod_entidade = pagamento.cod_entidade
+                              AND lancamento.cod_lote     = pagamento.cod_lote
+                              AND lancamento.sequencia    = pagamento.sequencia
+                              AND lancamento.tipo         = pagamento.tipo
+                        INNER JOIN tesouraria.pagamento_tipo_documento
+                               ON pagamento_tipo_documento.cod_nota     = nlp.cod_nota
+                              AND pagamento_tipo_documento.exercicio    = nlp.exercicio
+                              AND pagamento_tipo_documento.cod_entidade = nlp.cod_entidade
+                              AND pagamento_tipo_documento.timestamp    = nlp.timestamp
+                        LEFT JOIN tcmgo.tipo_documento
+                               ON tcmgo.tipo_documento.cod_tipo  =  pagamento_tipo_documento.cod_tipo_documento
+                            WHERE nlp.timestamp BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
+                                                    AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                         ORDER BY cod_nota
+                         ) as nota_liquidacao_paga
+              INNER JOIN empenho.nota_liquidacao
+                      ON nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio
+                     AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
+                     AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
+              INNER JOIN empenho.empenho
+                      ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                     AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                     AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
+              INNER JOIN empenho.pre_empenho
+                      ON pre_empenho.exercicio       = empenho.exercicio
+                     AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+              INNER JOIN empenho.pre_empenho_despesa
+                      ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio
+                     AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+              INNER JOIN orcamento.despesa
+                      ON despesa.exercicio   = pre_empenho_despesa.exercicio
+                     AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+              INNER JOIN orcamento.pao
+                      ON pao.num_pao   = despesa.num_pao
+                     AND pao.exercicio = despesa.exercicio
+              INNER JOIN orcamento.pao_ppa_acao
+                      ON pao_ppa_acao.exercicio = pao.exercicio
+                     AND pao_ppa_acao.num_pao   = pao.num_pao
+              INNER JOIN ppa.acao
+                      ON acao.cod_acao = pao_ppa_acao.cod_acao
+              INNER JOIN orcamento.programa AS o_programa
+                      ON o_programa.cod_programa = despesa.cod_programa
+                     AND o_programa.exercicio    = despesa.exercicio
+              INNER JOIN orcamento.programa_ppa_programa
+                      ON programa_ppa_programa.cod_programa = o_programa.cod_programa
+                     AND programa_ppa_programa.exercicio    = o_programa.exercicio
+              INNER JOIN ppa.programa
+                      ON programa.cod_programa = programa_ppa_programa.cod_programa_ppa
+              INNER JOIN orcamento.conta_despesa
+                      ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                     AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+               LEFT JOIN tcmgo.elemento_de_para
+                      ON elemento_de_para.cod_conta = conta_despesa.cod_conta
+                     AND elemento_de_para.exercicio = conta_despesa.exercicio
+              INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
+                      ON nota_liquidacao_paga.cod_entidade = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
+                     AND nota_liquidacao_paga.cod_nota     = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
+                     AND nota_liquidacao_paga.exercicio    = pagamento_liquidacao_nota_liquidacao_paga.exercicio
+                     AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
+              INNER JOIN empenho.pagamento_liquidacao
+                      ON pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = pagamento_liquidacao.exercicio_liquidacao
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = pagamento_liquidacao.cod_entidade
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = pagamento_liquidacao.cod_nota
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem            = pagamento_liquidacao.cod_ordem
+                     AND pagamento_liquidacao_nota_liquidacao_paga.exercicio            = pagamento_liquidacao.exercicio
+              INNER JOIN empenho.ordem_pagamento
+                      ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
+                     AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
+                     AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+               LEFT JOIN (
+                          SELECT ordem_pagamento_retencao.cod_ordem
+                               , ordem_pagamento_retencao.cod_entidade
+                               , ordem_pagamento_retencao.exercicio
+                               , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
+                            FROM empenho.ordem_pagamento_retencao
+                      INNER JOIN contabilidade.plano_analitica
+                              ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
+                             AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
+                      INNER JOIN contabilidade.plano_conta
+                              ON plano_conta.cod_conta = plano_analitica.cod_conta
+                             AND plano_conta.exercicio = plano_analitica.exercicio
+                        GROUP BY ordem_pagamento_retencao.cod_ordem
+                               , ordem_pagamento_retencao.cod_entidade
+                               , ordem_pagamento_retencao.exercicio
+                         ) as retencao
+                      ON ordem_pagamento.cod_ordem    = retencao.cod_ordem
+                     AND ordem_pagamento.cod_entidade = retencao.cod_entidade
+                     AND ordem_pagamento.exercicio    = retencao.exercicio
+              INNER JOIN contabilidade.plano_analitica
+                      ON plano_analitica.cod_plano = nota_liquidacao_paga.cod_plano
+                     AND plano_analitica.exercicio = nota_liquidacao_paga.exercicio_plano
+              INNER JOIN contabilidade.plano_conta
+                      ON plano_conta.cod_conta = plano_analitica.cod_conta
+                     AND plano_conta.exercicio = plano_analitica.exercicio
+              INNER JOIN contabilidade.plano_banco
+                      ON plano_analitica.cod_plano = plano_banco.cod_plano
+                     AND plano_analitica.exercicio = plano_banco.exercicio
+              INNER JOIN monetario.conta_corrente
+                      ON conta_corrente.cod_banco          = plano_banco.cod_banco
+                     AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
+                     AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
+              INNER JOIN monetario.agencia
+                      ON agencia.cod_banco   = conta_corrente.cod_banco
+                     AND agencia.cod_agencia = conta_corrente.cod_agencia
+              INNER JOIN monetario.banco
+                      ON agencia.cod_banco = banco.cod_banco
+              INNER JOIN contabilidade.plano_recurso
+                      ON plano_recurso.exercicio = plano_analitica.exercicio
+                     AND plano_recurso.cod_plano = plano_analitica.cod_plano
+              INNER JOIN orcamento.recurso
+                      ON recurso.exercicio   = plano_recurso.exercicio
+                     AND recurso.cod_recurso = plano_recurso.cod_recurso
+                   WHERE ordem_pagamento.exercicio = '".$this->getDado('exercicio')."'
+                GROUP BY TipoRegistro
+                       , CodPrograma
+                       , CodOrgao
+                       , CodUnidade
+                       , CodFuncao
+                       , CodSubFuncao
+                       , NaturezaAcao
+                       , NroProjAtiv
+                       , elementodespesa
+                       , subelemento
+                       , DotOrigp2001
+                       , nroEmpenho
+                       , nroop 
+                       , Banco
+                       , Agencia
+                       , ContaCorrente
+                       , contaCorrenteDigVerif
+                       , nota_liquidacao_paga.nrdocumento
+                       , codFonteRecurso
+                       , plano_conta.cod_estrutural
+                       , pagamento_liquidacao.vl_pagamento
+                   UNION 
+                  SELECT '13' AS TipoRegistro
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN LPAD(programa.num_programa::varchar, 4, '0')
+                                         ELSE LPAD(programa.num_programa::varchar, 4, '0')
+                                     END)
+                              ELSE '0000'
+                          END AS CodPrograma
+                       , LPAD(despesa.num_orgao::varchar, 2, '0') AS CodOrgao
+                       , LPAD(despesa.num_unidade::varchar, 2, '0') AS CodUnidade
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN LPAD(despesa.cod_funcao::varchar, 2, '0')
+                                         ELSE LPAD(despesa.cod_funcao::varchar, 2, '0')
+                                     END)
+                              ELSE '00'
+                          END AS CodFuncao
+                       , CASE WHEN nota_liquidacao.exercicio_empenho > '2001'
+                              THEN (
+                                    CASE WHEN NOT pre_empenho.implantado
+                                         THEN despesa.cod_subfuncao::varchar
+                                         ELSE LPAD(despesa.cod_subfuncao::varchar, 03, '0')
+                                     END)
+                              ELSE '000'
+                          END AS CodSubFuncao
+                       , LPAD(SUBSTR(LPAD(acao.num_acao::varchar, 4, '0'), 1, 1), 6, '0') AS NaturezaAcao
+                       , SUBSTR(LPAD(acao.num_acao::varchar, 4, '0'), 2, 3) AS NroProjAtiv
+                       , SUBSTR(REPLACE(conta_despesa.cod_estrutural,'.',''),1,6) AS elementodespesa
+                       , CASE WHEN( elemento_de_para.estrutural IS NOT NULL )
+                              THEN SUBSTR(REPLACE(elemento_de_para.estrutural,'.',''),7,2)
+                              ELSE '00'
+                          END AS subelemento
+                       , CASE WHEN nota_liquidacao.exercicio_empenho <= '2001' AND pre_empenho.implantado
+                              THEN LPAD(despesa.num_unidade::varchar  , 4, '0')
+                                || LPAD(despesa.cod_funcao::varchar   , 2, '0')
+                                || LPAD(despesa.cod_programa::varchar , 2, '0')
+                                || LPAD(despesa.cod_subfuncao::varchar, 3, '0')
+                                || LPAD(despesa.num_pao::varchar      , 6, '0')
+                                || SUBSTR(REPLACE( conta_despesa.cod_estrutural, '.', ''),1, 6)
+                              ELSE LPAD('', 21, '0')
+                          END AS DotOrigp2001
+                       , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroEmpenho
+                       , ordem_pagamento.cod_ordem AS nroop 
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999'
+                              ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
+                          END AS Banco
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999'
+                              ELSE LPAD(BTRIM(REPLACE(COALESCE(agencia.num_agencia, '0'),'-','')), 6, '0')
+                          END AS Agencia
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999999999'
+                              ELSE LPAD(BTRIM(REPLACE(SPLIT_PART(COALESCE(conta_corrente.num_conta_corrente,'0'), '-', 1), '-', '')), 12, '0')
+                          END AS ContaCorrente
+                       , LTRIM(split_part(conta_corrente.num_conta_corrente,'-',2),'0') AS contaCorrenteDigVerif
+                       , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
+                              THEN '03'
+                              WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
+                              THEN '02'
+                              ELSE '01'
+                          END as tipo_conta 
+                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                              THEN '999999999999999'
+                              ELSE nota_liquidacao_paga.nrdocumento
+                          END AS nrdocumento
+                       , recurso.cod_fonte AS codFonteRecurso
+                       , pagamento_liquidacao.vl_pagamento
+                       , '' AS Brancos
+                       , 0 AS numero_sequencial
+                       , coalesce(vl_retencao,0.00) as vl_retencao
+                       , TRUE AS tipo_retencao
+                    FROM ( SELECT nlp.exercicio
+                                , nlp.cod_nota
+                                , nlp.cod_entidade
+                                , vl_pago as valor
+                                , nlcp.exercicio AS exercicio_plano
+                                , nlcp.cod_plano
+                                , tipo_documento.cod_tipo as tipo_doc
+                                , tipo_documento.descricao as descricao_doc
+                                , pagamento_tipo_documento.num_documento as nrDocumento
+                                , nlp.timestamp
+                             FROM empenho.nota_liquidacao_paga as nlp
+                        LEFT JOIN empenho.nota_liquidacao_paga_anulada as nlpa
+                               ON nlp.exercicio    = nlpa.exercicio
+                              AND nlp.cod_nota     = nlpa.cod_nota
+                              AND nlp.cod_entidade = nlpa.cod_entidade
+                              AND nlp.timestamp    = nlpa.timestamp
+                       INNER JOIN empenho.nota_liquidacao_conta_pagadora as nlcp
+                               ON nlp.exercicio    = nlcp.exercicio_liquidacao
+                              AND nlp.cod_nota     = nlcp.cod_nota
+                              AND nlp.cod_entidade = nlcp.cod_entidade
+                              AND nlp.timestamp    = nlcp.timestamp
+                        LEFT JOIN contabilidade.pagamento
+                               ON pagamento.exercicio_liquidacao = nlp.exercicio
+                              AND pagamento.cod_entidade         = nlp.cod_entidade
+                              AND pagamento.cod_nota             = nlp.cod_nota
+                              AND pagamento.timestamp            = nlp.timestamp
+                        LEFT JOIN contabilidade.lancamento
+                               ON lancamento.exercicio    = pagamento.exercicio
+                              AND lancamento.cod_entidade = pagamento.cod_entidade
+                              AND lancamento.cod_lote     = pagamento.cod_lote
+                              AND lancamento.sequencia    = pagamento.sequencia
+                              AND lancamento.tipo         = pagamento.tipo
+                       INNER JOIN contabilidade.lancamento_retencao
+                               ON lancamento_retencao.cod_lote     = lancamento.cod_lote
+                              AND lancamento_retencao.tipo         = lancamento.tipo
+                              AND lancamento_retencao.sequencia    = lancamento.sequencia
+                              AND lancamento_retencao.exercicio    = lancamento.exercicio
+                              AND lancamento_retencao.cod_entidade = lancamento.cod_entidade
+                       INNER JOIN tesouraria.pagamento_tipo_documento  
+                               ON pagamento_tipo_documento.cod_nota     = nlp.cod_nota
+                              AND pagamento_tipo_documento.exercicio    = nlp.exercicio
+                              AND pagamento_tipo_documento.cod_entidade = nlp.cod_entidade
+                        LEFT JOIN tcmgo.tipo_documento
+                               ON tcmgo.tipo_documento.cod_tipo  =  pagamento_tipo_documento.cod_tipo_documento
+                            WHERE nlp.timestamp BETWEEN TO_DATE('".$this->getDado('dtInicio')."','dd/mm/yyyy')
+                                                    AND TO_DATE('".$this->getDado('dtFim')."','dd/mm/yyyy')
+                         ORDER BY cod_nota
+                         ) as nota_liquidacao_paga
+              INNER JOIN empenho.nota_liquidacao
+                      ON nota_liquidacao.exercicio    = nota_liquidacao_paga.exercicio
+                     AND nota_liquidacao.cod_entidade = nota_liquidacao_paga.cod_entidade
+                     AND nota_liquidacao.cod_nota     = nota_liquidacao_paga.cod_nota
+              INNER JOIN empenho.empenho
+                      ON empenho.exercicio    = nota_liquidacao.exercicio_empenho
+                     AND empenho.cod_entidade = nota_liquidacao.cod_entidade
+                     AND empenho.cod_empenho  = nota_liquidacao.cod_empenho
+              INNER JOIN empenho.pre_empenho
+                      ON pre_empenho.exercicio       = empenho.exercicio
+                     AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+              INNER JOIN empenho.pre_empenho_despesa
+                      ON pre_empenho.exercicio       = pre_empenho_despesa.exercicio
+                     AND pre_empenho.cod_pre_empenho = pre_empenho_despesa.cod_pre_empenho
+              INNER JOIN orcamento.despesa
+                      ON despesa.exercicio   = pre_empenho_despesa.exercicio
+                     AND despesa.cod_despesa = pre_empenho_despesa.cod_despesa
+              INNER JOIN orcamento.pao
+                      ON pao.num_pao   = despesa.num_pao
+                     AND pao.exercicio = despesa.exercicio
+              INNER JOIN orcamento.pao_ppa_acao
+                      ON pao_ppa_acao.exercicio = pao.exercicio
+                     AND pao_ppa_acao.num_pao   = pao.num_pao
+              INNER JOIN ppa.acao
+                      ON acao.cod_acao = pao_ppa_acao.cod_acao
+              INNER JOIN orcamento.programa AS o_programa
+                      ON o_programa.cod_programa = despesa.cod_programa
+                     AND o_programa.exercicio    = despesa.exercicio
+              INNER JOIN orcamento.programa_ppa_programa
+                      ON programa_ppa_programa.cod_programa = o_programa.cod_programa
+                     AND programa_ppa_programa.exercicio    = o_programa.exercicio
+              INNER JOIN ppa.programa
+                      ON programa.cod_programa = programa_ppa_programa.cod_programa_ppa
+              INNER JOIN orcamento.conta_despesa
+                      ON conta_despesa.exercicio = pre_empenho_despesa.exercicio
+                     AND conta_despesa.cod_conta = pre_empenho_despesa.cod_conta
+               LEFT JOIN tcmgo.elemento_de_para
+                      ON elemento_de_para.cod_conta = conta_despesa.cod_conta
+                     AND elemento_de_para.exercicio = conta_despesa.exercicio
+              INNER JOIN empenho.pagamento_liquidacao_nota_liquidacao_paga
+                      ON nota_liquidacao_paga.cod_entidade = pagamento_liquidacao_nota_liquidacao_paga.cod_entidade
+                     AND nota_liquidacao_paga.cod_nota     = pagamento_liquidacao_nota_liquidacao_paga.cod_nota
+                     AND nota_liquidacao_paga.exercicio    = pagamento_liquidacao_nota_liquidacao_paga.exercicio
+                     AND nota_liquidacao_paga.timestamp    = pagamento_liquidacao_nota_liquidacao_paga.timestamp
+              INNER JOIN empenho.pagamento_liquidacao
+                      ON pagamento_liquidacao_nota_liquidacao_paga.exercicio_liquidacao = pagamento_liquidacao.exercicio_liquidacao
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_entidade         = pagamento_liquidacao.cod_entidade
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_nota             = pagamento_liquidacao.cod_nota
+                     AND pagamento_liquidacao_nota_liquidacao_paga.cod_ordem            = pagamento_liquidacao.cod_ordem
+                     AND pagamento_liquidacao_nota_liquidacao_paga.exercicio            = pagamento_liquidacao.exercicio
+              INNER JOIN empenho.ordem_pagamento
+                      ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
+                     AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
+                     AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+              INNER JOIN (
+                          SELECT ordem_pagamento_retencao.cod_ordem
+                               , ordem_pagamento_retencao.cod_entidade
+                               , ordem_pagamento_retencao.exercicio
+                               , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
+                            FROM empenho.ordem_pagamento_retencao
+                      INNER JOIN contabilidade.plano_analitica
+                              ON ordem_pagamento_retencao.cod_plano = plano_analitica.cod_plano
+                             AND ordem_pagamento_retencao.exercicio = plano_analitica.exercicio
+                      INNER JOIN contabilidade.plano_conta
+                              ON plano_conta.cod_conta = plano_analitica.cod_conta
+                             AND plano_conta.exercicio = plano_analitica.exercicio
+                        GROUP BY ordem_pagamento_retencao.cod_ordem
+                               , ordem_pagamento_retencao.cod_entidade
+                               , ordem_pagamento_retencao.exercicio
+                         ) as retencao
+                      ON ordem_pagamento.cod_ordem    = retencao.cod_ordem
+                     AND ordem_pagamento.cod_entidade = retencao.cod_entidade
+                     AND ordem_pagamento.exercicio    = retencao.exercicio
+              INNER JOIN contabilidade.plano_analitica
+                      ON plano_analitica.cod_plano = nota_liquidacao_paga.cod_plano
+                     AND plano_analitica.exercicio = nota_liquidacao_paga.exercicio_plano
+              INNER JOIN contabilidade.plano_conta
+                      ON plano_conta.cod_conta = plano_analitica.cod_conta
+                     AND plano_conta.exercicio = plano_analitica.exercicio
+              INNER JOIN contabilidade.plano_banco
+                      ON plano_analitica.cod_plano = plano_banco.cod_plano
+                     AND plano_analitica.exercicio = plano_banco.exercicio
+              INNER JOIN monetario.conta_corrente
+                      ON conta_corrente.cod_banco          = plano_banco.cod_banco
+                     AND conta_corrente.cod_agencia        = plano_banco.cod_agencia
+                     AND conta_corrente.cod_conta_corrente = plano_banco.cod_conta_corrente
+              INNER JOIN monetario.agencia
+                      ON agencia.cod_banco   = conta_corrente.cod_banco
+                     AND agencia.cod_agencia = conta_corrente.cod_agencia
+              INNER JOIN monetario.banco
+                      ON agencia.cod_banco = banco.cod_banco
+              INNER JOIN contabilidade.plano_recurso
+                      ON plano_recurso.exercicio = plano_analitica.exercicio
+                     AND plano_recurso.cod_plano = plano_analitica.cod_plano
+              INNER JOIN orcamento.recurso
+                      ON recurso.exercicio   = plano_recurso.exercicio
+                     AND recurso.cod_recurso = plano_recurso.cod_recurso
+                   WHERE ordem_pagamento.exercicio = '".$this->getDado('exercicio')."'
+                GROUP BY TipoRegistro
+                       , CodPrograma
+                       , CodOrgao
+                       , CodUnidade
+                       , CodFuncao
+                       , CodSubFuncao
+                       , NaturezaAcao
+                       , NroProjAtiv
+                       , elementodespesa
+                       , subelemento
+                       , DotOrigp2001
+                       , nroEmpenho
+                       , nroop 
+                       , Banco
+                       , Agencia
+                       , ContaCorrente
+                       , contaCorrenteDigVerif
+                       , nota_liquidacao_paga.nrdocumento
+                       , codFonteRecurso
+                       , pagamento_liquidacao.vl_pagamento
+                       , vl_retencao
+                       , plano_conta.cod_estrutural
+                 ) as tbl
+        ORDER BY codprograma
+               , codunidade
+               , codfuncao
+               , codsubfuncao
+               , naturezaacao
+               , nroprojativ
+               , elementodespesa
+               , subelemento
+               , dotorigp2001
+               , nroempenho
+               , nroop
+               , nrdocumento
+               , banco
+               , agencia
+               , contacorrente
+               , tipo_retencao
+        ";
+        return $stSql;
+    }
 }

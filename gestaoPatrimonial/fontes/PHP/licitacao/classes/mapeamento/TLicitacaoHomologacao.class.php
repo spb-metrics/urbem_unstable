@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: TLicitacaoHomologacao.class.php 64205 2015-12-15 20:31:55Z michel $
+    $Id: TLicitacaoHomologacao.class.php 64900 2016-04-12 18:44:26Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1399,9 +1399,18 @@ from (
                        , 0 as historico
                        , 0 as cod_tipo
                        , false as implantado
-                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as reserva
-                       , sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0) as qtd_cotacao
-                       , (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2) as vl_cotacao
+                       , CASE WHEN solicitacao_item_dotacao.cod_despesa IS NOT NULL
+                              THEN (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2)
+                              ELSE (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2)
+                         END AS reserva
+                       , CASE WHEN solicitacao_item_dotacao.cod_despesa IS NOT NULL
+                              THEN sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)
+                              ELSE sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)
+                         END AS qtd_cotacao
+                       , CASE WHEN solicitacao_item_dotacao.cod_despesa IS NOT NULL
+                              THEN (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item_dotacao.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2)
+                              ELSE (( sum(cotacao_fornecedor_item.vl_cotacao) / sum(cotacao_item.quantidade) ) * (sum(mapa_item.quantidade) - coalesce (sum(mapa_item_anulacao.quantidade),0)) )::numeric(14,2)
+                         END AS vl_cotacao
                        , catalogo_item.descricao_resumida
                        , catalogo_item.descricao as descricao_completa
                        , unidade_medida.cod_unidade

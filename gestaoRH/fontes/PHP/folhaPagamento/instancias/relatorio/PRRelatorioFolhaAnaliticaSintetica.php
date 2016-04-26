@@ -1817,7 +1817,11 @@ function analiticaResumida(&$fpdf,$inLinha)
     $nuTotalDescontos = 0;
 
     // verifica se recebeu dados na competencia selecionada, se nao receber dados gerar relatorio com valor zero(branco) ao invez de gerar erro
-    if ( !empty($arProventos) && !empty($arDescontos) && !empty($arBases) ) {
+    // Não deve considerar as bases
+    if(empty($arBases)){
+        $arBases = array();
+    }
+    if ( !empty($arProventos) && !empty($arDescontos) ) {
         ksort($arProventos);
         ksort($arDescontos);
         ksort($arBases);

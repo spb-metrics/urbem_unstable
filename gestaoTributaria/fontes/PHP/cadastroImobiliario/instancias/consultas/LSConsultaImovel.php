@@ -32,7 +32,7 @@
 
  * @ignore
 
- * $Id: LSConsultaImovel.php 64728 2016-03-23 19:49:02Z jean $
+ * $Id: LSConsultaImovel.php 64894 2016-04-12 18:12:52Z evandro $
 
  * Casos de uso: uc-05.01.18
  */
@@ -82,17 +82,17 @@ if ( !Sessao::read('paginando') ) {
     Sessao::write('pg' , $request->get('pg'));
     Sessao::write('pos', $request->get('pos'));
 
-    $_REQUEST['inInscricaoImobiliaria'] = $arFiltroSessao['inInscricaoImobiliaria'];
-    $_REQUEST['inCodLote'             ] = $arFiltroSessao['inCodLote'];
-    $_REQUEST['stChaveLocalizacao'    ] = $arFiltroSessao['stChaveLocalizacao' ];
-    $_REQUEST['inNumLogradouro'       ] = $arFiltroSessao['inNumLogradouro'];
-    $_REQUEST['inNumero'              ] = $arFiltroSessao['inNumero'];
-    $_REQUEST['stComplemento'         ] = $arFiltroSessao['stComplemento'];
-    $_REQUEST['inCodCondominio'       ] = $arFiltroSessao['inCodCondominio'];
-    $_REQUEST['inCodBairro'           ] = $arFiltroSessao['inCodBairro'];
-    $_REQUEST['inNumCGM'              ] = $arFiltroSessao['inNumCGM'];
-    $_REQUEST['stCreci'               ] = $arFiltroSessao['stCreci'];
-    $_GET['stAcao'                    ] = $arFiltroSessao['stAcao'];
+    $request->set('inInscricaoImobiliaria', $arFiltroSessao['inInscricaoImobiliaria'] );
+    $request->set('inCodLote'             , $arFiltroSessao['inCodLote'] );
+    $request->set('stChaveLocalizacao'    , $arFiltroSessao['stChaveLocalizacao']) ;
+    $request->set('inNumLogradouro'       , $arFiltroSessao['inNumLogradouro'] );
+    $request->set('inNumero'              , $arFiltroSessao['inNumero'] );
+    $request->set('stComplemento'         , $arFiltroSessao['stComplemento'] );
+    $request->set('inCodCondominio'       , $arFiltroSessao['inCodCondominio'] );
+    $request->set('inCodBairro'           , $arFiltroSessao['inCodBairro'] );
+    $request->set('inNumCGM'              , $arFiltroSessao['inNumCGM'] );
+    $request->set('stCreci'               , $arFiltroSessao['stCreci'] );
+    $request->set('stAcao'                , $arFiltroSessao['stAcao'] );
 }
 
 $stAcao = $request->get('stAcao');
@@ -126,19 +126,19 @@ foreach ($arFiltroSessao as $valor => $key) {
 
 //SETA ELEMENTOS PARA O FILTRO
 $obRegra->setAtributosDinamicosConsultaImob                  ( $arAtributosFiltro );
-$obRegra->setNumeroInscricao                                 ( $_REQUEST['inInscricaoImobiliaria'] );
-$obRegra->roRCIMLote->setNumeroLote                          ( ltrim($_REQUEST['inCodLote'], '0'));
-$obRegra->roRCIMLote->obRCIMLocalizacao->setCodigoLocalizacao( $_REQUEST['stChaveLocalizacao']     );
-$obRegra->obRCIMCondominio->setCodigoCondominio              ( $_REQUEST['inCodCondominio']        );
+$obRegra->setNumeroInscricao                                 ( $request->get('inInscricaoImobiliaria') );
+$obRegra->roRCIMLote->setNumeroLote                          ( ltrim($request->get('inCodLote'), '0')  );
+$obRegra->roRCIMLote->obRCIMLocalizacao->setCodigoLocalizacao( $request->get('stChaveLocalizacao')     );
+$obRegra->obRCIMCondominio->setCodigoCondominio              ( $request->get('inCodCondominio')        );
 $obRegra->addImovelCorrespondencia();
-$obRegra->obRCIMLogradouro->setCodigoLogradouro              ( $_REQUEST['inNumLogradouro']        );
-$obRegra->setNumeroImovel                                    ( (int) $_REQUEST['inNumero']          );
-$obRegra->setComplementoImovel                               ( $_REQUEST['stComplemento']          );
-$obRegra->obRCIMBairro->setCodigoBairro                      ( $_REQUEST['inCodBairro']            );
+$obRegra->obRCIMLogradouro->setCodigoLogradouro              ( $request->get('inNumLogradouro')        );
+$obRegra->setNumeroImovel                                    ( (int) $request->get('inNumero')         );
+$obRegra->setComplementoImovel                               ( $request->get('stComplemento')          );
+$obRegra->obRCIMBairro->setCodigoBairro                      ( $request->get('inCodBairro')            );
 $obRegra->addProprietario();
-$obRegra->roUltimoProprietario->setNumeroCGM                 ( $_REQUEST['inNumCGM']               );
-$obRegra->obRCIMImobiliaria->setRegistroCreci                ( $_REQUEST['stCreci']                );
-$obRegra->listarImoveisConsulta( $rsLista ,"", $request->get("stOrder"));
+$obRegra->roUltimoProprietario->setNumeroCGM                 ( $request->get('inNumCGM')               );
+$obRegra->obRCIMImobiliaria->setRegistroCreci                ( $request->get('stCreci')                );
+$obRegra->listarConsultaCadastroImobilario( $rsLista ,"", $request->get("stOrder"));
 
 $rsLista->setprimeiroElemento();
 
