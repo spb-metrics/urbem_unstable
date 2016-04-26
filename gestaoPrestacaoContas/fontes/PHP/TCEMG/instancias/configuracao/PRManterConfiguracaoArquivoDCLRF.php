@@ -32,11 +32,11 @@
   
   * @ignore
   *
-  * $Id: PRManterConfiguracaoArquivoDCLRF.php 64504 2016-03-07 19:23:58Z carlos.silva $
+  * $Id: PRManterConfiguracaoArquivoDCLRF.php 64864 2016-04-08 17:03:33Z evandro $
   
-  * $Revision: 64504 $
-  * $Author: carlos.silva $
-  * $Date: 2016-03-07 16:23:58 -0300 (Seg, 07 Mar 2016) $
+  * $Revision: 64864 $
+  * $Author: evandro $
+  * $Date: 2016-04-08 14:03:33 -0300 (Sex, 08 Abr 2016) $
   
 */
 
@@ -66,9 +66,14 @@ switch ($stAcao){
         $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
         
         if(!$obErro->ocorreu()) {
+            if( Sessao::getExercicio() >= '2016' ){
+                $nuValorAtualConcessoesGarantia = $request->get('flValorSaldoAtualConcessoesGarantiaExterna');
+            }else{
+                $nuValorAtualConcessoesGarantia = $request->get('flValorSaldoAtualConcessoesGarantia');
+            }
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('exercicio',$request->get('stExercicio'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('mes_referencia',$request->get('stMes'));
-            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_concessoes_garantia',$request->get('flValorSaldoAtualConcessoesGarantia'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_concessoes_garantia',$nuValorAtualConcessoesGarantia );
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('receita_privatizacao',$request->get('flValorReceitaPrivatizacao'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_liquidado_incentivo_contribuinte',$request->get('flValorLiquidadoIncentivoContribuinte'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_liquidado_incentivo_instituicao_financeira',$request->get('flValorLiquidadoIncentivoInstituicaoFinanceiro'));
@@ -80,7 +85,14 @@ switch ($stAcao){
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('dt_publicacao_relatorio_lrf', $request->get('dtPublicacaoRelatorioLRF'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('bimestre', $request->get('inBimestre'));
             $obTTCEMGConfiguracaoArquivoDCLRF->setDado('meta_bimestral', $request->get('inMetaBimestral'));
-            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('medida_adotada', $request->get('stMedidasAdotadas'));
+            $obTTCEMGConfiguracaoArquivoDCLRF->setDado('medida_adotada', $request->get('stMedidasAdotadas'));            
+            
+            if( Sessao::getExercicio() >= '2016' ){
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_concessoes_garantia_interna',$request->get('flValorSaldoAtualConcessoesGarantiaInterna'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_contra_concessoes_garantia_interna',$request->get('flValorSaldoAtualContraConcessoesGarantiaInterna'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('valor_saldo_atual_contra_concessoes_garantia_externa',$request->get('flValorSaldoAtualContraConcessoesGarantiaExterna'));
+                $obTTCEMGConfiguracaoArquivoDCLRF->setDado('medidas_corretivas',$request->get('stMedidasCorretivas'));
+            }
             
             //Seta o valor atual para os campos abaixo caso não seja o mês de dezembro
             $obTTCEMGConfiguracaoArquivoDCLRF->recuperaPorChave($rsTTCEMGConfiguracaoArquivoDCLRF);

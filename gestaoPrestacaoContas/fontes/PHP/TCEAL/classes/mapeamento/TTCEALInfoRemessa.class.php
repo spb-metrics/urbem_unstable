@@ -27,7 +27,7 @@
     *
     * @author: Carolina Schwaab Marçal
     *
-    * $Id: TTCEALInfoRemessa.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TTCEALInfoRemessa.class.php 64808 2016-04-04 21:52:52Z carlos.silva $
     *
     * @ignore
     *
@@ -47,6 +47,7 @@ class TTCEALInfoRemessa extends Persistente
        
     public function listarExportacaoInfoRemessa(&$rsRecordSet,$stFiltro="",$stOrder=" ",$boTransacao="")
     {
+        
         $stSql = "SELECT sw_cgm_pessoa_juridica.cnpj as cod_und_gestora
                                   , (SELECT lpad(valor,4,'0') as valor
                                         FROM administracao.configuracao_entidade
@@ -56,37 +57,11 @@ class TTCEALInfoRemessa extends Persistente
                                            AND configuracao_entidade.cod_entidade =  ".$this->getDado('inCodEntidade')."
                                      ) AS codigo_ua
 
-                    FROM contabilidade.plano_banco
-
-              INNER JOIN contabilidade.plano_analitica
-                      ON plano_analitica.exercicio = plano_banco.exercicio
-                     AND plano_analitica.cod_plano = plano_banco.cod_plano
-
-              INNER JOIN contabilidade.plano_conta
-                      ON plano_conta.exercicio = plano_analitica.exercicio
-                     AND plano_conta.cod_conta = plano_analitica.cod_conta
-
-              INNER JOIN contabilidade.plano_recurso
-                      ON plano_recurso.exercicio = plano_analitica.exercicio
-                     AND plano_recurso.cod_plano = plano_analitica.cod_plano
-
-              INNER JOIN orcamento.recurso
-                      ON recurso.exercicio = plano_recurso.exercicio
-                     AND recurso.cod_recurso = plano_recurso.cod_recurso
-
-              INNER JOIN orcamento.despesa
-                      ON despesa.exercicio = recurso.exercicio
-                     AND despesa.cod_recurso = recurso.cod_recurso
-
-              INNER JOIN orcamento.entidade
-                      ON entidade.exercicio = despesa.exercicio
-                     AND entidade.cod_entidade = despesa.cod_entidade
-
+                    FROM orcamento.entidade
                LEFT JOIN sw_cgm_pessoa_juridica
                       ON sw_cgm_pessoa_juridica.numcgm = entidade.numcgm
-
-                   WHERE plano_analitica.exercicio ='".$this->getDado('stExercicio')."'
-                     AND despesa.cod_entidade IN (".$this->getDado('inCodEntidade').")
+                   WHERE entidade.exercicio ='".$this->getDado('stExercicio')."'
+                     AND entidade.cod_entidade IN (".$this->getDado('inCodEntidade').")
 
                 GROUP BY cod_und_gestora
                        , codigo_ua";

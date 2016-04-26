@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.01.06
 
-  $Id: LSManterBaixarBem.php 64578 2016-03-15 20:25:48Z arthur $
+  $Id: LSManterBaixarBem.php 64857 2016-04-07 19:41:03Z arthur $
 
   */
 
@@ -74,7 +74,7 @@ if (!Sessao::read('paginando')) {
 
 if ($arFiltro) {
     foreach ($arFiltro as $key => $value) {
-        $_REQUEST[$key] = $value;
+        $request->set($key,$value);
     }
 }
 

@@ -209,8 +209,8 @@ switch ($stCtrl) {
             Sessao::write('arRegimeSubDivisao',$arRegimeSubDivisao);
             
             $stJs  = montaListaRegime($arRegimeSubDivisao);
-            $stJs .= " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','value'); ";
-            $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','value'); ";
+            $stJs .= " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','valueText'); ";
+            $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','valueText'); ";
             $stJs .= " jq('#cmbTipoCargo').val(''); ";
             $stJs .= " jq('#btnIncluirRegimeSubDivisao').val('Incluir'); ";
             $stJs .= " jq('#cmbTipoCargo').prop( 'disabled', false ); ";
@@ -310,8 +310,8 @@ switch ($stCtrl) {
     break;
     
     case 'limparListaRegimeSubDivisao':
-        $stJs  = " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','value'); ";
-        $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','value'); ";
+        $stJs  = " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','valueText'); ";
+        $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','valueText'); ";
         $stJs .= " jq('#cmbTipoCargo').val(''); ";
         $stJs .= " jq('#cmbTipoCargo').prop( 'disabled', false ); ";
         $stJs .= " jq('#btnIncluirRegimeSubDivisao').val('Incluir'); ";
@@ -353,7 +353,7 @@ switch ($stCtrl) {
             Sessao::write('arRequisitosCargos',$arRequisitosCargos);
                         
             $stJs  = montaListaRequisitoCargo($arRequisitosCargos);
-            $stJs .= " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','value'); ";            
+            $stJs .= " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','valueText'); ";            
             $stJs .= " jq('#cmbTipoRequisitosCargos').val(''); ";
             $stJs .= " jq('#btnIncluirRequisitosCargos').val('Incluir'); ";
             $stJs .= " jq('#cmbTipoRequisitosCargos').prop( 'disabled', false ); ";            
@@ -367,15 +367,14 @@ switch ($stCtrl) {
 
     case 'detalharRequisitosCargo':
         $arAux = Sessao::read('arRequisitosCargos');
+        $arAux = $arAux[$request->get('cod_tipo')];
         
         $obTPessoalCargo = new TPessoalCargo;
         
         foreach ($arAux as $chave => $cargos) {
-            foreach ($cargos as $key => $value) {
-                //Nome do cargo
-                $obTPessoalCargo->recuperaTodos( $rsPessoalCargo," WHERE cod_cargo = ".$key." "," ORDER BY cod_cargo",$boTransacao );            
-                $arRequesitosCargo[]['nom_cargo'] = $rsPessoalCargo->getCampo('cod_cargo')." - ".$rsPessoalCargo->getCampo('descricao');
-            }
+            //Nome do cargo
+            $obTPessoalCargo->recuperaTodos( $rsPessoalCargo," WHERE cod_cargo = ".$chave." "," ORDER BY cod_cargo",$boTransacao );            
+            $arRequesitosCargo[]['nom_cargo'] = $rsPessoalCargo->getCampo('cod_cargo')." - ".$rsPessoalCargo->getCampo('descricao');
         }
         
         $rsRegimes = new RecordSet();
@@ -436,7 +435,7 @@ switch ($stCtrl) {
     break;
     
     case 'limparRequisitosCargos':
-        $stJs  = " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','value'); ";        
+        $stJs  = " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','valueText'); ";        
         $stJs .= " jq('#cmbTipoRequisitosCargos').val(''); ";
         $stJs .= " jq('#arRequisitosCargosDisponivel').focus(); ";
         $stJs .= " jq('#btnIncluirRequisitosCargos').val('Incluir'); ";
@@ -479,7 +478,7 @@ switch ($stCtrl) {
             Sessao::write('arEventos',$arEventos);
                         
             $stJs  = montaListaEventos($arEventos);
-            $stJs .= " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','value'); ";            
+            $stJs .= " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','valueText'); ";
             $stJs .= " jq('#cmbTipoRemuneracao').val(''); ";
             $stJs .= " jq('#btnIncluirEventos').val('Incluir'); ";            
             $stJs .= " jq('#cmbTipoRemuneracao').prop( 'disabled', false ); ";            
@@ -493,15 +492,14 @@ switch ($stCtrl) {
 
     case 'detalharRemuneracaoEventos':
         $arAux = Sessao::read('arEventos');
+        $arAux = $arAux[$request->get('cod_tipo')];
         
         $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
-        
+
         foreach ($arAux as $chave => $eventos) {
-            foreach ($eventos as $key => $value) {
-                //Nome do evento
-                $obTFolhaPagamentoEvento->recuperaTodos( $rsEventos," WHERE cod_evento = ".$key." "," ORDER BY cod_evento",$boTransacao );            
-                $arEventos[]['nom_evento'] = $rsEventos->getCampo('codigo')." - ".$rsEventos->getCampo('descricao');
-            }
+            //Nome do evento
+            $obTFolhaPagamentoEvento->recuperaTodos( $rsEventos," WHERE cod_evento = ".$chave." "," ORDER BY cod_evento",$boTransacao );            
+            $arEventos[]['nom_evento'] = $rsEventos->getCampo('codigo')." - ".$rsEventos->getCampo('descricao');
         }
         
         $rsEventos = new RecordSet();
@@ -567,7 +565,7 @@ switch ($stCtrl) {
     break;
     
     case 'limparEventos':
-        $stJs  = " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','value'); ";        
+        $stJs  = " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','valueText'); ";        
         $stJs .= " jq('#cmbTipoRemuneracao').val(''); ";
         $stJs .= " jq('#arEventosDisponiveis').focus(); ";
     break;
@@ -628,10 +626,10 @@ switch ($stCtrl) {
     break;
 
     case 'limparTudo':
-        $stJs  = " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','value'); ";
-        $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','value'); ";
-        $stJs .= " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','value'); ";        
-        $stJs .= " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','value'); ";        
+        $stJs  = " JavaScript:passaItem('document.frm.arRegimeSubdivisaoSelecionados','document.frm.arRegimeSubdivisaoDisponiveis','tudo','valueText'); ";
+        $stJs .= " JavaScript:passaItem('document.frm.arCargosRegimeSelecionados','document.frm.arCargosRegimeDisponiveis','tudo','valueText'); ";
+        $stJs .= " JavaScript:passaItem('document.frm.arRequisitosCargosSelecionados','document.frm.arRequisitosCargosDisponivel','tudo','valueText'); ";        
+        $stJs .= " JavaScript:passaItem('document.frm.arEventosSelecionados','document.frm.arEventosDisponiveis','tudo','valueText'); ";        
         $stJs .= " jq('#cmbTipoCargo').val(''); ";
     break;
 

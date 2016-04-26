@@ -30,7 +30,7 @@
     *
     * @author: Evandro Melos
     *
-    $Id: TTCEALLoaDespesa.class.php 64771 2016-03-30 19:35:02Z carlos.silva $
+    $Id: TTCEALLoaDespesa.class.php 64806 2016-04-04 21:09:58Z carlos.silva $
     *
     * @ignore
     *
@@ -111,7 +111,7 @@ class TTCEALLoaDespesa extends Persistente
                                 , LPAD(despesa.cod_subfuncao::varchar,3,'0')            as cod_subfuncao
                                 , LPAD(programa.num_programa::varchar,4,'0')            as cod_programa
                                 , LPAD(num_acao::varchar,4,'0')                         as cod_proj_atividade                                                                
-                                , REPLACE(conta_despesa.cod_estrutural::varchar,'.','') as cod_conta_despesa
+                                , RPAD(REPLACE(conta_despesa.cod_estrutural::varchar,'.',''), 16, '0') as cod_conta_despesa
                                 , LPAD(recurso.cod_recurso::varchar,9,'0')              as cod_rec_vinculado
                                 , despesa.vl_original                                   as dotacao_inicial
                                 , CASE WHEN previsao_despesa.periodo = 1 THEN

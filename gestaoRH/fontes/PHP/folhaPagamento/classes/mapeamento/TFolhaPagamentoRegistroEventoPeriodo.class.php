@@ -201,7 +201,6 @@ function montaRecuperaContratosDeLocal()
     $stSql .= "       , contrato.cod_contrato                                                                                  \n";
     $stSql .= "       , sw_cgm.numcgm                                                                                          \n";
     $stSql .= "       , sw_cgm.nom_cgm                                                                                         \n";
-
     return $stSql;
 }
 
@@ -324,6 +323,95 @@ function montaDeletarRegistroPeriodo()
     $stSql  = "SELECT criarBufferTexto('stEntidade','".Sessao::getEntidade()."');       \n";
     $stSql .= "SELECT criarBufferTexto('stTipoFolha','S');                              \n";
     $stSql .= "SELECT deletarRegistroEventoPeriodo(".$this->getDado("cod_registro")."); \n";
+
+    return $stSql;
+}
+
+function recuperaContratoGeral (&$rsRecordSet, $stFiltro = "", $stOrdem ="", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    $stSql  = $this->montaRecuperaContratoGeral().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+function montaRecuperaContratoGeral()
+{
+    $stSql = "
+                SELECT *
+
+                  FROM (
+                        SELECT
+                                contrato.*
+                                , servidor.numcgm                                                                                                   
+                                , (select nom_cgm from sw_cgm where numcgm = servidor.numcgm) as nom_cgm
+
+                          FROM folhapagamento.registro_evento_periodo
+
+                    INNER JOIN folhapagamento.registro_evento
+                            ON registro_evento_periodo.cod_registro = registro_evento.cod_registro
+
+                    INNER JOIN folhapagamento.ultimo_registro_evento
+                            ON registro_evento.cod_registro = ultimo_registro_evento.cod_registro
+                           AND registro_evento.cod_evento = ultimo_registro_evento.cod_evento
+                           AND registro_evento.timestamp = ultimo_registro_evento.timestamp
+
+                    INNER JOIN folhapagamento.contrato_servidor_periodo
+                            ON contrato_servidor_periodo.cod_periodo_movimentacao = registro_evento_periodo.cod_periodo_movimentacao
+                           AND contrato_servidor_periodo.cod_contrato = registro_evento_periodo.cod_contrato
+
+                    INNER JOIN pessoal.contrato
+                            ON contrato.cod_contrato = contrato_servidor_periodo.cod_contrato
+
+                    INNER JOIN pessoal.contrato_servidor
+                            ON contrato_servidor.cod_contrato = contrato.cod_contrato
+
+                    INNER JOIN pessoal.servidor_contrato_servidor
+                            ON servidor_contrato_servidor.cod_contrato = contrato_servidor.cod_contrato
+
+                    INNER JOIN pessoal.servidor
+                            ON servidor.cod_servidor = servidor_contrato_servidor.cod_servidor
+
+                         WHERE NOT EXISTS ( SELECT 1                                                                                            
+                                              FROM pessoal.contrato_servidor_caso_causa                                                           
+                                             WHERE contrato_servidor_caso_causa.cod_contrato = servidor_contrato_servidor.cod_contrato
+                                          )
+
+                         UNION
+
+                        SELECT contrato.*
+                             , pensionista.numcgm
+                             , (select nom_cgm from sw_cgm where numcgm = pensionista.numcgm) as nom_cgm
+
+                          FROM folhapagamento.registro_evento_periodo
+
+                    INNER JOIN folhapagamento.registro_evento
+                            ON registro_evento_periodo.cod_registro = registro_evento.cod_registro
+
+                    INNER JOIN folhapagamento.ultimo_registro_evento
+                            ON registro_evento.cod_registro = ultimo_registro_evento.cod_registro
+                           AND registro_evento.cod_evento = ultimo_registro_evento.cod_evento
+                           AND registro_evento.timestamp = ultimo_registro_evento.timestamp
+
+                    INNER JOIN pessoal.contrato_pensionista
+                            ON registro_evento_periodo.cod_contrato = contrato_pensionista.cod_contrato
+
+                    INNER JOIN pessoal.contrato
+                            ON contrato.cod_contrato = contrato_pensionista.cod_contrato
+
+                    INNER JOIN pessoal.pensionista
+                            ON pensionista.cod_pensionista = contrato_pensionista.cod_pensionista
+                           AND pensionista.cod_contrato_cedente = contrato_pensionista.cod_contrato_cedente
+                           AND NOT EXISTS ( SELECT 1
+                                                FROM pessoal.contrato_servidor_caso_causa
+                                               WHERE contrato_servidor_caso_causa.cod_contrato = contrato_pensionista.cod_contrato)
+                        ) AS tabela
+            ";
 
     return $stSql;
 }

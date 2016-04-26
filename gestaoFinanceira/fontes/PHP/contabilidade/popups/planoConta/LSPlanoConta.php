@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 64695 2016-03-22 17:34:14Z arthur $
+    * $Id: LSPlanoConta.php 64857 2016-04-07 19:41:03Z arthur $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -784,7 +784,7 @@ if ($_REQUEST['tipoBusca']) {
             if ( $request->get('stCodEstrutural') ) {
                 $inCodEstrutural= $request->get('stCodEstrutural') ;
             }else{
-                $inCodEstrutural = '1.2.3';
+                $inCodEstrutural = '3';
             }
             $obRegra->setCodEstrutural($inCodEstrutural);
             $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");

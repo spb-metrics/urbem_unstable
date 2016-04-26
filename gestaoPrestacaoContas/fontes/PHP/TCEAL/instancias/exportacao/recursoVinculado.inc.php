@@ -28,7 +28,7 @@
     *
     * Data de Criação: 29/05/2014
     *
-    $Id: recursoVinculado.inc.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: recursoVinculado.inc.php 64812 2016-04-05 16:31:27Z carlos.silva $
     *
     * @author: Arthur Cruz
     *
@@ -76,7 +76,7 @@ while (!$rsRecordSet->eof()) {
     $arResult[$idCount]['CodigoUA']         = ($rsRecordSet->getCampo('codigo_ua') == "" ? '0000' : $rsRecordSet->getCampo('codigo_ua'));
     $arResult[$idCount]['Bimestre']         = $inBimestre;
     $arResult[$idCount]['Exercicio']        = $rsRecordSet->getCampo('exercicio');
-    $arResult[$idCount]['codRecVinculado']  = $rsRecordSet->getCampo('codrecvinculado');
+    $arResult[$idCount]['CodRecVinculado']  = $rsRecordSet->getCampo('codrecvinculado');
     $arResult[$idCount]['Nome']             = $rsRecordSet->getCampo('nome');
     $arResult[$idCount]['Finalidade']       = $rsRecordSet->getCampo('finalidade');
     $arResult[$idCount]['Tipo']             = $rsRecordSet->getCampo('cod_tipo_esfera');

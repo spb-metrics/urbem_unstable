@@ -46,8 +46,11 @@ include_once( CAM_GRH_PES_NEGOCIO."RPessoalRescisaoContrato.class.php" );
 include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php" );
 include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php" );
 include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoCalcularFolhas.class.php" );
+include_once( CAM_GRH_PES_MAPEAMENTO."TPessoalPensao.class.php");
+include_once( CAM_GRH_PES_MAPEAMENTO."TPessoalServidorContratoServidor.class.php");
+//include_once( CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidorCasoCausa.class.php"                 );
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 
 $stPrograma = "RescindirContrato";
 $pgFilt = "FL".$stPrograma.".php?".Sessao::getId()."&stAcao=$stAcao";
@@ -58,89 +61,165 @@ $pgOcul = "OC".$stPrograma.".php";
 
 $obErro = new Erro;
 $obRPessoalRescisaoContrato  = new RPessoalRescisaoContrato;
+
+$obTransacao = new Transacao();
+$boFlagTransacao = false;
+$obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
 switch ($stAcao) {
     case "incluir":
-        $obTransacao = new Transacao;
-        $obRPessoalRescisaoContrato->obRPessoalCausaRescisao->addPessoalCasoCausa();
-        $obRPessoalRescisaoContrato->obRPessoalCausaRescisao->roUltimoPessoalCasoCausa->setCodCasoCausa( $_POST['inCasoCausa'] );
-        $obRPessoalRescisaoContrato->setDtRescisao( $_POST['dtRescisao'] );
-        $obRPessoalRescisaoContrato->setNroCertidaoObito($_POST['stNroCertidaoObito']);
-        $obRPessoalRescisaoContrato->setDescCausaMortis($_POST['stDescCausaMortis']);
-        $obRPessoalRescisaoContrato->setAvisoPrevio($_POST['stAvisoPrevio']);
-        $obRPessoalRescisaoContrato->setDataAvisoPrevio($_POST['dtAviso']);
-        $obRPessoalRescisaoContrato->setIncorporarFolhaSalario(($_POST['boFolhaSalario'] == 1) ? true : false);
-        $obRPessoalRescisaoContrato->setIncorporarFolhaDecimo(($_POST['boFolhaDecimo'] == 1) ? true : false);
-        $obRPessoalRescisaoContrato->setRNorma($_POST['inCodNorma' ] );
-        $obRPessoalRescisaoContrato->setExercicio(Sessao::getExercicio());
+        if (!$obErro->ocorreu()) {
+            
+            $obRPessoalRescisaoContrato->obRPessoalCausaRescisao->addPessoalCasoCausa();
+            $obRPessoalRescisaoContrato->obRPessoalCausaRescisao->roUltimoPessoalCasoCausa->setCodCasoCausa( $request->get('inCasoCausa') );
+            $obRPessoalRescisaoContrato->setDtRescisao( $request->get('dtRescisao') );
+            $obRPessoalRescisaoContrato->setNroCertidaoObito( $request->get('stNroCertidaoObito') );
+            $obRPessoalRescisaoContrato->setDescCausaMortis( $request->get('stDescCausaMortis') );
+            $obRPessoalRescisaoContrato->setAvisoPrevio( $request->get('stAvisoPrevio') );
+            $obRPessoalRescisaoContrato->setDataAvisoPrevio( $request->get('dtAviso') );
+            $obRPessoalRescisaoContrato->setIncorporarFolhaSalario( ($request->get('boFolhaSalario') == 1) ? true : false );
+            $obRPessoalRescisaoContrato->setIncorporarFolhaDecimo( ($request->get('boFolhaDecimo') == 1) ? true : false );
+            $inCodNorma = $request->get('inCodNorma');
+            $obRPessoalRescisaoContrato->setRNorma( $inCodNorma );
+            $obRPessoalRescisaoContrato->setExercicio(Sessao::getExercicio());
 
-        // Verifica se veio da ação de alteracão de pensionista com opção de rescisão de contrato
-        if (sessao::read('incluirRescisaoContratoPensionista') != null) {
-            $obRPessoalRescisaoContrato->obRPessoalContrato->setCodContrato( $_POST['inCodContrato'] );
-            $obErro = $obRPessoalRescisaoContrato->incluirRescisaoContratoPensionista();
-            $pgFilt = "../pensionista/FLManterPensionista.php?".Sessao::getId();
-        } else {
-            $obRPessoalRescisaoContrato->obRPessoalContratoServidor->setCodContrato( $_POST['inCodContrato'] );
-            $obErro = $obRPessoalRescisaoContrato->incluirRescisaoContrato();
-        }
-
-        if ($_POST['boGeraTermoRecisao'] == 'true' && !$obErro->ocorreu()) {
-            include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
-            $obTPessoalContrato = new TPessoalContrato;
-            $stFiltro = " AND contrato.cod_contrato = ".$_POST['inCodContrato'];
-            $obTPessoalContrato->recuperaCgmDoRegistro($rsCGM,$stFiltro);
-            $arContratos = array();
-            $arTmp = array(
-                'inContrato' => $rsCGM->getCampo("registro"),
-                'cod_contrato' => $rsCGM->getCampo("cod_contrato"),
-                'numcgm' => $rsCGM->getCampo("numcgm"),
-                'nom_cgm' => $rsCGM->getCampo("nom_cgm")
-            );
-            $arContratos[] = $arTmp;
-
-            //Necessário calcular recisão para gerar Termo de recisão
-            $obRFolhaPagamentoCalcularFolhas = new RFolhaPagamentoCalcularFolhas();
-            $obRFolhaPagamentoCalcularFolhas->setTipoFiltro('cgm_contrato');
-            $obRFolhaPagamentoCalcularFolhas->setCodigos($arContratos);
-            $obRFolhaPagamentoCalcularFolhas->setCalcularRescisao();
-            $obRFolhaPagamentoCalcularFolhas->calcularFolha(true);
-        }
-
-        if ( !$obErro->ocorreu() ) {
-            if ($_POST['boGeraTermoRecisao'] == 'true') {
-                //busca competência atual
-                $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
-                $obRFolhaPagamentoFolhaSituacao->roRFolhaPagamentoPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao,$boTransacao);
-
-                $arData = explode("/",$rsUltimaMovimentacao->getCampo('dt_final'));
-                $inMes     = (int) ($arData[1]);
-                $stAno     = $arData[2];
-
-                $stLink  = "?stCaminho=".CAM_GRH_FOL_INSTANCIAS."relatorio/PREmitirTermoRescisao.php";
-                $stLink .= "&stTipoFiltro=contrato_rescisao&stOrdenacao=alfabetica";
-                $stLink .= "&inCodMes=".$inMes;
-                $stLink .= "&inAno=".$stAno;
-
-                Sessao::write('arContratos', $arContratos);
+            // Verifica se veio da ação de alteracão de pensionista com opção de rescisão de contrato
+            if (sessao::read('incluirRescisaoContratoPensionista') != null) {
+                $obRPessoalRescisaoContrato->obRPessoalContrato->setCodContrato( $request->get('inCodContrato') );
+                $obErro = $obRPessoalRescisaoContrato->incluirRescisaoContratoPensionista($boTransacao);
+                $pgFilt = "../pensionista/FLManterPensionista.php?".Sessao::getId();                
+            } else {
+                $obRPessoalRescisaoContrato->obRPessoalContratoServidor->setCodContrato( $request->get('inCodContrato') );
+                $obErro = $obRPessoalRescisaoContrato->incluirRescisaoContrato($boTransacao);
+            }
+        
+            if (!$obErro->ocorreu()) {
+                $obTPessoalServidorContratoServidor = new TPessoalServidorContratoServidor();
+                $obTPessoalServidorContratoServidor->setDado('cod_contrato',$request->get('inCodContrato'));
+                $obErro = $obTPessoalServidorContratoServidor->listar($rsLista,$boTransacao);    
+                if (!$obErro->ocorreu()) {
+                    $obTPessoalPensao = new TPessoalPensao();
+                    $stFiltro = " WHERE cod_servidor = ".$rsLista->getCampo('cod_servidor')." ";
+                    $obErro = $obTPessoalPensao->recuperaRelacionamento($rsPensao,$stFiltro,'',$boTransacao);                    
+                    //Realiza a alteracao da data limite se já houver pensao
+                    if (!$obErro->ocorreu()) {
+                        if ( $rsPensao->getNumLinhas() > 0 ){
+                            $obTPessoalPensao->setDado('cod_pensao'    , $rsPensao->getCampo('cod_pensao') );
+                            $obTPessoalPensao->setDado('cod_dependente', $rsPensao->getCampo('cod_dependente') );
+                            $obTPessoalPensao->setDado('cod_servidor'  , $rsPensao->getCampo('cod_servidor') );
+                            $obTPessoalPensao->setDado('tipo_pensao'   , $rsPensao->getCampo('tipo_pensao') );
+                            $obTPessoalPensao->setDado('dt_inclusao'   , $rsPensao->getCampo('dt_inclusao') );
+                            $obTPessoalPensao->setDado('percentual'    , $rsPensao->getCampo('percentual') );
+                            $obTPessoalPensao->setDado('observacao'    , $rsPensao->getCampo('observacao') );
+                            //Atualizando a data_limite de acordo com a data da rescisao
+                            $obTPessoalPensao->setDado('dt_limite'     , $request->get('dtRescisao') );
+                        
+                            $obErro = $obTPessoalPensao->alteracao($boTransacao);
+                        }
+                    }
+                }
             }
 
-            SistemaLegado::LiberaFrames(true, false);
-            SistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$_POST['inRegistro'],"incluir","aviso", Sessao::getId(), "../");
+            if (sessao::read('incluirRescisaoContratoPensionista') != null) {
+                $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPessoalRescisaoContrato->obTPessoalContratoPensionistaCasoCausa );
+            }else{
+                $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPessoalRescisaoContrato->obTPessoalContratoServidorCasoCausa );
+            }
 
-            if ($_POST['boGeraTermoRecisao'] == 'true') {
-                SistemaLegado::mudaFrameOculto(CAM_FW_POPUPS."relatorio/OCRelatorio.php".$stLink);
+            if (!$obErro->ocorreu()) {
+                if ($request->get('boGeraTermoRecisao') == 'true' && !$obErro->ocorreu()) {
+                    include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
+                    $obTPessoalContrato = new TPessoalContrato;
+                    $stFiltro = " AND contrato.cod_contrato = ".$request->get('inCodContrato');
+                    $obErro = $obTPessoalContrato->recuperaCgmDoRegistro($rsCGM,$stFiltro,'',$boTransacao);
+                    $arContratos = array();
+                    $arTmp = array(
+                        'inContrato' => $rsCGM->getCampo("registro"),
+                        'cod_contrato' => $rsCGM->getCampo("cod_contrato"),
+                        'numcgm' => $rsCGM->getCampo("numcgm"),
+                        'nom_cgm' => $rsCGM->getCampo("nom_cgm")
+                    );
+                    $arContratos[] = $arTmp;
+    
+                    //Necessário calcular recisão para gerar Termo de recisão
+                    $obRFolhaPagamentoCalcularFolhas = new RFolhaPagamentoCalcularFolhas();
+                    $obRFolhaPagamentoCalcularFolhas->setTipoFiltro('cgm_contrato');
+                    $obRFolhaPagamentoCalcularFolhas->setCodigos($arContratos);
+                    $obRFolhaPagamentoCalcularFolhas->setCalcularRescisao();
+                    $obRFolhaPagamentoCalcularFolhas->calcularFolha(true);
+                }
+            }
+
+            if ( !$obErro->ocorreu() ) {
+                if ($request->get('boGeraTermoRecisao') == 'true') {
+                    //busca competência atual
+                    $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
+                    $obRFolhaPagamentoFolhaSituacao->roRFolhaPagamentoPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao,$boTransacao);
+
+                    $arData = explode("/",$rsUltimaMovimentacao->getCampo('dt_final'));
+                    $inMes     = (int) ($arData[1]);
+                    $stAno     = $arData[2];
+
+                    $stLink  = "?stCaminho=".CAM_GRH_FOL_INSTANCIAS."relatorio/PREmitirTermoRescisao.php";
+                    $stLink .= "&stTipoFiltro=contrato_rescisao&stOrdenacao=alfabetica";
+                    $stLink .= "&inCodMes=".$inMes;
+                    $stLink .= "&inAno=".$stAno;
+
+                    Sessao::write('arContratos', $arContratos);
+                }
+
+                SistemaLegado::LiberaFrames(true, false);
+                SistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$_POST['inRegistro'],"incluir","aviso", Sessao::getId(), "../");
+
+                if ($request->get('boGeraTermoRecisao') == 'true') {
+                    SistemaLegado::mudaFrameOculto(CAM_FW_POPUPS."relatorio/OCRelatorio.php".$stLink);
+                }
+            } else {
+                SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
             }
         } else {
             SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
-        }
+        }        
     break;
 
     case "excluir":
-        $obRPessoalRescisaoContrato->obRPessoalContratoServidor->setCodContrato( $_GET['inCodContrato'] );
-        $obErro = $obRPessoalRescisaoContrato->excluirRescisaoContrato();
-        if ( !$obErro->ocorreu() )
-            SistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$_GET['inRegistro'],"excluir","aviso", Sessao::getId(), "../");
-        else
-            SistemaLegado::alertaAviso($pgFilt,urlencode($_GET['inRegistro']),"n_excluir","erro", Sessao::getId(), "../");
+        if (!$obErro->ocorreu()) {
+            $obTPessoalServidorContratoServidor = new TPessoalServidorContratoServidor();
+            $obTPessoalServidorContratoServidor->setDado('cod_contrato',$request->get('inCodContrato'));
+            $obErro = $obTPessoalServidorContratoServidor->listar($rsLista,$boTransacao);    
+            if (!$obErro->ocorreu()) {
+                $obTPessoalPensao = new TPessoalPensao();
+                $stFiltro = " WHERE cod_servidor = ".$rsLista->getCampo('cod_servidor')." ";
+                $obErro = $obTPessoalPensao->recuperaRelacionamento($rsPensao,$stFiltro,'',$boTransacao);                                
+                if (!$obErro->ocorreu()) {
+                    if ( $rsPensao->getNumLinhas() > 0 ){
+                        $obTPessoalPensao->setDado('cod_pensao'    , $rsPensao->getCampo('cod_pensao') );
+                        $obTPessoalPensao->setDado('cod_dependente', $rsPensao->getCampo('cod_dependente') );
+                        $obTPessoalPensao->setDado('cod_servidor'  , $rsPensao->getCampo('cod_servidor') );
+                        $obTPessoalPensao->setDado('tipo_pensao'   , $rsPensao->getCampo('tipo_pensao') );
+                        $obTPessoalPensao->setDado('dt_inclusao'   , $rsPensao->getCampo('dt_inclusao') );
+                        $obTPessoalPensao->setDado('percentual'    , $rsPensao->getCampo('percentual') );
+                        $obTPessoalPensao->setDado('observacao'    , $rsPensao->getCampo('observacao') );
+                        $obTPessoalPensao->setDado('timestamp'    , $rsPensao->getCampo('timestamp') );
+                        //Atualizando a data_limite de acordo com a data da rescisao
+                        $obTPessoalPensao->setDado('dt_limite'     , '' );
+                        $obErro = $obTPessoalPensao->alteracao($boTransacao);
+                    }
+                }
+            }
+        }
+
+        if (!$obErro->ocorreu()) {
+            $obRPessoalRescisaoContrato->obRPessoalContratoServidor->setCodContrato( $request->get('inCodContrato') );
+            $obErro = $obRPessoalRescisaoContrato->excluirRescisaoContrato($boTransacao);
+        }
+        
+        if ( !$obErro->ocorreu() ){
+            $obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obRPessoalRescisaoContrato->obTPessoalContratoServidorCasoCausa );
+            SistemaLegado::alertaAviso($pgFilt,"Matrícula: ".$request->get('inRegistro'),"excluir","aviso", Sessao::getId(), "../");
+        }else{
+            SistemaLegado::alertaAviso($pgFilt,urlencode($request->get('inRegistro')),"n_excluir","erro", Sessao::getId(), "../");
+        }
     break;
 }
 

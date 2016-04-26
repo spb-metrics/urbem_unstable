@@ -50,76 +50,36 @@ $pgForm    = "FM".$stPrograma.".php";
 $pgProc    = "PR".$stPrograma.".php";
 $pgOcul    = "OC".$stPrograma.".php";
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao","configuracao");
 
 $obTExportacao = new TTCEALExportacaoConfiguracao();
 
 $obErro = new Erro;
 
 $obTransacao = new Transacao;
-$obTransacao->begin();
-$boTransacao = $obTransacao->getTransacao();
+$obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
 $obTExportacao->setDado("cod_modulo",62);
 $obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_orgao_prefeitura" );
-$obTExportacao->setDado( "valor", $_POST['inCodExecutivo'] );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
 
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_unidade_prefeitura" );
-$obTExportacao->setDado( "valor", $_POST['inCodUnidadeExecutivo'] );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_orgao_camara" );
-$obTExportacao->setDado( "valor", $_POST['inCodLegislativo'] );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_unidade_camara" );
-$obTExportacao->setDado( "valor", $_POST['inCodUnidadeLegislativo'] );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_orgao_rpps" );
-$obTExportacao->setDado( "valor", ($_POST['inCodRPPS']?$_POST['inCodRPPS']:$_POST['inCodExecutivo']) );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_unidade_rpps" );
-$obTExportacao->setDado( "valor", ($_POST['inCodUnidadeRPPS']?$_POST['inCodUnidadeRPPS']:$_POST['inCodUnidadeExecutivo']) );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_orgao_outros" );
-$obTExportacao->setDado( "valor", ($_POST['inCodOutros']?$_POST['inCodOutros']:$_POST['inCodExecutivo']) );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
-        
-$obTExportacao->setDado("cod_modulo",62);
-$obTExportacao->setDado("exercicio",  Sessao::getExercicio());
-$obTExportacao->setDado("parametro", "tceal_unidade_outros" );
-$obTExportacao->setDado( "valor", ($_POST['inCodUnidadeOutros']?$_POST['inCodUnidadeOutros']:$_POST['inCodUnidadeExecutivo']) );
-$obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
-$obErro = $obTExportacao->alteracao( $boTransacao );
+foreach ($request->getAll() as $chave => $valor) {
+    $arRegistro = explode("_",$chave);
 
-if ( !$obErro->ocorreu() ) {
-    $obErro = $obTransacao->commitAndClose();
-} else {
-    $obTransacao->rollbackAndClose();
+    if ($arRegistro[0] == "tceal") {
+        $obTExportacao->setDado( "parametro", $arRegistro[0]."_".$arRegistro[1] );
+        $obTExportacao->setDado( "cod_entidade", $arRegistro[2] );
+
+        $obErro = $obTExportacao->recuperaPorChave( $rsRecordSet, $boTransacao );
+
+        if (!$obErro->ocorreu()) {
+            $obTExportacao->setDado( "valor", $valor );
+            if ($rsRecordSet->getNumLinhas() > 0) {
+                $obErro = $obTExportacao->alteracao( $boTransacao );
+            } else {
+                $obErro = $obTExportacao->inclusao( $boTransacao );
+            }
+        }
+    }
 }
 
 if ( !$obErro->ocorreu() ) {
@@ -127,5 +87,8 @@ if ( !$obErro->ocorreu() ) {
 } else {
     SistemaLegado::exibeAviso(urlencode($obErro->getDescricao()),"n_incluir","erro");
 }
+
+
+$obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $obTExportacao );
 
 ?>

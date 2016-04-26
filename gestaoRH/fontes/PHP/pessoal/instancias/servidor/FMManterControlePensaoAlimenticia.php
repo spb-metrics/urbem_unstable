@@ -145,7 +145,7 @@ $obRPessoalServidor = new RPessoalServidor;
 $obRPessoalServidor->obRCGMPessoaFisica->setNumCGM ( $inCGM                                 );
 $obRPessoalServidor->consultarServidor             ( $rsServidor, false                     );
 $obRPessoalServidor->setCodServidor                ( $rsServidor->getCampo( 'cod_servidor') );
-$obRPessoalServidor->obRCGMPessoaFisica->consultarCGM( &$rsCGM );
+$obRPessoalServidor->obRCGMPessoaFisica->consultarCGM( $rsCGM );
 
 $stServidor = $inCGM . ' - '. $rsCGM->getCampo( 'nom_cgm' ) ;
 

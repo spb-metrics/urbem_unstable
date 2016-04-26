@@ -68,7 +68,7 @@ function TPessoalServidorContratoServidor()
 
 }
 
-function listar(&$rsLista)
+function listar(&$rsLista,$boTransacao="")
 {
     $obErro      = new Erro;
     $rsLista     = new RecordSet;
@@ -82,7 +82,7 @@ function listar(&$rsLista)
 
     $stFiltro = ( $stFiltro != "" ) ? " WHERE ".substr($stFiltro,4,strlen($stFiltro)) : "";
 
-    $obErro = $this->recuperaTodos( $rsLista, $stFiltro );
+    $obErro = $this->recuperaTodos( $rsLista, $stFiltro ,'',$boTransacao);
 
     return $obErro;
 }

@@ -53,7 +53,7 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
-$stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 $saldo_inicial = 0.00;
   
 switch ($stCtrl) {
@@ -90,8 +90,7 @@ case 'mudaValor':
     $inCodOrgao    = $request->get('inCodOrgao');
     $inCodUnidade  = $request->get('inCodUnidade');
     $stExercicio   = Sessao::getExercicio();
-  //    SistemaLegado::mostraVar($_REQUEST);
-
+    
     $TTCEMGCronogramaExecucaoMensalDesembolso = new TTCEMGCronogramaExecucaoMensalDesembolso;
     $TTCEMGCronogramaExecucaoMensalDesembolso->setDado('cod_entidade'  , $inCodEntidade      );
     $TTCEMGCronogramaExecucaoMensalDesembolso->setDado('num_orgao'     , $inCodOrgao         );
@@ -132,7 +131,7 @@ function montaSpanGruposDespesa(){
     $inCodOrgao    = $request->get('inCodOrgao');
     $inCodUnidade  = $request->get('inCodUnidade');
     $stExercicio   = Sessao::getExercicio();
-    $arIDValor2       = array();
+    $arIDValor2    = array();
     
     $TTCEMGCronogramaExecucaoMensalDesembolso = new TTCEMGCronogramaExecucaoMensalDesembolso;
     $TTCEMGCronogramaExecucaoMensalDesembolso->setDado('cod_entidade'  , $inCodEntidade      );
@@ -141,12 +140,12 @@ function montaSpanGruposDespesa(){
     $TTCEMGCronogramaExecucaoMensalDesembolso->setDado('num_unidade'   , $inCodUnidade       );
     $TTCEMGCronogramaExecucaoMensalDesembolso->recuperaOrgaoUnidade($rsOrgaoUnidade, '', $boTransacao);   
     $TTCEMGCronogramaExecucaoMensalDesembolso->listarPeriodo( $rsListaPeriodo,'', $boTransacao); 
-    $TTCEMGCronogramaExecucaoMensalDesembolso->recuperaSaldoInicial( $rsSaldoInicial,'', $boTransacao ); 
+    $TTCEMGCronogramaExecucaoMensalDesembolso->recuperaSaldoInicial( $rsSaldoInicial,'', $boTransacao );
   
     $nom_orgao = $rsOrgaoUnidade->getCampo('nom_orgao');
     $nom_unidade = $rsOrgaoUnidade->getCampo('nom_unidade');
-    $saldo_inicial = number_format($rsSaldoInicial->getCampo( 'saldo_inicial' ),2, ",", ".");
-  
+    $saldo_inicial = number_format($rsSaldoInicial->getCampo( 'saldo_inicial' ) == "" ? 0.00 : $rsSaldoInicial->getCampo( 'saldo_inicial' ), 2, ",", ".");
+      
     $saldo_total = str_replace(".","",$saldo_inicial);
     $saldo_total = str_replace(",",".",$saldo_total);
   
@@ -179,7 +178,7 @@ function montaSpanGruposDespesa(){
         $rsListaPeriodo->proximo();
     }
 
-    $TTCEMGCronogramaExecucaoMensalDesembolso->recuperaGruposDespesa($rsGruposDespesa, '', $boTransacao);   //$TTCEMGCronogramaExecucaoMensalDesembolso->debug();
+    $TTCEMGCronogramaExecucaoMensalDesembolso->recuperaGruposDespesa($rsGruposDespesa, '', $boTransacao);
     $arValorMensal = array();
     $i = 0 ;
     foreach ( $rsGruposDespesa->getElementos() as $arRegistro ) {
@@ -191,7 +190,7 @@ function montaSpanGruposDespesa(){
             $arValorMensal[$i][$x] = number_format($arIDValor2[$arRegistro['cod_grupo']][$x],2, ",", ".");
         }
         $arValorMensal[$i]['valorTotal'] = number_format($vlSomatorioPeriodo,2, ",", ".");
-        $arValorMensal[$i]['saldo_inicial'] = number_format($rsSaldoInicial->getCampo( 'saldo_inicial' ),2, ",", ".");
+        $arValorMensal[$i]['saldo_inicial'] = number_format($rsSaldoInicial->getCampo( 'saldo_inicial' ) == "" ? 0.00 : $rsSaldoInicial->getCampo( 'saldo_inicial' ), 2, ",", ".");
         $i++;
     }
     

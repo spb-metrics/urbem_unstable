@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterOrdemCompra.php 64595 2016-03-17 17:35:31Z jean $
+    $Id: PRManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -59,7 +59,7 @@ Sessao::getTransacao()->setMapeamento( $obTOrdemCompra );
 
 $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
 $stTipoOrdem = ( strpos($stAcao,'OS')===false ) ? 'C' : 'S';
 $stDesc = ($stTipoOrdem=='C') ? 'Compra' : 'Serviço';
 
@@ -77,7 +77,7 @@ if ( strpos($stAcao,"anular")===false && strpos($stAcao,"reemitir")===false ) {
     $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
     
     foreach ($arItens as $chave =>$dados) {
-        $inQtdItem = str_replace(',','.',str_replace('.','',$_REQUEST['qtdeOC_'.$i]));
+        $inQtdItem = str_replace(',','.',str_replace('.','',$request->get('qtdeOC_'.$i)));
 
         if ($inQtdItem == 0) {
             $itemZerado++;
@@ -86,9 +86,19 @@ if ( strpos($stAcao,"anular")===false && strpos($stAcao,"reemitir")===false ) {
                 SistemaLegado::exibeAviso("Indique o Vínculo do Almoxarifado do Item ".$i." da lista!");
                 $boCodItem = true;
                 $obErro = true;   
-            }
-            else{
-                $arItens[$i-1]['cod_item'] = $arItensAlmoxarifado[$dados['num_item']]['inCodItem'];
+            }else{
+                if( empty($arItensAlmoxarifado[$dados['num_item']]['inCodItem']       ) ||
+                    empty($arItensAlmoxarifado[$dados['num_item']]['inCodCentroCusto']) ||
+                    empty($arItensAlmoxarifado[$dados['num_item']]['inMarca']         )
+                )
+                {
+                    SistemaLegado::exibeAviso("Preencha todos os campos do Vínculo do Almoxarifado do Item ".$i." da lista!");
+                    $boCodItem = true;
+                    $obErro = true;
+                    break;
+                }
+                else
+                    $arItens[$i-1]['cod_item'] = $arItensAlmoxarifado[$dados['num_item']]['inCodItem'];
             }
         }
         $i++;
@@ -118,36 +128,36 @@ if ($obErro == true) {
     }
 
 } else {
-    switch ($_REQUEST['stAcao']) {
+    switch ($stAcao) {
 
     case "incluir":
     case "incluirOS":
-        Sessao::write ('stIncluirAssinaturaUsuario', $_REQUEST['stIncluirAssinaturaUsuario']);
+        Sessao::write ('stIncluirAssinaturaUsuario', $request->get('stIncluirAssinaturaUsuario'));
         $stExercicioOrdemCompra = Sessao::getExercicio();
 
         $obTOrdemCompra = new TComprasOrdem();
-        $obTOrdemCompra->setDado('exercicio_empenho'    , $_REQUEST["stExercicioEmpenho"]   );
-        $obTOrdemCompra->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']        );
-        $obTOrdemCompra->setDado('exercicio'            , Sessao::getExercicio()            );
-        $obTOrdemCompra->setDado('tipo'                 , $stTipoOrdem                      );
+        $obTOrdemCompra->setDado('exercicio_empenho'    , $request->get('stExercicioEmpenho')   );
+        $obTOrdemCompra->setDado('cod_entidade'         , $request->get('inCodEntidade')        );
+        $obTOrdemCompra->setDado('exercicio'            , Sessao::getExercicio()                );
+        $obTOrdemCompra->setDado('tipo'                 , $stTipoOrdem                          );
         $obTOrdemCompra->proximoCod($inCodOrdem);
         $obTOrdemCompra->setDado('cod_ordem'            , $inCodOrdem);
-        $obTOrdemCompra->setDado('cod_empenho'          , $_REQUEST["inCodEmpenho"]         );
-        $obTOrdemCompra->setDado('observacao'           , $_REQUEST["stObservacao"]         );
-        if($_REQUEST['inEntrega'])
-            $obTOrdemCompra->setDado('numcgm_entrega'   , $_REQUEST['inEntrega']            );
+        $obTOrdemCompra->setDado('cod_empenho'          , $request->get('inCodEmpenho')         );
+        $obTOrdemCompra->setDado('observacao'           , $request->get('stObservacao')         );
+        if($request->get('inEntrega'))
+            $obTOrdemCompra->setDado('numcgm_entrega'   , $request->get('inEntrega')            );
         $obTOrdemCompra->inclusao();
 
         $inCount = 1;
 
         foreach ($arItens as $key => $value) {
-            $inQuantidade = str_replace(',','.',str_replace('.','',$_REQUEST['qtdeOC_'.$inCount]));
+            $inQuantidade = str_replace(',','.',str_replace('.','',$request->get('qtdeOC_'.$inCount)));
 
             if ($inQuantidade > 0) {
                 $obTOrdemCompraItem = new TComprasOrdemItem;
                 $obTOrdemCompraItem->setDado('exercicio'                , Sessao::getExercicio()                    );
-                $obTOrdemCompraItem->setDado('exercicio_pre_empenho'    , $_REQUEST['stExercicioEmpenho']           );
-                $obTOrdemCompraItem->setDado('cod_entidade'             , $_REQUEST['inCodEntidade']                );
+                $obTOrdemCompraItem->setDado('exercicio_pre_empenho'    , $request->get('stExercicioEmpenho')       );
+                $obTOrdemCompraItem->setDado('cod_entidade'             , $request->get('inCodEntidade')            );
                 $obTOrdemCompraItem->setDado('cod_ordem'                , $obTOrdemCompra->getDado('cod_ordem')     );
                 $obTOrdemCompraItem->setDado('num_item'                 , $value['num_item']                        );
                 $obTOrdemCompraItem->setDado('cod_pre_empenho'          , $value['cod_pre_empenho']                 );
@@ -160,9 +170,9 @@ if ($obErro == true) {
                     $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
                     $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
 
-                    $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $_REQUEST['stExercicioEmpenho']   );
-                    $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $value['cod_pre_empenho']         );
-                    $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $value['num_item']                );
+                    $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $request->get('stExercicioEmpenho') );
+                    $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $value['cod_pre_empenho']           );
+                    $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $value['num_item']                  );
 
                     $obTEmpenhoItemPreEmpenho->recuperaPorChave($rsItemPreEmpenho);
 
@@ -201,8 +211,8 @@ if ($obErro == true) {
                     }
 
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio()                                        );
-                    $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                               );
-                    $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                                    );
+                    $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')                           );
+                    $obTOrdemCompraItem->setDado('cod_entidade'         , $request->get('inCodEntidade')                                );
                     $obTOrdemCompraItem->setDado('cod_ordem'            , $obTOrdemCompra->getDado('cod_ordem')                         );
                     $obTOrdemCompraItem->setDado('num_item'             , $value['num_item']                                            );
                     $obTOrdemCompraItem->setDado('cod_pre_empenho'      , $value['cod_pre_empenho']                                     );
@@ -218,35 +228,35 @@ if ($obErro == true) {
             }
             $inCount++;
         }
-        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$_REQUEST['inCodEntidade']."&inCodOrdem=".$inCodOrdem."&stTipo=".$_REQUEST['stTipo']."&stTipoOrdem=".$stTipoOrdem."&stExercicioOrdemCompra=".$stExercicioOrdemCompra,"Ordem de $stDesc - ".$obTOrdemCompra->getDado('cod_ordem'),"incluir","incluir_n", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$request->get('inCodEntidade')."&inCodOrdem=".$inCodOrdem."&stTipo=".$request->get('stTipo')."&stTipoOrdem=".$stTipoOrdem."&stExercicioOrdemCompra=".$stExercicioOrdemCompra,"Ordem de $stDesc - ".$obTOrdemCompra->getDado('cod_ordem'),"incluir","incluir_n", Sessao::getId(), "../");
 
     break;
 
     case "alterar":
     case "alterarOS":
-        Sessao::write ('stIncluirAssinaturaUsuario', $_REQUEST['stIncluirAssinaturaUsuario']);
+        Sessao::write ('stIncluirAssinaturaUsuario', $request->get('stIncluirAssinaturaUsuario'));
 
         // altera o campo observacao da tabela
         $obTOrdemCompra = new TComprasOrdem();
-        $obTOrdemCompra->setDado('exercicio_empenho'    , $_REQUEST["stExercicioEmpenho"]       );
-        $obTOrdemCompra->setDado('exercicio'            , $_REQUEST['stExercicioOrdemCompra']   );
-        $obTOrdemCompra->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']            );
-        $obTOrdemCompra->setDado('cod_ordem'            , $_REQUEST['inCodOrdemCompra']         );
-        $obTOrdemCompra->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']       );
-        $obTOrdemCompra->setDado('cod_empenho'          , $_REQUEST['inCodEmpenho']             );
-        $obTOrdemCompra->setDado('observacao'           , $_REQUEST['stObservacao']             );
-        $obTOrdemCompra->setDado('tipo'                 , $stTipoOrdem                          );
-        if($_REQUEST['inEntrega'])
-            $obTOrdemCompra->setDado('numcgm_entrega'   , $_REQUEST['inEntrega']                );
+        $obTOrdemCompra->setDado('exercicio_empenho'    , $request->get('stExercicioEmpenho')       );
+        $obTOrdemCompra->setDado('exercicio'            , $request->get('stExercicioOrdemCompra')   );
+        $obTOrdemCompra->setDado('cod_entidade'         , $request->get('inCodEntidade')            );
+        $obTOrdemCompra->setDado('cod_ordem'            , $request->get('inCodOrdemCompra')         );
+        $obTOrdemCompra->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')       );
+        $obTOrdemCompra->setDado('cod_empenho'          , $request->get('inCodEmpenho')             );
+        $obTOrdemCompra->setDado('observacao'           , $request->get('stObservacao')             );
+        $obTOrdemCompra->setDado('tipo'                 , $stTipoOrdem                              );
+        if($request->get('inEntrega'))
+            $obTOrdemCompra->setDado('numcgm_entrega'   , $request->get('inEntrega')                );
         $obTOrdemCompra->alteracao();
 
         // exclui os dados para inseri-los novamente na tabela
         $obTOrdemCompraItem = new TComprasOrdemItem();
-        $obTOrdemCompraItem->setDado('exercicio'            , $_REQUEST['stExercicioOrdemCompra']   );
-        $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']            );
-        $obTOrdemCompraItem->setDado('cod_ordem'            , $_REQUEST['inCodOrdemCompra']         );
-        $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']       );
-        $obTOrdemCompraItem->setDado('tipo'                 , $stTipoOrdem                          );
+        $obTOrdemCompraItem->setDado('exercicio'            , $request->get('stExercicioOrdemCompra')   );
+        $obTOrdemCompraItem->setDado('cod_entidade'         , $request->get('inCodEntidade')            );
+        $obTOrdemCompraItem->setDado('cod_ordem'            , $request->get('inCodOrdemCompra')         );
+        $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')       );
+        $obTOrdemCompraItem->setDado('tipo'                 , $stTipoOrdem                              );
 
         $obTOrdemCompraItem->recuperaPorChave($rsOrdemCompraItem);
 
@@ -274,12 +284,12 @@ if ($obErro == true) {
 
         foreach ($arItens as $stChave => $stValor) {
             $inCount++;
-            $inQuantidade = str_replace(',','.',str_replace('.','',$_REQUEST['qtdeOC_'.$inCount]));
+            $inQuantidade = str_replace(',','.',str_replace('.','',$request->get('qtdeOC_'.$inCount)));
             if ($inQuantidade > 0) {
-                $obTOrdemCompraItem->setDado('exercicio'            , $_REQUEST['stExercicioOrdemCompra']       );
-                $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']           );
-                $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                );
-                $obTOrdemCompraItem->setDado('cod_ordem'            , $_REQUEST['inCodOrdemCompra']             );
+                $obTOrdemCompraItem->setDado('exercicio'            , $request->get('stExercicioOrdemCompra')   );
+                $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')       );
+                $obTOrdemCompraItem->setDado('cod_entidade'         , $request->get('inCodEntidade')            );
+                $obTOrdemCompraItem->setDado('cod_ordem'            , $request->get('inCodOrdemCompra')         );
                 $obTOrdemCompraItem->setDado('num_item'             , $stValor['num_item']                      );
                 $obTOrdemCompraItem->setDado('cod_pre_empenho'      , $stValor['cod_pre_empenho']               );
                 $obTOrdemCompraItem->setDado('quantidade'           , $inQuantidade                             );
@@ -291,9 +301,9 @@ if ($obErro == true) {
                     $obTEmpenhoItemPreEmpenho  = new TEmpenhoItemPreEmpenho;
                     $obTAlmoxarifadoCatalogoItemMarca = new TAlmoxarifadoCatalogoItemMarca;
 
-                    $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $_REQUEST['stExercicioEmpenho']   );
-                    $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $stValor['cod_pre_empenho']       );
-                    $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $stValor['num_item']              );
+                    $obTEmpenhoItemPreEmpenho->setDado( "exercicio"         , $request->get('stExercicioEmpenho') );
+                    $obTEmpenhoItemPreEmpenho->setDado( "cod_pre_empenho"   , $stValor['cod_pre_empenho']         );
+                    $obTEmpenhoItemPreEmpenho->setDado( "num_item"          , $stValor['num_item']                );
 
                     $obTEmpenhoItemPreEmpenho->recuperaPorChave($rsItemPreEmpenho);
 
@@ -332,8 +342,8 @@ if ($obErro == true) {
                     }
 
                     $obTOrdemCompraItem->setDado('exercicio'            , Sessao::getExercicio());
-                    $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                                   );
-                    $obTOrdemCompraItem->setDado('cod_entidade'         , $_REQUEST['inCodEntidade']                                        );
+                    $obTOrdemCompraItem->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')                               );
+                    $obTOrdemCompraItem->setDado('cod_entidade'         , $request->get('inCodEntidade')                                    );
                     $obTOrdemCompraItem->setDado('cod_ordem'            , $obTOrdemCompra->getDado('cod_ordem')                             );
                     $obTOrdemCompraItem->setDado('num_item'             , $stValor['num_item']                                              );
                     $obTOrdemCompraItem->setDado('cod_pre_empenho'      , $stValor['cod_pre_empenho']                                       );
@@ -347,16 +357,16 @@ if ($obErro == true) {
                 }
             }
         }
-        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$_REQUEST['inCodEntidade']."&inCodOrdem=".$_REQUEST['inCodOrdemCompra']."&stTipo=".$_REQUEST['stTipo']."&stTipoOrdem=".$stTipoOrdem."&stExercicioOrdemCompra=".$_REQUEST['stExercicioOrdemCompra'],"Ordem de $stDesc - ".$_REQUEST['inCodOrdemCompra'],"incluir","incluir", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$request->get('inCodEntidade')."&inCodOrdem=".$request->get('inCodOrdemCompra')."&stTipo=".$request->get('stTipo')."&stTipoOrdem=".$stTipoOrdem."&stExercicioOrdemCompra=".$request->get('stExercicioOrdemCompra'),"Ordem de $stDesc - ".$request->get('inCodOrdemCompra'),"incluir","incluir", Sessao::getId(), "../");
     break;
     case "anular":
     case "anularOS":
         $obTOrdemCompraAnulacao = new TComprasOrdemAnulacao();
-        $obTOrdemCompraAnulacao->setDado('exercicio'    , $_REQUEST['stExercicioOrdemCompra']   );
-        $obTOrdemCompraAnulacao->setDado('cod_entidade' , $_REQUEST['inCodEntidade']            );
-        $obTOrdemCompraAnulacao->setDado('cod_ordem'    , $_REQUEST['inCodOrdemCompra']         );
-        $obTOrdemCompraAnulacao->setDado('motivo'       , $_REQUEST['stMotivo']                 );
-        $obTOrdemCompraAnulacao->setDado('tipo'         , $stTipoOrdem                          );
+        $obTOrdemCompraAnulacao->setDado('exercicio'    , $request->get('stExercicioOrdemCompra')   );
+        $obTOrdemCompraAnulacao->setDado('cod_entidade' , $request->get('inCodEntidade')            );
+        $obTOrdemCompraAnulacao->setDado('cod_ordem'    , $request->get('inCodOrdemCompra')         );
+        $obTOrdemCompraAnulacao->setDado('motivo'       , $request->get('stMotivo')                 );
+        $obTOrdemCompraAnulacao->setDado('tipo'         , $stTipoOrdem                              );
         $obTOrdemCompraAnulacao->inclusao();
         $obTOrdemCompraAnulacao->recuperaDados( $rsOrdemCompraAnulacao );
 
@@ -376,18 +386,18 @@ if ($obErro == true) {
                 $obTOrdemCompraItemAnulacao->setDado('quantidade'           , $flQuantidade                                     );
                 $obTOrdemCompraItemAnulacao->setDado('vl_total'             , $flQuantidade * $stValor['vl_unitario']           );
                 $obTOrdemCompraItemAnulacao->setDado('tipo'                 , $stTipoOrdem                                      );
-                $obTOrdemCompraItemAnulacao->setDado('exercicio_pre_empenho', $_REQUEST['stExercicioEmpenho']                   );
+                $obTOrdemCompraItemAnulacao->setDado('exercicio_pre_empenho', $request->get('stExercicioEmpenho')               );
                 $obTOrdemCompraItemAnulacao->inclusao();
             }
         }
 
-        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Ordem de $stDesc - ".$_REQUEST['inCodOrdemCompra']."","excluir","excluir", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgList."?".Sessao::getId()."&stAcao=".$stAcao,"Ordem de $stDesc - ".$request->get('inCodOrdemCompra')."","excluir","excluir", Sessao::getId(), "../");
     break;
 
     case 'reemitir':
     case 'reemitirOS':
         $stIncluirAssinaturaUsuario = Sessao::read('stIncluirAssinaturaUsuario');
-        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$_REQUEST['inCodEntidade']."&inCodOrdem=".$_REQUEST['inCodOrdemCompra']."&stTipo=".$_REQUEST['stTipo']."&stTipoOrdem=".$_REQUEST['stTipoOrdem']."&stExercicioOrdemCompra=".$_REQUEST['stExercicioOrdemCompra']."&stIncluirAssinaturaUsuario=".$stIncluirAssinaturaUsuario,"Ordem de $stDesc - ".$_REQUEST['inCodOrdemCompra'],"incluir","incluir", Sessao::getId(), "../");
+        SistemaLegado::alertaAviso($pgRel."&inCodEntidade=".$request->get('inCodEntidade')."&inCodOrdem=".$request->get('inCodOrdemCompra')."&stTipo=".$request->get('stTipo')."&stTipoOrdem=".$request->get('stTipoOrdem')."&stExercicioOrdemCompra=".$request->get('stExercicioOrdemCompra')."&stIncluirAssinaturaUsuario=".$stIncluirAssinaturaUsuario,"Ordem de $stDesc - ".$request->get('inCodOrdemCompra'),"incluir","incluir", Sessao::getId(), "../");
     break;
 
     }

@@ -29,12 +29,13 @@
  * @category    Urbem
  * @package     TCE/MG
  * @author      Eduardo Schitz   <eduardo.schitz@cnm.org.br>
- * $Id: OCExportarFolhaPagamento.php 64796 2016-04-01 14:39:22Z franver $
+ * $Id: OCExportarFolhaPagamento.php 64860 2016-04-08 12:38:08Z evandro $
  */
 set_time_limit(0);
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CLA_EXPORTADOR;
 include_once CAM_GPC_TCEMG_MAPEAMENTO.'TTCEMGConfigurarIDE.class.php';
+include_once(CAM_GRH_ENT_MAPEAMENTO."TEntidade.class.php");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ExportarFolhaPagamento" ;
@@ -46,6 +47,7 @@ $pgOcul     = "OC".$stPrograma.".php";
 SistemaLegado::BloqueiaFrames();
 
 $obExportador = new Exportador();
+$obTEntidade = new TEntidade();
 
 $arFiltro = Sessao::read('filtroRelatorio');
 if( array_key_exists('stExercicioExportador',$arFiltro) ){
@@ -54,7 +56,31 @@ if( array_key_exists('stExercicioExportador',$arFiltro) ){
     $stExercicioFiltro = Sessao::getExercicio();
 }
 
-$stEntidades = implode(",",$arFiltro['inCodEntidade']);
+// Busca a entidade definida como prefeitura na configuração do orçamento
+$stCampo   = "valor";
+$stTabela  = "administracao.configuracao";
+$stFiltro  = " WHERE exercicio = '".Sessao::getExercicio()."'";
+$stFiltro .= "   AND parametro = 'cod_entidade_prefeitura' ";
+
+$inCodEntidadePrefeitura = SistemaLegado::pegaDado($stCampo, $stTabela, $stFiltro);
+
+// Se foi selecionada a entidade definida como prefeitura, não vai "_" no schema
+if ($arFiltro['inCodEntidade'] == $inCodEntidadePrefeitura) {
+    Sessao::setEntidade('');
+} else {
+    // Se não foi selecionada a entidade definida como prefeitura
+    // ao executar as consultas, automaticamente é adicionado o "_" + cod_entidade selecionada
+    $arSchemasRH = array();
+    $obTEntidade->recuperaSchemasRH($rsSchemasRH);
+    while (!$rsSchemasRH->eof()) {
+        $arSchemasRH[] = $rsSchemasRH->getCampo("schema_nome");
+        $rsSchemasRH->proximo();
+    }
+    Sessao::write('arSchemasRH', $arSchemasRH, true);
+    Sessao::setEntidade($arFiltro['inCodEntidade']);
+}
+
+$stEntidades = $arFiltro['inCodEntidade'];
 $inMes = $arFiltro['inMes'];
 
 SistemaLegado::retornaInicialFinalMesesPeriodicidade($arDatasInicialFinal, '', $inMes, $stExercicioFiltro);
@@ -62,7 +88,7 @@ SistemaLegado::retornaInicialFinalMesesPeriodicidade($arDatasInicialFinal, '', $
 foreach($arFiltro['arArquivosSelecionados'] AS $stArquivo){
     $obExportador->addArquivo($stArquivo);
     $obExportador->roUltimoArquivo->setTipoDocumento('TCE_MG');
-    $arNomArquivo = explode('.',$stArquivo);
+    $arNomArquivo = explode('.',$stArquivo);    
     include_once(CAM_GPC_TCEMG_INSTANCIAS."layout_arquivos/folhaPagamento/".Sessao::getExercicio()."/".$arNomArquivo[0].".inc.php");
 }
 

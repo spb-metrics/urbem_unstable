@@ -44,7 +44,6 @@ DECLARE
     
     inIndice                    INTEGER := 0;
     inCodLote                   INTEGER := 0;
-    inCodPlanoTipoBaixa         INTEGER := 0;
     inCodPlanoDeb               INTEGER := 0;
     inCodPlanoCred              INTEGER := 0;
     inSequencia                 INTEGER := 0;
@@ -58,48 +57,7 @@ DECLARE
     reCodPlano                  RECORD;
     reBaixaBem                  RECORD;
 BEGIN
-   
-    -- Através do tipo de baixa, seta o codigo_estrutural para buscar o cod_plano, que será usado no Débito, ou crédito quando estorno.
-    IF PinTipoBaixa = 1 THEN
-        -- Doação de bens Imóveis 
-        stCodEstruturalBaixa := '3.5.1.2.2.02.02.00.00.00';
-    
-    ELSEIF PinTipoBaixa = 2 THEN
-        -- Doação de bens Móveis
-        stCodEstruturalBaixa := '3.5.1.2.2.02.04.00.00.00';
-    
-    ELSEIF PinTipoBaixa = 3 THEN
-        -- Transferência de bens Imóveis
-        stCodEstruturalBaixa := '3.5.1.2.2.02.01.00.00.00';
-    
-    ELSEIF PinTipoBaixa = 4 THEN
-        -- Transferência de bens Móveis
-        stCodEstruturalBaixa := '3.5.1.2.2.02.03.00.00.00';
-    
-    ELSEIF PinTipoBaixa = 5 THEN
-        -- Perda Involuntária de bens Imóveis
-        stCodEstruturalBaixa := '3.6.3.1.1.02.00.00.00.00';
-    
-    ELSEIF PinTipoBaixa = 6 THEN
-        -- Perda Involuntária de bens Móveis
-        stCodEstruturalBaixa := '3.6.3.1.1.01.00.00.00.00';
-    END IF;
-    
-    -- Verifica a partir do estrutural do tipo de baixa, se está cadastrada no sistema...
-     SELECT INTO
-            inCodPlanoTipoBaixa
-            cod_plano
-      FROM contabilidade.plano_conta 
-INNER JOIN contabilidade.plano_analitica
-        ON plano_analitica.exercicio  = plano_conta.exercicio 
-       AND plano_analitica.cod_conta  = plano_conta.cod_conta 
-     WHERE plano_conta.cod_estrutural = stCodEstruturalBaixa
-       AND plano_analitica.exercicio  = PstExercicio;
-       
-    IF inCodPlanoTipoBaixa IS NULL THEN
-        RAISE EXCEPTION 'Conta ( % ) não é analítica ou não está cadastrada no plano de contas.', stCodEstruturalBaixa;
-    END IF;
-    
+
     stSql := '
             SELECT grupo_plano_analitica.cod_plano
                  , CASE WHEN '|| PinTipoBaixa || ' = 1 OR '|| PinTipoBaixa || ' = 2 THEN grupo_plano_analitica.cod_plano_doacao
@@ -179,13 +137,13 @@ INNER JOIN contabilidade.plano_analitica
     
         -- Conforme parametro passado verifica se é ou não Estorno, caso seja, inverte as contas de lançamento.
         IF PboEstorno = FALSE THEN
-            inCodPlanoDeb  := inCodPlanoTipoBaixa;
-            inCodPlanoCred := reBaixaBem.cod_plano_tipo_baixa;
+            inCodPlanoDeb  := reBaixaBem.cod_plano_tipo_baixa;
+            inCodPlanoCred := reBaixaBem.cod_plano;
             stNomeLote     := 'Lançamento de Baixa Patrimonial de Bem na data: ' || TO_CHAR(PdtDataBaixa, 'DD/MM/YYYY');
             stComplemento  := 'Baixa de Bem na data: ' || TO_CHAR(PdtDataBaixa, 'DD/MM/YYYY');
         ELSE
-            inCodPlanoDeb  := reBaixaBem.cod_plano_tipo_baixa;
-            inCodPlanoCred := inCodPlanoTipoBaixa;
+            inCodPlanoDeb  := reBaixaBem.cod_plano;
+            inCodPlanoCred := reBaixaBem.cod_plano_tipo_baixa;
             stNomeLote     := 'Lançamento de Estorno de Baixa Patrimonial de Bem: ' || TO_CHAR(PdtDataBaixa, 'DD/MM/YYYY');
             stComplemento  := 'Estorno de Baixa de Bem na data: ' || TO_CHAR(PdtDataBaixa, 'DD/MM/YYYY');
         END IF;

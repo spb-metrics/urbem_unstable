@@ -166,8 +166,8 @@ switch ($stAcao) {
                 }elseif ($inCountBensCompetencia<=0) {
                     $obErro->setDescricao("Não há bem a ser depreciado na competência ".$inMesCompetenciaMensagem."!");
                 }else {
-                    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica;
-                    $obFPAtrimonioReavaliacaoDepreciacaoAutomatica = new FPatrimonioReavaliacaoDepreciacaoAutomatica;
+                    $obFPAtrimonioDepreciacaoAutomatica = new FPatrimonioDepreciacaoAutomatica();
+                    $obFPAtrimonioReavaliacaoDepreciacaoAutomatica = new FPatrimonioReavaliacaoDepreciacaoAutomatica();
 
                     $stParametros  = '\''.$request->get("inExercicio").'\',';
                     $stParametros .= '\''.str_pad($request->get("inCompetencia"),2,'0',STR_PAD_LEFT).'\',';

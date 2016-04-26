@@ -31,11 +31,11 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
 
   * @ignore
-  * $Id: FMManterConfiguracaoArquivoDCLRF.php 64770 2016-03-30 19:33:22Z lisiane $
+  * $Id: FMManterConfiguracaoArquivoDCLRF.php 64886 2016-04-11 17:22:14Z evandro $
   *   
-  * $Rev: 64770 $
-  * $Author: lisiane $
-  * $Date: 2016-03-30 16:33:22 -0300 (Qua, 30 Mar 2016) $
+  * $Rev: 64886 $
+  * $Author: evandro $
+  * $Date: 2016-04-11 14:22:14 -0300 (Seg, 11 Abr 2016) $
 */
 include_once("../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php");
 include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php");
@@ -57,6 +57,11 @@ $obTTCEMGConfiguracaoArquivoDCLRF->recuperaValoresArquivoDCLRF($rsTTCEMGConfigur
 
 if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0) {
     $vlSaldoAtualConcessoesGarantia               = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_concessoes_garantia'), '2', ',', '.');
+    $vlSaldoAtualConcessoesGarantiaInterna        = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_concessoes_garantia_interna'), '2', ',', '.');
+    $vlSaldoAtualConcessoesGarantiaExterna        = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_concessoes_garantia'), '2', ',', '.');
+    $vlSaldoAtualContraConcessoesGarantiaInterna  = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_contra_concessoes_garantia_interna'), '2', ',', '.');
+    $vlSaldoAtualContraConcessoesGarantiaExterna  = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_saldo_atual_contra_concessoes_garantia_externa'), '2', ',', '.');
+    $stMedidasCorretivas                          = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('medidas_corretivas');
     $vlReceitaPrivatizacao                        = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('receita_privatizacao'), '2', ',', '.');
     $vlLiquidadoIncentivoContribuinte             = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_liquidado_incentivo_contribuinte'), '2', ',', '.');
     $vlLiquidadoIncentivoInstituicaoFinanceiro    = number_format($rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('valor_liquidado_incentivo_instituicao_financeira'), '2', ',', '.');
@@ -70,7 +75,7 @@ if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0) {
     $inMetaBimestral                              = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('meta_bimestral');
     $stMedidasAdotadas                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('medida_adotada');
     $inContOpCredito                              = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('cont_op_credito');
-    $stMedidasAdotadas                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('desc_cont_op_credito');
+    $stDescricaoOPCredito                         = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('desc_cont_op_credito');
     $inRealizOpCredito                            = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('realiz_op_credito');
     $inTipoRealizOpCreditoCapta                   = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_capta');
     $inTipoRealizOpCreditoReceb                   = $rsTTCEMGConfiguracaoArquivoDCLRF->getCampo('tipo_realiz_op_credito_receb');
@@ -79,6 +84,10 @@ if($rsTTCEMGConfiguracaoArquivoDCLRF->getNumLinhas() > 0) {
 
 } else {
     $vlSaldoAtualConcessoesGarantia = "0,00";
+    $vlSaldoAtualConcessoesGarantiaExterna = "0,00";
+    $vlSaldoAtualConcessoesGarantiaInterna = "0,00";
+    $vlSaldoAtualContraConcessoesGarantiaExterna = "0,00";
+    $vlSaldoAtualContraConcessoesGarantiaInterna = "0,00"; 
     $vlReceitaPrivatizacao = "0,00";
     $vlLiquidadoIncentivoContribuinte = "0,00";
     $vlLiquidadoIncentivoInstituicaoFinanceiro = "0,00";
@@ -126,6 +135,55 @@ $obFlValorSaldoAtualConcessoesGarantia->setDecimais(2);
 $obFlValorSaldoAtualConcessoesGarantia->setMaxLength(15);
 $obFlValorSaldoAtualConcessoesGarantia->setSize(17);
 $obFlValorSaldoAtualConcessoesGarantia->setValue($vlSaldoAtualConcessoesGarantia);
+
+$obFlValorSaldoAtualConcessoesGarantiaInterna = new Numerico();
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setId('flValorSaldoAtualConcessoesGarantiaInterna');
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setName('flValorSaldoAtualConcessoesGarantiaInterna');
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setRotulo('Saldo atual das concessões de garantia Interna');
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setTitle('Saldo atual das concessões de garantia INTERNAS decorrentes do compromisso de adimplência de obrigação financeira ou contratual assumida por Ente da Federação ou entidade a ele vinculada (art. 29, IV, da Lei de Responsabilidade Fiscal).');
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setDecimais(2);
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setMaxLength(15);
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setSize(17);
+$obFlValorSaldoAtualConcessoesGarantiaInterna->setValue($vlSaldoAtualConcessoesGarantiaInterna);
+
+$obFlValorSaldoAtualConcessoesGarantiaExterna = new Numerico();
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setId('flValorSaldoAtualConcessoesGarantiaExterna');
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setName('flValorSaldoAtualConcessoesGarantiaExterna');
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setRotulo('Saldo atual das concessões de garantia Externa');
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setTitle('Saldo atual das concessões de garantia EXTERNAS decorrentes do compromisso de adimplência de obrigação financeira ou contratual assumida por Ente da Federação ou entidade a ele vinculada (art. 29, IV, da Lei de Responsabilidade Fiscal).');
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setDecimais(2);
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setMaxLength(15);
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setSize(17);
+$obFlValorSaldoAtualConcessoesGarantiaExterna->setValue($vlSaldoAtualConcessoesGarantiaExterna);
+
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna = new Numerico();
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setId('flValorSaldoAtualContraConcessoesGarantiaInterna');
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setName('flValorSaldoAtualContraConcessoesGarantiaInterna');
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setRotulo('Saldo atual das contra garantias Interna Recebidas');
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setTitle('Saldo atual das contra garantias INTERNAS recebidas em virtude da concessão de garantias às operações internas, tendo por finalidade salvaguardar o ente dos riscos decorrentes da concessão de garantias, nos termos da lei.');
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setDecimais(2);
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setMaxLength(15);
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setSize(17);
+$obFlValorSaldoAtualContraConcessoesGarantiaInterna->setValue($vlSaldoAtualContraConcessoesGarantiaInterna);
+
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna = new Numerico();
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setId('flValorSaldoAtualContraConcessoesGarantiaExterna');
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setName('flValorSaldoAtualContraConcessoesGarantiaExterna');
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setRotulo('Saldo atual das contra garantias Externa Recebidas');
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setTitle('Saldo atual das contra garantias EXTERNAS recebidas em virtude da concessão de garantias às operações externas, tendo por finalidade salvaguardar o ente dos riscos decorrentes da concessão de garantias, nos termos da lei.');
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setDecimais(2);
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setMaxLength(15);
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setSize(17);
+$obFlValorSaldoAtualContraConcessoesGarantiaExterna->setValue($vlSaldoAtualContraConcessoesGarantiaExterna);
+
+$obTxtMedidasCorretivas = new TextArea();
+$obTxtMedidasCorretivas->setName('stMedidasCorretivas');
+$obTxtMedidasCorretivas->setId('stMedidasCorretivas');
+$obTxtMedidasCorretivas->setRotulo('Deverá ser indicado as medidas corretivas adotadas ou a adotar caso o ente ultrapasse o limite de concessão de Garantia, definido no art. 9º da Resolução n.º 43/2002 do Senado Federal.');
+$obTxtMedidasCorretivas->setMaxCaracteres(4000);
+$obTxtMedidasCorretivas->setRows(3);
+$obTxtMedidasCorretivas->setValue($stMedidasCorretivas);
+$obTxtMedidasCorretivas->setNull(true);
 
 $obFlValorReceitaPrivatizacao = new Numerico();
 $obFlValorReceitaPrivatizacao->setId('flValorReceitaPrivatizacao');
@@ -293,7 +351,7 @@ if($_REQUEST['inMes'] == 12) {
     $obTxtDescContOpCredito->setRotulo('Informe a ocorrência de cancelamento, amortização ou constituição de reserva, de acordo com o artigo 33 da Lei Complementar n°101/2000.');
     $obTxtDescContOpCredito->setMaxCaracteres(1000);
     $obTxtDescContOpCredito->setRows(3);
-    $obTxtDescContOpCredito->setValue($stMedidasAdotadas);
+    $obTxtDescContOpCredito->setValue($stDescricaoOPCredito);
     $obTxtDescContOpCredito->setNull(true);
     
     $obRdRealizOpCredito_S = new Radio;
@@ -401,7 +459,16 @@ $obFormulario->addHidden       ( $obHdnMes );
 $obFormulario->setLarguraRotulo( 40 );
 $obFormulario->setLarguraCampo ( 60 );
 $obFormulario->addTitulo       ( "Configuração do Arquivo Dados Complementares à LRF" );
-$obFormulario->addComponente   ( $obFlValorSaldoAtualConcessoesGarantia );
+if(Sessao::getExercicio() >= 2016) {
+    $obFormulario->addComponente     ( $obFlValorSaldoAtualConcessoesGarantiaInterna );
+    $obFormulario->addComponente     ( $obFlValorSaldoAtualConcessoesGarantiaExterna );
+    $obFormulario->addComponente     ( $obFlValorSaldoAtualContraConcessoesGarantiaInterna );
+    $obFormulario->addComponente     ( $obFlValorSaldoAtualContraConcessoesGarantiaExterna );    
+    $obFormulario->addComponente     ( $obTxtMedidasCorretivas );
+}else{
+    $obFormulariomulario->addComponente   ( $obFlValorSaldoAtualConcessoesGarantia );
+}
+
 $obFormulario->addComponente   ( $obFlValorReceitaPrivatizacao );
 $obFormulario->addComponente   ( $obFlValorLiquidadoIncentivoContribuinte );
 $obFormulario->addComponente   ( $obFlValorLiquidadoIncentivoInstituicaoFinanceiro );
@@ -414,7 +481,7 @@ if(Sessao::getExercicio() >= 2016) {
     $obFormulario->agrupaComponentes ( array($obRdPublicacaoRelatorioLRF_S, $obRdPublicacaoRelatorioLRF_N ));
     $obFormulario->addComponente     ( $obDtPublicacaoRelatorioLRF );
     $obFormulario->addComponente     ( $obCmbBimestre );
-    $obFormulario->agrupaComponentes ( array($obRdMetaBimestral_S, $obRdMetaBimestral_N ));
+    $obFormulario->agrupaComponentes ( array($obRdMetaBimestral_S, $obRdMetaBimestral_N ));    
     $obFormulario->addComponente     ( $obTxtMedidasAdotadas );
 
     if($_REQUEST['inMes'] == 12) {

@@ -47,7 +47,7 @@ include_once ( CAM_GRH_PES_NEGOCIO.'RPessoalPensao.class.php'                   
 
 function montaSpanContrato($boExecuta=false)
 {
-    $obIFiltroContrato = new IFiltroContrato;
+    $obIFiltroContrato = new IFiltroContrato('todos',false);
     $obIFiltroContrato->setInformacoesFuncao  ( false );
     $obIFiltroContrato->obIContratoDigitoVerificador->setNull( false );
 
@@ -73,7 +73,7 @@ function montaSpanContrato($boExecuta=false)
 
 function montaSpanCGMContrato($boExecuta=false)
 {
-    $obIFiltroCGMContrato = new IFiltroCGMContrato;
+    $obIFiltroCGMContrato = new IFiltroCGMContrato('todos',false);
     $obIFiltroCGMContrato->setInformacoesFuncao  ( false );
     $obIFiltroCGMContrato->obCmbContrato->setNull( false );
 

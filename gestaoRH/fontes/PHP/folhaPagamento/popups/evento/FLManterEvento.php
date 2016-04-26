@@ -57,6 +57,7 @@ $stAcao              = $_REQUEST['stAcao'];
 $stCtrl              = $_REQUEST['stCtrl'];
 $campoNum            = $_REQUEST['campoNum'];
 $campoNom            = $_REQUEST['campoNom'];
+$campoTexto          = $_REQUEST['stTextoComplementar'];
 $nomForm             = $_REQUEST['nomForm'];
 $inCodigoEvento      = $_REQUEST['inCodigoEvento'];
 $stDescricao         = $_REQUEST['stDescricao'];
@@ -112,6 +113,10 @@ $obHdnCampoNum->setValue                        ( $campoNum                     
 $obHdnCampoNom =  new Hidden;
 $obHdnCampoNom->setName                         ( "campoNom"                                            );
 $obHdnCampoNom->setValue                        ( $campoNom                                             );
+
+$obHdnCampoTexto =  new Hidden;
+$obHdnCampoTexto->setName                         ( "campoTexto"                                        );
+$obHdnCampoTexto->setValue                        ( $campoTexto                                         );
 
 $obHdnNomForm =  new Hidden;
 $obHdnNomForm->setName                          ( "nomForm"                                             );
@@ -225,6 +230,7 @@ $obFormulario->addHidden                        ( $obHdnNaturezaCheked          
 $obFormulario->addHidden                        ( $obHdnNaturezasAceitas                                );
 $obFormulario->addHidden                        ( $obHdnCampoNum                                        );
 $obFormulario->addHidden                        ( $obHdnCampoNom                                        );
+$obFormulario->addHidden                        ( $obHdnCampoTexto                                      );
 $obFormulario->addHidden                        ( $obHdnNomForm                                         );
 $obFormulario->addHidden                        ( $obHdnEventoSistema                                   );
 $obFormulario->addHidden                        ( $obHdnTipoEvento                                      );

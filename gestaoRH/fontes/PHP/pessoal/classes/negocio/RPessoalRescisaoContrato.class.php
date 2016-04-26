@@ -334,9 +334,7 @@ class RPessoalRescisaoContrato
      **/
     public function incluirRescisaoContrato($boTransacao = "")
     {
-        $boFlagTransacao = false;
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
-
+        $obErro = new Erro();
         if ( !$obErro->ocorreu() ) {
             $this->obTPessoalContratoServidorCasoCausa->setDado( 'cod_contrato'   , $this->obRPessoalContratoServidor->getCodContrato() );
             $this->obTPessoalContratoServidorCasoCausa->setDado( 'cod_caso_causa' , $this->obRPessoalCausaRescisao->roUltimoPessoalCasoCausa->getCodCasoCausa() );
@@ -437,8 +435,6 @@ class RPessoalRescisaoContrato
                 $rsAssentamentoAssentamento->proximo();
             }
         }
-        ###Assentamento###
-        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTPessoalContratoServidorCasoCausa );
 
         return $obErro;
     }
@@ -451,8 +447,7 @@ class RPessoalRescisaoContrato
      **/
     public function incluirRescisaoContratoPensionista($boTransacao = "")
     {
-        $boFlagTransacao = false;
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        $obErro = new Erro();
 
         if ( !$obErro->ocorreu() ) {
             $this->obTPessoalContratoPensionistaCasoCausa->setDado( 'cod_contrato'   , $this->obRPessoalContrato->getCodContrato() );
@@ -493,8 +488,6 @@ class RPessoalRescisaoContrato
             $obErro = $obFFolhaPagamentoGeraRegistroRescisao->geraRegistroRescisao($rsRetorno,$boTransacao);
         }
 
-        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTPessoalContratoPensionistaCasoCausa );
-
         return $obErro;
     }
 
@@ -506,8 +499,7 @@ class RPessoalRescisaoContrato
      **/
     public function excluirRescisaoContrato($boTransacao = "")
     {
-        $boFlagTransacao = false;
-        $obErro = $this->obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+        $obErro =  new Erro();
         if ( !$obErro->ocorreu() ) {
             $this->obTPessoalContratoServidorCasoCausa->setDado('cod_contrato', $this->obRPessoalContratoServidor->getCodContrato() );
             $obErro = $this->obTPessoalContratoServidorCasoCausa->recuperaPorChave($rsContratoRescisao,$boTransacao);
@@ -649,7 +641,6 @@ class RPessoalRescisaoContrato
             $obTFolhaPagamentoDeducaoDependente->setDado("cod_tipo",5);
             $obErro = $obTFolhaPagamentoDeducaoDependente->exclusao($boTransacao);
         }
-        $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTPessoalContratoServidorCasoCausa );
 
         return $obErro;
     }

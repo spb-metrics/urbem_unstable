@@ -34,11 +34,11 @@
     * @package URBEM
     * @subpackage Mapeamento
     *
-    * $Id: TTCEMGConfiguracaoArquivoDCLRF.class.php 64693 2016-03-22 14:02:13Z jean $
+    * $Id: TTCEMGConfiguracaoArquivoDCLRF.class.php 64864 2016-04-08 17:03:33Z evandro $
     *
-    * $Date: 2016-03-22 11:02:13 -0300 (Ter, 22 Mar 2016) $
-    * $Author: jean $
-    * $Rev: 64693 $
+    * $Date: 2016-04-08 14:03:33 -0300 (Sex, 08 Abr 2016) $
+    * $Author: evandro $
+    * $Rev: 64864 $
 */
 
 include_once( "../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php" );
@@ -78,6 +78,10 @@ class TTCEMGConfiguracaoArquivoDCLRF extends Persistente {
         $this->AddCampo('tipo_realiz_op_credito_receb'                        , 'integer', false,     '', false, false);
         $this->AddCampo('tipo_realiz_op_credito_assun_dir'                    , 'integer', false,     '', false, false);
         $this->AddCampo('tipo_realiz_op_credito_assun_obg'                    , 'integer', false,     '', false, false);
+        $this->AddCampo('valor_saldo_atual_concessoes_garantia_interna'       , 'numeric', false, '14,2', false, false);
+        $this->AddCampo('valor_saldo_atual_contra_concessoes_garantia_interna', 'numeric', false, '14,2', false, false);
+        $this->AddCampo('valor_saldo_atual_contra_concessoes_garantia_externa', 'numeric', false, '14,2', false, false);
+        $this->AddCampo('medidas_corretivas'                                  , 'text'   , false,     '', false, false);
     }    
     
     function recuperaValoresArquivoDCLRF(&$rsRecordSet) {
@@ -96,27 +100,31 @@ class TTCEMGConfiguracaoArquivoDCLRF extends Persistente {
         }
         
         $stSql .= "
-             , mes_referencia
-             , REPLACE(valor_saldo_atual_concessoes_garantia::VARCHAR, '.',',') AS valor_saldo_atual_concessoes_garantia
-             , REPLACE(receita_privatizacao::VARCHAR, '.',',') AS receita_privatizacao
-             , REPLACE(valor_liquidado_incentivo_contribuinte::VARCHAR, '.',',') AS valor_liquidado_incentivo_contribuinte
-             , REPLACE(valor_liquidado_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_liquidado_incentivo_instituicao_financeira
-             , REPLACE(valor_inscrito_rpnp_incentivo_contribuinte::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_contribuinte
-             , REPLACE(valor_inscrito_rpnp_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_instituicao_financeira
-             , REPLACE(valor_compromissado::VARCHAR, '.',',') AS valor_compromissado
-             , REPLACE(valor_recursos_nao_aplicados::VARCHAR, '.',',') AS valor_recursos_nao_aplicados
-             , publicacao_relatorio_lrf
-             , TO_CHAR(dt_publicacao_relatorio_lrf, 'DD/MM/YYYY') AS dt_publicacao_relatorio_lrf
-             , bimestre
-             , meta_bimestral
-             , medida_adotada
-             , cont_op_credito
-             , desc_cont_op_credito
-             , realiz_op_credito
-             , tipo_realiz_op_credito_capta
-             , tipo_realiz_op_credito_receb
-             , tipo_realiz_op_credito_assun_dir
-             , tipo_realiz_op_credito_assun_obg
+            , mes_referencia
+            , REPLACE(valor_saldo_atual_concessoes_garantia::VARCHAR, '.',',') AS valor_saldo_atual_concessoes_garantia
+            , REPLACE(receita_privatizacao::VARCHAR, '.',',') AS receita_privatizacao
+            , REPLACE(valor_liquidado_incentivo_contribuinte::VARCHAR, '.',',') AS valor_liquidado_incentivo_contribuinte
+            , REPLACE(valor_liquidado_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_liquidado_incentivo_instituicao_financeira
+            , REPLACE(valor_inscrito_rpnp_incentivo_contribuinte::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_contribuinte
+            , REPLACE(valor_inscrito_rpnp_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_instituicao_financeira
+            , REPLACE(valor_compromissado::VARCHAR, '.',',') AS valor_compromissado
+            , REPLACE(valor_recursos_nao_aplicados::VARCHAR, '.',',') AS valor_recursos_nao_aplicados
+            , publicacao_relatorio_lrf
+            , TO_CHAR(dt_publicacao_relatorio_lrf, 'DD/MM/YYYY') AS dt_publicacao_relatorio_lrf
+            , bimestre
+            , meta_bimestral
+            , medida_adotada
+            , cont_op_credito
+            , desc_cont_op_credito
+            , realiz_op_credito
+            , tipo_realiz_op_credito_capta
+            , tipo_realiz_op_credito_receb
+            , tipo_realiz_op_credito_assun_dir
+            , tipo_realiz_op_credito_assun_obg
+            , valor_saldo_atual_concessoes_garantia_interna
+            , valor_saldo_atual_contra_concessoes_garantia_interna
+            , valor_saldo_atual_contra_concessoes_garantia_externa
+            , medidas_corretivas
              
           FROM tcemg.configuracao_arquivo_dclrf 
          WHERE exercicio = '".$this->getDado('exercicio')."'

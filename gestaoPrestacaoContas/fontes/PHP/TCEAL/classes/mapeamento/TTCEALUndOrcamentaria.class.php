@@ -27,7 +27,7 @@
     *
     * @author: Franver Sarmento de Moraes
     *
-    * $Id: TTCEALUndOrcamentaria.class.php 64771 2016-03-30 19:35:02Z carlos.silva $
+    * $Id: TTCEALUndOrcamentaria.class.php 64806 2016-04-04 21:09:58Z carlos.silva $
     *
     * @ignore
     *
@@ -121,6 +121,8 @@ class TTCEALUndOrcamentaria extends Persistente {
               LEFT JOIN tceal.uniorcam
                 ON uniorcam.num_unidade = unidade.num_unidade
                AND uniorcam.num_orgao = unidade.num_orgao
+               AND uniorcam.exercicio = unidade.exercicio
+               
               LEFT JOIN sw_cgm
                 ON sw_cgm.numcgm = uniorcam.numcgm
               LEFT JOIN sw_cgm_pessoa_juridica AS PJ
@@ -128,7 +130,6 @@ class TTCEALUndOrcamentaria extends Persistente {
              
              WHERE despesa.exercicio = '".$this->getDado('exercicio')."'
                AND despesa.cod_entidade IN (".$this->getDado('cod_entidade').")
-               AND PJ.cnpj <> ''
              
              GROUP BY despesa.exercicio
                  , unidade.num_unidade

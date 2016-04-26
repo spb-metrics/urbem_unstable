@@ -155,7 +155,7 @@ $obTxtDescricaoGrupo->setValue ( $stNomGrupo );
 
 //cria um busca inner para retornar uma conta contábil
 $obBscContaContabil = new BuscaInner;
-$obBscContaContabil->setRotulo               ( "Conta Contábil"                       );
+$obBscContaContabil->setRotulo               ( "Conta Contábil do Bem"                       );
 $obBscContaContabil->setTitle                ( "Informe a conta do plano de contas."     );
 $obBscContaContabil->setId                   ( "stDescricaoConta"                        );
 $obBscContaContabil->obCampoCod->setName     ( "inCodConta"                              );
@@ -167,7 +167,7 @@ $obBscContaContabil->setValue                ( $stNomConta );
 $obBscContaContabil->obCampoCod->setValue    ( $inCodPlano );
 
 $obBscContaContabilDoacao = new BuscaInner;
-$obBscContaContabilDoacao->setRotulo               ( "Conta Contábil de Baixa por Doação"  );
+$obBscContaContabilDoacao->setRotulo               ( "Conta de VPD para Baixa por Doação"  );
 $obBscContaContabilDoacao->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Doação." );
 $obBscContaContabilDoacao->setId                   ( "stDescricaoContaDoacao"              );
 $obBscContaContabilDoacao->obCampoCod->setName     ( "inCodContaDoacao"                    );
@@ -179,7 +179,7 @@ $obBscContaContabilDoacao->setValue                ( $stNomContaDoacao );
 $obBscContaContabilDoacao->obCampoCod->setValue    ( $inCodPlanoDoacao );
 
 $obBscContaContabilPerdaInvoluntaria = new BuscaInner;
-$obBscContaContabilPerdaInvoluntaria->setRotulo               ( "Conta Contábil de Baixa por Perda Involuntária"  );
+$obBscContaContabilPerdaInvoluntaria->setRotulo               ( " Conta de VPD para Baixa por Perda Involuntária"  );
 $obBscContaContabilPerdaInvoluntaria->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Perda Involuntária." );
 $obBscContaContabilPerdaInvoluntaria->setId                   ( "stDescricaoPerdaInvoluntaria"                    );
 $obBscContaContabilPerdaInvoluntaria->obCampoCod->setName     ( "inCodContaPerdaInvoluntaria"                     );
@@ -191,7 +191,7 @@ $obBscContaContabilPerdaInvoluntaria->setValue                ( $stNomContaPerda
 $obBscContaContabilPerdaInvoluntaria->obCampoCod->setValue    ( $inCodPlanoPerdaInvoluntaria );
 
 $obBscContaContabilTransferencia = new BuscaInner;
-$obBscContaContabilTransferencia->setRotulo               ( "Conta Contábil de Baixa por Transferência" );
+$obBscContaContabilTransferencia->setRotulo               ( "Conta de VPD para Baixa por Transferência" );
 $obBscContaContabilTransferencia->setTitle                ( "Informe o Código do Plano de Contas para efetuar lançamento contábil de Baixa por Transferência." );
 $obBscContaContabilTransferencia->setId                   ( "stDescricaoTransferencia"                  );
 $obBscContaContabilTransferencia->obCampoCod->setName     ( "inCodContaTransferencia"                   );

@@ -27,7 +27,7 @@
     *
     * @author: Carolina Schwaab Marçal
     *
-    * $Id: funcoesServidores.inc.php 64794 2016-04-01 14:04:57Z carlos.silva $
+    * $Id: funcoesServidores.inc.php 64853 2016-04-07 18:27:30Z carlos.silva $
     *
     * @ignore
     *
@@ -68,8 +68,8 @@ foreach ($undGestora as $inCodEntidade) {
     }
 
     $stPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
-    $stPeriodoMovimentacao->setDado('dtInicial' , $dtInicial);
-    $stPeriodoMovimentacao->setDado('dtFinal'   , $dtFinal  );
+    $stPeriodoMovimentacao->setDado('dtInicial', $dtInicial);
+    $stPeriodoMovimentacao->setDado('dtFinal', $dtFinal  );
     $stPeriodoMovimentacao->recuperaPeriodoMovimentacaoTCEAL($rsPeriodoMovimentacao);
     
     if($rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao') != '') {
@@ -77,23 +77,23 @@ foreach ($undGestora as $inCodEntidade) {
         $rsRecordSet .= $stEntidade;
         $$rsRecordSet = new RecordSet();
         
-        $obTTCEALFuncoesServidores->setDado('dtInicial'             , $dtInicial            );
-        $obTTCEALFuncoesServidores->setDado('dtFinal'               , $dtFinal              );
+        $obTTCEALFuncoesServidores->setDado('dtInicial', $dtInicial);
+        $obTTCEALFuncoesServidores->setDado('dtFinal', $dtFinal);
         $obTTCEALFuncoesServidores->setDado('codPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
-        $obTTCEALFuncoesServidores->setDado('stExercicio'           , Sessao::getExercicio());
-        $obTTCEALFuncoesServidores->setDado('stEntidade'            , $stEntidade           );
-        $obTTCEALFuncoesServidores->setDado('inCodEntidade'         , $inCodEntidade        );
-        $obTTCEALFuncoesServidores->setDado('entidade'              , $entidade             );
+        $obTTCEALFuncoesServidores->setDado('stExercicio', Sessao::getExercicio());
+        $obTTCEALFuncoesServidores->setDado('stEntidade', $stEntidade);
+        $obTTCEALFuncoesServidores->setDado('inCodEntidade', $inCodEntidade);
+        $obTTCEALFuncoesServidores->setDado('entidade', $entidade);
     
         $obTTCEALFuncoesServidores->listarExportacaoFuncoesServidores($rsRecordSet);
     
         while (!$rsRecordSet->eof()) {
-            $arResult[$idCount]['CodUndGestora']= $rsRecordSet->getCampo('cod_und_gestora');
-            $arResult[$idCount]['CodigoUA']     = $rsRecordSet->getCampo('codigo_ua');
-            $arResult[$idCount]['Bimestre']     = $inBimestre;
-            $arResult[$idCount]['Exercicio']    = Sessao::getExercicio();
-            $arResult[$idCount]['CodFuncao']    = $rsRecordSet->getCampo('cod_funcao');
-            $arResult[$idCount]['Descricao']    = $rsRecordSet->getCampo('descricao');
+            $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
+            $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua');
+            $arResult[$idCount]['Bimestre'] = $inBimestre;
+            $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
+            $arResult[$idCount]['CodFuncao'] = $rsRecordSet->getCampo('cod_funcao');
+            $arResult[$idCount]['Descricao'] = $rsRecordSet->getCampo('descricao');
             
             $idCount++;
             $rsRecordSet->proximo();

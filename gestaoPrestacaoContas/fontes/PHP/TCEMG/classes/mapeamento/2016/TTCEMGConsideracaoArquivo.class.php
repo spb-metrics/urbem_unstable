@@ -89,16 +89,9 @@ class TTCEMGConsideracaoArquivo extends Persistente
     public function montaRecuperaConsid()
     {
         $stSql  = "
-            SELECT 10 as tipo_registro \n";
-
-        if ( $this->getDado('exercicio') >= "2015" && $this->getDado('tipo') != 'folhapagamento'){
-            $stSql  .= " , consideracao_arquivo.nom_arquivo \n";
-        } else {
-            $stSql  .= " , consideracao_arquivo.cod_arquivo \n";
-        }
-        
-        $stSql  .= "         
-                 , CAD.descricao as consideracoes
+            SELECT 10 as tipo_registro
+                  , 'FLPGO' AS nom_arquivo
+                  , CAD.descricao as consideracoes
               FROM tcemg.consideracao_arquivo
               
               JOIN tcemg.consideracao_arquivo_descricao as CAD

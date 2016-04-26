@@ -33,7 +33,7 @@
     * @package Conectividade
     * @subpackage Persistente
 
-    $Id: Persistente.class.php 63572 2015-09-11 14:07:05Z evandro $
+    $Id: Persistente.class.php 64804 2016-04-04 19:29:47Z michel $
 
     Casos de uso: uc-01.01.00
 
@@ -1310,7 +1310,6 @@ public function validaExclusao($stFiltro = "" , $boTransacao = "")
     $stTabelaPrincipal = $this->getTabela();    
     //Busca as tabelas que são referenciadas pela tabela principal
     $stSql = $this->buscaForeingKeys( $stTabelaPrincipal );
-    $this->setDebug($stSql);    
     $obErro = $obConexao->executaSQL($rsRecordSet, $stSql, $boTransacao, $obConexao);
     
     if ( !$obErro->ocorreu() ) {

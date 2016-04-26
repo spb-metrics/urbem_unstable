@@ -64,107 +64,93 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName ( "stCtrl" );
 $obHdnCtrl->setValue( $stCtrl );
 
- $obTExportacaoConfiguracao = new TTCEALExportacaoConfiguracao;
+//Define Span para DataGrid
+$obSpnOrgaoUnidade = new Span;
+$obSpnOrgaoUnidade->setId ( "spnOrgaoUnidade" );
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_orgao_prefeitura");
- $obTExportacaoConfiguracao->consultar();
- 
-$obTxtExecutivo = new TextBox;
-$obTxtExecutivo->setName        ( "inCodExecutivo"   );
-$obTxtExecutivo->setValue       ( $obTExportacaoConfiguracao->getDado("valor")  );
-$obTxtExecutivo->setRotulo      ( "Órgão Poder Executivo"          );
-$obTxtExecutivo->setTitle       ( "Informe o código do orgão relativo ao poder executivo");
-$obTxtExecutivo->setInteiro     ( true                           );
-$obTxtExecutivo->setSize        ( 3 );
-$obTxtExecutivo->setMaxLength   ( "2" );
-$obTxtExecutivo->setNull        ( false                          );
+$obTExportacaoConfiguracao = new TTCEALExportacaoConfiguracao;
+$obTExportacaoConfiguracao->recuperaOrgaoUnidade($rsRecordSet,'',' ORDER BY cod_entidade',$boTransacao);
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_unidade_prefeitura");
- $obTExportacaoConfiguracao->consultar();
- 
-$obTxtExecutivoUnidade = new TextBox;
-$obTxtExecutivoUnidade->setName        ( "inCodUnidadeExecutivo"   );
-$obTxtExecutivoUnidade->setValue       ( $obTExportacaoConfiguracao->getDado("valor")  );
-$obTxtExecutivoUnidade->setRotulo      ( "Unidade Poder Executivo"          );
-$obTxtExecutivoUnidade->setTitle       ( "Informe o código da unidade relativo ao poder executivo");
-$obTxtExecutivoUnidade->setInteiro     ( true                           );
-$obTxtExecutivoUnidade->setSize        ( 3 );
-$obTxtExecutivoUnidade->setMaxLength   ( "2" );
-$obTxtExecutivoUnidade->setNull        ( false                          );
+if ($rsRecordSet->getNumLinhas() < 1) {
+    $obTExportacaoConfiguracao->recuperaEntidades($rsRecordSet,'',' ORDER BY cod_entidade',$boTransacao);
+}
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_orgao_camara");
- $obTExportacaoConfiguracao->consultar();
+$arOrgaoUnidade = array();
 
-$obTxtLegislativo = new Textbox;
-$obTxtLegislativo->setName        ( "inCodLegislativo"   );
-$obTxtLegislativo->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtLegislativo->setRotulo      ( "Órgão Poder Legislativo"          );
-$obTxtLegislativo->setTitle       ( "Informe o código do orgão relativo ao poder legislativo");
-$obTxtLegislativo->setInteiro     ( true                           );
-$obTxtLegislativo->setSize        ( 3 );
-$obTxtLegislativo->setMaxLength   ( "2" );
-$obTxtLegislativo->setNull        ( false                          );
+foreach ($rsRecordSet->getElementos() as $chave => $valor) {
+    $arOrgaoUnidade[$chave]['descricao_entidade'] = $valor["nom_cgm"];
+    $arOrgaoUnidade[$chave]['descricao_orgao'] = "tceal_orgao";
+    $arOrgaoUnidade[$chave]['descricao_unidade'] = "tceal_unidade";
+    $arOrgaoUnidade[$chave]['cod_orgao'] = $valor["valor"];
+    $stFiltro = " WHERE exercicio = '".Sessao::getExercicio()."'
+                    AND cod_modulo = 62
+                    AND parametro ilike 'tceal_unidade%'
+                    AND cod_entidade = ".$valor["cod_entidade"];
+    $inCodUnidade = SistemaLegado::pegaDado('valor', 'administracao.configuracao_entidade', $stFiltro); 
+    $arOrgaoUnidade[$chave]['cod_unidade'] = $inCodUnidade;
+}
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_unidade_camara");
- $obTExportacaoConfiguracao->consultar();
- 
-$obTxtLegislativoUnidade = new Textbox;
-$obTxtLegislativoUnidade->setName        ( "inCodUnidadeLegislativo"   );
-$obTxtLegislativoUnidade->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtLegislativoUnidade->setRotulo      ( "Unidade Poder Legislativo"          );
-$obTxtLegislativoUnidade->setTitle       ( "Informe o código da unidade relativo ao poder legislativo");
-$obTxtLegislativoUnidade->setInteiro     ( true                           );
-$obTxtLegislativoUnidade->setSize        ( 3 );
-$obTxtLegislativoUnidade->setMaxLength   ( "2" );
-$obTxtLegislativoUnidade->setNull        ( false                          );
+$rsTemp = new RecordSet;
+$rsTemp->preenche( $arOrgaoUnidade );
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_orgao_rpps");
- $obTExportacaoConfiguracao->consultar();
+$obLista = new Lista;
+$obLista->setMostraPaginacao( false );
+$obLista->setRecordSet( $rsTemp );
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo("&nbsp;");
+$obLista->ultimoCabecalho->setWidth( 3 );
+$obLista->commitCabecalho();
 
-$obTxtRPPS = new Textbox;
-$obTxtRPPS->setName        ( "inCodRPPS"   );
-$obTxtRPPS->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtRPPS->setRotulo      ( "Órgão RPPS"          );
-$obTxtRPPS->setTitle       ( "Informe o código do orgão relativo ao RPPS");
-$obTxtRPPS->setInteiro     ( true                           );
-$obTxtRPPS->setSize        ( 3 );
-$obTxtRPPS->setMaxLength   ( "2" );
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "Descrição" );
+$obLista->ultimoCabecalho->setWidth( 50 );
+$obLista->commitCabecalho();
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_unidade_rpps");
- $obTExportacaoConfiguracao->consultar();
- 
-$obTxtRPPSUnidade = new Textbox;
-$obTxtRPPSUnidade->setName        ( "inCodUnidadeRPPS"   );
-$obTxtRPPSUnidade->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtRPPSUnidade->setRotulo      ( "Unidade RPPS"          );
-$obTxtRPPSUnidade->setTitle       ( "Informe o código da unidade relativo ao RPPS");
-$obTxtRPPSUnidade->setInteiro     ( true                           );
-$obTxtRPPSUnidade->setSize        ( 3 );
-$obTxtRPPSUnidade->setMaxLength   ( "2" );
+//Dados
+$obLista->addDado();
+$obLista->ultimoDado->setAlinhamento('ESQUERDA');
+$obLista->ultimoDado->setCampo('[descricao_entidade]');
+$obLista->commitDadoComponente();
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "Orgão" );
+$obLista->ultimoCabecalho->setWidth( 10 );
+$obLista->commitCabecalho();
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_orgao_outros");
- $obTExportacaoConfiguracao->consultar();
+$obTxtOrgao = new TextBox;
+$obTxtOrgao->setName      ( '[descricao_orgao]_[cod_entidade]' );
+$obTxtOrgao->setid        ( '[descricao_orgao]_[cod_entidade]' );
+$obTxtOrgao->setValue     ( '[cod_orgao]'                      );
+$obTxtOrgao->setRotulo    ( '[descricao_entidade]'             );
+$obTxtOrgao->setTitle     ( "Informe o código do orgão "       );
+$obTxtOrgao->setInteiro   ( true                               );
+$obTxtOrgao->setSize      ( 20                                 );
+$obTxtOrgao->setMaxLength ( "10"                               );
+$obTxtOrgao->setNull      ( false                              );
 
-$obTxtOutros = new Textbox;
-$obTxtOutros->setName        ( "inCodOutros"   );
-$obTxtOutros->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtOutros->setRotulo      ( "Órgão Outros"          );
-$obTxtOutros->setTitle       ( "Informe o código do orgão para outros poderes");
-$obTxtOutros->setInteiro     ( true                           );
-$obTxtOutros->setSize        ( 3 );
-$obTxtOutros->setMaxLength   ( "2" );
+$obLista->addDadoComponente( $obTxtOrgao );
+$obLista->ultimoDado->setAlinhamento('CENTRO');
+$obLista->commitDadoComponente();
+$obLista->addCabecalho();
+$obLista->ultimoCabecalho->addConteudo( "Unidade" );
+$obLista->ultimoCabecalho->setWidth( 10 );
+$obLista->commitCabecalho();
 
- $obTExportacaoConfiguracao->setDado("parametro","tceal_unidade_outros");
- $obTExportacaoConfiguracao->consultar();
+$obTxtUnidade = new TextBox;
+$obTxtUnidade->setName      ( '[descricao_unidade]_[cod_entidade]' );
+$obTxtUnidade->setid        ( '[descricao_unidade]_[cod_entidade]' );
+$obTxtUnidade->setValue     ( '[cod_unidade]'                      );
+$obTxtUnidade->setRotulo    ( '[descricao_entidade]'               );
+$obTxtUnidade->setTitle     ( "Informe o código da unidade "       );
+$obTxtUnidade->setInteiro   ( true                                 );
+$obTxtUnidade->setSize      ( 20                                   );
+$obTxtUnidade->setMaxLength ( "10"                                 );
+$obTxtUnidade->setNull      ( false                                );
 
-$obTxtOutrosUnidade = new Textbox;
-$obTxtOutrosUnidade->setName        ( "inCodUnidadeOutros"   );
-$obTxtOutrosUnidade->setValue       ( $obTExportacaoConfiguracao->getDado("valor")    );
-$obTxtOutrosUnidade->setRotulo      ( "Unidade Outros"          );
-$obTxtOutrosUnidade->setTitle       ( "Informe o código da unidade para outros poderes");
-$obTxtOutrosUnidade->setInteiro     ( true                           );
-$obTxtOutrosUnidade->setSize        ( 3 );
-$obTxtOutrosUnidade->setMaxLength   ( "2" );
+$obLista->addDadoComponente( $obTxtUnidade );
+$obLista->ultimoDado->setAlinhamento('CENTRO');
+$obLista->commitDadoComponente();
+$obLista->montaHTML();
+$obSpnOrgaoUnidade->setValue($obLista->getHTML());
 
 //****************************************//
 //Monta FORMULARIO
@@ -172,18 +158,10 @@ $obTxtOutrosUnidade->setMaxLength   ( "2" );
 $obFormulario = new Formulario;
 $obFormulario->addForm( $obForm );
 
-$obFormulario->addTitulo    ( "Configuração de Órgão/Unidade"     );
-$obFormulario->addHidden    ( $obHdnAcao            );
-$obFormulario->addHidden    ( $obHdnCtrl            );
-$obFormulario->addComponente( $obTxtExecutivo       );
-$obFormulario->addComponente( $obTxtExecutivoUnidade       );
-$obFormulario->addComponente( $obTxtLegislativo     );
-$obFormulario->addComponente( $obTxtLegislativoUnidade     );
-$obFormulario->addComponente( $obTxtRPPS            );
-$obFormulario->addComponente( $obTxtRPPSUnidade            );
-$obFormulario->addComponente( $obTxtOutros          );
-$obFormulario->addComponente( $obTxtOutrosUnidade          );
-
+$obFormulario->addTitulo    ( "Configuração de Órgão/Unidade" );
+$obFormulario->addHidden    ( $obHdnAcao                      );
+$obFormulario->addHidden    ( $obHdnCtrl                      );
+$obFormulario->addSpan      ( $obSpnOrgaoUnidade              );
 
 $obOk  = new Ok;
 $obLimpar = new Button;

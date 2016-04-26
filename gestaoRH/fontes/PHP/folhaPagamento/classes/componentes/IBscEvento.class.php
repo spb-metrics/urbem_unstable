@@ -121,6 +121,9 @@ class IBscEvento
     public $stCampoCodEvento;
     
     public $stCampoNomEvento;
+
+    public $stCampoTextoComplementar;
+
     /**
         * @access Private
         * @var Boolean
@@ -225,6 +228,10 @@ class IBscEvento
     
     public function setCampoNomEvento($var) { $this->stCampoNomEvento = $var; }
 
+    public function getCampoTextoComplementar() { return $this->stTextoComplementar; }
+    
+    public function setCampoTextoComplementar($var) { $this->stTextoComplementar = $var; }
+
     /**
         * @access Public
         * @return Boolean
@@ -235,7 +242,7 @@ class IBscEvento
         * Método Construtor
         * @access Public
     */
-    public function IBscEvento($stCampoCodEvento='inCodigoEvento', $stCampoNomEvento='stEvento')
+    public function IBscEvento($stCampoCodEvento='inCodigoEvento', $stCampoNomEvento='stEvento', $stCampoTextoComplementar='stTextoComplementar')
     {
         include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php" );
 
@@ -246,6 +253,7 @@ class IBscEvento
         
         $this->setCampoCodEvento($stCampoCodEvento);
         $this->setCampoNomEvento($stCampoNomEvento);
+        $this->setCampoTextoComplementar($stCampoTextoComplementar);
         $this->setTextoComplementar(true);
 
         //Define a mascara do campo Evento
@@ -321,9 +329,9 @@ class IBscEvento
         $this->obSpnDadosEvento->setValue ( ""               );
 
         $this->obLblTextoComplementar= new Label;
-        $this->obLblTextoComplementar->setRotulo              ( "Texto Complementar"                                      );
-        $this->obLblTextoComplementar->setName                ( "stTextoComplementar"                                     );
-        $this->obLblTextoComplementar->setId                  ( "stTextoComplementar"                                     );
+        $this->obLblTextoComplementar->setRotulo              ( "Texto Complementar"                                  );
+        $this->obLblTextoComplementar->setName                ( $stCampoTextoComplementar                             );
+        $this->obLblTextoComplementar->setId                  ( $stCampoTextoComplementar                             );
 
         $this->obLblMesAno = new Label;
         $this->obLblMesAno->setRotulo                     ( "Previsão Mês/Ano Limite"                                 );
@@ -370,7 +378,7 @@ class IBscEvento
             $stTipoEvento = "todos_eventos";
         }
 
-        $this->obBscInnerEvento->setFuncaoBusca( "abrePopUp('".CAM_GRH_FOL_POPUPS."evento/FLManterEvento.php','frm','".$this->stCampoCodEvento."','".$this->stCampoNomEvento."','','".Sessao::getId()."&stNaturezasAceitas=".$this->getNaturezasAceitas()."&stNaturezaChecked=".$this->getNaturezaChecked()."&boInformarValorQuantidade=".$this->getInformarValorQuantidade()."&boInformarQuantidadeParcelas=".$this->getInformarQuantidadeParcelas()."&boSugerirValorQuantidade=".$this->getSugerirValorQuantidade()."&stTipoEvento=".$stTipoEvento."','800','550')" );
+        $this->obBscInnerEvento->setFuncaoBusca( "abrePopUp('".CAM_GRH_FOL_POPUPS."evento/FLManterEvento.php','frm','".$this->stCampoCodEvento."','".$this->stCampoNomEvento."','','".Sessao::getId()."&stNaturezasAceitas=".$this->getNaturezasAceitas()."&stNaturezaChecked=".$this->getNaturezaChecked()."&boInformarValorQuantidade=".$this->getInformarValorQuantidade()."&boInformarQuantidadeParcelas=".$this->getInformarQuantidadeParcelas()."&boSugerirValorQuantidade=".$this->getSugerirValorQuantidade()."&stTipoEvento=".$stTipoEvento."&stTextoComplementar=".$this->getCampoTextoComplementar()."','800','550')" );
     }
 
     public function montaFuncaoPreenche()

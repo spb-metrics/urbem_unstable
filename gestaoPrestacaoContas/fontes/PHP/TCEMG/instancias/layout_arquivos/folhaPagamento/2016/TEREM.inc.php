@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Jean
   *
   * @ignore
-  * $Id: TEREM.inc.php 64792 2016-04-01 13:51:20Z michel $
-  * $Date: 2016-04-01 10:51:20 -0300 (Sex, 01 Abr 2016) $
-  * $Author: michel $
-  * $Rev: 64792 $
+  * $Id: TEREM.inc.php 64811 2016-04-05 13:50:46Z evandro $
+  * $Date: 2016-04-05 10:50:46 -0300 (Ter, 05 Abr 2016) $
+  * $Author: evandro $
+  * $Rev: 64811 $
   *
 */
 /**
@@ -56,9 +56,9 @@ $obTTCEMGTEREM->recuperaDados($rsRecordSet);
 if ( count($rsRecordSet->getElementos()) > 0 ) {
     $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tiporegistro");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlparateto");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');

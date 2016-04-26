@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterOrdemCompra.php 64639 2016-03-17 19:51:04Z arthur $
+    $Id: OCManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
 
 */
 
@@ -159,7 +159,7 @@ function montaListaItens($arRecordSet , $boExecuta = true)
         return $stHTML;
     }
 }
-function BuscaOrdemCompraItens($stEmpenho, $inCodEntidade, $stExercicioOrdemCompra, $inCodOrdemCompra, $stTipoOrdem, $stAcao)
+function BuscaOrdemCompraItens($stEmpenho, $inCodEntidade, $stExercicioOrdemCompra, $inCodOrdemCompra, $stTipoOrdem, $stAcao, $stTipo)
 {
     $stJsPreenche="";
     $arEmpenho = explode('/',$stEmpenho);
@@ -194,10 +194,10 @@ function BuscaOrdemCompraItens($stEmpenho, $inCodEntidade, $stExercicioOrdemComp
                 $arItens[$inCount]['oc_vl_total'] = number_format($rsItens->getCampo('vl_total_item'), 2, ',', '.');
                 $arItens[$inCount]['oc_saldo'] = $rsItens->getCampo('oc_saldo');
                 $arItens[$inCount]['quantidade_original'] = number_format($rsItens->getCampo('qtde_da_oc'), 4, ",", ".");
-                
+
                 if ( strpos($stAcao,'incluir') !== false || strpos($stAcao,'alterar') !== false )
                     $stJsPreenche.= "$('qtdeOC_".($inCount+1)."').value = '".number_format($rsItens->getCampo('qtde_da_oc'),4,',','.')."'; ";
-                
+
                 if(!is_null($rsItens->getCampo('cod_centro_ordem'))&&!is_null($rsItens->getCampo('cod_marca_ordem'))){
                     $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['inCodItem'] = $inCodItem;
                     $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomItem'] = $rsItens->getCampo('nom_item');
@@ -205,10 +205,10 @@ function BuscaOrdemCompraItens($stEmpenho, $inCodEntidade, $stExercicioOrdemComp
                     $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomCentroCusto'] = $rsItens->getCampo('nom_centro_ordem');
                     $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['inMarca'] = $rsItens->getCampo('cod_marca_ordem');
                     $arItensAlmoxarifado[$rsItens->getCampo('num_item')]['stNomMarca'] = $rsItens->getCampo('nom_marca_ordem');
-                }else if(!is_null($rsItens->getCampo('cod_item_ordem'))){
+                }else if(!is_null($rsItens->getCampo('cod_item_ordem')) && $stTipo == 'diversos'){
                     $arItens[$inCount]['bo_centro_marca'] = 't';
                 }
-                
+
                 $inCount++; 
                 $rsItens->proximo();
             }
@@ -371,8 +371,8 @@ switch ($stCtrl) {
 case 'calculaValorTotal':
 
     $arItens = Sessao::read('arItens');
-    $arPosicao = explode('_',$_REQUEST['stId']);
-    $inQtde = str_replace(',','.',str_replace('.','',$_REQUEST['inQtde']));
+    $arPosicao = explode('_',$request->get('stId')); 
+    $inQtde = str_replace(',','.',str_replace('.','',$request->get('inQtde')));
     $flQtdeOriginal = str_replace(',','.', str_replace(".", "", $arItens[$arPosicao[1]-1]['quantidade_original']));
     $saldo = $arItens[$arPosicao[1]-1]['oc_saldo'] + $flQtdeOriginal;
 
@@ -380,16 +380,16 @@ case 'calculaValorTotal':
 
         $inVlUnitario = $arItens[$arPosicao[1]-1]['vl_unitario'];
         $stValor = number_format($inQtde * $inVlUnitario, 2, ',', '.');
-        $stJs.= "$('".$_REQUEST['inTableId']."_row_".$arPosicao[1]."_cell_9').innerHTML = '".$stValor."';";
-        $stValorDisponivel = number_format($arItens[$arPosicao[1]-1]['oc_saldo'] + $flQtdeOriginal - str_replace(',','.',str_replace('.','',$_REQUEST['inQtde'])),4,',','.');
-        $stJs.= "$('".$_REQUEST['inTableId']."_row_".$arPosicao[1]."_cell_6').innerHTML = '".$stValorDisponivel."';";
+        $stJs.= "$('".$request->get('inTableId')."_row_".$arPosicao[1]."_cell_9').innerHTML = '".$stValor."';";
+        $stValorDisponivel = number_format($arItens[$arPosicao[1]-1]['oc_saldo'] + $flQtdeOriginal - str_replace(',','.',str_replace('.','',$request->get('inQtde'))),4,',','.');
+        $stJs.= "$('".$request->get('inTableId')."_row_".$arPosicao[1]."_cell_6').innerHTML = '".$stValorDisponivel."';";
 
     } else {
 
         $stValorDisponivel = number_format($arItens[$arPosicao[1]-1]['oc_saldo'] + $flQtdeOriginal,4,',','.');
-        $stJs.= "$('".$_REQUEST['inTableId']."_row_".$arPosicao[1]."_cell_6').innerHTML = '".$stValorDisponivel."';";
-        $stJs.= "$('".$_REQUEST['inTableId']."_row_".$arPosicao[1]."_cell_9').innerHTML = '0,00';";
-        $stJs.= "$('".$_REQUEST['stId']."').value = '0,0000';";
+        $stJs.= "$('".$request->get('inTableId')."_row_".$arPosicao[1]."_cell_6').innerHTML = '".$stValorDisponivel."';";
+        $stJs.= "$('".$request->get('inTableId')."_row_".$arPosicao[1]."_cell_9').innerHTML = '0,00';";
+        $stJs.= "$('".$request->get('stId')."').value = '0,0000';";
         $stJs.= "alertaAviso('A quantidade do item deve ser menor ou igual ao saldo.','form','erro','".Sessao::getId()."');";
     }
 
@@ -401,7 +401,7 @@ case 'calculaValorTotal':
     var vlTotal = 0;
     var vlLinha;
     for (var i=0; i<".$inCount."; i++) {
-        vlLinha = $('".$_REQUEST['inTableId']."_row_'+(i+1)+'_cell_9').innerHTML.replace('.', '').replace(',', '.');
+        vlLinha = $('".$request->get('inTableId')."_row_'+(i+1)+'_cell_9').innerHTML.replace('.', '').replace(',', '.');
         vlTotal = parseFloat(vlTotal) + parseFloat(vlLinha);
     }";
     // pega o total e separa o centavos do valor para que possa ser montado o valor sem perder as casas decimais
@@ -429,7 +429,7 @@ case 'detalharItem' :
     $obForm = new Form();
     $obForm->setName("frm2");
 
-    if ( $request->get('stAcao') == 'consultar' || $request->get('stAcao') == 'anular' ) {
+    if ( $rsDetalheItem->getCampo('bo_centro_marca')=='f' || strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular') !== false ){
         $stTitulo = 'Detalhe do Item';
         $obLblCodItem = new Label();
         $obLblCodItem->setRotulo( 'Código do Item' );
@@ -531,7 +531,7 @@ case 'detalharItem' :
     $obBtnLimpar->setTipo       ( "button"                                  );
     $obBtnLimpar->obEvento->setOnClick ( "limpaItem(".$request->get('num_item').", '".$boCentroMarca."', '".$boLimparCentroCusto."');" );
     
-    if ( $request->get('stAcao') == 'consultar'|| $request->get('stAcao') == 'anular' ) {
+    if ( $rsDetalheItem->getCampo('bo_centro_marca')=='f' || strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular') !== false ) {
         $obLblItem = new Label();
         $obLblItem->setRotulo( 'Descrição' );
         $obLblItem->setValue( $rsDetalheItem->getCampo('descricao') );
@@ -561,10 +561,12 @@ case 'detalharItem' :
     $obFormulario->addForm( $obForm );
     $obFormulario->addTitulo( $stTitulo );
 
-    if ( $request->get('stAcao') == 'consultar'|| $request->get('stAcao') == 'anular' ) {
+    if ( $rsDetalheItem->getCampo('bo_centro_marca')=='f' || strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular')!== false ) {
         $obFormulario->addComponente( $obLblCodItem  );
-        $obFormulario->addComponente( $obLblCentroDeCusto );
-        $obFormulario->addComponente( $obLblIMarca );
+        if( strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular')!== false ){
+            $obFormulario->addComponente( $obLblCentroDeCusto );
+            $obFormulario->addComponente( $obLblIMarca );
+        }
     }else{
         $obFormulario->addComponente( $obIPopUpCatalogoItem );
         $obFormulario->addComponente( $obCentroCustoUsuario );
@@ -575,7 +577,7 @@ case 'detalharItem' :
     $obFormulario->addComponente( $obLblGrandeza );
     $obFormulario->addComponente( $obLblUnidade );
 
-    if ( $request->get('stAcao') != 'consultar' && $request->get('stAcao') != 'anular' )
+    if ( $rsDetalheItem->getCampo('bo_centro_marca')=='t' && strpos($request->get('stAcao'),'consultar') === false && strpos($request->get('stAcao'),'anular') === false )
         $obFormulario->defineBarra ( array( $obBtnIncluir , $obBtnLimpar ) );
 
     $obFormulario->show();
@@ -583,20 +585,31 @@ case 'detalharItem' :
     break;
 
     case 'delItem':
-        $stJs = delItem( $_REQUEST['inNumItem'] );
+        $stJs = delItem( $request->get('inNumItem') );
     break;
 
     case 'BuscaOrdemCompraItens':
-        $stJs = BuscaOrdemCompraItens($_REQUEST['stEmpenho'], $_REQUEST['inCodEntidade'], $_REQUEST['stExercicioOrdemCompra'],$_REQUEST['inCodOrdemCompra'],$_REQUEST['stTipoOrdem'],$_REQUEST['stAcao']);
+        $stJs = BuscaOrdemCompraItens( $request->get('stEmpenho')
+                                     , $request->get('inCodEntidade')
+                                     , $request->get('stExercicioOrdemCompra')
+                                     , $request->get('inCodOrdemCompra')
+                                     , $request->get('stTipoOrdem')
+                                     , $request->get('stAcao')
+                                     , $request->get('stTipo')
+                                     );
     break;
 
     case 'BuscaEmpenhoItens':
-        $stJs = BuscaEmpenhoItens( $_REQUEST['stEmpenho'],$_REQUEST['inCodEntidade'],$stTipoOrdem, $stAcao);
+        $stJs = BuscaEmpenhoItens( $request->get('stEmpenho')
+                                 , $request->get('inCodEntidade')
+                                 , $stTipoOrdem
+                                 , $stAcao
+                                 );
     break;
 
     case 'incluirItem':
-        if($_REQUEST['idItem']){
-            $idItem = $_REQUEST['idItem'];
+        if($request->get('idItem')){
+            $idItem = $request->get('idItem');
 
             $arItens = Sessao::read('arItens');
 
@@ -607,22 +620,22 @@ case 'detalharItem' :
 
             $arItensAlmoxarifado = is_array(Sessao::read('arItensAlmoxarifado')) ? Sessao::read('arItensAlmoxarifado') : array();
 
-            $arItensAlmoxarifado[$idItem]['inCodItem']          = $_REQUEST['inCodItem'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomItem']          = $_REQUEST['stNomItem'.$idItem];
-            $arItensAlmoxarifado[$idItem]['inCodCentroCusto']   = $_REQUEST['inCodCentroCusto'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomCentroCusto']   = $_REQUEST['stNomCentroCusto'.$idItem];
-            $arItensAlmoxarifado[$idItem]['inMarca']            = $_REQUEST['inMarca'.$idItem];
-            $arItensAlmoxarifado[$idItem]['stNomMarca']         = $_REQUEST['stNomMarca'.$idItem];
+            $arItensAlmoxarifado[$idItem]['inCodItem']          = $request->get('inCodItem'.$idItem);
+            $arItensAlmoxarifado[$idItem]['stNomItem']          = $request->get('stNomItem'.$idItem);
+            $arItensAlmoxarifado[$idItem]['inCodCentroCusto']   = $request->get('inCodCentroCusto'.$idItem);
+            $arItensAlmoxarifado[$idItem]['stNomCentroCusto']   = $request->get('stNomCentroCusto'.$idItem);
+            $arItensAlmoxarifado[$idItem]['inMarca']            = $request->get('inMarca'.$idItem);
+            $arItensAlmoxarifado[$idItem]['stNomMarca']         = $request->get('stNomMarca'.$idItem);
 
             Sessao::write('arItensAlmoxarifado', $arItensAlmoxarifado);
 
-            $js = "alertaAviso('Código do Item (".$_REQUEST['inCodItem'.$idItem].") vinculado ao Item - ".$stNomItem." ','form','erro','".Sessao::getId()."', '../');";
+            $js = "alertaAviso('Código do Item (".$request->get('inCodItem'.$idItem).") vinculado ao Item - ".$stNomItem." ','form','erro','".Sessao::getId()."', '../');";
         }
     break;
 
     case 'excluirItem':
-        if($_REQUEST['idItem']){
-            $idItem = $_REQUEST['idItem'];
+        if($request->get('idItem')){
+            $idItem = $request->get('idItem');
             $arItensTemp = array();
 
             $arItens = Sessao::read('arItens');

@@ -98,7 +98,7 @@ BEGIN
     PERFORM 1
        FROM contabilidade.plano_conta_geral
       WHERE cod_uf    = 2
-        AND versao    = '2,1'
+        AND versao    = '2.1'
         AND dt_versao = '2016-01-07'
           ;
     IF NOT FOUND THEN
@@ -5471,6 +5471,477 @@ $$ LANGUAGE 'plpgsql';
 SELECT        manutencao();
 DROP FUNCTION manutencao();
 
+
+-----------------------
+-- Ticket #23514 #23471
+-----------------------
+
+CREATE OR REPLACE FUNCTION manutencao() RETURNS VOID AS $$
+DECLARE
+
+    reRecord    RECORD;
+    stSQL       VARCHAR;
+    stFiltroFK  VARCHAR;
+    stTemp      VARCHAR;
+
+BEGIN
+    PERFORM 1
+       FROM administracao.configuracao
+      WHERE cod_modulo = 2
+        AND exercicio  = '2016'
+        AND parametro  = 'cnpj'
+        AND valor      IN ('12198693000158', '12369880000157', '19904298000192')
+        -----------------     ARAPIRACA   -   PAO DE ACUCAR   -   CONAGRESTE
+          ;
+    IF FOUND THEN
+
+           UPDATE administracao.configuracao
+              SET valor = '9.9.9.9.9.99.99.99.99.99'
+            WHERE parametro = 'masc_plano_contas';
+
+           --VERIFICAR TABELAS QUE TENHAM DECLARADO A TABELA contabilidade.plano_analitica COMO FOREIGN KEY
+           CREATE TEMPORARY TABLE tmp_tables_fk_plano_analitica AS (
+                SELECT schema_table_fk
+                     , table_fk
+                     , string_to_array(descricao_fk[1]::TEXT, ', ', '') AS chaves_fk
+                     , string_to_array(descricao_fk[2]::TEXT, ', ', '') AS chaves_plano_analitica
+                     , array_length(string_to_array(descricao_fk[1]::TEXT, ', ', ''), 1) AS count_chaves
+                  FROM (
+                             SELECT namespace_2.nspname||'.'||class_2.relname AS schema_table_fk
+                                  , class_2.relname AS table_fk
+                                  , string_to_array(
+                                                   REPLACE(
+                                                           REPLACE(
+                                                                   REPLACE(
+                                                                          regexp_replace(
+                                                                                        pg_catalog.pg_get_constraintdef(pg_constraint.oid, true)
+                                                                                        ,' REFERENCES '
+                                                                                        , ' - '
+                                                                                        )
+                                                                          ,')'
+                                                                          ,''
+                                                                          ) 
+                                                                   , 'FOREIGN KEY ('
+                                                                   , ''
+                                                                   )
+                                                           , 'contabilidade.plano_analitica('
+                                                           , ''
+                                                           )
+                                                   , ' - '
+                                                   , ''
+                                                   )
+                                    AS descricao_fk
+                               FROM pg_namespace  AS namespace_1
+                         INNER JOIN pg_class      AS class_1
+                                 ON namespace_1.oid = class_1.relnamespace
+                         INNER JOIN pg_constraint
+                                 ON class_1.oid = pg_constraint.confrelid
+                         INNER JOIN pg_class      AS class_2
+                                 ON pg_constraint.conrelid = class_2.oid
+                         INNER JOIN pg_namespace namespace_2
+                                 ON class_2.relnamespace = namespace_2.oid
+                              WHERE namespace_1.nspname = 'contabilidade'
+                                AND class_1.relname     = 'plano_analitica'
+                           ORDER BY namespace_1.nspname
+                                  , class_1.relname
+                                  , namespace_2.nspname
+                                  , class_2.relname
+                       ) AS fk
+           );
+
+           --MONTAR SQL DE TESTE DE USO NAS TABELAS FK
+           --LIMITE DE 4 CHAVES, TABELA contabilidade.plano_analitica POSSUI 4 CAMPOS cod_plano, exercicio, cod_conta, natureza_saldo
+           stSQL := '
+                    SELECT CASE WHEN count_chaves = 4
+	                            THEN '' SELECT 1 FROM ''
+	                                 || schema_table_fk
+	                                 ||'' WHERE ''
+	                                 || table_fk ||''.''|| chaves_fk[1]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[1]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[2]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[2]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[3]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[3]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[4]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[4]
+	                                 ||'' ''
+	                            WHEN count_chaves = 3
+	                            THEN '' SELECT 1 FROM ''
+	                                 || schema_table_fk
+	                                 ||'' WHERE ''
+	                                 || table_fk ||''.''|| chaves_fk[1]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[1]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[2]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[2]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[3]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[3]
+	                                 ||'' ''
+	                            WHEN count_chaves = 2
+	                           THEN '' SELECT 1 FROM ''
+	                                 || schema_table_fk
+	                                 ||'' WHERE ''
+	                                 || table_fk ||''.''|| chaves_fk[1]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[1]
+	                                 ||'' AND ''
+	                                 || table_fk ||''.''|| chaves_fk[2]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[2]
+	                                 ||'' ''
+	                            WHEN count_chaves = 1
+	                            THEN '' SELECT 1 FROM ''
+	                                 || schema_table_fk
+	                                 ||'' WHERE ''
+	                                 || table_fk ||''.''|| chaves_fk[1]
+	                                 ||'' = pa_10.''|| chaves_plano_analitica[1]
+	                                 ||'' ''
+	                       END AS sql_fk
+	                  FROM tmp_tables_fk_plano_analitica;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                stTemp := '
+                            AND NOT EXISTS (
+                                           '||reRecord.sql_fk||'
+                                           )
+                          ';
+                stFiltroFK := CONCAT(stFiltroFK, stTemp);
+
+           END LOOP;
+
+           ----- NIVEL 9 COM REDUZIDO E NIVEL 10 COM REDUZIDO
+           ----- EXCLUIR NIVEL 10 COM REDUZIDO
+           ----- DESDE QUE NÃO TENHO SIDO UTILIZADA NAS TABELAS FK - stFiltroFK
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                         , plano_conta.cod_estrutural
+                         , plano_conta.exercicio
+                         , array_length(string_to_array(plano_conta.cod_estrutural, ''.'', ''''),1) AS nivel
+                         , plano_analitica.cod_plano
+                         , pc_10.cod_conta      AS cod_conta_10
+                         , pc_10.cod_estrutural AS cod_estrutural_10
+                         , pa_10.cod_plano      AS cod_plano_10
+                      FROM contabilidade.plano_conta
+
+                INNER JOIN contabilidade.plano_analitica
+                        ON plano_analitica.exercicio = plano_conta.exercicio
+                       AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                INNER JOIN contabilidade.plano_conta as pc_10
+                        ON pc_10.exercicio      = plano_conta.exercicio
+                       AND pc_10.cod_estrutural LIKE ''''||plano_conta.cod_estrutural||''%''
+                       AND pc_10.cod_conta      NOT IN (plano_conta.cod_conta)
+
+                INNER JOIN contabilidade.plano_analitica as pa_10
+                        ON pa_10.exercicio = pc_10.exercicio
+                       AND pa_10.cod_conta = pc_10.cod_conta
+
+                     WHERE plano_conta.exercicio = ''2016''
+                       '||stFiltroFK||'
+                     ;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                DELETE
+                  FROM contabilidade.plano_analitica
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_plano = reRecord.cod_plano_10;
+
+                DELETE
+                  FROM contabilidade.classificacao_plano
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_conta = reRecord.cod_conta_10;
+
+                DELETE
+                 FROM contabilidade.plano_conta
+                WHERE exercicio = reRecord.exercicio
+                  AND cod_conta = reRecord.cod_conta_10;
+
+           END LOOP;
+
+           ----- NIVEL 9 SEM REDUZIDO E NIVEL 10 COM REDUZIDO
+           ----- EXCLUIR NIVEL 9 SEM REDUZIDO
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                         , plano_conta.cod_estrutural
+                         , plano_conta.exercicio
+                         , array_length(string_to_array(plano_conta.cod_estrutural, ''.'', ''''),1) AS nivel
+                         , plano_analitica.cod_plano
+                         , pc_10.cod_conta      AS cod_conta_10
+                         , pc_10.cod_estrutural AS cod_estrutural_10
+                         , pa_10.cod_plano      AS cod_plano_10
+                      FROM contabilidade.plano_conta
+
+                 LEFT JOIN contabilidade.plano_analitica
+                        ON plano_analitica.exercicio = plano_conta.exercicio
+                       AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                INNER JOIN contabilidade.plano_conta as pc_10
+                        ON pc_10.exercicio      = plano_conta.exercicio
+                       AND pc_10.cod_estrutural LIKE ''''||plano_conta.cod_estrutural||''%''
+                       AND pc_10.cod_conta      NOT IN (plano_conta.cod_conta)
+
+                INNER JOIN contabilidade.plano_analitica as pa_10
+                        ON pa_10.exercicio = pc_10.exercicio
+                       AND pa_10.cod_conta = pc_10.cod_conta
+
+                     WHERE plano_conta.exercicio = ''2016''
+                       AND plano_analitica.cod_plano IS NULL;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                DELETE
+                  FROM contabilidade.classificacao_plano
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_conta = reRecord.cod_conta;
+
+                DELETE
+                 FROM contabilidade.plano_conta
+                WHERE exercicio = reRecord.exercicio
+                  AND cod_conta = reRecord.cod_conta;
+
+           END LOOP;
+
+           ----- NIVEL 9 COM REDUZIDO E NIVEL 10 SEM REDUZIDO
+           ----- EXCLUIR NIVEL 10 SEM REDUZIDO
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                         , plano_conta.cod_estrutural
+                         , plano_conta.exercicio
+                         , array_length(string_to_array(plano_conta.cod_estrutural, ''.'', ''''),1) AS nivel
+                         , plano_analitica.cod_plano
+                         , pc_10.cod_conta      AS cod_conta_10
+                         , pc_10.cod_estrutural AS cod_estrutural_10
+                         , pa_10.cod_plano      AS cod_plano_10
+                      FROM contabilidade.plano_conta
+
+                INNER JOIN contabilidade.plano_analitica
+                        ON plano_analitica.exercicio = plano_conta.exercicio
+                       AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                INNER JOIN contabilidade.plano_conta as pc_10
+                        ON pc_10.exercicio      = plano_conta.exercicio
+                       AND pc_10.cod_estrutural LIKE ''''||plano_conta.cod_estrutural||''%''
+                       AND pc_10.cod_conta      NOT IN (plano_conta.cod_conta)
+
+                 LEFT JOIN contabilidade.plano_analitica as pa_10
+                        ON pa_10.exercicio = pc_10.exercicio
+                       AND pa_10.cod_conta = pc_10.cod_conta
+
+                     WHERE plano_conta.exercicio = ''2016''
+                       AND pa_10.cod_plano IS NULL;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                DELETE
+                  FROM contabilidade.classificacao_plano
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_conta = reRecord.cod_conta_10;
+
+                DELETE
+                 FROM contabilidade.plano_conta
+                WHERE exercicio = reRecord.exercicio
+                  AND cod_conta = reRecord.cod_conta_10;
+
+           END LOOP;
+
+           ----- NIVEL 9 SEM REDUZIDO E NIVEL 10 SEM REDUZIDO
+           ----- EXCLUIR NIVEL 9 SEM REDUZIDO
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                        , plano_conta.cod_estrutural
+                        , plano_conta.exercicio
+                        , array_length(string_to_array(plano_conta.cod_estrutural, ''.'', ''''),1) AS nivel
+                        , plano_analitica.cod_plano
+                        , pc_10.cod_conta      AS cod_conta_10
+                        , pc_10.cod_estrutural AS cod_estrutural_10
+                        , pa_10.cod_plano      AS cod_plano_10
+                     FROM contabilidade.plano_conta
+
+                LEFT JOIN contabilidade.plano_analitica
+                       ON plano_analitica.exercicio = plano_conta.exercicio
+                      AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+               INNER JOIN contabilidade.plano_conta as pc_10
+                       ON pc_10.exercicio      = plano_conta.exercicio
+                      AND pc_10.cod_estrutural LIKE ''''||plano_conta.cod_estrutural||''%''
+                      AND pc_10.cod_conta      NOT IN (plano_conta.cod_conta)
+
+                LEFT JOIN contabilidade.plano_analitica as pa_10
+                       ON pa_10.exercicio = pc_10.exercicio
+                      AND pa_10.cod_conta = pc_10.cod_conta
+
+                    WHERE plano_conta.exercicio = ''2016''
+                      AND plano_analitica.cod_plano IS NULL
+                      AND pa_10.cod_plano IS NULL;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                DELETE
+                  FROM contabilidade.classificacao_plano
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_conta = reRecord.cod_conta;
+
+                DELETE
+                 FROM contabilidade.plano_conta
+                WHERE exercicio = reRecord.exercicio
+                  AND cod_conta = reRecord.cod_conta;
+
+           END LOOP;
+
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                         , plano_conta.cod_estrutural
+                         , publico.fn_mascara_completa(nivel.mascara_config, plano_conta.cod_estrutural)::VARCHAR(160) AS cod_estrutural_mascarado
+                         , plano_conta.exercicio
+                         , nivel.mascara_array
+                         , CASE WHEN classificacao_plano.cod_conta IS NOT NULL
+                                THEN TRUE
+                                ELSE FALSE
+                           END AS bo_classificacao_plano
+                         , CASE WHEN posicao_plano.exercicio IS NOT NULL
+                                THEN TRUE
+                                ELSE FALSE
+                           END AS bo_posicao_plano
+                         , nivel.nivel_config
+                         , plano_conta.nivel AS nivel_plano
+                         , (classificacao_plano.nivel+1) AS nivel_classificacao_plano
+                         , (posicao_plano.nivel+1) AS nivel_posicao_plano
+
+                      FROM (
+                              SELECT array_length(string_to_array(configuracao.valor, ''.'', ''''),1) AS nivel_config
+                                   , configuracao.valor AS mascara_config
+                                   , configuracao.exercicio
+                                   , (string_to_array(configuracao.valor, ''.'', '''')) AS mascara_array
+                                FROM administracao.configuracao
+                               WHERE parametro = ''masc_plano_contas''
+                                 AND exercicio = ''2016''
+                            GROUP BY configuracao.exercicio, configuracao.valor
+                            ORDER BY configuracao.exercicio
+                           ) AS nivel
+
+                INNER JOIN ( SELECT plano_conta.cod_conta
+                                  , plano_conta.cod_estrutural
+                                  , plano_conta.exercicio
+                                  , array_length(string_to_array(plano_conta.cod_estrutural, ''.'', ''''),1) AS nivel
+                               FROM contabilidade.plano_conta
+                           ) AS plano_conta
+                        ON plano_conta.exercicio = nivel.exercicio
+                       AND nivel.nivel_config > plano_conta.nivel
+
+                 LEFT JOIN ( SELECT count(posicao_plano.cod_posicao) AS nivel
+                                  , posicao_plano.exercicio
+                               FROM contabilidade.posicao_plano
+                           GROUP BY posicao_plano.exercicio
+                           ORDER BY posicao_plano.exercicio
+                           ) AS posicao_plano
+                        ON posicao_plano.exercicio = plano_conta.exercicio
+                       AND nivel.nivel_config > posicao_plano.nivel
+
+                 LEFT JOIN ( SELECT count(classificacao_plano.cod_posicao) AS nivel
+                                  , classificacao_plano.cod_conta
+                                  , classificacao_plano.exercicio
+                               FROM contabilidade.classificacao_plano
+                           GROUP BY classificacao_plano.exercicio, classificacao_plano.cod_conta
+                           ORDER BY classificacao_plano.exercicio
+                           ) AS classificacao_plano
+                        ON classificacao_plano.exercicio = plano_conta.exercicio
+                       AND classificacao_plano.cod_conta = plano_conta.cod_conta
+                       AND nivel.nivel_config > classificacao_plano.nivel
+
+                    ORDER BY nivel.exercicio, plano_conta.cod_estrutural;
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+               UPDATE contabilidade.plano_conta
+                  SET cod_estrutural        = reRecord.cod_estrutural_mascarado
+                WHERE exercicio             = reRecord.exercicio
+                  AND cod_conta             = reRecord.cod_conta;
+
+                  IF reRecord.bo_classificacao_plano = TRUE THEN
+                        FOR i IN (reRecord.nivel_classificacao_plano)..(reRecord.nivel_config) LOOP
+                            INSERT
+                              INTO contabilidade.classificacao_plano
+                            VALUES ( 0
+                                   , reRecord.exercicio
+                                   , reRecord.cod_conta
+                                   , i
+                                   );
+                        END LOOP;
+                  END IF;
+
+                  IF reRecord.bo_posicao_plano = TRUE THEN
+
+                        FOR i IN (reRecord.nivel_posicao_plano)..(reRecord.nivel_config) LOOP
+                            PERFORM 1
+                               FROM contabilidade.posicao_plano
+                              WHERE exercicio    = reRecord.exercicio
+                                AND cod_posicao  = i;
+
+                            IF NOT FOUND THEN
+
+                                INSERT
+                                  INTO contabilidade.posicao_plano
+                                VALUES ( reRecord.exercicio
+                                       , i
+                                       , reRecord.mascara_array[i]::VARCHAR(10)
+                                       );
+
+                            END IF;
+
+                        END LOOP;
+
+                  END IF;
+
+           END LOOP;
+
+           stSQL := '
+                    SELECT plano_conta.cod_conta
+                         , plano_conta.cod_estrutural
+                         , plano_conta.exercicio
+                         , plano_analitica.cod_plano
+
+                      FROM contabilidade.plano_conta
+
+                INNER JOIN contabilidade.plano_analitica
+                        ON plano_analitica.exercicio = plano_conta.exercicio
+                       AND plano_analitica.cod_conta = plano_conta.cod_conta
+
+                     WHERE plano_conta.exercicio      = ''2016''
+                       AND plano_conta.cod_estrutural IN ( ''1.1.1.1.1.01.00.00.00.00''
+                                                         , ''1.1.1.1.1.19.02.00.00.00''
+                                                         , ''1.1.1.1.1.19.03.00.00.00''
+                                                         );
+           ';
+
+           FOR reRecord IN EXECUTE stSQL LOOP
+
+                DELETE
+                  FROM contabilidade.plano_analitica
+                 WHERE exercicio = reRecord.exercicio
+                   AND cod_plano = reRecord.cod_plano;
+
+           END LOOP;
+
+           DROP TABLE tmp_tables_fk_plano_analitica;
+    END IF;
+END;
+
+$$ LANGUAGE 'plpgsql';
+
+SELECT manutencao();
+DROP FUNCTION manutencao();
+
+
 ----------------
 -- Ticket #23436
 ----------------
@@ -5513,25 +5984,25 @@ VALUES
 -- MANUTENCAO PARA CRIACAO DE RECURSOS COM cod_fonte EM BRANCO (2016 e 2017 - FRANVER
 -------------------------------------------------------------------------------------
 
-UPDATE administracao.configuracao
-   SET valor = (
-                 SELECT valor
-                   FROM administracao.configuracao
-                  WHERE cod_modulo = 8
-                    AND parametro  = 'masc_recurso'
-                    AND exercicio  = (
-                                       SELECT MAX(exercicio)
-                                         FROM administracao.configuracao
-                                        WHERE cod_modulo          = 8
-                                          AND parametro           = 'masc_recurso'
-                                          AND exercicio::INTEGER  < 2017
-                                          AND TRIM(valor)        != ''
-                                     )
-               )
- WHERE cod_modulo = 8
-   AND parametro  = 'masc_recurso'
-   AND exercicio  = '2017'
-     ;
+    UPDATE administracao.configuracao
+       SET valor = (
+                     SELECT valor
+                       FROM administracao.configuracao
+                      WHERE cod_modulo = 8
+                        AND parametro  = 'masc_recurso'
+                        AND exercicio  = (
+                                           SELECT MAX(exercicio)
+                                             FROM administracao.configuracao
+                                            WHERE cod_modulo          = 8
+                                              AND parametro           = 'masc_recurso'
+                                              AND exercicio::INTEGER  < 2017
+                                              AND TRIM(valor)        != ''
+                                         )
+                   )
+     WHERE cod_modulo = 8
+       AND parametro  = 'masc_recurso'
+       AND exercicio  = '2017'
+         ;
 
 UPDATE administracao.configuracao
    SET valor = (

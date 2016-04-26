@@ -57,20 +57,6 @@ $arRegimeSubDivisao = Sessao::read('arRegimeSubDivisao');
 $arRequisitosCargos = Sessao::read('arRequisitosCargos');
 $arEventos = Sessao::read('arEventos');
 
-if ( empty($arRegimeSubDivisao) ) {
-    SistemaLegado::LiberaFrames(true, true);
-    SistemaLegado::exibeAviso("Você deve incluir ao menos um registro na configuracao de Informações do Tipo de Cargo do Servidor!", 'aviso', 'aviso');
-    die();
-}elseif(empty($arRequisitosCargos)){
-    SistemaLegado::LiberaFrames(true, true);
-    SistemaLegado::exibeAviso("Você deve incluir ao menos um registro na configuracao de Informações de Requisitos dos Cargos!", 'aviso', 'aviso');
-    die();
-}elseif(empty($arEventos)){
-    SistemaLegado::LiberaFrames(true, true);
-    SistemaLegado::exibeAviso("Você deve incluir ao menos um registro na configuracao de Informações de Tipos de Remuneração!", 'aviso', 'aviso');
-    die();
-}
-
 $obTransacao = new Transacao();
 $obErro = $obTransacao->abreTransacao($boFlagTransacao,$boTransacao);
 
@@ -81,33 +67,46 @@ if ( !$obErro->ocorreu() ) {
     //folhapagamento.tcemg_entidade_cargo_servidor
     $obTFolhaPagamentoTCEMGEntidadeCargoServidor = new TFolhaPagamentoTCEMGEntidadeCargoServidor();
     $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('exercicio',Sessao::getExercicio() );
-    foreach ($arRegimeSubDivisao as $key => $value) {
-        if ( !$obErro->ocorreu() ) {
-            $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_tipo',$key);
-            $obErro = $obTFolhaPagamentoTCEMGEntidadeCargoServidor->exclusao($boTransacao);
+    if ( count($arRegimeSubDivisao) > 0 ){
+        foreach ($arRegimeSubDivisao as $key => $value) {
+            if ( !$obErro->ocorreu() ) {
+                $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_tipo',$key);
+                $obErro = $obTFolhaPagamentoTCEMGEntidadeCargoServidor->exclusao($boTransacao);
+            }
         }
+    }else{ //caso o usuario tenha limpado todos os dados cadastrados
+        $obErro = $obTFolhaPagamentoTCEMGEntidadeCargoServidor->exclusao($boTransacao);
     }
 }
+
 if ( !$obErro->ocorreu() ) {
     //folhapagamento.tcemg_entidade_requisitos_cargo
     $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo = new TFolhaPagamentoTCEMGEntidadeRequisitosCargo();
     $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('exercicio',Sessao::getExercicio() );
-    foreach ($arRequisitosCargos as $key => $value) {
-        if ( !$obErro->ocorreu() ) {
-            $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_tipo',$key);
-            $obErro = $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->exclusao($boTransacao);
+    if ( count($arRequisitosCargos) > 0 ){    
+        foreach ($arRequisitosCargos as $key => $value) {
+            if ( !$obErro->ocorreu() ) {
+                $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_tipo',$key);
+                $obErro = $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->exclusao($boTransacao);
+            }
         }
+    }else{//caso o usuario tenha limpado todos os dados cadastrados
+        $obErro = $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->exclusao($boTransacao);
     }
 }
 if ( !$obErro->ocorreu() ) {
     //folhapagamento.tcemg_entidade_remuneracao
     $obTFolhaPagamentoTCEMGEntidadeRemuneracao = new TFolhaPagamentoTCEMGEntidadeRemuneracao();
-    $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('exercicio',Sessao::getExercicio() );
-    foreach ($arEventos as $key => $value) {
-        if ( !$obErro->ocorreu() ) {
-            $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_tipo',$key);
-            $obErro = $obTFolhaPagamentoTCEMGEntidadeRemuneracao->exclusao($boTransacao);
+    $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('exercicio',Sessao::getExercicio() );    
+    if ( count($arEventos) > 0 ){    
+        foreach ($arEventos as $key => $value) {
+            if ( !$obErro->ocorreu() ) {
+                $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_tipo',$key);
+                $obErro = $obTFolhaPagamentoTCEMGEntidadeRemuneracao->exclusao($boTransacao);
+            }
         }
+    }else{//caso o usuario tenha limpado todos os dados cadastrados
+        $obErro = $obTFolhaPagamentoTCEMGEntidadeRemuneracao->exclusao($boTransacao);
     }
 }
 //-------------------------------------------------------
@@ -117,15 +116,17 @@ if ( !$obErro->ocorreu() ) {
 if ( !$obErro->ocorreu() ) {
     if ( !$obErro->ocorreu() ) {
         //folhapagamento.tcemg_entidade_cargo_servidor
-        foreach ($arRegimeSubDivisao as $codTipoRegime => $subDivisao ) {    
-            foreach ($subDivisao as $codSubDivisao => $cargo) {
-                foreach ($cargo as $codCargo => $value) {            
-                    if (!$obErro->ocorreu()) {
-                        $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('exercicio'      , Sessao::getExercicio() );
-                        $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_tipo'       , $codTipoRegime );
-                        $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_sub_divisao', $codSubDivisao );
-                        $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_cargo'      , $codCargo );
-                        $obErro = $obTFolhaPagamentoTCEMGEntidadeCargoServidor->inclusao($boTransacao);
+        if ( count($arRegimeSubDivisao) > 0 ){
+            foreach ($arRegimeSubDivisao as $codTipoRegime => $subDivisao ) {    
+                foreach ($subDivisao as $codSubDivisao => $cargo) {
+                    foreach ($cargo as $codCargo => $value) {            
+                        if (!$obErro->ocorreu()) {
+                            $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('exercicio'      , Sessao::getExercicio() );
+                            $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_tipo'       , $codTipoRegime );
+                            $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_sub_divisao', $codSubDivisao );
+                            $obTFolhaPagamentoTCEMGEntidadeCargoServidor->setDado('cod_cargo'      , $codCargo );
+                            $obErro = $obTFolhaPagamentoTCEMGEntidadeCargoServidor->inclusao($boTransacao);
+                        }
                     }
                 }
             }
@@ -134,13 +135,15 @@ if ( !$obErro->ocorreu() ) {
 
     if ( !$obErro->ocorreu() ) {
         //folhapagamento.tcemg_entidade_requisitos_cargo
-        foreach ($arRequisitosCargos as $codTipoRequisito => $cargo ) {    
-            foreach ($cargo as $codCargo => $value) {
-                if (!$obErro->ocorreu()) {
-                    $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('exercicio'      , Sessao::getExercicio() );
-                    $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_tipo'       , $codTipoRequisito );                    
-                    $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_cargo'      , $codCargo );
-                    $obErro = $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->inclusao($boTransacao);
+        if ( count($arRequisitosCargos) > 0 ){
+            foreach ($arRequisitosCargos as $codTipoRequisito => $cargo ) {    
+                foreach ($cargo as $codCargo => $value) {
+                    if (!$obErro->ocorreu()) {
+                        $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('exercicio'      , Sessao::getExercicio() );
+                        $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_tipo'       , $codTipoRequisito );                    
+                        $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->setDado('cod_cargo'      , $codCargo );
+                        $obErro = $obTFolhaPagamentoTCEMGEntidadeRequisitosCargo->inclusao($boTransacao);
+                    }
                 }
             }
         }
@@ -148,13 +151,15 @@ if ( !$obErro->ocorreu() ) {
 
     if ( !$obErro->ocorreu() ) {
         //folhapagamento.tcemg_entidade_remuneracao
-        foreach ($arEventos as $codRemuneracao => $evento ) {    
-            foreach ($evento as $codEvento => $value) {
-                if (!$obErro->ocorreu()) {
-                    $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('exercicio'      , Sessao::getExercicio() );
-                    $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_tipo'       , $codRemuneracao );                    
-                    $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_evento'     , $codEvento );
-                    $obErro = $obTFolhaPagamentoTCEMGEntidadeRemuneracao->inclusao($boTransacao);
+        if ( count($arRequisitosCargos) > 0 ){
+            foreach ($arEventos as $codRemuneracao => $evento ) {    
+                foreach ($evento as $codEvento => $value) {
+                    if (!$obErro->ocorreu()) {
+                        $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('exercicio'      , Sessao::getExercicio() );
+                        $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_tipo'       , $codRemuneracao );                    
+                        $obTFolhaPagamentoTCEMGEntidadeRemuneracao->setDado('cod_evento'     , $codEvento );
+                        $obErro = $obTFolhaPagamentoTCEMGEntidadeRemuneracao->inclusao($boTransacao);
+                    }
                 }
             }
         }

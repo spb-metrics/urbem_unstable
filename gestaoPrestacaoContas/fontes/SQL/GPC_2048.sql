@@ -5653,3 +5653,12 @@ VALUES
 
 INSERT INTO tcemg.consideracao_arquivo VALUES (60, 'FLPGO');
 
+----------------
+-- Ticket #23583
+----------------
+
+ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN valor_saldo_atual_concessoes_garantia_interna        NUMERIC(14,2);
+ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN valor_saldo_atual_contra_concessoes_garantia_interna NUMERIC(14,2);
+ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN valor_saldo_atual_contra_concessoes_garantia_externa NUMERIC(14,2);
+ALTER TABLE tcemg.configuracao_arquivo_dclrf ADD COLUMN medidas_corretivas TEXT;
+

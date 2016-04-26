@@ -24,7 +24,7 @@
 * Script de função PLPGSQL
 *
 
-	$Id: listaArrecadacaoConciliacao.plsql 59612 2014-09-02 12:00:51Z gelson $
+	$Id: listaArrecadacaoConciliacao.plsql 64809 2016-04-05 12:38:56Z lisiane $
 
 *
 * Casos de uso: uc-02.04.07,uc-02.04.19,uc-02.04.04,uc-02.04.10
@@ -155,6 +155,7 @@ BEGIN
             ORDER BY exercicio
                     ,cod_entidade
                     ,cod_receita)'';
+
     EXECUTE stSql;
 
     stSql := ''
@@ -268,6 +269,7 @@ BEGIN
             ORDER BY exercicio
                     ,cod_entidade
                     ,cod_receita)'';
+         
     EXECUTE stSql;
 
     stSql := ''
@@ -722,6 +724,7 @@ END LOOP;
                ,tbl.porcentagem_valor
                ,TAE.cgm_usuario
                ,tbl.tipo_arrecadacao
+               ,NULL::INTEGER AS cod_historico
          FROM tmp_estorno_arrecadacao          AS tbl
              ,tesouraria.arrecadacao_estornada AS TAE
          WHERE tbl.exercicio             = TAE.exercicio
@@ -751,6 +754,7 @@ END LOOP;
                ,TD.porcentagem_valor
                ,TD.cgm_usuario
                ,''''D'''' AS tipo_arrecadacao
+               ,925 AS cod_historico
          FROM tmp_arrecadacao AS TA
              ,tmp_deducao     AS TD
          WHERE TA.exercicio             = TD.exercicio
@@ -785,6 +789,7 @@ END LOOP;
                   ,0 as porcentagem_valor
                   ,TA.cgm_usuario
                   ,CAST( ''''D'''' AS VARCHAR) as tipo_arrecadacao
+                  ,NULL::INTEGER AS cod_historico
             FROM tesouraria.boletim               AS TB 
                  JOIN tesouraria.arrecadacao AS TA 
                  ON (   TB.exercicio   = TA.exercicio
@@ -841,6 +846,7 @@ END LOOP;
                    ,numeracao
                    ,cod_receita
     )'';
+
     EXECUTE stSql;
 
 RETURN true;

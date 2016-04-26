@@ -31,7 +31,7 @@
 
     * Casos de uso: uc-04.05.09
 
-    $Id: TFolhaPagamentoEventoCalculado.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TFolhaPagamentoEventoCalculado.class.php 64849 2016-04-06 20:31:58Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -166,115 +166,177 @@ function recuperaContratosCalculados(&$rsRecordSet, $stFiltro = "", $stOrdem =""
 
 function montaRecuperaContratosCalculados()
 {
-    $stSql  = "SELECT *                                                                                                 \n";
-    $stSql .= "  FROM (SELECT contrato.registro                                                                         \n";
-    $stSql .= "             , contrato.cod_contrato                                                                     \n";
-    $stSql .= "             , servidor_contrato_servidor.numcgm                                                         \n";
-    $stSql .= "             , servidor_contrato_servidor.nom_cgm                                                        \n";
-    $stSql .= "             , servidor_contrato_servidor.cod_orgao                                                      \n";
+
+    $stSql = "SELECT *
+
+                FROM (
+                        SELECT contrato.registro
+                             , contrato.cod_contrato
+                             , servidor_contrato_servidor.numcgm
+                             , servidor_contrato_servidor.nom_cgm
+                             , servidor_contrato_servidor.cod_orgao
+                             , registro_evento_periodo.cod_periodo_movimentacao
+            \n";
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "             , servidor_contrato_servidor.cod_local                                                  \n";
+        $stSql .= "          , servidor_contrato_servidor.cod_local
+                \n";
     }
 
-    $stSql .= "             , registro_evento_periodo.cod_periodo_movimentacao                                          \n";
-    $stSql .= "          FROM folhapagamento.registro_evento_periodo                           \n";
-    $stSql .= "             , (SELECT servidor_contrato_servidor.cod_contrato                                           \n";
-    $stSql .= "                     , sw_cgm.numcgm                                                                     \n";
-    $stSql .= "                     , sw_cgm.nom_cgm                                                                    \n";
-    $stSql .= "                     , contrato_servidor_orgao.cod_orgao                                                 \n";
+    if ($this->getDado('boFiltroEvento')) {
+        $stSql .= "          , evento_calculado.cod_evento
+                \n";
+    }
+
+    $stSql .= "            FROM folhapagamento.registro_evento_periodo
+
+                    INNER JOIN ( SELECT servidor_contrato_servidor.cod_contrato
+                                      , sw_cgm.numcgm
+                                      , sw_cgm.nom_cgm
+                                      , contrato_servidor_orgao.cod_orgao
+            \n";
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "                     , contrato_servidor_local.cod_local                                             \n";
+        $stSql .= "                   , contrato_servidor_local.cod_local
+                \n";
     }
 
-    $stSql .= "                  FROM pessoal.servidor_contrato_servidor                       \n";
+    $stSql .= "
+                          
+                                   FROM pessoal.servidor_contrato_servidor
+            \n";
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "            INNER JOIN pessoal.contrato_servidor_local                          \n";
-        $stSql .= "                    ON servidor_contrato_servidor.cod_contrato = contrato_servidor_local.cod_contrato    \n";
-        $stSql .= "            INNER JOIN (  SELECT contrato_servidor_local.cod_contrato                                    \n";
-        $stSql .= "                                , max(timestamp) as timestamp                                            \n";
-        $stSql .= "                             FROM pessoal.contrato_servidor_local               \n";
-        $stSql .= "                         GROUP BY contrato_servidor_local.cod_contrato) as max_contrato_servidor_local   \n";
-        $stSql .= "                    ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato   \n";
-        $stSql .= "                   AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp         \n";
+        $stSql .= "          INNER JOIN pessoal.contrato_servidor_local
+                                     ON servidor_contrato_servidor.cod_contrato = contrato_servidor_local.cod_contrato
+
+                             INNER JOIN ( SELECT contrato_servidor_local.cod_contrato
+                                               , MAX(timestamp) AS timestamp
+                                            FROM pessoal.contrato_servidor_local
+                                        GROUP BY contrato_servidor_local.cod_contrato
+                                        ) AS max_contrato_servidor_local
+                                     ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato
+                                    AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp
+                \n";
     }
 
-    $stSql .= "                     , pessoal.servidor                                         \n";
-    $stSql .= "                     , sw_cgm                                                                            \n";
-    $stSql .= "                     , pessoal.contrato_servidor_orgao                          \n";
-    $stSql .= "                     , (  SELECT contrato_servidor_orgao.cod_contrato                                    \n";
-    $stSql .= "                                , max(timestamp) as timestamp                                            \n";
-    $stSql .= "                             FROM pessoal.contrato_servidor_orgao               \n";
-    $stSql .= "                         GROUP BY contrato_servidor_orgao.cod_contrato) as max_contrato_servidor_orgao   \n";
-    $stSql .= "                 WHERE servidor_contrato_servidor.cod_servidor = servidor.cod_servidor                   \n";
-    $stSql .= "                   AND servidor.numcgm = sw_cgm.numcgm                                                   \n";
-    $stSql .= "                   AND servidor_contrato_servidor.cod_contrato = contrato_servidor_orgao.cod_contrato    \n";
-    $stSql .= "                   AND contrato_servidor_orgao.cod_contrato = max_contrato_servidor_orgao.cod_contrato   \n";
-    $stSql .= "                   AND contrato_servidor_orgao.timestamp = max_contrato_servidor_orgao.timestamp         \n";
-    $stSql .= "                 UNION                                                                                   \n";
-    $stSql .= "                SELECT contrato_pensionista.cod_contrato                                                 \n";
-    $stSql .= "                     , sw_cgm.numcgm                                                                     \n";
-    $stSql .= "                     , sw_cgm.nom_cgm                                                                    \n";
-    $stSql .= "                     , contrato_pensionista_orgao.cod_orgao                                              \n";
+    $stSql .= "
+
+                             INNER JOIN pessoal.servidor
+                                     ON servidor.cod_servidor = servidor_contrato_servidor.cod_servidor
+
+                             INNER JOIN sw_cgm
+                                     ON sw_cgm.numcgm = servidor.numcgm
+
+                             INNER JOIN pessoal.contrato_servidor_orgao
+                                     ON contrato_servidor_orgao.cod_contrato = servidor_contrato_servidor.cod_contrato
+
+                             INNER JOIN ( SELECT contrato_servidor_orgao.cod_contrato
+                                               , max(timestamp) AS timestamp
+
+                                            FROM pessoal.contrato_servidor_orgao
+
+                                        GROUP BY contrato_servidor_orgao.cod_contrato
+                                        ) AS max_contrato_servidor_orgao
+                                     ON max_contrato_servidor_orgao.cod_contrato = contrato_servidor_orgao.cod_contrato
+                                    AND max_contrato_servidor_orgao.timestamp = contrato_servidor_orgao.timestamp
+
+                                  UNION
+
+                                 SELECT contrato_pensionista.cod_contrato
+                                      , sw_cgm.numcgm
+                                      , sw_cgm.nom_cgm
+                                      , contrato_pensionista_orgao.cod_orgao
+            \n";
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "                     , contrato_servidor_local.cod_local                                             \n";
+        $stSql .= "                        , contrato_servidor_local.cod_local
+                \n";
     }
 
-    $stSql .= "                  FROM pessoal.contrato_pensionista                             \n";
+    $stSql .= "
+            
+                                   FROM pessoal.contrato_pensionista
+            \n";
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "            INNER JOIN pessoal.contrato_servidor_local                          \n";
-        $stSql .= "                    ON contrato_pensionista.cod_contrato_cedente = contrato_servidor_local.cod_contrato  \n";
-        $stSql .= "            INNER JOIN (  SELECT contrato_servidor_local.cod_contrato                                    \n";
-        $stSql .= "                                , max(timestamp) as timestamp                                            \n";
-        $stSql .= "                             FROM pessoal.contrato_servidor_local               \n";
-        $stSql .= "                         GROUP BY contrato_servidor_local.cod_contrato) as max_contrato_servidor_local   \n";
-        $stSql .= "                    ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato   \n";
-        $stSql .= "                   AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp         \n";
+        $stSql .= "          INNER JOIN pessoal.contrato_servidor_local
+                                     ON contrato_pensionista.cod_contrato_cedente = contrato_servidor_local.cod_contrato
+
+                             INNER JOIN (  SELECT contrato_servidor_local.cod_contrato
+                                                , max(timestamp) as timestamp
+
+                                             FROM pessoal.contrato_servidor_local
+
+                                         GROUP BY contrato_servidor_local.cod_contrato
+                                        ) AS max_contrato_servidor_local
+                                     ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato
+                                    AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp
+                \n";
     }
 
-    $stSql .= "                     , pessoal.pensionista                                      \n";
-    $stSql .= "                     , sw_cgm                                                                            \n";
-    $stSql .= "                     , pessoal.contrato_pensionista_orgao                       \n";
-    $stSql .= "                     , (  SELECT contrato_pensionista_orgao.cod_contrato                                 \n";
-    $stSql .= "                                , max(timestamp) as timestamp                                            \n";
-    $stSql .= "                             FROM pessoal.contrato_pensionista_orgao            \n";
-    $stSql .= "                         GROUP BY contrato_pensionista_orgao.cod_contrato) as max_contrato_pensionista_orgao\n";
-    $stSql .= "                 WHERE contrato_pensionista.cod_pensionista = pensionista.cod_pensionista                \n";
-    $stSql .= "                   AND contrato_pensionista.cod_contrato_cedente = pensionista.cod_contrato_cedente      \n";
-    $stSql .= "                   AND pensionista.numcgm = sw_cgm.numcgm                                                \n";
-    $stSql .= "                   AND contrato_pensionista.cod_contrato = contrato_pensionista_orgao.cod_contrato       \n";
-    $stSql .= "                   AND contrato_pensionista_orgao.cod_contrato = max_contrato_pensionista_orgao.cod_contrato\n";
-    $stSql .= "                   AND contrato_pensionista_orgao.timestamp = max_contrato_pensionista_orgao.timestamp   \n";
-    $stSql .= "                   ) as servidor_contrato_servidor                                                       \n";
-    $stSql .= "             , pessoal.contrato                                                 \n";
-    $stSql .= "             , folhapagamento.registro_evento                                   \n";
-    $stSql .= "             , folhapagamento.ultimo_registro_evento                            \n";
-    $stSql .= "             , folhapagamento.evento_calculado                                  \n";
-    $stSql .= "         WHERE registro_evento_periodo.cod_registro = registro_evento.cod_registro                       \n";
-    $stSql .= "           AND registro_evento.cod_registro = ultimo_registro_evento.cod_registro                        \n";
-    $stSql .= "           AND registro_evento.cod_evento = ultimo_registro_evento.cod_evento                            \n";
-    $stSql .= "           AND registro_evento.timestamp = ultimo_registro_evento.timestamp                              \n";
-    $stSql .= "           AND registro_evento.cod_registro = evento_calculado.cod_registro                              \n";
-    $stSql .= "           AND registro_evento.cod_evento = evento_calculado.cod_evento                                  \n";
-    $stSql .= "           AND registro_evento.timestamp = evento_calculado.timestamp_registro                           \n";
-    $stSql .= "           AND registro_evento_periodo.cod_contrato = servidor_contrato_servidor.cod_contrato            \n";
-    $stSql .= "           AND registro_evento_periodo.cod_contrato = contrato.cod_contrato                              \n";
-    $stSql .= "           AND registro_evento_periodo.cod_contrato NOT IN (SELECT cod_contrato                          \n";
-    $stSql .= "                                   FROM pessoal.contrato_servidor_caso_causa )  \n";
-    $stSql .= "      GROUP BY contrato.registro                                                                         \n";
-    $stSql .= "             , contrato.cod_contrato                                                                     \n";
-    $stSql .= "             , servidor_contrato_servidor.numcgm                                                         \n";
-    $stSql .= "             , servidor_contrato_servidor.cod_orgao                                                      \n";
+    $stSql .= "
+            
+                             INNER JOIN pessoal.pensionista
+                                     ON pensionista.cod_pensionista = contrato_pensionista.cod_pensionista
+
+                             INNER JOIN sw_cgm
+                                     ON sw_cgm.numcgm = pensionista.numcgm
+
+                             INNER JOIN pessoal.contrato_pensionista_orgao
+                                     ON contrato_pensionista_orgao.cod_contrato = contrato_pensionista.cod_contrato
+
+                             INNER JOIN ( SELECT contrato_pensionista_orgao.cod_contrato
+                                               , max(timestamp) as timestamp
+
+                                            FROM pessoal.contrato_pensionista_orgao
+
+                                        GROUP BY contrato_pensionista_orgao.cod_contrato
+                                        ) AS max_contrato_pensionista_orgao
+                                     ON max_contrato_pensionista_orgao.cod_contrato = contrato_pensionista_orgao.cod_contrato
+                                    AND max_contrato_pensionista_orgao.timestamp = contrato_pensionista_orgao.timestamp
+                               ) AS servidor_contrato_servidor
+                            ON servidor_contrato_servidor.cod_contrato = registro_evento_periodo.cod_contrato
+
+                    INNER JOIN pessoal.contrato
+                            ON contrato.cod_contrato = registro_evento_periodo.cod_contrato
+
+                    INNER JOIN folhapagamento.registro_evento
+                            ON registro_evento.cod_registro = registro_evento_periodo.cod_registro
+
+                    INNER JOIN folhapagamento.ultimo_registro_evento
+                            ON ultimo_registro_evento.cod_registro = registro_evento.cod_registro
+                           AND ultimo_registro_evento.cod_evento = registro_evento.cod_evento
+                           AND ultimo_registro_evento.timestamp = registro_evento.timestamp
+
+                    INNER JOIN folhapagamento.evento_calculado
+                            ON evento_calculado.cod_registro = registro_evento.cod_registro
+                           AND evento_calculado.cod_evento = registro_evento.cod_evento
+                           AND evento_calculado.timestamp_registro = registro_evento.timestamp
+
+                         WHERE registro_evento_periodo.cod_contrato NOT IN ( SELECT cod_contrato                          
+                                                                               FROM pessoal.contrato_servidor_caso_causa
+                                                                           )  
+                      GROUP BY contrato.registro                                                                         
+                             , contrato.cod_contrato                                                                     
+                             , servidor_contrato_servidor.numcgm                                                         
+                             , servidor_contrato_servidor.cod_orgao                                                      
+                             , servidor_contrato_servidor.nom_cgm
+                             , registro_evento_periodo.cod_periodo_movimentacao
+            \n";
+    
+    if ($this->getDado('boFiltroEvento')) {
+        $stSql .= "         , evento_calculado.cod_evento
+                \n";
+    }
 
     if ($this->getDado('boJoinLocal')) {
-        $stSql .= "             , servidor_contrato_servidor.cod_local                                                  \n";
+        $stSql .= "          , servidor_contrato_servidor.cod_local                                                  \n";
     }
 
-    $stSql .= "             , servidor_contrato_servidor.nom_cgm,registro_evento_periodo.cod_periodo_movimentacao) as contratos_calculados                               \n";
+    $stSql .= "
+                     ) AS contratos_calculados
+            ";
 
     return $stSql;
 }

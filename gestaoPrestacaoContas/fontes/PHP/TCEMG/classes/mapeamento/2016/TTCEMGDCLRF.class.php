@@ -72,14 +72,7 @@ class TTCEMGDCLRF extends Persistente {
         
         $stSql .= "
              , mes_referencia
-             , REPLACE(valor_saldo_atual_concessoes_garantia::VARCHAR, '.',',') AS valor_saldo_atual_concessoes_garantia
-             , REPLACE(receita_privatizacao::VARCHAR, '.',',') AS receita_privatizacao
-             , REPLACE(valor_liquidado_incentivo_contribuinte::VARCHAR, '.',',') AS valor_liquidado_incentivo_contribuinte
-             , REPLACE(valor_liquidado_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_liquidado_incentivo_instituicao_financeira
-             , REPLACE(valor_inscrito_rpnp_incentivo_contribuinte::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_contribuinte
-             , REPLACE(valor_inscrito_rpnp_incentivo_instituicao_financeira::VARCHAR, '.',',') AS valor_inscrito_rpnp_incentivo_instituicao_financeira
-             , REPLACE(valor_compromissado::VARCHAR, '.',',') AS valor_compromissado
-             , REPLACE(valor_recursos_nao_aplicados::VARCHAR, '.',',') AS valor_recursos_nao_aplicados
+             , *
           FROM tcemg.configuracao_arquivo_dclrf 
          WHERE exercicio = '".$this->getDado('exercicio')."'
            AND mes_referencia = ".$this->getDado('mes_referencia');

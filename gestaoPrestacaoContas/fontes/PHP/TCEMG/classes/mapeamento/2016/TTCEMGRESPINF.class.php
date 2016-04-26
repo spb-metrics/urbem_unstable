@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Arthur Cruz
   *
   * @ignore
-  * $Id: TTCEMGRESPINF.class.php 64739 2016-03-29 12:51:00Z franver $
-  * $Date: 2016-03-29 09:51:00 -0300 (Ter, 29 Mar 2016) $
-  * $Author: franver $
-  * $Rev: 64739 $
+  * $Id: TTCEMGRESPINF.class.php 64852 2016-04-07 17:08:44Z evandro $
+  * $Date: 2016-04-07 14:08:44 -0300 (Qui, 07 Abr 2016) $
+  * $Author: evandro $
+  * $Rev: 64852 $
   *
 */
 
@@ -53,13 +53,15 @@ class TTCEMGRESPINF extends Persistente
     }
 
     public function montaRecuperaDados () {
+        $stDataInicial = SistemaLegado::dataToSql($this->getDado('dt_inicial'));
+        $stDataInicialFinal = SistemaLegado::dataToSql($this->getDado('dt_final'));
         $stSql = "
           SELECT sw_cgm.nom_cgm AS nome_responsavel
                , sw_cgm_pessoa_fisica.rg AS cart_ident
                , sw_cgm_pessoa_fisica.orgao_emissor AS org_emissor
                , sw_cgm_pessoa_fisica.cpf AS cpf
-               , configuracao_orgao.dt_inicio
-               , configuracao_orgao.dt_fim AS dt_final
+               , '".$stDataInicial."'AS dt_inicio
+               , '".$stDataInicialFinal."' AS dt_final
             FROM tcemg.configuracao_orgao
       INNER JOIN sw_cgm
               ON sw_cgm.numcgm = configuracao_orgao.num_cgm

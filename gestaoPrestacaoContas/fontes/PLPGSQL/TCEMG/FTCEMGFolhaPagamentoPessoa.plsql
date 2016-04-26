@@ -45,7 +45,7 @@ BEGIN
               END AS tipo_documento
            , sw_cgm_pessoa_fisica.cpf
            , sem_acentos(sw_cgm.nom_cgm) AS nome
-           , UPPER(sw_cgm_pessoa_fisica.sexo) as sexo
+           , UPPER(COALESCE(sw_cgm_pessoa_fisica.sexo,''M'')) as sexo
            , TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,''ddmmyyyy'') as dt_nascimento
            , ''''::VARCHAR as tipo_cadastro
            , ''''::VARCHAR AS justificativa_alteracao

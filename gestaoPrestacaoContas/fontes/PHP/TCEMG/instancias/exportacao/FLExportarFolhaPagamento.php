@@ -35,11 +35,11 @@
 
     * @ignore
 
-    $Id: FLExportarFolhaPagamento.php 64780 2016-03-31 14:54:33Z michel $
+    $Id: FLExportarFolhaPagamento.php 64817 2016-04-05 21:32:48Z michel $
     */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once ( CAM_GF_ORC_COMPONENTES."ISelectMultiploEntidadeUsuario.class.php" );
+include_once CAM_GF_ORC_NEGOCIO.'ROrcamentoEntidade.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ExportarFolhaPagamento" ;
@@ -70,8 +70,19 @@ $obHdnAcao->setName ( "stAcao" );
 $obHdnAcao->setValue( $stAcao );
 
 /* ComboBox dos entidades */
-$obISelectMultiploEntidadeUsuario = new ISelectMultiploEntidadeUsuario();
+$obROrcamentoEntidade = new ROrcamentoEntidade;
+$obROrcamentoEntidade->setExercicio(Sessao::getExercicio());
+$obROrcamentoEntidade->listarEntidades($rsEntidades);
 
+$obCmbEntidades = new Select  ();
+$obCmbEntidades->setRotulo    ('Entidade');
+$obCmbEntidades->setId        ('inCodEntidade');
+$obCmbEntidades->setName      ('inCodEntidade');
+$obCmbEntidades->setCampoId   ('cod_entidade');
+$obCmbEntidades->setCampoDesc ('[cod_entidade] - [nom_cgm]');
+$obCmbEntidades->addOption    ('', 'Selecione');
+$obCmbEntidades->setNull      ( false );
+$obCmbEntidades->preencheCombo($rsEntidades);
 
 if(SistemaLegado::isTCEMG($boTransacao) && Sessao::getExercicio() <= '2016'){
     /* ComboBox do Exercício -
@@ -109,13 +120,13 @@ $obRdbTipoExportArqCompactado->setName  ( "stTipoExport" );
 $obRdbTipoExportArqCompactado->setLabel ( "Compactados"  );
 $obRdbTipoExportArqCompactado->setValue ( "compactados"  );
 
-
 $arNomeArquivos = array(
     'IDE.csv'
     ,'PESSOA.csv'
     ,'TEREM.csv'
-    ,'CONSID.csv'
     ,'RESPINF.csv'
+    ,'FLPGO.csv'
+    ,'CONSID.csv'
 );
 
 sort($arNomeArquivos);
@@ -154,7 +165,7 @@ $obFormulario->addTitulo("Dados para geração de arquivos");
 $obFormulario->addHidden($obHdnCtrl);
 $obFormulario->addHidden($obHdnAcao);
 $obFormulario->addHidden($obHdnPaginaExportacao);
-$obFormulario->addComponente($obISelectMultiploEntidadeUsuario);
+$obFormulario->addComponente($obCmbEntidades);
 if(SistemaLegado::isTCEMG($boTransacao) && Sessao::getExercicio() <= '2016'){
     $obFormulario->addComponente($obExercicio);
 }

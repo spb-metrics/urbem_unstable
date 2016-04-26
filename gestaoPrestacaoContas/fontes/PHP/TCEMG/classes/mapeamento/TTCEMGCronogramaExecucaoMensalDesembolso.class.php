@@ -209,7 +209,7 @@ class TTCEMGCronogramaExecucaoMensalDesembolso extends Persistente
                         , num_unidade
                     FROM (
                           SELECT DISTINCT cod_despesa
-                               , saldo_inicial
+                               , COALESCE(saldo_inicial,0.00) AS saldo_inicial
                                , retorno.num_orgao
                                , retorno.num_unidade
                             FROM orcamento.fn_balancete_despesa('".$this->getDado('exercicio')."',' AND od.cod_entidade IN  (".$this->getDado('cod_entidade').")','01/01/".Sessao::getExercicio()."','31/12/".Sessao::getExercicio()."','','','','','' ,'".$this->getDado('num_orgao')."','".$this->getDado('num_unidade')."', '' )

@@ -29,15 +29,17 @@
  *
  *
  * @author Desenvolvedor: Matheus Figueredo
+ *
+ * $Id: DTRelatorioAuditoriaDetalhes.php 64804 2016-04-04 19:29:47Z michel $
  */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkDB.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/Table.class.php';
-include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoria.class.php");
+include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoria.class.php";
 
-include(CAM_FW_LEGADO."funcoesLegado.lib.php");
+include CAM_FW_LEGADO."funcoesLegado.lib.php";
 include CAM_FW_LEGADO."paginacaoLegada.class.php";
 include CAM_FW_LEGADO."botoesPdfLegado.class.php";
 
@@ -65,7 +67,7 @@ $stFiltro = implode(" AND ", $arFiltro);
 //CONSULTA
 $rsRecordSet = null;
 $obTAuditoria = new TAuditoria();
-$obErro = $obTAuditoria->recuperaAuditoriaDetalhes($rsDetalhes, $stFiltro, '', false);
+$obErro = $obTAuditoria->recuperaAuditoriaDetalhes($rsDetalhes, $stFiltro, ' au_d.cod_detalhe ', false);
 
 if (!$obErro->ocorreu()) {
     $obLista = new Table;

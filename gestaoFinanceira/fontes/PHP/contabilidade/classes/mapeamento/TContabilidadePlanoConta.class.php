@@ -31,7 +31,7 @@
     * @subpackage Mapeamento
 
     * Casos de uso: uc-02.02.02, uc-02.08.03, uc-02.08.07, uc-02.02.31, uc-02.04.03
-    $Id: TContabilidadePlanoConta.class.php 64773 2016-03-30 21:45:45Z michel $
+    $Id: TContabilidadePlanoConta.class.php 64820 2016-04-06 14:23:36Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -861,7 +861,7 @@ function montaRecuperaDadosExportacaoBalVerificacao()
                             , sc.nom_sistema
                             , escrituracao
                             , tabela.indicador_superavit
-                            , CASE WHEN tabela.cod_estrutural LIKE '8.1.1.1.1%'
+                            , CASE WHEN tabela.cod_estrutural LIKE '8.2.1.1.1%'
                                    THEN COALESCE(plano_recurso.cod_recurso, 0)
                                    ELSE 0
                               END AS cod_recurso

@@ -189,6 +189,7 @@ function recuperaEntidadeGeral(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" ,
 
     return $obErro;
 }
+
 function recuperaEntidadeRestos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
 {
     $obErro      = new Erro;
@@ -198,6 +199,22 @@ function recuperaEntidadeRestos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" 
     if(trim($stOrdem))
         $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
     $stSql = $this->montaRecuperaRelacionamentoRestos().$stCondicao.$stOrdem;
+    $this->setDebug( $stSql );
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+
+    return $obErro;
+}
+
+
+function verificaEntidadeRestos(&$rsRecordSet, $stCondicao = "" , $stOrdem = "" , $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+
+    if(trim($stOrdem))
+        $stOrdem = (strpos($stOrdem,"ORDER BY")===false)?" ORDER BY $stOrdem":$stOrdem;
+    $stSql = $this->montaVerificaEntidadeRestos().$stCondicao.$stOrdem;
     $this->setDebug( $stSql );
     $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
@@ -235,11 +252,31 @@ function montaRecuperaRelacionamentoRestos()
                            WHERE configuracao_entidade.exercicio  = '".$this->getDado('exercicio')."'
                              AND configuracao_entidade.cod_modulo = 10
                              AND configuracao_entidade.parametro  = 'virada_GF' )
+                             
                     AND entidade.exercicio  = '".$this->getDado('exercicio')."' ";
 
     return $stSql;
 }
 
+
+function montaVerificaEntidadeRestos()
+{
+    $stSql  = " SELECT sw_cgm.numcgm                                                      
+                     , sw_cgm.nom_cgm                                                    
+                     , entidade.*   
+                  FROM orcamento.entidade
+            INNER JOIN sw_cgm                                                              
+                    ON sw_cgm.numcgm = entidade.numcgm
+            INNER JOIN administracao.configuracao_entidade
+                    ON configuracao_entidade.cod_entidade = entidade.cod_entidade
+                   AND configuracao_entidade.exercicio    = entidade.exercicio
+                        
+                   AND configuracao_entidade.parametro    = 'virada_GF'
+                   AND configuracao_entidade.cod_modulo   = 10	
+                WHERE entidade.exercicio  = '".$this->getDado('exercicio')."' ";
+
+    return $stSql;
+}
 
 function montaRecuperaRelacionamentoNomes()
 {

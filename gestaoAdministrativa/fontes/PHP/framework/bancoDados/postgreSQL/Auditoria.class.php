@@ -30,7 +30,7 @@
  * @package bancoDados
  * @subpackage postgreSQL
  *
- * $Id: Auditoria.class.php 63894 2015-11-03 17:42:57Z jean $
+ * $Id: Auditoria.class.php 64804 2016-04-04 19:29:47Z michel $
  *
  * Casos de uso: uc-01.01.00
 */
@@ -263,8 +263,8 @@ class Auditoria
 
     public function salvar($obMapeamento, $boTransacao)
     {
-        include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoria.class.php");
-        include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoriaDetalhe.class.php");
+        include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoria.class.php";
+        include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoAuditoriaDetalhe.class.php";
 
         $obTAuditoria = new TAuditoria();
         $obErro = new Erro();
@@ -316,14 +316,16 @@ class Auditoria
                     Auditoria::setConnection($obConexaoAuditoria);
                 }
 
+                $obTAuditoriaDetalhe = new TAuditoriaDetalhe($boTransacao);
+                $obTAuditoriaDetalhe->setDado("numcgm"     , $this->getNumCGM());
+                $obTAuditoriaDetalhe->setDado("cod_acao"   , $this->getCodAcao());
+                $obTAuditoriaDetalhe->setDado("timestamp"  , $stTimestampAuditoria);
+
                 foreach ($this->getDetalhes() as $obDetalheSerialized) {
+                    $obTAuditoriaDetalhe->proximoCod( $inCodDetalhe , $boTransacao );
+                    $obTAuditoriaDetalhe->setDado('cod_detalhe', $inCodDetalhe);
 
                     $obDetalhe = unserialize($obDetalheSerialized);
-
-                    $obTAuditoriaDetalhe = new TAuditoriaDetalhe($boTransacao);
-                    $obTAuditoriaDetalhe->setDado("numcgm"   , $this->getNumCGM());
-                    $obTAuditoriaDetalhe->setDado("cod_acao" , $this->getCodAcao());
-                    $obTAuditoriaDetalhe->setDado("timestamp", $stTimestampAuditoria);
 
                     $arValores = array();
 
@@ -374,12 +376,10 @@ class Auditoria
                                 }
                             }
                         }
-
                     } else {
                         $arEstrutura = $obDetalhe->getEstrutura();
 
                         foreach ($arEstrutura as $count => $key) {
-
                             if ($key->getConteudo() != '' OR $key->getConteudo() != NULL) {
                                 //Fora colocado essa verificação porque na classe $request é feito um addslashes e está adicionando \ 
                                 //assim ao adicionar o \, o str_replace está adicionando novamente a \, então esse str_count verifica

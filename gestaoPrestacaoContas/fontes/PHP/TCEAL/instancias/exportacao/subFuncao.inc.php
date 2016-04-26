@@ -69,7 +69,7 @@ $obTTCEALSubfuncao->setDado('und_gestora'  , $inCodUniGestora        );
 $obTTCEALSubfuncao->recuperaSubfuncao($rsRecordSet);
 
 $idCount = 0;
-$stNomeArquivo = 'Subfuncao';
+$stNomeArquivo = 'SubFuncao';
 $arResult = array();
 
 while (!$rsRecordSet->eof()) {

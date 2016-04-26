@@ -125,7 +125,9 @@ $boAgrupar = ($arFiltro["boAgrupar"])?$arFiltro["boAgrupar"]:$_POST["boAgrupar"]
 
 switch ($stTipoFiltro) {
     case "contrato_todos":
+    case "contrato":
     case "cgm_contrato_todos":
+    case "cgm_contrato":    
         if ($stOrdenacao == "alfabetica") {
             $stOrdem = "nom_cgm";
         } else {
@@ -237,7 +239,9 @@ include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoUF.class.php");
 $obTUF = new TUF();
 $obTUF->setDado("cod_uf",$rsCgmEntidade->getCampo("cod_uf"));
 $obTUF->recuperaPorChave($rsUF);
-$rsContratos->setCampo("nome_entidade",$rsEntidade->getCampo("entidade"),true);
+$stNomeEntidade = $rsEntidade->getCampo("entidade");
+SistemaLegado::removeAcentosSimbolos($stNomeEntidade);
+$rsContratos->setCampo("nome_entidade",$stNomeEntidade,true);
 $rsContratos->setCampo("estado_entidade",$rsUF->getCampo("nom_uf"),true);
 $rsContratos->setCampo("competencia",$stCompetencia,true);
 
@@ -545,7 +549,7 @@ $rsContratos->setCampo("competencia",$stCompetencia,true);
     $obTAdministracaoImpressora = new TAdministracaoImpressora();
     $obTAdministracaoImpressora->setDado("cod_impressora",$inCodImpressora);
     $obTAdministracaoImpressora->recuperaPorChave($rsImpressora);
-    system("lpr -P".$rsImpressora->getCampo("fila_impressao")." ".$stArquivo);
+    system("lpr -P ".$rsImpressora->getCampo("fila_impressao")." ".$stArquivo);
     fclose($impressao);
     unlink($stArquivo);
     $stMensagem = "O contracheque foi gerado e será impresso na impressora matricial configurada.";

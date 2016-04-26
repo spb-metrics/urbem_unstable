@@ -63,9 +63,9 @@ if (count($rsRecordSetIDE->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_orgao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

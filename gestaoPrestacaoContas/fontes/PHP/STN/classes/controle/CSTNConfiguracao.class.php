@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: CSTNConfiguracao.class.php 64797 2016-04-01 14:43:02Z arthur $
+ * $Id: CSTNConfiguracao.class.php 64883 2016-04-11 12:23:01Z evandro $
  */
 
 include CAM_FW_COMPONENTES . 'Table/TableTree.class.php';
@@ -688,8 +688,8 @@ class CSTNConfiguracao
         $obNumValor->setObrigatorioBarra(true);
         $obNumValor->setNegativo        (true);
 
-        $arPeriodo = explode('/', $_REQUEST['stPeriodo']);
-        $inExercicio = $arPeriodo[1];
+        $arPeriodo = explode('/', $_REQUEST['stDataImplantacao']);
+        $inExercicio = $arPeriodo[2];
 
         if($inExercicio>=2016){
             $stJs  = " jq('#spnReceitasCorrentes').css('display', 'inline'); ";
@@ -843,11 +843,11 @@ class CSTNConfiguracao
 
         $inCount = count($arPeriodo);
         if (!$obErro->ocorreu()) {
-            $arData = explode('/',$arParam['stPeriodo']);
+            $arData = explode('/',$arParam['stDataImplantacao']);            
             $arPeriodo[$inCount]['id'          ] = $inCount;
             $arPeriodo[$inCount]['cod_entidade'] = $arParam['inCodEntidade'];
-            $arPeriodo[$inCount]['mes'         ] = $arData[0];
-            $arPeriodo[$inCount]['ano'         ] = $arData[1];
+            $arPeriodo[$inCount]['mes'         ] = $arData[1];
+            $arPeriodo[$inCount]['ano'         ] = $arData[2];
             if ( $arPeriodo[$inCount]['ano'] >= '2016' ) {
                 $arPeriodo[$inCount]['valor_receita_tributaria']       = $this->mascaraValor($arParam['nuValorReceitaTributaria']    ,false);
                 $arPeriodo[$inCount]['valor_receita_contribuicoes']    = $this->mascaraValor($arParam['nuValorReceitaContribuicoes'] ,false);
@@ -862,7 +862,7 @@ class CSTNConfiguracao
                 $arPeriodo[$inCount]['valor_deducao_fundeb']           = $this->mascaraValor($arParam['nuValorDeducaoFundeb']        ,false);
             }
             $arPeriodo[$inCount]['valor'       ] = str_replace(',','.',str_replace('.','',$arParam['flValor'  ]));
-            $arPeriodo[$inCount]['descricao'   ] = $this->arMes[$arData[0]] . '/' . $arData[1];
+            $arPeriodo[$inCount]['descricao'   ] = $this->arMes[abs($arData[1])] . '/' . $arData[2];
 
             Sessao::write('arPeriodo',$arPeriodo);
 

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSManterOrdemCompra.php 64086 2015-12-01 11:48:08Z diogo.zarpelon $
+    * $Id: LSManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
 
     * Casos de uso: uc-03.04.24
 */
@@ -40,7 +40,7 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GP_COM_MAPEAMENTO."TComprasOrdem.class.php");
+include_once CAM_GP_COM_MAPEAMENTO."TComprasOrdem.class.php";
 
 $stPrograma = "ManterOrdemCompra";
 $pgFilt = "FL".$stPrograma.".php";
@@ -56,7 +56,7 @@ $stAcao = $request->get("stAcao");
 
 $stTipoOrdem = ( strpos($stAcao,'OS')===false ) ? 'C' : 'S';
 
-if ($stAcao == 'reemitir' || $stAcao == 'reemitirOS') {
+if ( strpos($stAcao,'reemitir') !== false ) {
     $pgProx = $pgProc;
 } else {
     $pgProx = $pgForm;
@@ -66,22 +66,22 @@ $paginando = Sessao::read('paginando');
 
 //filtros
 if (!$paginando) {
-    foreach ($_POST as $stCampo => $stValor) {
+    foreach ($request->getAll() as $stCampo => $stValor) {
         $filtro[$stCampo] = $stValor;
     }
     Sessao::write('filtro',$filtro);
-    Sessao::write('pg' , ($_GET['pg'] ? $_GET['pg'] : 0));
-    Sessao::write('pos', ($_GET['pos']? $_GET['pos'] : 0));
+    Sessao::write('pg' , $request->get('pg', 0));
+    Sessao::write('pos', $request->get('pos', 0));
     Sessao::write('paginando', true);
 } else {
-    Sessao::write('pg',  $_GET['pg']);
-    Sessao::write('pos', $_GET['pos']);
+    Sessao::write('pg',  $request->get('pg'));
+    Sessao::write('pos', $request->get('pos'));
 }
 
 $filtro = Sessao::read('filtro');
 if ($filtro) {
     foreach ($filtro as $key => $value) {
-        $_REQUEST[$key] = $value;
+        $request->set($key, $value);
     }
 }
 Sessao::write('paginando', true);
@@ -94,74 +94,76 @@ $arFiltros['paginando'] = true;
 
 Sessao::write('arFiltros', $arFiltros);
 
-if (is_array($_REQUEST["inCodEntidade"])) {
-    $filtro['inCodEntidade'] = implode(",", $_REQUEST["inCodEntidade"]);
+$inCodEntidade = $request->get('inCodEntidade');
+if (is_array($inCodEntidade)) {
+    $request->set('inCodEntidade', implode(",", $inCodEntidade));
+    $filtro['inCodEntidade'] = $request->get('inCodEntidade');
 }
 
 Sessao::write('filtro',$filtro);
-Sessao::write ('stIncluirAssinaturaUsuario', $_REQUEST['stIncluirAssinaturaUsuario']);
+Sessao::write ('stIncluirAssinaturaUsuario',$request->get('stIncluirAssinaturaUsuario'));
 
 /***************************
    FILTRAGEM DOS DADOS
 ***************************/
 
 if ( strpos($stAcao,'incluir') === false ) {
-    if ($_REQUEST["inCodOrdemCompra"] != "")
-        $stFiltro .= " ordem.cod_ordem = ".$_REQUEST["inCodOrdemCompra"]." \nAND ";
+    if ($request->get('inCodOrdemCompra', '') != "")
+        $stFiltro .= " ordem.cod_ordem = ".$request->get('inCodOrdemCompra')." \nAND ";
 
-    if ($_REQUEST["stExercicioOrdemCompra"] != "")
-        $stFiltro .= " ordem.exercicio = '".$_REQUEST["stExercicioOrdemCompra"]."' \n AND ";
+    if ($request->get('stExercicioOrdemCompra', '') != "")
+        $stFiltro .= " ordem.exercicio = '".$request->get('stExercicioOrdemCompra')."' \n AND ";
 }
 
-if ($_REQUEST["inCodEntidade"] != "")
-    $stFiltro .= " empenho.cod_entidade in (".$filtro['inCodEntidade'].") \nAND ";
+if ($request->get('inCodEntidade', '') != "")
+    $stFiltro .= " empenho.cod_entidade in (".$request->get('inCodEntidade').") \nAND ";
 
-if ($_REQUEST["stExercicio"] != "")
-    $stFiltro .= " empenho.exercicio = '".$_REQUEST["stExercicio"]."' \nAND ";
+if ($request->get('stExercicio', '') != "")
+    $stFiltro .= " empenho.exercicio = '".$request->get('stExercicio')."' \nAND ";
 
-if ($_REQUEST["inCodDespesa"] != "")
-    $stFiltro .= " pre_empenho_despesa.cod_despesa = ".$_REQUEST["inCodDespesa"]." \nAND ";
+if ($request->get('inCodDespesa', '') != "")
+    $stFiltro .= " pre_empenho_despesa.cod_despesa = ".$request->get('inCodDespesa')." \nAND ";
 
 // verifica os campos de código inicial e final para o filtro.
 // caso um dos campos não seja preenchido, é feita a parquisa a partir dele
 // para no máximo (se for código final) ou mínimo (se for código inicial)
-if ( ($_REQUEST["inCodEmpenhoInicial"] != "") && ($_REQUEST["inCodEmpenhoFinal"] != "") ) {
-    $stFiltro .= " empenho.cod_empenho between ".$_REQUEST["inCodEmpenhoInicial"]." and ".$_REQUEST["inCodEmpenhoFinal"]." \nAND ";
-} elseif ($_REQUEST["inCodEmpenhoInicial"] != "") {
-    $stFiltro .= " empenho.cod_empenho >= ".$_REQUEST["inCodEmpenhoInicial"]." \nAND ";
-} elseif ($_REQUEST["inCodEmpenhoFinal"] != "") {
-    $stFiltro .= " empenho.cod_empenho <= ".$_REQUEST["inCodEmpenhoFinal"]." \nAND ";
+if ( ($request->get('inCodEmpenhoInicial', '') != "") && ($request->get('inCodEmpenhoFinal', '') != "") ) {
+    $stFiltro .= " empenho.cod_empenho between ".$request->get('inCodEmpenhoInicial')." and ".$request->get('inCodEmpenhoFinal')." \nAND ";
+} elseif ($request->get('inCodEmpenhoInicial', '') != "") {
+    $stFiltro .= " empenho.cod_empenho >= ".$request->get('inCodEmpenhoInicial')." \nAND ";
+} elseif ($request->get('inCodEmpenhoFinal', '') != "") {
+    $stFiltro .= " empenho.cod_empenho <= ".$request->get('inCodEmpenhoFinal')." \nAND ";
 }
 
 // idem ao caso do codEmpenhoInicial e codEmpenhoFinal
-if ( ($_REQUEST["inCodAutorizacaoInicial"] != "") && ($_REQUEST["inCodAutorizacaoFinal"] != "") ) {
-    $stFiltro .= "  autorizacao_empenho.cod_autorizacao between ".$_REQUEST["inCodAutorizacaoInicial"]." AND ".$_REQUEST["inCodAutorizacaoFinal"]." \nAND ";
-} elseif ($_REQUEST["inCodAutorizacaoInicial"] != "") {
-    $stFiltro .= " autorizacao_empenho.cod_autorizacao >= ".$_REQUEST["inCodAutorizacaoInicial"]." \nAND ";
-} elseif ($_REQUEST["inCodAutorizacaoFinal"] != "") {
-    $stFiltro .= " autorizacao_empenho.cod_autorizacao <= ".$_REQUEST["inCodAutorizacaoFinal"]." \nAND ";
+if ( ($request->get('inCodAutorizacaoInicial', '') != "") && ($request->get('inCodAutorizacaoFinal', '') != "") ) {
+    $stFiltro .= "  autorizacao_empenho.cod_autorizacao between ".$request->get('inCodAutorizacaoInicial')." AND ".$request->get('inCodAutorizacaoFinal')." \nAND ";
+} elseif ($request->get('inCodAutorizacaoInicial', '') != "") {
+    $stFiltro .= " autorizacao_empenho.cod_autorizacao >= ".$request->get('inCodAutorizacaoInicial')." \nAND ";
+} elseif ($request->get('inCodAutorizacaoFinal', '') != "") {
+    $stFiltro .= " autorizacao_empenho.cod_autorizacao <= ".$request->get('inCodAutorizacaoFinal')." \nAND ";
 }
 
-if ($_REQUEST["inCodFornecedor"] != "") {
-    $stFiltro .= " item_pre_empenho_julgamento.cgm_fornecedor = ".$_REQUEST["inCodFornecedor"]." \nAND ";
+if ($request->get('inCodFornecedor', '') != "") {
+    $stFiltro .= " item_pre_empenho_julgamento.cgm_fornecedor = ".$request->get('inCodFornecedor')." \nAND ";
 }
 
 // idem ao caso do codEmpenhoInicial e codEmpenhoFinal
 if ( strpos($stAcao,'incluir') !== false ) {
-    if ( ($_REQUEST["stDtInicial"] != "") && ($_REQUEST["stDtFinal"] != "") ) {
-        $stFiltro .= " empenho.dt_empenho BETWEEN TO_DATE('".$_REQUEST["stDtInicial"]."', 'dd/mm/yyyy') AND TO_DATE('".$_REQUEST["stDtFinal"]."', 'dd/mm/yyyy') \nAND ";
-    } elseif ($_REQUEST["stDtInicial"] != "") {
-        $stFiltro .= " empenho.dt_empenho >= TO_DATE('".$_REQUEST["stDtInicial"]."', 'dd/mm/yyyy') \nAND ";
-    } elseif ($_REQUEST["stDtFinal"] != "") {
-        $stFiltro .= " empenho.dt_empenho <= TO_DATE('".$_REQUEST["stDtFinal"]."', 'dd/mm/yyyy') \nAND ";
+    if ( ($request->get('stDtInicial', '') != "") && ($request->get('stDtFinal', '') != "") ) {
+        $stFiltro .= " empenho.dt_empenho BETWEEN TO_DATE('".$request->get('stDtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$request->get('stDtFinal')."', 'dd/mm/yyyy') \nAND ";
+    } elseif ($request->get('stDtInicial', '') != "") {
+        $stFiltro .= " empenho.dt_empenho >= TO_DATE('".$request->get('stDtInicial')."', 'dd/mm/yyyy') \nAND ";
+    } elseif ($request->get('stDtFinal', '') != "") {
+        $stFiltro .= " empenho.dt_empenho <= TO_DATE('".$request->get('stDtFinal')."', 'dd/mm/yyyy') \nAND ";
     }
 } else {
-    if ( ($_REQUEST["stDtInicial"] != "") && ($_REQUEST["stDtFinal"] != "") ) {
-        $stFiltro .= " ordem.timestamp::date BETWEEN TO_DATE('".$_REQUEST["stDtInicial"]."', 'dd/mm/yyyy') AND TO_DATE('".$_REQUEST["stDtFinal"]."', 'dd/mm/yyyy') \nAND ";
-    } elseif ($_REQUEST["stDtInicial"] != "") {
-        $stFiltro .= " ordem.timestamp::date >= TO_DATE('".$_REQUEST["stDtInicial"]."', 'dd/mm/yyyy') \nAND ";
-    } elseif ($_REQUEST["stDtFinal"] != "") {
-        $stFiltro .= " ordem.timestamp::date <= TO_DATE('".$_REQUEST["stDtFinal"]."', 'dd/mm/yyyy') \nAND ";
+    if ( ($request->get('stDtInicial', '') != "") && ($request->get('stDtFinal', '') != "") ) {
+        $stFiltro .= " ordem.timestamp::date BETWEEN TO_DATE('".$request->get('stDtInicial')."', 'dd/mm/yyyy') AND TO_DATE('".$request->get('stDtFinal')."', 'dd/mm/yyyy') \nAND ";
+    } elseif ($request->get('stDtInicial', '') != "") {
+        $stFiltro .= " ordem.timestamp::date >= TO_DATE('".$request->get('stDtInicial')."', 'dd/mm/yyyy') \nAND ";
+    } elseif ($request->get('stDtFinal', '') != "") {
+        $stFiltro .= " ordem.timestamp::date <= TO_DATE('".$request->get('stDtFinal')."', 'dd/mm/yyyy') \nAND ";
     }
 }
 
@@ -175,7 +177,6 @@ $obComprasOrdem->setDado('acao', $stAcao );
 if ( strpos($stAcao,'incluir') !== false ) {
     $obComprasOrdem->setDado('stFiltro',$stFiltro);
     $obComprasOrdem->recuperaListagemEmpenho($rsLista);
-
 } else {
     $stOrdem = ' ORDER BY empenho.cod_empenho DESC ';
 
@@ -298,7 +299,7 @@ if ($stAcao == 'reemitir') {
     $obLista->ultimaAcao->setAcao( str_replace("OS","",$stAcao) );
 }
 
-if (($stAcao == 'incluir')||($stAcao == 'incluirOS')) {
+if ( strpos($stAcao,'incluir') !== false ) {
     $stAcaoBotao = 'selecionar';
 } else {
     $stAcaoBotao = $stAcao;

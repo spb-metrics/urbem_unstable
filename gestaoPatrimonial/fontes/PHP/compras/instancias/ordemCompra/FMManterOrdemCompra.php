@@ -30,14 +30,14 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: FMManterOrdemCompra.php 64639 2016-03-17 19:51:04Z arthur $
+    * $Id: FMManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-require_once(TCOM."TComprasOrdem.class.php");
-require_once(TCOM."TComprasObjeto.class.php");
+require_once TCOM."TComprasOrdem.class.php";
+require_once TCOM."TComprasObjeto.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterOrdemCompra";
@@ -64,7 +64,7 @@ $stEmpenho = $request->get('inCodEmpenho')."/".$request->get('stExercicioEmpenho
 if ( strpos($stAcao,'incluir') !== false ) {
     $jsOnLoad = "executaFuncaoAjax('BuscaEmpenhoItens','&stEmpenho=".$stEmpenho."&inCodEntidade=".$request->get('inCodEntidade')."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$request->get('stAcao')."');";
 } else {
-    $jsOnLoad = "executaFuncaoAjax('BuscaOrdemCompraItens','&stEmpenho=".$stEmpenho."&inCodEntidade=".$request->get('inCodEntidade')."&stExercicioOrdemCompra=".$request->get('stExercicioOrdemCompra')."&inCodOrdemCompra=".$request->get('inCodOrdemCompra')."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$request->get('stAcao')."');";
+    $jsOnLoad = "executaFuncaoAjax('BuscaOrdemCompraItens','&stEmpenho=".$stEmpenho."&inCodEntidade=".$request->get('inCodEntidade')."&stExercicioOrdemCompra=".$request->get('stExercicioOrdemCompra')."&inCodOrdemCompra=".$request->get('inCodOrdemCompra')."&stTipoOrdem=".$stTipoOrdem."&stAcao=".$request->get('stAcao')."&stTipo=".$request->get('stTipo')."');";
 }
 
 $arFiltros = Sessao::read('arFiltros');

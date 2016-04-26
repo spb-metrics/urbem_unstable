@@ -39,21 +39,86 @@
 
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once (CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php");
+include_once(CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracaoEntidade.class.php");
 
-class TTCEALExportacaoConfiguracao extends TAdministracaoConfiguracao
+class TTCEALExportacaoConfiguracao extends TAdministracaoConfiguracaoEntidade
 {
 
 /**
     * Método Construtor
     * @access Private
 */
-    public function TTCEALExportacaoConfiguracao()
+    public function __construct()
     {
-        parent::TAdministracaoConfiguracao();
+        parent::TAdministracaoConfiguracaoEntidade();
 
         $this->SetDado("exercicio",Sessao::getExercicio());
         $this->SetDado("cod_modulo",62);
     }
+    
+    function recuperaOrgaoUnidade(&$rsRecordSet, $stFiltro = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        $stSql = $this->montaRecuperaOrgaoUnidade().$stFiltro.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+    
+    function montaRecuperaOrgaoUnidade()
+    {
+        $stSql = "
+                    SELECT configuracao_entidade.cod_entidade
+                         , sw_cgm.nom_cgm
+                         , configuracao_entidade.valor
 
+                      FROM administracao.configuracao_entidade
+
+                INNER JOIN orcamento.entidade
+                        ON entidade.cod_entidade = configuracao_entidade.cod_entidade
+                       AND entidade.exercicio = configuracao_entidade.exercicio
+
+                INNER JOIN sw_cgm
+                        ON sw_cgm.numcgm = entidade.numcgm
+
+                     WHERE configuracao_entidade.parametro ilike 'tceal_orgao%'
+                       AND configuracao_entidade.exercicio = '".Sessao::getExercicio()."'
+                ";
+    
+        return $stSql;
+    }
+
+    function recuperaEntidades(&$rsRecordSet, $stFiltro = "" , $stOrdem = "" , $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        $stSql = $this->montaRecuperaEntidades().$stFiltro.$stOrdem;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
+    
+    function montaRecuperaEntidades()
+    {
+        $stSql = "
+                    SELECT entidade.cod_entidade
+                         , sw_cgm.nom_cgm
+
+                      FROM orcamento.entidade
+
+                INNER JOIN sw_cgm
+                        ON sw_cgm.numcgm = entidade.numcgm
+
+                     WHERE entidade.exercicio = '".Sessao::getExercicio()."'
+                ";
+    
+        return $stSql;
+    }
 }

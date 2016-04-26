@@ -50,18 +50,19 @@ DECLARE
     inOut               INTEGER   := 0      ;
     stRetorno           VARCHAR   := ''   ;
 BEGIN
- stMascaraReduzida := publico.fn_mascarareduzida(stMask);
 
- SELECT count(*) into inOut
-        FROM    orcamento.conta_receita
-        WHERE   cod_estrutural like stMascaraReduzida ||'%'
-        AND     cod_estrutural  <>  stMask
-        AND     exercicio       =   stExercicio;
+    SELECT count(*) into inOut
+      FROM orcamento.receita
+INNER JOIN orcamento.conta_receita
+        ON conta_receita.cod_conta = receita.cod_conta
+       AND conta_receita.exercicio = receita.exercicio
+     WHERE conta_receita.cod_estrutural = stMask
+       AND receita.exercicio = stExercicio;
 
  IF inOut = 0 THEN
-  stRetorno := 'A';
- ELSE
   stRetorno := 'S';
+ ELSE
+  stRetorno := 'A';
  END IF;
  RETURN stRetorno;
 END;

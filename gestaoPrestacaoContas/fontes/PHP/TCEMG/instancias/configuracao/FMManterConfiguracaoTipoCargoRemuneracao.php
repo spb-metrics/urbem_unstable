@@ -146,13 +146,13 @@ $obCmbTipoCargo->setTitle     ('Informe o Tipo de Cargo.');
 $obCmbTipoCargo->preencheCombo($rsTipoCargoServidor);
 
 $obTPessoalSubDivisao = new TPessoalSubDivisao();
-$obTPessoalSubDivisao->recuperaRelacionamento($rsRegimeSubDivisao,'','',$boTransacao);
+$obTPessoalSubDivisao->recuperaRelacionamento($rsRegimeSubDivisao,'',' ORDER BY nom_sub_divisao ',$boTransacao);
 
 $obCmbRegimeSubDivisao = new SelectMultiplo();
 $obCmbRegimeSubDivisao->setName  ( 'arRegimeSubdivisao' );
 $obCmbRegimeSubDivisao->setRotulo( "Regime/Subdivisão" );
 $obCmbRegimeSubDivisao->setTitle ( 'Regime/Subdivisão Disponíveis' );
-$obCmbRegimeSubDivisao->setOrdenacao('value');
+$obCmbRegimeSubDivisao->setOrdenacao('valueText');
 $obCmbRegimeSubDivisao->setNull  ( true );
 $obCmbRegimeSubDivisao->setObrigatorioBarra (true);
 
@@ -167,14 +167,14 @@ $obCmbRegimeSubDivisao->setCampoDesc2( '[nom_regime] - [nom_sub_divisao]' );
 $obCmbRegimeSubDivisao->SetRecord2   ( new RecordSet() );
 
 $obTPessoalCargo = new TPessoalCargo ;
-$obTPessoalCargo->recuperaTodos( $rsPessoalCargo, " ORDER BY cod_cargo" );
+$obTPessoalCargo->recuperaTodos( $rsPessoalCargo, " ORDER BY descricao" );
 
 $obCmbCargosRegime = new SelectMultiplo();
 $obCmbCargosRegime->setName  ( 'arCargosRegime' );
 $obCmbCargosRegime->setRotulo( "Cargo" );
 $obCmbCargosRegime->setNull  ( true );
 $obCmbCargosRegime->setObrigatorioBarra (true);
-$obCmbCargosRegime->setOrdenacao('value');
+$obCmbCargosRegime->setOrdenacao('valueText');
 $obCmbCargosRegime->setTitle ( 'Cargos Disponíveis' );
 
 $obCmbCargosRegime->SetNomeLista1( 'arCargosRegimeDisponiveis' );
@@ -218,14 +218,14 @@ $obCmbTipoRequisitosCargos->setTitle     ('Informe o Requisito do Cargo.');
 $obCmbTipoRequisitosCargos->preencheCombo($rsTipoRequisitosCargo);
 
 $obTPessoalCargo = new TPessoalCargo ;
-$obTPessoalCargo->recuperaTodos( $rsPessoalCargo, " ORDER BY cod_cargo" );
+$obTPessoalCargo->recuperaTodos( $rsPessoalCargo, " ORDER BY descricao" );
 
 $obCmbCargosServidor = new SelectMultiplo();
 $obCmbCargosServidor->setName  ( 'arRequisitosCargos' );
 $obCmbCargosServidor->setRotulo( "Cargo" );
 $obCmbCargosServidor->setNull  ( true );
 $obCmbCargosServidor->setObrigatorioBarra (true);
-$obCmbCargosServidor->setOrdenacao('value');
+$obCmbCargosServidor->setOrdenacao('valueText');
 $obCmbCargosServidor->setTitle ( 'Cargos Disponíveis' );
 
 $obCmbCargosServidor->SetNomeLista1( 'arRequisitosCargosDisponivel' );
@@ -269,14 +269,14 @@ $obCmbTipoRemuneracao->setTitle     ('Informe o Tipo de Remuneração.');
 $obCmbTipoRemuneracao->preencheCombo($rsTipoRemuneracao);
 
 $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
-$obTFolhaPagamentoEvento->recuperaTodos($rsEventos,'','',$boTransacao);
+$obTFolhaPagamentoEvento->recuperaTodos($rsEventos,'',' ORDER BY descricao ',$boTransacao);
 
 $obCmbEventos = new SelectMultiplo();
 $obCmbEventos->setName  ( 'arEventos' );
 $obCmbEventos->setRotulo( 'Eventos' );
 $obCmbEventos->setNull  ( true );
 $obCmbEventos->setObrigatorioBarra (true);
-$obCmbEventos->setOrdenacao('value');
+$obCmbEventos->setOrdenacao('valueText');
 $obCmbEventos->setTitle ( 'Eventos Disponíveis' );
 
 $obCmbEventos->SetNomeLista1( 'arEventosDisponiveis' );

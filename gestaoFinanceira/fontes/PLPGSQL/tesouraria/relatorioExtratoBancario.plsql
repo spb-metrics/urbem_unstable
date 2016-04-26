@@ -133,11 +133,13 @@ UNION ALL
     SELECT
         to_char(ta.timestamp_arrecadacao, ''''HH:mm:ss'''') as hora,
         TAE.dt_boletim AS data,
-        cast(CASE WHEN TRIM(TAE.numeracao) =  '''''''' THEN
-            ''''Estorno de Arrecadação '''' || TAE.cod_receita || '''' - '''' || TAE.cod_entidade || ''''/'''' || TAE.exercicio
+        CASE WHEN TAE.cod_historico = 925 THEN
+                    ''''Arrecadação Receita Dedutora '''' || TAE.cod_receita || '''' - '''' || TAE.cod_entidade || ''''/'''' || TAE.exercicio
+             WHEN TRIM(TAE.numeracao) =  '''''''' THEN
+                    ''''Estorno de Arrecadação '''' || TAE.cod_receita || '''' - '''' || TAE.cod_entidade || ''''/'''' || TAE.exercicio
         ELSE
             ''''Estorno de Arrecadação '''' || TAE.numeracao || '''' - '''' || TAE.cod_entidade || ''''/'''' || TAE.exercicio
-        END || '''' - '''' || replace(trim(substring(coalesce(TA.observacao,''''''''),1,60)),''''\r\n'''','''''''') as varchar) AS descricao,
+        END || '''' - '''' || replace(trim(substring(coalesce(TA.observacao,''''''''),1,60)),''''\r\n'''','''''''') AS descricao,
         cast(CASE WHEN TAE.numeracao = '''''''' THEN
             (TAE.valor*(-1))
         ELSE

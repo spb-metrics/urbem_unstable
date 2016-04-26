@@ -27,7 +27,7 @@
     *
     * @author: Evandro Melos
     *
-    * $Id: TTCEALLeisOrcamentarias.class.php 64795 2016-04-01 14:35:55Z carlos.silva $
+    * $Id: TTCEALLeisOrcamentarias.class.php 64806 2016-04-04 21:09:58Z carlos.silva $
     *
     * @ignore
     *
@@ -68,7 +68,7 @@ class TTCEALLeisOrcamentarias extends Persistente
                         ) AS codigo_ua
                       , norma.cod_norma AS num_loa
                       , '".$this->getDado('exercicio')."'
-                      , (SELECT CASE WHEN valor = ''
+                      , SUBSTR((SELECT CASE WHEN valor = ''
                                         THEN '0'
                                         ELSE valor
                                         END AS valor
@@ -76,7 +76,7 @@ class TTCEALLeisOrcamentarias extends Persistente
                            WHERE configuracao.cod_modulo = 62
                              AND configuracao.exercicio = '".$this->getDado('exercicio')."'
                              AND configuracao.parametro like 'tceal_config_complementacao_loa'
-                          ) AS complementacao
+                          ), 0, 254) AS complementacao
                                                    
                       , TO_CHAR(norma.dt_assinatura ,'DD/MM/YYYY') AS data_loa
                       , TO_CHAR(norma.dt_publicacao ,'DD/MM/YYYY') AS data_pub_loa

@@ -57,6 +57,16 @@ BEGIN
         stFiltroParametro := 'tceal_'||stTipoDados||'_camara';
     ELSIF stParametro = 'rpps' THEN
         stFiltroParametro := 'tceal_'||stTipoDados||'_rpps';
+        
+    ELSIF stParametro = 'educacao' THEN
+        stFiltroParametro := 'tceal_'||stTipoDados||'_educacao';
+    ELSIF stParametro = 'saude' THEN
+        stFiltroParametro := 'tceal_'||stTipoDados||'_saude';
+    ELSIF stParametro = 'assistencia' THEN
+        stFiltroParametro := 'tceal_'||stTipoDados||'_assistencia';
+    ELSIF stParametro = 'smtt' THEN
+        stFiltroParametro := 'tceal_'||stTipoDados||'_smtt';
+        
     ELSE
         stFiltroParametro := 'tceal_'||stTipoDados||'_outros';
     END IF;

@@ -30,7 +30,7 @@
     *
     * @author: Jean Silva
     *
-    $Id: servidores.inc.php 60564 2014-10-29 20:38:09Z carlos.silva $
+    $Id: servidores.inc.php 64853 2016-04-07 18:27:30Z carlos.silva $
     *
     * @ignore
     *
@@ -73,55 +73,56 @@ foreach (explode(',',$stEntidades) as $inCodEntidade) {
         $stPeriodoMovimentacao->setDado('dtFinal', $dtFinal);
         $stPeriodoMovimentacao->recuperaPeriodoMovimentacaoTCEAL($rsPeriodoMovimentacao);
         
-        $rsRecordSet = "rsServidores";
-        $rsRecordSet .= $stEntidade;
-        $$rsRecordSet = new RecordSet();
-        
-        $obTTCEALServidores->setDado('dt_inicial', $dtInicial);
-        $obTTCEALServidores->setDado('dt_final', $dtFinal);
-        $obTTCEALServidores->setDado('cod_periodo_movimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
-        $obTTCEALServidores->setDado('exercicio', Sessao::getExercicio());
-        $obTTCEALServidores->setDado('entidade', $stEntidade  );
-        $obTTCEALServidores->setDado('cod_entidade', $entidade );
-        //$obTTCEALServidores->setDado('entidade', $entidade  );
-        $obTTCEALServidores->recuperaServidores ($rsRecordSet);
-        
-        $idCount=0;
-        $arResult = array();
-        
-        while (!$rsRecordSet->eof()) {
-            $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
-            $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua_verdadeiro');
-            $arResult[$idCount]['Bimestre'] = $inBimestre;
-            $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
-            $arResult[$idCount]['Cpf'] = $rsRecordSet->getCampo('cpf');
-            $arResult[$idCount]['Nome'] = $rsRecordSet->getCampo('nome');
-            $arResult[$idCount]['DataNascimento'] = $rsRecordSet->getCampo('data_nascimento');
-            $arResult[$idCount]['NomeMae'] = $rsRecordSet->getCampo('nome_mae');
-            $arResult[$idCount]['NomePai'] = $rsRecordSet->getCampo('nome_pai');
-            $arResult[$idCount]['PisPasep'] = $rsRecordSet->getCampo('pis_pasep');
-            $arResult[$idCount]['TituloEleitoral'] = $rsRecordSet->getCampo('titulo_eleitoral');
-            $arResult[$idCount]['DataAdmissao'] = $rsRecordSet->getCampo('dt_admissao');
-            $arResult[$idCount]['CodVinculoEmpregaticio'] = $rsRecordSet->getCampo('cod_vinculo_empregaticio');
-            $arResult[$idCount]['CodRegimePrevidenciario'] = $rsRecordSet->getCampo('cod_regime_previdenciario');
-            $arResult[$idCount]['CodEscolaridade'] = $rsRecordSet->getCampo('cod_escolaridade');
-            $arResult[$idCount]['SobCessao'] = $rsRecordSet->getCampo('sob_cessao');
-            $arResult[$idCount]['CnpjEntidade'] = $rsRecordSet->getCampo('cnpj_entidade');
-            $arResult[$idCount]['NomeEntidade'] = $rsRecordSet->getCampo('nome_entidade');
-            $arResult[$idCount]['DataCessao'] = $rsRecordSet->getCampo('data_cessao');
-            $arResult[$idCount]['DataRetornoCessao'] = $rsRecordSet->getCampo('data_retorno_cessao');
-            $arResult[$idCount]['SalarioBruto'] = $rsRecordSet->getCampo('salario_bruto');
-            $arResult[$idCount]['SalarioLiquido'] = $rsRecordSet->getCampo('salario_liquido');
-            $arResult[$idCount]['MargemConsignada'] = $rsRecordSet->getCampo('margem_consignada');
-            $arResult[$idCount]['CBO'] = $rsRecordSet->getCampo('cbo');
-            $arResult[$idCount]['CodCargo'] = $rsRecordSet->getCampo('cod_cargo');
-            $arResult[$idCount]['CodLotacao'] = $rsRecordSet->getCampo('cod_lotacao');
-            $arResult[$idCount]['CodFuncao'] = $rsRecordSet->getCampo('cod_funcao');
-            $arResult[$idCount]['Matricula'] = $rsRecordSet->getCampo('matricula');
+        if($rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao') != '') {
+            $rsRecordSet = "rsServidores";
+            $rsRecordSet .= $stEntidade;
+            $$rsRecordSet = new RecordSet();
             
-            $idCount++;
+            $obTTCEALServidores->setDado('dt_inicial', $dtInicial);
+            $obTTCEALServidores->setDado('dt_final', $dtFinal);
+            $obTTCEALServidores->setDado('cod_periodo_movimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
+            $obTTCEALServidores->setDado('exercicio', Sessao::getExercicio());
+            $obTTCEALServidores->setDado('entidade', $stEntidade  );
+            $obTTCEALServidores->setDado('cod_entidade', $entidade );
+            $obTTCEALServidores->recuperaServidores ($rsRecordSet);
             
-            $rsRecordSet->proximo();
+            $idCount=0;
+            $arResult = array();
+            
+            while (!$rsRecordSet->eof()) {
+                $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
+                $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua_verdadeiro');
+                $arResult[$idCount]['Bimestre'] = $inBimestre;
+                $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
+                $arResult[$idCount]['Cpf'] = $rsRecordSet->getCampo('cpf');
+                $arResult[$idCount]['Nome'] = $rsRecordSet->getCampo('nome');
+                $arResult[$idCount]['DataNascimento'] = $rsRecordSet->getCampo('data_nascimento');
+                $arResult[$idCount]['NomeMae'] = $rsRecordSet->getCampo('nome_mae');
+                $arResult[$idCount]['NomePai'] = $rsRecordSet->getCampo('nome_pai');
+                $arResult[$idCount]['PisPasep'] = $rsRecordSet->getCampo('pis_pasep');
+                $arResult[$idCount]['TituloEleitoral'] = $rsRecordSet->getCampo('titulo_eleitoral');
+                $arResult[$idCount]['DataAdmissao'] = $rsRecordSet->getCampo('dt_admissao');
+                $arResult[$idCount]['CodVinculoEmpregaticio'] = $rsRecordSet->getCampo('cod_vinculo_empregaticio');
+                $arResult[$idCount]['CodRegimePrevidenciario'] = $rsRecordSet->getCampo('cod_regime_previdenciario');
+                $arResult[$idCount]['CodEscolaridade'] = $rsRecordSet->getCampo('cod_escolaridade');
+                $arResult[$idCount]['SobCessao'] = $rsRecordSet->getCampo('sob_cessao');
+                $arResult[$idCount]['CnpjEntidade'] = $rsRecordSet->getCampo('cnpj_entidade');
+                $arResult[$idCount]['NomeEntidade'] = $rsRecordSet->getCampo('nome_entidade');
+                $arResult[$idCount]['DataCessao'] = $rsRecordSet->getCampo('data_cessao');
+                $arResult[$idCount]['DataRetornoCessao'] = $rsRecordSet->getCampo('data_retorno_cessao');
+                $arResult[$idCount]['SalarioBruto'] = $rsRecordSet->getCampo('salario_bruto');
+                $arResult[$idCount]['SalarioLiquido'] = $rsRecordSet->getCampo('salario_liquido');
+                $arResult[$idCount]['MargemConsignada'] = $rsRecordSet->getCampo('margem_consignada');
+                $arResult[$idCount]['CBO'] = $rsRecordSet->getCampo('cbo');
+                $arResult[$idCount]['CodCargo'] = $rsRecordSet->getCampo('cod_cargo');
+                $arResult[$idCount]['CodLotacao'] = $rsRecordSet->getCampo('cod_lotacao');
+                $arResult[$idCount]['CodFuncao'] = $rsRecordSet->getCampo('cod_funcao');
+                $arResult[$idCount]['Matricula'] = $rsRecordSet->getCampo('matricula');
+                
+                $idCount++;
+                
+                $rsRecordSet->proximo();
+            }
         }
     }
     

@@ -320,6 +320,18 @@ function sortByValue(a,b){
 } 
 
 /**
+* Ordena o select em ordem alfabética retirando o codigo antes da descricao
+*/
+function sortByValueText(a,b){
+    var a = a.text.split("-");
+    var b = b.text.split("-");
+
+    if ((a[1]+"") < (b[1]+"")) { return -1; }
+    if ((a[1]+"") > (b[1]+"")) { return 1; }
+    return 0;
+}
+
+/**
 * Executa a função que ordena as opções do select
 */
 function sortSelect(obj,ordenacao){
@@ -328,6 +340,9 @@ function sortSelect(obj,ordenacao){
         o[o.length] = new Option(obj.options[i].text, obj.options[i].value, obj.options[i].defaultSelected, obj.options[i].selected);
     }
     
+    if (ordenacao == "valueText")
+      o = o.sort(sortByValueText);
+
     if (ordenacao == "text")
       o = o.sort(sortByText);
 

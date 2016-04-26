@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Franver Sarmento de Moraes
   *
   * @ignore
-  * $Id: FrameWorkMPDF.class.php 64782 2016-03-31 16:55:09Z michel $
-  * $Date: 2016-03-31 13:55:09 -0300 (Qui, 31 Mar 2016) $
+  * $Id: FrameWorkMPDF.class.php 64854 2016-04-07 18:35:09Z michel $
+  * $Date: 2016-04-07 15:35:09 -0300 (Qui, 07 Abr 2016) $
   * $Author: michel $
-  * $Rev: 64782 $
+  * $Rev: 64854 $
   *
 */
 
@@ -359,13 +359,12 @@ class FrameWorkMPDF
         
         // Quando for selecionada duas ou mais entidades para gerar o relatório, será verificado qual entidade está como prefeitura na tabela administracao.configuracao
         // Caso contrário será gerado com a entidade selecionada
+        $inCodEntidade = $this->getCodEntidades();
         
-        if(substr_count($this->getCodEntidades(), ',') > 0 || empty($this->getCodEntidades())) {
+        if(substr_count($inCodEntidade, ',') > 0 || empty($inCodEntidade)) {
             $inCodEntidade = SistemaLegado::pegaDado('valor','administracao.configuracao',"where cod_modulo = 8 AND parametro ILIKE 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."'");
             $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade);
-
         } else {
-            $inCodEntidade = $this->getCodEntidades();
             $obTAdministracaoMPDF->setDado("cod_entidade", $inCodEntidade[0]);
         }
         

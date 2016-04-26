@@ -67,7 +67,7 @@ function limparEventoLista() {
     document.getElementById('inNomCGM').innerHTML = '&nbsp;';
     document.frm.inCodigoEvento.value = '';
     document.getElementById('stEvento').innerHTML = '&nbsp;';
-    document.getElementById('spnDadosEvento').innerHTML = '';
+    document.getElementById('spnDadosLoteEvento').innerHTML = '';
     document.frm.btAlterar.disabled = true;
     document.frm.btIncluir.disabled = false;
 }

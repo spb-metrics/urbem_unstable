@@ -28,6 +28,8 @@
   * Data de Criação: 29/08/2014
   * @author Analista:      Dagiane Vieira
   * @author Desenvolvedor: Jean da Silva
+  *
+  * $Id: CONSID.inc.php 64861 2016-04-08 13:29:06Z evandro $
 */
 /**
 * CONSID.csv | Autor : Jean da Silva
@@ -40,7 +42,7 @@ $obTTCEMGConsideracaoArquivo = new TTCEMGConsideracaoArquivo();
 $obTTCEMGConsideracaoArquivo->setDado('exercicio', Sessao::getExercicio());
 $obTTCEMGConsideracaoArquivo->setDado('entidade' , $stEntidades);
 $obTTCEMGConsideracaoArquivo->setDado('mes'      , $arFiltro['inMes']);
-$obTTCEMGConsideracaoArquivo->setDado('modulo_sicom','balancete');
+$obTTCEMGConsideracaoArquivo->setDado('modulo_sicom','folha');
 $obTTCEMGConsideracaoArquivo->setDado('tipo','folhapagamento');
 
 //10 – Considerações
@@ -54,7 +56,7 @@ if (count($rsConsid10->getElementos()) > 0) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_arquivo");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_arquivo");
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(20);

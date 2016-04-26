@@ -43,13 +43,15 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
-function gerarSpanOpcoes()
+//include_once (CAM_GRH_PES_PROCESSAMENTO."OCIFiltroComponentes.php");
+
+function gerarSpanOpcoes(Request $request)
 {
     Sessao::remove("arLoteMatriculas");
     Sessao::remove("arLoteEventos");
-    switch ($_GET["stOpcao"]) {
+    switch ($request->get("stOpcao")) {
         case "lote_evento":
-            $stJs = gerarSpanLoteEvento();
+            $stJs = gerarSpanLoteEvento($request);
             break;
         case "lote_matricula":
             $stJs = gerarSpanLoteMatricula();
@@ -62,10 +64,12 @@ function gerarSpanOpcoes()
     return $stJs;
 }
 
-function preencherDadosEvento()
+function preencherDadosEvento(Request $request)
 {
-    $inContrato =  $_GET["inContrato"];
-    $inCodigoEvento = $_GET["inCodigoEvento"];
+    $inContrato =  $request->get("inContrato","");
+    $inCodigoEvento = $request->get("inCodigoEvento","");
+    $stProporcional = $request->get('stProporcional',"");
+
     if ($inCodigoEvento != "") {
         $inCodigoEvento = str_pad($inCodigoEvento,strlen(Sessao::read("stMascaraEvento")),"0",STR_PAD_LEFT);
 
@@ -95,6 +99,7 @@ function preencherDadosEvento()
             Sessao::write("stTextoComplementar",$stObservacao);
             Sessao::write("stNatureza",$stNatureza);
             Sessao::write("stTipo",$stTipo);
+            Sessao::write("HdninCodigoEvento",$inCodEvento);
             $boIncluir = "false";
             $boLimpar  = "false";
         } else {
@@ -113,17 +118,19 @@ function preencherDadosEvento()
             Sessao::remove("stTextoComplementar");
             Sessao::remove("stNatureza");
             Sessao::remove("stTipo");
+            Sessao::remove("HdninCodigoEvento");
             $stJs .= "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
             $boIncluir = "true";
             $boLimpar  = "true";
         }
-        $stJs .= "f.inCodigoEvento.value = '".$inCodigoEvento."';\n";
-        $stJs .= "d.getElementById('stEvento').innerHTML = '".$stDescricao."';\n";
-        $stJs .= "f.hdnDescEvento.value = '".$stDescricao."';\n";
-        $stJs .= "f.HdninCodigoEvento.value = '".$inCodEvento."';\n";
-        $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '".$stObservacao."';\n";
-        $stJs .= "d.getElementById('stNatureza').innerHTML = '".$stNatureza."';\n";
-        $stJs .= "d.getElementById('stTipo').innerHTML = '".$stTipo."';\n";
+
+        $stJs .= "jq('#inCodigoEvento').val('".$inCodigoEvento."');\n";
+        $stJs .= "jq('#stEvento').html('".$stDescricao."');\n";
+        $stJs .= "jq('#hdnDescEvento').val('".$stDescricao."');\n";
+        $stJs .= "jq('#HdninCodigoEvento').val('".$inCodEvento."');\n";
+        $stJs .= "jq('#stTextoComplementar').html('".$stObservacao."');\n";
+        $stJs .= "jq('#stNatureza').html('".$stNatureza."');\n";
+        $stJs .= "jq('#stTipo').html('".$stTipo."');\n";
 
         if ($inContrato != "" and $inCodigoEvento != "" and !$obErro->ocorreu()) {
             include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContrato.class.php");
@@ -132,17 +139,17 @@ function preencherDadosEvento()
             $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
             $inCodContrato      = $rsContrato->getCampo("cod_contrato");
 
-            $stJs .= "f.btIncluir.disabled = ".$boIncluir.";";
-            $stJs .= "f.btLimpar.disabled = ".$boLimpar.";";
+            $stJs .= "jq('#btIncluir').prop('disabled', ".$boIncluir.");\n";
+            $stJs .= "jq('#btLimpar').prop('disabled', ".$boLimpar.");\n";
             $stJs .= gerarSpanRegistroEvento($inCodEvento,$inCodContrato,$stFixado,$stTipo,$stLimiteCalculo,$boApresentaParcela);
-            $stJs .= peencherDadosRegistroEvento($inCodEvento,$inCodContrato);
+            $stJs .= peencherDadosRegistroEvento($inCodEvento,$inCodContrato,$stProporcional);
         }
     }
 
     return $stJs;
 }
 
-function peencherDadosRegistroEvento($inCodEvento,$inCodContrato)
+function peencherDadosRegistroEvento($inCodEvento,$inCodContrato,$stProporcional)
 {
     if ($inCodEvento != 0 and $inCodContrato != 0) {
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
@@ -151,11 +158,11 @@ function peencherDadosRegistroEvento($inCodEvento,$inCodContrato)
 
         include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoRegistroEvento.class.php");
         $obTFolhaPagamentoRegistroEvento = new TFolhaPagamentoRegistroEvento();
-        $stProporcional  = ( $_GET["stProporcional"] == "Sim" ) ? "TRUE" : "FALSE";
-        $stFiltro  = " AND evento.cod_evento = ".$inCodEvento;
+        $boProporcional  = ( $stProporcional == "Sim" ) ? "TRUE" : "FALSE";
+        $stFiltro .= " AND evento.cod_evento = ".$inCodEvento;
         $stFiltro .= " AND contrato.cod_contrato = ".$inCodContrato;
         $stFiltro .= " AND registro_evento_periodo.cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
-        $stFiltro .= " AND proporcional IS ".$stProporcional;
+        $stFiltro .= " AND proporcional IS ".$boProporcional;
         $obTFolhaPagamentoRegistroEvento->recuperaRegistrosDeEventos($rsRegistroEvento,$stFiltro);
 
         if ($rsRegistroEvento->getNumLinhas() >= 1) {
@@ -166,41 +173,55 @@ function peencherDadosRegistroEvento($inCodEvento,$inCodContrato)
             $nuQuantidadeParcelasEvento = $rsRegistroEvento->getCampo("parcela");
             $inMesCarencia = $rsRegistroEvento->getCampo("mes_carencia");
             $stExcluirLancamento = "true";
-            $stJs .= "d.getElementById('boExcluirLancamento').disabled = false;\n";
-            $stJs .= "f.boExcluirLancamentoDisabled.value = 'false';";
+
+            $stJs .= "jq('#boExcluirLancamento').prop('disabled', false);\n";
+            $stJs .= "jq('#boExcluirLancamentoDisabled').val('false');\n";
         } else {
             $nuValorEvento = "";
             $nuQuantidadeEvento = "";
             $nuQuantidadeParcelasEvento = "";
             $inMesCarencia = 0;
             $stExcluirLancamento = "false";
-            $stJs .= "d.getElementById('boExcluirLancamento').disabled = true;\n";
-            $stJs .= "f.boExcluirLancamentoDisabled.value = 'true';";
+
+            $stJs .= "jq('#boExcluirLancamento').prop('disabled', true);\n";
+            $stJs .= "jq('#boExcluirLancamentoDisabled').val('true');\n";
         }
+
         if (Sessao::read("fixado") == "V") {
-            $stJs .= "f.nuValorEvento.value = '".$nuValorEvento."';\n";
-            $stJs .= "f.nuQuantidadeEvento.value = '".$nuQuantidadeEvento."';\n";
+            $stJs .= "jq('#nuValorEvento').val('".$nuValorEvento."');\n";
+            $stJs .= "jq('#nuQuantidadeEvento').val('".$nuQuantidadeEvento."');\n";
         } else {
-            $stJs .= "f.nuQuantidadeEvento.value = '".$nuQuantidadeEvento."';\n";
+            $stJs .= "jq('#nuQuantidadeEvento').val('".$nuQuantidadeEvento."');\n";
         }
+
         if (Sessao::read("limite_calculo") == "t") {
-            $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$nuQuantidadeParcelasEvento."';\n";
-            $stJs .= "f.inMesCarenciaEvento.value = ".$inMesCarencia.";\n";
+            $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$nuQuantidadeParcelasEvento."');\n";
+            $stJs .= "jq('#inMesCarenciaEvento').val('".$inMesCarencia."');\n";
         }
     }
 
     return $stJs;
 }
 
-function gerarSpanRegistroEvento($inCodEvento,$inCodContrato,$stFixado,$stTipo,$stLimiteCalculo,$boApresentaParcela)
+function gerarSpanRegistroEvento($inCodEvento,$inCodContrato,$stFixado,$stTipo,$stLimiteCalculo,$boApresentaParcela,$stTipoFiltro = '')
 {
-    if ($inCodEvento != 0 and $inCodContrato != 0) {
+    $boGera = false;
+
+    if ($stTipoFiltro != "") {
+        $boGera = true;
+    } else {
+        if ($inCodEvento != 0 and $inCodContrato != 0) {
+            $boGera = true;
+        }
+    }
+
+    if ($boGera == true) {
         $obTxtValor = new Numerico;
         $obTxtValor->setName      ( "nuValorEvento"                  );
         $obTxtValor->setId        ( "nuValorEvento"                  );
         $obTxtValor->setTitle     ( "Informe o valor a ser lançado." );
         $obTxtValor->setAlign     ( "RIGHT"                          );
-        $obTxtValor->setRotulo    ( "**Valor"                          );
+        $obTxtValor->setRotulo    ( "**Valor"                        );
         $obTxtValor->setMaxLength ( 14                               );
         $obTxtValor->setMaxValue  ( 999999999.99                     );
         $obTxtValor->setSize      ( 12                               );
@@ -208,47 +229,48 @@ function gerarSpanRegistroEvento($inCodEvento,$inCodContrato,$stFixado,$stTipo,$
         $obTxtValor->setNegativo  ( false                            );
 
         $obTxtQuantidade = new Numerico;
-        $obTxtQuantidade->setName      ( "nuQuantidadeEvento"            );
-        $obTxtQuantidade->setId        ( "nuQuantidadeEvento"            );
+        $obTxtQuantidade->setName      ( "nuQuantidadeEvento"                  );
+        $obTxtQuantidade->setId        ( "nuQuantidadeEvento"                  );
         $obTxtQuantidade->setTitle     ( "Informe a quantidade a ser lançada." );
-        $obTxtQuantidade->setAlign     ( "RIGHT"                         );
+        $obTxtQuantidade->setAlign     ( "RIGHT"                               );
+
         if ($stFixado == 'Q') {
-            $obTxtQuantidade->setRotulo    ( "**Quantidade"                    );
+            $obTxtQuantidade->setRotulo ( "**Quantidade"                       );
         } else {
-            $obTxtQuantidade->setRotulo    ( "Quantidade"                    );
+            $obTxtQuantidade->setRotulo ( "Quantidade"                         );
         }
-        $obTxtQuantidade->setMaxLength ( 14                              );
-        $obTxtQuantidade->setMaxValue  ( 999999999.99                    );
-        $obTxtQuantidade->setSize      ( 12                              );
-        $obTxtQuantidade->setDecimais  ( 2                               );
+
+        $obTxtQuantidade->setMaxLength ( 14                                    );
+        $obTxtQuantidade->setMaxValue  ( 999999999.99                          );
+        $obTxtQuantidade->setSize      ( 12                                    );
+        $obTxtQuantidade->setDecimais  ( 2                                     );
 
         $obTxtQuantidadeParcelas = new TextBox;
-        $obTxtQuantidadeParcelas->setName      ( "nuQuantidadeParcelasEvento"    );
-        $obTxtQuantidadeParcelas->setId        ( "nuQuantidadeParcelasEvento"    );
-        $obTxtQuantidadeParcelas->setRotulo    ( "**Quantidade de Parcelas"        );
-        $obTxtQuantidadeParcelas->setInteiro   ( true                            );
-        $obTxtQuantidadeParcelas->setMaxLength ( 10                              );
-        $obTxtQuantidadeParcelas->setSize      ( 10                              );
+        $obTxtQuantidadeParcelas->setName      ( "nuQuantidadeParcelasEvento"                      );
+        $obTxtQuantidadeParcelas->setId        ( "nuQuantidadeParcelasEvento"                      );
+        $obTxtQuantidadeParcelas->setRotulo    ( "**Quantidade de Parcelas"                        );
+        $obTxtQuantidadeParcelas->setInteiro   ( true                                              );
+        $obTxtQuantidadeParcelas->setMaxLength ( 10                                                );
+        $obTxtQuantidadeParcelas->setSize      ( 10                                                );
         $obTxtQuantidadeParcelas->setTitle     ( "Informe a quantidade de parcelas a ser lançada." );
         
         $obInCarencia= new Inteiro;
-        $obInCarencia->setRotulo             ( "Meses de Carência"                                        );
-        $obInCarencia->setTitle              ( "Informe a quantidade de meses de carência para o evento." );
-        $obInCarencia->setName               ( "inMesCarenciaEvento"                                      );
-        $obInCarencia->setValue              ( 0                                                          );
-        $obInCarencia->setNull               ( false                                                      );
-        //$obInCarencia->obEvento->setOnChange ( "buscaValor('preenchePrevisaoMesAno');"                    );
+        $obInCarencia->setRotulo ( "Meses de Carência"                                        );
+        $obInCarencia->setTitle  ( "Informe a quantidade de meses de carência para o evento." );
+        $obInCarencia->setName   ( "inMesCarenciaEvento"                                      );
+        $obInCarencia->setValue  ( 0                                                          );
+        $obInCarencia->setNull   ( false                                                      );
         
         $obCkbExcluirLancamento = new CheckBox();
-        $obCkbExcluirLancamento->setRotulo("Excluir Lançamento");
-        $obCkbExcluirLancamento->setName("boExcluirLancamento");
-        $obCkbExcluirLancamento->setId("boExcluirLancamento");
-        $obCkbExcluirLancamento->setValue("sim");
-        $obCkbExcluirLancamento->setTitle("Marque a opïção para excluir o evento informado do contrato.");
-        $obCkbExcluirLancamento->setDisabled(true);
+        $obCkbExcluirLancamento->setRotulo   ( "Excluir Lançamento"                                           );
+        $obCkbExcluirLancamento->setName     ( "boExcluirLancamento"                                          );
+        $obCkbExcluirLancamento->setId       ( "boExcluirLancamento"                                          );
+        $obCkbExcluirLancamento->setValue    ( "sim"                                                          );
+        $obCkbExcluirLancamento->setTitle    ( "Marque a opïção para excluir o evento informado do contrato." );
+        $obCkbExcluirLancamento->setDisabled ( true                                                           );
 
         $obHdnExcluirLancamento = new hidden();
-        $obHdnExcluirLancamento->setName("boExcluirLancamentoDisabled");
+        $obHdnExcluirLancamento->setName ( "boExcluirLancamentoDisabled" );
 
         $obFormulario = new Formulario;
         if ($stFixado == 'V') {
@@ -265,7 +287,8 @@ function gerarSpanRegistroEvento($inCodEvento,$inCodContrato,$stFixado,$stTipo,$
         $obFormulario->montaInnerHTML();
         $stHTML = $obFormulario->getHTML();
     }
-    $stJs .= "d.getElementById('spnDadosEvento').innerHTML = '".$stHTML."';";
+
+    $stJs .= "jq('#spnDadosLoteEvento').html('".$stHTML."');\n";
 
     return $stJs;
 }
@@ -311,19 +334,19 @@ function gerarSpanLoteMatricula()
     $obBscInnerEvento->obCampoCod->obEvento->setOnBlur("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
 
     $obLblTextoComplementar = new Label;
-    $obLblTextoComplementar->setRotulo              ( "Texto Complementar"                                      );
-    $obLblTextoComplementar->setId                  ( "stTextoComplementar"                                     );
-    $obLblTextoComplementar->setValue("&nbsp;");
+    $obLblTextoComplementar->setRotulo ( "Texto Complementar"  );
+    $obLblTextoComplementar->setId     ( "stTextoComplementar" );
+    $obLblTextoComplementar->setValue  ( "&nbsp;"              );
 
     $obLblNatureza = new Label;
-    $obLblNatureza->setRotulo          ( "Natureza"                             );
-    $obLblNatureza->setId              ( "stNatureza"                           );
-    $obLblNatureza->setValue("&nbsp;");
+    $obLblNatureza->setRotulo ( "Natureza"   );
+    $obLblNatureza->setId     ( "stNatureza" );
+    $obLblNatureza->setValue  ( "&nbsp;"     );
 
     $obLblTipo = new Label;
-    $obLblTipo->setRotulo              ( "Tipo"                                      );
-    $obLblTipo->setId                  ( "stTipo"                                    );
-    $obLblTipo->setValue("&nbsp;");
+    $obLblTipo->setRotulo ( "Tipo"   );
+    $obLblTipo->setId     ( "stTipo" );
+    $obLblTipo->setValue  ( "&nbsp;" );
 
     $obCmbLancarProporcional = new Select();
     $obCmbLancarProporcional->setRotulo("Lançar Somente na Aba Proporcional");
@@ -334,7 +357,7 @@ function gerarSpanLoteMatricula()
     $obCmbLancarProporcional->addOption("Não","Não");
 
     $obSpnDadosEvento = new Span();
-    $obSpnDadosEvento->setId("spnDadosEvento");
+    $obSpnDadosEvento->setId("spnDadosLoteEvento");
 
     $obSpanLoteMatricula = new Span();
     $obSpanLoteMatricula->setId("spnLoteMatricula");
@@ -371,11 +394,17 @@ function gerarSpanLoteMatricula()
     $obFormulario->addSpan($obSpanLoteMatricula);
     $obFormulario->montaInnerHTML();
 
-    $stJs  = "d.getElementById('spnOpcao').innerHTML = '".$obFormulario->getHTML()."';"   ;
+    $stJs .= "jq('#spnOpcao').html('".$obFormulario->getHTML()."');\n";
     $stJs .= $obFormulario->getInnerJavascriptBarra();
-    $stJs .= "document.getElementById('inContrato').focus();";
-    $stJs .= "f.btIncluir.disabled = true;";
-    $stJs .= "f.btLimpar.disabled = true;";
+    $stJs .= "jq('#inContrato').focus();\n";
+    $stJs .= "jq('#btIncluir').prop('disabled', true);\n";
+    $stJs .= "jq('#btLimpar').prop('disabled', true);\n";
+
+    //$stJs  = "d.getElementById('spnOpcao').innerHTML = '".$obFormulario->getHTML()."';"   ;
+    //$stJs .= $obFormulario->getInnerJavascriptBarra();
+    //$stJs .= "document.getElementById('inContrato').focus();";
+    //$stJs .= "f.btIncluir.disabled = true;";
+    //$stJs .= "f.btLimpar.disabled = true;";
 
     return $stJs;
 }
@@ -516,14 +545,15 @@ function gerarListaLoteMatricula()
     $stHtml = str_replace("  ","",$stHtml);
     $stHtml = str_replace("'","\\'",$stHtml);
 
-    $stJs = "document.getElementById('spnLoteMatricula').innerHTML = '".$stHtml."';\n";
+    $stJs .= "jq('#spnLoteMatricula').html('".$stHtml."');\n";
+    //$stJs = "document.getElementById('spnLoteMatricula').innerHTML = '".$stHtml."';\n";
 
     return $stJs;
 }
 
 function incluirLoteMatricula()
 {
-    $obErro = validarLoteEvento();
+    $obErro = validarLoteEvento('incluir', $request);
     if ( !$obErro->ocorreu() ) {
         $arLoteMatriculas = Sessao::read("arLoteMatriculas");
         $arTemp["inId"]         = count($arLoteMatriculas);
@@ -558,7 +588,7 @@ function incluirLoteMatricula()
 
 function alterarLoteMatricula()
 {
-    $obErro = validarLoteEvento("alterar");
+    $obErro = validarLoteEvento("alterar", $request);
     if ( !$obErro->ocorreu() ) {
         $arLoteMatriculas = Sessao::read("arLoteMatriculas");
         $arTemp["inId"]              = Sessao::read("inId");
@@ -613,17 +643,17 @@ function excluirLoteMatricula()
 
 function limparLoteMatricula()
 {
-    $stJs .= "d.getElementById('spnDadosEvento').innerHTML = '';             \n";
-    $stJs .= "d.getElementById('stEvento').innerHTML = '&nbsp;';             \n";
-    $stJs .= "f.hdnDescEvento.value = '';                                    \n";
-    $stJs .= "f.HdninCodigoEvento.value = '';                                \n";
-    $stJs .= "f.inCodigoEvento.value = '';                                   \n";
-    $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '&nbsp;';  \n";
-    $stJs .= "d.getElementById('stNatureza').innerHTML = '&nbsp;';           \n";
-    $stJs .= "d.getElementById('stTipo').innerHTML = '&nbsp;';               \n";
-    $stJs .= "f.stProporcional.value = 'Não';                                \n";
-    $stJs .= "document.frm.btIncluir.disabled = false;                       \n";
-    $stJs .= "document.frm.btAlterar.disabled = true;                        \n";
+    $stJs .= "jq('#spnDadosLoteEvento').html('');         \n";
+    $stJs .= "jq('#stEvento').html('&nbsp;');             \n";
+    $stJs .= "jq('#hdnDescEvento').value('');             \n";
+    $stJs .= "jq('#HdninCodigoEvento').val('');           \n";
+    $stJs .= "jq('#inCodigoEvento').val('');              \n";
+    $stJs .= "jq('#stTextoComplementar').html('&nbsp;');  \n";
+    $stJs .= "jq('#stNatureza').html('&nbsp;');           \n";
+    $stJs .= "jq('#stTipo').html('&nbsp;');               \n";
+    $stJs .= "jq('#stProporcional').val('Não');           \n";
+    $stJs .= "jq('#btIncluir').prop('disabled', false);   \n";
+    $stJs .= "jq('#btAlterar').prop('disabled', true);    \n";
 
     return $stJs;
 }
@@ -687,17 +717,16 @@ function montaAlterarLoteMatricula()
 #####################################################################################################################
 #LOTE DE EVENTO
 ######################################
-function gerarSpanLoteEvento()
+function gerarSpanLoteEvento(Request $request)
 {
-    include_once( CAM_GRH_PES_COMPONENTES."IFiltroContrato.class.php" );
+    include_once( CAM_GRH_PES_COMPONENTES."IFiltroComponentes.class.php" );
 
-    $obIFiltroContrato = new IFiltroContrato;
-    $obIFiltroContrato->setTituloFormulario("Dados da Matrícula");
-    $obIFiltroContrato->obIContratoDigitoVerificador->setRotulo("**Matrícula");
-    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->setNull(false);
-    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->setNullBarra( false );
-    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnChange("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
-    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnBlur("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
+    $obIFiltroComponentes = new IFiltroComponentes;
+    $obIFiltroComponentes->setMatricula();
+    $obIFiltroComponentes->setLotacao();
+    $obIFiltroComponentes->setLocal();    
+    $obIFiltroComponentes->setEvento();
+    $stOnChange = "montaParametrosGET('gerarSpanMatricula','stTipoFiltro,boQuebrarDisabled',true);";
 
     include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php" );
     //Define a mascara do campo Evento
@@ -720,107 +749,161 @@ function gerarSpanLoteEvento()
     $obBscInnerEvento->obCampoCod->obEvento->setOnBlur("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
 
     $obLblTextoComplementar = new Label;
-    $obLblTextoComplementar->setRotulo( "Texto Complementar" );
-    $obLblTextoComplementar->setId( "stTextoComplementar" );
-    $obLblTextoComplementar->setValue("&nbsp;");
+    $obLblTextoComplementar->setRotulo ( "Texto Complementar"  );
+    $obLblTextoComplementar->setId     ( "stTextoComplementar" );
+    $obLblTextoComplementar->setValue  ( "&nbsp;"              );
 
     $obLblNatureza = new Label;
-    $obLblNatureza->setRotulo( "Natureza" );
-    $obLblNatureza->setId( "stNatureza" );
-    $obLblNatureza->setValue("&nbsp;");
+    $obLblNatureza->setRotulo ( "Natureza"   );
+    $obLblNatureza->setId     ( "stNatureza" );
+    $obLblNatureza->setValue  ("&nbsp;"      );
 
     $obLblTipo = new Label;
-    $obLblTipo->setRotulo( "Tipo" );
-    $obLblTipo->setId( "stTipo" );
-    $obLblTipo->setValue("&nbsp;");
+    $obLblTipo->setRotulo ( "Tipo"   );
+    $obLblTipo->setId     ( "stTipo" );
+    $obLblTipo->setValue  ( "&nbsp;" );
 
     $obCmbLancarProporcional = new Select();
-    $obCmbLancarProporcional->setRotulo("Lançar Somente na Aba Proporcional");
-    $obCmbLancarProporcional->setTitle("Marque como SIM, para lançar apenas eventos na aba proporcional (válidos somente para esta competência). Para lançar no registro de eventos fixo/variável, utilizar a opição Não.");
-    $obCmbLancarProporcional->setName("stProporcional");
-    $obCmbLancarProporcional->setValue("Não");
-    $obCmbLancarProporcional->addOption("Sim","Sim");
-    $obCmbLancarProporcional->addOption("Não","Não");
+    $obCmbLancarProporcional->setRotulo ( "Lançar Somente na Aba Proporcional" );
+    $obCmbLancarProporcional->setTitle  ( "Marque como SIM, para lançar apenas eventos na aba proporcional (válidos somente para esta competência). Para lançar no registro de eventos fixo/variável, utilizar a opição Não." );
+    $obCmbLancarProporcional->setName   ( "stProporcional" );
+    $obCmbLancarProporcional->setValue  ( "Não" );
+    $obCmbLancarProporcional->addOption ( "Sim","Sim" );
+    $obCmbLancarProporcional->addOption ( "Não","Não" );
 
     $obSpnDadosEvento = new Span();
-    $obSpnDadosEvento->setId("spnDadosEvento");
+    $obSpnDadosEvento->setId ( "spnDadosLoteEvento" );
 
     $obSpanLoteEvento = new Span();
-    $obSpanLoteEvento->setId("spnLoteEvento");
+    $obSpanLoteEvento->setId ( "spnLoteEvento" );
 
     $obBtnIncluir = new Button;
-    $obBtnIncluir->setName              ( "btIncluir"    );
-    $obBtnIncluir->setValue             ( "Incluir"             );
+    $obBtnIncluir->setName              ( "btIncluir" );
+    $obBtnIncluir->setValue             ( "Incluir" );
     $obBtnIncluir->obEvento->setOnClick ( "montaParametrosGET( 'incluirLoteEvento','',true);" );
     $arBarra[] = $obBtnIncluir;
 
     $obBtnAlterar = new Button;
-    $obBtnAlterar->setName              ( "btAlterar"    );
-    $obBtnAlterar->setValue             ( "Alterar"             );
-    $obBtnAlterar->setDisabled          ( true                  );
+    $obBtnAlterar->setName              ( "btAlterar" );
+    $obBtnAlterar->setValue             ( "Alterar" );
+    $obBtnAlterar->setDisabled          ( true );
     $obBtnAlterar->obEvento->setOnClick ( "montaParametrosGET( 'alterarLoteEvento', '', true  );" );
     $arBarra[] = $obBtnAlterar;
 
     $obBtnLimpar = new Button;
-    $obBtnLimpar->setName              ( "btLimpar"          );
-    $obBtnLimpar->setValue             ( "Limpar"                   );
-    $obBtnLimpar->obEvento->setOnClick ( "montaParametrosGET('limparLoteEvento','',true);");
+    $obBtnLimpar->setName              ( "btLimpar" );
+    $obBtnLimpar->setValue             ( "Limpar" );
+    $obBtnLimpar->obEvento->setOnClick ( "montaParametrosGET('limparLoteEvento','',true);" );
     $arBarra[] = $obBtnLimpar;
 
     $obFormulario = new Formulario;
-    $obFormulario->addTitulo    ( "Dados do Evento" );
-    $obFormulario->addComponente                ( $obBscInnerEvento          );
-    $obFormulario->addComponente                ( $obLblTextoComplementar    );
-    $obFormulario->addComponente                ( $obLblNatureza    );
-    $obFormulario->addComponente                ( $obLblTipo    );
+    $obFormulario->addTitulo     ( "Dados do Evento"        );
+    $obFormulario->addComponente ( $obBscInnerEvento        );
+    $obFormulario->addComponente ( $obLblTextoComplementar  );
+    $obFormulario->addComponente ( $obLblNatureza           );
+    $obFormulario->addComponente ( $obLblTipo               );
+    $obFormulario->addComponente ( $obCmbLancarProporcional );
 
-    $obFormulario->addComponente                ( $obCmbLancarProporcional    );
-    $obIFiltroContrato->geraFormulario( $obFormulario );
-    $obFormulario->addSpan                      ( $obSpnDadosEvento );
-    $obFormulario->defineBarra( $arBarra , "left", "<b>**Campo obrigatório.</b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;");
-    $obFormulario->addSpan($obSpanLoteEvento);
+    $obIFiltroComponentes->geraFormulario( $obFormulario );
+    $obIFiltroComponentes->obCmbTipoFiltro->obEvento->setOnChange($stOnChange);
+
+    $obFormulario->addSpan ( $obSpnDadosEvento );
+    $obFormulario->defineBarra ( $arBarra , "left", "<b>**Campo obrigatório.</b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" );
+    $obFormulario->addSpan ( $obSpanLoteEvento );
     $obFormulario->montaInnerHTML();
 
-    $stJs  = "d.getElementById('spnOpcao').innerHTML = '".$obFormulario->getHTML()."';"   ;
+    $stJs  = "jq('#spnOpcao').html('".$obFormulario->getHTML()."');\n";
     $stJs .= $obFormulario->getInnerJavascriptBarra();
-    $stJs .= "document.getElementById('inCodigoEvento').focus();";
-    $stJs .= "f.btIncluir.disabled = true;";
-    $stJs .= "f.btLimpar.disabled = true;";
+    $stJs .= "jq('#inCodigoEvento').focus();\n";
+    $stJs .= "jq('#btIncluir').prop('disabled', true);\n";
+    $stJs .= "jq('#btLimpar').prop('disabled', true);\n";
 
     return $stJs;
 }
 
-function validarLoteEvento($stAcao="incluir")
+function validarLoteEvento($stAcao="incluir", Request $request)
 {
     $obErro = new Erro();
-    if ($_GET["inContrato"] == "") {
-        $stErro .= "@Campo Matrícula inválido!()";
-    }
-    if ($_GET["inCodigoEvento"] == "") {
+
+    $inCodigoEvento = $request->get("inCodigoEvento","");
+
+    if ($inCodigoEvento == "") {
         $stErro .= "@Campo Evento inválido!()";
     }
+
     if ($stErro == "") {
-        if (Sessao::read("fixado") == "V" and $_GET["nuValorEvento"] == "") {
+        switch ($request->get("stTipoFiltro")) {
+            case 'contrato':
+                $inContrato = $request->get("inContrato","");
+                if ($inContrato == "") {
+                    $stErro .= "@Campo Tipo de Filtro (Matrícula) inválido!()";
+                }
+                $registro = $inContrato;
+                break;
+
+            case 'lotacao':
+                $arCodLotacaoSelecionados = $request->get("inCodLotacaoSelecionados","");
+                if ($arCodLotacaoSelecionados = "") {
+                    $stErro .= "@Campo Tipo de Filtro (Lotação) inválido!()";
+                }
+                $registro = $arCodLotacaoSelecionados;
+                break;
+
+            case 'local':
+                $arCodLocalSelecionados = $request->get("inCodLocalSelecionados","");
+                if ($arCodLocalSelecionados = "") {
+                    $stErro .= "@Campo Tipo de Filtro (Local) inválido!()";
+                }
+                $registro = $arCodLocalSelecionados;
+                break;
+
+            case 'evento':
+                $inCodigoInnerEvento = $request->get("inCodigoInnerEvento","");
+                if ($inCodigoInnerEvento = "") {
+                    $stErro .= "@Campo Tipo de Filtro (Evento) inválido!()";
+                }
+                $registro = $inCodigoInnerEvento;
+                break;
+
+            // default = Geral
+            default:
+                $registro = "";
+                break;
+        }
+    }
+
+    if ($stErro == "") {
+        if (Sessao::read("fixado") == "V" and $request->get("nuValorEvento","") == "") {
             $stErro .= "@Campo Valor inválido!()";
         }
-        if (Sessao::read("fixado") == "Q" and $_GET["nuQuantidadeEvento"] == "") {
+
+        if (Sessao::read("fixado") == "Q" and $request->get("nuQuantidadeEvento","") == "") {
             $stErro .= "@Campo Quantidade inválido!()";
         }
-        if (isset($_GET["nuQuantidadeParcelasEvento"]) and $_GET["nuQuantidadeParcelasEvento"] == "") {
+
+        $nuQuantidadeParcelasEvento = $request->get("nuQuantidadeParcelasEvento");
+
+        if ($nuQuantidadeParcelasEvento != null && $nuQuantidadeParcelasEvento == "") {
             $stErro .= "@Campo Quantidade de Parcelas inválido!()";
         }
 
-        $inCodigoEvento  = ($_GET["inCodigoEvento"] != "") ? str_pad($_GET["inCodigoEvento"],strlen(Sessao::read("stMascaraEvento")),"0",STR_PAD_LEFT) : "";
+        $inCodigoEvento = str_pad($inCodigoEvento,strlen(Sessao::read("stMascaraEvento")),"0",STR_PAD_LEFT);
         $arLoteEventos = Sessao::read("arLoteEventos");
+    
         if (is_array($arLoteEventos) and $stAcao == "incluir") {
             foreach ($arLoteEventos as $arLoteEvento) {
-                if ($arLoteEvento["proporcional"] == $_GET["stProporcional"] and $arLoteEvento["registro"] == $_GET["inContrato"] and $arLoteEvento["codigo"] == $inCodigoEvento) {
+                if (($arLoteEvento["proporcional"] == $request->get("stProporcional","")) &&
+                    ($arLoteEvento["registro"] == $registro) &&
+                    ($arLoteEvento["codigo"] == $inCodigoEvento)
+                   ) {
                     $stErro .= "@O evento ".$inCodigoEvento." já foi incluído para o contrato ".$_GET["inContrato"]."!()";
                     break;
                 }
             }
         }
+
         $arLoteMatriculas = Sessao::read("arLoteMatriculas");
+
         if (is_array($arLoteMatriculas) and $stAcao == "incluir") {
             foreach ($arLoteMatriculas as $arLoteMatricula) {
                 if ($arLoteMatricula["proporcional"] == $_GET["stProporcional"] and $arLoteMatricula["registro"] == $_GET["inContrato"] and $arLoteMatricula["codigo"] == $inCodigoEvento) {
@@ -829,6 +912,7 @@ function validarLoteEvento($stAcao="incluir")
                 }
             }
         }
+
         if ($inCodigoEvento != "") {
             include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoRegistroEvento.class.php");
             $obTFolhaPagamentoRegistroEvento = new TFolhaPagamentoRegistroEvento();
@@ -842,6 +926,7 @@ function validarLoteEvento($stAcao="incluir")
             }
         }
     }
+
     $obErro->setDescricao($stErro);
 
     return $obErro;
@@ -1001,54 +1086,125 @@ function gerarListaLoteEvento()
 
 function limparLoteEvento()
 {
-    $stJs .= "f.inContrato.value = '';                           \n";
-    $stJs .= "d.getElementById('inNomCGM').innerHTML = '&nbsp;'; \n";
-    if (Sessao::read("fixado") == "V") {
-        $stJs .= "f.nuValorEvento.value = '';                    \n";
-        $stJs .= "f.nuQuantidadeEvento.value = '';               \n";
-    } else {
-        $stJs .= "f.nuQuantidadeEvento.value = '';               \n";
-    }
+    $stJs .= "jq('#stTipoFiltro').val('');\n";
+    $stJs .= "jq('#spnTipoFiltro').html('');\n";
+    $stJs .= "jq('#spnDadosLoteEvento').html('');\n";
+
     if (Sessao::read("limite_calculo") == "t") {
-        $stJs .= "f.nuQuantidadeParcelasEvento.value = '';       \n";
+        $stJs .= "jq('#nuQuantidadeParcelasEvento').val('');\n";
     }
-    $stJs .= "f.stProporcional.value = 'não';\n";
-    $stJs .= "d.getElementById('boExcluirLancamento').disabled = true; \n";
-    $stJs .= "d.getElementById('boExcluirLancamento').checked = false; \n";
-    $stJs .= "document.frm.btAlterar.disabled = true;                  \n";
-    $stJs .= "document.frm.btIncluir.disabled = false;                 \n";
 
     return $stJs;
 }
 
-function incluirLoteEvento()
+function incluirLoteEvento(Request $request)
 {
-    $obErro = validarLoteEvento();
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoRegistroEventoPeriodo.class.php" );
+    include_once ( CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEventoCalculado.class.php" );
+
+    $obErro = validarLoteEvento('incluir', $request);
+
+    $inCodigoEvento = $request->get("inCodigoEvento","");
+
+    include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
+    $obTFolhaPagamentoPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
+    $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
+    $inCodPeriodoMovimentacao = $rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
+
+    switch ($request->get("stTipoFiltro")) {
+        case 'lotacao':
+            Sessao::write("arLoteEventos","");
+            $arCodLotacaoSelecionados = $request->get("inCodLotacaoSelecionados","");
+            $arCodLotacaoSelecionados = implode(",",$arCodLotacaoSelecionados);
+            $obTFolhaPagamentoRegistroEventoPeriodo = new TFolhaPagamentoRegistroEventoPeriodo;
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_orgao",$arCodLotacaoSelecionados);
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_periodo_movimentacao",$inCodPeriodoMovimentacao);
+            $obTFolhaPagamentoRegistroEventoPeriodo->recuperaContratosDeLotacao($rsRecordSet);
+            break;
+
+        case 'local':
+            Sessao::write("arLoteEventos","");
+            $arCodLocalSelecionados = $request->get("inCodLocalSelecionados","");
+            $arCodLocalSelecionados = implode(",",$arCodLocalSelecionados);
+            $obTFolhaPagamentoRegistroEventoPeriodo = new TFolhaPagamentoRegistroEventoPeriodo;
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_local",$arCodLocalSelecionados);
+            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_periodo_movimentacao",$inCodPeriodoMovimentacao);
+            $obTFolhaPagamentoRegistroEventoPeriodo->recuperaContratosDeLocal($rsRecordSet);
+            break;
+
+        case 'evento':
+            Sessao::write("arLoteEventos","");
+            $inCodigoInnerEvento = (integer)$request->get("inCodigoInnerEvento","");
+            $stFiltro = " WHERE contratos_calculados.cod_evento = ".$inCodigoInnerEvento."
+                            AND contratos_calculados.cod_periodo_movimentacao = ".$inCodPeriodoMovimentacao."
+                        \n";
+            $obTFolhaPagamentoEventoCalculado = new TFolhaPagamentoEventoCalculado;
+            $obTFolhaPagamentoEventoCalculado->setDado ("boFiltroEvento", true);
+            $obTFolhaPagamentoEventoCalculado->recuperaContratosCalculados($rsRecordSet, $stFiltro);
+            break;
+
+        case "geral":
+            $stOrdem = " GROUP BY cod_contrato, registro, numcgm, nom_cgm ORDER BY registro, nom_cgm";
+
+            $obTFolhaPagamentoRegistroEventoPeriodo = new TFolhaPagamentoRegistroEventoPeriodo;
+            $obTFolhaPagamentoRegistroEventoPeriodo->recuperaContratoGeral($rsRecordSet, $stFiltro, $stOrdem);
+            break;
+    }
+
     if ( !$obErro->ocorreu() ) {
-        $arLoteEventos = Sessao::read("arLoteEventos");
-        $arTemp["inId"]              = count($arLoteEventos);
-        $arTemp["registro"]          = $_GET["inContrato"];
-        $arTemp["nom_cgm"]           = getNomeCGM($_GET["inContrato"]);
-        $arTemp["codigo"]            = $_GET["inCodigoEvento"];
-        $arTemp["cod_evento"]        = $_GET["HdninCodigoEvento"];
-        $arTemp["desc_evento"]       = $_GET["hdnDescEvento"];
-        $arTemp["texto_comp"]        = Sessao::read("stTextoComplementar");
-        $arTemp["natureza"]          = Sessao::read("stNatureza");
-        $arTemp["tipo"]              = Sessao::read("stTipo");
-        $arTemp["proporcional"]      = $_GET["stProporcional"];
-        $arTemp["valor"]             = str_replace(',','.',str_replace('.','',$_GET["nuValorEvento"]));
-        $arTemp["quantidade"]        = str_replace(',','.',str_replace('.','',$_GET["nuQuantidadeEvento"]));
-        $arTemp["parcelas"]          = $_GET["nuQuantidadeParcelasEvento"];
-        $arTemp["boExcluir"]         = $_GET["boExcluirLancamento"];
-        $arTemp["boExcluirDisabled"] = $_GET["boExcluirLancamentoDisabled"];
-        $arTemp["mes_carencia"]      = $_GET["inMesCarenciaEvento"];
-        
-        $arLoteEventos[] = $arTemp;
-        Sessao::write("arLoteEventos",$arLoteEventos);
+        $arTemp = array();
+        $arLoteTemp = array();
+
+        if ($request->get("stTipoFiltro") == "contrato") {
+            $arLoteEventos = Sessao::read("arLoteEventos");
+            $arLoteTemp = $arLoteEventos;
+            $arTemp["inId"]              = count($arLoteEventos);
+            $arTemp["registro"]          = $request->get("inContrato");
+            $arTemp["nom_cgm"]           = getNomeCGM($request->get("inContrato"));
+            $arTemp["codigo"]            = $request->get("inCodEvento");
+            $arTemp["cod_evento"]        = Sessao::read("HdninCodigoEvento");
+            $arTemp["desc_evento"]       = $request->get("hdnDescEvento");
+            $arTemp["texto_comp"]        = Sessao::read("stTextoComplementar");
+            $arTemp["natureza"]          = Sessao::read("stNatureza");
+            $arTemp["tipo"]              = Sessao::read("stTipo");
+            $arTemp["proporcional"]      = $request->get("stProporcional");
+            $arTemp["valor"]             = str_replace(',','.',str_replace('.','',$request->get("nuValorEvento")));
+            $arTemp["quantidade"]        = str_replace(',','.',str_replace('.','',$request->get("nuQuantidadeEvento")));
+            $arTemp["parcelas"]          = $request->get("nuQuantidadeParcelasEvento");
+            $arTemp["boExcluir"]         = $request->get("boExcluirLancamento");
+            $arTemp["boExcluirDisabled"] = $request->get("boExcluirLancamentoDisabled");
+            $arTemp["mes_carencia"]      = $request->get("inMesCarenciaEvento");
+
+            $arLoteTemp[] = $arTemp;
+        } else {
+            foreach ($rsRecordSet->getElementos() as $index => $value) {
+                $arTemp["inId"] = $index;
+                $arTemp["registro"] = $value["registro"];
+                $arTemp["nom_cgm"] = $value["nom_cgm"];
+                $arTemp["codigo"] = $request->get("inCodigoEvento");
+                $arTemp["cod_evento"] = Sessao::read("HdninCodigoEvento");
+                $arTemp["desc_evento"] = $request->get("hdnDescEvento");
+                $arTemp["texto_comp"] = Sessao::read("stTextoComplementar");
+                $arTemp["natureza"] = Sessao::read("stNatureza");
+                $arTemp["tipo"] = Sessao::read("stTipo");
+                $arTemp["proporcional"] = $request->get("stProporcional");
+                $arTemp["valor"] = str_replace(',','.',str_replace('.','',$request->get("nuValorEvento")));
+                $arTemp["quantidade"] = str_replace(',','.',str_replace('.','',$request->get("nuQuantidadeEvento")));
+                $arTemp["parcelas"] = $request->get("nuQuantidadeParcelasEvento");
+                $arTemp["boExcluir"] = $request->get("boExcluirLancamento");
+                $arTemp["boExcluirDisabled"] = $request->get("boExcluirLancamentoDisabled");
+                $arTemp["mes_carencia"] = $request->get("inMesCarenciaEvento");
+
+                $arLoteTemp[] = $arTemp;
+            }
+        }
+
+        Sessao::write("arLoteEventos",$arLoteTemp);
         
         $stJs .= gerarListaLoteEvento();
         $stJs .= limparLoteEvento();
-        $stJs .= "d.getElementById('inContrato').focus();\n";
+
+        $stJs .= "jq('#stTipoFiltro').focus();\n";
     } else {
         $stJs = "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
     }
@@ -1058,7 +1214,7 @@ function incluirLoteEvento()
 
 function alterarLoteEvento()
 {
-    $obErro = validarLoteEvento("alterar");
+    $obErro = validarLoteEvento("alterar", $request);
     if ( !$obErro->ocorreu() ) {
         $arLoteEventos = Sessao::read("arLoteEventos");
         $arTemp["inId"]              = Sessao::read("inId");
@@ -1109,47 +1265,49 @@ function excluirLoteEvento()
     return $stJs;
 }
 
-function montaAlterarLoteEvento()
+function montaAlterarLoteEvento(Request $request)
 {
-    $inId = $_GET["inId"];
+    $inId = $request["inId"];
     Sessao::write("inId",$inId);
     $arLoteEventos = Sessao::read("arLoteEventos");
     $arLoteEvento = $arLoteEventos[$inId];
-    $stJs .= "d.getElementById('stEvento').innerHTML = '".$arLoteEvento["desc_evento"]."';\n";
-    $stJs .= "f.inCodigoEvento.value = '".$arLoteEvento["codigo"]."';\n";
-    $stJs .= "d.frm.hdnDescEvento.value = '".$arLoteEvento["desc_evento"]."';\n";
-    $stJs .= "f.HdninCodigoEvento.value = '".$arLoteEvento["cod_evento"]."';\n";
-    $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '".$arLoteEvento["texto_comp"]."';\n";
-    $stJs .= "d.getElementById('stNatureza').innerHTML = '".$arLoteEvento["natureza"]."';\n";
-    $stJs .= "d.getElementById('stTipo').innerHTML = '".$arLoteEvento["tipo"]."';\n";
-    $stJs .= "f.stProporcional.value = '".$arLoteEvento["proporcional"]."';";
-    $stJs .= "f.inContrato.value = '".$arLoteEvento["registro"]."';";
-    $stJs .= "d.getElementById('inNomCGM').innerHTML = '".$arLoteEvento["nom_cgm"]."';\n";
+
+    $stJs .= "jq('#stEvento').html('".$arLoteEvento["desc_evento"]."');\n";
+    $stJs .= "jq('#inCodigoEvento').val('".$arLoteEvento["codigo"]."');\n";
+    $stJs .= "jq('#hdnDescEvento').val('".$arLoteEvento["desc_evento"]."');\n";
+    $stJs .= "jq('#HdninCodigoEvento').val('".$arLoteEvento["cod_evento"]."');\n";
+    $stJs .= "jq('#stTextoComplementar').html('".$arLoteEvento["texto_comp"]."');\n";
+    $stJs .= "jq('#stNatureza').html('".$arLoteEvento["natureza"]."');\n";
+    $stJs .= "jq('#stTipo').html('".$arLoteEvento["tipo"]."');\n";
+    $stJs .= "jq('#stProporcional').val('".$arLoteEvento["proporcional"]."');";
+    $stJs .= "jq('#inContrato').val('".$arLoteEvento["registro"]."');";
+    $stJs .= "jq('#inNomCGM').html('".$arLoteEvento["nom_cgm"]."');\n";
+
     if ($arLoteEvento["quantidade"] != "") {
-        $stJs .= "f.nuQuantidadeEvento.value = '".number_format($arLoteEvento["quantidade"],2,',','.')."';";
+        $stJs .= "jq('#nuQuantidadeEvento').val('".number_format($arLoteEvento["quantidade"],2,',','.')."');";
     }
     if ($arLoteEvento["valor"] != "") {
-        $stJs .= "f.nuValorEvento.value = '".number_format($arLoteEvento["valor"],2,',','.')."';";
+        $stJs .= "jq('#nuValorEvento').val('".number_format($arLoteEvento["valor"],2,',','.')."');";
     }
     if ($arLoteEvento["parcelas"] != "") {
-        $stJs .= "f.nuQuantidadeParcelasEvento.value = '".$arLoteEvento["parcelas"]."';";
+        $stJs .= "jq('#nuQuantidadeParcelasEvento').val('".$arLoteEvento["parcelas"]."');";
     }
     if ($arLoteEvento["mes_carencia"] != "") {
-        $stJs .= "f.inMesCarenciaEvento.value = '".$arLoteEvento["mes_carencia"]."';";
+        $stJs .= "jq('#inMesCarenciaEvento').val('".$arLoteEvento["mes_carencia"]."');";
     } else {
-        $stJs .= "f.inMesCarenciaEvento.value = 0;";
+        $stJs .= "jq('#inMesCarenciaEvento').val(0);";
     }
     if ($arLoteEvento["boExcluirDisabled"] != '') {
-        $stJs .= "d.getElementById('boExcluirLancamento').disabled = ".$arLoteEvento["boExcluirDisabled"].";\n";
-        $stJs .= "f.boExcluirLancamentoDisabled.value = '".$arLoteEvento["boExcluirDisabled"]."';";
+        $stJs .= "jq('#boExcluirLancamento').prop('disabled',".$arLoteEvento["boExcluirDisabled"].");\n";
+        $stJs .= "jq('#boExcluirLancamentoDisabled').val('".$arLoteEvento["boExcluirDisabled"]."');";
     }
     if ($arLoteEvento["boExcluir"]) {
-        $stJs .= "d.getElementById('boExcluirLancamento').checked = true;\n";
+        $stJs .= "jq('#boExcluirLancamento').prop('checked',true);\n";
     } else {
-        $stJs .= "d.getElementById('boExcluirLancamento').checked = false;\n";
+        $stJs .= "jq('boExcluirLancamento').prop('checked',false);\n";
     }
-    $stJs .= "document.frm.btAlterar.disabled = false;\n";
-    $stJs .= "document.frm.btIncluir.disabled = true;\n";
+    $stJs .= "jq('#btAlterar').prop('disabled',false);\n";
+    $stJs .= "jq('#btIncluir').prop('disabled',true);\n";
 
     return $stJs;
 }
@@ -1304,8 +1462,9 @@ function gerarSpanImportar()
     $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
     $stEval = str_replace("\n","",$stEval);
 
-    $stJs  = "d.getElementById('spnOpcao').innerHTML = '".$obFormulario->getHTML()."';"   ;
-    //$stJs .= "document.frm.stEval.value = '".$stEval."'; \n";
+    $stJs  = "jq('#spnOpcao').html('".$obFormulario->getHTML()."');\n";
+    $stJs  = "jq('#stEval').val('".$stEval."');\n";
+
     return $stJs;
 
 }
@@ -1428,7 +1587,7 @@ function preencheSpnListaEventos($boMostraAcao = true)
     $stHtml = str_replace("  ","",$stHtml);
     $stHtml = str_replace("'","\\'",$stHtml);
 
-    $stJs = "d.getElementById('spnListaEventos').innerHTML = '".$stHtml."';\n";
+    $stJs = "jq('#spnListaEventos').html('".$stHtml."');\n";
 
     return $stJs;
 }
@@ -1559,7 +1718,7 @@ function preencheSpnValoresSomados($boMostraAcao = true)
     $stHtml = str_replace("  ","",$stHtml);
     $stHtml = str_replace("'","\\'",$stHtml);
 
-    $stJs = "d.getElementById('spnValoresSomados').innerHTML = '".$stHtml."';\n";
+    $stJs = "jq('#spnValoresSomados').html'".$stHtml."');\n";
 
     return $stJs;
 
@@ -1874,11 +2033,11 @@ function importarEventos()
 
 function limpaCamposLista()
 {
-    $stJs .= "document.getElementById('inNomCGM').innerHTML       = '&nbsp;'; \n";
-    $stJs .= "document.getElementById('inContrato').value         = '';       \n";
-    $stJs .= "document.getElementById('inCodigoEvento').value        = '';    \n";
-    $stJs .= "document.getElementById('stEvento').innerHTML       = '&nbsp;'; \n";
-    $stJs .= "document.getElementById('spnDadosEvento').innerHTML = '';       \n";
+    $stJs .= "jq('#inNomCGM').html('&nbsp;');\n";
+    $stJs .= "jq('#inContrato').val('');\n";
+    $stJs .= "jq('#inCodigoEvento').val('');\n";
+    $stJs .= "jq('#stEvento').html('&nbsp;');\n";
+    $stJs .= "jq('#spnDadosLoteEvento').html('');\n";
 
     return $stJs;
 }
@@ -1887,10 +2046,10 @@ function limpaCamposLista()
 #IMPORTAR
 ######################################
 
-function submeter()
+function submeter(Request $request)
 {
     $obErro = new Erro();
-    switch ($_GET["stOpcao"]) {
+    switch ($request->get("stOpcao")) {
         case "lote_evento":
             if (count(Sessao::read("arLoteEventos")) == 0) {
                 $obErro->setDescricao("@Deve haver pelo menos uma Matrícula para um evento na lista de Matrículas.");
@@ -1916,25 +2075,362 @@ function submeter()
 function limparImportar()
 {
     $stJs .= "document.frm.reset();\n";
-    $stJs .= "document.getElementById('stOpcaoImportar').checked = true;\n";
+    $stJs .= "jq('#stOpcaoImportar').prop('checked',true);\n";
     $stJs .= gerarSpanImportar();
 
     return $stJs;
 }
 
+function gerarSpanMatricula($stTipoFiltro, $boQuebrarDisabled)
+{
+    $boAtualizarLotacao = false;
+
+    Sessao::write('arContratos',"");
+    Sessao::write('arPensionistas',"");
+    Sessao::write('arEstagios',"");
+
+    switch ($stTipoFiltro) {
+        case "contrato":
+        case "contrato_todos":
+        case "contrato_rescisao":
+        case "contrato_aposentado":
+            $stHtml = montaSpanContrato($stJs,$stTipoFiltro);
+            break;
+        case "contrato_rescisao":
+            $stHtml = montaSpanContrato($stJs, true);
+            break;
+        case "contrato_pensionista":
+            $stHtml = montaSpanContratoPensionista($stJs);
+            break;
+        case "lotacao":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanLotacao($stEval);
+            $boAtualizarLotacao = true;
+            break;
+        case "lotacao_grupo":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanLotacao($stEval,true);
+            $boAtualizarLotacao = true;
+            break;
+        case "local":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanLocal($stEval);
+            break;
+        case "local_grupo":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanLocal($stEval,true);
+            break;
+        case "evento":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanEvento($stJs);
+            break;
+        case "evento_multiplo":
+            $stJs .= "jq('#spnLoteEvento').html('');\n";
+            $stHtml = montaSpanEventoMultiplo($stEval);
+            break;
+    }
+        
+    $stEval = isset($stEval) ? $stEval : "";
+    $stJs = isset($stJs) ? $stJs : "";
+
+    $stJs .= "jq('#spnTipoFiltro').html('".$stHtml."');\n";
+    $stJs .= "jq('#hdnTipoFiltro').val('".$stEval."');\n";
+
+    if ($boAtualizarLotacao === true) {
+        $stJs .= atualizarLotacao();
+    }
+
+    $stJs .= gerarSpanRegistroEvento(0,0,'','&nbsp;','','',$stTipoFiltro);
+
+    return $stJs;
+}
+
+function montaSpanContrato(&$stJs, $stTipo="contrato_todos")
+{
+    include_once ( CAM_GRH_PES_COMPONENTES.'IFiltroContrato.class.php'   );
+    // $stTipo
+    // todos       = todos os servidores
+    // contrato    = somente servidores não rescindidos e não aposentados
+    // aposentados = somente servidores aposentados
+    // rescindidos = somente servidores rescindidos
+
+    $obSpnContratos = new Span;
+    $obSpnContratos->setid ( "spnContratos" );
+
+    $obIFiltroContrato = new IFiltroContrato;
+    $obIFiltroContrato->obIContratoDigitoVerificador->setRotulo("**Matrícula");
+    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->setNull(false);
+    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->setNullBarra( false );
+    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnChange("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
+    $obIFiltroContrato->obIContratoDigitoVerificador->obTxtRegistroContrato->obEvento->setOnBlur("montaParametrosGET('preencherDadosEvento','inCodigoEvento,inContrato,stProporcional',true);");
+
+    $obFormulario = new Formulario;
+    $obIFiltroContrato->geraFormulario($obFormulario);
+
+    $obFormulario->addSpan( $obSpnContratos );
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stJs .= $obFormulario->getInnerJavascriptBarra();
+    $stJs .= montaValidaMatriculas($stTipo);
+
+    $obFormulario = new Formulario;
+    $obIFiltroContrato->geraFormulario($obFormulario);
+    $obFormulario->addSpan($obSpnContratos);
+    $obFormulario->montaInnerHTML();
+
+    return $obFormulario->getHTML();
+}
+
+function montaSpanContratoPensionista(&$stJs)
+{
+    Sessao::write("arPensionistas",array());
+
+    include_once ( CAM_GRH_PES_COMPONENTES.'IFiltroContrato.class.php'   );
+    include_once ( CAM_GRH_PES_COMPONENTES.'IFiltroPensionista.class.php'   );
+
+    $obSpnContratos = new Span;
+    $obSpnContratos->setid( "spnContratosPensionistas" );
+
+    $stName = "ContratoPensionista";
+
+    $obBtnIncluir = new Button;
+    $obBtnIncluir->setName              ( "btIncluirContratoPensionista");
+    $obBtnIncluir->setValue             ( "Incluir"             );
+
+    $obBtnIncluir->obEvento->setOnClick ( "if ( ValidaContratoPensionista() ) { montaParametrosGET('incluirContratoPensionista','inContratoPensionista'); limpaFormularioContratoPensionista(); }" );
+    $arBarra[] = $obBtnIncluir;
+
+    $obBtnLimpar = new Button;
+    $obBtnLimpar->setName              ( "btLimparContratoPensionista"           );
+    $obBtnLimpar->setValue             ( "Limpar"                                );
+    $obBtnLimpar->obEvento->setOnClick ( "limpaFormularioContratoPensionista();" );
+    $arBarra[] = $obBtnLimpar;
+
+    $obIFiltroPensionista = new IFiltroPensionista(true);
+    $obIFiltroPensionista->obIContratoDigitoVerificador->obTxtRegistroContrato->setNullBarra(false);
+
+    $obFormulario = new Formulario;
+    $obIFiltroPensionista->geraFormulario($obFormulario);
+    $obFormulario->Incluir($stName,
+                            array($obIFiltroPensionista->obIContratoDigitoVerificador->obTxtRegistroContrato,
+                                  $obIFiltroPensionista->obLblCGM,
+                                  $obIFiltroPensionista->obHdnCGM
+                                 ),
+                            true
+                           );
+    $obFormulario->addSpan($obSpnContratos);
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stJs .= $obFormulario->getInnerJavascriptBarra();
+    $stJs .= montaValidaMatriculas("contrato_pensionista");
+
+    $obFormulario = new Formulario;
+    $obIFiltroPensionista->geraFormulario($obFormulario);
+    $obFormulario->defineBarra($arBarra);
+    $obFormulario->addSpan($obSpnContratos);
+    $obFormulario->montaInnerHTML();
+
+    return $obFormulario->getHTML();
+}
+
+function montaSpanLotacao(&$stEval,$boGrupo=false)
+{
+    include_once ( CAM_GRH_PES_COMPONENTES.'ISelectMultiploLotacao.class.php' );
+    global $request;
+    $obISelectMultiploLotacao = new ISelectMultiploLotacao;
+    $obISelectMultiploLotacao->setNull(false);
+
+    if (trim($request->get("inAno")) != "" and trim($_REQUEST["inCodMes"]) != "") {
+        $inDia = date("t",mktime(0,0,0,$_REQUEST["inCodMes"],1,$request->get("inAno")));
+        $dtCompetencia = date("Y-m-d",mktime(0,0,0,$_REQUEST["inCodMes"],$inDia,$request->get("inAno")));
+        $obISelectMultiploLotacao->obTOrganogramaOrgao->setDado('vigencia', $dtCompetencia);
+    }
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo("Filtro por Lotação");
+    $obFormulario->addComponente( $obISelectMultiploLotacao );
+
+    if ($boGrupo) {
+        addComponenteAgrupamento($obFormulario);
+    }
+
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
+    $stEval = str_replace("\n","",$stEval);
+
+    $obFormulario->montaInnerHtml();
+
+    return $obFormulario->getHTML();
+}
+
+function montaSpanLocal(&$stEval,$boGrupo=false)
+{
+    include_once ( CAM_GRH_PES_COMPONENTES.'ISelectMultiploLocal.class.php'   );
+
+    $obISelectMultiploLocal = new ISelectMultiploLocal;
+    $obISelectMultiploLocal->setNull(false);
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo ("Filtro por Local");
+    $obFormulario->addComponente( $obISelectMultiploLocal );
+
+    if ($boGrupo) {
+        addComponenteAgrupamento($obFormulario);
+    }
+
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
+    $stEval = str_replace("\n","",$stEval);
+    $obFormulario->montaInnerHtml();
+
+    return $obFormulario->getHTML();
+}
+
+function montaSpanEvento(&$stJs)
+{
+    include_once ( CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php" );
+
+    $obSpnEventos = new Span;
+    $obSpnEventos->setid ( "spnEventos" );
+
+    $obIBscEvento = new IBscEvento('inCodigoInnerEvento', 'stInnerEvento', 'stInnerTextoComplementar');
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo ("Filtro por Evento");
+    $obIBscEvento->geraFormulario ( $obFormulario );
+    $obFormulario->addSpan ( $obSpnEventos );
+    
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stJs .= $obFormulario->getInnerJavascriptBarra();
+    $obFormulario->montaInnerHtml();
+
+    return $obFormulario->getHTML();
+}
+
+function montaSpanEventoMultiplo(&$stEval)
+{
+    include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php"                         );
+
+    $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento();
+    $obRFolhaPagamentoEvento->listarEvento($rsEventos);
+
+    $obCmbEvento = new SelectMultiplo();
+    $obCmbEvento->setName            ( 'inCodEvento'                                             );
+    $obCmbEvento->setRotulo          ( "Eventos"                                                 );
+    $obCmbEvento->setTitle           ( "Selecione os eventos a serem apresentados no relatório (podem ser selecionados até 10 eventos)." );
+    $obCmbEvento->SetNomeLista1      ( 'inCodEventoDisponiveis'                                  );
+    $obCmbEvento->setCampoId1        ( '[cod_evento]'                                            );
+    $obCmbEvento->setCampoDesc1      ( '[codigo]-[descricao]'                                    );
+    $obCmbEvento->setStyle1          ( "width: 300px"                                            );
+    $obCmbEvento->SetRecord1         ( $rsEventos                                                );
+    $obCmbEvento->SetNomeLista2      ( 'inCodEventoSelecionados'                                 );
+    $obCmbEvento->setCampoId2        ( '[cod_evento]'                                            );
+    $obCmbEvento->setCampoDesc2      ( '[codigo]-[descricao]'                                    );
+    $obCmbEvento->setStyle2          ( "width: 300px"                                            );
+    $obCmbEvento->SetRecord2         ( new recordset()                                           );
+    $obCmbEvento->setNull            ( false                                                     );
+    $obCmbEvento->obSelect1->setSize ( 10                                                        );
+    $obCmbEvento->obSelect2->setSize ( 10                                                        );
+
+    $obFormulario = new Formulario;
+    $obFormulario->addTitulo("Filtro por Evento");
+    $obFormulario->addComponente( $obCmbEvento );
+    $obFormulario->obJavaScript->montaJavaScript();
+    $stEval = $obFormulario->obJavaScript->getInnerJavaScript();
+    $stEval = str_replace("\n","",$stEval);
+    $obFormulario->montaInnerHtml();
+
+    return $obFormulario->getHTML();
+}
+
+function montaValidaMatriculas($stTipoFiltro)
+{
+    if ($stTipoFiltro == "cgm_codigo_estagio") {
+        $stMensagem = "Deve haver pelo menos um estagiário na lista de estagiários";
+    } else {
+        $stMensagem = "Deve haver pelo menos uma matrícula na lista de matrículas";
+    }
+
+    $stHdnValidaMatriculas  = "if (document.frm.stTipoFiltro.value == \"$stTipoFiltro\") {";
+    $stHdnValidaMatriculas .= "  if (document.frm.inValidaMatriculas.value == \"0\") {";
+    $stHdnValidaMatriculas .= "     erro = true; ";
+    $stHdnValidaMatriculas .= "     mensagem += \"@".$stMensagem."!()\"; ";
+    $stHdnValidaMatriculas .= "  }";
+    $stHdnValidaMatriculas .= "}";
+
+    $stJs = "jq('#hdnValidaMatriculas').val('$stHdnValidaMatriculas');\n";
+
+    return $stJs;
+}
+
+function atualizarLotacao()
+{
+    include_once(CAM_GRH_PES_COMPONENTES."IFiltroCompetencia.class.php");
+    include_once(CAM_GRH_PES_COMPONENTES."ISelectAnoCompetencia.class.php");
+    include_once(CAM_GRH_PES_COMPONENTES."ISelectMultiploLotacao.class.php");
+    include_once(CAM_GRH_PES_MAPEAMENTO."FPessoalOrganogramaVigentePorTimestamp.class.php");
+    include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoPeriodoMovimentacao.class.php");
+
+    $stJs                    = "";
+    $arFiltroCompetencia     = Sessao::read("arFiltroCompetencia");
+    $arFiltroAnoCompetencia  = Sessao::read("arFiltroAnoCompetencia");
+    $arSelectMultiploLotacao = Sessao::read("arSelectMultiploLotacao");
+
+    if (is_array($arFiltroCompetencia) && count($arFiltroCompetencia) > 0) {
+        foreach ($arFiltroCompetencia as $obFiltroCompetencia) {
+            if (trim($obFiltroCompetencia->getCodigoPeriodoMovimentacao()) != "") {
+                $obFPessoalOrganogramaVigentePorTimestamp = new FPessoalOrganogramaVigentePorTimestamp();
+                $obFPessoalOrganogramaVigentePorTimestamp->setDado("cod_periodo_movimentacao",$obFiltroCompetencia->getCodigoPeriodoMovimentacao());
+                $obFPessoalOrganogramaVigentePorTimestamp->recuperaOrganogramaVigentePorTimestamp($rsOrganogramaVigente);
+
+                $inCodOrganograma = $rsOrganogramaVigente->getCampo("cod_organograma");
+                $stDataFinal      = $rsOrganogramaVigente->getCampo("dt_final");
+
+                if (is_array($arSelectMultiploLotacao) && count($arSelectMultiploLotacao) > 0) {
+                    foreach ($arSelectMultiploLotacao as $obSelectMultiploLotacao) {
+                        $stJs .= $obSelectMultiploLotacao->atualizarLotacao($stDataFinal, $inCodOrganograma);
+                    }
+                }
+            }
+        }
+    }
+
+    if (is_array($arFiltroAnoCompetencia) && count($arFiltroAnoCompetencia) > 0) {
+        foreach ($arFiltroAnoCompetencia as $obFiltroAnoCompetencia) {
+            if (trim($obFiltroAnoCompetencia->getCodigoPeriodoMovimentacao()) != "") {
+                $obFPessoalOrganogramaVigentePorTimestamp = new FPessoalOrganogramaVigentePorTimestamp();
+                $obFPessoalOrganogramaVigentePorTimestamp->setDado("cod_periodo_movimentacao",$obFiltroAnoCompetencia->getCodigoPeriodoMovimentacao());
+                $obFPessoalOrganogramaVigentePorTimestamp->recuperaOrganogramaVigentePorTimestamp($rsOrganogramaVigente);
+
+                $inCodOrganograma = $rsOrganogramaVigente->getCampo("cod_organograma");
+                $stDataFinal      = $rsOrganogramaVigente->getCampo("dt_final");
+
+                if (is_array($arSelectMultiploLotacao) && count($arSelectMultiploLotacao) > 0) {
+                    foreach ($arSelectMultiploLotacao as $obSelectMultiploLotacao) {
+                        $stJs .= $obSelectMultiploLotacao->atualizarLotacao($stDataFinal, $inCodOrganograma);
+                    }
+                }
+            }
+        }
+    }
+
+    return $stJs;
+}
+
 $boAjax = true;
-switch ($_REQUEST["stCtrl"]) {
+
+//SistemaLegado::mostraVar($request);
+
+switch ($request->get("stCtrl")) {
     case "gerarSpanOpcoes":
-        $stJs = gerarSpanOpcoes();
+        $stJs = gerarSpanOpcoes($request);
         break;
     case "gerarSpanLoteEvento":
-        $stJs = gerarSpanLoteEvento();
+        $stJs = gerarSpanLoteEvento($request);
         break;
     case "preencherDadosEvento":
-        $stJs = preencherDadosEvento();
+        $stJs = preencherDadosEvento($request);
         break;
     case "incluirLoteEvento":
-        $stJs = incluirLoteEvento();
+        $stJs = incluirLoteEvento($request);
         break;
     case "alterarLoteEvento":
         $stJs = alterarLoteEvento();
@@ -1946,7 +2442,7 @@ switch ($_REQUEST["stCtrl"]) {
         $stJs = limparLoteEvento();
         break;
     case "montaAlterarLoteEvento":
-        $stJs = montaAlterarLoteEvento();
+        $stJs = montaAlterarLoteEvento($request);
         break;
 
     case "incluirLoteMatricula":
@@ -1964,7 +2460,6 @@ switch ($_REQUEST["stCtrl"]) {
     case "montaAlterarLoteMatricula":
         $stJs = montaAlterarLoteMatricula();
         break;
-
     case "importarEventos":
         $boAjax = false;
         $stJs = importarEventos();
@@ -1972,11 +2467,24 @@ switch ($_REQUEST["stCtrl"]) {
     case "limparImportar":
         $stJs = limparImportar();
         break;
-
     case "submeter":
-        $stJs = submeter();
+        $stJs = submeter($request);
         break;
-
+    case "gerarSpanMatricula":
+        $stJs = gerarSpanMatricula($request->get('stTipoFiltro'), $request->get('boQuebrarDisabled'));
+        break;
+    case "incluirContrato":
+        $stJs = incluirContrato();
+        break;
+    case "excluirContrato":
+        $stJs = excluirContrato();
+        break;
+    case "incluirContratoPensionista":
+        $stJs = incluirContratoPensionista();
+        break;
+    case "excluirContratoPensionista":
+        $stJs = excluirContratoPensionista();
+        break;
 }
 
 if ($stJs) {

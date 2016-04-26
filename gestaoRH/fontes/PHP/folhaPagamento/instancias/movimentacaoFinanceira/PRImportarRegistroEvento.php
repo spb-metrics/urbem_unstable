@@ -38,16 +38,16 @@
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoPeriodoMovimentacao.class.php'                   );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoContratoServidorPeriodo.class.php'               );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEventoPeriodo.class.php'                 );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEvento.class.php'                        );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoUltimoRegistroEvento.class.php'                  );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEventoParcela.class.php'                 );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEventoCalculado.class.php'                       );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEventoCalculadoDependente.class.php'             );
-include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoLogErroCalculo.class.php'                        );
-include_once ( CAM_GRH_PES_MAPEAMENTO.'TPessoalContrato.class.php'                                     );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoPeriodoMovimentacao.class.php'       );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoContratoServidorPeriodo.class.php'   );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEventoPeriodo.class.php'     );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEvento.class.php'            );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoUltimoRegistroEvento.class.php'      );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoRegistroEventoParcela.class.php'     );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEventoCalculado.class.php'           );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEventoCalculadoDependente.class.php' );
+include_once ( CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoLogErroCalculo.class.php'            );
+include_once ( CAM_GRH_PES_MAPEAMENTO.'TPessoalContrato.class.php'                         );
 
 $obTFolhaPagamentoRegistroEvento            = new TFolhaPagamentoRegistroEvento();
 $obTFolhaPagamentoUltimoRegistroEvento      = new TFolhaPagamentoUltimoRegistroEvento();
@@ -60,14 +60,14 @@ $obTFolhaPagamentoContratoServidorPeriodo   = new TFolhaPagamentoContratoServido
 $obTPessoalContrato                         = new TPessoalContrato();
 $obTFolhaPagamentoPeriodoMovimentacao       = new TFolhaPagamentoPeriodoMovimentacao();
 
-$obTFolhaPagamentoContratoServidorPeriodo->obTFolhaPagamentoPeriodoMovimentacao = &$obTFolhaPagamentoPeriodoMovimentacao;
+$obTFolhaPagamentoContratoServidorPeriodo->obTFolhaPagamentoPeriodoMovimentacao   = &$obTFolhaPagamentoPeriodoMovimentacao;
 $obTFolhaPagamentoRegistroEventoPeriodo->obTFolhaPagamentoContratoServidorPeriodo = &$obTFolhaPagamentoContratoServidorPeriodo;
-$obTFolhaPagamentoRegistroEvento->obTFolhaPagamentoRegistroEventoPeriodo = &$obTFolhaPagamentoRegistroEventoPeriodo;
-$obTFolhaPagamentoUltimoRegistroEvento->obTFolhaPagamentoRegistroEvento = &$obTFolhaPagamentoRegistroEvento;
-$obTFolhaPagamentoRegistroEventoParcela->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
-$obTFolhaPagamentoEventoCalculado->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
-$obTFolhaPagamentoLogErroCalculo->obTFolhaPagamentoUltimoRegistroEvento = &$obTFolhaPagamentoUltimoRegistroEvento;
-$obTFolhaPagamentoEventoCalculadoDependente->obTFolhaPagamentoEventoCalculado = &$obTFolhaPagamentoEventoCalculado;
+$obTFolhaPagamentoRegistroEvento->obTFolhaPagamentoRegistroEventoPeriodo          = &$obTFolhaPagamentoRegistroEventoPeriodo;
+$obTFolhaPagamentoUltimoRegistroEvento->obTFolhaPagamentoRegistroEvento           = &$obTFolhaPagamentoRegistroEvento;
+$obTFolhaPagamentoRegistroEventoParcela->obTFolhaPagamentoUltimoRegistroEvento    = &$obTFolhaPagamentoUltimoRegistroEvento;
+$obTFolhaPagamentoEventoCalculado->obTFolhaPagamentoUltimoRegistroEvento          = &$obTFolhaPagamentoUltimoRegistroEvento;
+$obTFolhaPagamentoLogErroCalculo->obTFolhaPagamentoUltimoRegistroEvento           = &$obTFolhaPagamentoUltimoRegistroEvento;
+$obTFolhaPagamentoEventoCalculadoDependente->obTFolhaPagamentoEventoCalculado     = &$obTFolhaPagamentoEventoCalculado;
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ImportarRegistroEvento";
@@ -76,81 +76,140 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
-Sessao::setTrataExcecao(true);
-$obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao);
-if ($_POST["stOpcao"] == "lote_evento") {
-    $arLotes = Sessao::read("arLoteEventos");
-    $stMensagem = "Lote de Eventos incluído com sucesso!";
-}
-if ($_POST["stOpcao"] == "lote_matricula") {
-    $arLotes = Sessao::read("arLoteMatriculas");
-    $stMensagem = "Lote de Matrículas incluído com sucesso!";
-}
-if ($_POST["stOpcao"] == "importar") {
-    $arLotes = Sessao::read("EventosCadastrados");
-    $stMensagem = "Importação de matrículas concluída com sucesso!";
-}
+//Sessao::setTrataExcecao(true);
 
-foreach ($arLotes as $arLote) {
-    if ($arLote["stSituacao"] == "Ok" or !isset($arLote["stSituacao"])) {
-        $stFiltro = " WHERE registro = ".$arLote["registro"];
-        $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
-        $boPorporcional = ($arLote["proporcional"] == "Sim") ? true : false;
-        $obTFolhaPagamentoRegistroEvento->setDado("cod_evento",$arLote["cod_evento"]);
-        $obTFolhaPagamentoRegistroEvento->setDado("valor",$arLote["valor"]);
-        $obTFolhaPagamentoRegistroEvento->setDado("quantidade",$arLote["quantidade"]);
-        $obTFolhaPagamentoRegistroEvento->setDado("proporcional",$boPorporcional);
-        $obTFolhaPagamentoPeriodoMovimentacao->setDado("cod_periodo_movimentacao",$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao"));
-        $obTFolhaPagamentoContratoServidorPeriodo->setDado("cod_contrato",$rsContrato->getCampo("cod_contrato"));
-        //boExcluirDisabled é a variável que controla se o registro de evento já existe
-        //No caso do boExcluirDisabled igual a true, significa que não existe registro de evento para o contrato e evento
+$obErro = new Erro();
+$obTransacao = new Transacao();
+$obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
 
-        if ($arLote["boExcluirDisabled"] == "true") {
-            $obTFolhaPagamentoContratoServidorPeriodo->recuperaPorChave($rsContratoServidorPeriodo);
-            if ($rsContratoServidorPeriodo->getNumLinhas() == -1) {
-                $obTFolhaPagamentoContratoServidorPeriodo->inclusao();
-            }
-            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
-            $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
-            $obTFolhaPagamentoRegistroEvento->inclusao();
-            $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
-            if ($arLote["parcelas"] > 0) {
-                $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela",$arLote["parcelas"]);
-                $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia",$arLote["mes_carencia"]);
-                $obTFolhaPagamentoRegistroEventoParcela->inclusao();
-            }
-        } else {
-            $stFiltro  = " AND registro_evento_periodo.cod_contrato = ".$rsContrato->getCampo("cod_contrato");
-            $stFiltro .= " AND cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
-            $stFiltro .= " AND registro_evento.cod_evento = ".$arLote["cod_evento"];
-            $stProporcional  = ( $arLote["proporcional"] == "Sim" ) ? "TRUE" : "FALSE";
-            $stFiltro .= " AND proporcional IS ".$stProporcional;
-            $obTFolhaPagamentoRegistroEvento->recuperaRegistrosDeEventos($rsRegistroEvento,$stFiltro);
-            $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_evento",$rsRegistroEvento->getCampo("cod_evento"));
-            $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_registro",$rsRegistroEvento->getCampo("cod_registro"));
-            $obTFolhaPagamentoUltimoRegistroEvento->setDado("timestamp",$rsRegistroEvento->getCampo("timestamp"));
-            if ($arLote["boExcluir"] == "sim") {
-                $obTFolhaPagamentoEventoCalculadoDependente->exclusao();
-                $obTFolhaPagamentoEventoCalculado->exclusao();
-                $obTFolhaPagamentoLogErroCalculo->exclusao();
-                $obTFolhaPagamentoRegistroEventoParcela->exclusao();
-                $obTFolhaPagamentoUltimoRegistroEvento->exclusao();
-            } else {
-                $obTFolhaPagamentoEventoCalculadoDependente->exclusao();
-                $obTFolhaPagamentoEventoCalculado->exclusao();
-                $obTFolhaPagamentoLogErroCalculo->exclusao();
-                $obTFolhaPagamentoRegistroEventoParcela->exclusao();
-                $obTFolhaPagamentoUltimoRegistroEvento->exclusao();
+if (!$obErro->ocorreu()) {
+    $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao,"","",$boTransacao);
 
-                $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
-                $obTFolhaPagamentoRegistroEventoPeriodo->inclusao();
-                $obTFolhaPagamentoRegistroEvento->inclusao();
-                $obTFolhaPagamentoUltimoRegistroEvento->inclusao();
-                if ($arLote["parcelas"] > 0) {
-                    $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela",$arLote["parcelas"]);
-                    $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia",$arLote["mes_carencia"]);
-                    $obTFolhaPagamentoRegistroEventoParcela->inclusao();
+    if ($request->get("stOpcao") == "lote_evento") {
+        $arLotes = Sessao::read("arLoteEventos");
+        $stMensagem = "Lote de Eventos incluído com sucesso!";
+    }
+
+    if ($request->get("stOpcao") == "lote_matricula") {
+        $arLotes = Sessao::read("arLoteMatriculas");
+        $stMensagem = "Lote de Matrículas incluído com sucesso!";
+    }
+
+    if ($request->get("stOpcao") == "importar") {
+        $arLotes = Sessao::read("EventosCadastrados");
+        $stMensagem = "Importação de matrículas concluída com sucesso!";
+    }
+
+    foreach ($arLotes as $arLote) {
+        if ($arLote["stSituacao"] == "Ok" or !isset($arLote["stSituacao"])) {
+            $stFiltro = " WHERE registro = ".$arLote["registro"];
+            $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
+
+            $boPorporcional = ($arLote["proporcional"] == "Sim") ? true : false;
+            $obTFolhaPagamentoRegistroEvento->setDado("cod_evento",$arLote["cod_evento"]);
+            $obTFolhaPagamentoRegistroEvento->setDado("valor",$arLote["valor"]);
+            $obTFolhaPagamentoRegistroEvento->setDado("quantidade",$arLote["quantidade"]);
+            $obTFolhaPagamentoRegistroEvento->setDado("proporcional",$boPorporcional);
+            $obTFolhaPagamentoPeriodoMovimentacao->setDado("cod_periodo_movimentacao",$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao"));
+            $obTFolhaPagamentoContratoServidorPeriodo->setDado("cod_contrato",$rsContrato->getCampo("cod_contrato"));
+            //boExcluirDisabled é a variável que controla se o registro de evento já existe
+            //No caso do boExcluirDisabled igual a true, significa que não existe registro de evento para o contrato e evento
+    
+            if ($arLote["boExcluirDisabled"] == "true") {
+                $obErro = $obTFolhaPagamentoContratoServidorPeriodo->recuperaPorChave($rsContratoServidorPeriodo,$boTransacao);
+
+                if (!$obErro->ocorreu() && $rsContratoServidorPeriodo->getNumLinhas() == -1) {
+                    $obErro = $obTFolhaPagamentoContratoServidorPeriodo->inclusao($boTransacao);
                 }
+
+                if (!$obErro->ocorreu()) {
+                    $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+                    $obErro = $obTFolhaPagamentoRegistroEventoPeriodo->inclusao($boTransacao);
+
+                    if (!$obErro->ocorreu()) {
+                        $obErro = $obTFolhaPagamentoRegistroEvento->inclusao($boTransacao);
+                    }
+
+                    if (!$obErro->ocorreu()) {
+                        $obErro = $obTFolhaPagamentoUltimoRegistroEvento->inclusao($boTransacao);
+                    }
+    
+                    if ($arLote["parcelas"] > 0) {
+                        $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela",$arLote["parcelas"]);
+                        $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia",$arLote["mes_carencia"]);
+                        $obErro = $obTFolhaPagamentoRegistroEventoParcela->inclusao($boTransacao);
+                    }
+                }
+            } else {
+                $stFiltro  = " AND registro_evento_periodo.cod_contrato = ".$rsContrato->getCampo("cod_contrato");
+                $stFiltro .= " AND cod_periodo_movimentacao = ".$rsPeriodoMovimentacao->getCampo("cod_periodo_movimentacao");
+                $stFiltro .= " AND registro_evento.cod_evento = ".$arLote["cod_evento"];
+                $stProporcional = ( $arLote["proporcional"] == "Sim" ) ? "TRUE" : "FALSE";
+                $stFiltro .= " AND proporcional IS ".$stProporcional;
+                $obTFolhaPagamentoRegistroEvento->recuperaRegistrosDeEventos($rsRegistroEvento,$stFiltro,"",$boTransacao);
+
+                if (!$obErro->ocorreu()) {
+                    $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_evento",$rsRegistroEvento->getCampo("cod_evento"));
+                    $obTFolhaPagamentoUltimoRegistroEvento->setDado("cod_registro",$rsRegistroEvento->getCampo("cod_registro"));
+                    $obTFolhaPagamentoUltimoRegistroEvento->setDado("timestamp",$rsRegistroEvento->getCampo("timestamp"));
+
+                    if ($arLote["boExcluir"] == "sim") {
+                        $obErro = $obTFolhaPagamentoEventoCalculadoDependente->exclusao($boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoEventoCalculado->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoLogErroCalculo->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoRegistroEventoParcela->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoUltimoRegistroEvento->exclusao($boTransacao);
+                        }
+                    } else {
+                        $obErro = $obTFolhaPagamentoEventoCalculadoDependente->exclusao($boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoEventoCalculado->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoLogErroCalculo->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoRegistroEventoParcela->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoUltimoRegistroEvento->exclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obTFolhaPagamentoRegistroEventoPeriodo->setDado("cod_registro","");
+                            $obErro = $obTFolhaPagamentoRegistroEventoPeriodo->inclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoRegistroEvento->inclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $obErro = $obTFolhaPagamentoUltimoRegistroEvento->inclusao($boTransacao);
+                        }
+
+                        if (!$obErro->ocorreu() && $arLote["parcelas"] > 0) {
+                            $obTFolhaPagamentoRegistroEventoParcela->setDado("parcela",$arLote["parcelas"]);
+                            $obTFolhaPagamentoRegistroEventoParcela->setDado("mes_carencia",$arLote["mes_carencia"]);
+                            $obErro = $obTFolhaPagamentoRegistroEventoParcela->inclusao($boTransacao);
+                        }
+                    }
+                } 
             }
         }
     }
@@ -159,6 +218,9 @@ foreach ($arLotes as $arLote) {
 Sessao::write("arLoteEventos", array());
 Sessao::write("arLoteMatriculas", array());
 
-Sessao::encerraExcecao();
+if (!$obErro->ocorreu()) {
+    $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $obTFolhaPagamentoRegistroEvento);
+}
+
 sistemaLegado::alertaAviso($pgForm,$stMensagem,"importar","aviso", Sessao::getId(), "../");
 ?>

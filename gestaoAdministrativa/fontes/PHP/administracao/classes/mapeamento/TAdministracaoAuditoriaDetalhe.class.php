@@ -29,6 +29,8 @@
 
 * @author Analista: Fábio Rodrigues
 * @author Desenvolvedor: Matheus Figueredo
+*
+* $Id: TAdministracaoAuditoriaDetalhe.class.php 64804 2016-04-04 19:29:47Z michel $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
@@ -49,11 +51,5 @@ class TAuditoriaDetalhe extends Persistente
         $this->AddCampo( 'cod_acao'   ,'integer'  , true  ,'' , true , true  );
         $this->AddCampo( 'timestamp'  ,'timestamp', false ,'' , true , false );
         $this->AddCampo( 'valores'    ,'hstore'   , true  ,'' , false, false, '', array());
-
-        //Seta o campo cod_detalhe.
-        $inCodDetalhe = 0;
-        $this->proximoCod( $inCodDetalhe , $boTransacao );
-        $this->setDado('cod_detalhe', $inCodDetalhe);
     }
-
 }

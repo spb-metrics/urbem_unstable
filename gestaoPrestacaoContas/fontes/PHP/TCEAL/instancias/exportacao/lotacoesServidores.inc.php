@@ -27,7 +27,7 @@
     *
     * @author: Carolina Schwaab Marçal
     *
-    * $Id: lotacoesServidores.inc.php 60665 2014-11-06 18:59:33Z lisiane $
+    * $Id: lotacoesServidores.inc.php 64853 2016-04-07 18:27:30Z carlos.silva $
     *
     * @ignore
     *
@@ -73,35 +73,37 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
     $stPeriodoMovimentacao->setDado('dtFinal', $dtFinal);
     $stPeriodoMovimentacao->recuperaPeriodoMovimentacaoTCEAL($rsPeriodoMovimentacao);
 
-    $rsRecordSet = "rsLotacoesServidores";
-    $rsRecordSet .= $stEntidade;
-    $$rsRecordSet = new RecordSet();
-
-    $obTTCEALLotacoesServidores->setDado('dtInicial', $dtInicial);
-    $obTTCEALLotacoesServidores->setDado('dtFinal', $dtFinal);
-    $obTTCEALLotacoesServidores->setDado('codPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
-    $obTTCEALLotacoesServidores->setDado('stExercicio', Sessao::getExercicio());
-    $obTTCEALLotacoesServidores->setDado('stEntidade', $stEntidade  );
-    $obTTCEALLotacoesServidores->setDado('inCodEntidade', $inCodEntidade  );
-    $obTTCEALLotacoesServidores->setDado('entidade', $entidade  );
-
-    $obTTCEALLotacoesServidores->listarExportacaoLotacoesServidores($rsRecordSet);
-
-     $arResult = array();
-     $idCount = 0;
-     while (!$rsRecordSet->eof()) {
-         $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
-         $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua');
-         $arResult[$idCount]['Bimestre'] = $inBimestre;
-         $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
-         $arResult[$idCount]['CodFuncao'] = $rsRecordSet->getCampo('cod_lotacao');
-         $arResult[$idCount]['Descricao'] = $rsRecordSet->getCampo('descricao_lotacao');
-         $idCount++;
-         $rsRecordSet->proximo();
-         
-     }
-     return $arResult;
+    if($rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao') != '') {
+        $rsRecordSet = "rsLotacoesServidores";
+        $rsRecordSet .= $stEntidade;
+        $$rsRecordSet = new RecordSet();
     
+        $obTTCEALLotacoesServidores->setDado('dtInicial', $dtInicial);
+        $obTTCEALLotacoesServidores->setDado('dtFinal', $dtFinal);
+        $obTTCEALLotacoesServidores->setDado('codPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
+        $obTTCEALLotacoesServidores->setDado('stExercicio', Sessao::getExercicio());
+        $obTTCEALLotacoesServidores->setDado('stEntidade', $stEntidade  );
+        $obTTCEALLotacoesServidores->setDado('inCodEntidade', $inCodEntidade  );
+        $obTTCEALLotacoesServidores->setDado('entidade', $entidade  );
+    
+        $obTTCEALLotacoesServidores->listarExportacaoLotacoesServidores($rsRecordSet);
+    
+        $arResult = array();
+        $idCount = 0;
+        while (!$rsRecordSet->eof()) {
+            $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
+            $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua');
+            $arResult[$idCount]['Bimestre'] = $inBimestre;
+            $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
+            $arResult[$idCount]['CodFuncao'] = $rsRecordSet->getCampo('cod_lotacao');
+            $arResult[$idCount]['Descricao'] = $rsRecordSet->getCampo('descricao_lotacao');
+            $idCount++;
+            $rsRecordSet->proximo();
+            
+        }
+        
+        return $arResult;
+    }
  }
 
 ?>

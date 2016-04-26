@@ -174,8 +174,8 @@
         </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147" extends="urbem_221.postgres">
-        </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="postgres" id="1147"
+ extends="urbem_221.postgres"/>
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="eventos_calculados" id="1435">
@@ -206,7 +206,7 @@ this.queryText += "     , CASE WHEN evento_calculado.natureza = 'D' THEN evento_
 this.queryText += "            ELSE 0.00 END AS desconto			\n";
 this.queryText += "     , evento_calculado.valor      				\n";
 this.queryText += "  FROM recuperarEventosCalculados("+params["inCodConfiguracao"]+","+params["inCodPeriodoMovimentacao"]+",?,"+params["inCodComplementar"]+",'"+params["stEntidade"]+"','"+params["stOrdenacaoEventos"]+"') as evento_calculado \n";
-params["query"] =this.queryText; ]]></method>
+//params["query"] =this.queryText; ]]></method>
             <property name="dataSource">postgres</property>
             <xml-property name="queryText"><![CDATA[    SELECT evento.codigo
          , evento.descricao
@@ -840,179 +840,217 @@ INNER JOIN folhapagamento.evento
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="principal" id="1473">
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">param_1</property>
-                    <property name="paramName">exercicio</property>
-                    <property name="nativeName"></property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                    <property name="position">1</property>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData"/>
-            <method name="beforeOpen"><![CDATA[if(params["inCodConfiguracao"] == 0){
-    this.queryText += " WHERE EXISTS (    SELECT 1 \n";
-    this.queryText += "                     FROM folhapagamento.evento_complementar_calculado \n";
-    this.queryText += "               INNER JOIN folhapagamento.registro_evento_complementar \n";
-    this.queryText += "                       ON evento_complementar_calculado.cod_registro = registro_evento_complementar.cod_registro \n";
-    this.queryText += "                      AND evento_complementar_calculado.cod_evento = registro_evento_complementar.cod_evento \n";
-    this.queryText += "                      AND evento_complementar_calculado.cod_configuracao = registro_evento_complementar.cod_configuracao \n";
-    this.queryText += "                      AND evento_complementar_calculado.timestamp_registro = registro_evento_complementar.timestamp \n";         
-    this.queryText += "                    WHERE registro_evento_complementar.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+" \n";
-    this.queryText += "                      AND registro_evento_complementar.cod_complementar = "+params["inCodComplementar"]+" \n";
-    this.queryText += "                      AND registro_evento_complementar.cod_contrato = contrato.cod_contrato \n";
+            <method name="beforeOpen"><![CDATA[this.queryText =  "    SELECT *                                                                                                                                                            \n";
+this.queryText += "    FROM (                                                                                                                                                              \n";
+this.queryText += "    SELECT contrato.*                                                                                                                                                   \n";
+this.queryText += "         , sw_cgm.numcgm                                                                                                                                                \n";
+this.queryText += "         , sw_cgm.nom_cgm                                                                                                                                               \n";
+this.queryText += "         , cargo.descricao as funcao                                                                                                                                    \n";
+this.queryText += "         , recuperaDescricaoOrgao(contrato_servidor_orgao.cod_orgao,('"+params["exercicio"]+"-01-01')::date) as orgao                                                   \n";
+this.queryText += "         , local.descricao as local                                                                                                                                     \n";
+this.queryText += "         , to_char(contrato_servidor_nomeacao_posse.dt_posse,'dd/mm/yyyy') as dt_posse                                                                                  \n";
+this.queryText += "         , to_char(contrato_servidor_nomeacao_posse.dt_admissao,'dd/mm/yyyy') as dt_admissao                                                                            \n";
+this.queryText += "         , to_char(contrato_servidor_nomeacao_posse.dt_nomeacao,'dd/mm/yyyy') as dt_nomeacao                                                                            \n";
+this.queryText += "      FROM pessoal.contrato                                                                                                                                             \n";
+this.queryText += "INNER JOIN pessoal.servidor_contrato_servidor                                                                                                                           \n";
+this.queryText += "        ON servidor_contrato_servidor.cod_contrato = contrato.cod_contrato                                                                                              \n";
+this.queryText += "INNER JOIN pessoal.servidor                                                                                                                                             \n";
+this.queryText += "        ON servidor.cod_servidor = servidor_contrato_servidor.cod_servidor                                                                                              \n";
+this.queryText += "INNER JOIN sw_cgm                                                                                                                                                       \n";
+this.queryText += "        ON sw_cgm.numcgm = servidor.numcgm                                                                                                                              \n";
+this.queryText += "INNER JOIN pessoal.contrato_servidor_funcao                                                                                                                             \n";
+this.queryText += "        ON contrato_servidor_funcao.cod_contrato = contrato.cod_contrato                                                                                                \n";
+this.queryText += "INNER JOIN ( SELECT cod_contrato                                                                                                                                        \n";
+this.queryText += "                  , max(timestamp) as timestamp                                                                                                                         \n";
+this.queryText += "               FROM pessoal.contrato_servidor_funcao                                                                                                                    \n";
+this.queryText += "           GROUP BY cod_contrato) as max_contrato_servidor_funcao                                                                                                       \n";
+this.queryText += "        ON contrato_servidor_funcao.cod_contrato = max_contrato_servidor_funcao.cod_contrato                                                                            \n";
+this.queryText += "       AND contrato_servidor_funcao.timestamp = max_contrato_servidor_funcao.timestamp                                                                                  \n";
+this.queryText += "INNER JOIN pessoal.cargo                                                                                                                                                \n";
+this.queryText += "        ON cargo.cod_cargo = contrato_servidor_funcao.cod_cargo                                                                                                         \n";
+this.queryText += "INNER JOIN pessoal.contrato_servidor_orgao                                                                                                                              \n";
+this.queryText += "        ON contrato_servidor_orgao.cod_contrato = contrato.cod_contrato                                                                                                 \n";
+this.queryText += "INNER JOIN ( SELECT cod_contrato                                                                                                                                        \n";
+this.queryText += "                  , max(timestamp) as timestamp                                                                                                                         \n";
+this.queryText += "               FROM pessoal.contrato_servidor_orgao                                                                                                                     \n";
+this.queryText += "           GROUP BY cod_contrato) as max_contrato_servidor_orgao                                                                                                        \n";
+this.queryText += "        ON contrato_servidor_orgao.cod_contrato = max_contrato_servidor_orgao.cod_contrato                                                                              \n";
+this.queryText += "       AND contrato_servidor_orgao.timestamp = max_contrato_servidor_orgao.timestamp                                                                                    \n";
+this.queryText += "INNER JOIN organograma.orgao                                                                                                                                            \n";
+this.queryText += "        ON orgao.cod_orgao = contrato_servidor_orgao.cod_orgao                                                                                                          \n";
+this.queryText += " LEFT JOIN ( SELECT contrato_servidor_local.cod_local                                                                                                                   \n";
+this.queryText += "                  , contrato_servidor_local.cod_contrato                                                                                                                \n";
+this.queryText += "               FROM pessoal.contrato_servidor_local                                                                                                                     \n";
+this.queryText += "         INNER JOIN ( SELECT cod_contrato                                                                                                                               \n";
+this.queryText += "                           , max(timestamp) as timestamp                                                                                                                \n";
+this.queryText += "                        FROM pessoal.contrato_servidor_local                                                                                                            \n";
+this.queryText += "                    GROUP BY cod_contrato) as max_contrato_servidor_local                                                                                               \n";
+this.queryText += "                 ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato                                                                     \n";
+this.queryText += "                AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp                                                                           \n";
+this.queryText += "           ) contrato_servidor_local                                                                                                                                    \n";
+this.queryText += "        ON contrato_servidor_local.cod_contrato = contrato.cod_contrato                                                                                                 \n";
+this.queryText += " LEFT JOIN organograma.local                                                                                                                                            \n";
+this.queryText += "        ON local.cod_local = contrato_servidor_local.cod_local                                                                                                          \n";
+this.queryText += "INNER JOIN pessoal.contrato_servidor_nomeacao_posse                                                                                                                     \n";
+this.queryText += "        ON contrato_servidor_nomeacao_posse.cod_contrato = contrato.cod_contrato                                                                                        \n";
+this.queryText += "INNER JOIN ( SELECT cod_contrato                                                                                                                                        \n";
+this.queryText += "                  , max(timestamp) as timestamp                                                                                                                         \n";
+this.queryText += "               FROM pessoal.contrato_servidor_nomeacao_posse                                                                                                            \n";
+this.queryText += "           GROUP BY cod_contrato) as max_contrato_servidor_nomeacao_posse                                                                                               \n";
+this.queryText += "        ON contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato                                                            \n";
+this.queryText += "       AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp                                                                  \n";
+
+if(params["inCodConfiguracao"] == 0){
+    this.queryText += " WHERE EXISTS (    SELECT 1                                                                                                                                         \n";
+    this.queryText += "                     FROM folhapagamento.evento_complementar_calculado                                                                                              \n";
+    this.queryText += "               INNER JOIN folhapagamento.registro_evento_complementar                                                                                               \n";
+    this.queryText += "                       ON evento_complementar_calculado.cod_registro = registro_evento_complementar.cod_registro                                                    \n";
+    this.queryText += "                      AND evento_complementar_calculado.cod_evento = registro_evento_complementar.cod_evento                                                        \n";
+    this.queryText += "                      AND evento_complementar_calculado.cod_configuracao = registro_evento_complementar.cod_configuracao                                            \n";
+    this.queryText += "                      AND evento_complementar_calculado.timestamp_registro = registro_evento_complementar.timestamp                                                 \n";         
+    this.queryText += "                    WHERE registro_evento_complementar.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+"                                            \n";
+    this.queryText += "                      AND registro_evento_complementar.cod_complementar = "+params["inCodComplementar"]+"                                                           \n";
+    this.queryText += "                      AND registro_evento_complementar.cod_contrato = contrato.cod_contrato                                                                         \n";
     if(params["stTipoFiltro"] == "evento"){
-        this.queryText += "                  AND evento_complementar_calculado.cod_evento IN ("+params["stCodigos"]+")\n";
+        this.queryText += "                  AND evento_complementar_calculado.cod_evento IN ("+params["stCodigos"]+")                                                                     \n";
     }   
-    this.queryText += "                        ) \n";  
+    this.queryText += "                        )                                                                                                                                           \n";  
 }
 if(params["inCodConfiguracao"] == 1){
-	this.queryText += " WHERE EXISTS (    SELECT 1 \n";
-	this.queryText += "                     FROM folhapagamento.evento_calculado \n";
-	this.queryText += "               INNER JOIN folhapagamento.registro_evento_periodo \n";
-	this.queryText += "                       ON evento_calculado.cod_registro = registro_evento_periodo.cod_registro \n";
-	this.queryText += "                    WHERE registro_evento_periodo.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+" \n";
-	this.queryText += "                      AND registro_evento_periodo.cod_contrato = contrato.cod_contrato \n";
-	if(params["stTipoFiltro"] == "evento"){
-		this.queryText += "                  AND evento_calculado.cod_evento IN ("+params["stCodigos"]+")\n";
-	}	
-	this.queryText += "                        ) \n";	
+  this.queryText += " WHERE EXISTS (    SELECT 1                                                                                                                                           \n";
+  this.queryText += "                     FROM folhapagamento.evento_calculado                                                                                                             \n";
+  this.queryText += "               INNER JOIN folhapagamento.registro_evento_periodo                                                                                                      \n";
+  this.queryText += "                       ON evento_calculado.cod_registro = registro_evento_periodo.cod_registro                                                                        \n";
+  this.queryText += "                    WHERE registro_evento_periodo.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+"                                                   \n";
+  this.queryText += "                      AND registro_evento_periodo.cod_contrato = contrato.cod_contrato                                                                                \n";
+  if(params["stTipoFiltro"] == "evento"){
+    this.queryText += "                  AND evento_calculado.cod_evento IN ("+params["stCodigos"]+")                                                                                      \n";
+  } 
+  this.queryText += "                        )                                                                                                                                             \n"; 
 }
 if(params["inCodConfiguracao"] == 2){
-    this.queryText += " WHERE EXISTS (    SELECT 1 \n";
-    this.queryText += "                     FROM folhapagamento.evento_ferias_calculado \n";
-    this.queryText += "               INNER JOIN folhapagamento.registro_evento_ferias \n";
-    this.queryText += "                       ON evento_ferias_calculado.cod_registro = registro_evento_ferias.cod_registro \n";
-    this.queryText += "                      AND evento_ferias_calculado.cod_evento = registro_evento_ferias.cod_evento \n";
-    this.queryText += "                      AND evento_ferias_calculado.desdobramento = registro_evento_ferias.desdobramento \n";
-    this.queryText += "                      AND evento_ferias_calculado.timestamp_registro = registro_evento_ferias.timestamp \n";         
-    this.queryText += "                    WHERE registro_evento_ferias.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+" \n";
-    this.queryText += "                      AND registro_evento_ferias.cod_contrato = contrato.cod_contrato \n";
-	if(params["stTipoFiltro"] == "evento"){
-		this.queryText += "                  AND evento_ferias_calculado.cod_evento IN ("+params["stCodigos"]+")\n";
-	}	
-	this.queryText += "                        ) \n";    
+    this.queryText += " WHERE EXISTS (    SELECT 1                                                                                                                                         \n";
+    this.queryText += "                     FROM folhapagamento.evento_ferias_calculado                                                                                                    \n";
+    this.queryText += "               INNER JOIN folhapagamento.registro_evento_ferias                                                                                                     \n";
+    this.queryText += "                       ON evento_ferias_calculado.cod_registro = registro_evento_ferias.cod_registro                                                                \n";
+    this.queryText += "                      AND evento_ferias_calculado.cod_evento = registro_evento_ferias.cod_evento                                                                    \n";
+    this.queryText += "                      AND evento_ferias_calculado.desdobramento = registro_evento_ferias.desdobramento                                                              \n";
+    this.queryText += "                      AND evento_ferias_calculado.timestamp_registro = registro_evento_ferias.timestamp                                                             \n";         
+    this.queryText += "                    WHERE registro_evento_ferias.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+"                                                  \n";
+    this.queryText += "                      AND registro_evento_ferias.cod_contrato = contrato.cod_contrato                                                                               \n";
+  if(params["stTipoFiltro"] == "evento"){
+    this.queryText += "                  AND evento_ferias_calculado.cod_evento IN ("+params["stCodigos"]+")                                                                               \n";
+  } 
+  this.queryText += "                        )                                                                                                                                             \n";    
 }
 if(params["inCodConfiguracao"] == 3){
-    this.queryText += " WHERE EXISTS (    SELECT 1 \n";
-    this.queryText += "                     FROM folhapagamento.evento_decimo_calculado \n";
-    this.queryText += "               INNER JOIN folhapagamento.registro_evento_decimo \n";
-    this.queryText += "                       ON evento_decimo_calculado.cod_registro = registro_evento_decimo.cod_registro \n";
-    this.queryText += "                      AND evento_decimo_calculado.cod_evento = registro_evento_decimo.cod_evento \n";
-    this.queryText += "                      AND evento_decimo_calculado.desdobramento = registro_evento_decimo.desdobramento \n";
-    this.queryText += "                      AND evento_decimo_calculado.timestamp_registro = registro_evento_decimo.timestamp \n";         
-    this.queryText += "                    WHERE registro_evento_decimo.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+" \n";
-    this.queryText += "                      AND registro_evento_decimo.cod_contrato = contrato.cod_contrato \n";
-	if(params["stTipoFiltro"] == "evento"){
-		this.queryText += "                  AND evento_decimo_calculado.cod_evento IN ("+params["stCodigos"]+")\n";
-	}	
-	this.queryText += "                        ) \n";    
+    this.queryText += " WHERE EXISTS (    SELECT 1                                                                                                                                         \n";
+    this.queryText += "                     FROM folhapagamento.evento_decimo_calculado                                                                                                    \n";
+    this.queryText += "               INNER JOIN folhapagamento.registro_evento_decimo                                                                                                     \n";
+    this.queryText += "                       ON evento_decimo_calculado.cod_registro = registro_evento_decimo.cod_registro                                                                \n";
+    this.queryText += "                      AND evento_decimo_calculado.cod_evento = registro_evento_decimo.cod_evento                                                                    \n";
+    this.queryText += "                      AND evento_decimo_calculado.desdobramento = registro_evento_decimo.desdobramento                                                              \n";
+    this.queryText += "                      AND evento_decimo_calculado.timestamp_registro = registro_evento_decimo.timestamp                                                             \n";         
+    this.queryText += "                    WHERE registro_evento_decimo.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+"                                                  \n";
+    this.queryText += "                      AND registro_evento_decimo.cod_contrato = contrato.cod_contrato                                                                               \n";
+  if(params["stTipoFiltro"] == "evento"){
+    this.queryText += "                  AND evento_decimo_calculado.cod_evento IN ("+params["stCodigos"]+")                                                                               \n";
+  } 
+  this.queryText += "                        )                                                                                                                                             \n";    
 }
 if(params["inCodConfiguracao"] == 4){
-	this.queryText += " WHERE EXISTS (    SELECT 1 \n";
-	this.queryText += "                     FROM folhapagamento.evento_rescisao_calculado \n";
-	this.queryText += "               INNER JOIN folhapagamento.registro_evento_rescisao \n";
-	this.queryText += "                       ON evento_rescisao_calculado.cod_registro = registro_evento_rescisao.cod_registro \n";
-	this.queryText += "                      AND evento_rescisao_calculado.cod_evento = registro_evento_rescisao.cod_evento \n";
-	this.queryText += "                      AND evento_rescisao_calculado.desdobramento = registro_evento_rescisao.desdobramento \n";
-	this.queryText += "                      AND evento_rescisao_calculado.timestamp_registro = registro_evento_rescisao.timestamp \n";			
-	this.queryText += "                    WHERE registro_evento_rescisao.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+" \n";
-	this.queryText += "                      AND registro_evento_rescisao.cod_contrato = contrato.cod_contrato \n";
-	if(params["stTipoFiltro"] == "evento"){
-		this.queryText += "                  AND evento_rescisao_calculado.cod_evento IN ("+params["stCodigos"]+")\n";
-	}	
-	this.queryText += "                        ) \n";
+  this.queryText += " WHERE EXISTS (    SELECT 1                                                                                                                                           \n";
+  this.queryText += "                     FROM folhapagamento.evento_rescisao_calculado                                                                                                    \n";
+  this.queryText += "               INNER JOIN folhapagamento.registro_evento_rescisao                                                                                                     \n";
+  this.queryText += "                       ON evento_rescisao_calculado.cod_registro = registro_evento_rescisao.cod_registro                                                              \n";
+  this.queryText += "                      AND evento_rescisao_calculado.cod_evento = registro_evento_rescisao.cod_evento                                                                  \n";
+  this.queryText += "                      AND evento_rescisao_calculado.desdobramento = registro_evento_rescisao.desdobramento                                                            \n";
+  this.queryText += "                      AND evento_rescisao_calculado.timestamp_registro = registro_evento_rescisao.timestamp                                                           \n";     
+  this.queryText += "                    WHERE registro_evento_rescisao.cod_periodo_movimentacao = "+params["inCodPeriodoMovimentacao"]+"                                                  \n";
+  this.queryText += "                      AND registro_evento_rescisao.cod_contrato = contrato.cod_contrato                                                                               \n";
+  if(params["stTipoFiltro"] == "evento"){
+    this.queryText += "                  AND evento_rescisao_calculado.cod_evento IN ("+params["stCodigos"]+")                                                                             \n";
+  } 
+  this.queryText += "                        )                                                                                                                                             \n";
 }
 if(params["stTipoFiltro"] == "contrato" || params["stTipoFiltro"] == "contrato_todos" || params["stTipoFiltro"] == "cgm_contrato_todos"){
-	this.queryText += " AND contrato.cod_contrato IN ("+params["stCodigos"]+")";	
+  this.queryText += " AND contrato.cod_contrato IN ("+params["stCodigos"]+")                                                                                                               \n";  
 }
 if(params["stTipoFiltro"] == "lotacao"){
-	this.queryText += " AND contrato_servidor_orgao.cod_orgao IN ("+params["stCodigos"]+") \n";			
+  this.queryText += " AND contrato_servidor_orgao.cod_orgao IN ("+params["stCodigos"]+")                                                                                                   \n";     
 }
 if(params["stTipoFiltro"] == "local"){
-    this.queryText += " AND contrato_servidor_local.cod_local IN ("+params["stCodigos"]+") \n";  
+    this.queryText += " AND contrato_servidor_local.cod_local IN ("+params["stCodigos"]+")                                                                                                 \n";  
 }
-this.queryText += " ORDER BY sw_cgm.nom_cgm";
 this.queryText = this.queryText.replaceAll("pessoal", "pessoal" + params["stEntidade"]);
 this.queryText = this.queryText.replaceAll("folhapagamento", "folhapagamento" + params["stEntidade"]);
-params["query"] = this.queryText;]]></method>
+
+this.queryText += " UNION                                                                                                                                                                  \n";
+this.queryText += "     SELECT contrato.*                                                                                                                                                  \n";
+this.queryText += "          , sw_cgm.numcgm                                                                                                                                               \n";
+this.queryText += "          , sw_cgm.nom_cgm                                                                                                                                              \n";
+this.queryText += "          , cargo.descricao AS funcao                                                                                                                                   \n";
+this.queryText += "          , recuperaDescricaoOrgao(ultimo_contrato_pensionista_orgao.cod_orgao,('"+params["exercicio"]+"-01-01')::date) as orgao                                         \n";
+this.queryText += "          , local.descricao AS local                                                                                                                                    \n";
+this.queryText += "          , to_char(ultimo_contrato_pensionista_nomeacao_posse.dt_posse,'dd/mm/yyyy') AS dt_posse                                                                       \n"; 
+this.queryText += "          , to_char(ultimo_contrato_pensionista_nomeacao_posse.dt_admissao,'dd/mm/yyyy') AS dt_admissao                                                                 \n";
+this.queryText += "          , to_char(ultimo_contrato_pensionista_nomeacao_posse.dt_nomeacao,'dd/mm/yyyy') AS dt_nomeacao                                                                 \n";
+this.queryText += "       FROM pessoal.contrato_pensionista                                                                                                                                \n";
+this.queryText += " INNER JOIN pessoal.pensionista                                                                                                                                         \n";
+this.queryText += "         ON contrato_pensionista.cod_pensionista = pensionista.cod_pensionista                                                                                          \n";
+this.queryText += "        AND contrato_pensionista.cod_contrato_cedente = pensionista.cod_contrato_cedente                                                                                \n";
+this.queryText += " INNER JOIN pessoal.contrato                                                                                                                                            \n";
+this.queryText += "         ON contrato.cod_contrato = contrato_pensionista.cod_contrato                                                                                                   \n";
+this.queryText += " INNER JOIN sw_cgm                                                                                                                                                      \n";
+this.queryText += "         ON sw_cgm.numcgm = pensionista.numcgm                                                                                                                          \n";
+this.queryText += " INNER JOIN ultimo_contrato_pensionista_orgao('"+params["stEntidade"]+"', '"+params["inCodPeriodoMovimentacao"]+"') as ultimo_contrato_pensionista_orgao                \n";
+this.queryText += "         ON contrato_pensionista.cod_contrato = ultimo_contrato_pensionista_orgao.cod_contrato                                                                          \n";  
+this.queryText += " INNER JOIN ultimo_contrato_servidor_nomeacao_posse('"+params["stEntidade"]+"', '"+params["inCodPeriodoMovimentacao"]+"') as ultimo_contrato_pensionista_nomeacao_posse \n";
+this.queryText += "         ON pensionista.cod_contrato_cedente = ultimo_contrato_pensionista_nomeacao_posse.cod_contrato                                                                  \n";
+this.queryText += " INNER JOIN pessoal.contrato_servidor                                                                                                                                   \n";
+this.queryText += "         ON pensionista.cod_contrato_cedente = contrato_servidor.cod_contrato                                                                                           \n";
+this.queryText += " INNER JOIN ultimo_contrato_servidor_funcao('"+params["stEntidade"]+"', '"+params["inCodPeriodoMovimentacao"]+"') as ultimo_contrato_pensionista_funcao                 \n";
+this.queryText += "         ON pensionista.cod_contrato_cedente = ultimo_contrato_pensionista_funcao.cod_contrato                                                                          \n";
+this.queryText += " INNER JOIN pessoal.cargo                                                                                                                                               \n";
+this.queryText += "         ON cargo.cod_cargo = ultimo_contrato_pensionista_funcao.cod_cargo                                                                                              \n";
+this.queryText += "  LEFT JOIN ultimo_contrato_servidor_local('"+params["stEntidade"]+"', '"+params["inCodPeriodoMovimentacao"]+"') as ultimo_contrato_pensionista_local                   \n";
+this.queryText += "         ON pensionista.cod_contrato_cedente = ultimo_contrato_pensionista_local.cod_contrato                                                                           \n";
+this.queryText += "  LEFT JOIN organograma.local                                                                                                                                           \n";
+this.queryText += "         ON local.cod_local = ultimo_contrato_pensionista_local.cod_local                                                                                               \n";
+this.queryText += "      WHERE contrato_pensionista.cod_contrato IN ("+params["stCodigos"]+")                                                                                              \n";
+this.queryText += " ) AS retorno                                                                                                                                                           \n";
+this.queryText += "   ORDER BY retorno.nom_cgm                                                                                                                                             \n";
+
+//params["query"] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
-            <xml-property name="queryText"><![CDATA[    select contrato.*
-         , sw_cgm.numcgm
-         , sw_cgm.nom_cgm
-         , cargo.descricao as funcao
-         , recuperaDescricaoOrgao(contrato_servidor_orgao.cod_orgao,(?||'-01-01')::date) as orgao
-         , local.descricao as local
-         , to_char(contrato_servidor_nomeacao_posse.dt_posse,'dd/mm/yyyy') as dt_posse
-         , to_char(contrato_servidor_nomeacao_posse.dt_admissao,'dd/mm/yyyy') as dt_admissao
-         , to_char(contrato_servidor_nomeacao_posse.dt_nomeacao,'dd/mm/yyyy') as dt_nomeacao
-      from pessoal.contrato
-INNER JOIN pessoal.servidor_contrato_servidor
-        ON servidor_contrato_servidor.cod_contrato = contrato.cod_contrato
-INNER JOIN pessoal.servidor
-        ON servidor.cod_servidor = servidor_contrato_servidor.cod_servidor
-INNER JOIN sw_cgm
-        ON sw_cgm.numcgm = servidor.numcgm
-INNER JOIN pessoal.contrato_servidor_funcao
-        ON contrato_servidor_funcao.cod_contrato = contrato.cod_contrato
-INNER JOIN (  SELECT cod_contrato
-                   , max(timestamp) as timestamp
-                FROM pessoal.contrato_servidor_funcao
-            GROUP BY cod_contrato) as max_contrato_servidor_funcao
-        ON contrato_servidor_funcao.cod_contrato = max_contrato_servidor_funcao.cod_contrato
-       AND contrato_servidor_funcao.timestamp = max_contrato_servidor_funcao.timestamp
-INNER JOIN pessoal.cargo
-        ON cargo.cod_cargo = contrato_servidor_funcao.cod_cargo
-INNER JOIN pessoal.contrato_servidor_orgao
-        ON contrato_servidor_orgao.cod_contrato = contrato.cod_contrato
-INNER JOIN (  SELECT cod_contrato
-                   , max(timestamp) as timestamp
-                FROM pessoal.contrato_servidor_orgao
-            GROUP BY cod_contrato) as max_contrato_servidor_orgao
-        ON contrato_servidor_orgao.cod_contrato = max_contrato_servidor_orgao.cod_contrato
-       AND contrato_servidor_orgao.timestamp = max_contrato_servidor_orgao.timestamp
-INNER JOIN organograma.orgao    
-        ON orgao.cod_orgao = contrato_servidor_orgao.cod_orgao
- LEFT JOIN (    SELECT contrato_servidor_local.cod_local
-                     , contrato_servidor_local.cod_contrato
-                  FROM pessoal.contrato_servidor_local 
-            INNER JOIN ( SELECT cod_contrato
-                              , max(timestamp) as timestamp
-                           FROM pessoal.contrato_servidor_local
-                       GROUP BY cod_contrato) as max_contrato_servidor_local
-                    ON contrato_servidor_local.cod_contrato = max_contrato_servidor_local.cod_contrato
-                   AND contrato_servidor_local.timestamp = max_contrato_servidor_local.timestamp) contrato_servidor_local         
-        ON contrato_servidor_local.cod_contrato = contrato.cod_contrato
- LEFT JOIN organograma.local    
-        ON local.cod_local = contrato_servidor_local.cod_local
-INNER JOIN pessoal.contrato_servidor_nomeacao_posse
-        ON contrato_servidor_nomeacao_posse.cod_contrato = contrato.cod_contrato 
-INNER JOIN (  SELECT cod_contrato
-                   , max(timestamp) as timestamp
-                FROM pessoal.contrato_servidor_nomeacao_posse
-            GROUP BY cod_contrato) as max_contrato_servidor_nomeacao_posse
-        ON contrato_servidor_nomeacao_posse.cod_contrato = max_contrato_servidor_nomeacao_posse.cod_contrato
-       AND contrato_servidor_nomeacao_posse.timestamp = max_contrato_servidor_nomeacao_posse.timestamp   
-]]></xml-property>
+            <list-property name="resultSet"/>
+            <xml-property name="queryText"><![CDATA[  ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
-  <Version>1.0</Version>
-  <design:DataSetParameters>
-    <design:parameterDefinitions>
-      <design:inOutMode>In</design:inOutMode>
-      <design:attributes>
-        <design:name></design:name>
-        <design:position>1</design:position>
-        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
-        <design:precision>0</design:precision>
-        <design:scale>0</design:scale>
-        <design:nullability>Unknown</design:nullability>
-      </design:attributes>
-    </design:parameterDefinitions>
-  </design:DataSetParameters>
+  <Version>2.0</Version>
+  <DataSetParameters>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>1</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+          <design:precision>0</design:precision>
+          <design:scale>0</design:scale>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+        <design:inputAttributes>
+          <design:elementAttributes/>
+        </design:inputAttributes>
+      </design:ParameterDefinition>
+    </parameter>
+  </DataSetParameters>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
     </data-sets>

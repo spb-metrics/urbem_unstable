@@ -56,7 +56,7 @@ include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 $obTEntidade = new TOrcamentoEntidade;
 $obTEntidade->setDado('exercicio', Sessao::getExercicio());
-$obErro = $obTEntidade->recuperaEntidadeRestos( $rsRecordSet, $boTransacao );
+$obErro = $obTEntidade->verificaEntidadeRestos( $rsRecordSet, $boTransacao );
 
 if ($rsRecordSet->getNumLinhas() > 0) {
     SistemaLegado::exibeAlertaTopo('Há entidades que já processaram seus Restos a Pagar para o ano de '.Sessao::getExercicio().'. Portanto, é possível que nem todas estejam disponíveis para seleção.');

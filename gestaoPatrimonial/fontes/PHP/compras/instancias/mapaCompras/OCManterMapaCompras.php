@@ -34,7 +34,7 @@
 
   * Casos de uso: uc-03.04.05
 
-  $Id: OCManterMapaCompras.php 64288 2016-01-08 17:25:00Z jean $
+  $Id: OCManterMapaCompras.php 64888 2016-04-12 12:31:36Z carlos.silva $
 
   */
 
@@ -1573,9 +1573,9 @@ function totais()
     $rsItens->preenche( $itens );
     $rsItens->ordena ( 'nom_item', 'ASC', SORT_STRING );
     $rsItens->setPrimeiroElemento();
-
+    
     while ( !$rsItens->eof() ) {
-        $arTotais[ $rsItens->getCampo('cod_item') ]['valor']               = $arTotais[ $rsItens->getCampo('cod_item') ]['valor'] + $rsItens->getCampo( 'valor_total_mapa' );
+        $arTotais[ $rsItens->getCampo('cod_item') ]['valor']               = $arTotais[ $rsItens->getCampo('cod_item') ]['valor'] + $rsItens->getCampo( 'vl_reserva_solicitacao' );
         $arTotais[ $rsItens->getCampo('cod_item') ]['quantidade']          = $arTotais[ $rsItens->getCampo('cod_item') ]['quantidade'] + $rsItens->getCampo ( 'quantidade_mapa');
         $arTotais[ $rsItens->getCampo('cod_item') ]['nom_item']            = $rsItens->getCampo('nom_item');
         $arTotais[ $rsItens->getCampo('cod_item') ]['valor_ultima_compra'] = $rsItens->getCampo('valor_ultima_compra');
@@ -1606,9 +1606,7 @@ function montaListaTotais($rsTotais)
     $rsTotais->addFormatacao ( 'quantidade'          , 'NUMERIC_BR_4' );
 
     $table = new TableTree();
-
     $table->setRecordset( $rsTotais );
-
     $table->setSummary('Totais por Item');
 
     $table->setArquivo( CAM_GP_COM_INSTANCIAS . 'mapaCompras/OCManterMapaCompras.php');

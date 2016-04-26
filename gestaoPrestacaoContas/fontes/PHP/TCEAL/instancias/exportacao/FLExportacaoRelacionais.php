@@ -148,7 +148,7 @@ $arArquivos = array(
         'nome' => 'Função'
     ),
       array(
-        'arquivo' => 'subfuncao',
+        'arquivo' => 'subFuncao',
         'nome'    => 'Subfunção'
     ),
       array(

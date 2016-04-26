@@ -28,7 +28,7 @@
     *
     * Data de Criação: 29/05/2014
     *
-    $Id: TTCEALRecursoVinculado.class.php 60611 2014-11-03 19:34:54Z carlos.silva $
+    $Id: TTCEALRecursoVinculado.class.php 64810 2016-04-05 13:04:38Z arthur $
     *
     * @author: Arthur Cruz
     *
@@ -71,37 +71,58 @@ class TTCEALRecursoVinculado extends Persistente
 
     public function montaRecursoVinculado()
     {
-        $stSql  = "	SELECT (SELECT PJ.cnpj
-						FROM orcamento.entidade
-						JOIN sw_cgm
-						  ON sw_cgm.numcgm=entidade.numcgm
-						JOIN sw_cgm_pessoa_juridica AS PJ
-						  ON sw_cgm.numcgm=PJ.numcgm
-						WHERE entidade.exercicio    = '".$this->getDado('exercicio')."'
-						AND entidade.cod_entidade = ".$this->getDado('cod_entidade')."
-					  ) AS cod_und_gestora
-           
+        $stSql  = "
+			SELECT (SELECT PJ.cnpj
+					  FROM orcamento.entidade
+			    INNER JOIN sw_cgm
+						ON sw_cgm.numcgm = entidade.numcgm
+				INNER JOIN sw_cgm_pessoa_juridica AS PJ
+						ON sw_cgm.numcgm = PJ.numcgm
+					 WHERE entidade.exercicio  = '".$this->getDado('exercicio')."'
+					   AND entidade.cod_entidade = ".$this->getDado('cod_entidade')."
+				  ) AS cod_und_gestora
 				, ( SELECT LPAD(COALESCE(valor, '0'),4,'0') AS valor
 					 FROM administracao.configuracao_entidade
 					WHERE configuracao_entidade.cod_modulo = 62
-					  AND configuracao_entidade.exercicio ='".$this->getDado('exercicio')."'
+					  AND configuracao_entidade.exercicio  = '".$this->getDado('exercicio')."'
 					  AND configuracao_entidade.parametro like 'tceal_configuracao_unidade_autonoma'
 					  AND configuracao_entidade.cod_entidade =  ".$this->getDado('cod_entidade')."
-				  ) AS codigo_ua
-					
-				,'".$this->getDado('exercicio')."' AS exercicio
-				,LPAD(recurso.cod_recurso::VARCHAR,9,'0') as codRecVinculado
-				,recurso.nom_recurso as nome
-				,recurso_direto.finalidade
-				,recurso_direto.cod_tipo_esfera
-				FROM orcamento.recurso
-				INNER JOIN orcamento.recurso_direto
-					ON recurso.exercicio   = recurso_direto.exercicio
-				   AND recurso.cod_recurso = recurso_direto.cod_recurso
-																					  
-			 WHERE recurso.exercicio = '".$this->getDado('exercicio')."' ";
-				 
+				 ) AS codigo_ua
+				, '".$this->getDado('exercicio')."' AS exercicio
+				, LPAD(recurso.cod_recurso::VARCHAR,9,'0') as codRecVinculado
+				, recurso.nom_recurso as nome
+				, recurso_direto.finalidade
+				, recurso_direto.cod_tipo_esfera
+
+			 FROM orcamento.recurso
+
+	   INNER JOIN orcamento.recurso_direto
+			   ON recurso.exercicio   = recurso_direto.exercicio
+			  AND recurso.cod_recurso = recurso_direto.cod_recurso
+
+	    LEFT JOIN orcamento.receita
+               ON receita.exercicio    = recurso.exercicio
+              AND receita.cod_recurso  = recurso.cod_recurso
+              AND receita.cod_entidade = ".$this->getDado('cod_entidade')."
+
+        LEFT JOIN orcamento.despesa
+               ON despesa.exercicio    = recurso.exercicio
+              AND despesa.cod_recurso  = recurso.cod_recurso
+              AND despesa.cod_entidade = ".$this->getDado('cod_entidade')."
+
+			WHERE recurso.exercicio = '".$this->getDado('exercicio')."'
+			  AND ( receita.cod_recurso IS NOT NULL OR despesa.cod_recurso IS NOT NULL )
+		 
+		 GROUP BY cod_und_gestora
+                , codigo_ua
+                , receita.exercicio
+                , codRecVinculado
+                , nome
+                , recurso_direto.finalidade
+                , recurso_direto.cod_tipo_esfera ";
+
         return $stSql;
     }
 }
+
 ?>

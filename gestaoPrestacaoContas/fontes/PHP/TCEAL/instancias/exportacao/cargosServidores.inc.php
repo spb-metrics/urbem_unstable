@@ -27,7 +27,7 @@
     *
     * @author: Carolina Schwaab Marçal
     *
-    * $Id: cargosServidores.inc.php 60665 2014-11-06 18:59:33Z lisiane $
+    * $Id: cargosServidores.inc.php 64853 2016-04-07 18:27:30Z carlos.silva $
     *
     * @ignore
     *
@@ -68,42 +68,45 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
         $entidade = $codEntidadePrefeitura;
     }
 
-     $stPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
-     $stPeriodoMovimentacao->setDado('dtInicial', $dtInicial);
-     $stPeriodoMovimentacao->setDado('dtFinal', $dtFinal);
-     $stPeriodoMovimentacao->recuperaPeriodoMovimentacaoTCEAL($rsPeriodoMovimentacao);
+    $stPeriodoMovimentacao = new TFolhaPagamentoPeriodoMovimentacao();
+    $stPeriodoMovimentacao->setDado('dtInicial', $dtInicial);
+    $stPeriodoMovimentacao->setDado('dtFinal', $dtFinal);
+    $stPeriodoMovimentacao->recuperaPeriodoMovimentacaoTCEAL($rsPeriodoMovimentacao);
 
-     $rsRecordSet = "rsCargosServidores";
-     $rsRecordSet .= $stEntidade;
-     $$rsRecordSet = new RecordSet();
-
-     $obTTCEALCargosServidores->setDado('dtInicial', $dtInicial);
-     $obTTCEALCargosServidores->setDado('dtFinal', $dtFinal);
-     $obTTCEALCargosServidores->setDado('codPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
-     $obTTCEALCargosServidores->setDado('stExercicio', Sessao::getExercicio());
-     $obTTCEALCargosServidores->setDado('stEntidade', $stEntidade  );
-     $obTTCEALCargosServidores->setDado('inCodEntidade', $inCodEntidade  );
-     $obTTCEALCargosServidores->setDado('entidade', $entidade  );
-
-     $obTTCEALCargosServidores->listarExportacaoCargosServidores($rsRecordSet);
-     
-     $stNomeArquivo = 'CargosServidores';
-     $arResult = array();
-     $idCount = 0;
-
-     while (!$rsRecordSet->eof()) {
-        $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
-        $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua');
-        $arResult[$idCount]['Bimestre'] = $inBimestre;
-        $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
-        $arResult[$idCount]['CodCargo'] = $rsRecordSet->getCampo('cod_cargo');
-        $arResult[$idCount]['Descricao'] = $rsRecordSet->getCampo('descricao');
-
-        $idCount++;
-
-        $rsRecordSet->proximo();
-     }
-      return $arResult;
+    if($rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao') != '') {
+        $rsRecordSet = "rsCargosServidores";
+        $rsRecordSet .= $stEntidade;
+        $$rsRecordSet = new RecordSet();
+    
+        $obTTCEALCargosServidores->setDado('dtInicial', $dtInicial);
+        $obTTCEALCargosServidores->setDado('dtFinal', $dtFinal);
+        $obTTCEALCargosServidores->setDado('codPeriodoMovimentacao', $rsPeriodoMovimentacao->getCampo('cod_periodo_movimentacao'));
+        $obTTCEALCargosServidores->setDado('stExercicio', Sessao::getExercicio());
+        $obTTCEALCargosServidores->setDado('stEntidade', $stEntidade);
+        $obTTCEALCargosServidores->setDado('inCodEntidade', $inCodEntidade);
+        $obTTCEALCargosServidores->setDado('entidade', $entidade);
+    
+        $obTTCEALCargosServidores->listarExportacaoCargosServidores($rsRecordSet);
+       
+        $stNomeArquivo = 'CargosServidores';
+        $arResult = array();
+        $idCount = 0;
+    
+        while (!$rsRecordSet->eof()) {
+            $arResult[$idCount]['CodUndGestora'] = $rsRecordSet->getCampo('cod_und_gestora');
+            $arResult[$idCount]['CodigoUA'] = $rsRecordSet->getCampo('codigo_ua');
+            $arResult[$idCount]['Bimestre'] = $inBimestre;
+            $arResult[$idCount]['Exercicio'] = Sessao::getExercicio();
+            $arResult[$idCount]['CodCargo'] = $rsRecordSet->getCampo('cod_cargo');
+            $arResult[$idCount]['Descricao'] = $rsRecordSet->getCampo('descricao');
+    
+            $idCount++;
+    
+            $rsRecordSet->proximo();
+        }
+        
+        return $arResult;
+    }
 }
    
 ?>
