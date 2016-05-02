@@ -32,31 +32,19 @@
 
     * @ignore
 
-    $Revision: 30805 $
-    $Name$
-    $Autor: $
-    $Date: 2008-01-14 12:37:50 -0200 (Seg, 14 Jan 2008) $
+    $Id: OCGeraRelatorioSituacaoEmpenho.php 65133 2016-04-27 14:20:11Z michel $
 
     * Casos de uso: uc-02.03.13
 */
 
-/*
-$Log$
-Revision 1.8  2007/03/08 15:30:24  rodrigo_sr
-Bug #8616#
-
-Revision 1.7  2006/07/05 20:49:08  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoRelatorioSituacaoEmpenho.class.php"  );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoRelatorioSituacaoEmpenho.class.php";
 
 $obRegra      = new REmpenhoRelatorioSituacaoEmpenho;
 $obPDF        = new ListaPDF( "L" );
 
-$arFiltro = Sessao::read('filtroRelatorio');
+$arFiltro    = Sessao::read('filtroRelatorio');
 $arFiltroNom = Sessao::read('filtroNomRelatorio');
 $rsRecordSet = Sessao::read('rsRecordSet');
 // Adicionar logo nos relatorios
@@ -75,26 +63,26 @@ $obRegra->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->consultar($rsCGM);
 switch ($arFiltro[ 'inSituacao' ]) {
     case 1:
         $stSituacao = "Empenhados";
-        break;
+    break;
     case 2:
         $stSituacao = "Anulados";
-        break;
+    break;
     case 3:
         $stSituacao = "Liquidados";
-        break;
+    break;
     case 4:
         $stSituacao = "A Liquidar";
-        break;
+    break;
     case 5:
         $stSituacao = "Pagos";
-        break;
+    break;
     case 6:
         $stSituacao = "A Pagar";
-        break;
+    break;
     default:
         $stSituacao = "Todos";
 }
-$obPDF->setSubTitulo             ( $stSituacao  );
+$obPDF->setSubTitulo         ( $stSituacao  );
 
 $obPDF->setUsuario           ( Sessao::getUsername() );
 $obPDF->setEnderecoPrefeitura( $arConfiguracao );
@@ -106,24 +94,28 @@ foreach ($arFiltro['inCodEntidade'] as $inCodEntidade) {
 }
 
 switch ($arFiltro['inOrdenacao']) {
-case 1:
-    $stOrdenacao = "Empenho";
+    case 1:
+        $stOrdenacao = "Empenho";
     break;
-case 2:
-    $stOrdenacao = "Credor";
+    case 2:
+        $stOrdenacao = "Credor";
     break;
-case 3:
-    $stOrdenacao = "Data Pagamento";
+    case 3:
+        $stOrdenacao = "Data Pagamento";
     break;
 }
 
-$obPDF->addFiltro('Exercício', $arFiltro['inExercicio']);
+$obPDF->addFiltro('Exercício'             , $arFiltro['inExercicio']);
 $obPDF->addFiltro('Entidades Relacionadas', $arNomEntidade);
-$obPDF->addFiltro('Periodicidade Emissão', $arFiltro['stDataInicialEmissao']." até ".$arFiltro['stDataFinalEmissao']);
-$obPDF->addFiltro('Situação Até', $arFiltro['stDataSituacao']);
+$obPDF->addFiltro('Periodicidade Emissão' , $arFiltro['stDataInicialEmissao']." até ".$arFiltro['stDataFinalEmissao']);
+$obPDF->addFiltro('Situação Até'          , $arFiltro['stDataSituacao']);
 
 if ($arFiltro['inCodTipoEmpenho'] != "") {
-    $obPDF->addFiltro('Tipo de Empenho', SistemaLegado::pegaDado('nom_tipo', 'empenho.tipo_empenho', ' WHERE tipo_empenho.cod_tipo='.$arFiltro['inCodTipoEmpenho']));
+    $obPDF->addFiltro('Tipo de Empenho'   , SistemaLegado::pegaDado('nom_tipo', 'empenho.tipo_empenho', ' WHERE tipo_empenho.cod_tipo='.$arFiltro['inCodTipoEmpenho']));
+}
+if ($arFiltro['inCentroCusto'] && $arFiltro['inCentroCusto'] != ""){
+    $stCentroCusto = $arFiltro['inCentroCusto']." - ".SistemaLegado::pegaDado('descricao', 'almoxarifado.centro_custo', ' WHERE centro_custo.cod_centro='.$arFiltro['inCentroCusto']);
+    $obPDF->addFiltro( 'Centro de Custo' , $stCentroCusto );
 }
 
 if ($arFiltro['inCodDotacao']) {
@@ -157,19 +149,19 @@ if ($arFiltro['inCodFornecedor']) {
 $obPDF->addFiltro( 'Situação'                           , $stSituacao );
 
 $obPDF->setAlinhamento ( "C" );
-$obPDF->addCabecalho("EMPENHO"              , 7, 8);
-$obPDF->addCabecalho("EMISSÃO"              , 6, 8);
+$obPDF->addCabecalho("EMPENHO"           ,  7, 8);
+$obPDF->addCabecalho("EMISSÃO"           ,  6, 8);
 $obPDF->setAlinhamento ( "L" );
-$obPDF->addCabecalho("CREDOR"               ,16, 8);
+$obPDF->addCabecalho("CREDOR"            , 16, 8);
 $obPDF->setAlinhamento ( "R" );
-$obPDF->addCabecalho("EMPENHADO"            , 8, 8);
-$obPDF->addCabecalho("ANULADO"              , 8, 8);
-$obPDF->addCabecalho("SALDO EMPENHADO"      , 10, 8);
-$obPDF->addCabecalho("LIQUIDADO"            , 10, 8);
-$obPDF->addCabecalho("A LIQUIDAR"           , 8, 8);
-$obPDF->addCabecalho("PAGO"                 , 6, 8);
-$obPDF->addCabecalho("EMPENHADO A PAGAR"    , 10, 8);
-$obPDF->addCabecalho("LIQUIDADO A PAGAR"    , 10, 8);
+$obPDF->addCabecalho("EMPENHADO"         ,  8, 8);
+$obPDF->addCabecalho("ANULADO"           ,  8, 8);
+$obPDF->addCabecalho("SALDO EMPENHADO"   , 10, 8);
+$obPDF->addCabecalho("LIQUIDADO"         , 10, 8);
+$obPDF->addCabecalho("A LIQUIDAR"        ,  8, 8);
+$obPDF->addCabecalho("PAGO"              ,  6, 8);
+$obPDF->addCabecalho("EMPENHADO A PAGAR" , 10, 8);
+$obPDF->addCabecalho("LIQUIDADO A PAGAR" , 10, 8);
 $obPDF->addQuebraLinha("nivel",2,5);
 
 $obPDF->setAlinhamento ( "C" );
@@ -180,7 +172,7 @@ $obPDF->addCampo("credor"           , 6 );
 $obPDF->setAlinhamento ( "R" );
 $obPDF->addCampo("empenhado"        , 7 );
 $obPDF->addCampo("anulado"          , 7 );
-$obPDF->addCampo("saldoempenhado"        , 7 );
+$obPDF->addCampo("saldoempenhado"   , 7 );
 $obPDF->addCampo("liquidado"        , 7 );
 $obPDF->addCampo("aliquidar"        , 7 );
 $obPDF->addCampo("pago"             , 7 );
@@ -189,7 +181,7 @@ $obPDF->addCampo("liquidadoapagar"  , 7 );
 
 $arAssinaturas = Sessao::read('assinaturas');
 if ( count($arAssinaturas['selecionadas']) > 0 ) {
-    include_once( CAM_FW_PDF."RAssinaturas.class.php" );
+    include_once CAM_FW_PDF."RAssinaturas.class.php";
     $obRAssinaturas = new RAssinaturas;
     $obRAssinaturas->setArAssinaturas( $arAssinaturas['selecionadas'] );
     $obPDF->setAssinaturasDefinidas( $obRAssinaturas->getArAssinaturas() );
@@ -197,6 +189,4 @@ if ( count($arAssinaturas['selecionadas']) > 0 ) {
 }
 
 $obPDF->show();
-//$obPDF->montaPDF();
-//$obPDF->OutPut();
 ?>

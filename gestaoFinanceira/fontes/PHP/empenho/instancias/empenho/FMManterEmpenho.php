@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenho.php 64400 2016-02-16 16:00:53Z arthur $
+    $Id: FMManterEmpenho.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -143,9 +143,16 @@ if ($inCodCategoria == 2 || $inCodCategoria == 3) {
 }
 
 $arItens = array();
+
 foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $nuVlUnitario = ($obItemPreEmpenho->getValorTotal()/$obItemPreEmpenho->getQuantidade());
     $nuVlUnitario = number_format($nuVlUnitario,4,',','.');
+
+    $inCodMarca = $obItemPreEmpenho->getCodigoMarca();
+    $stDescrisaoItemMarca = '';
+    if(!empty($inCodMarca)){
+        $stDescrisaoItemMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', " WHERE cod_marca = ".$inCodMarca, $boTransacao);
+    }
 
     $arItens[$inCount]['num_item']     = $obItemPreEmpenho->getNumItem();
     $arItens[$inCount]['nom_item']     = $obItemPreEmpenho->getNomItem();
@@ -154,6 +161,8 @@ foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['cod_unidade']  = $obItemPreEmpenho->obRUnidadeMedida->getCodUnidade();
     $arItens[$inCount]['cod_grandeza'] = $obItemPreEmpenho->obRUnidadeMedida->obRGrandeza->getCodGrandeza();
     $arItens[$inCount]['nom_unidade']  = $obItemPreEmpenho->getNomUnidade();
+    $arItens[$inCount]['cod_marca']    = $inCodMarca;
+    $arItens[$inCount]['nome_marca']   = $stDescrisaoItemMarca;    
     $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
     $arItens[$inCount]['vl_unitario']  = $nuVlUnitario;
     if($obItemPreEmpenho->getCodItemPreEmp()!='')

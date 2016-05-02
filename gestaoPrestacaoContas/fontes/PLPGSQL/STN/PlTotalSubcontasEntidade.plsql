@@ -23,15 +23,14 @@
 /**
     * Data de Criação   : 08/10/2007
 
-
     * @author 
 
     * @ignore
 
-     * Casos de uso : uc-06.01.20
+    $Id: PlTotalSubcontasEntidade.plsql 65154 2016-04-28 17:12:23Z michel $
+
+    * Casos de uso : uc-06.01.20
 */
-
-
 
 CREATE OR REPLACE FUNCTION stn.pl_total_subcontas_entidade ( varchar, varchar ) RETURNS SETOF RECORD AS $$
 
@@ -69,27 +68,26 @@ BEGIN
             stPl    := '_novo';
             stConta := '';
             stContaDedutora := '';
-            
+
             --ALTERACOES PARA 2016 buscar as datas de acordo com o filtro
             IF inExercicio >= 2016 THEN
                 i := 12;
                 WHILE i >= 1 LOOP
-                    if ( inMes < 10 ) then
+                    IF ( inMes < 10 ) THEN
                         stMes := '0' || inMes;
-                    else
+                    ELSE
                         stMes := inMes;
-                    end if;
-                
+                    END IF;
+
                     arDatas[i] :=  '01/' || stMes || '/'|| inAno;
-                
+
                     i := i - 1;
                     inMes := inMes - 1;
-                    if ( inMes = 0 ) then
+                    IF ( inMes = 0 ) THEN
                         inAno := inAno -1;
                         inMes := 12;
-                    end if;
+                    END IF;
                 END LOOP;
-            
             END IF;--IF inExercicio >= 2016 
         END IF;--IF inExercicio > 2012
 
@@ -186,6 +184,7 @@ BEGIN
                 AND lote.tipo           = lan.tipo 
 
                 )';
+
         EXECUTE stSql;
 
         --- Linha   RECEITAS CORRENTES(I)
@@ -593,56 +592,6 @@ BEGIN
             ';
             
             END IF;
-            
-            
-           stSql := stSql || '
-                    UNION 
-                    select 1 AS ordem
-                         , cast( 0 as varchar ) AS cod_conta
-                         , cast(''(R) DEDUCOES DA RECEITA CORRENTE'' as varchar) as nom_conta
-                         , cast(''4.9.0.0.0.00.00.00.00.00''  as varchar) as cod_estrutural
-                         , cast( retorno.mes_1  as numeric ) * -1  
-                         , cast( retorno.mes_2  as numeric ) * -1 
-                         , cast( retorno.mes_3  as numeric ) * -1 
-                         , cast( retorno.mes_4  as numeric ) * -1 
-                         , cast( retorno.mes_5  as numeric ) * -1 
-                         , cast( retorno.mes_6  as numeric ) * -1 
-                         , cast( retorno.mes_7  as numeric ) * -1 
-                         , cast( retorno.mes_8  as numeric ) * -1 
-                         , cast( retorno.mes_9  as numeric ) * -1 
-                         , cast( retorno.mes_10 as numeric ) * -1 
-                         , cast( retorno.mes_11 as numeric ) * -1 
-                         , cast( retorno.mes_12 as numeric ) * -1 
-                         , cast(0 as numeric) as total_mes_1
-                         , cast(0 as numeric) as total_mes_2
-                         , cast(0 as numeric) as total_mes_3
-                         , cast(0 as numeric) as total_mes_4
-                         , cast(0 as numeric) as total_mes_5
-                         , cast(0 as numeric) as total_mes_6
-                         , cast(0 as numeric) as total_mes_7
-                         , cast(0 as numeric) as total_mes_8
-                         , cast(0 as numeric) as total_mes_9
-                         , cast(0 as numeric) as total_mes_10
-                         , cast(0 as numeric) as total_mes_11
-                         , cast(0 as numeric) as total_mes_12
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.04.31.02'', 8)
-                          as retorno ( cod_conta       varchar
-                                       ,nom_conta      varchar
-                                       ,cod_estrutural varchar
-                                       ,mes_1          numeric
-                                       ,mes_2          numeric
-                                       ,mes_3          numeric
-                                       ,mes_4          numeric
-                                       ,mes_5          numeric
-                                       ,mes_6          numeric
-                                       ,mes_7          numeric
-                                       ,mes_8          numeric
-                                       ,mes_9          numeric
-                                       ,mes_10         numeric
-                                       ,mes_11         numeric
-                                       ,mes_12         numeric)                                      
-
-            ';
        
         --
         -- recupera as receitas q devem ir na compensacao 
@@ -714,7 +663,6 @@ BEGIN
     
             ';
         END LOOP;
-
  
         stSql := stSql || '                                       
 
@@ -1135,67 +1083,67 @@ BEGIN
         
         stSql := stSql || '
 
-                union               
-                            select
-                                 ordem 
-                                ,cast(1 as varchar) as cod_conta
-                                ,nom_conta
-                                ,cod_estrutural
-                                ,mes_1
-                                ,mes_2
-                                ,mes_3
-                                ,mes_4
-                                ,mes_5
-                                ,mes_6
-                                ,mes_7
-                                ,mes_8
-                                ,mes_9
-                                ,mes_10
-                                ,mes_11
-                                ,mes_12
-                                ,total_mes_1
-                                ,total_mes_2
-                                ,total_mes_3
-                                ,total_mes_4
-                                ,total_mes_5
-                                ,total_mes_6
-                                ,total_mes_7
-                                ,total_mes_8
-                                ,total_mes_9
-                                ,total_mes_10
-                                ,total_mes_11
-                                ,total_mes_12
-                            from    
-                            ( select 2 as ordem ,cast( retorno.cod_conta as varchar ) 
-                                       ,cast(''DEDUÇÃO DA RECEITA PARA FORMAÇÃO DO FUNDEB'' as varchar) as nom_conta     
-                                       ,cast( case when retorno.cod_estrutural like ''4.9.0.0.0.00.00.00.00.00''
-                                                  then ''4.9.7.0.0.00.00.00.00.00'' end as varchar ) as cod_estrutural
-                                       ,cast( retorno.mes_1  as numeric )        
-                                       ,cast( retorno.mes_2  as numeric )        
-                                       ,cast( retorno.mes_3  as numeric )        
-                                       ,cast( retorno.mes_4  as numeric )        
-                                       ,cast( retorno.mes_5  as numeric )        
-                                       ,cast( retorno.mes_6  as numeric )        
-                                       ,cast( retorno.mes_7  as numeric )        
-                                       ,cast( retorno.mes_8  as numeric )        
-                                       ,cast( retorno.mes_9  as numeric )        
-                                       ,cast( retorno.mes_10 as numeric )        
-                                       ,cast( retorno.mes_11 as numeric )        
-                                       ,cast( retorno.mes_12 as numeric )
-                                                ,cast(0 as numeric) as total_mes_1         
-                                                ,cast(0 as numeric) as total_mes_2         
-                                                ,cast(0 as numeric) as total_mes_3         
-                                                ,cast(0 as numeric) as total_mes_4         
-                                                ,cast(0 as numeric) as total_mes_5         
-                                                ,cast(0 as numeric) as total_mes_6         
-                                                ,cast(0 as numeric) as total_mes_7         
-                                                ,cast(0 as numeric) as total_mes_8         
-                                                ,cast(0 as numeric) as total_mes_9         
-                                                ,cast(0 as numeric) as total_mes_10        
-                                                ,cast(0 as numeric) as total_mes_11        
-                                                ,cast(0 as numeric) as total_mes_12        
-                            from stn.sub_consulta_rcl_dedutora ('|| quote_literal(dtData) ||' ,''4.9'', 2)
-                                    as retorno ( cod_conta       varchar
+                union
+                    select ordem
+                         , cast(1 as varchar) as cod_conta
+                         , nom_conta
+                         , cod_estrutural
+                         , mes_1
+                         , mes_2
+                         , mes_3
+                         , mes_4
+                         , mes_5
+                         , mes_6
+                         , mes_7
+                         , mes_8
+                         , mes_9
+                         , mes_10
+                         , mes_11
+                         , mes_12
+                         , total_mes_1
+                         , total_mes_2
+                         , total_mes_3
+                         , total_mes_4
+                         , total_mes_5
+                         , total_mes_6
+                         , total_mes_7
+                         , total_mes_8
+                         , total_mes_9
+                         , total_mes_10
+                         , total_mes_11
+                         , total_mes_12
+                      from
+                           ( select 2 as ordem
+                                  , cast( retorno.cod_conta as varchar )
+                                  , cast(''DEDUÇÃO DA RECEITA PARA FORMAÇÃO DO FUNDEB'' as varchar) as nom_conta
+                                  , cast( case when retorno.cod_estrutural like ''4.9.0.0.0.00.00.00.00.00''
+                                               then ''4.9.7.0.0.00.00.00.00.00'' end as varchar ) as cod_estrutural
+                                  , cast( retorno.mes_1  as numeric )
+                                  , cast( retorno.mes_2  as numeric )
+                                  , cast( retorno.mes_3  as numeric )
+                                  , cast( retorno.mes_4  as numeric )
+                                  , cast( retorno.mes_5  as numeric )
+                                  , cast( retorno.mes_6  as numeric )
+                                  , cast( retorno.mes_7  as numeric )
+                                  , cast( retorno.mes_8  as numeric )
+                                  , cast( retorno.mes_9  as numeric )
+                                  , cast( retorno.mes_10 as numeric )
+                                  , cast( retorno.mes_11 as numeric )
+                                  , cast( retorno.mes_12 as numeric )
+                                  , cast(0 as numeric) as total_mes_1
+                                  , cast(0 as numeric) as total_mes_2
+                                  , cast(0 as numeric) as total_mes_3
+                                  , cast(0 as numeric) as total_mes_4
+                                  , cast(0 as numeric) as total_mes_5
+                                  , cast(0 as numeric) as total_mes_6
+                                  , cast(0 as numeric) as total_mes_7
+                                  , cast(0 as numeric) as total_mes_8
+                                  , cast(0 as numeric) as total_mes_9
+                                  , cast(0 as numeric) as total_mes_10
+                                  , cast(0 as numeric) as total_mes_11
+                                  , cast(0 as numeric) as total_mes_12
+                               from stn.sub_consulta_rcl_dedutora ('|| quote_literal(dtData) ||' ,''4.9'', 2)
+                                    as retorno ( cod_conta      varchar
                                                 ,nom_conta      varchar
                                                 ,cod_estrutural varchar
                                                 ,mes_1          numeric
@@ -1209,53 +1157,54 @@ BEGIN
                                                 ,mes_9          numeric
                                                 ,mes_10         numeric
                                                 ,mes_11         numeric
-                                                ,mes_12         numeric)  ) as dedu
-                            group by
-                                 ordem 
-                                ,nom_conta
-                                ,cod_estrutural
-                                ,mes_1
-                                ,mes_2
-                                ,mes_3
-                                ,mes_4
-                                ,mes_5
-                                ,mes_6
-                                ,mes_7
-                                ,mes_8
-                                ,mes_9
-                                ,mes_10
-                                ,mes_11
-                                ,mes_12
-                                ,total_mes_1
-                                ,total_mes_2
-                                ,total_mes_3
-                                ,total_mes_4
-                                ,total_mes_5
-                                ,total_mes_6
-                                ,total_mes_7
-                                ,total_mes_8
-                                ,total_mes_9
-                                ,total_mes_10
-                                ,total_mes_11
-                                ,total_mes_12
+                                                ,mes_12         numeric)
+                           ) as dedu
+                  group by ordem
+                         , nom_conta
+                         , cod_estrutural
+                         , mes_1
+                         , mes_2
+                         , mes_3
+                         , mes_4
+                         , mes_5
+                         , mes_6
+                         , mes_7
+                         , mes_8
+                         , mes_9
+                         , mes_10
+                         , mes_11
+                         , mes_12
+                         , total_mes_1
+                         , total_mes_2
+                         , total_mes_3
+                         , total_mes_4
+                         , total_mes_5
+                         , total_mes_6
+                         , total_mes_7
+                         , total_mes_8
+                         , total_mes_9
+                         , total_mes_10
+                         , total_mes_11
+                         , total_mes_12
 
                 --- Linha IPTU
                 union
-                    select 3 as ordem  , retorno.* 
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.02'', 6)
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.02'', 6)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1270,70 +1219,39 @@ BEGIN
                                        ,mes_10         numeric
                                        ,mes_11         numeric
                                        ,mes_12         numeric )
-                                       
+
                 --- Linha ISS
                 union
-                    select 3 as ordem  ,cast( retorno.cod_conta as varchar ) 
-                                       ,cast( ''Iss'' as varchar ) as nom_conta
-                                       ,cast( retorno.cod_estrutural as varchar ) as cod_estrutural
-                                       ,cast( retorno.mes_1  as numeric )        
-                                       ,cast( retorno.mes_2  as numeric )        
-                                       ,cast( retorno.mes_3  as numeric )        
-                                       ,cast( retorno.mes_4  as numeric )        
-                                       ,cast( retorno.mes_5  as numeric )        
-                                       ,cast( retorno.mes_6  as numeric )        
-                                       ,cast( retorno.mes_7  as numeric )        
-                                       ,cast( retorno.mes_8  as numeric )        
-                                       ,cast( retorno.mes_9  as numeric )        
-                                       ,cast( retorno.mes_10 as numeric )        
-                                       ,cast( retorno.mes_11 as numeric )        
-                                       ,cast( retorno.mes_12 as numeric )
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.3'', 5)
-                          as retorno ( cod_conta       varchar
-                                       ,nom_conta      varchar
-                                       ,cod_estrutural varchar
-                                       ,mes_1          numeric
-                                       ,mes_2          numeric
-                                       ,mes_3          numeric
-                                       ,mes_4          numeric
-                                       ,mes_5          numeric
-                                       ,mes_6          numeric
-                                       ,mes_7          numeric
-                                       ,mes_8          numeric
-                                       ,mes_9          numeric
-                                       ,mes_10         numeric
-                                       ,mes_11         numeric
-                                       ,mes_12         numeric )                    
-                   
-                --- Linha ITBI   
-                union
-                    select 3 as ordem  , retorno.* 
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.08'', 6)
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , cast( retorno.cod_conta as varchar )
+                         , cast( ''Iss'' as varchar ) as nom_conta
+                         , cast( retorno.cod_estrutural as varchar ) as cod_estrutural
+                         , cast( retorno.mes_1  as numeric )
+                         , cast( retorno.mes_2  as numeric )
+                         , cast( retorno.mes_3  as numeric )
+                         , cast( retorno.mes_4  as numeric )
+                         , cast( retorno.mes_5  as numeric )
+                         , cast( retorno.mes_6  as numeric )
+                         , cast( retorno.mes_7  as numeric )
+                         , cast( retorno.mes_8  as numeric )
+                         , cast( retorno.mes_9  as numeric )
+                         , cast( retorno.mes_10 as numeric )
+                         , cast( retorno.mes_11 as numeric )
+                         , cast( retorno.mes_12 as numeric )
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.3'', 5)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1348,38 +1266,25 @@ BEGIN
                                        ,mes_10         numeric
                                        ,mes_11         numeric
                                        ,mes_12         numeric )
-                                       
-                --- Linha IRRF
+
+                --- Linha ITBI   
                 union
-                    select 3 as ordem  ,cast( retorno.cod_conta as varchar ) 
-                                       ,cast( ''IRRF''  as varchar ) as nom_conta
-                                       ,cast( retorno.cod_estrutural as varchar ) as cod_estrutural
-                                       ,cast( retorno.mes_1  as numeric )        
-                                       ,cast( retorno.mes_2  as numeric )        
-                                       ,cast( retorno.mes_3  as numeric )        
-                                       ,cast( retorno.mes_4  as numeric )        
-                                       ,cast( retorno.mes_5  as numeric )        
-                                       ,cast( retorno.mes_6  as numeric )        
-                                       ,cast( retorno.mes_7  as numeric )        
-                                       ,cast( retorno.mes_8  as numeric )        
-                                       ,cast( retorno.mes_9  as numeric )        
-                                       ,cast( retorno.mes_10 as numeric )        
-                                       ,cast( retorno.mes_11 as numeric )        
-                                       ,cast( retorno.mes_12 as numeric )
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.04'', 6)
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.08'', 6)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1393,39 +1298,87 @@ BEGIN
                                        ,mes_9          numeric
                                        ,mes_10         numeric
                                        ,mes_11         numeric
-                                       ,mes_12         numeric )                    
+                                       ,mes_12         numeric )
+
+                --- Linha IRRF
+                union
+                    select 3 as ordem
+                         , cast( retorno.cod_conta as varchar )
+                         , cast( ''IRRF''  as varchar ) as nom_conta
+                         , cast( retorno.cod_estrutural as varchar ) as cod_estrutural
+                         , cast( retorno.mes_1  as numeric )
+                         , cast( retorno.mes_2  as numeric )
+                         , cast( retorno.mes_3  as numeric )
+                         , cast( retorno.mes_4  as numeric )
+                         , cast( retorno.mes_5  as numeric )
+                         , cast( retorno.mes_6  as numeric )
+                         , cast( retorno.mes_7  as numeric )
+                         , cast( retorno.mes_8  as numeric )
+                         , cast( retorno.mes_9  as numeric )
+                         , cast( retorno.mes_10 as numeric )
+                         , cast( retorno.mes_11 as numeric )
+                         , cast( retorno.mes_12 as numeric )
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.1.1.2.04'', 6)
+                           as retorno ( cod_conta      varchar
+                                       ,nom_conta      varchar
+                                       ,cod_estrutural varchar
+                                       ,mes_1          numeric
+                                       ,mes_2          numeric
+                                       ,mes_3          numeric
+                                       ,mes_4          numeric
+                                       ,mes_5          numeric
+                                       ,mes_6          numeric
+                                       ,mes_7          numeric
+                                       ,mes_8          numeric
+                                       ,mes_9          numeric
+                                       ,mes_10         numeric
+                                       ,mes_11         numeric
+                                       ,mes_12         numeric )
 
                  --- Linha Deducoes da Receita Tributaria
                 union
-                    select 3 as ordem  ,cast( retorno.cod_conta as varchar ) 
-                                       ,cast( ''Deduções da Receita Tributária''  as varchar ) as nom_conta
-                                       ,cast( ''4.1.1.1.9.99.99.99.99.99'' as varchar ) as cod_estrutural
-                                       ,cast( retorno.mes_1  as numeric ) * -1       
-                                       ,cast( retorno.mes_2  as numeric ) * -1       
-                                       ,cast( retorno.mes_3  as numeric ) * -1       
-                                       ,cast( retorno.mes_4  as numeric ) * -1       
-                                       ,cast( retorno.mes_5  as numeric ) * -1       
-                                       ,cast( retorno.mes_6  as numeric ) * -1       
-                                       ,cast( retorno.mes_7  as numeric ) * -1       
-                                       ,cast( retorno.mes_8  as numeric ) * -1       
-                                       ,cast( retorno.mes_9  as numeric ) * -1       
-                                       ,cast( retorno.mes_10 as numeric ) * -1       
-                                       ,cast( retorno.mes_11 as numeric ) * -1       
-                                       ,cast( retorno.mes_12 as numeric ) * -1  
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''9.1.1'', 3)
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , cast( retorno.cod_conta as varchar )
+                         , cast( ''Deduções da Receita Tributária''  as varchar ) as nom_conta
+                         , cast( ''4.1.1.1.9.99.99.99.99.99'' as varchar ) as cod_estrutural
+                         , cast( retorno.mes_1  as numeric ) * -1
+                         , cast( retorno.mes_2  as numeric ) * -1
+                         , cast( retorno.mes_3  as numeric ) * -1
+                         , cast( retorno.mes_4  as numeric ) * -1
+                         , cast( retorno.mes_5  as numeric ) * -1
+                         , cast( retorno.mes_6  as numeric ) * -1
+                         , cast( retorno.mes_7  as numeric ) * -1
+                         , cast( retorno.mes_8  as numeric ) * -1
+                         , cast( retorno.mes_9  as numeric ) * -1
+                         , cast( retorno.mes_10 as numeric ) * -1
+                         , cast( retorno.mes_11 as numeric ) * -1
+                         , cast( retorno.mes_12 as numeric ) * -1
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''9.1.1'', 3)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1439,40 +1392,40 @@ BEGIN
                                        ,mes_9          numeric
                                        ,mes_10         numeric
                                        ,mes_11         numeric
-                                       ,mes_12         numeric )                                                          
-                                       
+                                       ,mes_12         numeric )
+
                     --- Sub COnta de receita: COTA-PARTE DO FPM
                 union
-                    select 3 as ordem 
-                                       ,cast( retorno.cod_conta         as varchar  ) 
-                                       ,cast( initcap(retorno.nom_conta) as varchar )
-                                       ,cast( retorno.cod_estrutural    as varchar )
-                                       ,cast( retorno.mes_1             as numeric )        
-                                       ,cast( retorno.mes_2             as numeric )        
-                                       ,cast( retorno.mes_3             as numeric )        
-                                       ,cast( retorno.mes_4             as numeric )        
-                                       ,cast( retorno.mes_5             as numeric )        
-                                       ,cast( retorno.mes_6             as numeric )        
-                                       ,cast( retorno.mes_7             as numeric )        
-                                       ,cast( retorno.mes_8             as numeric )        
-                                       ,cast( retorno.mes_9             as numeric )        
-                                       ,cast( retorno.mes_10            as numeric )        
-                                       ,cast( retorno.mes_11            as numeric )        
-                                       ,cast( retorno.mes_12            as numeric )
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12        
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.01.02'', 7)                                                                 
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , cast( retorno.cod_conta         as varchar  )
+                         , cast( initcap(retorno.nom_conta) as varchar )
+                         , cast( retorno.cod_estrutural    as varchar )
+                         , cast( retorno.mes_1             as numeric )
+                         , cast( retorno.mes_2             as numeric )
+                         , cast( retorno.mes_3             as numeric )
+                         , cast( retorno.mes_4             as numeric )
+                         , cast( retorno.mes_5             as numeric )
+                         , cast( retorno.mes_6             as numeric )
+                         , cast( retorno.mes_7             as numeric )
+                         , cast( retorno.mes_8             as numeric )
+                         , cast( retorno.mes_9             as numeric )
+                         , cast( retorno.mes_10            as numeric )
+                         , cast( retorno.mes_11            as numeric )
+                         , cast( retorno.mes_12            as numeric )
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.01.02'', 7)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1487,24 +1440,24 @@ BEGIN
                                        ,mes_10         numeric
                                        ,mes_11         numeric
                                        ,mes_12         numeric)
-                                       
 
                 union
-                    select 3 as ordem , retorno.* 
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12         
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.36'', 6)                                                                 
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.36'', 6)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1519,125 +1472,124 @@ BEGIN
                                        ,mes_10         numeric
                                        ,mes_11         numeric
                                        ,mes_12         numeric)
-                                       
-                union                                       
 
-                    select 3 as ordem , retorno.* 
-                        ,cast(0 as numeric) as total_mes_1         
-                        ,cast(0 as numeric) as total_mes_2         
-                        ,cast(0 as numeric) as total_mes_3         
-                        ,cast(0 as numeric) as total_mes_4         
-                        ,cast(0 as numeric) as total_mes_5         
-                        ,cast(0 as numeric) as total_mes_6         
-                        ,cast(0 as numeric) as total_mes_7         
-                        ,cast(0 as numeric) as total_mes_8         
-                        ,cast(0 as numeric) as total_mes_9         
-                        ,cast(0 as numeric) as total_mes_10        
-                        ,cast(0 as numeric) as total_mes_11        
-                        ,cast(0 as numeric) as total_mes_12         
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.01.05'', 7)                                                                 
-                    as retorno ( cod_conta       varchar
-                        ,nom_conta      varchar
-                        ,cod_estrutural varchar
-                        ,mes_1          numeric
-                        ,mes_2          numeric
-                        ,mes_3          numeric
-                        ,mes_4          numeric
-                        ,mes_5          numeric
-                        ,mes_6          numeric
-                        ,mes_7          numeric
-                        ,mes_8          numeric
-                        ,mes_9          numeric
-                        ,mes_10         numeric
-                        ,mes_11         numeric
-                        ,mes_12         numeric)
+                union
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.1.01.05'', 7)
+                           as retorno ( cod_conta      varchar
+                                       ,nom_conta      varchar
+                                       ,cod_estrutural varchar
+                                       ,mes_1          numeric
+                                       ,mes_2          numeric
+                                       ,mes_3          numeric
+                                       ,mes_4          numeric
+                                       ,mes_5          numeric
+                                       ,mes_6          numeric
+                                       ,mes_7          numeric
+                                       ,mes_8          numeric
+                                       ,mes_9          numeric
+                                       ,mes_10         numeric
+                                       ,mes_11         numeric
+                                       ,mes_12         numeric)
 
-                union                                       
+                union
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.4.02'', 7)
+                           as retorno ( cod_conta      varchar
+                                       ,nom_conta      varchar
+                                       ,cod_estrutural varchar
+                                       ,mes_1          numeric
+                                       ,mes_2          numeric
+                                       ,mes_3          numeric
+                                       ,mes_4          numeric
+                                       ,mes_5          numeric
+                                       ,mes_6          numeric
+                                       ,mes_7          numeric
+                                       ,mes_8          numeric
+                                       ,mes_9          numeric
+                                       ,mes_10         numeric
+                                       ,mes_11         numeric
+                                       ,mes_12         numeric)
 
-                    select 3 as ordem , retorno.* 
-                        ,cast(0 as numeric) as total_mes_1         
-                        ,cast(0 as numeric) as total_mes_2         
-                        ,cast(0 as numeric) as total_mes_3         
-                        ,cast(0 as numeric) as total_mes_4         
-                        ,cast(0 as numeric) as total_mes_5         
-                        ,cast(0 as numeric) as total_mes_6         
-                        ,cast(0 as numeric) as total_mes_7         
-                        ,cast(0 as numeric) as total_mes_8         
-                        ,cast(0 as numeric) as total_mes_9         
-                        ,cast(0 as numeric) as total_mes_10        
-                        ,cast(0 as numeric) as total_mes_11        
-                        ,cast(0 as numeric) as total_mes_12         
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.4.02'', 7)                                                                 
-                    as retorno ( cod_conta       varchar
-                        ,nom_conta      varchar
-                        ,cod_estrutural varchar
-                        ,mes_1          numeric
-                        ,mes_2          numeric
-                        ,mes_3          numeric
-                        ,mes_4          numeric
-                        ,mes_5          numeric
-                        ,mes_6          numeric
-                        ,mes_7          numeric
-                        ,mes_8          numeric
-                        ,mes_9          numeric
-                        ,mes_10         numeric
-                        ,mes_11         numeric
-                        ,mes_12         numeric)
+                union
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.4.0'', 5)
+                           as retorno ( cod_conta      varchar
+                                       ,nom_conta      varchar
+                                       ,cod_estrutural varchar
+                                       ,mes_1          numeric
+                                       ,mes_2          numeric
+                                       ,mes_3          numeric
+                                       ,mes_4          numeric
+                                       ,mes_5          numeric
+                                       ,mes_6          numeric
+                                       ,mes_7          numeric
+                                       ,mes_8          numeric
+                                       ,mes_9          numeric
+                                       ,mes_10         numeric
+                                       ,mes_11         numeric
+                                       ,mes_12         numeric)
+                     where cod_estrutural not like ''4.1.7.2.4.99%''
 
-                        
-                union                                                   
-
-                    select 3 as ordem , retorno.* 
-                        ,cast(0 as numeric) as total_mes_1         
-                        ,cast(0 as numeric) as total_mes_2         
-                        ,cast(0 as numeric) as total_mes_3         
-                        ,cast(0 as numeric) as total_mes_4         
-                        ,cast(0 as numeric) as total_mes_5         
-                        ,cast(0 as numeric) as total_mes_6         
-                        ,cast(0 as numeric) as total_mes_7         
-                        ,cast(0 as numeric) as total_mes_8         
-                        ,cast(0 as numeric) as total_mes_9         
-                        ,cast(0 as numeric) as total_mes_10        
-                        ,cast(0 as numeric) as total_mes_11        
-                        ,cast(0 as numeric) as total_mes_12         
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.4.0'', 5)                                                                 
-                    as retorno ( cod_conta       varchar
-                        ,nom_conta      varchar
-                        ,cod_estrutural varchar
-                        ,mes_1          numeric
-                        ,mes_2          numeric
-                        ,mes_3          numeric
-                        ,mes_4          numeric
-                        ,mes_5          numeric
-                        ,mes_6          numeric
-                        ,mes_7          numeric
-                        ,mes_8          numeric
-                        ,mes_9          numeric
-                        ,mes_10         numeric
-                        ,mes_11         numeric
-                        ,mes_12         numeric)
-                    where
-                        cod_estrutural not like ''4.1.7.2.4.99%''
-                        
                 union
                     -- sub contas de Transferencias correntes
-                    -- Cota-Parte FPM, Cota-Parte ICMS, Cota-Parte IPVA, Transferencias do FUNDEF, 
+                    -- Cota-Parte FPM, Cota-Parte ICMS, Cota-Parte IPVA, Transferencias do FUNDEF,
                     -- Outras Transferencias Correntes
-                    select 3 as ordem , retorno.* 
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12         
-                    from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.2.01'', 7)                                                                 
-                          as retorno ( cod_conta       varchar
+                    select 3 as ordem
+                         , retorno.*
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
+                      from stn.sub_consulta_rcl'||stPl||'('|| quote_literal(dtData) ||' ,''4.1.7.2.2.01'', 7)
+                           as retorno ( cod_conta      varchar
                                        ,nom_conta      varchar
                                        ,cod_estrutural varchar
                                        ,mes_1          numeric
@@ -1652,70 +1604,70 @@ BEGIN
                                        ,mes_10         numeric
                                        ,mes_11         numeric
                                        ,mes_12         numeric)
-                    where cod_estrutural not in (''4.1.7.2.2.01.04.00.00.00'', 
-                                                 ''4.1.7.2.2.01.13.00.00.00'',''4.1.7.2.2.01.99.00.00.00'')
+                     where cod_estrutural not in (''4.1.7.2.2.01.04.00.00.00'',
+                                                  ''4.1.7.2.2.01.13.00.00.00'',
+                                                  ''4.1.7.2.2.01.99.00.00.00'')
 
                 union all
-                    select  3 as ordem
-                           ,cast(0  as varchar) as cod_conta   
-                           ,cast(''Outras Transferências Correntes.'' as varchar) as nom_conta     
-                           ,cast(''4.1.7.2.4.01.99.00.00.00''  as varchar) as cod_estrutural
-                           ,cast(0 as numeric) as mes_1         
-                           ,cast(0 as numeric) as mes_2         
-                           ,cast(0 as numeric) as mes_3         
-                           ,cast(0 as numeric) as mes_4         
-                           ,cast(0 as numeric) as mes_5         
-                           ,cast(0 as numeric) as mes_6         
-                           ,cast(0 as numeric) as mes_7         
-                           ,cast(0 as numeric) as mes_8         
-                           ,cast(0 as numeric) as mes_9         
-                           ,cast(0 as numeric) as mes_10        
-                           ,cast(0 as numeric) as mes_11        
-                           ,cast(0 as numeric) as mes_12        
-                                       ,cast(0 as numeric) as total_mes_1         
-                                       ,cast(0 as numeric) as total_mes_2         
-                                       ,cast(0 as numeric) as total_mes_3         
-                                       ,cast(0 as numeric) as total_mes_4         
-                                       ,cast(0 as numeric) as total_mes_5         
-                                       ,cast(0 as numeric) as total_mes_6         
-                                       ,cast(0 as numeric) as total_mes_7         
-                                       ,cast(0 as numeric) as total_mes_8         
-                                       ,cast(0 as numeric) as total_mes_9         
-                                       ,cast(0 as numeric) as total_mes_10        
-                                       ,cast(0 as numeric) as total_mes_11        
-                                       ,cast(0 as numeric) as total_mes_12       
+                    select 3 as ordem
+                         , cast(0  as varchar) as cod_conta
+                         , cast(''Outras Transferências Correntes.'' as varchar) as nom_conta
+                         , cast(''4.1.7.2.4.01.99.00.00.00''  as varchar) as cod_estrutural
+                         , cast(0 as numeric) as mes_1
+                         , cast(0 as numeric) as mes_2
+                         , cast(0 as numeric) as mes_3
+                         , cast(0 as numeric) as mes_4
+                         , cast(0 as numeric) as mes_5
+                         , cast(0 as numeric) as mes_6
+                         , cast(0 as numeric) as mes_7
+                         , cast(0 as numeric) as mes_8
+                         , cast(0 as numeric) as mes_9
+                         , cast(0 as numeric) as mes_10
+                         , cast(0 as numeric) as mes_11
+                         , cast(0 as numeric) as mes_12
+                         , cast(0 as numeric) as total_mes_1
+                         , cast(0 as numeric) as total_mes_2
+                         , cast(0 as numeric) as total_mes_3
+                         , cast(0 as numeric) as total_mes_4
+                         , cast(0 as numeric) as total_mes_5
+                         , cast(0 as numeric) as total_mes_6
+                         , cast(0 as numeric) as total_mes_7
+                         , cast(0 as numeric) as total_mes_8
+                         , cast(0 as numeric) as total_mes_9
+                         , cast(0 as numeric) as total_mes_10
+                         , cast(0 as numeric) as total_mes_11
+                         , cast(0 as numeric) as total_mes_12
                 order by cod_estrutural
             ';
-            
-            
-    flTotalMes[1]  := 0; 
-    flTotalMes[2]  := 0; 
-    flTotalMes[3]  := 0; 
-    flTotalMes[4]  := 0; 
-    flTotalMes[5]  := 0; 
-    flTotalMes[6]  := 0; 
-    flTotalMes[7]  := 0; 
-    flTotalMes[8]  := 0; 
-    flTotalMes[9]  := 0; 
-    flTotalMes[10] := 0; 
-    flTotalMes[11] := 0; 
-    flTotalMes[12] := 0; 
 
-    flTotalMes_OTC  [1]  := 0; 
-    flTotalMes_OTC  [2]  := 0; 
-    flTotalMes_OTC  [3]  := 0; 
-    flTotalMes_OTC  [4]  := 0; 
-    flTotalMes_OTC  [5]  := 0; 
-    flTotalMes_OTC  [6]  := 0; 
-    flTotalMes_OTC  [7]  := 0; 
-    flTotalMes_OTC  [8]  := 0; 
-    flTotalMes_OTC  [9]  := 0; 
-    flTotalMes_OTC  [10] := 0; 
-    flTotalMes_OTC  [11] := 0; 
-    flTotalMes_OTC  [12] := 0;   
+    flTotalMes[1]  := 0;
+    flTotalMes[2]  := 0;
+    flTotalMes[3]  := 0;
+    flTotalMes[4]  := 0;
+    flTotalMes[5]  := 0;
+    flTotalMes[6]  := 0;
+    flTotalMes[7]  := 0;
+    flTotalMes[8]  := 0;
+    flTotalMes[9]  := 0;
+    flTotalMes[10] := 0;
+    flTotalMes[11] := 0;
+    flTotalMes[12] := 0;
+
+    flTotalMes_OTC  [1]  := 0;
+    flTotalMes_OTC  [2]  := 0;
+    flTotalMes_OTC  [3]  := 0;
+    flTotalMes_OTC  [4]  := 0;
+    flTotalMes_OTC  [5]  := 0;
+    flTotalMes_OTC  [6]  := 0;
+    flTotalMes_OTC  [7]  := 0;
+    flTotalMes_OTC  [8]  := 0;
+    flTotalMes_OTC  [9]  := 0;
+    flTotalMes_OTC  [10] := 0;
+    flTotalMes_OTC  [11] := 0;
+    flTotalMes_OTC  [12] := 0;
 
     FOR reRegistro IN EXECUTE stSql
-    LOOP 
+    LOOP
 
         --AJUSTES DO DADOS PARA BUSCAR DE ACORDO COM A CONFIGURACAO A PARTIR DE 2016 SEM ALTERAR O QUE JA FAZ CASO NAO TENHA NADA CONFIGURADO
         arValoresConfigurados[1] := null;
@@ -1736,40 +1688,38 @@ BEGIN
             nuValorAux := 0.00;
             stDataIni := arDatas[i];
 
-            IF (SELECT COUNT(*) 
+            IF (SELECT COUNT(*)
                 FROM stn.receita_corrente_liquida
-                WHERE mes = substr(stDataIni,4,2)::integer 
-                AND exercicio = ''||substr(stDataIni,7,4)::integer||'' 
+                WHERE mes = substr(stDataIni,4,2)::integer
+                AND ano = ''||substr(stDataIni,7,4)::integer||''
             ) >= 1 THEN
 
                 --'RECEITAS CORRENTES (I)'
                 IF reRegistro.cod_estrutural = '1.0.0.0.00.00.00.00.00' THEN
-                    SELECT ( SUM(COALESCE(valor_receita_tributaria,0.00)) 
+                    SELECT ( SUM(COALESCE(valor_receita_tributaria,0.00))
                              +SUM(COALESCE(valor_receita_contribuicoes,0.00))
                              +SUM(COALESCE(valor_receita_patrimonial,0.00))
                              +SUM(COALESCE(valor_receita_agropecuaria,0.00))
                              +SUM(COALESCE(valor_receita_industrial,0.00))
                              +SUM(COALESCE(valor_receita_servicos,0.00))
                              +SUM(COALESCE(valor_transferencias_correntes,0.00))
-                             +SUM(COALESCE(valor_outras_receitas,0.00))                             
+                             +SUM(COALESCE(valor_outras_receitas,0.00))
                            ) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
-                    arValoresConfigurados[i] := nuValorAux;                    
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
                 END IF;
-
 
                 --'Receita Tributaria'
                 IF reRegistro.cod_estrutural = '1.1.0.0.00.00.00.00.00' THEN
                     SELECT SUM(COALESCE(valor_receita_tributaria,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
-                    
                 END IF;
 
                 --'Receita De Contribuicoes
@@ -1777,28 +1727,28 @@ BEGIN
                     SELECT SUM(COALESCE(valor_receita_contribuicoes,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
-            
+
                 --'Receita Patrimonial'
                 IF reRegistro.cod_estrutural = '1.3.0.0.00.00.00.00.00' THEN
                     SELECT SUM(COALESCE(valor_receita_patrimonial,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
-            
+
                 --'Receita Agropecuaria'
                 IF reRegistro.cod_estrutural = '1.4.0.0.00.00.00.00.00' THEN
                     SELECT SUM(COALESCE(valor_receita_agropecuaria,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
@@ -1807,8 +1757,8 @@ BEGIN
                     SELECT SUM(COALESCE(valor_receita_industrial,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
@@ -1817,8 +1767,8 @@ BEGIN
                     SELECT SUM(COALESCE(valor_receita_servicos,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
@@ -1827,8 +1777,8 @@ BEGIN
                     SELECT SUM(COALESCE(valor_transferencias_correntes,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
@@ -1837,57 +1787,56 @@ BEGIN
                     SELECT SUM(COALESCE(valor_outras_receitas,0.00)) as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
                 --'(R) DEDUCOES DA RECEITA CORRENTE'
                 IF reRegistro.cod_estrutural = '4.9.0.0.0.00.00.00.00.00' THEN
-                    SELECT (SUM(COALESCE(valor_contrib_plano_sss,0.00)) 
+                    SELECT (SUM(COALESCE(valor_contrib_plano_sss,0.00))
                              +SUM(COALESCE(valor_compensacao_financeira,0.00))
                              +SUM(COALESCE(valor_deducao_fundeb,0.00))
                            ) * -1 as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
-                    arValoresConfigurados[i] := nuValorAux;                    
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
+                    arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
-
                 --'Contrib. Plano Seg. Social Servidor'
-                IF reRegistro.cod_estrutural = '4.9.6.0.0.00.00.00.00.00' THEN
-                    SELECT SUM(COALESCE(valor_contrib_plano_sss,0.00)) as valor
+                IF reRegistro.cod_estrutural = '4.9.5.0.0.00.00.00.00.00' THEN
+                    SELECT SUM(COALESCE(valor_contrib_plano_sss,0.00)) * -1 as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
                 --'Compensação Financ. entre Regimes Previd.'
                 IF reRegistro.cod_estrutural = '4.9.6.0.0.00.00.00.00.00' THEN
-                    SELECT SUM(COALESCE(valor_compensacao_financeira,0.00)) as valor
+                    SELECT SUM(COALESCE(valor_compensacao_financeira,0.00)) * -1 as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
                 --'DEDUÇÃO DA RECEITA PARA FORMAÇÃO DO FUNDEB'
                 IF reRegistro.cod_estrutural = '4.9.7.0.0.00.00.00.00.00' THEN
-                    SELECT SUM(COALESCE(valor_deducao_fundeb,0.00)) as valor
+                    SELECT SUM(COALESCE(valor_deducao_fundeb,0.00)) * -1 as valor
                         INTO nuValorAux
                     FROM stn.receita_corrente_liquida
-                    WHERE mes = substr(stDataIni,4,2)::integer 
-                    AND exercicio = ''||substr(stDataIni,7,4)::integer||'';
+                    WHERE mes = substr(stDataIni,4,2)::integer
+                    AND ano = ''||substr(stDataIni,7,4)::integer||'';
                     arValoresConfigurados[i] := nuValorAux;
                 END IF;
 
             END IF;
-            
+
             i := i + 1;
         END LOOP;
 
@@ -1904,7 +1853,7 @@ BEGIN
         reRegistro.mes_11 := COALESCE(arValoresConfigurados[11],reRegistro.mes_11);
         reRegistro.mes_12 := COALESCE(arValoresConfigurados[12],reRegistro.mes_12);
 
-        -------- totalizando OUtras receitas tributárias 
+        -------- totalizando OUtras receitas tributárias
         if ( reRegistro.cod_estrutural = stConta||'1.1.0.0.00.00.00.00.00' ) then
             flTotalReceita[1]  := reRegistro.mes_1;
             flTotalReceita[2]  := reRegistro.mes_2;
@@ -1920,10 +1869,10 @@ BEGIN
             flTotalReceita[12] := reRegistro.mes_12;
         end if;
 
-        if ( (reRegistro.cod_estrutural = stConta||'1.1.1.2.02.00.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.04.00.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.08.00.00.00.00') ) then
-            
+        if ( (reRegistro.cod_estrutural = stConta||'1.1.1.2.02.00.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.04.00.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.1.1.2.08.00.00.00.00') )
+       then
             flTotalMes[1]  := flTotalMes[1]  + reRegistro.mes_1;
             flTotalMes[2]  := flTotalMes[2]  + reRegistro.mes_2;
             flTotalMes[3]  := flTotalMes[3]  + reRegistro.mes_3;
@@ -1936,25 +1885,24 @@ BEGIN
             flTotalMes[10] := flTotalMes[10] + reRegistro.mes_10;
             flTotalMes[11] := flTotalMes[11] + reRegistro.mes_11;
             flTotalMes[12] := flTotalMes[12] + reRegistro.mes_12;
-
-       end if; 
+       end if;
 
        if ( reRegistro.cod_estrutural = stConta||'1.1.1.2.09.00.00.00.00' ) then
-            reRegistro.mes_1  :=  flTotalReceita[1]  - flTotalMes[1]  ;
-            reRegistro.mes_2  :=  flTotalReceita[2]  - flTotalMes[2]  ;
-            reRegistro.mes_3  :=  flTotalReceita[3]  - flTotalMes[3]  ;
-            reRegistro.mes_4  :=  flTotalReceita[4]  - flTotalMes[4]  ;
-            reRegistro.mes_5  :=  flTotalReceita[5]  - flTotalMes[5]  ;
-            reRegistro.mes_6  :=  flTotalReceita[6]  - flTotalMes[6]  ;
-            reRegistro.mes_7  :=  flTotalReceita[7]  - flTotalMes[7]  ;
-            reRegistro.mes_8  :=  flTotalReceita[8]  - flTotalMes[8]  ;
-            reRegistro.mes_9  :=  flTotalReceita[9]  - flTotalMes[9]  ;
-            reRegistro.mes_10 :=  flTotalReceita[10] - flTotalMes[10] ;
-            reRegistro.mes_11 :=  flTotalReceita[11] - flTotalMes[11] ;
-            reRegistro.mes_12 :=  flTotalReceita[12] - flTotalMes[12] ;
+            reRegistro.mes_1  :=  flTotalReceita[1]  - flTotalMes[1];
+            reRegistro.mes_2  :=  flTotalReceita[2]  - flTotalMes[2];
+            reRegistro.mes_3  :=  flTotalReceita[3]  - flTotalMes[3];
+            reRegistro.mes_4  :=  flTotalReceita[4]  - flTotalMes[4];
+            reRegistro.mes_5  :=  flTotalReceita[5]  - flTotalMes[5];
+            reRegistro.mes_6  :=  flTotalReceita[6]  - flTotalMes[6];
+            reRegistro.mes_7  :=  flTotalReceita[7]  - flTotalMes[7];
+            reRegistro.mes_8  :=  flTotalReceita[8]  - flTotalMes[8];
+            reRegistro.mes_9  :=  flTotalReceita[9]  - flTotalMes[9];
+            reRegistro.mes_10 :=  flTotalReceita[10] - flTotalMes[10];
+            reRegistro.mes_11 :=  flTotalReceita[11] - flTotalMes[11];
+            reRegistro.mes_12 :=  flTotalReceita[12] - flTotalMes[12];
+       end if;
 
-       end if;  
-       --------FINAL totalizando OUtras receitas tributárias 
+       --------FINAL totalizando OUtras receitas tributárias
        ------- Totalizando outras Tranferencias correntes
        if ( reRegistro.cod_estrutural = stConta||'1.7.0.0.00.00.00.00.00' ) then
             flTotalReceita_OTC[1]  := reRegistro.mes_1;
@@ -1971,12 +1919,12 @@ BEGIN
             flTotalReceita_OTC[12] := reRegistro.mes_12;
        end if;
 
-       if ( (reRegistro.cod_estrutural = stConta||'1.7.2.1.01.02.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.7.2.2.01.01.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.7.2.2.01.02.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.7.2.1.36.00.00.00.00') 
-        or  (reRegistro.cod_estrutural = stConta||'1.7.2.1.01.05.00.00.00') ) then
-            
+       if ( (reRegistro.cod_estrutural = stConta||'1.7.2.1.01.02.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.7.2.2.01.01.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.7.2.2.01.02.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.7.2.1.36.00.00.00.00')
+        or  (reRegistro.cod_estrutural = stConta||'1.7.2.1.01.05.00.00.00') )
+       then
             flTotalMes_OTC[1]  := flTotalMes_OTC[1]  + reRegistro.mes_1;
             flTotalMes_OTC[2]  := flTotalMes_OTC[2]  + reRegistro.mes_2;
             flTotalMes_OTC[3]  := flTotalMes_OTC[3]  + reRegistro.mes_3;
@@ -1989,11 +1937,9 @@ BEGIN
             flTotalMes_OTC[10] := flTotalMes_OTC[10] + reRegistro.mes_10;
             flTotalMes_OTC[11] := flTotalMes_OTC[11] + reRegistro.mes_11;
             flTotalMes_OTC[12] := flTotalMes_OTC[12] + reRegistro.mes_12;
+       end if;
 
-       end if; 
-
-       if ( reRegistro.cod_estrutural = stConta||'1.7.2.4.00.00.00.00.00' )  then
-       
+       if ( reRegistro.cod_estrutural = stConta||'1.7.2.4.00.00.00.00.00' ) then
             flTotalMes_OTC[1]  := flTotalMes_OTC[1]  + reRegistro.mes_1;
             flTotalMes_OTC[2]  := flTotalMes_OTC[2]  + reRegistro.mes_2;
             flTotalMes_OTC[3]  := flTotalMes_OTC[3]  + reRegistro.mes_3;
@@ -2006,12 +1952,11 @@ BEGIN
             flTotalMes_OTC[10] := flTotalMes_OTC[10] + reRegistro.mes_10;
             flTotalMes_OTC[11] := flTotalMes_OTC[11] + reRegistro.mes_11;
             flTotalMes_OTC[12] := flTotalMes_OTC[12] + reRegistro.mes_12;
-        end if;
-    
+       end if;
+
        if ( reRegistro.cod_estrutural = stConta||'1.7.2.4.01.99.00.00.00' ) then
-       
             reRegistro.cod_estrutural := cast (stConta||'1.7.2.2.01.99.00.00.00' as varchar);
-       
+
             reRegistro.mes_1  := cast(( flTotalReceita_OTC[1]  - flTotalMes_OTC[1]  ) as numeric(14,2));
             reRegistro.mes_2  := cast(( flTotalReceita_OTC[2]  - flTotalMes_OTC[2]  ) as numeric(14,2));
             reRegistro.mes_3  := cast(( flTotalReceita_OTC[3]  - flTotalMes_OTC[3]  ) as numeric(14,2));
@@ -2024,65 +1969,62 @@ BEGIN
             reRegistro.mes_10 := cast(( flTotalReceita_OTC[10] - flTotalMes_OTC[10] ) as numeric(14,2));
             reRegistro.mes_11 := cast(( flTotalReceita_OTC[11] - flTotalMes_OTC[11] ) as numeric(14,2));
             reRegistro.mes_12 := cast(( flTotalReceita_OTC[12] - flTotalMes_OTC[12] ) as numeric(14,2));
-       end if;  
-       
-       
+       end if;
+
        ------- FINAL Totalizando outras Tranferencias correntes
        if ( reRegistro.cod_estrutural = stConta||'1.0.0.0.00.00.00.00.00' )
        then
-          reRegistro.total_mes_1  := reRegistro.mes_1; 
-          reRegistro.total_mes_2  := reRegistro.mes_2; 
-          reRegistro.total_mes_3  := reRegistro.mes_3; 
-          reRegistro.total_mes_4  := reRegistro.mes_4; 
-          reRegistro.total_mes_5  := reRegistro.mes_5; 
-          reRegistro.total_mes_6  := reRegistro.mes_6; 
-          reRegistro.total_mes_7  := reRegistro.mes_7; 
-          reRegistro.total_mes_8  := reRegistro.mes_8; 
-          reRegistro.total_mes_9  := reRegistro.mes_9; 
-          reRegistro.total_mes_10 := reRegistro.mes_10; 
-          reRegistro.total_mes_11 := reRegistro.mes_11; 
-          reRegistro.total_mes_12 := reRegistro.mes_12; 
-          
-          
-       end if ; 
-       
+          reRegistro.total_mes_1  := reRegistro.mes_1;
+          reRegistro.total_mes_2  := reRegistro.mes_2;
+          reRegistro.total_mes_3  := reRegistro.mes_3;
+          reRegistro.total_mes_4  := reRegistro.mes_4;
+          reRegistro.total_mes_5  := reRegistro.mes_5;
+          reRegistro.total_mes_6  := reRegistro.mes_6;
+          reRegistro.total_mes_7  := reRegistro.mes_7;
+          reRegistro.total_mes_8  := reRegistro.mes_8;
+          reRegistro.total_mes_9  := reRegistro.mes_9;
+          reRegistro.total_mes_10 := reRegistro.mes_10;
+          reRegistro.total_mes_11 := reRegistro.mes_11;
+          reRegistro.total_mes_12 := reRegistro.mes_12;
+       end if ;
+
        if (  reRegistro.cod_estrutural = stContaDedutora||'1.7.2.2.01.04.05.00.00' )
        then
-          reRegistro.total_mes_1  := reRegistro.mes_1  * -1; 
-          reRegistro.total_mes_2  := reRegistro.mes_2  * -1; 
-          reRegistro.total_mes_3  := reRegistro.mes_3  * -1; 
-          reRegistro.total_mes_4  := reRegistro.mes_4  * -1; 
-          reRegistro.total_mes_5  := reRegistro.mes_5  * -1; 
-          reRegistro.total_mes_6  := reRegistro.mes_6  * -1; 
-          reRegistro.total_mes_7  := reRegistro.mes_7  * -1; 
-          reRegistro.total_mes_8  := reRegistro.mes_8  * -1; 
-          reRegistro.total_mes_9  := reRegistro.mes_9  * -1; 
-          reRegistro.total_mes_10 := reRegistro.mes_10 * -1; 
-          reRegistro.total_mes_11 := reRegistro.mes_11 * -1; 
-          reRegistro.total_mes_12 := reRegistro.mes_12 * -1; 
+          reRegistro.total_mes_1  := reRegistro.mes_1  * -1;
+          reRegistro.total_mes_2  := reRegistro.mes_2  * -1;
+          reRegistro.total_mes_3  := reRegistro.mes_3  * -1;
+          reRegistro.total_mes_4  := reRegistro.mes_4  * -1;
+          reRegistro.total_mes_5  := reRegistro.mes_5  * -1;
+          reRegistro.total_mes_6  := reRegistro.mes_6  * -1;
+          reRegistro.total_mes_7  := reRegistro.mes_7  * -1;
+          reRegistro.total_mes_8  := reRegistro.mes_8  * -1;
+          reRegistro.total_mes_9  := reRegistro.mes_9  * -1;
+          reRegistro.total_mes_10 := reRegistro.mes_10 * -1;
+          reRegistro.total_mes_11 := reRegistro.mes_11 * -1;
+          reRegistro.total_mes_12 := reRegistro.mes_12 * -1;
        end if;
-       
+
        if ( ( reRegistro.cod_estrutural = '4.9.0.0.0.00.00.00.00.00' )
          or ( reRegistro.cod_estrutural = stContaDedutora||'1.0.0.0.00.00.00.00.00' )
          or ( substring(reRegistro.cod_estrutural from  1 for 1) = '9' ) )
        then
-          reRegistro.total_mes_1  := reRegistro.mes_1; 
-          reRegistro.total_mes_2  := reRegistro.mes_2; 
-          reRegistro.total_mes_3  := reRegistro.mes_3; 
-          reRegistro.total_mes_4  := reRegistro.mes_4; 
-          reRegistro.total_mes_5  := reRegistro.mes_5; 
-          reRegistro.total_mes_6  := reRegistro.mes_6; 
-          reRegistro.total_mes_7  := reRegistro.mes_7; 
-          reRegistro.total_mes_8  := reRegistro.mes_8; 
-          reRegistro.total_mes_9  := reRegistro.mes_9; 
-          reRegistro.total_mes_10 := reRegistro.mes_10; 
-          reRegistro.total_mes_11 := reRegistro.mes_11; 
-          reRegistro.total_mes_12 := reRegistro.mes_12; 
+          reRegistro.total_mes_1  := reRegistro.mes_1;
+          reRegistro.total_mes_2  := reRegistro.mes_2;
+          reRegistro.total_mes_3  := reRegistro.mes_3;
+          reRegistro.total_mes_4  := reRegistro.mes_4;
+          reRegistro.total_mes_5  := reRegistro.mes_5;
+          reRegistro.total_mes_6  := reRegistro.mes_6;
+          reRegistro.total_mes_7  := reRegistro.mes_7;
+          reRegistro.total_mes_8  := reRegistro.mes_8;
+          reRegistro.total_mes_9  := reRegistro.mes_9;
+          reRegistro.total_mes_10 := reRegistro.mes_10;
+          reRegistro.total_mes_11 := reRegistro.mes_11;
+          reRegistro.total_mes_12 := reRegistro.mes_12;
        end if;
-       
+
        RETURN next reRegistro;
     END LOOP;
-    DROP TABLE tmp_valor ;
+    DROP TABLE tmp_valor;
 
 RETURN;
 

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TEmpenhoItemPreEmpenho.class.php 64005 2015-11-17 16:49:06Z michel $
+    $Id: TEmpenhoItemPreEmpenho.class.php 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.03
 */
@@ -68,5 +68,6 @@ class TEmpenhoItemPreEmpenho extends Persistente
         $this->AddCampo('complemento'    , 'text'   , true , ''     , false, false  );
         $this->AddCampo('cod_item'       , 'integer', false, ''     , false, true   );
         $this->AddCampo('cod_centro'     , 'integer', false, ''     , false, true   );
+        $this->AddCampo('cod_marca'      , 'integer', false, ''     , false, true   );
     }
 }

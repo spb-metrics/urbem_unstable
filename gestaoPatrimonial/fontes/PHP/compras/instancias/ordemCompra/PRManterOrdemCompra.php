@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterOrdemCompra.php 64927 2016-04-13 19:45:13Z evandro $
+    $Id: PRManterOrdemCompra.php 65169 2016-04-29 16:39:13Z evandro $
 */
 
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -201,14 +201,18 @@ if ($obErro == true) {
                         $rsItemPreEmpenho->proximo();
                     }
 
-                    if($arItensAlmoxarifado[$value['num_item']]['inMarca'] != null) {
-                        $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$value['cod_item'];
-                        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-    
-                        if ($rsItemMarca->getNumLinhas() < 1) {
-                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $value['cod_item']                                    );
-                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
-                            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                    if ( !empty($value['cod_item']) ){
+                        if($arItensAlmoxarifado[$value['num_item']]['inMarca'] != null) {
+                            if($arItensAlmoxarifado[$value['num_item']]['inCodItem'] != null) {
+                                $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$arItensAlmoxarifado[$value['num_item']]['inCodItem'];
+                                $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
+        
+                                if ($rsItemMarca->getNumLinhas() < 1) {
+                                    $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $arItensAlmoxarifado[$value['num_item']]['inCodItem'] );
+                                    $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
+                                    $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                                }
+                            }
                         }
                     }
 
@@ -332,14 +336,18 @@ if ($obErro == true) {
                         $rsItemPreEmpenho->proximo();
                     }
                     
-                    if($arItensAlmoxarifado[$stValor['num_item']]['inMarca'] != null) {
-                        $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$stValor['num_item']]['inMarca']." AND acim.cod_item = ".$stValor['cod_item'];
-                        $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
-                
-                        if ($rsItemMarca->getNumLinhas() < 1) {
-                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $stValor['cod_item']                                  );
-                            $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$stValor['num_item']]['inMarca'] );
-                            $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                    if ( !empty($value['cod_item']) ){
+                        if($arItensAlmoxarifado[$value['num_item']]['inMarca'] != null) {
+                            if($arItensAlmoxarifado[$value['num_item']]['inCodItem'] != null) {
+                                $stFiltro = " AND acim.cod_marca = ".$arItensAlmoxarifado[$value['num_item']]['inMarca']." AND acim.cod_item = ".$arItensAlmoxarifado[$value['num_item']]['inCodItem'];
+                                $obTAlmoxarifadoCatalogoItemMarca->recuperaItemMarca($rsItemMarca, $stFiltro);
+        
+                                if ($rsItemMarca->getNumLinhas() < 1) {
+                                    $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_item'   , $arItensAlmoxarifado[$value['num_item']]['inCodItem'] );
+                                    $obTAlmoxarifadoCatalogoItemMarca->setDado('cod_marca'  , $arItensAlmoxarifado[$value['num_item']]['inMarca']   );
+                                    $obTAlmoxarifadoCatalogoItemMarca->inclusao();
+                                }
+                            }
                         }
                     }
 

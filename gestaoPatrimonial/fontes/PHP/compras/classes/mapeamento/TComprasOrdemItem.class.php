@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TComprasOrdemItem.class.php 62696 2015-06-09 14:19:37Z michel $
+    $Id: TComprasOrdemItem.class.php 65134 2016-04-27 14:42:09Z evandro $
 
     * Casos de uso: uc-03.04424
 */
@@ -47,7 +47,7 @@ class TComprasOrdemItem extends Persistente
     * Método Construtor
     * @access Private
 */
-    function TComprasOrdemItem()
+    function __construct()
     {
         parent::Persistente();
         $this->setTabela("compras.ordem_item");

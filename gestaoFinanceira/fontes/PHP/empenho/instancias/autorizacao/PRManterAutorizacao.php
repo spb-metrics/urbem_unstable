@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterAutorizacao.php 64442 2016-02-23 13:48:55Z michel $
+    $Id: PRManterAutorizacao.php 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -133,7 +133,7 @@ switch ($stAcao) {
             if ($request->get('inCodCategoria') == 2 || $request->get('inCodCategoria') == 3)
                 $obREmpenhoAutorizacaoEmpenho->obTEmpenhoContrapartidaAutorizacao->setDado('conta_contrapartida',$request->get('inCodContrapartida'));
 
-            $arItens = Sessao::read('arItens');
+            $arItens = Sessao::read('arItens');                        
             if ( sizeof( $arItens ) ) {
                 foreach ($arItens as $arItemPreEmpenho) {
                     $obREmpenhoAutorizacaoEmpenho->addItemPreEmpenho();
@@ -148,9 +148,12 @@ switch ($stAcao) {
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $arItemPreEmpenho[ 'cod_grandeza' ]   );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->consultar($rsUnidade);
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade( $rsUnidade->getCampo('simbolo')                                     );
+                    
                     if($request->get('stTipoItem')=='Catalogo')
                         $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodItemPreEmp ( $arItemPreEmpenho[ 'cod_item' ]                               );
+                    
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto    ( $arItemPreEmpenho[ 'cod_centro' ]                             );
+                    $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodigoMarca       ( $arItemPreEmpenho[ 'cod_marca' ]                              );
                 }
             } else
                 $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );
@@ -301,6 +304,8 @@ switch ($stAcao) {
                     if ($request->get('stTipoItem')=='Catalogo')
                         $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodItemPreEmp ( $arItemPreEmpenho[ 'cod_item' ]                               );
                     $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto    ( $arItemPreEmpenho[ 'cod_centro' ]                             );
+                    $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodCentroCusto    ( $arItemPreEmpenho[ 'cod_centro' ]                             );
+                    $obREmpenhoAutorizacaoEmpenho->roUltimoItemPreEmpenho->setCodigoMarca       ( $arItemPreEmpenho[ 'cod_marca' ]                              );
                 }
             } else
                 $obErro->setDescricao( "É necessário cadastrar pelo menos um Item" );

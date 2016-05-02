@@ -33,19 +33,19 @@
 
     * @ignore
 
-    $Id: OCExportacaoBalanco.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCExportacaoBalanco.php 65168 2016-04-29 16:36:09Z michel $
 
     * Casos de uso: uc-06.04.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GPC_TGO_MAPEAMENTO."TTGOConfiguracaoEntidade.class.php" );
-include_once( CLA_EXPORTADOR );
+include_once CAM_GPC_TGO_MAPEAMENTO."TTGOConfiguracaoEntidade.class.php";
+include_once CLA_EXPORTADOR;
 
 SistemaLegado::BloqueiaFrames();
 
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 
 $arFiltroRelatorio = Sessao::read('filtroRelatorio');
 
@@ -65,26 +65,31 @@ foreach ($arFiltroRelatorio['inCodEntidade'] as $inCodEntidade) {
 }
 
 $stTipoDocumento = "TCM_GO";
+$stTipoExportacao = "Balanco";
 
 $obExportador    = new Exportador();
 
 foreach ($arFiltroRelatorio["arArquivosSelecionados"] as $stArquivo) {
-    //foreach ($arUnidadesGestoras as $inUnidadeGestora => $stEntidades) {
-        $arArquivo = explode( '.',$stArquivo );
-        if ($stArquivo == 'Ide.txt' OR $stArquivo == 'Orgao.txt') {
-            $obExportador->addArquivo($stArquivo);
-        } else {
-            $obExportador->addArquivo($arArquivo[0].Sessao::getExercicio().'.'.$arArquivo[1]);
-        }
-        //$//obExportador->addArquivo($inUnidadeGestora.Sessao::getExercicio().$stArquivo);
-        $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+    
+    $arArquivo = explode( '.',$stArquivo );
+    if ($stArquivo == 'Ide.txt' OR $stArquivo == 'Orgao.txt') {
+        $obExportador->addArquivo($stArquivo);
+    } else {
+        $obExportador->addArquivo($arArquivo[0].Sessao::getExercicio().'.'.$arArquivo[1]);
+    }
+    $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+
+    if(Sessao::getExercicio() >= 2016) {
+        include (CAM_GPC_TGO_INSTANCIAS."layout_arquivos/balanco/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')).".inc.php");
+    }else {
         include( substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
-        $arRecordSet = null;
-    //}
+    }
+
+    $arRecordSet = null;
 }
 
 if ($arFiltroRelatorio['stTipoExport'] == 'compactados') {
-    $obExportador->setNomeArquivoZip('Balanco'.Sessao::getExercicio().'.zip');
+    $obExportador->setNomeArquivoZip($stTipoExportacao.Sessao::getExercicio().'.zip');
 }
 
 $obExportador->show();

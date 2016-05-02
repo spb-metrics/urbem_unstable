@@ -147,8 +147,10 @@ class TTCEALRelEventosContabeis extends Persistente
                    AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado("dt_inicial")."','dd/mm/yyyy')
                    AND TO_DATE('".$this->getDado("dt_final")."','dd/mm/yyyy')
                    AND lancamento.cod_entidade IN ( ".$this->getDado('inCodEntidade')." )
-
+              
               GROUP BY 1,2,3,4,5,6,7,8
+              ORDER BY retorno_evento.cod_evento
+              
             ";
             
         return $this->executaRecuperaSql($stSql,$rsRecordSet,"","",$boTransacao);

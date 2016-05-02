@@ -56,6 +56,7 @@ include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php" );
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
 $obTEntidade = new TOrcamentoEntidade;
 $obTEntidade->setDado('exercicio', Sessao::getExercicio());
+$obTEntidade->setDado('valor', 't');
 $obErro = $obTEntidade->verificaEntidadeRestos( $rsRecordSet, $boTransacao );
 
 if ($rsRecordSet->getNumLinhas() > 0) {

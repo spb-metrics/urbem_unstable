@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    * $Id: TEmpenhoEmpenho.class.php 64778 2016-03-31 13:51:44Z michel $
+    * $Id: TEmpenhoEmpenho.class.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.01.23
                     uc-02.03.03
@@ -3398,17 +3398,23 @@ function recuperaRelatorioEmpenhoItens(&$rsRecordSet, $stCondicao = "", $boTrans
 
 function montaRelatorioEmpenhoItens()
 {
-    $stSql  = " SELECT                                                              \n";
-    $stSql .= "      it.vl_total                    as valor_total                  \n";
-    $stSql .= "     ,(it.vl_total/it.quantidade)    as valor_unitario               \n";
-    $stSql .= "     ,it.num_item                                                    \n";
-    $stSql .= "     ,it.quantidade                                                  \n";
-    $stSql .= "     ,it.nom_item                                                    \n";
-    $stSql .= "     ,it.complemento                                                 \n";
-    $stSql .= "     ,it.sigla_unidade as simbolo                                    \n";
-    $stSql .= "     ,it.cod_item                                                    \n";
-    $stSql .= " FROM                                                                \n";
-    $stSql .= "      empenho.item_pre_empenho   as it                           \n";
+    $stSql="SELECT                                                              
+                 it.vl_total                    as valor_total                  
+                ,(it.vl_total/it.quantidade)    as valor_unitario               
+                ,it.num_item                                                    
+                ,it.quantidade                                                  
+                ,CASE WHEN it.cod_marca IS NOT NULL
+                    THEN it.nom_item||' (Marca: '||marca.cod_marca||' - '||marca.descricao||')'
+                    ELSE it.nom_item
+                END AS nom_item                                                    
+                
+                ,it.complemento                                                 
+                ,it.sigla_unidade as simbolo                                    
+                ,it.cod_item                                                    
+            FROM empenho.item_pre_empenho   as it
+            LEFT JOIN almoxarifado.marca
+                ON marca.cod_marca = it.cod_marca
+    ";
 
     return $stSql;
 }

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterOrdemCompra.php 64816 2016-04-05 20:55:05Z michel $
+    $Id: OCManterOrdemCompra.php 65150 2016-04-28 11:33:52Z evandro $
 
 */
 
@@ -289,7 +289,7 @@ function BuscaEmpenhoItens($stEmpenho, $inCodEntidade, $stTipoOrdem, $stAcao)
                 }
 
                 $rsItens->proximo();
-            }
+            }            
             Sessao::write('arItens', $arItens);
             $stJs = montaListaItens( $arItens );
 
@@ -506,8 +506,21 @@ case 'detalharItem' :
     $obCentroCustoUsuario->obCampoCod->setValue ( $inCodCentroCusto                             );
     $obCentroCustoUsuario->setValue             ( $stNomCentroCusto                             );
 
-    $inMarca    = ( !is_null($arItensAlmoxarifado[$request->get('num_item')]['inMarca'])    ) ? $arItensAlmoxarifado[$request->get('num_item')]['inMarca']      : $rsDetalheItem->getCampo('cod_marca_ordem');
-    $stNomMarca = ( !is_null($arItensAlmoxarifado[$request->get('num_item')]['stNomMarca']) ) ? $arItensAlmoxarifado[$request->get('num_item')]['stNomMarca']   : $rsDetalheItem->getCampo('nom_marca_ordem');
+    if (is_null($arItensAlmoxarifado[$request->get('num_item')]['inMarca'])) {
+        $arItensAlmoxarifado[$request->get('num_item')]['inMarca'] = $rsDetalheItem->getCampo('cod_marca_ordem');
+        $inMarca = $rsDetalheItem->getCampo('cod_marca_ordem');
+        Sessao::write('arItensAlmoxarifado',$arItensAlmoxarifado);
+    }else{
+        $inMarca = $arItensAlmoxarifado[$request->get('num_item')]['inMarca'];
+    }
+
+    if (is_null($arItensAlmoxarifado[$request->get('num_item')]['stNomMarca'])) {
+        $arItensAlmoxarifado[$request->get('num_item')]['stNomMarca'] = $rsDetalheItem->getCampo('nom_marca_ordem');
+        $stNomMarca = $rsDetalheItem->getCampo('nom_marca_ordem');
+        Sessao::write('arItensAlmoxarifado',$arItensAlmoxarifado);
+    }else{
+        $stNomMarca = $arItensAlmoxarifado[$request->get('num_item')]['stNomMarca'];
+    }    
 
     $obMarca = new IPopUpMarca( new Form);
     $obMarca->setNull               ( true                                  );
@@ -563,10 +576,8 @@ case 'detalharItem' :
 
     if ( $rsDetalheItem->getCampo('bo_centro_marca')=='f' || strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular')!== false ) {
         $obFormulario->addComponente( $obLblCodItem  );
-        if( strpos($request->get('stAcao'),'consultar') !== false || strpos($request->get('stAcao'),'anular')!== false ){
-            $obFormulario->addComponente( $obLblCentroDeCusto );
-            $obFormulario->addComponente( $obLblIMarca );
-        }
+        $obFormulario->addComponente( $obLblCentroDeCusto );
+        $obFormulario->addComponente( $obLblIMarca );
     }else{
         $obFormulario->addComponente( $obIPopUpCatalogoItem );
         $obFormulario->addComponente( $obCentroCustoUsuario );

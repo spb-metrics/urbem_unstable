@@ -57,7 +57,8 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
     $obTTCEALEventosContabeis->setDado('dt_final'     , $dtFinal );
     $obTTCEALEventosContabeis->recuperaEventosContabeis ($rsRecordSet);
 
-    $idCount=0;
+    $idCount = 0;
+    $inNumEvento = 1;
     $arResult = array();
     
     while (!$rsRecordSet->eof()) {
@@ -65,7 +66,7 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
         $arResult[$idCount]['CodigoUA']             = $rsRecordSet->getCampo('codigo_ua');
         $arResult[$idCount]['Exercicio']            = $rsRecordSet->getCampo('exercicio');
         $arResult[$idCount]['Bimestre']             = $rsRecordSet->getCampo('bimestre');
-        $arResult[$idCount]['NumEvento']            = $rsRecordSet->getCampo('num_evento');
+        $arResult[$idCount]['NumEvento']            = str_pad($inNumEvento, 6, "0", STR_PAD_LEFT);
         $arResult[$idCount]['CodEvento']            = $rsRecordSet->getCampo('cod_evento');
         $arResult[$idCount]['Historico']            = $rsRecordSet->getCampo('historico');
         $arResult[$idCount]['DataLancamento']       = $rsRecordSet->getCampo('dt_lancamento');
@@ -74,6 +75,7 @@ foreach ($arEsquemasEntidades as $inCodEntidade) {
         $arResult[$idCount]['ValorLancamento']      = $rsRecordSet->getCampo('vl_lancamento');
         
         $idCount++;
+        $inNumEvento++;
         
         $rsRecordSet->proximo();
     }

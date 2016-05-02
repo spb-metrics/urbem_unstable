@@ -251,7 +251,9 @@ function montaRecuperaRelacionamentoRestos()
                             FROM administracao.configuracao_entidade
                            WHERE configuracao_entidade.exercicio  = '".$this->getDado('exercicio')."'
                              AND configuracao_entidade.cod_modulo = 10
-                             AND configuracao_entidade.parametro  = 'virada_GF' )
+                             AND configuracao_entidade.parametro  = 'virada_GF'
+                             AND LOWER(TRIM(configuracao_entidade.valor)) = LOWER('".$this->getDado('valor')."')
+                             )
                              
                     AND entidade.exercicio  = '".$this->getDado('exercicio')."' ";
 
@@ -273,7 +275,8 @@ function montaVerificaEntidadeRestos()
                         
                    AND configuracao_entidade.parametro    = 'virada_GF'
                    AND configuracao_entidade.cod_modulo   = 10	
-                WHERE entidade.exercicio  = '".$this->getDado('exercicio')."' ";
+                WHERE entidade.exercicio  = '".$this->getDado('exercicio')."'
+                  AND LOWER(TRIM(configuracao_entidade.valor)) = '".$this->getDado('valor')."'";
 
     return $stSql;
 }

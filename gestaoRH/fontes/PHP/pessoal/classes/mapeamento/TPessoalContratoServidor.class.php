@@ -781,12 +781,16 @@ function recuperaContratosCargoExercidoComSubDivisaoAssentamento(&$rsRecordSet, 
 */
 function montaRecuperaContratosCargoExercidoComSubDivisaoAssentamento()
 {
-    $stSql  = "    SELECT pcs.cod_contrato                                    \n";
-    $stSql .= "      FROM pessoal.contrato_servidor pcs                       \n";
-    $stSql .= " LEFT JOIN pessoal.contrato_servidor_especialidade_cargo pcsec \n";
-    $stSql .= "        ON pcsec.cod_contrato = pcs.cod_contrato               \n";
-    $stSql .= "INNER JOIN pessoal.assentamento_sub_divisao                    \n";
-    $stSql .= "        ON assentamento_sub_divisao.cod_sub_divisao = pcs.cod_sub_divisao \n";
+    $stSql  = "    SELECT pcs.cod_contrato                                   
+                     FROM pessoal.contrato_servidor pcs                      
+                LEFT JOIN pessoal.contrato_servidor_especialidade_cargo pcsec
+                       ON pcsec.cod_contrato = pcs.cod_contrato              
+               INNER JOIN pessoal.assentamento_sub_divisao                   
+                       ON assentamento_sub_divisao.cod_sub_divisao = pcs.cod_sub_divisao
+               INNER JOIN pessoal.contrato_servidor_situacao
+                       ON contrato_servidor_situacao.cod_contrato = pcs.cod_contrato
+            ";
+
 
     return $stSql;
 }
@@ -868,39 +872,41 @@ function recuperaContratosFuncaoExercidaComSubDivisaoAssentamento(&$rsRecordSet,
 */
 function montaRecuperaContratosFuncaoExercidaComSubDivisaoAssentamento()
 {
-    $stSql  = "    SELECT pcs.cod_contrato                                                         \n";
-    $stSql .= "         , pcsf.cod_cargo                                                           \n";
-    $stSql .= "         , pcsef.cod_especialidade                                                  \n";
-    $stSql .= "      FROM pessoal.contrato_servidor pcs                                            \n";
-    $stSql .= "      JOIN ( SELECT pcsf.cod_contrato                                               \n";
-    $stSql .= "                  , pcsf.cod_cargo                                                  \n";
-    $stSql .= "               FROM pessoal.contrato_servidor_funcao pcsf                           \n";
-    $stSql .= "               JOIN ( SELECT pcsf.cod_contrato                                      \n";
-    $stSql .= "                                     , MAX( pcsf.timestamp ) as timestamp           \n";
-    $stSql .= "                                  FROM pessoal.contrato_servidor_funcao pcsf        \n";
-    $stSql .= "                              GROUP BY pcsf.cod_contrato                            \n";
-    $stSql .= "                    ) as max_pcsf                                                   \n";
-    $stSql .= "                 ON max_pcsf.cod_contrato = pcsf.cod_contrato                       \n";
-    $stSql .= "                AND max_pcsf.timestamp    = pcsf.timestamp                          \n";
-    $stSql .= "           ) as pcsf                                                                \n";
-    $stSql .= "        ON pcsf.cod_contrato = pcs.cod_contrato                                     \n";
-    $stSql .= "INNER JOIN pessoal.contrato_servidor_sub_divisao_funcao                             \n";
-    $stSql .= "        ON contrato_servidor_sub_divisao_funcao.cod_contrato = pcs.cod_contrato     \n";
-    $stSql .= "INNER JOIN pessoal.assentamento_sub_divisao                                         \n";
-    $stSql .= "        ON assentamento_sub_divisao.cod_sub_divisao = contrato_servidor_sub_divisao_funcao.cod_sub_divisao \n";
-    $stSql .= " LEFT JOIN ( SELECT pcsef.cod_contrato                                              \n";
-    $stSql .= "                  , pcsef.cod_especialidade                                         \n";
-    $stSql .= "               FROM pessoal.contrato_servidor_especialidade_funcao pcsef            \n";
-    $stSql .= "               JOIN (   SELECT pcsef.cod_contrato                                   \n";
-    $stSql .= "                             , MAX( pcsef.timestamp ) as timestamp                  \n";
-    $stSql .= "                          FROM pessoal.contrato_servidor_especialidade_funcao pcsef \n";
-    $stSql .= "                      GROUP BY pcsef.cod_contrato                                   \n";
-    $stSql .= "                    ) as max_pcsef                                                  \n";
-    $stSql .= "                 ON max_pcsef.cod_contrato = pcsef.cod_contrato                     \n";
-    $stSql .= "                AND max_pcsef.timestamp    = pcsef.timestamp                        \n";
-    $stSql .= "           ) as pcsef                                                               \n";
-    $stSql .= "        ON pcsef.cod_contrato = pcs.cod_contrato                                    \n";
-
+    $stSql  = "    SELECT pcs.cod_contrato                                                        
+                        , pcsf.cod_cargo                                                          
+                        , pcsef.cod_especialidade                                                 
+                     FROM pessoal.contrato_servidor pcs                                           
+                     JOIN ( SELECT pcsf.cod_contrato                                              
+                                 , pcsf.cod_cargo                                                 
+                              FROM pessoal.contrato_servidor_funcao pcsf                          
+                              JOIN ( SELECT pcsf.cod_contrato                                     
+                                                    , MAX( pcsf.timestamp ) as timestamp          
+                                                 FROM pessoal.contrato_servidor_funcao pcsf       
+                                             GROUP BY pcsf.cod_contrato                           
+                                   ) as max_pcsf                                                  
+                                ON max_pcsf.cod_contrato = pcsf.cod_contrato                      
+                               AND max_pcsf.timestamp    = pcsf.timestamp                         
+                          ) as pcsf                                                               
+                       ON pcsf.cod_contrato = pcs.cod_contrato                                    
+               INNER JOIN pessoal.contrato_servidor_sub_divisao_funcao                            
+                       ON contrato_servidor_sub_divisao_funcao.cod_contrato = pcs.cod_contrato    
+               INNER JOIN pessoal.assentamento_sub_divisao                                        
+                       ON assentamento_sub_divisao.cod_sub_divisao = contrato_servidor_sub_divisao_funcao.cod_sub_divisao
+                LEFT JOIN ( SELECT pcsef.cod_contrato                                              
+                                 , pcsef.cod_especialidade                                         
+                              FROM pessoal.contrato_servidor_especialidade_funcao pcsef            
+                              JOIN (   SELECT pcsef.cod_contrato                                   
+                                            , MAX( pcsef.timestamp ) as timestamp                  
+                                         FROM pessoal.contrato_servidor_especialidade_funcao pcsef 
+                                     GROUP BY pcsef.cod_contrato                                   
+                                   ) as max_pcsef                                                  
+                                ON max_pcsef.cod_contrato = pcsef.cod_contrato                     
+                               AND max_pcsef.timestamp    = pcsef.timestamp                        
+                          ) as pcsef                                                               
+                       ON pcsef.cod_contrato = pcs.cod_contrato                                    
+               INNER JOIN pessoal.contrato_servidor_situacao
+                       ON contrato_servidor_situacao.cod_contrato = pcs.cod_contrato
+            ";
     return $stSql;
 }
 

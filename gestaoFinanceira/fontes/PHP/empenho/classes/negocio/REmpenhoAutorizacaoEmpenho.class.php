@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoAutorizacaoEmpenho.class.php 64900 2016-04-12 18:44:26Z michel $
+    $Id: REmpenhoAutorizacaoEmpenho.class.php 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.03.03
@@ -1310,7 +1310,7 @@ function incluir($boTransacao = "")
                             }
                         }
 
-                        if ( !$obErro->ocorreu() ) {
+                        if ( !$obErro->ocorreu() ) {                            
                             $obErro = parent::incluir( $boTransacao );
 
                             if ( !$obErro->ocorreu() ) {

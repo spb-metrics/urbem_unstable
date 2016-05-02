@@ -42,13 +42,11 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/Framewor
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 
 include_once( CAM_GP_LIC_COMPONENTES."ISelectDocumento.class.php");
-
 include_once( CAM_GP_COM_COMPONENTES."IMontaNumeroCompraDireta.class.php" );
 include_once( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php");
 require_once( CAM_GF_ORC_COMPONENTES . "ITextBoxSelectEntidadeUsuario.class.php" );
 include_once( CAM_GA_ADM_NEGOCIO."RCadastroDinamico.class.php");
 include_once( CAM_GA_NORMAS_COMPONENTES."IPopUpNorma.class.php");
-
 include_once (TLIC."TLicitacaoTipoContrato.class.php");
 include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoContratoDocumento.class.php");
 include_once( CAM_GP_LIC_MAPEAMENTO."TLicitacaoPublicacaoContrato.class.php");
@@ -57,6 +55,8 @@ include_once( TCOM."TComprasFornecedor.class.php");
 include_once (TLIC."TLicitacaoContratoArquivo.class.php");
 include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoOrgao.class.php"  );
 include_once ( CAM_GP_COM_MAPEAMENTO . "TComprasTipoObjeto.class.php" );
+include_once ( TLIC.'TLicitacaoTipoInstrumento.class.php' );
+include_once ( TLIC.'TLicitacaoTipoGarantia.class.php' );
 
 $stPrograma = "ManterContrato";
 $pgFilt = "FL".$stPrograma.".php";
@@ -70,14 +70,20 @@ include($pgJs);
 Sessao::remove('arValores');
 Sessao::remove('arDocumentos');
 Sessao::remove('arArquivos');
-
+SistemaLegado::mostraVar($_REQUEST);
 $stAcao = $request->get('stAcao');
 $inNumContrato = $request->get('inNumContrato');
 $inCodEntidade = $request->get('inCodEntidade');
 $stExercicio = $request->get('stExercicio');
 
 $obTLicitacaoTipoContrato = new TLicitacaoTipoContrato();
-$obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE cod_tipo IN (43,38,19,46,20,35,27,23,42,10,12,14,6,1,39,28,16,4,18,26,30,24,45,8,34,31,32,33,3,22) ', ' ORDER BY descricao ' );
+$obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE ativo IS TRUE ', ' ORDER BY descricao ' );
+
+$obTLicitacaoTipoInstrumento = new TLicitacaoTipoInstrumento();
+$obTLicitacaoTipoInstrumento->recuperaTodos( $rsTipoInstrumento );
+
+$obTLicitacaoTipoGarantia = new TLicitacaoTipoGarantia();
+$obTLicitacaoTipoGarantia->recuperaTodos( $rsTipoGarantia );
 
 if ($inNumContrato) {
   $obTContratoCompraDireta = new TComprasContratoCompraDireta();
@@ -86,7 +92,7 @@ if ($inNumContrato) {
   $stFiltro .=" AND contrato.cod_entidade =".$inCodEntidade;
   $stFiltro .=" AND contrato.exercicio = '".$stExercicio."'";
 
-  $obTContratoCompraDireta->recuperaContratosCompraDireta($rsContrato, $stFiltro);
+  $obTContratoCompraDireta->recuperaContratosCompraDireta($rsContrato, $stFiltro);$obTContratoCompraDireta->debug();
 
   $inCodCompraDireta = $rsContrato->getCampo('cod_compra_direta');
   $inCodModalidade = $rsContrato->getCampo('cod_modalidade');
@@ -106,6 +112,7 @@ if ($inNumContrato) {
   $stTipoContrato = $rsContrato->getCampo('tipo_descricao');
   $inExercicioContrato  = $rsContrato->getCampo('exercicio_contrato');
   $inExercicioCompra  = $rsContrato->getCampo('exercicio_compra_direta');
+  $stTipoInstrumento = $rsContrato->getCampo('cod_tipo_instrumento');
   
   $stNomEntidade = $rsContrato->getCampo('nom_entidade');
   $inNumOrgao = $rsContrato->getCampo('num_orgao');
@@ -125,6 +132,14 @@ if ($inNumContrato) {
   $stJustificativa = $rsContrato->getCampo('justificativa');
   $stRazao = $rsContrato->getCampo('razao');
   $stFundamentacaoLegal = $rsContrato->getCampo('fundamentacao_legal');
+  $stMultaInadimplemento = $rsContrato->getCampo('multa_inadimplemento');
+  $inCGMRepresentanteLegal = $rsContrato->getCampo('cgm_representante_legal');
+  if($inCGMRepresentanteLegal){
+    $stNomRepresentanteLegal = SistemaLegado::pegaDado("nom_cgm" , "sw_cgm" , " WHERE numcgm = ".$inCGMRepresentanteLegal);
+  }else {
+    $stNomRepresentanteLegal = '';
+  }
+  $inCodGarantia = $rsContrato->getCampo('cod_garantia');
 
   $obTContratoDocumento = new TLicitacaoContratoDocumento;
   $obTContratoDocumento->setDado('num_contrato', $inNumContrato);
@@ -315,7 +330,7 @@ if ($stAcao == 'alterarCD') {
     $obLblTipoContrato = new Label;
     $obLblTipoContrato->setRotulo ( "Tipo de Contrato");
     $obLblTipoContrato->setValue ( $stTipoContrato );
-
+    
     $obLblExercicioContrato = new Label;
     $obLblExercicioContrato->setRotulo ( "Exercício do Contrato");
     $obLblExercicioContrato->setValue ( $inExercicioContrato );
@@ -413,8 +428,24 @@ if ($stAcao == 'incluirCD') {
   $obCmbContratado->setCampoId('cgm_fornecedor');
   $obCmbContratado->setCampoDesc('nom_cgm');
   $obCmbContratado->obEvento->setOnBlur("ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&inCGMFornecedor='+this.value+'&inCodEntidade='+document.frm.inCodEntidade.value+'&inCodModalidade='+document.frm.inCodModalidade.value+'&inCodCompraDireta='+document.frm.inCodCompraDireta.value+'&exercicio='+document.frm.stExercicioCompraDireta.value,'carregaValorFornecedorCompraDireta');");
-}
 
+  
+}
+$obCGMRepresentanteLegal = new IPopUpCGMVinculado( $obForm );
+$obCGMRepresentanteLegal->setTabelaVinculo    ( 'sw_cgm_pessoa_fisica' );
+$obCGMRepresentanteLegal->setCampoVinculo     ( 'numcgm' );
+$obCGMRepresentanteLegal->setNomeVinculo      ( 'CGM Representante Legal' );
+$obCGMRepresentanteLegal->setRotulo           ( 'CGM Representante Legal' );
+$obCGMRepresentanteLegal->setTitle            ( 'Informe o CGM de quem será Representante Legal do Contratado.');
+$obCGMRepresentanteLegal->setName             ( 'stCGMRepresentanteLegal');
+$obCGMRepresentanteLegal->setId               ( 'stCGMRepresentanteLegal');
+$obCGMRepresentanteLegal->obCampoCod->setName ( 'inCGMRepresentanteLegal' );
+$obCGMRepresentanteLegal->obCampoCod->setId   ( 'inCGMRepresentanteLegal' );
+$obCGMRepresentanteLegal->obCampoCod->setValue( $inCGMRepresentanteLegal );
+$obCGMRepresentanteLegal->obCampoCod->setNull ( false );
+$obCGMRepresentanteLegal->setNull             ( false );
+$obCGMRepresentanteLegal->setValue( $stNomRepresentanteLegal );
+  
 $obCmbTipoContrato = new Select();
 $obCmbTipoContrato->setRotulo( 'Tipo de contrato' );
 $obCmbTipoContrato->setTitle( 'Selecione o tipo de contrato' );
@@ -426,6 +457,19 @@ $obCmbTipoContrato->setCampoDesc( 'descricao' );
 $obCmbTipoContrato->setStyle('width: 300');
 $obCmbTipoContrato->setNull(false);
 $obCmbTipoContrato->preencheCombo( $rsTipoContrato );
+
+$obCmbTipoInstrumento = new Select();
+$obCmbTipoInstrumento->setRotulo( 'Tipo de Instrumento' );
+$obCmbTipoInstrumento->setTitle( 'Selecione o tipo de instrumento' );
+$obCmbTipoInstrumento->setName( 'inTipoInstrumento' );
+$obCmbTipoInstrumento->setId( 'inTipoInstrumento' );
+$obCmbTipoInstrumento->addOption( '', 'Selecione' );
+$obCmbTipoInstrumento->setCampoId( 'cod_tipo' );
+$obCmbTipoInstrumento->setCampoDesc( 'descricao' );
+$obCmbTipoInstrumento->setStyle('width: 300');
+$obCmbTipoInstrumento->setNull(false);
+$obCmbTipoInstrumento->preencheCombo( $rsTipoInstrumento );
+$obCmbTipoInstrumento->setValue( $stTipoInstrumento );
 
 $obTxtObjeto = new TextArea;
 $obTxtObjeto->setId     ( "stObjeto" );
@@ -488,6 +532,18 @@ $obTxtPrazoExecucao->setRows ( 2 );
 $obTxtPrazoExecucao->setCols ( 70 );
 $obTxtPrazoExecucao->setMaxCaracteres ( 100 );
 $obTxtPrazoExecucao->setValue( $stPrazoExecucao );
+
+$obTxtMultaInadimplemento = new TextArea;
+$obTxtMultaInadimplemento->setId     ( "stMultaInadimplemento" );
+$obTxtMultaInadimplemento->setName   ( "stMultaInadimplemento" );
+$obTxtMultaInadimplemento->setValue  ( "" );
+$obTxtMultaInadimplemento->setRotulo ( "Multa Inadimplemento" );
+$obTxtMultaInadimplemento->setTitle  ( "Descrição da previsão de multa inadimplemento, conforme previsão do art. 55, VII, da Lei Federal n. 8.666/93." );
+$obTxtMultaInadimplemento->setNull ( false );
+$obTxtMultaInadimplemento->setRows ( 2 );
+$obTxtMultaInadimplemento->setCols ( 70 );
+$obTxtMultaInadimplemento->setMaxCaracteres ( 100 );
+$obTxtMultaInadimplemento->setValue( $stMultaInadimplemento );
 
 $obTxtMultaRescisoria = new TextArea;
 $obTxtMultaRescisoria->setId     ( "stMultaRescisoria" );
@@ -556,6 +612,19 @@ $obTxtDataFimExecucao->setValue  ( $dtFimExecucao                      );
 $obTxtDataFimExecucao->setRotulo ( 'Data de Fim de Execução'           );
 $obTxtDataFimExecucao->setTitle  ( 'Informe a data de fim de execução.' );
 $obTxtDataFimExecucao->setnull   ( false                               );
+
+$obCmbTipoGarantia = new Select();
+$obCmbTipoGarantia->setRotulo( 'Tipo de Garantia' );
+$obCmbTipoGarantia->setTitle( 'Selecione o tipo de garantia' );
+$obCmbTipoGarantia->setName( 'inTipoGarantia' );
+$obCmbTipoGarantia->setId( 'inTipoGarantia' );
+$obCmbTipoGarantia->addOption( '', 'Selecione' );
+$obCmbTipoGarantia->setCampoId( 'cod_garantia' );
+$obCmbTipoGarantia->setCampoDesc( 'descricao' );
+$obCmbTipoGarantia->setStyle('width: 300');
+$obCmbTipoGarantia->setNull(false);
+$obCmbTipoGarantia->preencheCombo( $rsTipoGarantia );
+$obCmbTipoGarantia->setValue($inCodGarantia);
 
 $obTxtValorGarantiaExecucao = new Moeda();
 $obTxtValorGarantiaExecucao->setNull(false);
@@ -758,6 +827,13 @@ $obFormulario->addTitulo ( "Dados do Contrato"   );
 
 if ($stAcao == 'incluirCD') {
     $obFormulario->addComponente( $obCmbTipoContrato );
+}else{
+     $obFormulario->addComponente ( $obLblTipoContrato );
+}
+
+$obFormulario->addComponente( $obCmbTipoInstrumento );
+
+if ($stAcao == 'incluirCD') {
     $obFormulario->addComponente( $obTxtExercicioContrato );
     
     $obFormulario->addComponenteComposto( $obTxtOrgao, $obCmbOrgao );
@@ -769,7 +845,6 @@ if ($stAcao == 'incluirCD') {
 }
 
 if ($stAcao == 'alterarCD') {
-   $obFormulario->addComponente ( $obLblTipoContrato );
    $obFormulario->addComponente ( $obLblExercicioContrato );
    $obFormulario->addComponente ( $obLblExercicioLicitacao );
    $obFormulario->addComponente ( $obLblEntidade );
@@ -808,13 +883,17 @@ if ($stAcao == 'incluirCD') {
     $obFormulario->addHidden     ( $obHdnContratado );
     $obFormulario->addHidden     ( $obHdnNomContratado );
     $obFormulario->addHidden     ( $obHdnNomRepresentante );
+    //$obFormulario->addComponente   ( $obLblRepresentanteLegal );
+    //$obFormulario->addHidden       ( $obHdnRepresentanteLegal );
+    //$obFormulario->addHidden       ( $obHdnNomRepresentanteLegal );
 }
-
+$obFormulario->addComponente  ( $obCGMRepresentanteLegal );
 $obFormulario->addComponente    ( $obTxtObjeto );
 $obFormulario->addComponente    ( $obTxtFormaFornecimento );
 $obFormulario->addComponente    ( $obTxtFormaPagamento );
 $obFormulario->addComponente    ( $obCGMSignatario );
 $obFormulario->addComponente    ( $obTxtPrazoExecucao );
+$obFormulario->addComponente    ( $obTxtMultaInadimplemento );
 $obFormulario->addComponente    ( $obTxtMultaRescisoria );
 
 $obFormulario->addComponente  ( $obTxtDataAssinatura     );
@@ -823,6 +902,7 @@ $obFormulario->addComponente  ( $obTxtDataInicioExecucao );
 $obFormulario->addComponente  ( $obTxtDataFimExecucao    );
 $obFormulario->addHidden      ( $obHdnValorContrato );
 $obFormulario->addComponente  ( $obTxtValorContrato );
+$obFormulario->addComponente  ( $obCmbTipoGarantia );
 $obFormulario->addComponente  ( $obTxtValorGarantiaExecucao );
 
 $obFormulario->addComponente    ( $obTxtJustificativa );

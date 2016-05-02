@@ -33,6 +33,8 @@
 * @package framework
 * @subpackage componentes
 
+  $Id: IBscEvento.class.php 65130 2016-04-26 20:41:36Z michel $
+
 Casos de uso: uc-00.00.00
 
 */
@@ -221,15 +223,15 @@ class IBscEvento
 
     ###
     public function getCampoCodEvento() { return $this->stCampoCodEvento; }
-    
+
     public function setCampoCodEvento($var) { $this->stCampoCodEvento = $var; }
-    
+
     public function getCampoNomEvento() { return $this->stCampoNomEvento; }
-    
+
     public function setCampoNomEvento($var) { $this->stCampoNomEvento = $var; }
 
     public function getCampoTextoComplementar() { return $this->stTextoComplementar; }
-    
+
     public function setCampoTextoComplementar($var) { $this->stTextoComplementar = $var; }
 
     /**
@@ -237,20 +239,20 @@ class IBscEvento
         * @return Boolean
     */
     public function getTextoComplementar() { return $this->boTextoComplementar; }
-    
+
     /**
         * Método Construtor
         * @access Public
     */
     public function IBscEvento($stCampoCodEvento='inCodigoEvento', $stCampoNomEvento='stEvento', $stCampoTextoComplementar='stTextoComplementar')
     {
-        include_once ( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php" );
+        include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php";
 
         //Define a mascara do campo Evento
         $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
         $obRFolhaPagamentoConfiguracao->consultar();
         $stMascaraEvento = $obRFolhaPagamentoConfiguracao->getMascaraEvento();
-        
+
         $this->setCampoCodEvento($stCampoCodEvento);
         $this->setCampoNomEvento($stCampoNomEvento);
         $this->setCampoTextoComplementar($stCampoTextoComplementar);
@@ -260,17 +262,17 @@ class IBscEvento
         $obRFolhaPagamentoConfiguracao = new RFolhaPagamentoConfiguracao;
         $obRFolhaPagamentoConfiguracao->consultar();
         $stMascaraEvento = $obRFolhaPagamentoConfiguracao->getMascaraEvento();
-        
+
         $this->obBscInnerEvento = new BuscaInner;
-        $this->obBscInnerEvento->setRotulo              ( "Evento"   );
-        $this->obBscInnerEvento->setId                  ( $stCampoNomEvento );
-        $this->obBscInnerEvento->setName                ( $stCampoNomEvento );
+        $this->obBscInnerEvento->setRotulo              ( "Evento"            );
+        $this->obBscInnerEvento->setId                  ( $stCampoNomEvento   );
+        $this->obBscInnerEvento->setName                ( $stCampoNomEvento   );
         $this->obBscInnerEvento->setTitle               ( "Informe o evento a ser lançado." );
-        $this->obBscInnerEvento->obCampoCod->setName    ( $stCampoCodEvento );
-        $this->obBscInnerEvento->obCampoCod->setId      ( $stCampoCodEvento );
-        $this->obBscInnerEvento->obCampoCod->setValue   ( $inCodigoEvento  );
-        $this->obBscInnerEvento->obCampoCod->setPreencheComZeros ( "E"     );
-        $this->obBscInnerEvento->obCampoCod->setMascara ( $stMascaraEvento );
+        $this->obBscInnerEvento->obCampoCod->setName    ( $stCampoCodEvento   );
+        $this->obBscInnerEvento->obCampoCod->setId      ( $stCampoCodEvento   );
+        $this->obBscInnerEvento->obCampoCod->setValue   ( $inCodigoEvento     );
+        $this->obBscInnerEvento->obCampoCod->setPreencheComZeros ( "E"        );
+        $this->obBscInnerEvento->obCampoCod->setMascara ( $stMascaraEvento    );
         $this->obBscInnerEvento->obCampoDescrHidden->setName( "hdnDescEvento" );
         $this->obBscInnerEvento->obCampoDescrHidden->setId  ( "hdnDescEvento" );
 
@@ -321,7 +323,7 @@ class IBscEvento
 
         $this->obHdnApresentaParcela = new Hidden;
         $this->obHdnApresentaParcela->setName  ( "stHdnApresentaParcela" );
-        $this->obHdnApresentaParcela->setId    ( "stHdnApresentaParcela"    );
+        $this->obHdnApresentaParcela->setId    ( "stHdnApresentaParcela" );
         $this->obHdnApresentaParcela->setValue ( ""                      );
 
         $this->obSpnDadosEvento = new Span;
@@ -329,15 +331,14 @@ class IBscEvento
         $this->obSpnDadosEvento->setValue ( ""               );
 
         $this->obLblTextoComplementar= new Label;
-        $this->obLblTextoComplementar->setRotulo              ( "Texto Complementar"                                  );
-        $this->obLblTextoComplementar->setName                ( $stCampoTextoComplementar                             );
-        $this->obLblTextoComplementar->setId                  ( $stCampoTextoComplementar                             );
+        $this->obLblTextoComplementar->setRotulo ( "Texto Complementar"      );
+        $this->obLblTextoComplementar->setName   ( $stCampoTextoComplementar );
+        $this->obLblTextoComplementar->setId     ( $stCampoTextoComplementar );
 
         $this->obLblMesAno = new Label;
-        $this->obLblMesAno->setRotulo                     ( "Previsão Mês/Ano Limite"                                 );
-        $this->obLblMesAno->setName                       ( "stMesAno"                                                );
-        $this->obLblMesAno->setId                         ( "stMesAno"                                                );
-
+        $this->obLblMesAno->setRotulo( "Previsão Mês/Ano Limite" );
+        $this->obLblMesAno->setName  ( "stMesAno"                );
+        $this->obLblMesAno->setId    ( "stMesAno"                );
     }
 
     public function geraFormulario(&$obFormulario)
@@ -345,16 +346,16 @@ class IBscEvento
         $this->montaFuncaoBusca();
         $this->montaFuncaoPreenche();
 
-        $obFormulario->addComponente                ( $this->obBscInnerEvento          );
-        
+        $obFormulario->addComponente     ( $this->obBscInnerEvento       );
+
         if ($this->getTextoComplementar()) {
-            $obFormulario->addComponente            ( $this->obLblTextoComplementar    );
+            $obFormulario->addComponente ( $this->obLblTextoComplementar );
         }
 
-        $obFormulario->addSpan                      ( $this->obSpnDadosEvento          );
-        $obFormulario->addHidden                    ( $this->obHdnEvalIBscEvento, true );
-        $obFormulario->addHidden                    ( $this->obHdnFixado               );
-        $obFormulario->addHidden                    ( $this->obHdnApresentaParcela     );
+        $obFormulario->addSpan  ( $this->obSpnDadosEvento          );
+        $obFormulario->addHidden( $this->obHdnEvalIBscEvento, true );
+        $obFormulario->addHidden( $this->obHdnFixado               );
+        $obFormulario->addHidden( $this->obHdnApresentaParcela     );
 
         Sessao::write('IBscEvento',$this);
     }
@@ -390,7 +391,7 @@ class IBscEvento
             $this->setNaturezasAceitas('D');
         }
         $stOnChange = $this->obBscInnerEvento->obCampoCod->obEvento->getOnChange();
-        $this->obBscInnerEvento->obCampoCod->obEvento->setOnChange( "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento='+this.value+'&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."', 'preencheDescEvento' ); ".$stOnChange );
+        $this->obBscInnerEvento->obCampoCod->obEvento->setOnChange( "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento='+this.value+'&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."&stTextoComplementar=".$this->stTextoComplementar."', 'preencheDescEvento' ); ".$stOnChange );
     }
 
     public function montaJsPreencheValores()
@@ -398,7 +399,7 @@ class IBscEvento
         Sessao::write('IBscEvento',$this );
 
         $stJs  = "document.getElementById('inCodigoEvento').value = '".$this->obBscInnerEvento->obCampoCod->getValue()."'\n";
-        $stJs .= "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento=".$this->obBscInnerEvento->obCampoCod->getValue()."&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."', 'preencheDescEvento' );";
+        $stJs .= "ajaxJavaScript( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&inCodigoEvento=".$this->obBscInnerEvento->obCampoCod->getValue()."&stCampoNomEvento=".$this->stCampoNomEvento."&stCampoCodEvento=".$this->stCampoCodEvento."&stTextoComplementar=".$this->stTextoComplementar."', 'preencheDescEvento' );";
 
         return $stJs;
     }

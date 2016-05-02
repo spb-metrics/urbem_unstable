@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: ROrcamentoEntidade.class.php 64847 2016-04-06 19:39:51Z carlos.silva $
+    $Id: ROrcamentoEntidade.class.php 65191 2016-04-29 20:02:55Z franver $
 
     $Revision: 30824 $
     $Name$
@@ -768,9 +768,8 @@ function listarEntidadeRestos(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
     include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
     $obTEntidade = new TOrcamentoEntidade;
     $obTEntidade->setDado('exercicio',  $this->stExercicio);
-    
+    $obTEntidade->setDado('valor', 't');
     $obErro = $obTEntidade->recuperaEntidadeRestos( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
-
     return $obErro;
 }
 
@@ -779,9 +778,8 @@ function verificaEntidadeRestos(&$rsRecordSet, $stOrdem = "", $boTransacao = "")
     include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
     $obTEntidade = new TOrcamentoEntidade;
     $obTEntidade->setDado('exercicio',  $this->stExercicio);
-    
+    $obTEntidade->setDado('valor', 'f');
     $obErro = $obTEntidade->verificaEntidadeRestos( $rsRecordSet, $stFiltro, $stOrdem, $boTransacao);
-
     return $obErro;
 }
 

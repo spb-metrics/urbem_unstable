@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 64214 2015-12-17 16:13:13Z michel $
+    $Id: TLicitacaoContrato.class.php 65124 2016-04-26 19:51:11Z lisiane $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -79,6 +79,10 @@ function __construct()
     $this->AddCampo('justificativa'            ,'char'    ,true ,'250' ,true ,false                            );
     $this->AddCampo('razao'                    ,'char'    ,true ,'250' ,true ,false                            );
     $this->AddCampo('fundamentacao_legal'      ,'char'    ,true ,'250' ,true ,false                            );
+    $this->AddCampo('cod_tipo_instrumento'     ,'integer' ,false,''    ,false,true                             );
+    $this->AddCampo('cod_garantia'             ,'integer' ,false,''    ,false,true                             );
+    $this->AddCampo('multa_inadimplemento'     ,'char'    ,false,'100' ,false,false                            );
+    $this->AddCampo('cgm_representante_legal'  ,'integer' ,false,''    ,false,true                             );
 }
 
 function recuperaDadosContrato(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
@@ -124,7 +128,11 @@ function montaRecuperaDadosContrato()
     $stSql .= "      , contrato.justificativa                                         \n";
     $stSql .= "      , contrato.razao                                                 \n";
     $stSql .= "      , contrato.fundamentacao_legal                                   \n";
-    
+    $stSql .= "      , contrato.cod_garantia                                          \n";
+    $stSql .= "      , contrato.multa_inadimplemento                                  \n";
+    $stSql .= "      , contrato.cod_tipo_instrumento                                  \n";
+    $stSql .= "      , contrato.cgm_representante_legal                               \n";
+    $stSql .= "                                                                       \n";
     $stSql .= "   FROM													              \n";
     $stSql .= "   	  licitacao.contrato								              \n";
     $stSql .= "        JOIN ( SELECT numcgm								              \n";
@@ -234,7 +242,11 @@ function montaRecuperaRelacionamento()
                    , orgao.nom_orgao
                    , unidade.nom_unidade
                    , entidade.nom_cgm AS nom_entidade
-    
+                   , contrato.cod_garantia               
+                   , contrato.multa_inadimplemento       
+                   , contrato.cod_tipo_instrumento       
+                   , contrato.cgm_representante_legal 
+                
                 FROM licitacao.licitacao
                    , licitacao.contrato_licitacao
                    , compras.objeto

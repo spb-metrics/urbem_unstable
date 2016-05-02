@@ -427,7 +427,11 @@ FROM (
              ,it.quantidade
              ,it.nom_unidade                                                                              
              ,it.sigla_unidade as simbolo                                                                 
-             ,it.nom_item                                                                                 
+             ,it.nom_item
+             ,CASE WHEN it.cod_marca IS NOT NULL 
+                THEN it.nom_item||' ( Marca: '||marca.cod_marca||' - '||marca.descricao||' )' 
+                ELSE it.nom_item
+              END as nom_item_e_marca                                                                                 
              ,it.complemento                                                                              
              ,cg.numcgm as num_fornecedor                                                                 
              ,cg.nom_cgm                                                                                 
@@ -477,6 +481,8 @@ FROM (
              LEFT JOIN
               almoxarifado.centro_custo
              ON centro_custo.cod_centro = it.cod_centro
+             LEFT JOIN almoxarifado.marca
+              ON marca.cod_marca = it.cod_marca
              ,orcamento.unidade            as ou                                                          
              ,orcamento.orgao              as oo                                                          
              ,orcamento.entidade           as oe                                                          
@@ -2955,20 +2961,21 @@ FROM (
                 </structure>
                 <structure>
                     <property name="name">nom_item</property>
-                    <expression name="expression">if(dataSetRow["complemento"] != '' &amp;&amp; dataSetRow["complemento"] != dataSetRow["nom_item"]){
+                    <expression name="expression" type="javascript">if(dataSetRow["complemento"] != '' &amp;&amp; dataSetRow["complemento"] != dataSetRow["nom_item"]){
 	if(dataSetRow["cod_item"] != '' &amp;&amp;dataSetRow["cod_item"] !=null){
-		dataSetRow["cod_item"] +' - '+dataSetRow["nom_item"] + ' ' + dataSetRow["complemento"];
+		dataSetRow["cod_item"] +' - '+dataSetRow["nom_item_e_marca"] + ' ' + dataSetRow["complemento"];
 	}else{
-		dataSetRow["nom_item"] + ' ' + dataSetRow["complemento"];
+		dataSetRow["nom_item_e_marca"] + ' ' + dataSetRow["complemento"];
 	}
 } else {
 	if(dataSetRow["cod_item"] != '' &amp;&amp;dataSetRow["cod_item"] !=null ){
-		dataSetRow["cod_item"] +' - '+dataSetRow["nom_item"];
+		dataSetRow["cod_item"] +' - '+dataSetRow["nom_item_e_marca"];
 	}else{
-		dataSetRow["nom_item"];
+		dataSetRow["nom_item_e_marca"];
 	}
 }</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">complemento</property>

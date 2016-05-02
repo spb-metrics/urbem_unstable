@@ -34,7 +34,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoDiversos.php 64697 2016-03-22 19:12:28Z carlos.silva $
+    $Id: FMManterEmpenhoDiversos.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -51,6 +51,7 @@ include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNRoyalties.class.php';
 include_once CAM_FW_HTML.'MontaAtributos.class.php';
 include_once CAM_GF_ORC_COMPONENTES.'IPopUpDotacaoFiltroClassificacao.class.php';
 include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
+require_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma    = 'ManterEmpenho';
@@ -447,6 +448,14 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtComplemento->setRows  (3);
     $obTxtComplemento->setCols  (100);
 
+    $obMarca = new IPopUpMarca($obForm);
+    $obMarca->setNull               ( true );
+    $obMarca->setRotulo             ( 'Marca' );
+    $obMarca->setId                 ( 'stNomeMarca' );
+    $obMarca->setName               ( 'stNomeMarca' );
+    $obMarca->obCampoCod->setName   ( 'inMarca' );
+    $obMarca->obCampoCod->setId     ( 'inMarca' );
+
     // Define Objeto Numeric para Quantidade
     $obTxtQuantidade = new Numerico;
     $obTxtQuantidade->setName     ('nuQuantidade');
@@ -735,6 +744,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMontaItemUnidade->geraFormulario($obFormulario);
     $obFormulario->addComponente($obTxtNomItem);
     $obFormulario->addComponente($obTxtComplemento);
+    $obFormulario->addComponente($obMarca);
     $obFormulario->addComponente($obTxtQuantidade);
     $obFormulario->addComponente($obCmbUnidade);
     $obFormulario->addComponente($obTxtVlUnitario);

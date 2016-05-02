@@ -33,14 +33,14 @@
 
     * @ignore
 
-    $Id: FLExportacaoBalanco.php 61571 2015-02-09 13:28:01Z evandro $
+    $Id: FLExportacaoBalanco.php 65159 2016-04-28 19:59:09Z lisiane $
 
     * Casos de uso: uc-06.04.00
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GF_ORC_COMPONENTES."ISelectMultiploEntidadeUsuario.class.php" );
+include_once CAM_GF_ORC_COMPONENTES."ISelectMultiploEntidadeUsuario.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ExportacaoBalanco";
@@ -66,7 +66,6 @@ $obHdnAcao->setValue( $stAcao );
 //Define o objeto que ira armazenar o nome da pagina oculta
 $obHdnAcao = new Hidden;
 $obHdnAcao->setName ( "hdnPaginaExportacao" );
-#$obHdnAcao->setValue( "../TCEPB/".$pgOcul );
 $obHdnAcao->setValue( "../../../TCMGO/instancias/exportacao/".$pgOcul );
 
 $obTxtPeriodoExport = new Select();
@@ -100,14 +99,15 @@ $arNomeArquivos = array(
                        'DDA.txt',
                        'DES.txt',
                        'IdeBalanco.txt',
+                       'ISI.txt',
                        'OrgaoBalanco.txt',
                        'REC.txt',
                        'PFD.txt',
                        'PFR.txt',
-                    // 'PFR.txt',
                        'PPD.txt',
                        'REP.txt',
-                       'ROP.txt'
+                       'ROP.txt',
+                       'Orgao.txt'
                     );
 
 for ($inCounter=0;$inCounter < count($arNomeArquivos);$inCounter++) {
@@ -141,7 +141,6 @@ $obCmbArquivos->SetRecord2   ( $rsArqSelecionados );
 
 //Instancia o formulário
 $obForm = new Form;
-//$obForm->setAction      ( "../processamento/PRExportador.php"   );
 $obForm->setAction      ( "../../../exportacao/instancias/processamento/PRExportador.php"   );
 $obForm->setTarget      ( "telaPrincipal"                       ); //oculto - telaPrincipal
 

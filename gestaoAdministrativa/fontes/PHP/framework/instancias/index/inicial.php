@@ -92,113 +92,15 @@ if (!Sessao::started()) {
 <?php
 if (isset($_REQUEST['reservaSaldo'])) {
 ?>
-<style type="text/css">
-   div.ui-dialog {
-      z-index : 9 !important;
-      background: #edf4fa;
-      padding: 2px;
-      border-radius : 2px;
-   }
-
-   div#dialog{
-      padding: 8px;
-      font-weight: bold;
-   }
-
-   div.ui-dialog-titlebar {
-      margin: 2px;
-      padding: 5px;
-      background: #4a6491;
-      color: #FFFFFF;
-      font-weight: bold;
-      border-radius : 2px;
-   }
-
-   button.ui-dialog-titlebar-close {
-      border: 0;
-      color: #4a6491;
-      background: #d0e4f2;
-      margin-left: 20px;
-      font-weight: bold;
-      border-radius : 2px;
-   }
-
-   div.ui-dialog-buttonset {
-      text-align: center;
-   }
-
-   button.ui-button-text-only {
-      border: 0;
-      color: orange;
-      background: #4a6491;
-      font-weight: bold;
-      border-radius : 2px;
-   }
-
-</style>
-<div id="dialog" title="Data da Reserva de Saldo">
-   <label>Data&nbsp;</label>
-   <input type="text" id="stDataReserva" style="width:90px" />
+<div id="dialog"> <!-- Data da Reserva de Saldo -->
+   <input type="hidden" id="stDataReserva"/>
 </div>
 <script>
-   jq("#stDataReserva").val('<?=date("d/m/Y")?>');
+    jq("#stDataReserva").val('31/12/<?=date("Y")-1?>');
 
-   function desbloqueiaFrames()
-   {
-      if (typeof jq == 'undefined') {
-         var jq = window.parent.frames["telaPrincipal"].jQuery;
-      }
-      for (i=1;i<4;i++) {
-         jq('div#containerPopUp',parent.frames[i].document).remove();
-         jq('html',parent.frames[i].document).css({'overflow':'auto'});
-      }
-   }
-
-   function bloqueiaFrames()
-   {
-    stHTMLFrames = '<div id="containerPopUp"></div>';
-    var containerCSS = { 'width':'100%',
-                         'height': '100%',
-                         'background':'transparent url(../../../../../../gestaoAdministrativa/fontes/PHP/framework/temas/padrao/imagens/overlay.png) left',
-                         'position':'absolute',
-                         'left':'0',
-                         'top':'0' };
-
-    for (i=1;i<4;i++) {
-        jq('html',parent.frames[i].document).append(stHTMLFrames);
-        jq('html',parent.frames[i].document).css({'overflow':'hidden'});
-        jq('div#containerPopUp', parent.frames[i].document).css(containerCSS);
-    }
-   }
-
-   jq(function () {
-      jq( "#dialog" ).dialog({
-         width  : '210px',
-         minHeight : '50px',
-         closeText : 'X',
-         autoOpen: false,
-         modal: true,
-         buttons: [ { text: "OK", click:
-            function () {
-               var boValida = /^((0?[1-9]|[12]\d)\/(0?[1-9]|1[0-2])|30\/(0?[13-9]|1[0-2])|31\/(0?[13578]|1[02]))\/(19|20)\d{2}$/;
-               if (boValida.test(jq("#stDataReserva").val())) {
-                  jq(this).dialog('close');
-                  window.parent.frames['telaMenu'].location = 'menu.php?'+'<?=Sessao::getId()?>'+'&nivel=1&cod_gestao_pass=2&stTitulo=Financeira&stDataReserva='+jq("#stDataReserva").val();
-                  desbloqueiaFrames();
-               } else {
-                  alert('Digite uma data válida no formato "dd/mm/yyyy"');
-               }
-            }
-         } ]
-
-      });
-   });
-
-   jq(document).ready(function () {
-      //jq('#dialog').css('display','block');
-      jq('#dialog').dialog('open');
-      bloqueiaFrames();
-   });
+    jq(document).ready(function () {
+        window.parent.frames['telaMenu'].location = 'menu.php?'+'<?=Sessao::getId()?>'+'&nivel=1&cod_gestao_pass=2&stTitulo=Financeira&stDataReserva='+jq("#stDataReserva").val();
+    });
 </script>
 <?php
 }

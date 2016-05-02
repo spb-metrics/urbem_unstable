@@ -64,23 +64,23 @@ $stAcao = $request->get('stAcao');
 
 $obRPessoalGeracaoAssentamento = new RPessoalGeracaoAssentamento;
 $rsContrato = new recordset;
-if ($_REQUEST['inContrato'] != "") {
+if ($request->get('inContrato') != "") {
     $obTPessoalContrato = new TPessoalContrato;
-    $stFiltro = " WHERE registro = ".$_REQUEST['inContrato'];
+    $stFiltro = " WHERE registro = ".$request->get('inContrato');
     $obTPessoalContrato->recuperaTodos($rsContrato,$stFiltro);
 }
 
-$stLink .= '&inCodLotacao='      .$_REQUEST['inCodLotacao'];
-$stLink .= '&inCodAssentamento=' .$_REQUEST['inCodAssentamento'];
-$stLink .= '&inContrato='        .$_REQUEST['inContrato'];
-$stLink .= '&boCargoExercido='   .$_REQUEST['boCargoExercido'];
-$stLink .= '&inCodCargo='        .$_REQUEST['inCodCargo'];
-$stLink .= '&inCodEspecialidade='.$_REQUEST['inCodEspecialidade'];
-$stLink .= '&boFuncaoExercida='  .$_REQUEST['boFuncaoExercida'];
-$stLink .= '&stDataInicial='     .$_REQUEST['stDataInicial'];
-$stLink .= '&stDataFinal='       .$_REQUEST['stDataFinal'];
-$stLink .= '&stModoGeracao='     .$_REQUEST['stModoGeracao'];
-$stLink .= '&HdninCodLotacao='   .$_REQUEST['HdninCodLotacao'];
+$stLink .= '&inCodLotacao='      .$request->get('inCodLotacao');
+$stLink .= '&inCodAssentamento=' .$request->get('inCodAssentamento');
+$stLink .= '&inContrato='        .$request->get('inContrato');
+$stLink .= '&boCargoExercido='   .$request->get('boCargoExercido');
+$stLink .= '&inCodCargo='        .$request->get('inCodCargo');
+$stLink .= '&inCodEspecialidade='.$request->get('inCodEspecialidade');
+$stLink .= '&boFuncaoExercida='  .$request->get('boFuncaoExercida');
+$stLink .= '&stDataInicial='     .$request->get('stDataInicial');
+$stLink .= '&stDataFinal='       .$request->get('stDataFinal');
+$stLink .= '&stModoGeracao='     .$request->get('stModoGeracao');
+$stLink .= '&HdninCodLotacao='   .$request->get('HdninCodLotacao');
 
 
 $stFiltroPaginacao = '';
@@ -90,24 +90,24 @@ if ($_GET["pg"] and  $_GET["pos"]) {
     $arLink["pg"]  = $_GET["pg"];
     $arLink["pos"] = $_GET["pos"];
 
-    $stFiltroPaginacao = "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
+    $stFiltroPaginacao = "&pg=".$request->get("pg")."&pos=".$request->get("pos");
 }
 
 $rsLista = new RecordSet;
-$arFiltros['inCodAssentamento'] = $_REQUEST['inCodAssentamento'];
-$arFiltros['inCodClassificacao'] = $_REQUEST['inCodClassificacao'];
+$arFiltros['inCodAssentamento'] = $request->get('inCodAssentamento');
+$arFiltros['inCodClassificacao'] = $request->get('inCodClassificacao');
 $arFiltros['inCodContrato']     = $rsContrato->getCampo("cod_contrato");
-if ($_POST['boCargoExercido']) {
-    $arFiltros['inCodCargo']        = $_REQUEST['inCodCargo'];
-    $arFiltros['inCodEspecialidade']= $_REQUEST['inCodEspecialidade'];
+if ($request->get('boCargoExercido')) {
+    $arFiltros['inCodCargo']        = $request->get('inCodCargo');
+    $arFiltros['inCodEspecialidade']= $request->get('inCodEspecialidade');
 }
-if ($_POST['boFuncaoExercida']) {
-    $arFiltros['inCodFuncao']             = $_REQUEST['inCodCargo'];
-    $arFiltros['inCodEspecialidadeFuncao']= $_REQUEST['inCodEspecialidade'];
+if ($request->get('boFuncaoExercida')) {
+    $arFiltros['inCodFuncao']             = $request->get('inCodCargo');
+    $arFiltros['inCodEspecialidadeFuncao']= $request->get('inCodEspecialidade');
 }
-$arFiltros['inCodLotacao']       = $_REQUEST['inCodLotacao'];
-$arFiltros['dtPeriodoInicial2']  = $_REQUEST['stDataInicial'];
-$arFiltros['dtPeriodoFinal2']    = $_REQUEST['stDataFinal'];
+$arFiltros['inCodLotacao']       = $request->get('inCodLotacao');
+$arFiltros['dtPeriodoInicial2']  = $request->get('stDataInicial');
+$arFiltros['dtPeriodoFinal2']    = $request->get('stDataFinal');
 
 $obRPessoalGeracaoAssentamento->listarAssentamentoServidor( $rsLista,$arFiltros,$stOrdem );
 $request->set('dtInicial', $rsLista->getCampo('dt_inicial') );

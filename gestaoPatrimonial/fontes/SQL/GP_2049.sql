@@ -289,3 +289,10 @@ ALTER TABLE licitacao.contrato ADD COLUMN cgm_representante_legal INTEGER;
 ALTER TABLE licitacao.contrato ADD CONSTRAINT fk_contrato_11 FOREIGN KEY   (cgm_representante_legal)
                                                              REFERENCES sw_cgm_pessoa_fisica(numcgm);
 
+
+----------------
+-- Ticket #23665
+----------------
+
+CREATE SEQUENCE licitacao.seq_nro_contrato_apostila;
+

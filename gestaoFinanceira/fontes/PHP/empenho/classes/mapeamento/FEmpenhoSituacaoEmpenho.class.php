@@ -33,23 +33,13 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 30668 $
-    $Name$
-    $Autor: $
-    $Date: 2007-12-04 12:08:26 -0200 (Ter, 04 Dez 2007) $
+    $Id: FEmpenhoSituacaoEmpenho.class.php 65133 2016-04-27 14:20:11Z michel $
 
     * Casos de uso: uc-02.03.13
 */
 
-/*
-$Log$
-Revision 1.6  2006/07/05 20:46:56  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
 class FEmpenhoSituacaoEmpenho extends Persistente
 {
@@ -57,7 +47,7 @@ class FEmpenhoSituacaoEmpenho extends Persistente
     * Método Construtor
     * @access Private
 */
-function FEmpenhoSituacaoEmpenho()
+function __construct()
 {
     parent::Persistente();
 
@@ -66,66 +56,78 @@ function FEmpenhoSituacaoEmpenho()
     $this->AddCampo('empenho'       ,'integer',false,''    ,false,false);
     $this->AddCampo('entidade'      ,'integer',false,''    ,false,false);
     $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('emissao'       ,'text',false,''       ,false,false);
+    $this->AddCampo('emissao'       ,'text'   ,false,''    ,false,false);
     $this->AddCampo('credor'        ,'varchar',false,''    ,false,false);
     $this->AddCampo('empenhado'     ,'numeric',false,'14.2',false,false);
     $this->AddCampo('anulado'       ,'numeric',false,'14.2',false,false);
     $this->AddCampo('liquidado'     ,'numeric',false,'14.2',false,false);
     $this->AddCampo('pago'          ,'numeric',false,'14.2',false,false);
-    $this->AddCampo('data_pagamento','text',false,''       ,false,false);
+    $this->AddCampo('data_pagamento','text'  ,false,''     ,false,false);
 }
 
 function montaRecuperaTodos()
 {
-    $stSql  = "select retorno.*                                                                                        \n";
-    $stSql .= "  from ".$this->getTabela()."('".$this->getDado("stEntidade")."',                                        \n";
-    $stSql .= "  '".$this->getDado("exercicio")."','".$this->getDado("stDataInicialEmissao")."',                        \n";
-    $stSql .= "  '".$this->getDado("stDataFinalEmissao")."','".$this->getDado("stDataInicialAnulacao")."',              \n";
-    $stSql .= "  '".$this->getDado("stDataFinalAnulacao")."','".$this->getDado("stDataInicialLiquidacao")."',           \n";
-    $stSql .= "  '".$this->getDado("stDataFinalLiquidacao")."','".$this->getDado("stDataInicialEstornoLiquidacao")."',  \n";
-    $stSql .= "  '".$this->getDado("stDataFinalEstornoLiquidacao")."','".$this->getDado("stDataInicialPagamento")."',   \n";
-    $stSql .= "  '".$this->getDado("stDataFinalPagamento")."','" . $this->getDado("stDataInicialEstornoPagamento")."',  \n";
-    $stSql .= "  '".$this->getDado("stDataFinalEstornoPagamento")."','".$this->getDado("inCodEmpenhoInicial")."',       \n";
-    $stSql .= "  '".$this->getDado("inCodEmpenhoFinal")."','".$this->getDado("inCodDotacao")."',                        \n";
-    $stSql .= "  '".$this->getDado("inCodDespesa")."','".$this->getDado("inCodRecurso")."',                             \n";
-    $stSql .= "  '".$this->getDado("stDestinacaoRecurso")."','".$this->getDado("inCodDetalhamento")."',                 \n";
-    $stSql .= "  '".$this->getDado("inNumOrgao")."','".$this->getDado("inNumUnidade")."',                               \n";
-    $stSql .= "  '".$this->getDado("inOrdenacao")."','".$this->getDado("inCodFornecedor")."',                           \n";
-    $stSql .= "  '".$this->getDado("inSituacao")."', '".$this->getDado("stTipoEmpenho")."') as retorno(                 \n";
-    $stSql .= "  empenho             integer,                                           \n";
-    $stSql .= "  entidade            integer,                                           \n";
-    $stSql .= "  exercicio           char(4),                                           \n";
-    $stSql .= "  emissao             text,                                              \n";
-    $stSql .= "  credor              varchar,                                           \n";
-    $stSql .= "  empenhado           numeric,                                           \n";
-    $stSql .= "  anulado             numeric,                                           \n";
-    $stSql .= "  saldoempenhado      numeric,                                           \n";
-    $stSql .= "  liquidado           numeric,                                           \n";
-    $stSql .= "  pago                numeric,                                           \n";
-    $stSql .= "  aliquidar           numeric,                                           \n";
-    $stSql .= "  empenhadoapagar     numeric,                                           \n";
-    $stSql .= "  liquidadoapagar     numeric,                                           \n";
-    $stSql .= "  cod_recurso         integer                                            \n";
-    $stSql .= "  )                                                                        ";
+    $stSql  = "
+                SELECT retorno.*
+                  FROM ".$this->getTabela()."
+                       ( '".$this->getDado("stEntidade")."', '".$this->getDado("exercicio")."'
+                       , '".$this->getDado("stDataInicialEmissao")."', '".$this->getDado("stDataFinalEmissao")."'
+                       , '".$this->getDado("stDataInicialAnulacao")."', '".$this->getDado("stDataFinalAnulacao")."'
+                       , '".$this->getDado("stDataInicialLiquidacao")."', '".$this->getDado("stDataFinalLiquidacao")."'
+                       , '".$this->getDado("stDataInicialEstornoLiquidacao")."', '".$this->getDado("stDataFinalEstornoLiquidacao")."'
+                       , '".$this->getDado("stDataInicialPagamento")."', '".$this->getDado("stDataFinalPagamento")."'
+                       , '".$this->getDado("stDataInicialEstornoPagamento")."', '".$this->getDado("stDataFinalEstornoPagamento")."'
+                       , '".$this->getDado("inCodEmpenhoInicial")."', '".$this->getDado("inCodEmpenhoFinal")."'
+                       , '".$this->getDado("inCodDotacao")."', '".$this->getDado("inCodDespesa")."'
+                       , '".$this->getDado("inCodRecurso")."', '".$this->getDado("stDestinacaoRecurso")."'
+                       , '".$this->getDado("inCodDetalhamento")."', '".$this->getDado("inNumOrgao")."'
+                       , '".$this->getDado("inNumUnidade")."', '".$this->getDado("inOrdenacao")."'
+                       , '".$this->getDado("inCodFornecedor")."', '".$this->getDado("inSituacao")."'
+                       , '".$this->getDado("stTipoEmpenho")."'
+                       ) AS retorno
+                       ( empenho             integer
+                       , entidade            integer
+                       , exercicio           char(4)
+                       , emissao             text
+                       , credor              varchar
+                       , empenhado           numeric
+                       , anulado             numeric
+                       , saldoempenhado      numeric
+                       , liquidado           numeric
+                       , pago                numeric
+                       , aliquidar           numeric
+                       , empenhadoapagar     numeric
+                       , liquidadoapagar     numeric
+                       , cod_recurso         integer
+                       )
+    ";
 
     if (Sessao::getExercicio() > '2015') {
+        $stFiltroCentro = "";
+        if ($this->getDado("inCentroCusto") != "")
+            $stFiltroCentro = "AND item_pre_empenho.cod_centro      = ".$this->getDado("inCentroCusto");
+
         $stSql .= "
-                    INNER JOIN empenho.empenho
-                            ON empenho.cod_empenho = retorno.empenho
-                           AND empenho.cod_entidade = retorno.entidade
-                           AND empenho.exercicio = retorno.exercicio
+            INNER JOIN empenho.empenho
+                    ON empenho.cod_empenho = retorno.empenho
+                   AND empenho.cod_entidade = retorno.entidade
+                   AND empenho.exercicio = retorno.exercicio
 
-                    INNER JOIN empenho.pre_empenho
-                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+            INNER JOIN empenho.pre_empenho
+                    ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                   AND pre_empenho.exercicio = empenho.exercicio
 
-                    INNER JOIN empenho.item_pre_empenho
-                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                           AND item_pre_empenho.exercicio = pre_empenho.exercicio
-                \n";
-
-        if ($this->getDado("inCentroCusto") != "") {
-            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado("inCentroCusto")."\n";
-        }
+            INNER JOIN (SELECT item_pre_empenho.cod_pre_empenho
+                             , item_pre_empenho.exercicio
+                             , item_pre_empenho.cod_centro
+                          FROM empenho.item_pre_empenho
+                      GROUP BY item_pre_empenho.cod_pre_empenho
+                             , item_pre_empenho.exercicio
+                             , item_pre_empenho.cod_centro
+                       ) AS item_pre_empenho
+                    ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                   AND item_pre_empenho.exercicio       = pre_empenho.exercicio
+                   ".$stFiltroCentro;
     }
 
     return $stSql;

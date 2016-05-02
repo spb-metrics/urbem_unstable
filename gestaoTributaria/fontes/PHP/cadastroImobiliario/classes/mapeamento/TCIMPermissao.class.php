@@ -33,7 +33,7 @@
      * @package URBEM
      * @subpackage Mapeamento
 
-    * $Id: TCIMPermissao.class.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: TCIMPermissao.class.php 65128 2016-04-26 20:07:17Z evandro $
 
      * Casos de uso: uc-05.01.28
 */
@@ -51,7 +51,7 @@ class TCIMPermissao extends Persistente
         * Método Construtor
         * @access Private
     */
-    public function TCIMPermissao()
+    public function __construct()
     {
         parent::Persistente();
         $this->setTabela('imobiliario.permissao');

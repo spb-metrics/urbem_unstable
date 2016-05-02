@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoPreEmpenho.class.php 64372 2016-01-28 17:55:48Z arthur $
+    $Id: REmpenhoPreEmpenho.class.php 65141 2016-04-27 20:10:02Z evandro $
 
     *Casos de uso: uc-02.01.23
                    uc-02.03.15
@@ -594,6 +594,7 @@ class REmpenhoPreEmpenho
                 $this->roUltimoItemPreEmpenho->setValorTotal    ( $rsItemPreEmpenho->getCampo( "vl_total" )         );
                 $this->roUltimoItemPreEmpenho->setComplemento   ( $rsItemPreEmpenho->getCampo( "complemento" )      );
                 $this->roUltimoItemPreEmpenho->setCodCentroCusto( $rsItemPreEmpenho->getCampo( "cod_centro" )       );
+                $this->roUltimoItemPreEmpenho->setCodigoMarca   ( $rsItemPreEmpenho->getCampo( "cod_marca" )        );                
                 $this->roUltimoItemPreEmpenho->consultaCodMaterial( $boTransacao );
 
                 if( $rsItemPreEmpenho->getCampo( "cod_centro" ) == '')

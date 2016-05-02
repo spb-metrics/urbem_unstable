@@ -32,26 +32,20 @@
 
 * @ignore
 
-$Revision: 30766 $
-$Name$
-$Author: souzadl $
-$Date: 2007-12-04 09:20:23 -0200 (Ter, 04 Dez 2007) $
+$Id: FMImportarRegistroEvento.php 65130 2016-04-26 20:41:36Z michel $
 
 * Casos de uso: uc-04.05.49
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php"                            );
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                      );
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php"                             );
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php"                             );
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoConfiguracao.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoFolhaSituacao.class.php";
 
 //Define a função do arquivo, ex: incluir ou alterar
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ImportarRegistroEvento";
@@ -59,7 +53,8 @@ $pgForm     = "FM".$stPrograma.".php";
 $pgProc     = "PR".$stPrograma.".php";
 $pgOcul     = "OC".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
-include_once( $pgJs );
+
+include_once $pgJs;
 
 //Utilizado para trazer o título da competência.
 $obRFolhaPagamentoFolhaSituacao = new RFolhaPagamentoFolhaSituacao(new RFolhaPagamentoPeriodoMovimentacao);
@@ -74,19 +69,19 @@ $stSituacaoFolha = $obRFolhaPagamentoFolhaSituacao->getSituacao();
 $obForm = new Form;
 $obForm->setAction( $pgProc );
 $obForm->setTarget( "oculto" );
-$obForm->setEncType     ( "multipart/form-data" );
+$obForm->setEncType( "multipart/form-data" );
 
 $obHdnCtrl =  new Hidden;
-$obHdnCtrl->setName                             ( "stCtrl" );
-$obHdnCtrl->setValue                            ( $stCtrl  );
+$obHdnCtrl->setName  ( "stCtrl" );
+$obHdnCtrl->setValue ( $stCtrl );
 
 $obHdnAcao =  new Hidden;
-$obHdnAcao->setName                             ( "stAcao" );
-$obHdnAcao->setValue                            ( $stAcao  );
+$obHdnAcao->setName  ( "stAcao" );
+$obHdnAcao->setValue ( $stAcao );
 
 $obHdnEval = new HiddenEval;
-$obHdnEval->setName                         ( "stEval" );
-$obHdnEval->setValue                        ( ""       );
+$obHdnEval->setName  ( "stEval" );
+$obHdnEval->setValue ( "" );
 
 $obLblSituacao = new Label;
 $obLblSituacao->setRotulo ( 'Situação'   );
@@ -137,16 +132,16 @@ $arBotoes = array($obBtnOk);
 //Monta FORMULARIO
 //****************************************//
 $obFormulario = new Formulario;
-$obFormulario->addForm               ( $obForm                                                          );
-$obFormulario->addHidden             ( $obHdnEval , true                                                );
-$obFormulario->addHidden                        ( $obHdnAcao                                                            );
-$obFormulario->addHidden                        ( $obHdnCtrl                                                            );
-$obFormulario->addTitulo             ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia() ,"right" );
+$obFormulario->addForm ( $obForm );
+$obFormulario->addHidden ( $obHdnEval, true );
+$obFormulario->addHidden ( $obHdnAcao );
+$obFormulario->addHidden ( $obHdnCtrl );
+$obFormulario->addTitulo ( $obRFolhaPagamentoFolhaSituacao->consultarCompetencia(), "right" );
 if ($stSituacaoFolha != "Aberto") {
-    $obFormulario->addComponente         ( $obLblSituacao                                                   );
+    $obFormulario->addComponente ( $obLblSituacao );
 } else {
     $jsOnload   = "executaFuncaoAjax( 'gerarSpanLoteEvento' );";
-    $obFormulario->agrupaComponentes( array( $obRdbLoteEvento,$obRdbLoteMatricula , $obRdbOpcaoImportar )   );
+    $obFormulario->agrupaComponentes( array( $obRdbLoteEvento,$obRdbLoteMatricula , $obRdbOpcaoImportar ) );
     $obFormulario->addSpan( $obSpnOpcao );
     $obFormulario->defineBarra($arBotoes);
 }

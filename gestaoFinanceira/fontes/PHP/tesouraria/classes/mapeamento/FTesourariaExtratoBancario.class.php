@@ -71,125 +71,125 @@ include_once ( CLA_PERSISTENTE );
 
 class FTesourariaExtratoBancario extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FTesourariaExtratoBancario()
-{
-    parent::Persistente();
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "select *                                                                               \n";
-    $stSql .= "  from tesouraria.fn_relatorio_extrato_bancario (" . $this->getDado("inCodPlano") .",  \n";
-    $stSql .= "  '" . $this->getDado("stExercicio") . "',                                             \n";
-    $stSql .= "  '" . $this->getDado("stEntidade")."',                                                \n";
-    $stSql .= "  '" . $this->getDado("stDataInicial")."',                                             \n";
-    $stSql .= "  '" . $this->getDado("stDataFinal")."',                                               \n";
-    $stSql .= "  '" . $this->getDado("botcems")."') as retorno(                                       \n";
-    $stSql .= "     hora                text                                                          \n";
-    $stSql .= "    ,data                text                                                          \n";
-    $stSql .= "    ,descricao           varchar                                                       \n";
-    $stSql .= "    ,valor               numeric                                                       \n";
-    $stSql .= "    ,cod_lote            numeric                                                       \n";
-    $stSql .= "    ,cod_arrecadacao     numeric                                                       \n";
-    $stSql .= "    ,tipo_valor          varchar                                                       \n";
-    $stSql .= "    ,situacao            varchar                                                       \n";
-    $stSql .= "    ,cod_situacao        varchar                                                       \n";
-    $stSql .= "  )                                                                                      ";
-
-    return $stSql;
-
-}
-
-function recuperaDadosBancarios(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-    if ($stOrder == "") {
-        $stOrder .= " ORDER BY 1";
-    }
-    $stSql = $this->montaRecuperaDadosBancarios().$stCondicao.$stOrder;
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
-
-    return $obErro;
-}
-
-function montaRecuperaDadosBancarios()
-{
-    $stSql = " SELECT
-                    PA.cod_plano,
-                    PC.nom_conta,
-                    PC.cod_estrutural,
-                    (select publico.fn_nivel(PC.cod_estrutural)) as nivel,
-                    PB.cod_banco,
-                    PB.cod_agencia,
-                    PB.conta_corrente,
-                    MA.nom_agencia,
-                    MB.nom_banco
-                FROM
-                    contabilidade.plano_conta       as PC,
-                    contabilidade.plano_analitica   as PA,
-                    contabilidade.plano_banco       as PB
-                    LEFT JOIN monetario.agencia as MA ON(
-                        PB.cod_banco    = MA.cod_banco      AND
-                        PB.cod_agencia  = MA.cod_agencia
-                    )
-                    LEFT JOIN monetario.banco as MB ON(
-                        MA.cod_banco    = MB.cod_banco
-                    )
-                WHERE
-                    PC.cod_conta    = PA.cod_conta      AND
-                    PC.exercicio    = PA.exercicio      AND
-                    PA.cod_plano    = PB.cod_plano      AND
-                    PA.exercicio    = PB.exercicio      AND
-                    PB.exercicio = '".$this->getDado("stExercicio")."'
-             ";
-    if ( ( $this->getDado("inCodPlanoInicial") ) and ( $this->getDado("inCodPlanoFinal") ) ) {
-        $stSql .= " AND PA.cod_plano BETWEEN " . $this->getDado("inCodPlanoInicial") . " AND " . $this->getDado("inCodPlanoFinal") ;
-    } elseif ( $this->getDado("inCodPlanoInicial") ) {
-        $stSql .= " AND PA.cod_plano =" . $this->getDado("inCodPlanoInicial") ;
-    } elseif ( $this->getDado("inCodPlanoFinal") ) {
-        $stSql .= " AND PA.cod_plano =" . $this->getDado("inCodPlanoFinal") ;
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
     }
 
-    return $stSql;
-
-}
-
-function recuperaSaldoAnteriorAtual(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $boTransacao = "")
-{
-    $obErro      = new Erro;
-    $obConexao   = new Conexao;
-    $rsRecordSet = new RecordSet;
-
-    if ($stOrder != "") {
-        if( !strstr( $stOrder, "ORDER BY" ) )
-            $stOrder = " ORDER BY ".$stOrder;
+    function montaRecuperaTodos()
+    {
+        $stSql  = "select *                                                                               \n";
+        $stSql .= "  from tesouraria.fn_relatorio_extrato_bancario (" . $this->getDado("inCodPlano") .",  \n";
+        $stSql .= "  '" . $this->getDado("stExercicio") . "',                                             \n";
+        $stSql .= "  '" . $this->getDado("stEntidade")."',                                                \n";
+        $stSql .= "  '" . $this->getDado("stDataInicial")."',                                             \n";
+        $stSql .= "  '" . $this->getDado("stDataFinal")."',                                               \n";
+        $stSql .= "  '" . $this->getDado("botcems")."') as retorno(                                       \n";
+        $stSql .= "     hora                text                                                          \n";
+        $stSql .= "    ,data                text                                                          \n";
+        $stSql .= "    ,descricao           varchar                                                       \n";
+        $stSql .= "    ,valor               numeric                                                       \n";
+        $stSql .= "    ,cod_lote            numeric                                                       \n";
+        $stSql .= "    ,cod_arrecadacao     numeric                                                       \n";
+        $stSql .= "    ,tipo_valor          varchar                                                       \n";
+        $stSql .= "    ,situacao            varchar                                                       \n";
+        $stSql .= "    ,cod_situacao        varchar                                                       \n";
+        $stSql .= "  )                                                                                      ";
+    
+        return $stSql;
+    
     }
-    $stSql = $this->montaRecuperaSaldoAnteriorAtual().$stCondicao;
-    $this->setDebug( $stSql );
-    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
 
-    return $obErro;
-}
+    function recuperaDadosBancarios(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+        if ($stOrder == "") {
+            $stOrder .= " ORDER BY 1";
+        }
+        $stSql = $this->montaRecuperaDadosBancarios().$stCondicao.$stOrder;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-function montaRecuperaSaldoAnteriorAtual()
-{
-     $stSql  = "select  *                                                                                   \n";
-     $stSql .= "     FROM                                                                                   \n";
-     $stSql .= "         tesouraria.fn_saldo_conta_tesouraria ('". $this->getDado("stExercicio") ."',         \n";
-     $stSql .= "          ". $this->getDado("inCodPlano") .",                                               \n";
-     $stSql .= "         '". $this->getDado("stDtInicial")."',                                              \n";
-     $stSql .= "         '". $this->getDado("stDtFinal")."',                                                \n";
-     $stSql .= "         ". $this->getDado("boMovimentacao").")                                                \n";
+    function montaRecuperaDadosBancarios()
+    {
+        $stSql = " SELECT
+                        PA.cod_plano,
+                        PC.nom_conta,
+                        PC.cod_estrutural,
+                        (select publico.fn_nivel(PC.cod_estrutural)) as nivel,
+                        PB.cod_banco,
+                        PB.cod_agencia,
+                        PB.conta_corrente,
+                        MA.nom_agencia,
+                        MB.nom_banco
+                    FROM
+                        contabilidade.plano_conta       as PC,
+                        contabilidade.plano_analitica   as PA,
+                        contabilidade.plano_banco       as PB
+                        LEFT JOIN monetario.agencia as MA ON(
+                            PB.cod_banco    = MA.cod_banco      AND
+                            PB.cod_agencia  = MA.cod_agencia
+                        )
+                        LEFT JOIN monetario.banco as MB ON(
+                            MA.cod_banco    = MB.cod_banco
+                        )
+                    WHERE
+                        PC.cod_conta    = PA.cod_conta      AND
+                        PC.exercicio    = PA.exercicio      AND
+                        PA.cod_plano    = PB.cod_plano      AND
+                        PA.exercicio    = PB.exercicio      AND
+                        PB.exercicio = '".$this->getDado("stExercicio")."'
+                 ";
+        if ( ( $this->getDado("inCodPlanoInicial") ) and ( $this->getDado("inCodPlanoFinal") ) ) {
+            $stSql .= " AND PA.cod_plano BETWEEN " . $this->getDado("inCodPlanoInicial") . " AND " . $this->getDado("inCodPlanoFinal") ;
+        } elseif ( $this->getDado("inCodPlanoInicial") ) {
+            $stSql .= " AND PA.cod_plano =" . $this->getDado("inCodPlanoInicial") ;
+        } elseif ( $this->getDado("inCodPlanoFinal") ) {
+            $stSql .= " AND PA.cod_plano =" . $this->getDado("inCodPlanoFinal") ;
+        }
+    
+        return $stSql;
+    }
+    
+    public function recuperaSaldoAnteriorAtual(&$rsRecordSet, $stCondicao = "", $stOrder = "",  $boTransacao = "")
+    {
+        $obErro      = new Erro;
+        $obConexao   = new Conexao;
+        $rsRecordSet = new RecordSet;
+    
+        if ($stOrder != "") {
+            if( !strstr( $stOrder, "ORDER BY" ) )
+                $stOrder = " ORDER BY ".$stOrder;
+        }
+        $stSql = $this->montaRecuperaSaldoAnteriorAtual().$stCondicao;
+        $this->setDebug( $stSql );
+        $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
+    
+        return $obErro;
+    }
 
-    return $stSql;
-
-}
+    public function montaRecuperaSaldoAnteriorAtual()
+    {
+        $stSql = "
+          SELECT *
+            FROM tesouraria.fn_saldo_conta_tesouraria ( '". $this->getDado("stExercicio") ."'
+                                                      , ". $this->getDado("inCodPlano") ."
+                                                      , '". $this->getDado("stDtInicial")."'
+                                                      , '". $this->getDado("stDtFinal")."'
+                                                      , ". $this->getDado("boMovimentacao")."
+                                                      )
+        \n";
+        return $stSql;
+    
+    }
 
 }

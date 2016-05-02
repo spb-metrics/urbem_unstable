@@ -27,20 +27,11 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 59612 $
-* $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Id: saldoEmpenho.plsql 65190 2016-04-29 19:36:51Z michel $
 *
 * Casos de uso: uc-06.00.00
 */
 
-/*
-$Log$
-Revision 1.1  2007/04/24 13:16:08  domluc
-Função para retornar saldo do empenho até a data passada
-
-*/
 
 CREATE OR REPLACE FUNCTION tc.fn_saldo_empenho (   inCodEmpenho  integer
                                                     , inCodEntidade integer
@@ -67,7 +58,7 @@ BEGIN
             empenho.item_pre_empenho    as ipe
         WHERE
             e.cod_entidade      =   inCodEntidade AND
-            e.exercicio         =   inExercicio   AND 
+            e.exercicio         =   inExercicio::VARCHAR AND 
             e.cod_empenho       =   inCodEmpenho  AND 
             e.dt_empenho       <=   to_date( stDataFinal ,''dd/mm/yyyy'') AND 
             --Ligação EMPENHO : PRE_EMPENHO
@@ -77,10 +68,6 @@ BEGIN
             --Ligação PRE_EMPENHO : ITEM_PRE_EMPENHO
             pe.exercicio        = ipe.exercicio AND
             pe.cod_pre_empenho  = ipe.cod_pre_empenho ;
-/*        GROUP BY
-            e.cod_entidade,
-            e.cod_empenho,
-            e.exercicio; */
 
 
     -- EMPENHO ANULADO
@@ -93,7 +80,7 @@ BEGIN
             empenho.empenho_anulado_item    as eai
         WHERE
             e.cod_entidade      = inCodEmpenho AND
-            e.exercicio         = inExercicio  AND
+            e.exercicio         = inExercicio::VARCHAR AND
             e.cod_empenho       = inCodEmpenho AND
             to_date( to_char( ea.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'' ) <= to_date( stDataFinal ,''dd/mm/yyyy'') AND 
 
@@ -106,12 +93,6 @@ BEGIN
             ea.timestamp        = eai.timestamp AND
             ea.cod_entidade     = eai.cod_entidade AND
             ea.cod_empenho      = eai.cod_empenho ;
-/*
-        GROUP BY
-            e.cod_entidade,
-            e.cod_empenho,
-            e.exercicio
-*/
     
         SELECT
             coalesce(sum(nlp.vl_pago),0.00)    as valor
@@ -122,7 +103,7 @@ BEGIN
             empenho.nota_liquidacao_paga    as nlp
         WHERE
             e.cod_entidade      = inCodEntidade AND
-            e.exercicio         = inExercicio   AND
+            e.exercicio         = inExercicio::VARCHAR AND
             e.cod_empenho       = inCodEmpenho  AND
             to_date( to_char( nlp.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'' ) <= to_date(stDataFinal ,''dd/mm/yyyy'') AND
 
@@ -135,12 +116,6 @@ BEGIN
             nl.exercicio        = nlp.exercicio AND
             nl.cod_nota         = nlp.cod_nota AND
             nl.cod_entidade     = nlp.cod_entidade;
-/*
-        GROUP BY
-            e.cod_entidade,
-            e.cod_empenho,
-            e.exercicio
-*/
 
         SELECT
             coalesce(sum(nlpa.vl_anulado),0.00)    as valor
@@ -152,7 +127,7 @@ BEGIN
             empenho.nota_liquidacao_paga_anulada    as nlpa
         WHERE
             e.cod_entidade      = inCodEntidade AND
-            e.exercicio         = inExercicio   AND
+            e.exercicio         = inExercicio::VARCHAR AND
             e.cod_empenho       = inCodEmpenho  AND
             to_date( to_char( nlpa.timestamp, ''dd/mm/yyyy''), ''dd/mm/yyyy'' ) <= to_date(stDataFinal ,''dd/mm/yyyy'') AND
 

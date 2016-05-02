@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: JSManterAutorizacao.js 64051 2015-11-24 17:55:39Z franver $
+    $Id: JSManterAutorizacao.js 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08 
@@ -199,7 +199,9 @@ function limparItem() {
     document.getElementById('stUnidadeMedida').innerHTML = '&nbsp;';
     document.getElementById('stNomCentroCusto').innerHTML = '&nbsp;';
     jQuery("#btnIncluir").val('Incluir');
-    jQuery("#btnIncluir").attr('onclick',"if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}");
+    jQuery("#btnIncluir").attr('onclick',"if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}");    
+    jQuery("#inMarca").val('');
+    jQuery("#stNomeMarca").html('&nbsp;');
 }
 
 function gerarValorTotal() {

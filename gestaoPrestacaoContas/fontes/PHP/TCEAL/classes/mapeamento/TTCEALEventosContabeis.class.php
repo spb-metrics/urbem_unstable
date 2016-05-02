@@ -73,10 +73,6 @@ class TTCEALEventosContabeis extends Persistente
                        ) AS codigo_ua
                      , '".$this->getDado('stExercicio')."' AS exercicio
                      , ".$this->getDado('bimestre')." AS bimestre
-                     , ( SELECT COALESCE(RPAD(codigo::VARCHAR, 6, '0')::INTEGER, 0)
-                           FROM folhapagamento.evento
-                          WHERE cod_evento = retorno_evento.cod_evento 
-		               )AS num_evento
                      , retorno_evento.cod_evento
                      , historico_contabil.nom_historico AS historico
                      , TO_CHAR(lote.dt_lote, 'DD/MM/YYYY') AS dt_lancamento
@@ -176,8 +172,9 @@ class TTCEALEventosContabeis extends Persistente
                     AND lote.dt_lote BETWEEN TO_DATE('".$this->getDado("dt_inicial")."','DD/MM/YYYY')
                                          AND TO_DATE('".$this->getDado("dt_final")."','DD/MM/YYYY')
                     AND lancamento.cod_entidade IN ( ".$this->getDado('inCodEntidade')." )
-
-               GROUP BY 1,2,3,4,5,6,7,8,9,10 ";
+	       
+               GROUP BY 1,2,3,4,5,6,7,8,9
+	       ORDER BY retorno_evento.cod_evento";
         return $stSql;        
     }
      

@@ -32,25 +32,16 @@
 
     * @ignore
 
-    $Revision: 30813 $
-    $Name$
-    $Author: cleisson $
-    $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+    $Id: OCManterReducao.php 65156 2016-04-28 17:58:44Z michel $
 
     * Casos de uso: uc-02.01.07
 */
 
-/*
-$Log$
-Revision 1.5  2006/07/05 20:42:23  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoSuplementacao.class.php" );
-include_once( CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php" );
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoSuplementacao.class.php";
+include_once CAM_GF_ORC_NEGOCIO."ROrcamentoDespesa.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterSuplementacao";
@@ -60,10 +51,10 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 
-$stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
-list($inCodNorma,$stDecreto)  = $_REQUEST['inCodNorma'];
-//$arRecordReducoes =
+list($inCodNorma,$stDecreto)  = $request->get('inCodNorma');
+
 
 $obRegra = new ROrcamentoSuplementacao;
 $obRegra->setExercicio( Sessao::getExercicio() );
@@ -608,10 +599,12 @@ function incluirSuplementadaRecurso(Request $request)
 
 function incluirReducao(Request $request)
 {
-    $nuVlTotal       = str_replace( '.' , '' , $_POST['nuVlTotal']           );
-    $nuVlTotal       = str_replace( ',' ,'.' , $nuVlTotal                    );
-    $nuVlRedutora    = str_replace( '.' , '' , $_POST['nuVlDotacaoRedutora'] );
-    $nuVlRedutora    = str_replace( ',' ,'.' , $nuVlRedutora                 );
+    $obRegra         = new ROrcamentoSuplementacao;
+
+    $nuVlTotal       = str_replace( '.' , '' , $request->get('nuVlTotal')           );
+    $nuVlTotal       = str_replace( ',' ,'.' , $nuVlTotal                           );
+    $nuVlRedutora    = str_replace( '.' , '' , $request->get('nuVlDotacaoRedutora') );
+    $nuVlRedutora    = str_replace( ',' ,'.' , $nuVlRedutora                        );
     $nuVlSomatoria   = $nuVlRedutora;
 
     $arRedutoras = Sessao::read('arRedutoras');
@@ -619,7 +612,7 @@ function incluirReducao(Request $request)
     $inCount = sizeof($arRedutoras);
     if ($inCount) {
         foreach ($arRedutoras as $value) {
-            if ($value['cod_reduzido'] != $_POST['inCodDotacaoReducao']) {
+            if ($value['cod_reduzido'] != $request->get('inCodDotacaoReducao')) {
                 $nuVlSomatoria += $value['vl_valor'];
             } else {
                 SistemaLegado::exibeAviso('Esta dotação já está presente na lista',"n_incluir","erro");
@@ -629,8 +622,8 @@ function incluirReducao(Request $request)
     }
     if ( bcsub($nuVlSomatoria, $nuVlTotal, 4) <= 0 ) {
         $obRegra->addDespesaReducao();
-        $obRegra->roUltimoDespesaReducao->setCodDespesa( $_REQUEST["inCodDotacaoReducao"] );
-        $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+        $obRegra->roUltimoDespesaReducao->setCodDespesa( $request->get("inCodDotacaoReducao") );
+        $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $request->get("inCodEntidade") );
         $obRegra->roUltimoDespesaReducao->setExercicio( Sessao::getExercicio() );
 
         $obRegra->roUltimoDespesaReducao->consultarSaldoDotacao();
@@ -642,8 +635,6 @@ function incluirReducao(Request $request)
             $arRedutoras[$inCount]['dotacao']      = trim( $rsDespesa->getCampo('dotacao')     );
             $arRedutoras[$inCount]['descricao']    = trim( $rsDespesa->getCampo('descricao')   );
             $arRedutoras[$inCount]['vl_valor']     = trim( $nuVlRedutora                       );
-
-            
 
             Sessao::write('arRedutoras',$arRedutoras );
             $stHTML = montaListaReducoes( $arRedutoras, $nuVlSomatoria );
@@ -668,7 +659,7 @@ function incluirReducaoRecurso(Request $request)
     $inCount = sizeof($arRedutoras);
     if ($inCount) {
         foreach ($arRedutoras as $value) {
-            if ($value['cod_reduzido'] != $_POST['inCodDotacaoReducao']) {
+            if ($value['cod_reduzido'] != $request->get('inCodDotacaoReducao')) {
                 $nuVlSomatoria += $value['vl_valor'];
             } else {
                 SistemaLegado::exibeAviso('Esta dotação já está presente na lista',"n_incluir","erro");
@@ -678,8 +669,8 @@ function incluirReducaoRecurso(Request $request)
     }
     if ( bcsub($nuVlSomatoria, $nuVlTotal, 4) <= 0 ) {
         $obRegra->addDespesaReducao();
-        $obRegra->roUltimoDespesaReducao->setCodDespesa( $_REQUEST["inCodDotacaoReducao"] );
-        $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+        $obRegra->roUltimoDespesaReducao->setCodDespesa( $request->get("inCodDotacaoReducao") );
+        $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $request->get("inCodEntidade") );
         $obRegra->roUltimoDespesaReducao->setExercicio( Sessao::getExercicio() );
 
         $obRegra->roUltimoDespesaReducao->consultarSaldoDotacao();
@@ -754,7 +745,7 @@ switch ($stCtrl) {
             $arRecursos = Sessao::read('arRedutoras');
             $arRecursosRedutoras = Sessao::read('arRecursosRedutoras');            
             foreach ($arRecursos as $key => $value) {
-                if ( ($value['cod_reduzido']) != $_GET['inCodDotacaoReducao'] ) {
+                if ( ($value['cod_reduzido']) != $request->get('inCodDotacaoReducao') ) {
                     $arTEMP[$inCount]['cod_reduzido'] = $value['cod_reduzido'];
                     $arTEMP[$inCount]['dotacao']      = $value['dotacao'];
                     $arTEMP[$inCount]['descricao']    = $value['descricao'];
@@ -782,7 +773,7 @@ switch ($stCtrl) {
             $nuVlTotal = 0;
             $arRedutoras = Sessao::read('arRedutoras');
             foreach ($arRedutoras as $value) {
-                if ( ($value['cod_reduzido']) != $_GET['inCodDotacaoReducao'] ) {
+                if ( ($value['cod_reduzido']) != $request->get('inCodDotacaoReducao') ) {
                     $arTEMP[$inCount]['cod_reduzido'] = $value['cod_reduzido'];
                     $arTEMP[$inCount]['dotacao']      = $value['dotacao'];
                     $arTEMP[$inCount]['descricao']    = $value['descricao'];
@@ -827,7 +818,7 @@ switch ($stCtrl) {
             $arSuplementada = Sessao::read('arSuplementada');
             $arRecursos = Sessao::read('arRecursos');
             foreach ($arSuplementada as $key => $value) {
-                if ( ($value['cod_reduzido']) != $_GET['inCodDotacaoSuplementada'] ) {
+                if ( ($value['cod_reduzido']) != $request->get('inCodDotacaoSuplementada') ) {
                     $arTEMP[$inCount]['cod_reduzido'] = $value['cod_reduzido'];
                     $arTEMP[$inCount]['dotacao']      = $value['dotacao'];
                     $arTEMP[$inCount]['descricao']    = $value['descricao'];
@@ -854,7 +845,7 @@ switch ($stCtrl) {
             $nuVlTotal = 0;
             $arSuplementada = Sessao::read('arSuplementada');
             foreach ($arSuplementada as $value) {
-                if ( ($value['cod_reduzido']) != $_GET['inCodDotacaoSuplementada'] ) {
+                if ( ($value['cod_reduzido']) != $request->get('inCodDotacaoSuplementada') ) {
                     $arTEMP[$inCount]['cod_reduzido'] = $value['cod_reduzido'];
                     $arTEMP[$inCount]['dotacao']      = $value['dotacao'];
                     $arTEMP[$inCount]['descricao']    = $value['descricao'];
@@ -869,11 +860,11 @@ switch ($stCtrl) {
 
     break;
     case 'buscaDespesaReducao':
-        if (($_REQUEST["inCodDotacaoReducao"] != "") && ($_REQUEST['inCodEntidade'] != "")) {
+        if (($request->get("inCodDotacaoReducao", '') != "") && ($request->get('inCodEntidade', '') != "")) {
 
             $obRegra->addDespesaReducao();
-            $obRegra->roUltimoDespesaReducao->setCodDespesa( $_REQUEST["inCodDotacaoReducao"] );
-            $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+            $obRegra->roUltimoDespesaReducao->setCodDespesa( $request->get("inCodDotacaoReducao") );
+            $obRegra->roUltimoDespesaReducao->obROrcamentoEntidade->setCodigoEntidade( $request->get("inCodEntidade") );
             $obRegra->roUltimoDespesaReducao->setExercicio( Sessao::getExercicio() );
             $obRegra->roUltimoDespesaReducao->listarDespesa( $rsDespesa );
 
@@ -883,7 +874,7 @@ switch ($stCtrl) {
                 $js  = 'f.inCodDotacaoReducao.value = "";';
                 $js .= 'f.inCodDotacaoReducao.focus();';
                 $js .= 'd.getElementById("stNomDotacaoRedutora").innerHTML = "&nbsp;";';
-                $js .= "alertaAviso('@Valor inválido. (".$_REQUEST["inCodDotacaoReducao"].")','form','erro','".Sessao::getId()."');";
+                $js .= "alertaAviso('@Valor inválido. (".$request->get("inCodDotacaoReducao").")','form','erro','".Sessao::getId()."');";
             } else {
                 $js  = 'd.getElementById("stNomDotacaoRedutora").innerHTML = "'.$stNomDespesa.'";';
             }
@@ -894,10 +885,10 @@ switch ($stCtrl) {
     break;
 
     case 'buscaDespesaSuplementada':
-        if (($_REQUEST["inCodDotacaoSuplementada"] != "") && ($_REQUEST['inCodEntidade'] != "")) {
+        if (($request->get("inCodDotacaoSuplementada", '') != "") && ($request->get('inCodEntidade', '') != "")) {
             $obRegra->addDespesaSuplementada();
-            $obRegra->roUltimoDespesaSuplementada->setCodDespesa( $_REQUEST["inCodDotacaoSuplementada"] );
-            $obRegra->roUltimoDespesaSuplementada->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST["inCodEntidade"] );
+            $obRegra->roUltimoDespesaSuplementada->setCodDespesa( $request->get("inCodDotacaoSuplementada") );
+            $obRegra->roUltimoDespesaSuplementada->obROrcamentoEntidade->setCodigoEntidade( $request->get("inCodEntidade") );
             $obRegra->roUltimoDespesaSuplementada->setExercicio( Sessao::getExercicio() );
             $obRegra->roUltimoDespesaSuplementada->listarDespesa( $rsDespesa );
 
@@ -907,7 +898,7 @@ switch ($stCtrl) {
                 $js  = 'f.inCodDotacaoSuplementada.value = "";';
                 $js .= 'f.inCodDotacaoSuplementada.focus();';
                 $js .= 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "&nbsp;";';
-                $js .= "alertaAviso('@Valor inválido. (".$_REQUEST["inCodDotacaoSuplementada"].")','form','erro','".Sessao::getId()."');";
+                $js .= "alertaAviso('@Valor inválido. (".$request->get("inCodDotacaoSuplementada").")','form','erro','".Sessao::getId()."');";
             } else {
                 $js  = 'd.getElementById("stNomDotacaoSuplementada").innerHTML = "'.$stNomDespesa.'";';
             }
@@ -919,10 +910,10 @@ switch ($stCtrl) {
 
     case 'buscaDespesaSuplementadaEspecial':
 
-    if ($_POST["inCodDotacaoSuplementada"] != "" &&  $_REQUEST['inCodEntidade'] != "") {
+    if ($request->get("inCodDotacaoSuplementada", '') != "" &&  $request->get('inCodEntidade', '') != "") {
 
-        $obROrcamentoDespesa->setCodDespesa($_REQUEST["inCodDotacaoSuplementada"] );
-        $obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade($_REQUEST["inCodEntidade"] );
+        $obROrcamentoDespesa->setCodDespesa($request->get("inCodDotacaoSuplementada") );
+        $obROrcamentoDespesa->obROrcamentoEntidade->setCodigoEntidade($request->get("inCodEntidade") );
         $obROrcamentoDespesa->listarDespesaCredEspecial($rsEspDespesa);
         $stNomDespesa = $rsEspDespesa->getCampo("descricao");
 
@@ -952,8 +943,8 @@ switch ($stCtrl) {
         Sessao::remove('arRecursosRedutoras');        
     break;
         case 'buscaNorma':
-        if ($_POST['inCodNorma']) {
-            $obRegra->obRNorma->setCodNorma( $_POST['inCodNorma'] );
+        if ($request->get('inCodNorma')) {
+            $obRegra->obRNorma->setCodNorma( $request->get('inCodNorma') );
             $obRegra->obRNorma->setExercicio( Sessao::getExercicio() );
             $obErro = $obRegra->obRNorma->consultar( $rsRecordSet );
             if ( !$obErro->ocorreu() ) {
@@ -965,7 +956,7 @@ switch ($stCtrl) {
                     $js  = 'f.inCodNorma.value = "";';
                     $js .= 'window.parent.frames["telaPrincipal"].document.frm.inCodNorma.focus();';
                     $js .= 'd.getElementById("stNomTipoNorma").innerHTML = "&nbsp;";';
-                    $js .= "alertaAviso('@Valor inválido. (".$_POST["inCodNorma"].")','form','erro','".Sessao::getId()."');";
+                    $js .= "alertaAviso('@Valor inválido. (".$request->get("inCodNorma").")','form','erro','".Sessao::getId()."');";
                 }
             }
         } else {

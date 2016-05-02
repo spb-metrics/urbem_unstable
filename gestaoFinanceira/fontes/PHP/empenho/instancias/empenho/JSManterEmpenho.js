@@ -374,7 +374,9 @@ function limparItem() {
     document.frm.inCodItem.value = '';
     document.getElementById('stNomItemCatalogo').innerHTML = '&nbsp;';
     document.getElementById('stUnidadeMedida').innerHTML = '&nbsp;';
-    
+    jQuery('#inMarca').val('');
+    jQuery('#stNomeMarca').html('&nbsp;');
+
     document.frm.btnIncluir.value='Incluir';
     document.frm.btnIncluir.setAttribute('onclick','return incluirItem()');
 }

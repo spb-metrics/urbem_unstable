@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenhoDiversos.php 64212 2015-12-17 12:38:12Z michel $
+    $Id: PRManterEmpenhoDiversos.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -106,12 +106,12 @@ switch ($stAcao) {
         if (( $request->get('inCodCategoria') == 2 || $request->get('inCodCategoria') == 3) && (!$request->get('inCodContrapartida')) ) {
             SistemaLegado::exibeAviso("Campo Contrapartida inválido!","n_incluir","erro");
             SistemaLegado::LiberaFrames(true,false);
-            break;
+            exit();
         }
         if (!$request->get('inCodFornecedor')) {
             SistemaLegado::exibeAviso("Fornecedor não informado!","n_incluir","erro");
             SistemaLegado::LiberaFrames(true,false);
-            break;
+            exit();
         }
 
         $inCodUF = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio(),$boTransacao);
@@ -119,7 +119,7 @@ switch ($stAcao) {
             if (!$request->get('inModalidadeLicitacao') || $request->get('inModalidadeLicitacao') == '') {
                 SistemaLegado::exibeAviso("Modalidade TCMGO não informada!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,false);
-                break;
+                exit();
             }
 
             if ($request->get('inModalidadeLicitacao') == '10' || $request->get('inModalidadeLicitacao') == '11') {
@@ -127,19 +127,19 @@ switch ($stAcao) {
                 if (!$request->get('inFundamentacaoLegal') || $request->get('inFundamentacaoLegal') == '') {
                     SistemaLegado::exibeAviso("Fundamentação legal não informada!","n_incluir","erro");
                     SistemaLegado::LiberaFrames(true,false);
-                    break;
+                    exit();
                 }
 
                 if (!$request->get('stJustificativa') || $request->get('stJustificativa') == '') {
                     SistemaLegado::exibeAviso("Justificativa não informada!","n_incluir","erro");
                     SistemaLegado::LiberaFrames(true,false);
-                    break;
+                    exit();
                 }
 
                 if (!$request->get('stRazao') || $request->get('stRazao') == '') {
                     SistemaLegado::exibeAviso("Razão da escolha não informada!","n_incluir","erro");
                     SistemaLegado::LiberaFrames(true,false);
-                    break;
+                    exit();
                 }
             }
         }
@@ -163,14 +163,14 @@ switch ($stAcao) {
         if ($stErro == true) {
             SistemaLegado::exibeAviso("Campo ".$arAtr[2].' Não Informado!',"n_incluir","erro");
             SistemaLegado::LiberaFrames(true,false);
-            break;
+            exit();
         }
 
         if($request->get('inCodContrato') && $request->get('stExercicioContrato')){
             if (sistemaLegado::comparaDatas($request->get('dtContrato'), $request->get('stDtEmpenho'), true)) {
                 SistemaLegado::exibeAviso("Data do empenho deve ser maior ou igual a data do Contrato!","n_incluir","erro");
                 SistemaLegado::LiberaFrames(true,false);
-                break;
+                exit();
             }
         }
 
@@ -197,6 +197,7 @@ switch ($stAcao) {
             foreach ($arItensSessao as $arItemPreEmpenho) {
                 $obREmpenhoEmpenho->addItemPreEmpenho();
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setNumItem    ( $arItemPreEmpenho["num_item"    ] );
+                
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setQuantidade ( $arItemPreEmpenho['quantidade'  ] );
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setNomUnidade ( $arItemPreEmpenho["nom_unidade" ] );
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setValorTotal ( $arItemPreEmpenho["vl_total"    ] );
@@ -205,10 +206,12 @@ switch ($stAcao) {
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->setCodUnidade( $arItemPreEmpenho['cod_unidade'] );
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $arItemPreEmpenho["cod_grandeza"] );
                 $obREmpenhoEmpenho->roUltimoItemPreEmpenho->obRUnidadeMedida->consultar($rsUnidade, $boTransacao);
-                $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade( $rsUnidade->getCampo('simbolo') );
+                $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setSiglaUnidade( $rsUnidade->getCampo('simbolo') );                
+                $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setCodigoMarca ( $arItemPreEmpenho['cod_marca'] );                                
                 if($request->get('stTipoItem')=='Catalogo'){
                     $obREmpenhoEmpenho->roUltimoItemPreEmpenho->setCodItemPreEmp    ( $arItemPreEmpenho["cod_item"    ] );
                 }
+ 
             }
         }
         $nuVlSaldo   = str_replace(".", "" , $request->get('flVlSaldo')     );

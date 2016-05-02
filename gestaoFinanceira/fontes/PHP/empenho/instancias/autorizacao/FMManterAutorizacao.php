@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FMManterAutorizacao.php 64207 2015-12-16 13:09:13Z evandro $
+    $Id: FMManterAutorizacao.php 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -46,6 +46,7 @@ include_once CAM_FW_HTML.'MontaAtributos.class.php';
 include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
 include_once TEMP.'TEmpenhoCategoriaEmpenho.class.php';
 include_once CAM_GP_ALM_COMPONENTES.'IPopUpCentroCustoUsuario.class.php';
+require_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = 'ManterAutorizacao';
@@ -159,7 +160,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $stDescricao           = $obREmpenhoAutorizacaoEmpenho->getDescricao();
         $inCodHistorico        = $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->getCodHistorico();
         $inCodCategoria        = $obREmpenhoAutorizacaoEmpenho->getCodCategoria();
-        
+
         if ($inCodCategoria == 2 || $inCodCategoria == 3) {
             include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoContrapartidaAutorizacao.class.php';
             $obTEmpenhoContrapartidaAutorizacao = new TEmpenhoContrapartidaAutorizacao();
@@ -208,6 +209,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
             $arItens[$inCount]['nom_unidade']  = $obItemPreEmpenho->getNomUnidade();
             $arItens[$inCount]['cod_material'] = $obItemPreEmpenho->getCodMaterial();
             $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
+            $arItens[$inCount]['cod_marca']    = $obItemPreEmpenho->getCodigoMarca();
             Sessao::write('arItens', $arItens);
         }
         $nuVlUnitario = '';
@@ -569,6 +571,16 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtComplemento->setRows  (2);
     $obTxtComplemento->setCols  (100);
 
+    $obMarca = new IPopUpMarca($obForm);
+    $obMarca->setNull               ( true );
+    $obMarca->setRotulo             ( 'Marca' );
+    $obMarca->setId                 ( 'stNomeMarca' );
+    $obMarca->setName               ( 'stNomeMarca' );
+    $obMarca->obCampoCod->setName   ( 'inMarca' );
+    $obMarca->obCampoCod->setId     ( 'inMarca' );
+    $obMarca->obCampoCod->setValue  ( $inMarca );
+    $obMarca->setValue              ( $stNomeMarca );
+
     // Define Objeto Numeric para Quantidade
     $obTxtQuantidade = new Numerico;
     $obTxtQuantidade->setName     ('nuQuantidade');
@@ -796,6 +808,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obMontaItemUnidade->geraFormulario($obFormulario);
         $obFormulario->addComponente($obTxtNomItem);
         $obFormulario->addComponente($obTxtComplemento);
+        $obFormulario->addComponente($obMarca);        
         $obFormulario->addComponente($obCentroCustoUsuario);
         $obFormulario->addComponente($obTxtQuantidade);
         $obFormulario->addComponente($obCmbUnidade);

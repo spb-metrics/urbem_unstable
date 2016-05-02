@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCExportacaoBalancete.php 63215 2015-08-04 19:42:18Z franver $
+    $Id: OCExportacaoBalancete.php 65190 2016-04-29 19:36:51Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -42,8 +42,8 @@ set_time_limit(0);
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GPC_TGO_MAPEAMENTO."TTGOConfiguracaoEntidade.class.php" );
-include_once( CLA_EXPORTADOR );
+include_once CAM_GPC_TGO_MAPEAMENTO."TTGOConfiguracaoEntidade.class.php";
+include_once CLA_EXPORTADOR;
 
 SistemaLegado::BloqueiaFrames();
 
@@ -76,34 +76,38 @@ foreach ($arFiltroRelatorio['inCodEntidade'] as $inCodEntidade) {
     $arUnidadesGestoras[ $obTConfiguracao->getDado('valor') ] .= $inCodEntidade;
 }
 
-
 $stTipoDocumento = "TCM_GO";
+$stTipoExportacao = "Balancete";
+
 $obExportador    = new Exportador();
 
 foreach ($arFiltroRelatorio["arArquivosSelecionados"] as $stArquivo) {
-    //foreach ($arUnidadesGestoras as $inUnidadeGestora => $stEntidades) {
-        $arArquivo = explode( '.',$stArquivo );
-        
-        if ($stArquivo == 'Ide.txt' OR $stArquivo == 'Orgao.txt') {
-            $obExportador->addArquivo($arArquivo[0].'.'.$arArquivo[1]);
-        } elseif ($stArquivo == 'CON.txt') {
-            $obExportador->addArquivo('CON'.$inMes.substr(Sessao::getExercicio(),2,2).'.txt');
-        } else {
-            $obExportador->addArquivo($arArquivo[0].$inMes.substr(Sessao::getExercicio(),2,2).'.'.$arArquivo[1]);
-        }
-        
-        $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
-        if ($stArquivo == 'CON.txt') {
-            include ('CONArq'. ".inc.php");
-        } else {
-            include( $arArquivo[0] . ".inc.php");
-        }
-        $arRecordSet = null;
-    //}
+    $arArquivo = explode( '.',$stArquivo );
+
+    if ($stArquivo == 'Ide.txt' OR $stArquivo == 'Orgao.txt') {
+        $obExportador->addArquivo($arArquivo[0].'.'.$arArquivo[1]);
+    } elseif ($stArquivo == 'CON.txt') {
+        $obExportador->addArquivo('CON'.$inMes.substr(Sessao::getExercicio(),2,2).'.txt');
+    } else {
+        $obExportador->addArquivo($arArquivo[0].$inMes.substr(Sessao::getExercicio(),2,2).'.'.$arArquivo[1]);
+    }
+
+    $obExportador->roUltimoArquivo->setTipoDocumento($stTipoDocumento);
+
+    if ($stArquivo == 'CON.txt')
+        $stArquivo = 'CONArq.txt';
+
+    if(Sessao::getExercicio() >= 2016) {
+        include (CAM_GPC_TGO_INSTANCIAS."layout_arquivos/balancete/".Sessao::getExercicio()."/".substr($stArquivo,0,strpos($stArquivo,'.txt')).".inc.php");
+    }else {
+        include( substr($stArquivo,0,strpos($stArquivo,'.txt')) . ".inc.php");
+    }
+
+    $arRecordSet = null;
 }
 
 if ($arFiltroRelatorio['stTipoExport'] == 'compactados') {
-    $obExportador->setNomeArquivoZip('Balancete'.Sessao::getExercicio().$inMes.'.zip');
+    $obExportador->setNomeArquivoZip($stTipoExportacao.Sessao::getExercicio().$inMes.'.zip');
 }
 
 $obExportador->show();

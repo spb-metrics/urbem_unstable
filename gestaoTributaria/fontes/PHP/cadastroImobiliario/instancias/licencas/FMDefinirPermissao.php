@@ -30,7 +30,7 @@
     * @author Analista: Fabio Bertoldi
     * @author Desenvolvedor: Fernando Piccini Cercato
 
-    $Id: FMDefinirPermissao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: FMDefinirPermissao.php 65128 2016-04-26 20:07:17Z evandro $
 
     * Casos de uso: uc-05.01.28
 */
@@ -41,7 +41,7 @@ $Log$
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GA_CGM_COMPONENTES."IPopUpCGM.class.php" );
+include_once ( CAM_GA_CGM_COMPONENTES."IPopUpCGMVinculado.class.php" );
 include_once ( CAM_GT_CIM_MAPEAMENTO."TCIMTipoLicenca.class.php");
 
 //Define o nome dos arquivos PHP
@@ -131,10 +131,13 @@ $obFormulario->addHidden( $obHdnAcao );
 $obFormulario->addHidden( $obHdnCtrl );
 $obFormulario->addTitulo( "Dados para Permissão" );
 
-$obPopUpCGM = new IPopUpCGM( $obForm );
+$obPopUpCGM = new IPopUpCGMVinculado( $obForm );
 $obPopUpCGM->setNull ( true );
 $obPopUpCGM->setRotulo ( "*Usuário" );
 $obPopUpCGM->setTitle ( "Informe o CGM do usuário que poderá conceder a licença." );
+$obPopUpCGM->setTabelaVinculo ( 'administracao.usuario' );
+$obPopUpCGM->setCampoVinculo  ( 'numcgm' );
+$obPopUpCGM->setTipo('usuario');
 
 $obFormulario->addComponenteComposto  ( $obTxtTipoLicenca, $obCmbTipoLicenca );
 $obFormulario->addComponente ( $obPopUpCGM );

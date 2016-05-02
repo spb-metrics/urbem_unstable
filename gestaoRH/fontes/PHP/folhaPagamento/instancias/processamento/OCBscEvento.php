@@ -31,10 +31,8 @@
     * @author Desenvolvedor: Andre Almeida
 
     * @ignore
-    $Revision: 30727 $
-    $Name$
-    $Author: souzadl $
-    $Date: 2007-02-01 08:13:47 -0200 (Qui, 01 Fev 2007) $
+
+    $Id: OCBscEvento.php 65130 2016-04-26 20:41:36Z michel $
 
     * Caso de uso: uc-04.04.14
 
@@ -45,7 +43,8 @@ include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/includ
 
 function preencheValorQuantidade($stFixado, $nuValorQuantidade, $boLimiteCalculo)
 {
-    include_once( CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php"      );
+    include_once CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php";
+
     $obIBscEvento = Sessao::read('IBscEvento');
     $boInformaValorQuantidade    = $obIBscEvento->getInformarValorQuantidade();
     if ( $obIBscEvento->getSugerirValorQuantidade() ) {
@@ -85,12 +84,13 @@ function preencheValorQuantidade($stFixado, $nuValorQuantidade, $boLimiteCalculo
     return $stJs;
 }
 
-function preencheDescEvento()
+function preencheDescEvento(Request $request)
 {
-    include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php" );
-    include_once( CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php"        );
+    include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoEvento.class.php";
+    include_once CAM_GRH_FOL_COMPONENTES."IBscEvento.class.php";
+
     $obIBscEvento                = Sessao::read('IBscEvento');
-    $inCodigoEvento              = $_GET['inCodigoEvento'];
+    $inCodigoEvento              = $request->get('inCodigoEvento');
     $boInformaValorQuantidade    = $obIBscEvento->getInformarValorQuantidade();
     $boInformaQuantidadeParcelas = $obIBscEvento->getInformarQuantidadeParcelas();
     $stNaturezasAceitas          = $obIBscEvento->getNaturezasAceitas();
@@ -101,11 +101,14 @@ function preencheDescEvento()
     if ( $obIBscEvento->getEventoSistema() === false ) {
         $stEventoSistema = "false";
     }
-    if ($_GET['boPopUp']) {
+    if ($request->get('boPopUp')) {
         $stJs = "d = window.opener.parent.frames['telaPrincipal'].document; \n";
     }
 
-    $stJs .= "d.getElementById('".$_REQUEST['stCampoNomEvento']."').innerHTML = '&nbsp;';\n";
+    $stJs .= "d.getElementById('".$request->get('stCampoNomEvento')."').innerHTML = '&nbsp;';\n";
+
+    $stTextoComplementar = $request->get('stTextoComplementar', 'stTextoComplementar');
+
     if ($inCodigoEvento) {
         $obRFolhaPagamentoEvento = new RFolhaPagamentoEvento;
         $obRFolhaPagamentoEvento->setCodigo( $inCodigoEvento );
@@ -118,25 +121,25 @@ function preencheDescEvento()
         $rsEvento->addFormatacao('valor_quantidade','NUMERIC_BR');
 
         if ( $rsEvento->getNumLinhas() > 0 ) {
-            $stJs .= "d.getElementById('".$_REQUEST['stCampoNomEvento']."').innerHTML = '".$rsEvento->getCampo('descricao')."';\n";
+            $stJs .= "d.getElementById('".$request->get('stCampoNomEvento')."').innerHTML = '".$rsEvento->getCampo('descricao')."';\n";
             $stJs .= "d.frm.hdnDescEvento.value = '".$rsEvento->getCampo('descricao')."';\n";
             $stJs .= "d.frm.HdninCodigoEvento.value = '".$rsEvento->getCampo('cod_evento')."';\n";
             $stJs .= "d.frm.stHdnFixado.value = '".$rsEvento->getCampo('fixado')."';\n";
             $stJs .= "d.frm.stHdnApresentaParcela.value = '".$rsEvento->getCampo('apresenta_parcela')."';\n";
-            $stJs .= "if(d.getElementById('stTextoComplementar') != null) { ";
-            $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '".$rsEvento->getCampo('observacao')."';\n";
+            $stJs .= "if(d.getElementById('".$stTextoComplementar."') != null) { ";
+            $stJs .= "d.getElementById('".$stTextoComplementar."').innerHTML = '".$rsEvento->getCampo('observacao')."';\n";
             $stJs .= "}\n ";
-            
+
             if ($boInformaValorQuantidade || $boInformaQuantidadeParcelas) {
                 $stJs .= preencheValorQuantidade( $rsEvento->getCampo("fixado"), $rsEvento->getCampo("valor_quantidade"), $rsEvento->getCampo("limite_calculo") );
             }
         } else {
-            $stJs .= "d.getElementById('".$_REQUEST['stCampoCodEvento']."').value = '';\n";
-            $stJs .= "d.getElementById('".$_REQUEST['stCampoCodEvento']."').focus();\n";
+            $stJs .= "d.getElementById('".$request->get('stCampoCodEvento')."').value = '';\n";
+            $stJs .= "d.getElementById('".$request->get('stCampoCodEvento')."').focus();\n";
             $stJs .= "d.getElementById('spnDadosEvento').innerHTML = '';\n";
             $stJs .= "d.frm.hdnDescEvento.value = '';\n";
-            $stJs .= "if(d.getElementById('stTextoComplementar') != null) { ";
-            $stJs .= "d.getElementById('stTextoComplementar').innerHTML = '&nbsp;';\n";
+            $stJs .= "if(d.getElementById('".$stTextoComplementar."') != null) { ";
+            $stJs .= "d.getElementById('".$stTextoComplementar."').innerHTML = '&nbsp;';\n";
             $stJs .= "}\n ";
             $stJs .= "alertaAviso('Código de evento inválido. (".$inCodigoEvento.") ','form','erro','".Sessao::getId()."');\n";
         }
@@ -147,45 +150,46 @@ function preencheDescEvento()
     return $stJs;
 }
 
-function validarQuantidade()
+function validarQuantidade(Request $request)
 {
-    $nuQuantidadeEvento = str_replace(".","",$_GET['nuQuantidadeEvento']);
+    $nuQuantidadeEvento = str_replace(".","",$request->get('nuQuantidadeEvento'));
     $nuQuantidadeEvento = str_replace(",",".",$nuQuantidadeEvento);
     $nuValidacao = 99999999.99;
     if ($nuQuantidadeEvento > $nuValidacao) {
         $stValidacao = number_format($nuValidacao,2,",",".");
         $stJs  = "f.nuQuantidadeEvento.value = '';\n";
         $stJs .= "d.getElementById('nuQuantidadeEvento').focus();\n";
-        $stJs .= "alertaAviso('campo Quantidade inválido!(".$_GET['nuQuantidadeEvento'].")','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('campo Quantidade inválido!(".$request->get('nuQuantidadeEvento').")','form','erro','".Sessao::getId()."');\n";
     }
 
     return $stJs;
 }
 
-function validarValor()
+function validarValor(Request $request)
 {
-    $nuValorEvento = str_replace(".","",$_GET['nuValorEvento']);
+    $nuValorEvento = str_replace(".","",$request->get('nuValorEvento'));
     $nuValorEvento = str_replace(",",".",$nuValorEvento);
     $nuValidacao = 99999999.99;
     if ($nuValorEvento > $nuValidacao) {
         $stValidacao = number_format($nuValidacao,2,",",".");
         $stJs  = "f.nuValorEvento.value = '';\n";
         $stJs .= "d.getElementById('nuValorEvento').focus();\n";
-        $stJs .= "alertaAviso('campo Valor inválido!(".$_GET['nuValorEvento'].").','form','erro','".Sessao::getId()."');\n";
+        $stJs .= "alertaAviso('campo Valor inválido!(".$request->get('nuValorEvento').").','form','erro','".Sessao::getId()."');\n";
     }
 
     return $stJs;
 }
 
-function preencherPrevisaoMesAno()
+function preencherPrevisaoMesAno(Request $request)
 {
-    include_once(CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php");
-    include_once(CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php");
+    include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php";
+    include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+
     $obRFolhaPagamentoPeriodoContratoServidor = new RFolhaPagamentoPeriodoContratoServidor( new RFolhaPagamentoPeriodoMovimentacao );
     $obRFolhaPagamentoPeriodoContratoServidor->roRFolhaPagamentoPeriodoMovimentacao->listarUltimaMovimentacao($rsUltimaMovimentacao);
     $arDataFinal        = explode("/",$rsUltimaMovimentacao->getCampo('dt_final'));
-    $inResto            = (($_GET['nuQuantidadeParcelasEvento'])%12);
-    $inInt              = intval((($_GET['nuQuantidadeParcelasEvento'])/12));
+    $inResto            = (($request->get('nuQuantidadeParcelasEvento'))%12);
+    $inInt              = intval((($request->get('nuQuantidadeParcelasEvento'))/12));
     if ($inResto) {
         $inAno = $arDataFinal[2] + $inInt;
     } else {
@@ -199,19 +203,19 @@ function preencherPrevisaoMesAno()
     return $stJs;
 }
 
-switch ($_GET['stCtrl']) {
+switch ($request->get('stCtrl')) {
     case "preencheDescEvento":
-        $js = preencheDescEvento();
+        $js = preencheDescEvento($request);
     break;
     case "validarQuantidade":
-        $js = validarQuantidade();
+        $js = validarQuantidade($request);
     break;
     case "validarValor":
-        $js = validarValor();
+        $js = validarValor($request);
     break;
     case "preencherPrevisaoMesAno":
-        $js = preencherPrevisaoMesAno();
-        break;
+        $js = preencherPrevisaoMesAno($request);
+    break;
 }
 
 if ($js) {

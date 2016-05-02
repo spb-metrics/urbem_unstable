@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Lisane Morais
   *
   * @ignore
-  * $Id:$
+  * $Id: ISI.inc.php 65142 2016-04-27 20:29:50Z michel $
   * $Date:$
   * $Author:$
   * $Rev:$
@@ -58,9 +58,10 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
+$inTamNumDoc = (Sessao::getExercicio() >= '2016' && $stTipoExportacao == "Balanco") ? 12 : 14;
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_documento");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo($inTamNumDoc);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_pessoa");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -118,28 +119,26 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("versao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
-if ( Sessao::getExercicio() >= "2014" ) {
+if ( Sessao::getExercicio() >= "2014" && $stTipoExportacao == "Balancete") {
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_portal_transparencia");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_portal_transparencia");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("url_portal_transparencia");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("url_portal_transparencia");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_sistema_integrado");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_sistema_integrado");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_despesa");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
 
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_despesa");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
-
-$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_receita");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
-    
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("bo_receita");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01); 
 }
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
@@ -150,7 +149,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06
 $recordSet[$stArquivo] = new RecordSet();
 $recordSet[$stArquivo]->preenche(array(array('tipo_registro' => 99,'espacador'=> '', 'numero_registro' => $i+1)));
 
-$inEspacoBranco = (Sessao::getExercicio() >= "2014") ? 630 : 526;
+$inEspacoBranco = (Sessao::getExercicio() >= "2014" && $stTipoExportacao == "Balancete") ? 630 : 526;
 
 $obExportador->roUltimoArquivo->addBloco($recordSet[$stArquivo]);
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");

@@ -30,7 +30,7 @@
 
     * @author Desenvolvedor: Anderson cAko Konze
 
-    $Id: PRAnularRestosAPagar.php 62838 2015-06-26 13:02:49Z diogo.zarpelon $
+    $Id: PRAnularRestosAPagar.php 65191 2016-04-29 20:02:55Z franver $
 
     * Casos de uso: uc-02.02.31
 */
@@ -77,6 +77,18 @@ if ( !$obErro->ocorreu() ) {
             $obRConfiguracaoEntidade->setCodModulo( 10 );
             $obRConfiguracaoEntidade->setExercicio( Sessao::getExercicio());
             $obErro = $obRConfiguracaoEntidade->alterar( $boTransacao );
+
+            if(!$obErro->ocorreu()){
+                require_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php';
+                $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade();
+                $obTAdministracaoConfiguracaoEntidade->setDado("cod_modulo", 10 );
+                $obTAdministracaoConfiguracaoEntidade->setDado("cod_entidade",$_REQUEST['inCodEntidadeCredito']);
+                $obTAdministracaoConfiguracaoEntidade->setDado("exercicio" , Sessao::getExercicio() );
+                $obTAdministracaoConfiguracaoEntidade->setDado("parametro" , 'virada_GF' );
+                $obTAdministracaoConfiguracaoEntidade->setDado("valor" , 'f' );
+                $obErro = $obTAdministracaoConfiguracaoEntidade->alteracao($boTransacao);
+            }
+            
         }
     }
 }

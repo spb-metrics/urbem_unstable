@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoItemPreEmpenho.class.php 64194 2015-12-14 18:20:21Z jean $
+    $Id: REmpenhoItemPreEmpenho.class.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.03.03, uc-02.03.02, uc-02.03.30
 */
@@ -168,6 +168,11 @@ class REmpenhoItemPreEmpenho
     * @var Integer;
     **/
     public $inCodCentroCusto;
+
+    public $inCodMarca;
+    
+    public $stNomeMarca;    
+    
     /**
     * @access Public
     * @param Object $Valor
@@ -271,6 +276,9 @@ class REmpenhoItemPreEmpenho
     public function setExercicioJulgamento($valor) { $this->inExercicioJulgamento = $valor; }
     public function setLoteCompras($valor) { $this->inLoteCompras = $valor; }
     public function setCgmFornecedor($valor) { $this->inCgmFornecedor = $valor; }
+    public function setCodigoMarca($valor) { $this->inCodMarca = $valor; }
+    public function setNomeMarca($valor) { $this->stNomeMarca = $valor; }
+
     /**
     * @access Public
     * @param Integer $Valor
@@ -366,7 +374,10 @@ class REmpenhoItemPreEmpenho
     * @return Integer
     */
     public function getCodCentroCusto() { return $this->inCodCentroCusto; }
+  
+    public function getCodigoMarca() { return $this->inCodMarca; }
 
+    public function getNomeMarca() { return $this->stNomeMarca; }
     /**
     * Método construtor
     * @access Public
@@ -402,6 +413,8 @@ class REmpenhoItemPreEmpenho
             $this->stComplemento = $rsRecordSet->getCampo( "complemento" );
             $this->obRUnidadeMedida->setCodUnidade( $rsRecordSet->getCampo( "cod_unidade" ) );
             $this->obRUnidadeMedida->obRGrandeza->setCodGrandeza( $rsRecordSet->getCampo( "cod_grandeza" ) );
+            $this->setCodigoMarca( $rsRecordSet->getCampo( "cod_marca" ) );            
+
         }
 
         return $obErro;
@@ -506,8 +519,10 @@ class REmpenhoItemPreEmpenho
             $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"    , $this->obRUnidadeMedida->obRGrandeza->getCodGrandeza() );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_item"        , $this->inCodItemPreEmp                                 );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_centro"      , $this->inCodCentroCusto                                );
+            $obTEmpenhoItemPreEmpenho->setDado( "cod_marca"       , $this->getCodigoMarca()                                );
 
             $obErro = $obTEmpenhoItemPreEmpenho->inclusao( $boTransacao );
+
             if ( !$obErro->ocorreu() ) {
                 if ( $this->getCodMaterial() ) {
                     $obTEmpenhoItemPreEmpenhoCompra->setDado( "cod_pre_empenho" , $this->roPreEmpenho->getCodPreEmpenho() );
@@ -563,6 +578,7 @@ class REmpenhoItemPreEmpenho
             $obTEmpenhoItemPreEmpenho->setDado( "complemento"     , $this->stComplemento                                   );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_unidade"     , $this->obRUnidadeMedida->getCodUnidade()               );
             $obTEmpenhoItemPreEmpenho->setDado( "cod_grandeza"    , $this->obRUnidadeMedida->obRGrandeza->getCodGrandeza() );
+            $obTEmpenhoItemPreEmpenho->setDado( "cod_marca"       , $this->getCodigoMarca()                                );
 
             $obErro = $obTEmpenhoItemPreEmpenho->alteracao( $boTransacao );
         }

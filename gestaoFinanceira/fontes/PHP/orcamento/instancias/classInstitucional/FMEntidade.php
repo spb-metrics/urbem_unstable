@@ -85,7 +85,7 @@ include_once ($pgJS);
 $obREntidadeOrcamento  = new ROrcamentoEntidade;
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
+$stAcao = $request->get('stAcao');
 
 $rsUsuariosDisponiveis = $rsUsuariosSelecionados = new recordSet;
 $stOrdem               = " ORDER BY C.nom_cgm";
@@ -154,6 +154,7 @@ if ($stAcao == 'alterar') {
 
     $obLista->setRecordSet( $rsLista );
     $obLista->setTitulo("Marque as Entidades ATIVAS para este Exercício:");
+    $obLista->setMostraPaginacao( false );
 
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("&nbsp;");
@@ -212,10 +213,6 @@ if ($stAcao == 'alterar') {
 
     $obLista->montaHTML();
     $stHTML = $obLista->getHTML();
-    $stHTML = str_replace( "\n" ,"" ,$stHTML );
-    $stHTML = str_replace( "  " ,"" ,$stHTML );
-    $stHTML = str_replace( "'","\\'",$stHTML );
-    $stHTML = str_replace( "\\\'","\\'",$stHTML );
 }
 if ( !$obREntidadeOrcamento->getCodigoEntidade() ) {
     $obREntidadeOrcamento->pegarProximoCodigo();

@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterEmpenho.php 64357 2016-01-25 19:06:29Z arthur $
+    $Id: OCManterEmpenho.php 65158 2016-04-28 19:26:54Z evandro $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -68,9 +68,16 @@ $obREmpenhoEmpenho->setExercicio(Sessao::getExercicio());
 
 function montaLista($arRecordSet, $boExecuta = true)
 {
+    $codItem = false;
+    $boCodMarca = false;
+    
     for($i=0;$i<count($arRecordSet);$i++){
-            if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!='')
+            if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!=''){
                 $codItem = true;
+            }
+            if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!=''){
+                $boCodMarca = true;
+            }
             break;
     }
         
@@ -103,10 +110,16 @@ function montaLista($arRecordSet, $boExecuta = true)
     $obLista->commitCabecalho();
 
     $obLista->addDado();
-    if ($codItem)
-        $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item]" );
-    else
+    if ($codItem){
+        if ($boCodMarca) {
+            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );    
+        }else{
+            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item]" );
+        }
+    }else{
         $obLista->ultimoDado->setCampo( "nom_item" );
+    }
+
     $obLista->ultimoDado->setAlinhamento('ESQUERDA');
     $obLista->commitDado();
     $obLista->addDado();
@@ -219,6 +232,13 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
 {
 	$codUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
     $rsLista = new RecordSet;
+    for($i=0;$i<count($arRecordSet);$i++){            
+            if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!=''){
+                $boCodMarca = true;
+            }
+            break;
+    }
+
     $rsLista->preenche( $arRecordSet );
     $rsLista->addFormatacao('vl_total', 'NUMERIC_BR');
     if (!$rsLista->eof()) {
@@ -260,12 +280,21 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
         }
         if ($request->get('stTipoItem')=='Catalogo') {
             $obLista->addDado();
+            if ($boCodMarca) {
+                $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );    
+            }else{
+                $obLista->ultimoDado->setCampo( "cod_item" );
+            }
             $obLista->ultimoDado->setCampo('cod_item');
             $obLista->ultimoDado->setAlinhamento('ESQUERDA');
             $obLista->commitDado();
-        }
+        }        
         $obLista->addDado();
-        $obLista->ultimoDado->setCampo('nom_item');
+        if ($boCodMarca) {
+            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );
+        }else{
+            $obLista->ultimoDado->setCampo('nom_item');
+        }
         $obLista->ultimoDado->setAlinhamento('ESQUERDA');
         $obLista->commitDado();
         $obLista->addDado();
@@ -924,8 +953,8 @@ switch ($stCtrl) {
             $stNomUnidade = $request->get('stNomUnidade');
         }else{
             list($inCodUnidade, $inCodGrandeza, $stNomUnidade) = explode("-",$request->get('inCodUnidade'));
-        }
-        $arItens = Sessao::read('arItens');
+        }        
+        $arItens = Sessao::read('arItens');        
         $arItens[$inCount]['num_item']     = $inCount+1;
         if ($request->get('stTipoItem')=='Catalogo') {
             foreach ($arItens as $key => $valor) {
@@ -944,6 +973,8 @@ switch ($stCtrl) {
         $arItens[$inCount]['cod_unidade']  = $inCodUnidade;
         $arItens[$inCount]['cod_grandeza'] = $inCodGrandeza;
         $arItens[$inCount]['nom_unidade']  = $stNomUnidade;
+        $arItens[$inCount]['cod_marca']    = $request->get('inMarca');
+        $arItens[$inCount]['nome_marca']   = $request->get('stNomeMarca');
         $arItens[$inCount]['vl_total']     = $nuVlTotal;
 
         if($erro){
@@ -974,6 +1005,8 @@ switch ($stCtrl) {
                 $arTEMP[$inCount]['cod_unidade']  = $arItens[$i]['cod_unidade'];
                 $arTEMP[$inCount]['nom_unidade']  = $arItens[$i]['nom_unidade'];
                 $arTEMP[$inCount]['cod_grandeza'] = $arItens[$i]['cod_grandeza'];
+                $arTEMP[$inCount]['cod_marca']    = $arItens[$i]['cod_marca'];
+                $arTEMP[$inCount]['nome_marca']   = $arItens[$i]['nome_marca'];
                 $arTEMP[$inCount]['vl_total']     = $arItens[$i]['vl_total'];
                 $arTEMP[$inCount]['vl_unitario']  = $arItens[$i]['vl_unitario'];
                 $inCount++;
@@ -1024,6 +1057,8 @@ switch ($stCtrl) {
                 $stJs .= "f.btnIncluir.setAttribute('onclick','return alterarItem()');";
                 $stJs .= "f.stNomItem.value = f.stNomItem.value.unescapeHTML();";
                 $stJs .= "f.stComplemento.value = f.stComplemento.value.unescapeHTML();\n";
+                $stJs .= " jq('#inMarca').val('".$valor["cod_marca"]."'); \n";
+                $stJs .= " jq('#stNomeMarca').html('".$valor["nome_marca"]."'); \n";
 
                 $value = $valor["cod_unidade"]."-". $valor["cod_grandeza"]."-". $valor["nom_unidade"];
                 $stJs .= "f.inCodUnidade.value='".$value."';";
@@ -1062,6 +1097,8 @@ switch ($stCtrl) {
                         $arItens[$key]['vl_unitario'] = $request->get("nuVlUnitario");
                         $arItens[$key]['nom_unidade'] = $stNomUnidade;
                         $arItens[$key]['cod_grandeza'] = $inCodGrandeza;
+                        $arItens[$key]['cod_marca']    = $request->get('inMarca');
+                        $arItens[$key]['nome_marca']   = $request->get('stNomeMarca');
 
                         $nuVlTotal = str_replace('.','',$request->get("nuVlTotal"));
                         $nuVlTotal = str_replace(',','.',$nuVlTotal);

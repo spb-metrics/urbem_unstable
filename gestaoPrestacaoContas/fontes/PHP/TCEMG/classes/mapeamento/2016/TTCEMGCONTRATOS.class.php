@@ -135,7 +135,9 @@ class TTCEMGCONTRATOS extends Persistente
 			                         END
                            END AS natureza_objeto  
 						 , sem_acentos(objeto.descricao) AS objeto_contrato
-						 , 1 AS tipo_instrumento -- Verificar futuramente
+						 , CASE WHEN contrato.cod_tipo_instrumento > 0 THEN contrato.cod_tipo_instrumento
+						        ELSE 1
+						   END AS tipo_instrumento 
 						 , TO_CHAR(contrato.inicio_execucao, 'ddmmyyyy') AS dt_inicio_vigencia
 						 , TO_CHAR(contrato.fim_execucao, 'ddmmyyyy') AS dt_final_vigencia
 						 , contrato.valor_contratado
@@ -143,8 +145,8 @@ class TTCEMGCONTRATOS extends Persistente
 						 , sem_acentos(contrato.forma_pagamento) AS forma_pagamento
 						 , sem_acentos(contrato.prazo_execucao) AS prazo_execucao
 						 , sem_acentos(contrato.multa_rescisoria) AS multa_rescisoria
-						 , '' AS multa_inadimplemento -- Verificar futuramente
-						 , contrato.cod_garantia -- Verificar futuramente
+						 , contrato.multa_inadimplemento AS multa_inadimplemento 
+						 , contrato.cod_garantia 
 						 , sw_cgm_pessoa_fisica.cpf AS cpf_signatario_contratante
 						 , TO_CHAR(publicacao_contrato.dt_publicacao, 'ddmmyyyy') AS dt_publicacao 
 						 , sw_cgm.nom_cgm AS veiculo_divulgacao
@@ -212,6 +214,8 @@ class TTCEMGCONTRATOS extends Persistente
                          , cpf
                          , dt_publicacao
                          , veiculo_divulgacao
+						 , tipo_instrumento
+						 , multa_inadimplemento
 				  ORDER BY numero_contrato
 		";
         return $stSql;
@@ -391,12 +395,14 @@ class TTCEMGCONTRATOS extends Persistente
 					     , CASE WHEN CGMPJ.cnpj IS NOT NULL THEN CGMPJ.cnpj
                                 ELSE CGMPF.cpf
                            END AS nro_documento
-                         , '' AS cpf_representante_legal
+                         , representante_legal.cpf AS cpf_representante_legal
                       FROM licitacao.contrato 
                  LEFT JOIN sw_cgm_pessoa_juridica AS CGMPJ
                         ON CGMPJ.numcgm=contrato.cgm_contratado 
                  LEFT JOIN sw_cgm_pessoa_fisica AS CGMPF
-                        ON CGMPF.numcgm=contrato.cgm_contratado 
+                        ON CGMPF.numcgm=contrato.cgm_contratado
+				 LEFT JOIN sw_cgm_pessoa_fisica AS representante_legal
+				        ON representante_legal.numcgm = contrato.cgm_representante_legal
                 INNER JOIN sw_cgm AS CGM
                         ON CGM.numcgm=contrato.cgm_contratado
                      WHERE contrato.exercicio='".$this->getDado('exercicio')."' -- ENTRADA EXERCICIO
@@ -676,13 +682,13 @@ class TTCEMGCONTRATOS extends Persistente
                          , LPAD(LPAD(contrato.num_orgao::VARCHAR,2,'0')||LPAD(contrato.num_unidade::VARCHAR,2,'0'),5,'0') as cod_unidade_sub 
                          , contrato.numero_contrato AS nro_contrato
                          , TO_CHAR(contrato.dt_assinatura, 'ddmmyyyy') AS dt_assinatura_contrato
-                         , TO_CHAR(contrato_anulado.dt_anulacao, 'ddmmyyyy') AS dt_rescisao
-                         , contrato_anulado.valor_anulacao AS valor_cancelamento_contrato
+                         , TO_CHAR(rescisao_contrato.dt_rescisao, 'ddmmyyyy') AS dt_rescisao
+                         , rescisao_contrato.vlr_indenizacao AS valor_cancelamento_contrato
                       FROM licitacao.contrato
-                INNER JOIN licitacao.contrato_anulado 
-                        ON contrato_anulado.num_contrato=contrato.num_contrato
-                       AND contrato_anulado.exercicio=contrato.exercicio
-                       AND contrato_anulado.cod_entidade=contrato.cod_entidade
+                INNER JOIN licitacao.rescisao_contrato  
+                        ON rescisao_contrato.num_contrato=contrato.num_contrato
+                       AND rescisao_contrato.exercicio_contrato=contrato.exercicio
+                       AND rescisao_contrato.cod_entidade=contrato.cod_entidade
 				     WHERE contrato.exercicio='".$this->getDado('exercicio')."' -- ENTRADA EXERCICIO
                        AND (contrato.inicio_execucao <= TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy')
                         OR  contrato.inicio_execucao BETWEEN TO_DATE('".$this->getDado('dt_inicial')."','dd/mm/yyyy') AND TO_DATE('".$this->getDado('dt_final')."','dd/mm/yyyy')

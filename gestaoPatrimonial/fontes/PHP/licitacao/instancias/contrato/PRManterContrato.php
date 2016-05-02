@@ -30,7 +30,7 @@
     * @author Analista: Cleisson da Silva Barboza
     * @author Desenvolvedor: Rodrigo
 
-    * $Id: PRManterContrato.php 63675 2015-09-28 21:31:00Z jean $
+    * $Id: PRManterContrato.php 65124 2016-04-26 19:51:11Z lisiane $
 
     * Casos de uso : uc-03.05.23
 */
@@ -179,6 +179,7 @@ switch ($stAcao) {
                 $obTContrato->setDado('inicio_execucao', $request->get('dtInicioExecucao') );
                 $obTContrato->setDado('fim_execucao', $request->get('dtFimExecucao') );
                 $obTContrato->setDado('cod_tipo_contrato', $request->get('inTipoContrato') );
+                $obTContrato->setDado('cod_tipo_instrumento', $request->get('inTipoInstrumento') );
                 
                 $obTContrato->setDado('num_orgao', $request->get('inNumOrgao') );
                 $obTContrato->setDado('num_unidade', $request->get('inNumUnidade') );
@@ -193,6 +194,10 @@ switch ($stAcao) {
                 $obTContrato->setDado('justificativa', $request->get('stJustificativa') );
                 $obTContrato->setDado('razao', $request->get('stRazao') );
                 $obTContrato->setDado('fundamentacao_legal', $request->get('stFundamentacaoLegal') );
+                $obTContrato->setDado('cgm_representante_legal', $request->get('inCGMRepresentanteLegal') );
+                $obTContrato->setDado('multa_inadimplemento', $request->get('stMultaInadimplemento') );
+                $obTContrato->setDado('cod_garantia', $request->get('inTipoGarantia') );
+                
                 
                 $obTContrato->inclusao();
 
@@ -374,6 +379,7 @@ switch ($stAcao) {
             $obTContrato->setDado('valor_garantia', str_replace(',','.',str_replace('.','',$request->get('nmValorGarantiaExecucao'))) );
             $obTContrato->setDado('valor_contratado', $request->get('vlContrato'));
             $obTContrato->setDado('cod_tipo_contrato', $request->get('inTipoContrato') );
+            $obTContrato->setDado('cod_tipo_instrumento', $request->get('inTipoInstrumento') );
             
             $obTContrato->setDado('num_orgao', $request->get('inNumOrgao') );
             $obTContrato->setDado('num_unidade', $request->get('inNumUnidade') );
@@ -388,6 +394,9 @@ switch ($stAcao) {
             $obTContrato->setDado('justificativa', $request->get('stJustificativa') );
             $obTContrato->setDado('razao', $request->get('stRazao') );
             $obTContrato->setDado('fundamentacao_legal', $request->get('stFundamentacaoLegal') );
+            $obTContrato->setDado('cgm_representante_legal', $request->get('inCGMRepresentanteLegal') );
+            $obTContrato->setDado('multa_inadimplemento', $request->get('stMultaInadimplemento') );
+            $obTContrato->setDado('cod_garantia', $request->get('inTipoGarantia') );
             $obTContrato->alteracao();
 
             $inCountDocumentos = count($arDocumentos);

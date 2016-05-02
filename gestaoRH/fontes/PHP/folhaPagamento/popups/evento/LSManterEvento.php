@@ -32,20 +32,18 @@
 
     * @ignore
 
-    $Revision: 30930 $
-    $Name$
-    $Author: rgarbin $
-    $Date: 2008-03-05 11:37:01 -0300 (Qua, 05 Mar 2008) $
+    $Id: LSManterEvento.php 65130 2016-04-26 20:41:36Z michel $
 
     * Casos de uso: uc-04.05.23
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php"                  );
-include_once( CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php"                      );
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoContratoServidor.class.php";
+include_once CAM_GRH_FOL_NEGOCIO."RFolhaPagamentoPeriodoMovimentacao.class.php";
+include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEvento.class.php";
 
-foreach ($_REQUEST as $stCampo=>$stValor) {
+foreach ($request->getAll() as $stCampo=>$stValor) {
     $stLink .= "&".$stCampo."=".$stValor;
 }
 
@@ -58,59 +56,55 @@ $pgProc = "PR".$stPrograma.".php?".Sessao::getId();
 $pgOcul = "OC".$stPrograma.".php?".Sessao::getId();
 $pgJS   = "JS".$stPrograma.".js";
 
-$stFncJavaScript .= " function insereEvento(cod_evento,num,nom,texto) {                     \n";
-$stFncJavaScript .= " var sNum;                                                             \n";
-$stFncJavaScript .= " var sNom;                                                             \n";
-$stFncJavaScript .= " var sTexto;                                                           \n";
-$stFncJavaScript .= " sNum = num;                                                           \n";
-$stFncJavaScript .= " sNom = nom;                                                           \n";
-$stFncJavaScript .= " sTexto = texto;                                                       \n";
-$stFncJavaScript .= " d = window.opener.parent.frames['telaPrincipal'].document ;           \n";
-$stFncJavaScript .= " d.getElementById('".$_REQUEST["campoNom"]."').innerHTML = sNom;       \n";
-$stFncJavaScript .= " d.".$_REQUEST["nomForm"].".Hdn".$_REQUEST["campoNum"].".value = sNom; \n";
-$stFncJavaScript .= " d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".value = sNum;    \n";
-$stFncJavaScript .= " d.getElementById('".$_REQUEST["campoTexto"]."').innerHTML = texto;      \n";
-$stFncJavaScript .= " d.".$_REQUEST["nomForm"].".".$_REQUEST["campoNum"].".focus();         \n";
-$stFncJavaScript .= " ajaxJavaScriptSincrono( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&boPopUp=true&".$_REQUEST["campoNum"]."='+num, 'preencheDescEvento', '".Sessao::getId()."' );";
-$stFncJavaScript .= " window.close();                                                       \n";
-$stFncJavaScript .= " }                                                                     \n";
+$stFncJavaScript .= " function insereEvento(cod_evento,num,nom,texto) {                             \n";
+$stFncJavaScript .= " var sNum;                                                                     \n";
+$stFncJavaScript .= " var sNom;                                                                     \n";
+$stFncJavaScript .= " var sTexto;                                                                   \n";
+$stFncJavaScript .= " sNum = num;                                                                   \n";
+$stFncJavaScript .= " sNom = nom;                                                                   \n";
+$stFncJavaScript .= " sTexto = texto;                                                               \n";
+$stFncJavaScript .= " d = window.opener.parent.frames['telaPrincipal'].document ;                   \n";
+$stFncJavaScript .= " d.getElementById('".$request->get("campoNom")."').innerHTML = sNom;           \n";
+$stFncJavaScript .= " d.".$request->get("nomForm").".Hdn".$request->get("campoNum").".value = sNom; \n";
+$stFncJavaScript .= " d.".$request->get("nomForm").".".$request->get("campoNum").".value = sNum;    \n";
+$stFncJavaScript .= " d.getElementById('".$request->get("campoTexto")."').innerHTML = texto;        \n";
+$stFncJavaScript .= " d.".$request->get("nomForm").".".$request->get("campoNum").".focus();         \n";
+$stFncJavaScript .= " ajaxJavaScriptSincrono( '".CAM_GRH_FOL_PROCESSAMENTO."OCBscEvento.php?".Sessao::getId()."&boPopUp=true&".$request->get("campoNum")."='+num, 'preencheDescEvento', '".Sessao::getId()."' ); \n";
+$stFncJavaScript .= " window.close();                                                               \n";
+$stFncJavaScript .= " }                                                                             \n";
 
-if ($_REQUEST['stNatureza'] != "") {
-    $stFiltro .= " AND natureza = '".$_REQUEST['stNatureza']."'";
-}
+if ($request->get('stNatureza', '') != "")
+    $stFiltro .= " AND natureza = '".$request->get('stNatureza')."'";
 
-if ($_REQUEST['inCodigoEvento'] != "") {
-    $stFiltro .= " AND FPE.codigo::integer = '".$_REQUEST['inCodigoEvento']."'::integer";
-}
+if ($request->get('inCodigoEvento', '') != "")
+    $stFiltro .= " AND FPE.codigo::integer = '".$request->get('inCodigoEvento')."'::integer";
 
-if ($_REQUEST['stDescricao'] != "") {
-    $stFiltro .= " AND LOWER(descricao) LIKE LOWER('".$_REQUEST['stDescricao']."%') ";
-}
+if ($request->get('stDescricao', '') != "")
+    $stFiltro .= " AND LOWER(descricao) LIKE LOWER('".$request->get('stDescricao')."%') ";
 
-if ($_REQUEST["stTipo"] != "") {
-    $stFiltro .= " AND tipo = '".$_REQUEST["stTipo"]."'";
-}
+if ($request->get("stTipo", '') != "")
+    $stFiltro .= " AND tipo = '".$request->get("stTipo")."'";
 
-switch (trim($_REQUEST['stTipoEvento'])) {
+switch (trim($request->get('stTipoEvento'))) {
     case "n_evento_sistema":
-            $stFiltro .= " AND evento_sistema = false";
-        break;
+        $stFiltro .= " AND evento_sistema = false";
+    break;
 
     case "evento_sistema":
-            $stFiltro .= " AND evento_sistema = true";
-        break;
+        $stFiltro .= " AND evento_sistema = true";
+    break;
 }
 
 $rsLista = new RecordSet;
-include_once(CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoEvento.class.php");
+
 $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
 $obTFolhaPagamentoEvento->recuperaEventos($rsLista,$stFiltro,$stOrdem);
 
 $rsLista->addFormatacao('valor_quantidade','NUMERIC_BR');
 $rsLista->addFormatacao('unidade_quantitativa','NUMERIC_BR');
 $obLista = new Lista;
-$obLista->setRecordSet          ( $rsLista );
-$obLista->setTitulo             ("Eventos Cadastrados");
+$obLista->setRecordSet( $rsLista );
+$obLista->setTitulo("Eventos Cadastrados");
 
 $obLista->addCabecalho();
 $obLista->ultimoCabecalho->addConteudo("&nbsp;");
@@ -195,16 +189,16 @@ $obLista->commitDado();
 $obLista->addAcao();
 $obLista->ultimaAcao->setAcao( "selecionar" );
 $obLista->ultimaAcao->setFuncao( true );
-$obLista->ultimaAcao->setLink( "JavaScript:insereEvento();" );
-$obLista->ultimaAcao->addCampo( "1"   , "cod_evento" );
-$obLista->ultimaAcao->addCampo( "2"   , "codigo" );
-$obLista->ultimaAcao->addCampo( "3"   , "descricao");
-$obLista->ultimaAcao->addCampo( "4"   , "observacao");
-$obLista->ultimaAcao->addCampo( "5"   , "tipo");
-$obLista->ultimaAcao->addCampo( "6"   , "fixado");
-$obLista->ultimaAcao->addCampo( "7"   , "valor_quantidade");
-$obLista->ultimaAcao->addCampo( "8"   , "limite_calculo");
-$obLista->ultimaAcao->addCampo( "9"   , "proventos_descontos");
+$obLista->ultimaAcao->setLink( "JavaScript:window.close();insereEvento();" );
+$obLista->ultimaAcao->addCampo( "1", "cod_evento" );
+$obLista->ultimaAcao->addCampo( "2", "codigo" );
+$obLista->ultimaAcao->addCampo( "3", "descricao");
+$obLista->ultimaAcao->addCampo( "4", "observacao");
+$obLista->ultimaAcao->addCampo( "5", "tipo");
+$obLista->ultimaAcao->addCampo( "6", "fixado");
+$obLista->ultimaAcao->addCampo( "7", "valor_quantidade");
+$obLista->ultimaAcao->addCampo( "8", "limite_calculo");
+$obLista->ultimaAcao->addCampo( "9", "proventos_descontos");
 $obLista->commitAcao();
 
 $obLista->show();
@@ -212,17 +206,17 @@ $obLista->show();
 $obFormulario = new Formulario;
 
 $obBtnCancelar = new Button;
-$obBtnCancelar->setName                 ( 'cancelar'                                        );
-$obBtnCancelar->setValue                ( 'Cancelar'                                        );
-$obBtnCancelar->obEvento->setOnClick    ( "window.close();"                                 );
+$obBtnCancelar->setName              ( 'cancelar'        );
+$obBtnCancelar->setValue             ( 'Cancelar'        );
+$obBtnCancelar->obEvento->setOnClick ( "window.close();" );
 
 $obBtnFiltro = new Button;
-$obBtnFiltro->setName                   ( 'filtro'                                          );
-$obBtnFiltro->setValue                  ( 'Filtro'                                          );
-$obBtnFiltro->obEvento->setOnClick      ( "Cancelar('".$pgFilt."','telaPrincipal');"        );
+$obBtnFiltro->setName              ( 'filtro'                                   );
+$obBtnFiltro->setValue             ( 'Filtro'                                   );
+$obBtnFiltro->obEvento->setOnClick ( "Cancelar('".$pgFilt."','telaPrincipal');" );
 
-$obFormulario->defineBarra              ( array( $obBtnCancelar,$obBtnFiltro ) , '', ''     );
-$obFormulario->obJavaScript->addFuncao  ( $stFncJavaScript                                  );
+$obFormulario->defineBarra             ( array( $obBtnCancelar,$obBtnFiltro ) , '', '' );
+$obFormulario->obJavaScript->addFuncao ( $stFncJavaScript                              );
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

@@ -199,6 +199,10 @@ class TComprasContratoCompraDireta extends Persistente
                        , orgao.nom_orgao
                        , unidade.nom_unidade
                        , entidade_contrato.nom_cgm AS nom_entidade
+                       , contrato.cod_garantia
+                       , contrato.multa_inadimplemento
+                       , contrato.cod_tipo_instrumento
+                       , contrato.cgm_representante_legal 
                
                     FROM licitacao.contrato_compra_direta
                        , orcamento.entidade

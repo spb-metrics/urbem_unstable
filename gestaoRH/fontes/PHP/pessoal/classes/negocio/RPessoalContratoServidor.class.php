@@ -2763,6 +2763,15 @@ function listarContratosCargoExercidoComSubDivisaoAssentamento(&$rsRecordSet, $i
       $stFiltro .= " AND assentamento_sub_divisao.cod_assentamento = ".$inCodAssentamento." \n";
     }
 
+    $stFiltro .= " AND contrato_servidor_situacao.timestamp = (
+                                                                SELECT timestamp
+                                                                  FROM pessoal.contrato_servidor_situacao
+                                                                 WHERE cod_contrato = pcs.cod_contrato                                                               
+                                                              ORDER BY timestamp desc
+                                                                 LIMIT 1
+                                                              )
+                   AND contrato_servidor_situacao.situacao = 'A' \n";
+
     $stFiltro = ($stFiltro) ? " WHERE ".substr($stFiltro,4,strlen($stFiltro)) : "";
     $stOrder = "pcs.cod_contrato";
 
@@ -2815,12 +2824,21 @@ function listarContratosFuncaoExercidaComSubDivisaoAssentamento(&$rsRecordSet, $
         $stFiltro .= " AND assentamento_sub_divisao.cod_assentamento = ".$inCodAssentamento." \n";
     }
 
+    $stFiltro .= " AND assentamento_sub_divisao.cod_sub_divisao = contrato_servidor_sub_divisao_funcao.cod_sub_divisao
+                   AND contrato_servidor_situacao.timestamp = (
+                                                                SELECT timestamp
+                                                                  FROM pessoal.contrato_servidor_situacao
+                                                                 WHERE cod_contrato = pcs.cod_contrato                                                               
+                                                              ORDER BY timestamp desc
+                                                                 LIMIT 1
+                                                              )
+                   AND contrato_servidor_situacao.situacao = 'A' \n";
+
     $stFiltro = ($stFiltro) ? " WHERE ".substr($stFiltro,4,strlen($stFiltro)) : "";
     $stOrder = "pcs.cod_contrato";
 
     $obTPessoalContratoServidor =  new TPessoalContratoServidor;
     $obErro = $obTPessoalContratoServidor->recuperaContratosFuncaoExercidaComSubDivisaoAssentamento( $rsRecordSet , $stFiltro , $stOrder , $boTransacao );
-
     return $obErro;
 }
 

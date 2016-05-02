@@ -31,7 +31,7 @@
     * @author Desenvolvedor: Andre Almeida
 
     * @ignore
-    $Id: OCManterGeracaoAssentamento.php 65033 2016-04-19 20:31:30Z jean $
+    $Id: OCManterGeracaoAssentamento.php 65149 2016-04-27 22:02:59Z michel $
 
     * Caso de uso: uc-04.04.14
 
@@ -901,11 +901,12 @@ function montaAlterarAssentamento($boExecuta=false)
             $stJs .= "f.inContrato.value                     = '".$arAssentamento['inRegistro']."';         \n";
         break;
         case "cargo":
-            $stJs .= "f.boCargoExercido.ckecked         = ".$arAssentamento['boCargoExercido'].";           \n";
+            $boCargoExercido = ($arAssentamento['boCargoExercido'] == "") ? 'false' : $arAssentamento['boCargoExercido'];
+            $stJs .= "f.boCargoExercido.ckecked         = ".$boCargoExercido.";                             \n";
             if ($arAssentamento['boFuncaoExercida'] == "") {
                 $stJs .= "f.boFuncaoExercida.checked        = false;                                        \n";
             } else {
-                $stJs .= "f.boFuncaoExercida.checked        = ".$arAssentamento['boFuncaoExercida'].";          \n";
+                $stJs .= "f.boFuncaoExercida.checked        = ".$arAssentamento['boFuncaoExercida'].";      \n";
             }
             $stJs .= "f.inCodCargoTxt.value             = '".$arAssentamento['inCodCargo']."';              \n";
             $stJs .= "f.inCodCargo.value                = '".$arAssentamento['inCodCargo']."';              \n";
@@ -944,12 +945,6 @@ function montaAlterarAssentamento($boExecuta=false)
     $stJs .= "f.stDataFinal.value           = '".$arAssentamento['stDataFinal']     ."';\n";
     Sessao::write('arNormas', $arAssentamento['arNormas']);
     $stJs .= montaListaNorma();
-//    $stJs .= "f.inCodTipoNorma.value           = '".$arAssentamento['inCodTipoNorma']."';\n";
-//    $stJs .= "f.inCodTipoNormaTxt.value           = '".$arAssentamento['inCodTipoNorma']."';\n";
-//    Sessao::write("inCodTipoNorma", $arAssentamento['inCodTipoNorma']);
-//    $stJs .= MontaNorma();
-//    $stJs .= "f.inCodNorma.value           = '".$arAssentamento['inCodNorma']."';\n";
-//    $stJs .= "f.inCodNormaTxt.value           = '".$arAssentamento['inCodNorma']."';\n";
     $_REQUEST["inCodClassificacao"] = $arAssentamento['inCodClassificacao'];
     $_REQUEST["inCodClassificacaoTxt"] = $arAssentamento['inCodClassificacao'];
     $_REQUEST["inCodAssentamento"]  = $arAssentamento['inCodAssentamento'];
@@ -958,6 +953,7 @@ function montaAlterarAssentamento($boExecuta=false)
     $stJs .= gerarSpanLicencaPremio();
     $stJs .= buscaContrato($arAssentamento['inRegistro']);
     $stJs .= "f.stObservacao.value          = '".$arAssentamento['stObservacao']    ."';\n";
+
     if ($boExecuta) {
         sistemaLegado::executaFrameOculto( $stJs );
     } else {
@@ -1110,20 +1106,18 @@ function processarForm($boExecuta = false, $stArquivo = "Form", $stAcao = "inclu
             $inCodMotivo = SistemaLegado::pegaDado("cod_motivo"
                                             ,"pessoal.assentamento_assentamento"
                                             ,"WHERE cod_assentamento = ".Sessao::read('inCodAssentamento')." AND cod_classificacao = ".Sessao::read('inCodClassificacao')."");
-            
-            if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) )
-                $stJs .= gerarSpanCargoFuncaoSalario($arDados);
 
-            $stJs .= preencheSubDivisaoAlterar();
-            $stJs .= preencheCargoAlterar();
-            $stJs .= preencheEspecialidadeAlterar();
-            $stJs .= preencheSubDivisaoFuncaoAlterar();
-            $stJs .= preencheFuncaoAlterar();
-            $stJs .= preencheEspecialidadeFuncaoAlterar();
-            
-            if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) )
+            if ( ($inCodMotivo == 18) || ($inCodMotivo == 14) ){
+                $stJs .= gerarSpanCargoFuncaoSalario($arDados);
+                $stJs .= preencheSubDivisaoAlterar();
+                $stJs .= preencheCargoAlterar();
+                $stJs .= preencheEspecialidadeAlterar();
+                $stJs .= preencheSubDivisaoFuncaoAlterar();
+                $stJs .= preencheFuncaoAlterar();
+                $stJs .= preencheEspecialidadeFuncaoAlterar();
                 $stJs .= preencheInformacoesSalariais($arDados['inCodFuncao'], $arDados['inCodEspecialidadeFuncao']);
-            
+            }
+
             $stJs .= preencheProgressaoAlterar();
         break;
 

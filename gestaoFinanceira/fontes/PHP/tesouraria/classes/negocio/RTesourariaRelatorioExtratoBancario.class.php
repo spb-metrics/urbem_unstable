@@ -223,7 +223,7 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
         $obFTesourariaExtratoBancario->setDado( "stDtInicial","01/01/".$this->getExercicio());
         if (substr($this->getDataInicial(),0,5) == "01/01") {
             $dtAnterior = $this->getDataInicial();
-            $obFTesourariaExtratoBancario->setDado( "boMovimentacao", "true" );
+            $obFTesourariaExtratoBancario->setDado( "boMovimentacao", "false" );
         } else {
             $dtInicial = explode("/",$this->getDataInicial());
             $dtAnterior = date("d/m/Y",mktime(0,0,0,$dtInicial[1],$dtInicial[0]-1,$dtInicial[2]));

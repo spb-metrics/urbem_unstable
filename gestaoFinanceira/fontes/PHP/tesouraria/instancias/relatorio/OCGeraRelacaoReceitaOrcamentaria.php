@@ -32,106 +32,86 @@
 
     * @ignore
 
+    $Id: OCGeraRelacaoReceitaOrcamentaria.php 65160 2016-04-28 20:25:34Z michel $
+
     * Casos de uso: uc-02.04.36
-*/
-
-/*
-$Log$
-Revision 1.5  2007/09/10 15:03:10  hboaventura
-Ticket#10067#
-
-Revision 1.4  2007/08/30 19:38:58  hboaventura
-Bug#9931#, Bug#10042#
-
-Revision 1.3  2007/08/23 12:48:36  hboaventura
-Bug#9928#
-
-Revision 1.2  2007/08/20 15:03:16  hboaventura
-Bug#9936#
-
-Revision 1.1  2007/08/08 14:07:41  hboaventura
-uc_02-04-36
-
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkBirt.inc.php';
-include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php" );
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoEntidade.class.php";
 
 $preview = new PreviewBirt(2,30,1);
 $preview->setTitulo('Relatório do Birt');
 $preview->setVersaoBirt('2.5.0');
 
-if (count($_REQUEST['inCodigoEntidadesSelecionadas'])>0) {
-    $preview->addParametro( "cod_entidade",implode(',',$_REQUEST['inCodigoEntidadesSelecionadas']) );
-} else {
-    $preview->addParametro( "cod_entidade","" );
-}
+$stEntidade = "";
 
-//seta a entidade
-if (count($_REQUEST['inCodigoEntidadesSelecionadas'])>0) {
-    foreach ($_REQUEST['inCodigoEntidadesSelecionadas'] as $array) {
-        $arEntidades.=  $array.", ";
-    }
-    $arEntidades = substr( $arEntidades, 0, strlen($arEntidades)-2 );
-    $preview->addParametro( "cod_entidade",$arEntidades );
-} else {
-    $preview->addParametro( "cod_entidade","" );
-}
+$inCodigoEntidadesSelecionadas = $request->get('inCodigoEntidadesSelecionadas');
+if (count($inCodigoEntidadesSelecionadas)>0)
+    $stEntidade = implode(',',$inCodigoEntidadesSelecionadas);
+
+if (count($inCodigoEntidadesSelecionadas)>1 || count($inCodigoEntidadesSelecionadas)==0)
+    $inCodEntidade = SistemaLegado::pegaDado('valor','administracao.configuracao',"where cod_modulo = 8 AND parametro ILIKE 'cod_entidade_prefeitura' AND exercicio = '".Sessao::getExercicio()."'");
+else
+    $inCodEntidade = $inCodigoEntidadesSelecionadas[0];
+
+$preview->addParametro( "cod_entidade", $stEntidade );
+$preview->addParametro( "entidade", $inCodEntidade );
 
 //seta a data
-$preview->addParametro( "data_ini",$_REQUEST['stDataInicial']);
-$preview->addParametro( "data_fim",$_REQUEST['stDataFinal']);
+$preview->addParametro( "data_ini", $request->get('stDataInicial'));
+$preview->addParametro( "data_fim", $request->get('stDataFinal'));
 
 //seta as o código estrutural das receitas
-if ($_REQUEST['stCodEstruturalInicial'] != '' AND $_REQUEST['stCodEstruturalFinal'] != '') {
-    $preview->addParametro( "estrutural", " BETWEEN '".$_REQUEST['stCodEstruturalInicial']."' AND '".$_REQUEST['stCodEstruturalFinal']."' " );
-} elseif ($_REQUEST['stCodEstruturalInicial'] == '' AND $_REQUEST['stCodEstruturaFinal'] != '') {
-    $preview->addParametro( "estrutural", " <= '".$_REQUEST['stCodEstruturalFinal']."' " );
-} elseif ($_REQUEST['stCodEstruturalInicial'] != '' AND $_REQUEST['stCodEstruturalFinal'] == '') {
-    $preview->addParametro( "estrutural", " >= '".$_REQUEST['stCodEstruturalInicial']."' " );
+if ($request->get('stCodEstruturalInicial', '') != '' AND $request->get('stCodEstruturalFinal', '') != '') {
+    $preview->addParametro( "estrutural", " BETWEEN '".$request->get('stCodEstruturalInicial')."' AND '".$request->get('stCodEstruturalFinal')."' " );
+} elseif ($request->get('stCodEstruturalInicial', '') == '' AND $request->get('stCodEstruturaFinal', '') != '') {
+    $preview->addParametro( "estrutural", " <= '".$request->get('stCodEstruturalFinal')."' " );
+} elseif ($request->get('stCodEstruturalInicial', '') != '' AND $request->get('stCodEstruturalFinal', '') == '') {
+    $preview->addParametro( "estrutural", " >= '".$request->get('stCodEstruturalInicial')."' " );
 } else {
     $preview->addParametro( "estrutural", "" );
 }
 
 //seta o cod_reduzido
-if ($_REQUEST['inReceitaInicial'] != '' AND $_REQUEST['inReceitaFinal'] != '') {
-    $preview->addParametro("cod_reduzido", " BETWEEN ".$_REQUEST['inReceitaInicial']." AND ".$_REQUEST['inReceitaFinal']);
-} elseif ($_REQUEST['inReceitaInicial'] == '' AND $_REQUEST['inReceitaFinal'] != '') {
-    $preview->addParametro("cod_reduzido", " <= ".$_REQUEST['inReceitaFinal']);
-} elseif ($_REQUEST['inReceitaInicial'] != '' AND $_REQUEST['inReceitaFinal'] == '') {
-    $preview->addParametro("cod_reduzido", " >= ".$_REQUEST['inReceitaInicial']);
+if ($request->get('inReceitaInicial', '') != '' AND $request->get('inReceitaFinal', '') != '') {
+    $preview->addParametro("cod_reduzido", " BETWEEN ".$request->get('inReceitaInicial')." AND ".$request->get('inReceitaFinal'));
+} elseif ($request->get('inReceitaInicial', '') == '' AND $request->get('inReceitaFinal', '') != '') {
+    $preview->addParametro("cod_reduzido", " <= ".$request->get('inReceitaFinal'));
+} elseif ($request->get('inReceitaInicial', '') != '' AND $request->get('inReceitaFinal', '') == '') {
+    $preview->addParametro("cod_reduzido", " >= ".$request->get('inReceitaInicial'));
 } else {
     $preview->addParametro("cod_reduzido", "");
 }
 
 //seta o cod_plano
-if ($_REQUEST['inCodContaBancoInicial'] != '' AND $_REQUEST['inCodContaBancoFinal'] != '') {
-    $preview->addParametro( "conta_banco", " BETWEEN ".$_REQUEST['inCodContaBancoInicial']." AND ".$_REQUEST['inCodContaBancoFinal'] );
-} elseif ($_REQUEST['inCodContaBancoInicial'] == '' AND $_REQUEST['inCodContaBancoFinal'] != '') {
-    $preview->addParametro( "conta_banco", " <= ".$_REQUEST['inCodContaBancoFinal'] );
-} elseif ($_REQUEST['inCodContaBancoInicial'] != '' AND $_REQUEST['inCodContaBancoFinal'] == '') {
-    $preview->addParametro( "conta_banco", " >= ".$_REQUEST['inCodContaBancoInicial'] );
+if ($request->get('inCodContaBancoInicial', '') != '' AND $request->get('inCodContaBancoFinal', '') != '') {
+    $preview->addParametro( "conta_banco", " BETWEEN ".$request->get('inCodContaBancoInicial')." AND ".$request->get('inCodContaBancoFinal') );
+} elseif ($request->get('inCodContaBancoInicial', '') == '' AND $request->get('inCodContaBancoFinal', '') != '') {
+    $preview->addParametro( "conta_banco", " <= ".$request->get('inCodContaBancoFinal') );
+} elseif ($request->get('inCodContaBancoInicial', '') != '' AND $request->get('inCodContaBancoFinal', '') == '') {
+    $preview->addParametro( "conta_banco", " >= ".$request->get('inCodContaBancoInicial') );
 } else {
     $preview->addParametro( "conta_banco", "" );
 }
 
-if ($_REQUEST['inCodRecurso'] != '') {
-    $preview->addParametro( 'recurso', $_REQUEST['inCodRecurso'] );
+if ($request->get('inCodRecurso', '') != '') {
+    $preview->addParametro( 'recurso', $request->get('inCodRecurso') );
 } else {
     $preview->addParametro( 'recurso', '' );
 }
 
-if( $_REQUEST['inCodUso']<>NULL && $_REQUEST['inCodDestinacao'] && $_REQUEST['inCodEspecificacao'] )
-     $preview->addParametro( 'destinacaorecurso', $_REQUEST['inCodUso'].".".$_REQUEST['inCodDestinacao'].".".$_REQUEST['inCodEspecificacao'] );
+if( $request->get('inCodUso')<>NULL && $request->get('inCodDestinacao') && $request->get('inCodEspecificacao') )
+     $preview->addParametro( 'destinacaorecurso', $request->get('inCodUso').".".$request->get('inCodDestinacao').".".$request->get('inCodEspecificacao') );
 else $preview->addParametro( 'destinacaorecurso', '');
 
-if ( $_REQUEST['inCodDetalhamento'] )
-     $preview->addParametro( 'cod_detalhamento', $_REQUEST['inCodDetalhamento'] );
+if ( $request->get('inCodDetalhamento') )
+     $preview->addParametro( 'cod_detalhamento', $request->get('inCodDetalhamento') );
 else $preview->addParametro( 'cod_detalhamento', '' );
 
-if ($_REQUEST['stTipoRelatorio'] != '') {
-    $preview->addParametro( 'tipo_relatorio', $_REQUEST['stTipoRelatorio'] );
+if ($request->get('stTipoRelatorio', '') != '') {
+    $preview->addParametro( 'tipo_relatorio', $request->get('stTipoRelatorio') );
 } else {
     $preview->addParametro( 'tipo_relatorio', '' );
     $preview->addParametro( 'ordenacao', ' arrecadacao.timestamp_arrecadacao ASC ');

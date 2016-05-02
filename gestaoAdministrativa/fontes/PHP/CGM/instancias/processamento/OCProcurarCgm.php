@@ -30,7 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Id: OCProcurarCgm.php 63969 2015-11-12 18:43:12Z evandro $
+$Id: OCProcurarCgm.php 65128 2016-04-26 20:07:17Z evandro $
 $Revision: 26876 $
 $Name$
 $Author: hboaventura $
@@ -74,9 +74,13 @@ function buscaPopup()
             $obTCGM->recuperaRelacionamentoVinculado( $rsLista, $stFiltro, " ORDER BY CGM.nom_cgm", "" , $_REQUEST['stTabelaVinculo'] , $_REQUEST['stCampoVinculo'],$stFiltroVinculado);
 
             $stNomCGM = $rsLista->getCampo('nom_cgm');
-            if ( !$stNomCGM )
-                $stJs .= "alertaAviso('@" . $_REQUEST['stNomeVinculo']  . "  ( CGM: ". $_GET[ $_GET['stNomCampoCod'] ] ." ) não encontrado ou inativo!', 'form','erro','".Sessao::getId()."');";
-
+            if ( !$stNomCGM ){
+                if ($request->get('stTipo') == 'usuario') {
+                    $stJs .= "alertaAviso('@" . $_REQUEST['stNomeVinculo']  . " Usuário com CGM ". $_GET[ $_GET['stNomCampoCod'] ] ." não foi encontrado no cadastro de Usuários!', 'form','erro','".Sessao::getId()."');";    
+                }else{
+                    $stJs .= "alertaAviso('@" . $_REQUEST['stNomeVinculo']  . "  ( CGM: ". $_GET[ $_GET['stNomCampoCod'] ] ." ) não encontrado ou inativo!', 'form','erro','".Sessao::getId()."');";
+                }
+            }
         } else {
             if ($_GET[ $_GET['stNomCampoCod'] ] != "") {
                 if ($_REQUEST["stTipoBusca"]=="fisica") {

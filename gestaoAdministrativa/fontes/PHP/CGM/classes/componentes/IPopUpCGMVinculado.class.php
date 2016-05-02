@@ -117,7 +117,7 @@ class  IPopUpCGMVinculado extends BuscaInner
         $arAux['stFiltroVinculado'] = $this->getFiltroVinculado();
         Sessao::write($this->getId(), $arAux);
 
-        $pgOcul = "'".CAM_GA_CGM_PROCESSAMENTO."OCProcurarCgm.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+document.getElementById('".$this->obCampoCod->getName()."').value+'&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."&stTabelaVinculo=". $this->getTabelaVinculo(). "&stNomeVinculo=" . $this->getNomeVinculo() . "&stCampoVinculo=".$this->getCampoVinculo()."&buscaContrato=".$this->getBuscaContrato()."'";
+        $pgOcul = "'".CAM_GA_CGM_PROCESSAMENTO."OCProcurarCgm.php?".Sessao::getId()."&".$this->obCampoCod->getName()."='+document.getElementById('".$this->obCampoCod->getName()."').value+'&stNomCampoCod=".$this->obCampoCod->getName()."&stIdCampoDesc=".$this->getId()."&stTabelaVinculo=". $this->getTabelaVinculo(). "&stNomeVinculo=" . $this->getNomeVinculo() . "&stCampoVinculo=".$this->getCampoVinculo() . "&buscaContrato=".$this->getBuscaContrato() . "&stTipo=".$this->stTipo."'";
 
         if (($this->obCampoCod->getName() == 'inNumResponsavelAnterior') or ($this->obCampoCod->getName() == 'inNumResponsavelNovo')) {
             $this->obCampoCod->obEvento->setOnBlur ( "ajaxJavaScript(".$pgOcul.",'buscaPopup');" );

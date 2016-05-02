@@ -35,7 +35,7 @@
     
     * @ignore
     
-    $Id: PRManterApostilaContrato.php 64936 2016-04-14 17:11:06Z jean $
+    $Id: PRManterApostilaContrato.php 65151 2016-04-28 12:56:33Z jean $
 */
 include_once ( '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php'        );
 include_once ( '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php'  );
@@ -133,8 +133,8 @@ switch( $request->get('stAcao') ){
 				
 				$nuVlApostila = str_replace(".", "", $request->get('nuVlApostila'));
 				$nuVlApostila = str_replace(",", ".", $nuVlApostila);
+				$nuVlApostila = ($nuVlApostila != "") ? $nuVlApostila : 0;
 
-			    $nuVlApostila=(isset($nuVlApostila)) ? $nuVlApostila : 0;
 				$obTLicitacaoContratoApostila->setDado( 'valor_apostila', $nuVlApostila );
 				
 				$obErro = $obTLicitacaoContratoApostila->inclusao();

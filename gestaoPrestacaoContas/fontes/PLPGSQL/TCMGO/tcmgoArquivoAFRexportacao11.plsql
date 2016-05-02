@@ -26,10 +26,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Revision: 59612 $
-* $Name$
-* $Author: gelson $
-* $Date: 2014-09-02 09:00:51 -0300 (Ter, 02 Set 2014) $
+* $Id:$
 *
 * Casos de uso: uc-02.02.11
 */
@@ -108,8 +105,8 @@ BEGIN
         stSql := '  INSERT INTO tmp_balanco_verificacao_afr_recurso
                     SELECT 
                               '''||inTipoLancamento||''' as tipo_lancamento
-                            , '||inOrgao||' as orgao
-                            , '||inUnidade||' as unidade
+                            , '||COALESCE(inOrgao, 0)||' as orgao
+                            , '||COALESCE(inUnidade, 0)||' as unidade
                             , plano_recurso.cod_recurso as cod_fonte
                             , registro.* 
                     FROM contabilidade.fn_rl_balancete_verificacao( '''||stExercicio||'''

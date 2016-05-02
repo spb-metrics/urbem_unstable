@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacao.php 64317 2016-01-15 12:53:03Z arthur $
+    $Id: OCManterAutorizacao.php 65141 2016-04-27 20:10:02Z evandro $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -614,6 +614,9 @@ switch ($stCtrl) {
         $nuQuantidade = str_replace('.','',trim($request->get('nuQuantidade')));
         $nuQuantidade = str_replace(',','.',$nuQuantidade);
 
+        $inCodMarca = $request->get('inMarca');
+        $stNomeMarca = $request->get('stNomeMarca');
+
         if($request->get('stTipoItem')=='Catalogo'){
             list($inCodUnidade, $inCodGrandeza) = explode("-",$request->get('inCodUnidadeMedida'));
             $stNomUnidade = $request->get('stNomUnidade');
@@ -641,6 +644,9 @@ switch ($stCtrl) {
         $arItens[$inCount]['nom_unidade']  = $stNomUnidade;
         $arItens[$inCount]['vl_total']     = $nuVlTotal;
         $arItens[$inCount]['cod_material'] = trim($request->get('inCodMaterial'));
+        $arItens[$inCount]['cod_marca']    = $inCodMarca;
+        $arItens[$inCount]['nome_marca']   = $stNomeMarca;
+
         if($erro){
             $js = "alertaAviso('Item(".$request->get('inCodItem').") Já Incluso na Lista.','frm','erro','".Sessao::getId()."'); \n";
             $js .= "jq('#Ok').prop('disabled',false);\n";
@@ -667,6 +673,7 @@ switch ($stCtrl) {
                     $js .= "jq('#stNomItemCatalogo').html(\"".$valor["nom_item"]."\");                                          \n";
                     $js .= "jq('#inCodUnidadeMedida').val(\"".$valor["cod_unidade"]."-". $valor["cod_grandeza"]."\");           \n";
                     $js .= "jq('#stNomUnidade').val(\"".$valor["nom_unidade"]."\");                                             \n";
+                    
                 } else {
                     $js .= "jq('#stNomItem').val(\"".htmlentities($valor["nom_item"], ENT_QUOTES)."\");                         \n";
                 }
@@ -677,7 +684,9 @@ switch ($stCtrl) {
                     $nomCentro = SistemaLegado::pegaDado("descricao","almoxarifado.centro_custo","where cod_centro = ".$valor["cod_centro"]);
                 $js .= "jq('#stNomCentroCusto').html(\"".$nomCentro."\");                                                       \n";
 
-                $js .= "jq('#stComplemento').val(\"".htmlentities($valor["complemento"], ENT_QUOTES)."\");                      \n";
+                $js .= "jq('#stComplemento').val(\"".htmlentities($valor["complemento"], ENT_QUOTES)."\");                      \n";                
+                $js .= "jq('#inMarca').val(\"".$valor["cod_marca"]."\");                                                        \n";
+                $js .= "jq('#inMarca').trigger('blur');                                                                         \n";
                 $js .= "jq('#nuQuantidade').val(\"".number_format($valor['quantidade'],4,',','.')."\");                         \n";
                 $js .= "jq('#inCodUnidade').val(\"".$stUnidade."\");                                                            \n";
                 $js .= "jq('#nuVlUnitario').val(\"".number_format($valor['vl_unitario'],4,',','.')."\");                        \n";
@@ -721,6 +730,9 @@ switch ($stCtrl) {
                     $nuQuantidade = str_replace('.','',trim($request->get('nuQuantidade')));
                     $nuQuantidade = str_replace(',','.',$nuQuantidade);
 
+                    $inCodMarca = $request->get('inMarca');
+                    $stNomeMarca = $request->get('stNomeMarca');
+
                     $arItens[$key]['cod_centro']   = $request->get('inCodCentroCusto');
                     $arItens[$key]['complemento']  = stripslashes($request->get('stComplemento'));
                     $arItens[$key]['quantidade' ]  = $nuQuantidade;
@@ -728,7 +740,9 @@ switch ($stCtrl) {
                     $arItens[$key]['cod_grandeza'] = $inCodGrandeza;
                     $arItens[$key]['nom_unidade']  = $stNomUnidade;
                     $arItens[$key]['vl_unitario']  = $nuVlUnitario;
-                    $arItens[$key]['vl_total'] = $nuVlTotal;
+                    $arItens[$key]['vl_total']     = $nuVlTotal;
+                    $arItens[$key]['cod_marca']    = $inCodMarca;
+                    $arItens[$key]['nome_marca']   = $stNomeMarca;
                     break;
                 }
             }
@@ -772,6 +786,8 @@ switch ($stCtrl) {
                 $arTEMP[$inCount]['vl_total']     = $arItens[$i]['vl_total'];
                 $arTEMP[$inCount]['vl_unitario']  = $arItens[$i]['vl_unitario'];
                 $arTEMP[$inCount]['cod_material'] = $arItens[$i]['cod_material'];
+                $arTEMP[$inCount]['cod_marca']    = $arItens[$i]['cod_marca'];
+                $arTEMP[$inCount]['nome_marca']   = $arItens[$i]['nome_marca'];
                 $inCount++;
             }
         }
