@@ -32,32 +32,17 @@
 
     * @ignore
 
-    $Revision: 31087 $
-    $Name$
-    $Autor:$
-    $Date: 2007-03-05 09:02:28 -0300 (Seg, 05 Mar 2007) $
+    $Id: FMAnularAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
 
 */
 
-/*
-$Log$
-Revision 1.9  2007/03/05 12:02:28  vitor
-#8382#
-
-Revision 1.8  2007/02/23 15:15:05  gelson
-Sempre que for autorização tem que ir a reserva. Adicionado em todos arquivos o caso de uso da reserva.
-
-Revision 1.7  2006/07/05 20:47:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
-include_once ( CAM_FW_HTML."MontaAtributos.class.php"       );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
+include_once CAM_FW_HTML."MontaAtributos.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterAutorizacao";
@@ -71,10 +56,7 @@ $pgJS   = "JS".$stPrograma.".js";
 include_once ($pgJS);
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 if ( Sessao::read('filtro') ) {
     $arFiltro = Sessao::read('filtro');
@@ -87,13 +69,13 @@ if ( Sessao::read('filtro') ) {
 
 $stAcao = 'anular';
 
-$inCodPreEmpenho = $_REQUEST['inCodPreEmpenho'];
-$inCodEntidade = $_REQUEST['inCodEntidade'];
-$inCodReserva = $_REQUEST['inCodReserva'];
-$inCodAutorizacao = $_REQUEST['inCodAutorizacao'];
+$inCodPreEmpenho  = $request->get('inCodPreEmpenho');
+$inCodEntidade    = $request->get('inCodEntidade');
+$inCodReserva     = $request->get('inCodReserva');
+$inCodAutorizacao = $request->get('inCodAutorizacao');
 
-if($_REQUEST['stExercicio'])
-    $stExercicio = $_REQUEST['stExercicio'];
+if($request->get('stExercicio'))
+    $stExercicio = $request->get('stExercicio');
 else
     $stExercicio = Sessao::getExercicio();
 
@@ -114,15 +96,15 @@ $stMascaraRubrica = $obREmpenhoAutorizacaoEmpenho->obROrcamentoClassificacaoDesp
 Sessao::remove('arItens');
 
 $obREmpenhoAutorizacaoEmpenho->setExercicio( $stExercicio );
-$obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $_REQUEST['inCodAutorizacao'] );
-$obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho( $_REQUEST['inCodPreEmpenho'] );
-$obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
-$obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setCodReserva( $_REQUEST['inCodReserva'] );
+$obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $request->get('inCodAutorizacao') );
+$obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+$obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+$obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setCodReserva( $request->get('inCodReserva') );
 $obREmpenhoAutorizacaoEmpenho->consultar();
 
-if ( $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa() ) {
-  $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior( $nuVlSaldoDotacao );
-}
+if ( $obREmpenhoAutorizacaoEmpenho->obROrcamentoDespesa->getCodDespesa() )
+    $obREmpenhoAutorizacaoEmpenho->consultaSaldoAnterior( $nuVlSaldoDotacao );
+
 $nuVlSaldoDotacao = number_format($nuVlSaldoDotacao,2,',','.');
 
 $stNomEmpenho       = $obREmpenhoAutorizacaoEmpenho->getDescricao();
@@ -164,11 +146,16 @@ foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
     if($obItemPreEmpenho->getCodItemPreEmp()!='')
         $arItens[$inCount]['cod_item']     = $obItemPreEmpenho->getCodItemPreEmp();
+    if($obItemPreEmpenho->getCodigoMarca()!=''){
+        $stDescricaoItemMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', " WHERE cod_marca = ".$obItemPreEmpenho->getCodigoMarca());
+        $arItens[$inCount]['cod_marca']    = $obItemPreEmpenho->getCodigoMarca();
+        $arItens[$inCount]['nome_marca']   = $stDescricaoItemMarca;
+    }
 }
 Sessao::write('arItens', $arItens);
-SistemaLegado::executaFramePrincipal("buscaDado('montaListaItemPreEmpenhoAnular');");
-$arChaveAtributo =  array( "cod_pre_empenho" => $_REQUEST["inCodPreEmpenho"],
-                           "exercicio"       => $stExercicio         );
+$jsOnload = "buscaDado('montaListaItemPreEmpenhoAnular');";
+$arChaveAtributo =  array( "cod_pre_empenho" => $request->get("inCodPreEmpenho"),
+                           "exercicio"       => $stExercicio );
 $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
 $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 
@@ -275,9 +262,9 @@ $obLblDtVencimento->setValue  ( $dtVencimento  );
 
 // Define Objeto Label para Histórico
 $obLblHistorico = new Label;
-$obLblHistorico->setRotulo    ( "Histórico"      );
-$obLblHistorico->setId        ( "stNomHistorico" );
-$obLblHistorico->setValue     ( $inCodHistorico.' - '.$stNomHistorico  );
+$obLblHistorico->setRotulo ( "Histórico"      );
+$obLblHistorico->setId     ( "stNomHistorico" );
+$obLblHistorico->setValue  ( $inCodHistorico.' - '.$stNomHistorico  );
 
 // Atributos Dinamicos
 $obMontaAtributos = new MontaAtributos;
@@ -292,20 +279,20 @@ $obSpan->setId( "spnLista" );
 
 // Define Objeto Label para Valor Total dos Itens
 $obLblVlTotal = new Label;
-$obLblVlTotal->setId( "nuValorTotal" );
-$obLblVlTotal->setRotulo( "TOTAL: " );
+$obLblVlTotal->setId     ( "nuValorTotal" );
+$obLblVlTotal->setRotulo ( "TOTAL: "      );
 
 // Define Objeto Label para valor da reserva
 $obLblVlReserva = new Label;
-$obLblVlReserva->setId       ( "nuVlReserva" );
-$obLblVlReserva->setValue    ( $nuVlReserva  );
-$obLblVlReserva->setRotulo   ( "Valor da Reserva" );
+$obLblVlReserva->setId     ( "nuVlReserva" );
+$obLblVlReserva->setValue  ( $nuVlReserva  );
+$obLblVlReserva->setRotulo ( "Valor da Reserva" );
 
 // Define objeto Label para validade final
 $obLblValidadeFinal = new Label;
-$obLblValidadeFinal->setId       ( "stDtValidadeFinal" );
-$obLblValidadeFinal->setValue    ( $stDtValidadeFinal );
-$obLblValidadeFinal->setRotulo   ( "Data Validade Final" );
+$obLblValidadeFinal->setId     ( "stDtValidadeFinal" );
+$obLblValidadeFinal->setValue  ( $stDtValidadeFinal );
+$obLblValidadeFinal->setRotulo ( "Data Validade Final" );
 
 // Define Objeto TextArea para Motivo da Anulação
 $obTxtMotivo = new TextArea;

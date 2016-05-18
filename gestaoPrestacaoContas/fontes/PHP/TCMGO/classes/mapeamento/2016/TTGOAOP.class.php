@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
     
-    $Id: TTGOAOP.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOAOP.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -109,28 +109,19 @@ class TTGOAOP extends Persistente
                                         , TO_CHAR(ordem_pagamento.dt_emissao,'ddmmyyyy') AS dtemissao
                                         , COALESCE(SUM(pagamento_liquidacao.vl_pagamento),0) AS vlop
                                         , nota_liquidacao_paga_anulada.vl_anulado AS vlanuladoop
-                                        , sw_cgm.nom_cgm as nomecredor \n";
-
-        if (Sessao::getExercicio() > 2012) {
-          $stSql .= "                      , CASE WHEN sw_cgm.cod_pais <> 1 THEN
+                                        , sw_cgm.nom_cgm as nomecredor
+                                        , CASE WHEN sw_cgm.cod_pais <> 1 THEN
                                                  3
                                             WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN
                                                  1
                                             ELSE
                                                  2
-                                            END AS tipocredor \n";
-        } else {
-          $stSql .= "                      , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN
-                                                 1
-                                            ELSE
-                                                 2
-                                            END AS tipocredor \n";
-        }
-        $stSql .= "                      , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL
+                                            END AS tipocredor
+                                        , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL
                                                THEN LPAD(sw_cgm_pessoa_fisica.cpf, 14, '0')
                                                ELSE
                                                     LPAD(sw_cgm_pessoa_juridica.cnpj, 14, '0')
-                                        END AS cpfcnpj
+                                            END AS cpfcnpj
                                         , sem_acentos(ordem_pagamento.observacao) as especificacaoop
                                         , 0 AS numero_sequencial
                                         , 0 AS nrextraorcamentaria
@@ -338,7 +329,7 @@ class TTGOAOP extends Persistente
                                         , ordem_pagamento.cod_ordem AS nranulacaoop
                                         --, tc.numero_pagamento_empenho(ordem_pagamento_anulada.exercicio, ordem_pagamento_anulada.cod_entidade, ordem_pagamento_anulada.cod_ordem, ordem_pagamento_anulada.timestamp) AS  nranulacaoop
                                         , TO_CHAR(nota_liquidacao.dt_liquidacao, 'ddmmyyyy') AS dtliquidacao
-                                        , TCMGO.numero_nota_liquidacao('2014',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho) AS nrliquidacao
+                                        , TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho) AS nrliquidacao
                                         , nota_liquidacao_paga_anulada.vl_anulado AS vlanulacao
                                         , 0 AS numero_sequencial
 

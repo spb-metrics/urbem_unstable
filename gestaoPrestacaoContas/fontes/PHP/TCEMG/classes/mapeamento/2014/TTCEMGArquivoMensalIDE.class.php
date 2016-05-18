@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCEMGArquivoMensalIDE.class.php 62269 2015-04-15 18:28:39Z franver $
+    $Id: TTCEMGArquivoMensalIDE.class.php 65300 2016-05-10 20:27:55Z evandro $
 
 */
 
@@ -76,7 +76,7 @@ class TTCEMGArquivoMensalIDE extends Persistente
                       WHERE  configuracao_entidade.exercicio   = ACE.exercicio 
                         AND configuracao_entidade.cod_entidade = ACE.cod_entidade 
                         AND parametro = 'tcemg_codigo_orgao_entidade_sicom'
-             ), 2, '0') AS cod_orgao
+             ), 3, '0') AS cod_orgao
              , ( SELECT valor 
                    FROM tcemg.orgao
              INNER JOIN administracao.configuracao_entidade

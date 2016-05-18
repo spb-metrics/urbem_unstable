@@ -33,20 +33,13 @@
 
 * @package framework
 * @subpackage componentes
+*
+* $Id: Numerico.class.php 65311 2016-05-11 20:42:32Z michel $
 
 Casos de uso: uc-01.01.00
 
 */
 
-/**
-    * Gerar o componente tipo text que formate seu valor como data
-    * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
-    * @author Desenvolvedor: Diego Barbosa Victoria
-    * @author Desenvolvedor: Eduardo Martins
-
-    * @package framework
-    * @subpackage componentes
-*/
 class Numerico extends TextBox
 {
 /**
@@ -70,6 +63,11 @@ var $boNegativo;
     * @var string
 */
 var $stTipoComponente;
+/**
+    * @access Private
+    * @var Boolean
+*/
+var $boFormatarNumeroBR;
 
 /**
     * @access Public
@@ -95,6 +93,12 @@ function setFormatoValorBancario($valor) { $this->stTipoComponente = $valor; }
 
 /**
     * @access Public
+    * @param Boolean $valor
+*/
+function setFormatarNumeroBR($valor) { $this->boFormatarNumeroBR = $valor; }
+
+/**
+    * @access Public
     * @return float
 */
 function getMaxValue() { return $this->flMaxValue; }
@@ -116,6 +120,12 @@ function getNegativo() { return $this->boNegativo; }
 function getFormatoValorBancario() { return $this->stTipoComponente; }
 
 /**
+    * @access Public
+    * @return string
+*/
+function getFormatarNumeroBR() { return $this->boFormatarNumeroBR; }
+
+/**
     * Método Construtor
     * @access Public
 */
@@ -124,12 +134,13 @@ function Numerico()
     parent::TextBox();
     $this->flMaxValue = null;
     $this->flMinValue = null;
-    $this->setName      ( "Numerico" );
-    $this->setFormatoValorBancario  (false);
-    $this->setValue     ( "" );
-    $this->setDefinicao ( "NUMERICO" );
-    $this->setFloat     ( true );
-    $this->setNegativo  ( true );
+    $this->setName                 ( "Numerico" );
+    $this->setFormatoValorBancario ( false      );
+    $this->setValue                ( ""         );
+    $this->setDefinicao            ( "NUMERICO" );
+    $this->setFloat                ( true       );
+    $this->setNegativo             ( true       );
+    $this->setFormatarNumeroBR     ( false      );
 }
 
 /**
@@ -148,12 +159,23 @@ function MontaHTML()
     // Calcula o numero de digitos necessários para o campo para comportar o valor maximo!
     $tamanhoRealMaxLength = $this->getMaxLength() + $this->getDecimais();
     $tamanhoRealSize = $this->getSize();
+    $inQtdMilhar = ceil($this->getMaxLength()/3);
 
-    $this->setMaxLength           ( $tamanhoRealMaxLength );
-    $this->setSize                ( $tamanhoRealSize );
+    $this->setMaxLength ( $tamanhoRealMaxLength );
+    $this->setSize      ( $tamanhoRealSize );
 
     if ($this->getFormatoValorBancario() == false) {
-        $this->obEvento->setOnKeyUp("mascaraNumerico(this, ".$this->getMaxLength().", ".$this->getDecimais().", event, ".$stNegativo.");");
+        if($this->getFormatarNumeroBR() == true){
+            $this->obEvento->setOnKeyUp  ("mascaraNumericoBR(this, ".$this->getMaxLength().", ".$this->getDecimais().", event, ".$stNegativo.");");
+            $this->obEvento->setOnKeyDown("mascaraNumericoBR(this, ".$this->getMaxLength().", ".$this->getDecimais().", event, ".$stNegativo.");");
+
+            $this->setMaxLength ( $this->getMaxLength() + $inQtdMilhar );
+        }else{
+            $this->obEvento->setOnKeyUp  ("mascaraNumerico(this, ".$this->getMaxLength().", ".$this->getDecimais().", event, ".$stNegativo.");");
+            $this->obEvento->setOnKeyDown("mascaraNumerico(this, ".$this->getMaxLength().", ".$this->getDecimais().", event, ".$stNegativo.");");
+    
+            $this->setMaxLength ( ($this->getMaxLength() - 1) );
+        }
     } elseif ($this->getFormatoValorBancario() == true) {
         $this->setAlign('right');
         $this->obEvento->setOnKeyUp("formataValor(this);");

@@ -32,11 +32,11 @@
 
     Caso de uso: uc-03.04.08
 
-    $Id: OCManterConfiguracao.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: OCManterConfiguracao.php 65196 2016-05-02 17:49:38Z michel $
 */
 
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once(TCOM."TComprasConfiguracao.class.php");
+include_once TCOM."TComprasConfiguracao.class.php";
 
 function montSpanResponsaveis()
 {
@@ -179,21 +179,78 @@ function delResponsavel($inId)
     }
 
     return $stJs;
-
 }
 
-switch ($_REQUEST['stCtrl']) {
+function validaDtFixa(Request $request)
+{
+    $stJs = "";
+
+    if($request->get('stDtSolicitacao')){
+        list ( $dia, $mes, $ano ) = explode("/", $request->get('stDtSolicitacao'));
+        if($ano == Sessao::getExercicio()){
+            include_once CAM_GP_COM_MAPEAMENTO."TComprasSolicitacao.class.php";
+
+            $obTComprasSolicitacao = new TComprasSolicitacao();
+            $obTComprasSolicitacao->setDado('exercicio', Sessao::getExercicio());
+            $obTComprasSolicitacao->recuperaRelacionamentoSolicitacao($rsSolicitacao, "", "ORDER BY solicitacao.timestamp DESC LIMIT 1");
+
+            if (!$rsSolicitacao->eof()) {
+                $stMaxDtSolicitacao = $rsSolicitacao->getCampo('data');
+
+                if(!SistemaLegado::comparaDatas($request->get('stDtSolicitacao'), $stMaxDtSolicitacao, TRUE))
+                    $stMensagem = "A Data Fixa para Solicitação não pode ser inferior a data: ".$stMaxDtSolicitacao." (data da última solicitação).";
+            }
+        }else
+            $stMensagem = "A Data Fixa para Solicitação deve ser do exercício de ".Sessao::getExercicio()."!";
+
+        if($stMensagem){
+            $stJs .= "jQuery('#stDtSolicitacao').val('');";
+            $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    if($request->get('stDtCompraDireta')){
+        list ( $dia, $mes, $ano ) = explode("/", $request->get('stDtCompraDireta'));
+        if($ano == Sessao::getExercicio()){
+            include_once TCOM."TComprasCompraDireta.class.php";
+
+            $obTCompraDireta = new TComprasCompraDireta;
+            $obTCompraDireta->setDado('exercicio_entidade', Sessao::getExercicio());
+            $obTCompraDireta->recuperaDataCompraDireta($rsCompraDireta, "", "ORDER BY compra_direta.timestamp DESC LIMIT 1");
+
+            if (!$rsCompraDireta->eof()) {
+                $stMaxDtSolicitacao = $rsCompraDireta->getCampo('data');
+
+                if(!SistemaLegado::comparaDatas($request->get('stDtCompraDireta'), $stMaxDtSolicitacao, TRUE))
+                    $stMensagem = "A Data Fixa para Compra Direta não pode ser inferior a data: ".$stMaxDtSolicitacao." (data da última compra direta).";
+            }
+        }else
+            $stMensagem = "A Data Fixa para Compra Direta deve ser do exercício de ".Sessao::getExercicio()."!";
+
+        if($stMensagem){
+            $stJs .= "jQuery('#stDtCompraDireta').val('');";
+            $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    return $stJs;
+}
+
+switch ($request->get('stCtrl')) {
     case "recuperaFormularioAlteracao":
 
     break;
+
     case 'incluirResponsavel':
-
-      $stJs = addResponsavel( $_REQUEST['inCGM'] , $_REQUEST['inCodEntidade'], $_REQUEST['stNomCGM'] ) ;
-
+        $stJs = addResponsavel( $request->get('inCGM'), $request->get('inCodEntidade'), $request->get('stNomCGM') );
     break;
 
     case 'delResp':
-        $stJs = delResponsavel( $_REQUEST['inId'] );
+        $stJs = delResponsavel( $request->get('inId') );
+    break;
+
+    case 'validaDtFixa':
+        $stJs = validaDtFixa( $request );
     break;
 
 }

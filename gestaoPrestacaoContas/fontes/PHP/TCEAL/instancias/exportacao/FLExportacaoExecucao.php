@@ -30,7 +30,7 @@
     * @author Analista: Eduardo Schitz
     * @author Desenvolvedor: Carolina Schwaab Marçal
     
-    $Id: FLExportacaoExecucao.php 64783 2016-03-31 17:46:03Z arthur $
+    $Id: FLExportacaoExecucao.php 65341 2016-05-13 13:00:46Z lisiane $
     
     * @ignore
 
@@ -207,6 +207,14 @@ $arArquivos = array(
     array(
         'arquivo' => 'eventosContabeis',
         'nome' => 'Eventos Contábeis'
+    ),
+    array(
+        'arquivo' => 'declaracaoPublicacaoRREO',
+        'nome' => 'Declaração Publicação RREO'
+    ),
+    array(
+        'arquivo' => 'declaracaoPublicacaoRGF',
+        'nome' => 'Declaração Publicação RGF'
     )
 );
 

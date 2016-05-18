@@ -32,36 +32,17 @@
 
     * @ignore
 
-    $Revision: 31087 $
-    $Name$
-    $Author: luciano $
-    $Date: 2007-07-03 16:45:40 -0300 (Ter, 03 Jul 2007) $
+    $Id: PRManterConfiguracao.php 65211 2016-05-03 17:21:13Z michel $
 
     * Casos de uso: uc-02.03.01, uc-02.03.04, uc-02.03.05
 */
 
-/*
-$Log$
-Revision 1.9  2007/07/03 19:45:40  luciano
-Bug#9451#
-
-Revision 1.8  2007/07/03 19:37:59  luciano
-Bug#9451#
-
-Revision 1.7  2007/07/03 15:29:59  luciano
-Bug#9451#
-
-Revision 1.6  2006/07/05 20:47:34  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GF_EMP_NEGOCIO. "REmpenhoConfiguracao.class.php");
-include_once(CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php');
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php';
 
-$stAcao = $_POST["stAcao"] ? $_POST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get("stAcao");
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracao";
@@ -72,57 +53,56 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
 $obRegra = new REmpenhoConfiguracao;
-$obRegra->setNumeracao ( $_POST['stTipoNumeracao'] );
+$obRegra->setNumeracao ( $request->get('stTipoNumeracao') );
 
-/*if ($_POST['boAnularAutorizacaoAutomatica'] == "Sim") {
-    $boAnularAutorizacaoAutomatica = "true";
-} else {
-    $boAnularAutorizacaoAutomatica = "false";
-}
-$obRegra->setAnularAutorizacaoAutomatica ( $boAnularAutorizacaoAutomatica );*/
 $obRegra->setAnularAutorizacaoAutomatica ( true );
 
-if ($_POST['boDataVencimento'] == "Sim") {
+if ($request->get('boDataVencimento') == "Sim") {
     $boDataVencimento = "true";
 } else {
     $boDataVencimento = "false";
 }
 $obRegra->setDataVencimento ( $boDataVencimento );
 
-if ($_POST['boLiquidacaoAutomatica'] == "Sim") {
+if ($request->get('boLiquidacaoAutomatica') == "Sim") {
     $boLiquidacaoAutomatica = "true";
 } else {
     $boLiquidacaoAutomatica = "false";
 }
 $obRegra->setLiquidacaoAutomatica ( $boLiquidacaoAutomatica );
 
-if ($_POST['boOPAutomatica'] == "Sim") {
+if ($request->get('boOPAutomatica') == "Sim") {
     $boOPAutomatica = "true";
 } else {
     $boOPAutomatica = "false";
 }
 $obRegra->setOPAutomatica ( $boOPAutomatica );
 
-if ($_POST['boOPCarne'] == "Sim") {
+if ($request->get('boOPCarne') == "Sim") {
     $boOPCarne = "true";
 } else {
     $boOPCarne = "false";
 }
 $obRegra->setEmitirCarneOP($boOPCarne);
 
+$obRegra->setDataAutorizacao($request->get('stDtAutorizacao'));
+
+$obRegra->setDataEmpenho($request->get('stDtEmpenho'));
+
+$obRegra->setDataLiquidacao($request->get('stDtLiquidacao'));
+
 $obErro = $obRegra->salvar();
 
 // Insere as contas caixa para as entidades
 if (is_array(Sessao::read('arItens'))) {
-
     $obTAdministracaoConfiguracaoEntidade = new TAdministracaoConfiguracaoEntidade;
     $stFiltro = " WHERE parametro = 'conta_caixa' AND exercicio = '".Sessao::getExercicio()."' ";
     $obTAdministracaoConfiguracaoEntidade->recuperaTodos($rsJaForam, $stFiltro);
     while ( !$rsJaForam->eof() ) {
-        $stKeyDb = $rsJaForam->getCampo('exercicio').'-'.
-                   $rsJaForam->getCampo('cod_entidade').'-'.
-                   $rsJaForam->getCampo('cod_modulo').'-'.
-                   $rsJaForam->getCampo('parametro');
+        $stKeyDb  = $rsJaForam->getCampo('exercicio').'-';
+        $stKeyDb .= $rsJaForam->getCampo('cod_entidade').'-';
+        $stKeyDb .= $rsJaForam->getCampo('cod_modulo').'-';
+        $stKeyDb .= $rsJaForam->getCampo('parametro');
 
         $arItensChave[$stKeyDb] = true;
         $rsJaForam->proximo();
@@ -131,30 +111,26 @@ if (is_array(Sessao::read('arItens'))) {
     // Inclui os dados
     $arItens = Sessao::read('arItens');
     foreach ($arItens as $key => $value) {
-
         $stKeyNew = Sessao::getExercicio().'-'.$value['inCodEntidade'].'-10-conta_caixa';
 
-        $obTAdministracaoConfiguracaoEntidade->setDado( 'exercicio'    , Sessao::getExercicio()      );
+        $obTAdministracaoConfiguracaoEntidade->setDado( 'exercicio'    , Sessao::getExercicio()  );
         $obTAdministracaoConfiguracaoEntidade->setDado( 'cod_entidade' , $value['inCodEntidade'] );
         $obTAdministracaoConfiguracaoEntidade->setDado( 'cod_modulo'   , 10                      );
         $obTAdministracaoConfiguracaoEntidade->setDado( 'parametro'    , 'conta_caixa'           );
         $obTAdministracaoConfiguracaoEntidade->setDado( 'valor'        , $value['inCodConta']    );
 
         if ( !isset( $arItensChave[$stKeyNew] ) ) {
-
             $obTAdministracaoConfiguracaoEntidade->inclusao();
             unset( $arItensChave[$stKeyNew] );
         } else {
             $obTAdministracaoConfiguracaoEntidade->alteracao();
             unset( $arItensChave[$stKeyNew] );
         }
-
     }
 
     // Exclui os dados que restaram
     if (is_array($arItensChave)) {
         foreach ($arItensChave as $stChave => $valor) {
-
             $arChave = explode('-',$stChave);
 
             $obTAdministracaoConfiguracaoEntidade->setDado( 'exercicio'        , $arChave[0] );
@@ -162,10 +138,8 @@ if (is_array(Sessao::read('arItens'))) {
             $obTAdministracaoConfiguracaoEntidade->setDado( 'cod_modulo'       , $arChave[2] );
             $obTAdministracaoConfiguracaoEntidade->setDado( 'parametro'        , $arChave[3] );
             $obTAdministracaoConfiguracaoEntidade->exclusao();
-
         }
     }
-
 }
 
 if ( !$obErro->ocorreu() )

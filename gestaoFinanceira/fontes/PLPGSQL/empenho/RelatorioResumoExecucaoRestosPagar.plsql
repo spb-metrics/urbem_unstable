@@ -26,13 +26,14 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: RelatorioResumoExecucaoRestosPagar.plsql 64462 2016-02-25 17:57:26Z michel $
+* $Id: RelatorioResumoExecucaoRestosPagar.plsql 65265 2016-05-06 18:40:44Z michel $
 */
 
 /**
- * Recebe como paramentro exercicio, entidade, data inicial e final
+ * Recebe como paramentro exercicio, entidade, data inicial, data final, exercicio empenho, credor, orgao, unidade
 **/
-CREATE OR REPLACE FUNCTION empenho.fn_relatorio_resumo_execucao_restos_pagar(varchar,varchar,varchar,varchar,varchar,varchar) RETURNS SETOF RECORD AS $$
+
+CREATE OR REPLACE FUNCTION empenho.fn_relatorio_resumo_execucao_restos_pagar(varchar,varchar,varchar,varchar,varchar,varchar,integer,integer) RETURNS SETOF RECORD AS $$
 DECLARE
   
   stExercicio         ALIAS FOR $1;
@@ -41,6 +42,8 @@ DECLARE
   dtFinal             ALIAS FOR $4;
   stExercicioEmpenho  ALIAS FOR $5;
   stCgmCredor         ALIAS FOR $6;
+  inOrgao             ALIAS FOR $7;
+  inUnidade           ALIAS FOR $8;
 
   stExercicioAnterior   VARCHAR := '';
   stSql                 VARCHAR := '';
@@ -83,6 +86,16 @@ BEGIN
                         WHERE exercicio < '''||stExercicio||'''
                          '||stFiltro||'
                        ; ';
+
+  stFiltro := '';
+
+  IF inOrgao IS NOT NULL AND inOrgao > 0 THEN
+    stFiltro := stFiltro||' AND despesa.num_orgao = '||inOrgao;
+  END IF;
+
+  IF inUnidade IS NOT NULL AND inUnidade > 0 THEN
+    stFiltro := stFiltro||' AND despesa.num_unidade = '||inUnidade;
+  END IF;
 
   FOR reRecord IN EXECUTE stSqlExercicios LOOP
     stExercicioMin := reRecord.stExercicioMin::INTEGER;
@@ -156,6 +169,42 @@ BEGIN
                              ON empenho.exercicio    = retorno.exercicio
                             AND empenho.cod_empenho  = retorno.cod_empenho
                             AND empenho.cod_entidade = retorno.cod_entidade
+
+                     INNER JOIN empenho.pre_empenho
+                             ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                            AND pre_empenho.exercicio       = empenho.exercicio
+
+                     INNER JOIN (  SELECT ped.exercicio
+                                        , ped.cod_pre_empenho
+                                        , d.num_orgao
+                                        , d.num_unidade
+                                        , d.cod_recurso
+                                        , REPLACE(cd.cod_estrutural,''.'', '''') AS cod_estrutural
+                                        , d.cod_funcao
+                                        , d.cod_subfuncao
+                                     FROM empenho.pre_empenho_despesa as ped
+                               INNER JOIN orcamento.despesa as d
+                                       ON ped.cod_despesa = d.cod_despesa 
+                                      AND ped.exercicio = d.exercicio 
+                               INNER JOIN orcamento.recurso as r
+                                       ON r.cod_recurso = d.cod_recurso
+                                      AND r.exercicio = d.exercicio
+                               INNER JOIN orcamento.conta_despesa as cd
+                                       ON ped.cod_conta = cd.cod_conta 
+                                      AND ped.exercicio = cd.exercicio
+                                    UNION
+                                   SELECT restos_pre_empenho.exercicio
+                                        , restos_pre_empenho.cod_pre_empenho
+                                        , restos_pre_empenho.num_orgao
+                                        , restos_pre_empenho.num_unidade
+                                        , restos_pre_empenho.recurso AS cod_recurso
+                                        , restos_pre_empenho.cod_estrutural
+                                        , restos_pre_empenho.cod_funcao
+                                        , restos_pre_empenho.cod_subfuncao
+                                     FROM empenho.restos_pre_empenho
+                                ) AS despesa
+                             ON despesa.exercicio       = pre_empenho.exercicio 
+                            AND despesa.cod_pre_empenho = pre_empenho.cod_pre_empenho
 
                       LEFT JOIN (  SELECT exercicio_item
                                         , cod_pre_empenho
@@ -266,6 +315,7 @@ BEGIN
                             AND liquidacao_paga.cod_entidade       = empenho.cod_entidade
 
                           WHERE ( aliquidar > 0 OR liquidadoapagar > 0 )
+                            '||stFiltro||'
 
                        GROUP BY retorno.exercicio
                               , retorno.cod_empenho

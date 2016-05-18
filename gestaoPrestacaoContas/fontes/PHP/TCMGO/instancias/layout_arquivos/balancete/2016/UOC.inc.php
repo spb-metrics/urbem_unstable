@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: UOC.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: UOC.inc.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -70,21 +70,13 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_unidade");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
-if (Sessao::getExercicio() > 2013) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_consolidacao");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_consolidacao");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-if (Sessao::getExercicio() > 2012 AND Sessao::getExercicio() < 2014  ) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(328);
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(326);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(326);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -165,11 +157,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("e_mail");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(80);
 
-if (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
@@ -266,11 +256,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("e_mail");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(80);
 
-if (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -342,11 +330,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("e_mail");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(80);
 
-if (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("escolaridade");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
@@ -443,15 +429,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("e_mail");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(80);
 
-if (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(05);
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(05);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -467,15 +447,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-if (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(382);
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(380);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(382);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

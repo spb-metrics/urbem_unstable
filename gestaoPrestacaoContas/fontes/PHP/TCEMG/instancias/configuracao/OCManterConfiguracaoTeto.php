@@ -31,7 +31,7 @@
   * @author Desenvolvedor: Michel Teixeira
   *
   * @ignore
-  * $Id: OCManterConfiguracaoTeto.php 64799 2016-04-01 18:32:14Z michel $
+  * $Id: OCManterConfiguracaoTeto.php 65298 2016-05-10 18:53:52Z jean $
   *
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -241,14 +241,19 @@ function alterarTeto(Request $request) {
 
 function excluirTeto(Request $request) {
     $arTemp = array();
+    $arDelete = array();
     $arListaTetos = Sessao::read('arListaTetos');
 
     foreach ($arListaTetos as $key => $teto) {
-        if ($teto['inId'] != $request->get('inId'))
+        if ($teto['inId'] != $request->get('inId')) {
             $arTemp[] = $teto;
+        } else {
+            $arDelete[] = $teto;
+        }
     }
 
     Sessao::write('arListaTetos', $arTemp);
+    Sessao::write('arListaTetosDelete', $arDelete);
 
     $stJs  = "alertaAviso('Teto Remuneratório Removido.','form','erro','".Sessao::getId()."');\n";
     $stJs .= montaTeto();

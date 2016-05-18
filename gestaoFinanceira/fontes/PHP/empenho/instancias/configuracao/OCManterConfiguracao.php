@@ -30,26 +30,11 @@
     * @author Analista:
     * @author Programador:
 
-    $Revision: 31968 $
-    $Name$
-    $Author: vitor $
-    $Date: 2007-07-23 11:35:09 -0300 (Seg, 23 Jul 2007) $
+    $Id: OCManterConfiguracao.php 65211 2016-05-03 17:21:13Z michel $
 
     Caso de uso: uc-02.03.01
 */
 
-/*
-$Log$
-Revision 1.3  2007/07/23 14:35:09  vitor
-Bug#9669#
-
-Revision 1.2  2007/07/13 19:05:13  cako
-Bug#9383#, Bug#9384#
-
-Revision 1.1  2007/07/03 15:30:42  luciano
-Bug#9451#
-
-*/
 include '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 
@@ -77,11 +62,7 @@ function montaSpanContaCaixa()
     $obLista->ultimoCabecalho->addConteudo("Código Entidade");
     $obLista->ultimoCabecalho->setWidth( 10 );
     $obLista->commitCabecalho();
-    /*
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo("Nome");
-    $obLista->commitCabecalho();
-    */
+
     $obLista->addCabecalho();
     $obLista->ultimoCabecalho->addConteudo("Conta Caixa");
     $obLista->ultimoCabecalho->setWidth( 10 );
@@ -100,12 +81,7 @@ function montaSpanContaCaixa()
     $obLista->ultimoDado->setAlinhamento("CENTRO");
     $obLista->ultimoDado->setCampo( "inCodEntidade" );
     $obLista->commitDado();
-    /*
-    $obLista->addDado();
-    $obLista->ultimoDado->setAlinhamento("ESQUERDA");
-    $obLista->ultimoDado->setCampo( "nom_entidade" );
-    $obLista->commitDado();
-    */
+
     $obLista->addDado();
     $obLista->ultimoDado->setAlinhamento("CENTRO");
     $obLista->ultimoDado->setCampo( "inCodConta" );
@@ -121,7 +97,6 @@ function montaSpanContaCaixa()
     $obLista->ultimaAcao->setAcao( "EXCLUIR" );
     $obLista->ultimaAcao->setFuncao( true );
     $obLista->ultimaAcao->setLink( "javascript: executaFuncaoAjax('delContaCaixa');" );
-    //$obLista->ultimaAcao->addCampo("1","inId");
     $obLista->ultimaAcao->addCampo("","&inId=[inId]&inCodPlano=[inCodConta]&inCodEntidade=[inCodEntidade]");
     $obLista->commitAcao();
 
@@ -136,7 +111,6 @@ function montaSpanContaCaixa()
     $stJs .= "d.getElementById('spnContaCaixa').innerHTML = '".$html."';\n";
 
     return $stJs;
-
 }
 
 function addContaCaixa($inCodEntidade, $stNomEntidade, $inCodContaAnalitica, $stNomContaAnalitica)
@@ -154,11 +128,8 @@ function addContaCaixa($inCodEntidade, $stNomEntidade, $inCodContaAnalitica, $st
     }
 
     if ($stErro) {
-
         $stJs = "alertaAviso('$stErro','form','erro','".Sessao::getId()."');\n  ";
-
     } else {
-
         $inId = count(Sessao::read('arItens'));
 
         $arItens[$inId]['inId'            ] = $inId;
@@ -172,47 +143,119 @@ function addContaCaixa($inCodEntidade, $stNomEntidade, $inCodContaAnalitica, $st
     }
 
     return $stJs;
-
 }
 
-switch ($_REQUEST['stCtrl']) {
+function validaDtFixa(Request $request)
+{
+    $stJs = "";
 
-   case 'limpaPopUpContaAnalitica':
+    if($request->get('stDtAutorizacao')){
+        list ( $dia, $mes, $ano ) = explode("/", $request->get('stDtAutorizacao'));
+        if($ano == Sessao::getExercicio()){
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoAutorizacaoEmpenho.class.php";
 
-      $stJs .= "document.frm.inCodContaAnalitica.value = '';\n";
-      $stJs .= "document.getElementById('stNomContaAnalitica').innerHTML = '&nbsp';\n";
-      echo $stJs;
+            $obTEmpenhoAutorizacaoEmpenho = new TEmpenhoAutorizacaoEmpenho();
+            $obTEmpenhoAutorizacaoEmpenho->recuperaRelacionamentoPorPreEmpenho($rsAutorizacao, " WHERE ae.exercicio = '".Sessao::getExercicio()."' ", " ORDER BY ae.dt_autorizacao DESC LIMIT 1 ");
 
+            if (!$rsAutorizacao->eof()) {
+                $stMaxDtAutorizacao = $rsAutorizacao->getCampo('dt_autorizacao');
+
+                if(!SistemaLegado::comparaDatas($request->get('stDtAutorizacao'), $stMaxDtAutorizacao, TRUE))
+                    $stMensagem = "A Data Fixa para Autorização não pode ser inferior a data: ".$stMaxDtAutorizacao." (data da última autorização).";
+            }
+        }else
+            $stMensagem = "A Data Fixa para Autorização deve ser do exercício de ".Sessao::getExercicio()."!";
+
+        if($stMensagem){
+            $stJs .= "jQuery('#stDtAutorizacao').val('');                                 \n";
+            $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    if($request->get('stDtEmpenho')){
+        list ( $dia, $mes, $ano ) = explode("/", $request->get('stDtEmpenho'));
+        if($ano == Sessao::getExercicio()){
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoEmpenho.class.php";
+
+            $obTEmpenhoEmpenho = new TEmpenhoEmpenho;
+            $obTEmpenhoEmpenho->recuperaMaiorDataEmpenho($rsEmpenho);
+
+            if (!$rsEmpenho->eof()) {
+                $stMaxDtEmpenho = $rsEmpenho->getCampo('dataempenho');
+
+                if(!SistemaLegado::comparaDatas($request->get('stDtEmpenho'), $stMaxDtEmpenho, TRUE))
+                    $stMensagem = "A Data Fixa para Empenho não pode ser inferior a data: ".$stMaxDtEmpenho." (data da última empenho).";
+            }
+        }else
+            $stMensagem = "A Data Fixa para Empenho deve ser do exercício de ".Sessao::getExercicio()."!";
+
+        if($stMensagem){
+            $stJs .= "jQuery('#stDtEmpenho').val('');                                     \n";
+            $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    if($request->get('stDtLiquidacao')){
+        list ( $dia, $mes, $ano ) = explode("/", $request->get('stDtLiquidacao'));
+        if($ano == Sessao::getExercicio()){
+            include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoNotaLiquidacao.class.php";
+
+            $obTEmpenhoNotaLiquidacao = new TEmpenhoNotaLiquidacao;
+            $obTEmpenhoNotaLiquidacao->setDado( "stDataEmpenho", "01/01/".Sessao::getExercicio());
+            $obTEmpenhoNotaLiquidacao->setDado( "stExercicio"  , Sessao::getExercicio());
+            $obTEmpenhoNotaLiquidacao->recuperaMaiorDataLiquidacao($rsLiquidacao, " WHERE nota_liquidacao.exercicio = '".Sessao::getExercicio()."' ");
+
+            if (!$rsLiquidacao->eof()) {
+                $stMaxDtLiquidacao = $rsLiquidacao->getCampo('data_liquidacao');
+
+                if(!SistemaLegado::comparaDatas($request->get('stDtLiquidacao'), $stMaxDtLiquidacao, TRUE))
+                    $stMensagem = "A Data Fixa para Liquidação não pode ser inferior a data: ".$stMaxDtLiquidacao." (data da última liquidação).";
+            }
+        }else
+            $stMensagem = "A Data Fixa para Liquidação deve ser do exercício de ".Sessao::getExercicio()."!";
+
+        if($stMensagem){
+            $stJs .= "jQuery('#stDtLiquidacao').val('');                                  \n";
+            $stJs .= "alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."'); \n";
+        }
+    }
+
+    return $stJs;
+}
+
+switch ($request->get('stCtrl')) {
+    case 'limpaPopUpContaAnalitica':
+        $stJs .= "document.frm.inCodContaAnalitica.value = '';\n";
+        $stJs .= "document.getElementById('stNomContaAnalitica').innerHTML = '&nbsp';\n";
+        echo $stJs;
     break;
 
     case "recuperaFormularioAlteracao":
 
     break;
+
     case 'incluircontaCaixa':
-
-      $stJs = addContaCaixa( $_REQUEST['inCodEntidade'], $_REQUEST['stNomEntidade'], $_REQUEST['inCodContaAnalitica'], $_REQUEST['stNomContaAnalitica'] ) ;
-
+        $stJs = addContaCaixa( $request->get('inCodEntidade'), $request->get('stNomEntidade'), $request->get('inCodContaAnalitica'), $request->get('stNomContaAnalitica') ) ;
     break;
 
     case 'delContaCaixa':
-        if ($_REQUEST['inCodPlano']) {
+        if ($request->get('inCodPlano')) {
             include_once(CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php");
             $obErro = new Erro();
             $obTEmpenhoConfiguracao = new TEmpenhoConfiguracao;
-            $obTEmpenhoConfiguracao->setDado('cod_plano', $_REQUEST['inCodPlano']);
-            $obTEmpenhoConfiguracao->setDado('cod_entidade', $_REQUEST['inCodEntidade']);
+            $obTEmpenhoConfiguracao->setDado('cod_plano', $request->get('inCodPlano'));
+            $obTEmpenhoConfiguracao->setDado('cod_entidade', $request->get('inCodEntidade'));
             $obTEmpenhoConfiguracao->setDado('exercicio', Sessao::getExercicio() );
             $obErro = $obTEmpenhoConfiguracao->verificaUtilizacaoContaCaixa( $rsRecordSet );
             if (!$obErro->ocorreu() && $rsRecordSet->getNumLinhas() < 0) {
                 $arTMP = array();
-                $id = $_REQUEST['inId'];
+                $id = $request->get('inId');
                 $inCount = 0;
 
                 $arItensSessao = array();
                 $arItensSessao = Sessao::read('arItens');
                 $arItens = array();
                 foreach ($arItensSessao as $array) {
-
                     if ($array['inId'] != $id) {
 
                         $arItens[$inCount]['inId'            ] = $array['inId'];
@@ -226,12 +269,15 @@ switch ($_REQUEST['stCtrl']) {
                     $stJs = montaSpanContaCaixa();
                 }
             } else {
-                $stJs = "alertaAviso('Erro ao excluir conta: A Conta Caixa ".$_REQUEST['inCodPlano']." já possui movimentação de Retenções.','form','erro','".Sessao::getId()."');\n  ";
+                $stJs = "alertaAviso('Erro ao excluir conta: A Conta Caixa ".$request->get('inCodPlano')." já possui movimentação de Retenções.','form','erro','".Sessao::getId()."');\n  ";
             }
         }
 
     break;
 
+    case 'validaDtFixa':
+        $stJs = validaDtFixa( $request );
+    break;
 }
 
 if ($stJs) {

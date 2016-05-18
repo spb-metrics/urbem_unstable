@@ -30,7 +30,7 @@
 
     * @ignore
 
-    $Id: JSManterOrdemCompra.js 64005 2015-11-17 16:49:06Z michel $
+    $Id: JSManterOrdemCompra.js 65194 2016-05-02 13:27:34Z evandro $
 
 */
 </script>
@@ -52,40 +52,16 @@
     }
 
     function incluirItem( idItem, linha_table_tree) {
-        var boErro = false;
-        var msg = '';
+        TableTreeLineControl( linha_table_tree , 'none', '', 'none');
 
-        var inCodItem = document.getElementById('inCodItem'+idItem).value;
-        var inCodCentroCusto = document.getElementById('inCodCentroCusto'+idItem).value;
-        var inMarca = document.getElementById('inMarca'+idItem).value;
-
-        if (inCodItem=='') {
-            boErro = true;
-            msg = msg+'@Campo Código do Item inválido().';
-        }
-        if (inCodCentroCusto=='') {
-            boErro = true;
-            msg = msg+'@Campo Centro de Custo inválido().';
-        }
-        if (inMarca=='') {
-            boErro = true;
-            msg = msg+'@Campo Marca inválido().';
-        }
-
-        if(boErro == true){
-            alertaAviso(msg,'form','erro','".Sessao::getId()."', '../');
-        }else{
-            TableTreeLineControl( linha_table_tree , 'none', '', 'none');
-
-            var stTarget = document.frm.target;
-            var stAction = document.frm.action;
-            document.frm.target = 'oculto';
-            document.frm.stCtrl.value = 'incluirItem';
-            document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&idItem='+idItem;
-            document.frm.submit();
-            document.frm.action = stAction;
-            document.frm.target = stTarget;
-        }
+        var stTarget = document.frm.target;
+        var stAction = document.frm.action;
+        document.frm.target = 'oculto';
+        document.frm.stCtrl.value = 'incluirItem';
+        document.frm.action = '<?=$pgOcul;?>?<?=Sessao::getId();?>&idItem='+idItem;
+        document.frm.submit();
+        document.frm.action = stAction;
+        document.frm.target = stTarget;
     }
 
     function limpaItem( idItem, boMarcaCentro, boLimparCentroCusto ) {

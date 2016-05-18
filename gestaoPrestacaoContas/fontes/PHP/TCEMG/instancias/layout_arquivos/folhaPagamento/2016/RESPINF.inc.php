@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Arthur Cruz
   *
   * @ignore
-  * $Id: RESPINF.inc.php 64739 2016-03-29 12:51:00Z franver $
-  * $Date: 2016-03-29 09:51:00 -0300 (Ter, 29 Mar 2016) $
-  * $Author: franver $
-  * $Rev: 64739 $
+  * $Id: RESPINF.inc.php 65302 2016-05-11 11:35:18Z evandro $
+  * $Date: 2016-05-11 08:35:18 -0300 (Qua, 11 Mai 2016) $
+  * $Author: evandro $
+  * $Rev: 65302 $
   *
 */
 /**
@@ -50,33 +50,19 @@ $obTTCEMGRESPINF->recuperaDados($rsRecordSet);
 
 if ( $rsRecordSet->getNumLinhas() > 0 ) {
     $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nome_responsavel");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(120);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cart_ident");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(10);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("org_emissor");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(10);
-
+    
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_inicio");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_final");
-    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 }

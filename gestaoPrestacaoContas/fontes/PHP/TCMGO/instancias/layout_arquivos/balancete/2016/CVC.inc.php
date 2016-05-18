@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: CVC.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: CVC.inc.php 65220 2016-05-03 21:30:22Z michel $
 
 */
 
@@ -51,161 +51,21 @@
 
     $inCount = 0;
 
-    if (Sessao::getExercicio() > '2008') {
-        //tipo10
-        foreach ($rsVeiculos->arElementos as $arVeiculos) {
+    //tipo10
+    foreach ($rsVeiculos->arElementos as $arVeiculos) {
 
-            $arVeiculos['nro_sequencial'] = ++$inCount;
-            $stChave = $arVeiculos['cod_orgao'].$arVeiculos['cod_unidade'].$arVeiculos['cod_veiculo'];
+        $arVeiculos['nro_sequencial'] = ++$inCount;
+        $stChave = $arVeiculos['cod_orgao'].$arVeiculos['cod_unidade'].$arVeiculos['cod_veiculo'];
 
-            $rsBloco = 'rsBloco_'.$inCount;
-            unset($$rsBloco);
-            $$rsBloco = new RecordSet();
-            $$rsBloco->preenche(array($arVeiculos));
+        $rsBloco = 'rsBloco_'.$inCount;
+        unset($$rsBloco);
+        $$rsBloco = new RecordSet();
+        $$rsBloco->preenche(array($arVeiculos));
 
-            $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_veiculo");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_veiculo");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subtipo_veiculo");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("modelo");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_fabricacao");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("placa");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("chassi");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(30);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_serie");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("situacao_veiculo");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_deslocamento");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("km_inicial");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("km_final");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("atestado_controle");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
-
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-            //tipo 11
-            foreach ($rsConsumoCombustivel->arElementos as $arConsumoCombustivel) {
-                $stChaveConsumo = $arConsumoCombustivel['cod_orgao'].$arConsumoCombustivel['cod_unidade'].$arConsumoCombustivel['cod_veiculo'];
-                if ($stChave == $stChaveConsumo) {
-                    $arConsumoCombustivel['nro_sequencial'] = ++$inCount;
-
-                    $rsBloco = 'rsBloco_'.$inCount;
-                    unset($$rsBloco);
-                    $$rsBloco = new RecordSet();
-                    $$rsBloco->preenche(array($arConsumoCombustivel));
-
-                    $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_veiculo");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_gasto");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_combustivel");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("quantidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("origem_combustivel");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espaco_branco");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(224);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-                }
-            }
-        }
-        $i = 0;
-        foreach ($rsDetalhamentoEmpenhos->arElementos as $arAux) {
-            $rsDetalhamentoEmpenhos->arElementos[$i]['nro_sequencial'] = $inCount + 1;
-            $i++;
-            $inCount++;
-        }
-
-        //tipo12
-        $obExportador->roUltimoArquivo->addBloco( $rsDetalhamentoEmpenhos );
+        $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -215,82 +75,200 @@
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_funcao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_veiculo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_veiculo");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_subfuncao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subtipo_veiculo");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_acao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("modelo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("ano_fabricacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("placa");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("chassi");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(30);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_serie");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(20);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("situacao_veiculo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_deslocamento");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("km_inicial");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("km_final");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("atestado_controle");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_proj_ativ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("elemento_despesa");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subelemento_despesa");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_empenho");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_empenho");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(08);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espaco_branco");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(208);
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
 
-        //tipo99
-        $arTemp[0] = array( 'tipo_registro'=> '99', 'espacador'=> '', 'numero_sequencial' => $inCount+1 );
+        //tipo 11
+        foreach ($rsConsumoCombustivel->arElementos as $arConsumoCombustivel) {
+            $stChaveConsumo = $arConsumoCombustivel['cod_orgao'].$arConsumoCombustivel['cod_unidade'].$arConsumoCombustivel['cod_veiculo'];
+            if ($stChave == $stChaveConsumo) {
+                $arConsumoCombustivel['nro_sequencial'] = ++$inCount;
 
-        $arRecordSet[$stArquivo] = new RecordSet();
-        $arRecordSet[$stArquivo]->preenche( $arTemp );
+                $rsBloco = 'rsBloco_'.$inCount;
+                unset($$rsBloco);
+                $$rsBloco = new RecordSet();
+                $$rsBloco->preenche(array($arConsumoCombustivel));
 
-        $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+                $obExportador->roUltimoArquivo->addBloco( $$rsBloco );
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(254);
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
-    } else {
-        //tipo99
-        $arTemp[0] = array( 'tipo_registro'=> '99', 'espacador'=> '', 'numero_sequencial' => $inCount+1 );
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $arRecordSet[$stArquivo] = new RecordSet();
-        $arRecordSet[$stArquivo]->preenche( $arTemp );
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_veiculo");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
-        $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_gasto");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(196);
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_combustivel");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("quantidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
 
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("origem_combustivel");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espaco_branco");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(224);
+
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+            }
+        }
     }
+    $i = 0;
+    foreach ($rsDetalhamentoEmpenhos->arElementos as $arAux) {
+        $rsDetalhamentoEmpenhos->arElementos[$i]['nro_sequencial'] = $inCount + 1;
+        $i++;
+        $inCount++;
+    }
+
+    //tipo12
+    $obExportador->roUltimoArquivo->addBloco( $rsDetalhamentoEmpenhos );
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_programa");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(04);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_funcao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_subfuncao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_acao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(01);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_proj_ativ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(03);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("elemento_despesa");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("subelemento_despesa");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_empenho");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_empenho");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(08);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espaco_branco");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(208);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
+
+    //tipo99
+    $arTemp[0] = array( 'tipo_registro'=> '99', 'espacador'=> '', 'numero_sequencial' => $inCount+1 );
+
+    $arRecordSet[$stArquivo] = new RecordSet();
+    $arRecordSet[$stArquivo]->preenche( $arTemp );
+
+    $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(254);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);

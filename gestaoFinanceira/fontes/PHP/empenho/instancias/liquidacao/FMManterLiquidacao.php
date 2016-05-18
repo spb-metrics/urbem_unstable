@@ -32,21 +32,19 @@
 
     * @ignore
 
-    $Id: FMManterLiquidacao.php 64431 2016-02-22 18:00:21Z jean $
-
-    $Revision: 32093 $
-    $Name:  $
-    $Autor:$
-    $Date: 2008-03-31 11:05:16 -0300 (Seg, 31 Mar 2008) $
+    $Id: FMManterLiquidacao.php 65211 2016-05-03 17:21:13Z michel $
 
     * Casos de uso: uc-02.03.04, uc-02.03.05
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php" );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoNotaLiquidacao.class.php" );
-include_once ( CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php" );
-include_once ( CAM_FW_HTML."MontaAtributos.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoEmpenhoAutorizacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoNotaLiquidacao.class.php";
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_FW_HTML."MontaAtributos.class.php";
+include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoRecurso.class.php";
+include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
+include_once CAM_GT_ARR_NEGOCIO.'RARRCarne.class.php';
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterLiquidacao";
@@ -59,15 +57,11 @@ $pgJS   = "JS".$stPrograma.".js";
 
 Sessao::write('stTituloPagina', 'Gestão Financeira | Empenho | Liquidação | Liquidar Empenho');
 
-if ( isset($_REQUEST['pgProxEmpenho']) ) {
-    $pgProx = CAM_GF_EMP_INSTANCIAS . "empenho/" . $_REQUEST['pgProxEmpenho'];
-}
+if ( $request->get('pgProxEmpenho') )
+    $pgProx = CAM_GF_EMP_INSTANCIAS."empenho/".$request->get('pgProxEmpenho');
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $request->get('stAcao');
-if ($stAcao == '') {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
 
 $obREmpenhoConfiguracao       = new REmpenhoConfiguracao;
 $obREmpenhoEmpenhoAutorizacao = new REmpenhoEmpenhoAutorizacao;
@@ -116,10 +110,10 @@ $stNomEmpenho  = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getDescricao(
 $stNomEntidade = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->obRCGM->getNomCGM();
 $inCodTipo     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoTipoEmpenho->getCodTipo();
 $stNomTipo     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoTipoEmpenho->getNomTipo();
-$inNumUnidade = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNumeroUnidade();
-$stNomUnidade = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNomUnidade();
-$inNumOrgao   = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao();
-$stNomOrgao   = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNomeOrgao();
+$inNumUnidade  = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNumeroUnidade();
+$stNomUnidade  = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNomUnidade();
+$inNumOrgao    = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNumeroOrgao();
+$stNomOrgao    = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->getNomeOrgao();
 $inCodDespesa       = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->getCodDespesa();
 $stNomDespesa       = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoClassificacaoDespesa->getDescricao();
 $stCodClassificacao = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoClassificacaoDespesa->getMascClassificacao();
@@ -130,7 +124,7 @@ $stDtVencimento     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getDtVen
 $inCodHistorico     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoHistorico->getCodHistorico();
 $stNomHistorico     = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoHistorico->getNomHistorico();
 $stDtEmpenho        = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getDtEmpenho();
-$arItemPreEmpenho = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getItemPreEmpenho();
+$arItemPreEmpenho   = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getItemPreEmpenho();
 
 $stConfiguracaoUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
 
@@ -168,45 +162,39 @@ foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['vl_empenhado_anulado']  = $obItemPreEmpenho->getValorEmpenhadoAnulado();
     $arItens[$inCount]['vl_liquidado']          = $obItemPreEmpenho->getValorLiquidado();
     $arItens[$inCount]['vl_liquidado_anulado']  = $obItemPreEmpenho->getValorLiquidadoAnulado();
-    $arItens[$inCount]['vl_liquidado_real']  = bcsub( $obItemPreEmpenho->getValorLiquidado(), $obItemPreEmpenho->getValorLiquidadoAnulado() ,2);
+    $arItens[$inCount]['vl_liquidado_real']     = bcsub( $obItemPreEmpenho->getValorLiquidado(), $obItemPreEmpenho->getValorLiquidadoAnulado() ,2);
 
     $nuValorEmpenhadoReal = bcsub( $obItemPreEmpenho->getValorTotal(), $obItemPreEmpenho->getValorEmpenhadoAnulado() ,2);
     $nuValorLiquidadoReal = bcsub( $obItemPreEmpenho->getValorLiquidado(), $obItemPreEmpenho->getValorLiquidadoAnulado() ,2);
     $nuValorALiquidar     = bcsub( $nuValorEmpenhadoReal, $nuValorLiquidadoReal,2 );
     $arItens[$inCount]['vl_a_liquidar'] = $nuValorALiquidar;
     $nuVTotal = $nuVTotal + $obItemPreEmpenho->getValorTotal();
-
 }
+
 if (count($arItens) > 0) {
     Sessao::write('FiltroItens', $arItens);
 } else {
     Sessao::write('FiltroItens', $arItensReserva);
 }
 
-include_once( CAM_GF_ORC_MAPEAMENTO   ."TOrcamentoRecurso.class.php"             );
 $obTOrcamentoRecurso = new TOrcamentoRecurso;
 
-$inCodRecurso       = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso();
+$inCodRecurso = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoDespesa->obROrcamentoRecurso->getCodRecurso();
 
-$stFiltro = '';
+$stFiltro = " WHERE exercicio = '".Sessao::getExercicio()."' ";
 
-if ($inCodRecurso != '') {
-    $stFiltro .= " WHERE cod_recurso = ".$inCodRecurso;
-}
-
-if (Sessao::getExercicio()) {
-    $stFiltro .= " AND exercicio = '".Sessao::getExercicio()."'";
-}
+if ($inCodRecurso != '')
+    $stFiltro .= " AND cod_recurso = ".$inCodRecurso;
 
 $obErro = $obTOrcamentoRecurso->recuperaTodos( $rsLista, $stFiltro);
-if ( !$obErro->ocorreu() ) {
-    $stNomRecurso = $rsLista->getCampo( 'nom_recurso' );
-}
 
-$arChaveAtributo =  array( 	"cod_pre_empenho" => $request->get("inCodPreEmpenho"),
-                                            "exercicio" => $request->get('dtExercicioEmpenho') );
+if ( !$obErro->ocorreu() )
+    $stNomRecurso = $rsLista->getCampo( 'nom_recurso' );
+
+$arChaveAtributo = array( "cod_pre_empenho" => $request->get("inCodPreEmpenho"),
+                          "exercicio"       => $request->get('dtExercicioEmpenho') );
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos     );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 
 // Atributos Dinamicos - LIQUIDACAO
 $obREmpenhoNotaLiquidacao->obRCadastroDinamico->recuperaAtributosSelecionados( $rsAtributosLiquidacao );
@@ -220,27 +208,26 @@ $arTmp = array();
 $arAtributosLiquidacao = array();
 
 if ($inExercicio > 2008) {
-while (!$rsAtributosLiquidacao->eof()) {
-    if ($rsAtributosLiquidacao->getCampo('nom_atributo') != 'TipoCredor') {
-        $arTmp['cod_cadastro']      = $rsAtributosLiquidacao->getCampo('cod_cadastro');
-        $arTmp['cod_atributo']      = $rsAtributosLiquidacao->getCampo('cod_atributo');
-        $arTmp['ativo']             = $rsAtributosLiquidacao->getCampo('ativo');
-        $arTmp['nao_nulo']          = $rsAtributosLiquidacao->getCampo('nao_nulo');
-        $arTmp['nom_atributo']      = $rsAtributosLiquidacao->getCampo('nom_atributo');
-        $arTmp['valor_padrao']      = $rsAtributosLiquidacao->getCampo('valor_padrao');
-        $arTmp['valor_padrao_desc'] = $rsAtributosLiquidacao->getCampo('valor_padrao_desc');
-        $arTmp['valor_desc']        = $rsAtributosLiquidacao->getCampo('valor_desc');
-        $arTmp['ajuda']             = $rsAtributosLiquidacao->getCampo('ajuda');
-        $arTmp['mascara']           = $rsAtributosLiquidacao->getCampo('mascara');
-        $arTmp['nom_tipo']          = $rsAtributosLiquidacao->getCampo('nom_tipo');
-        $arTmp['cod_tipo']          = $rsAtributosLiquidacao->getCampo('cod_tipo');
-        $arAtributosLiquidacao[] = $arTmp;
+    while (!$rsAtributosLiquidacao->eof()) {
+        if ($rsAtributosLiquidacao->getCampo('nom_atributo') != 'TipoCredor') {
+            $arTmp['cod_cadastro']      = $rsAtributosLiquidacao->getCampo('cod_cadastro');
+            $arTmp['cod_atributo']      = $rsAtributosLiquidacao->getCampo('cod_atributo');
+            $arTmp['ativo']             = $rsAtributosLiquidacao->getCampo('ativo');
+            $arTmp['nao_nulo']          = $rsAtributosLiquidacao->getCampo('nao_nulo');
+            $arTmp['nom_atributo']      = $rsAtributosLiquidacao->getCampo('nom_atributo');
+            $arTmp['valor_padrao']      = $rsAtributosLiquidacao->getCampo('valor_padrao');
+            $arTmp['valor_padrao_desc'] = $rsAtributosLiquidacao->getCampo('valor_padrao_desc');
+            $arTmp['valor_desc']        = $rsAtributosLiquidacao->getCampo('valor_desc');
+            $arTmp['ajuda']             = $rsAtributosLiquidacao->getCampo('ajuda');
+            $arTmp['mascara']           = $rsAtributosLiquidacao->getCampo('mascara');
+            $arTmp['nom_tipo']          = $rsAtributosLiquidacao->getCampo('nom_tipo');
+            $arTmp['cod_tipo']          = $rsAtributosLiquidacao->getCampo('cod_tipo');
+            $arAtributosLiquidacao[] = $arTmp;
+        }
+        $rsAtributosLiquidacao->proximo();
     }
-    $rsAtributosLiquidacao->proximo();
-}
-} else {
+} else
     $arAtributosLiquidacao = $rsAtributosLiquidacao->getElementos();
-}
 
 $inCount=0;
 while ( $inCount < count($arAtributos) ) {
@@ -267,13 +254,13 @@ $obREmpenhoNotaLiquidacao->listarMaiorDataAnulacaoEmpenho($rsMaiorDataAnulacao);
 if ($rsMaiorDataAnulacao->getCampo('dataanulacao') != '') {
     if(SistemaLegado::comparaDatas($rsMaiorDataAnulacao->getCampo('dataanulacao'), $rsMaiorData->getCampo('data_liquidacao')))
         $stDtLiquidacao = $rsMaiorDataAnulacao->getCampo('dataanulacao');
-    else $stDtLiquidacao = $rsMaiorData->getCampo('data_liquidacao');
+    else
+        $stDtLiquidacao = $rsMaiorData->getCampo('data_liquidacao');
 
-} elseif ($rsMaiorData) {
+} elseif ($rsMaiorData)
     $stDtLiquidacao = $rsMaiorData->getCampo('data_liquidacao');
-}
 
-if ($_REQUEST['boImplantado'] != 't') {
+if ($request->get('boImplantado') != 't') {
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->consultaSaldoAnterior( $nuSaldoDotacao );
     $stDespesa = $inCodDespesa.' - '.$stNomDespesa;
     $stOrgao   = $inNumOrgao.' - '.$stNomOrgao;
@@ -300,14 +287,13 @@ if ( Sessao::read('filtro') ) {
 
 Sessao::remove('assinaturas');
 
-include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
 $obMontaAssinaturas = new IMontaAssinaturas(null, 'nota_liquidacao');
 $obMontaAssinaturas->definePapeisDisponiveis('nota_liquidacao');
 $obMontaAssinaturas->setOpcaoAssinaturas( false );
 
-$inCodEmpenho = $request->get('inCodEmpenho');
+$inCodEmpenho    = $request->get('inCodEmpenho');
 $inCodPreEmpenho = $request->get('inCodPreEmpenho');
-$inCodEntidade = $request->get('inCodEntidade');
+$inCodEntidade   = $request->get('inCodEntidade');
 
 //*****************************************************//
 // Define COMPONENTES DO FORMULARIO
@@ -380,7 +366,6 @@ $obHdnCriaContasCredDeb->setId   ("boCriaContasDebCred");
 $obHdnCriaContasCredDeb->setValue($boCriaContasDebCred );
 
 // Verifica se o credor possui débitos com a Prefeitura
-include_once CAM_GT_ARR_NEGOCIO.'RARRCarne.class.php';
 $obRARRCarne = new RARRCarne;
 $obRARRCarne->obRARRParcela->roRARRLancamento->obRCgm->setNumCgm($inCodFornecedor);
 
@@ -400,11 +385,11 @@ $obHdnDebitoContribuinte->setName ("boExisteDebitoContribuinte");
 $obHdnDebitoContribuinte->setId   ("boExisteDebitoContribuinte");
 $obHdnDebitoContribuinte->setValue  ($boExisteDebitoContribuinte);
 
-if ( isset($_REQUEST['stEmitirEmpenho']) ) {
+if ( $request->get('stEmitirEmpenho') ) {
     // Define Objeto Hidden para informar que a ultima acao foi a inclusao de um empenho
     $obHdnEmitirEmpenho = new Hidden;
     $obHdnEmitirEmpenho->setName   ( "stEmitirEmpenho" );
-    $obHdnEmitirEmpenho->setValue  ( $_REQUEST['stEmitirEmpenho']  );
+    $obHdnEmitirEmpenho->setValue  ( $request->get('stEmitirEmpenho') );
 
     // Define Objeto Hidden para setar a acao da pagina do empenho
     $stAcaoEmpenho = $request->get('stAcaoEmpenho');
@@ -439,6 +424,7 @@ if ( isset($_REQUEST['stEmitirEmpenho']) ) {
     $obHdnFuncionalidadeEmpenho->setName   ( "funcionalidadeEmpenho" );
     $obHdnFuncionalidadeEmpenho->setValue  ( $funcionalidadeEmpenho  );
 }
+
 // Define objeto Label para Empenho
 $obLblEmpenho = new Label;
 $obLblEmpenho->setRotulo( "N° Empenho" );
@@ -464,7 +450,7 @@ $obLblTipo->setRotulo ( "Tipo de Empenho"           );
 // Define Objeto Label para Despesa
 $obLblDespesa = new Label;
 $obLblDespesa->setRotulo ( "Dotação Orçamentária" );
-$obLblDespesa->setId     ( "stNomDespesa"  );
+$obLblDespesa->setId     ( "stNomDespesa" );
 $obLblDespesa->setValue  ( $stDespesa );
 
 // Define Objeto Label para Classificacao da Despesa
@@ -530,7 +516,6 @@ $obMontaAtributosLiquidacao->setRecordSet  ( $rsAtributosLiquidacao );
 $obMontaAtributosLiquidacao->setSortLabel  ( true                   );
 
 if ($boCriaContasDebCred) {
-
     // Define Objeto TextBox para Codigo do Historico Padrao
     $obBscHistorico = new BuscaInner;
     $obBscHistorico->setRotulo ( "Histórico" );
@@ -558,7 +543,7 @@ if ($boCriaContasDebCred) {
 
     $stGrupoConta = (in_array($stCodClassIncorporacao, $arIncorpPatrimonial)) ? "_incorp" : "_amort";
 
-    include_once( CAM_GF_CONT_COMPONENTES . "IPopUpContaAnalitica.class.php" );
+    include_once CAM_GF_CONT_COMPONENTES."IPopUpContaAnalitica.class.php";
 
     $obBscContaDebito = new IPopUpContaAnalitica ( $obEntidadeUsuario->obSelect );
     $obBscContaDebito->setID ( 'innerContaDebito' );
@@ -577,7 +562,6 @@ if ($boCriaContasDebCred) {
     $obBscContaCredito->setRotulo ( 'Conta Crédito' );
     $obBscContaCredito->setTitle ( 'Informe a conta a Creditar para fins de Incorporação Patrimonial' );
     $obBscContaCredito->setTipoBusca ( 'emp_conta_credito' . $stGrupoConta );
-
 }
 
 // Define Objeto Span Para lista de itens
@@ -706,7 +690,7 @@ switch ($stConfiguracaoUf) {
         $obNuValorNota->setMaxLength( 16 );
         $obNuValorNota->setValue    ( '0,00' );
         $obNuValorNota->setNegativo ( false );
-        
+
         $obTxtObjetoNF = new TextBox;
         $obTxtObjetoNF->setName      ( 'stObjetoNF' );
         $obTxtObjetoNF->setId        ( 'stObjetoNF' );
@@ -724,13 +708,12 @@ switch ($stConfiguracaoUf) {
         $obTxtUFDocumento->setSize      ( 2 );
         $obTxtUFDocumento->setMaxLength ( 2 );
         $obTxtUFDocumento->setNull      ( true );
-
     break;
     case '11':
         $obHdnVlVlTotalDoctoFiscal = new Hidden;
         $obHdnVlVlTotalDoctoFiscal->setName  ( "nuTotalNf" );
         $obHdnVlVlTotalDoctoFiscal->setId    ( "nuTotalNf" );
-            
+
         //Radio para definicao de Inclusão de Documento Fiscal
         $obRdIncluirNFS = new Radio;
         $obRdIncluirNFS->setRotulo  ( "*Incluir Documento Fiscal" );
@@ -740,7 +723,7 @@ switch ($stConfiguracaoUf) {
         $obRdIncluirNFS->setLabel   ( "Sim" );
         $obRdIncluirNFS->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
         $obRdIncluirNFS->setChecked ( false );
-     
+
         $obRdIncluirNFN = new Radio;
         $obRdIncluirNFN->setRotulo  ( "*Incluir Documento Fiscal" );
         $obRdIncluirNFN->setName    ( "stIncluirNF"    );
@@ -749,9 +732,9 @@ switch ($stConfiguracaoUf) {
         $obRdIncluirNFN->setLabel   ( "Não" );
         $obRdIncluirNFN->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
         $obRdIncluirNFN->setChecked ( true );
-        
+
         $arRadiosNF = array( $obRdIncluirNFS, $obRdIncluirNFN );
-        
+
         $obSpnNF = new Span();
         $obSpnNF->setId( 'spnNF' );
     break;
@@ -778,7 +761,7 @@ switch ($stConfiguracaoUf) {
         $obDtEmissaoNF->setTitle( 'Informe a Data da Emissão da NF' );
         $obDtEmissaoNF->setNull( true );
         $obDtEmissaoNF->obEvento->setOnBlur( "validaDataEmissaoNF();" );
-    
+
         $obTxtCodValidacaoNF = new TextBox;
         $obTxtCodValidacaoNF->setName( 'stCodValidacaoNF' );
         $obTxtCodValidacaoNF->setRotulo( 'Código de Validação da NF' );
@@ -813,7 +796,7 @@ switch ($stConfiguracaoUf) {
         $obHdnVlVlTotalDoctoFiscal = new Hidden;
         $obHdnVlVlTotalDoctoFiscal->setName  ( "nuTotalNf" );
         $obHdnVlVlTotalDoctoFiscal->setId    ( "nuTotalNf" );
-            
+
         //Radio para definicao de Inclusão de Documento Fiscal
         $obRdIncluirNFS = new Radio;
         $obRdIncluirNFS->setRotulo  ( "*Incluir Documento Fiscal" );
@@ -823,7 +806,7 @@ switch ($stConfiguracaoUf) {
         $obRdIncluirNFS->setLabel   ( "Sim" );
         $obRdIncluirNFS->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
         $obRdIncluirNFS->setChecked ( false );
-     
+
         $obRdIncluirNFN = new Radio;
         $obRdIncluirNFN->setRotulo  ( "*Incluir Documento Fiscal" );
         $obRdIncluirNFN->setName    ( "stIncluirNF"    );
@@ -832,14 +815,13 @@ switch ($stConfiguracaoUf) {
         $obRdIncluirNFN->setLabel   ( "Não" );
         $obRdIncluirNFN->obEvento->setOnClick( "montaParametrosGET('montaNF', 'stIncluirNF');" );
         $obRdIncluirNFN->setChecked ( true );
-        
+
         $arRadiosNF = array( $obRdIncluirNFS, $obRdIncluirNFN );
-        
+
         $obSpnNF = new Span();
         $obSpnNF->setId( 'spnNF' );
     break;
 }
-
 
 // Prepara o combo do Tipo de Documento para os estados que devem possuir esse campo.
 if ($obComboEstados == 'true') {
@@ -853,7 +835,7 @@ if ($obComboEstados == 'true') {
     $obTxtTipoDocumento->setInteiro  (true);
     $obTxtTipoDocumento->setNull     (false);
     $obTxtTipoDocumento->obEvento->setOnChange("montaParametrosGET('alteraCamposTipoDocumento');");
-    
+
     $obCboTipoDocumento = new Select;
     $obCboTipoDocumento->setName      ('inCodTipoDocumento');
     $obCboTipoDocumento->setId        ('inCodTipoDocumento');
@@ -889,23 +871,29 @@ if (!$stDtLiquidacao) {
     $arDtEmpenho = explode('/',$stDtEmpenho);
     if ($arDtEmpenho[2] < date('Y')) {
         $stDtLiquidacao = date('d/m/Y');
-    } else $stDtLiquidacao = $stDtEmpenho;
+    } else
+        $stDtLiquidacao = $stDtEmpenho;
 }
+
 // Define objeto Data para validade final
 $obDtLiquidacao = new Data;
 $obDtLiquidacao->setName     ( "stDtLiquidacao" );
-$obDtLiquidacao->setValue    ( $stDtLiquidacao  );
 $obDtLiquidacao->setRotulo   ( 'Data de Liquidação' );
 $obDtLiquidacao->setTitle    ( 'Informe a data de liquidação.' );
 $obDtLiquidacao->setNull     ( false );
 $obDtLiquidacao->obEvento->setOnBlur( "validaDataLiquidacao();" );
+if($obREmpenhoConfiguracao->getDataLiquidacao() != ''){
+    $obDtLiquidacao->setValue ( $obREmpenhoConfiguracao->getDataLiquidacao() );
+    $obDtLiquidacao->setLabel ( TRUE );
+}else
+    $obDtLiquidacao->setValue ( $stDtLiquidacao );
 
 // Define objeto TextArea para Motivo da Anulação
 $obTxtObservacao = new TextArea;
 $obTxtObservacao->setId       ( "stObservacao" );
 $obTxtObservacao->setName     ( "stObservacao" );
 $obTxtObservacao->setRotulo   ( "Observação"   );
-$obTxtObservacao->setTitle    ( "Informe a observação."   );
+$obTxtObservacao->setTitle    ( "Informe a observação." );
 $obTxtObservacao->setCols     ( 100            );
 $obTxtObservacao->setRows     ( 3              );
 $obTxtObservacao->setMaxCaracteres( 640        );
@@ -916,11 +904,10 @@ $obIFrame->setWidth("0");
 $obIFrame->setHeight("0");
 $obIFrame->show();
 
-if($boOPAutomatica=="true"){
+if($boOPAutomatica=="true")
     $stOPAutomatica = "SIM";
-}else{
+else
     $stOPAutomatica = "NAO";
-}
 
 // Define Objeto SimNao para emitir OP
 $obSimNaoEmitirOP = new SimNao();
@@ -952,7 +939,7 @@ $obFormulario->addHidden( $obHdnVlTotalLiquidado );
 $obFormulario->addHidden($obHdnDebitoContribuinte);
 $obFormulario->addHidden($obHdnCriaContasCredDeb);
 
-if ( isset($_REQUEST['stEmitirEmpenho']) ) {
+if ( $request->get('stEmitirEmpenho') ) {
     $obFormulario->addHidden( $obHdnEmitirEmpenho );
     $obFormulario->addHidden( $obHdnAcaoEmp );
     $obFormulario->addHidden( $obHdnPgProxEmpenho );
@@ -984,15 +971,15 @@ if ($boCriaContasDebCred) {
     $obFormulario->addTitulo( "Incorporação Patrimonial/Amortização" );
     $obFormulario->addComponente( $obBscContaDebito );
     $obFormulario->addComponente( $obBscContaCredito );
-    $obFormulario->addComponente( $obBscHistorico         );
-    $obFormulario->addComponente( $obTxtComplemento       );
+    $obFormulario->addComponente( $obBscHistorico );
+    $obFormulario->addComponente( $obTxtComplemento );
 }
 
 $obFormulario->addTitulo( "Itens do empenho" );
 $obFormulario->addSpan( $obSpan );
-$obFormulario->addComponente( $obLblVlTotalEmp        );
-$obFormulario->addComponente( $obLblVlTotal        );
-$obFormulario->addComponente( $obLblVlTotalSaldo      );
+$obFormulario->addComponente( $obLblVlTotalEmp );
+$obFormulario->addComponente( $obLblVlTotal );
+$obFormulario->addComponente( $obLblVlTotalSaldo );
 
 $obFormulario->addTitulo( "Liquidação" );
 $obFormulario->addComponente( $obDtLiquidacao );
@@ -1041,15 +1028,13 @@ if ($obComboEstados == 'true') {
 
 $obMontaAtributosLiquidacao->geraFormulario ( $obFormulario );
 
-if ( isset($_REQUEST['stEmitirEmpenho']) ) {
-    if ($_REQUEST['pgDespesasFixas'] != '') {
+if ( $request->get('stEmitirEmpenho') ) {
+    if ($request->get('pgDespesasFixas', '') != '')
         $stLocation =  CAM_GF_EMP_INSTANCIAS."empenho/FMManterDespesasMensaisFixas.php?".Sessao::getId().'&stAcao='.$stAcaoEmpenho.'&acao='.$acaoEmpenho.'&modulo='.$moduloEmpenho.'&funcionalidade='.$funcionalidadeEmpenho;
-    } else {
+    else
         $stLocation = $pgProx.'?'.Sessao::getId().'&stAcao='.$stAcaoEmpenho.'&acao='.$acaoEmpenho.'&modulo='.$moduloEmpenho.'&funcionalidade='.$funcionalidadeEmpenho;
-    }
-} else {
+} else
     $stLocation = $pgList.'?'.Sessao::getId().'&stAcao='.$stAcao.$stFiltro;
-}
 
 $obFormulario->addComponente( $obSimNaoEmitirOP );
 

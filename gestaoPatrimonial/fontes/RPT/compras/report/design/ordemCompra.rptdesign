@@ -73,6 +73,7 @@ function formataNumExenteso(valor)
 
     return rt;
 }]]></method>
+    <property name="theme">urbem_221.defaultTheme</property>
     <text-property name="displayName">Template Urbem Retrato</text-property>
     <property name="layoutPreference">auto layout</property>
     <list-property name="libraries">
@@ -260,7 +261,7 @@ if (params['exercicio_ordem_compra'] != ""){
 if (params['tipo_ordem'] != ""){
   this.queryText += " AND ordem.tipo = '"+params['tipo_ordem']+"'";
 }
-params['stQuery'] = this.queryText;]]></method>
+//params['stQuery'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[SELECT ordem.cod_ordem
@@ -473,10 +474,12 @@ if (params['exercicio'] != ""){
 if (params['tipo_ordem'] != ""){
   this.queryText += " AND ordem.tipo = '"+params['tipo_ordem']+"'";
   this.queryText += " AND ordem_item.tipo = '"+params['tipo_ordem']+"'";
-}]]></method>
+}
+
+params['stQuery'] = this.queryText;]]></method>
             <property name="dataSource">postgres</property>
             <list-property name="resultSet"/>
-            <xml-property name="queryText"><![CDATA[SELECT  catalogo_item.descricao AS item
+            <xml-property name="queryText"><![CDATA[SELECT  item_pre_empenho.nom_item AS item
       , marca.descricao AS marca
       , ordem_item.quantidade
       , ROUND(ordem_item.vl_total / ordem_item.quantidade,2) AS vl_unitario
@@ -514,7 +517,7 @@ LEFT JOIN compras.cotacao_fornecedor_item
        AND julgamento_item.lote = cotacao_fornecedor_item.lote
        AND julgamento_item.cgm_fornecedor = cotacao_fornecedor_item.cgm_fornecedor
 
-INNER JOIN  almoxarifado.catalogo_item
+ LEFT JOIN  almoxarifado.catalogo_item
         ON  julgamento_item.cod_item = catalogo_item.cod_item
         OR  ( ordem_item.cod_item = catalogo_item.cod_item AND julgamento_item.cod_item IS NULL )
 

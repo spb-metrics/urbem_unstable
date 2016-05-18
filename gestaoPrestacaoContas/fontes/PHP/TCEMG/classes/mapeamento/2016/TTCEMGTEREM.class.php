@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Jean
   *
   * @ignore
-  * $Id: TTCEMGTEREM.class.php 64792 2016-04-01 13:51:20Z michel $
-  * $Date: 2016-04-01 10:51:20 -0300 (Sex, 01 Abr 2016) $
-  * $Author: michel $
-  * $Rev: 64792 $
+  * $Id: TTCEMGTEREM.class.php 65368 2016-05-16 20:26:35Z jean $
+  * $Date: 2016-05-16 17:26:35 -0300 (Seg, 16 Mai 2016) $
+  * $Author: jean $
+  * $Rev: 65368 $
   *
 */
 require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -67,22 +67,53 @@ class TTCEMGTEREM extends Persistente
     public function montaRecuperaDados()
     {
         $stSql = "
-          SELECT 10 AS tiporegistro
+          SELECT 10 AS tipo_registro
                , teto_remuneratorio.teto AS vlparateto
                , CASE WHEN teto_remuneratorio_controle.cod_entidade IS NOT NULL
                       THEN 2
                       ELSE 1
-                  END AS tipocadastro
-               , teto_remuneratorio.justificativa AS justalteracao
+                  END AS tipo_cadastro
+               , teto_remuneratorio.justificativa AS just_alteracao
+               , CASE WHEN teto_remuneratorio_controle.cod_entidade IS NULL
+                        THEN TO_CHAR(teto_remuneratorio.vigencia,'ddmmyyyy')
+                        ELSE ''
+                 END AS dt_inicial
+               , CASE WHEN teto_remuneratorio_controle.cod_entidade IS NOT NULL
+                        THEN TO_CHAR((teto_remuneratorio.vigencia-1),'ddmmyyyy')
+                        ELSE ''
+                 END AS dt_final
+               , sw_cgm_pessoa_juridica.cnpj
+               
             FROM tcemg.teto_remuneratorio
+
        LEFT JOIN tcemg.teto_remuneratorio_controle
               ON teto_remuneratorio_controle.cod_entidade = teto_remuneratorio.cod_entidade
              AND teto_remuneratorio_controle.exercicio = teto_remuneratorio.exercicio
+
+      INNER JOIN administracao.configuracao_entidade
+              ON configuracao_entidade.exercicio = teto_remuneratorio.exercicio
+             AND configuracao_entidade.cod_entidade = teto_remuneratorio.cod_entidade
+             AND configuracao_entidade.parametro = 'tcemg_codigo_orgao_entidade_sicom'
+
+      INNER JOIN orcamento.entidade
+              ON entidade.cod_entidade = configuracao_entidade.cod_entidade
+             AND entidade.exercicio = configuracao_entidade.exercicio
+
+      INNER JOIN sw_cgm_pessoa_juridica
+              ON sw_cgm_pessoa_juridica.numcgm = entidade.numcgm
+
            WHERE teto_remuneratorio.vigencia <= last_day(TO_DATE('01/".$this->getDado('mes')."/".$this->getDado('exercicio')."','dd/mm/yyyy'))
              AND teto_remuneratorio.vigencia = ( SELECT MAX(teto_remuneratorio.vigencia)
                                                    FROM tcemg.teto_remuneratorio
                                                   WHERE teto_remuneratorio.vigencia <= last_day(TO_DATE('01/".$this->getDado('mes')."/".$this->getDado('exercicio')."','dd/mm/yyyy'))
                                                )
+        GROUP BY tipo_registro
+               , vlparateto
+               , tipo_cadastro
+               , just_alteracao
+               , dt_inicial
+               , dt_final
+               , cnpj
         ";
         return $stSql;
     }

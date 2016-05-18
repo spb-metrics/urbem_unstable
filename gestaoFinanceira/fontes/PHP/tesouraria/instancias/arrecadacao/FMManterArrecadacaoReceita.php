@@ -166,7 +166,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obBscReceita->setValue                ($request->get('stNomReceita'));
 
     if ($stAcao == 'incluir') {
-        $obBscReceita->obCampoCod->obEvento->setOnBlur("montaParametrosGET('montaTipo','inCodReceita,inCodEntidade,inCodPlano');");
+        $obBscReceita->obCampoCod->obEvento->setOnBlur("montaParametrosGET('montaTipo','inCodReceita,inCodEntidade,inCodPlano'); montaParametrosGET('montaBemAlienacao','inCodReceita,inCodEntidade');");
     }
 
     $obBscReceita->obImagem->setId('imgReceita');
@@ -246,6 +246,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $obSpnModalidade = new Span();
     $obSpnModalidade->setId('spnModalidade');
+    
+    $obSpnBemAlienacao = new Span();
+    $obSpnBemAlienacao->setId('spnBemAlienacao');
 
     // Define Objeto TextArea para observações
     $obTxtObs = new TextArea;
@@ -302,7 +305,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     if ($stAcao != 'devolucao') {
         $obFormulario->addSpan($obSpnModalidade);
     }
-
+    
+    $obFormulario->addSpan($obSpnBemAlienacao);
+    
     $obFormulario->addComponente($obBscConta);
     $obFormulario->addComponente($obTxtValor);
     $obFormulario->addComponente($obTxtObs);
@@ -316,6 +321,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $jsOnload .= "ajaxJavaScript('".CAM_GF_TES_INSTANCIAS."arrecadacao/".$pgOcul."?inCodigoEntidade=".$_REQUEST['inCodigoEntidade']."&inCodBoletim=".$_REQUEST['inCodBoletim']."','buscaBoletim');";
     }
 }
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

@@ -33,7 +33,7 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: ABL.inc.php 65190 2016-04-29 19:36:51Z michel $
+    * $Id: ABL.inc.php 65220 2016-05-03 21:30:22Z michel $
 
 */
 
@@ -355,8 +355,7 @@ $arTemp[0] = array( 'tipo_registro'=> 99
       
 $arRecordSet[$stArquivo] = new RecordSet();
 $arRecordSet[$stArquivo]->preenche( $arTemp );
-$inEspacoBranco = (Sessao::getExercicio() >= "2014") ? 1026 : 389;
-    
+
 $obExportador->roUltimoArquivo->addBloco($arRecordSet[$stArquivo]);
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -364,7 +363,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2)
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo($inEspacoBranco);
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1026);
 
 unset($rsRecordSetABL10);
 unset($rsRecordSetABL11);

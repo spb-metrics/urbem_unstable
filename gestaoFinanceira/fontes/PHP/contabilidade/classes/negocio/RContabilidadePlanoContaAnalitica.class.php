@@ -30,7 +30,7 @@
     * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Anderson R. M. Buzo
 
-    $Id: RContabilidadePlanoContaAnalitica.class.php 64153 2015-12-09 19:16:02Z evandro $
+    $Id: RContabilidadePlanoContaAnalitica.class.php 65343 2016-05-13 17:02:26Z arthur $
 
     * Casos de uso: uc-02.02.02, uc-02.02.19, uc-02.04.03, uc-02.04.09, uc-02.03.23
 */
@@ -790,32 +790,6 @@ function listarValorContaAtivoPermanente(&$rsRecordSet, $stOrder = "" , $boTrans
     $stFiltro = " AND exercicio = '".$this->stExercicio."'";
     $obTContabilidadePlanoConta->setDado('cod_lote',1) ;
     $obErro = $obTContabilidadePlanoConta->recuperaValorContaAtivoPermanente( $rsRecordSet, $stFiltro, '', $boTransacao);
-
-    return $obErro;
-}
-
-/**
- * Busca informações das contas de depreciação
- * @access Public
- * @param  Object $obTransacao Parâmetro Transação
- * @return Object Objeto Erro
- */
-
-function listarContaAnaliticaDepreciacao(&$rsRecordSet, $stOrder = "" , $boTransacao = "")
-{
-    include_once ( CAM_GF_CONT_MAPEAMENTO."TContabilidadePlanoConta.class.php"        );
-    include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/legado/funcoesLegado.lib.php';
-    $obTContabilidadePlanoConta        = new TContabilidadePlanoConta;
-    if( $this->stExercicio )
-        $stFiltro  .= " AND pa.exercicio = '".$this->stExercicio."' ";
-    if( $this->stNomConta )
-        $stFiltro .= " AND pc.nom_conta ilike '%".$this->stNomConta."%' ";
-    if( $this->stCodEstrutural )
-        $stFiltro .= " AND pc.cod_estrutural like publico.fn_mascarareduzida('".$this->stCodEstrutural."') || '%' ";
-    if ($this->inCodPlano) {
-        $stFiltro .= " AND pa.cod_plano = ".$this->inCodPlano;
-    }
-    $obErro = $obTContabilidadePlanoConta->recuperaContaAnaliticaAtivoPermanente( $rsRecordSet, $stFiltro, '', $boTransacao);
 
     return $obErro;
 }

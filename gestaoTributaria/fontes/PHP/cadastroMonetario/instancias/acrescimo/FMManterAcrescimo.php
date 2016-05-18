@@ -32,7 +32,7 @@
     * @author Desenvolvedor: Diego Bueno Coelho
     * @ignore
 
-    * $Id: FMManterAcrescimo.php 59612 2014-09-02 12:00:51Z gelson $
+    * $Id: FMManterAcrescimo.php 65344 2016-05-13 18:00:50Z jean $
 
     *Casos de uso: uc-05.05.11
 
@@ -163,7 +163,7 @@ $obBscNorma->obCampoCod->obEvento->setOnChange("buscaValor('buscaNorma');");
 $obBscNorma->setFuncaoBusca ( "abrePopUp('".CAM_GA_ADM_POPUPS."../../normas/popups/normas/FLNorma.php','frm','inCodNorma','stNorma','todos','".Sessao::getId()."','800','550');" );
 
 $obIPopUpFuncao = new IPopUpFuncao;
-$obIPopUpFuncao->setTipoFuncaoBusca( "externa" );
+$obIPopUpFuncao->setTipoFuncaoBusca( "todas" );
 $obIPopUpFuncao->setCodModulo( 28 );
 $obIPopUpFuncao->setCodBiblioteca( 2 );
 //--------------------------------

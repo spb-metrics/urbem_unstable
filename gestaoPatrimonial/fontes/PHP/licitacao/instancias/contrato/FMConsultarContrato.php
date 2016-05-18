@@ -29,7 +29,7 @@
 
     * @author Leandro André Zis
 
-    * $Id: FMConsultarContrato.php 64214 2015-12-17 16:13:13Z michel $
+    * $Id: FMConsultarContrato.php 65317 2016-05-12 17:40:05Z carlos.silva $
 
     * Casos de uso : uc-03.05.22
 */
@@ -94,6 +94,7 @@ if ($inNumContrato) {
 
   $inCodLicitacao = $rsContrato->getCampo('cod_licitacao');
   $inCodModalidade = $rsContrato->getCampo('cod_modalidade');
+  $stModalidade = $rsContrato->getCampo('modalidade');
   $stDescObjeto = $rsContrato->getCampo('descricao');
   $inCGMResponsavelJuridico = $rsContrato->getCampo('cgm_responsavel_juridico');
   $stLabelAssinatura = $rsContrato->getCampo('dt_assinatura');
@@ -252,6 +253,10 @@ $obLabelNumeroContrato->setId  ( "inNumeroContrato" );
 $obLabelNumeroContrato->setRotulo( "Número do Contrato" );
 $obLabelNumeroContrato->setTitle ( "Informe o número do contrato." );
 $obLabelNumeroContrato->setValue( $inNumeroContrato);
+
+$obLblModalidade= new Label;
+$obLblModalidade->setRotulo ( "Modalidade" );
+$obLblModalidade->setValue  ( $stModalidade );
 
 $obLblNumeroLicitacao= new Label;
 $obLblNumeroLicitacao->setRotulo    ( "Número da Licitação" );
@@ -484,6 +489,7 @@ $obFormulario->addComponente    ( $obLblEntidade );
 $obFormulario->addComponente    ( $obLabelOrgao );
 $obFormulario->addComponente    ( $obLabelUnidade );
 
+$obFormulario->addComponente    ( $obLblModalidade );
 $obFormulario->addComponente    ( $obLblNumeroLicitacao );
 $obFormulario->addComponente    ( $obLabelTipoObjeto );
 

@@ -32,7 +32,7 @@
 
 * @ignore
 
-  $Id: PRImportarRegistroEvento.php 65130 2016-04-26 20:41:36Z michel $
+  $Id: PRImportarRegistroEvento.php 65310 2016-05-11 20:29:34Z evandro $
 
 * Casos de uso: uc-04.05.49
 */
@@ -81,6 +81,24 @@ $pgJs       = "JS".$stPrograma.".js";
 $obErro = new Erro();
 $obTransacao = new Transacao();
 $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
+
+switch ($request->get("stOpcao")) {
+    case "lote_evento":
+        if (count(Sessao::read("arLoteEventos")) == 0) {
+            $obErro->setDescricao("@Deve haver pelo menos uma Matrícula para um evento na lista de Matrículas.");
+        }
+    break;
+    case "lote_matricula":
+        if (count(Sessao::read("arLoteMatriculas")) == 0) {
+            $obErro->setDescricao("@Deve haver pelo menos um evento para uma Matrícula na lista de eventos.");
+        }
+    break;
+    case "importar":
+        if (count(Sessao::read("EventosCadastrados")) == 0) {
+            $obErro->setDescricao("@Deve haver pelo menos um evento para uma Matrícula na lista de eventos.");
+        }
+    break;
+}
 
 if (!$obErro->ocorreu()) {
     $obErro = $obTFolhaPagamentoPeriodoMovimentacao->recuperaUltimaMovimentacao($rsPeriodoMovimentacao,"","",$boTransacao);

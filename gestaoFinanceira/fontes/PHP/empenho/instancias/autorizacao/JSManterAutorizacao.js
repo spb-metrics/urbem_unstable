@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: JSManterAutorizacao.js 65141 2016-04-27 20:10:02Z evandro $
+    $Id: JSManterAutorizacao.js 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08 
@@ -202,12 +202,14 @@ function limparItem() {
     jQuery("#btnIncluir").attr('onclick',"if(incluirItem()){montaParametrosGET('incluiItemPreEmpenho');}");    
     jQuery("#inMarca").val('');
     jQuery("#stNomeMarca").html('&nbsp;');
+    jQuery('input[name=stNomeMarca]').val('');
 }
 
-function gerarValorTotal() {
+function gerarValorTotal(objeto) {
     var nuVlUnidade = document.frm.nuVlUnitario.value;
     var nuQuantidade = document.frm.nuQuantidade.value;
     var nuVlTotal = "";
+    var nuVlTotalTeste = "";
     if( nuVlUnidade && nuQuantidade ) {
         nuVlUnidade = nuVlUnidade.replace( new  RegExp("[.]","g") ,'');
         nuVlUnidade = nuVlUnidade.replace( "," ,'.');
@@ -215,6 +217,7 @@ function gerarValorTotal() {
         nuQuantidade = nuQuantidade.replace( "," ,'.');
         nuVlTotal = nuVlUnidade * nuQuantidade;
         nuVlTotal = Math.round(nuVlTotal*Math.pow(10,2))/Math.pow(10,2);
+        nuVlTotalTeste = nuVlTotal;
         nuVlTotal = new String(nuVlTotal.toFixed(2));
         arVlTotal = nuVlTotal.split(".") ;
         if( !arVlTotal[1] )
@@ -230,7 +233,15 @@ function gerarValorTotal() {
             inCount++;
         }
         nuVlTotal = inValor + ',' + arVlTotal[1];
-        document.frm.nuVlTotal.value = nuVlTotal;
+
+        if (nuVlTotalTeste > 999999999999.99) {
+            objeto.value = '';
+            document.frm.nuVlTotal.value = '0,00';
+            objeto.focus();
+            alertaAviso('O resultado do campo Valor Total ('+nuVlTotal+') não pode ultrapassar o valor limite de 999.999.999.999,99','form','erro','<?=Sessao::getId();?>', '../');
+        } else{
+            document.frm.nuVlTotal.value = nuVlTotal;
+        }
     }
 }
 

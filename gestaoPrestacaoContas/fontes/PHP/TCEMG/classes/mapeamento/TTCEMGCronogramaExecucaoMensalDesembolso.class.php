@@ -88,11 +88,14 @@ class TTCEMGCronogramaExecucaoMensalDesembolso extends Persistente
                     JOIN tcemg.uniorcam
                       ON cronem.num_unidade = uniorcam.num_unidade
                      AND cronem.num_orgao = uniorcam.num_orgao
+                     AND cronem.exercicio = uniorcam.exercicio
                     JOIN orcamento.orgao 
                       ON orgao.num_orgao = uniorcam.num_orgao
+                     AND orgao.exercicio = uniorcam.exercicio
                     JOIN orcamento.unidade
                       ON unidade.num_unidade = uniorcam.num_unidade
                      AND unidade.num_orgao = uniorcam.num_orgao
+                     AND unidade.exercicio = uniorcam.exercicio
                    WHERE cronem.exercicio = '".$this->getDado('exercicio')."'
                      AND uniorcam.num_orgao = ".$this->getDado('num_orgao')."
                      AND cronem.cod_entidade = ".$this->getDado('cod_entidade')."
@@ -156,9 +159,11 @@ class TTCEMGCronogramaExecucaoMensalDesembolso extends Persistente
                     FROM tcemg.uniorcam
                     JOIN orcamento.orgao 
                       ON orgao.num_orgao = uniorcam.num_orgao
+                     AND orgao.exercicio = uniorcam.exercicio
                     JOIN orcamento.unidade
                       ON unidade.num_unidade = uniorcam.num_unidade
                      AND unidade.num_orgao = uniorcam.num_orgao
+                     AND unidade.exercicio = uniorcam.exercicio
                    WHERE uniorcam.exercicio = '".$this->getDado('exercicio')."'
                      AND uniorcam.num_orgao = ".$this->getDado('num_orgao')."
                      AND uniorcam.num_unidade = ".$this->getDado('num_unidade')."

@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOIdeBalanco.class.php 65168 2016-04-29 16:36:09Z michel $
+    $Id: TTGOIdeBalanco.class.php 65247 2016-05-04 18:50:31Z jean $
 
     * Casos de uso: uc-06.04.00
 */
@@ -57,117 +57,95 @@ function __construct()
 //Mapeamento do case pode ser encontrado no documento de tabelas auxiliares do tribunal
 function montaRecuperaTodos()
 {
-    $stSql  = "
-    SELECT
-           '10'                                AS tipo_registro
-           ,configuracao_entidade.cod_entidade AS codigo_entidade
-           ,configuracao_entidade.exercicio    AS ano_referencia
-           ,to_char(NOW(),'ddmmyyyy')          AS data_geracao
-           ,cgm.nom_cgm                        AS nom_prefeito
-           ,cgm.cpf                            AS cpf_prefeito
-           ,pft.logradouro                     AS lograd_prefeitura
-           ,pft.bairro                         AS bairro_prefeitura
-           ,pft.cidade                         AS cid_prefeitura
-           ,pft.sigla_uf                       AS uf_prefeitura
-           ,pft.cep                            AS cep_prefeitura
-           ,cgm.logradouro                     AS lograd_prefeito
-           ,cgm.bairro                         AS bairro_prefeito
-           ,cgm.cidade                         AS cid_prefeito
-           ,cgm.sigla_uf                       AS uf_prefeito
-           ,cgm.cep                            AS cep_prefeito
-           ,cont.nom_cgm                       AS nom_contador
-           ,cont.cpf                           AS cpf_contador
-           ,cont.num_registro                  AS crc_contador
-           ,cont.sigla_uf                      AS uf_contador
-           , 0                                 AS nom_contr_int
-           , 0                                 AS cpf_contr_int
+  $stSql = "
+            SELECT
+                    30 AS tipo_registro
+                  , cgm_entidade.cod_municipio
+                  , configuracao_ide.exercicio AS ano_referencia
+                  , TO_CHAR(now(),'ddmmyyyy') AS data_geracao
+                  , cgm_chefe.nom_cgm AS chefe_governo
+                  , cgm_chefe.cpf AS cpf_chefe
+                  , cgm_entidade.logradouro
+                  , cgm_entidade.bairro AS setor_logra
+                  , cgm_entidade.nom_municipio AS cidade_logra
+                  , cgm_entidade.cod_uf AS uf_cidade_logra
+                  , cgm_entidade.cep AS cep_logra
+                  , cgm_chefe.logradouro AS logra_res_gestor
+                  , cgm_chefe.bairro AS setor_logra_gestor
+                  , cgm_chefe.nom_municipio AS cidade_logra_gestor
+                  , cgm_chefe.cod_uf AS uf_cidade_logra_gestor
+                  , cgm_chefe.cep AS cep_logra_gestor
+                  , cgm_contador.nom_cgm AS nome_contador
+                  , cgm_contador.cpf AS cpf_contador
+                  , configuracao_ide.crc_contador
+                  , configuracao_ide.uf_crc_contador
+                  , cgm_controle.nom_cgm AS nome_controle_interno
+                  , cgm_controle.cpf AS cpf_controle_interno
 
-     FROM
-           administracao.configuracao_entidade
-           JOIN  ( SELECT
-                      configuracao_entidade.exercicio
-                      ,configuracao_entidade.cod_entidade
-                      ,substr(trim(logradouro)||', '||trim(numero)||' '||trim(complemento), 1,50) as logradouro
-                      ,bairro
-                      ,nom_uf as cidade
-                      ,sigla_uf
-                      ,cep
-                    FROM
-                      orcamento.entidade
-                      ,administracao.configuracao_entidade
-                      ,sw_cgm
-                      ,sw_uf
-                    WHERE
-                      orcamento.entidade.cod_entidade = administracao.configuracao_entidade.cod_entidade AND
-                      orcamento.entidade.numcgm       = sw_cgm.numcgm                                    AND
-                      orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." )           AND
-                      orcamento.entidade.exercicio = ".$this->getDado('exercicio')."                     AND
-                      configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'                      AND
-                      sw_cgm.cod_uf = sw_uf.cod_uf
-                 ) AS pft ON (
-                      pft.exercicio = administracao.configuracao_entidade.exercicio AND
-                      pft.cod_entidade = administracao.configuracao_entidade.cod_entidade
-                      )
+              FROM tcmgo.configuracao_ide
 
-           JOIN  ( SELECT
-                      entidade.exercicio
-                      ,entidade.cod_entidade
-                      ,nom_cgm
-                      ,cpf
-                      ,substr(trim(logradouro)||', '||trim(numero)||' '||trim(complemento), 1,50) as logradouro
-                      ,bairro
-                      ,nom_uf as cidade
-                      ,sigla_uf
-                      ,cep
-                   FROM
-                      sw_uf
-                      ,sw_cgm_pessoa_fisica
-                      ,sw_cgm
-                      ,administracao.configuracao
-                      ,administracao.configuracao_entidade
-                      ,orcamento.entidade
-                   WHERE
-                      administracao.configuracao.parametro = 'CGMPrefeito'  AND
-                      sw_cgm.numcgm  = administracao.configuracao.valor     AND
-                      sw_cgm.numcgm  = sw_cgm_pessoa_fisica.numcgm          AND
-                      sw_cgm.cod_uf = sw_uf.cod_uf                          AND
-                      orcamento.entidade.cod_entidade = administracao.configuracao_entidade.cod_entidade AND
-                      configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'                      AND
-                      orcamento.entidade.exercicio = ".$this->getDado('exercicio')."                     AND
-                      orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." )
-                 ) AS cgm ON (
-                      cgm.exercicio = administracao.configuracao_entidade.exercicio AND
-                      cgm.cod_entidade = administracao.configuracao_entidade.cod_entidade
-                      )
-           JOIN ( SELECT
-                     entidade.exercicio
-                     ,entidade.cod_entidade
-                     ,nom_cgm
-                     ,cpf
-                     ,economico.responsavel_tecnico.num_registro
-                     ,sigla_uf
-                  FROM
-                     economico.responsavel_tecnico
-                     ,sw_uf
-                     ,sw_cgm_pessoa_fisica
-                     ,sw_cgm
-                     ,orcamento.entidade
-                  WHERE
-                     orcamento.entidade.exercicio = ".$this->getDado('exercicio')." AND
-                     orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." ) AND
-                     orcamento.entidade.cod_resp_tecnico = sw_cgm.numcgm   AND
-                     orcamento.entidade.cod_resp_tecnico = economico.responsavel_tecnico.numcgm AND
-                     sw_cgm.numcgm  = sw_cgm_pessoa_fisica.numcgm          AND
-                     sw_cgm.cod_uf = sw_uf.cod_uf
-                ) AS cont ON (
-                     cont.exercicio = administracao.configuracao_entidade.exercicio AND
-                     cont.cod_entidade = administracao.configuracao_entidade.cod_entidade
-                     )
+        INNER JOIN orcamento.entidade
+                ON entidade.exercicio = configuracao_ide.exercicio
+               AND entidade.cod_entidade = configuracao_ide.cod_entidade
 
-    WHERE  configuracao_entidade.cod_entidade IN (  ".$this->getDado('stEntidades')." ) AND
-           configuracao_entidade.exercicio = ".$this->getDado('exercicio')."            AND
-           configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'
-    ";
+        INNER JOIN (
+                    SELECT sw_cgm.numcgm
+                         , sw_cgm.logradouro
+                         , sw_cgm.cep
+                         , sw_cgm.cod_uf
+                         , sw_cgm.bairro
+                         , sw_cgm.cod_municipio
+                         , sw_municipio.nom_municipio
+              FROM sw_cgm
+        INNER JOIN sw_municipio
+                ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+               AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                   ) AS cgm_entidade
+                ON cgm_entidade.numcgm = entidade.numcgm
+
+        INNER JOIN (
+                    SELECT sw_cgm.nom_cgm
+                         , sw_cgm.numcgm
+                         , sw_cgm_pessoa_fisica.cpf
+                         , sw_cgm.logradouro
+                         , sw_cgm.bairro
+                         , sw_municipio.nom_municipio
+                         , sw_municipio.cod_uf
+                         , sw_cgm.cep
+                  FROM sw_cgm
+    
+            INNER JOIN sw_cgm_pessoa_fisica
+                    ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+
+            INNER JOIN sw_municipio
+                    ON sw_municipio.cod_municipio = sw_cgm.cod_municipio
+                    AND sw_municipio.cod_uf = sw_cgm.cod_uf
+                  ) AS cgm_chefe
+                ON cgm_chefe.numcgm = configuracao_ide.cgm_chefe_governo
+
+            INNER JOIN (
+                        SELECT sw_cgm.nom_cgm
+                             , sw_cgm.numcgm
+                             , sw_cgm_pessoa_fisica.cpf
+                          FROM sw_cgm
+                    INNER JOIN sw_cgm_pessoa_fisica
+                            ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                       ) AS cgm_contador
+                    ON cgm_contador.numcgm = configuracao_ide.cgm_contador
+
+            INNER JOIN (
+                        SELECT sw_cgm.nom_cgm
+                             , sw_cgm.numcgm
+                             , sw_cgm_pessoa_fisica.cpf
+                          FROM sw_cgm
+                    INNER JOIN sw_cgm_pessoa_fisica
+                            ON sw_cgm_pessoa_fisica.numcgm = sw_cgm.numcgm
+                       ) AS cgm_controle
+                    ON cgm_controle.numcgm = configuracao_ide.cgm_controle_interno
+
+                 WHERE configuracao_ide.cod_entidade IN (".$this->getDado('stEntidades').")
+                   AND configuracao_ide.exercicio = '".$this->getDado('exercicio')."'
+          ";
 
     return $stSql;
 }

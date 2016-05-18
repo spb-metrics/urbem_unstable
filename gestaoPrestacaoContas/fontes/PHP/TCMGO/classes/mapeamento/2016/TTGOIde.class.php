@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOIde.class.php 65168 2016-04-29 16:36:09Z michel $
+    $Id: TTGOIde.class.php 65222 2016-05-03 22:19:36Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -56,32 +56,116 @@ function __construct()
 //Mapeamento do case pode ser encontrado no documento de tabelas auxiliares do tribunal
 function montaRecuperaTodos()
 {
-    $inMes = explode('/',$this->getDado('dtFim'));
-    $inMes = $inMes[1];
     $stSql  = "
-        SELECT  '10' AS tipo_registro
-             ,  valor AS codigo_entidade
-             ,  (   SELECT  valor
-                      FROM  administracao.configuracao_entidade AS ent
-                     WHERE  ent.cod_entidade = configuracao_entidade.cod_entidade
-                       AND  ent.exercicio = configuracao_entidade.exercicio
-                       AND  ent.parametro = 'tc_codigo_tipo_balancete'";
-    if ($this->getDado('inCodModulo')) {
-        $stSql .= " AND ent.cod_modulo = ".$this->getDado('inCodModulo');
-    }
+    SELECT
+           '10'                                AS tipo_registro
+           ,configuracao_entidade.cod_entidade AS codigo_entidade
+           ,configuracao_entidade.exercicio    AS ano_referencia
+           ,to_char(NOW(),'ddmmyyyy')          AS data_geracao
+           ,cgm.nom_cgm                        AS nom_prefeito
+           ,cgm.cpf                            AS cpf_prefeito
+           ,pft.logradouro                     AS lograd_prefeitura
+           ,pft.bairro                         AS bairro_prefeitura
+           ,pft.cidade                         AS cid_prefeitura
+           ,pft.sigla_uf                       AS uf_prefeitura
+           ,pft.cep                            AS cep_prefeitura
+           ,cgm.logradouro                     AS lograd_prefeito
+           ,cgm.bairro                         AS bairro_prefeito
+           ,cgm.cidade                         AS cid_prefeito
+           ,cgm.sigla_uf                       AS uf_prefeito
+           ,cgm.cep                            AS cep_prefeito
+           ,cont.nom_cgm                       AS nom_contador
+           ,cont.cpf                           AS cpf_contador
+           ,cont.num_registro                  AS crc_contador
+           ,cont.sigla_uf                      AS uf_contador
+           , 0                                 AS nom_contr_int
+           , 0                                 AS cpf_contr_int
 
-    $stSql .= "
-                ) AS tipo_balancete
-             ,  exercicio AS ano_referencia
-             ,  ".$inMes." AS mes_referencia
-             ,  '0' AS balancete_complementar
-             ,  to_char(NOW(),'ddmmyyyy') AS data_geracao
-             ,  '1' AS numero_registro
-          FROM  administracao.configuracao_entidade
-         WHERE  cod_entidade IN ( ".$this->getDado('stEntidades')." )
-           AND  exercicio = '".$this->getDado('exercicio')."'
-           AND  parametro = 'tc_codigo_unidade_gestora'
+     FROM
+           administracao.configuracao_entidade
+           JOIN  ( SELECT
+                      configuracao_entidade.exercicio
+                      ,configuracao_entidade.cod_entidade
+                      ,substr(trim(logradouro)||', '||trim(numero)||' '||trim(complemento), 1,50) as logradouro
+                      ,bairro
+                      ,nom_uf as cidade
+                      ,sigla_uf
+                      ,cep
+                    FROM
+                      orcamento.entidade
+                      ,administracao.configuracao_entidade
+                      ,sw_cgm
+                      ,sw_uf
+                    WHERE
+                      orcamento.entidade.cod_entidade = administracao.configuracao_entidade.cod_entidade AND
+                      orcamento.entidade.numcgm       = sw_cgm.numcgm                                    AND
+                      orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." )           AND
+                      orcamento.entidade.exercicio = '".$this->getDado('exercicio')."'                   AND
+                      configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'                      AND
+                      sw_cgm.cod_uf = sw_uf.cod_uf
+                 ) AS pft ON (
+                      pft.exercicio = administracao.configuracao_entidade.exercicio AND
+                      pft.cod_entidade = administracao.configuracao_entidade.cod_entidade
+                      )
 
+           JOIN  ( SELECT
+                      entidade.exercicio
+                      ,entidade.cod_entidade
+                      ,nom_cgm
+                      ,cpf
+                      ,substr(trim(logradouro)||', '||trim(numero)||' '||trim(complemento), 1,50) as logradouro
+                      ,bairro
+                      ,nom_uf as cidade
+                      ,sigla_uf
+                      ,cep
+                   FROM
+                      sw_uf
+                      ,sw_cgm_pessoa_fisica
+                      ,sw_cgm
+                      ,administracao.configuracao
+                      ,administracao.configuracao_entidade
+                      ,orcamento.entidade
+                   WHERE
+                      administracao.configuracao.parametro = 'CGMPrefeito'  AND
+                      sw_cgm.numcgm  = administracao.configuracao.valor::integer AND
+                      sw_cgm.numcgm  = sw_cgm_pessoa_fisica.numcgm          AND
+                      sw_cgm.cod_uf = sw_uf.cod_uf                          AND
+                      orcamento.entidade.cod_entidade = administracao.configuracao_entidade.cod_entidade AND
+                      configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'                      AND
+                      orcamento.entidade.exercicio = '".$this->getDado('exercicio')."'                   AND
+                      orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." )
+                 ) AS cgm ON (
+                      cgm.exercicio = administracao.configuracao_entidade.exercicio AND
+                      cgm.cod_entidade = administracao.configuracao_entidade.cod_entidade
+                      )
+           JOIN ( SELECT
+                     entidade.exercicio
+                     ,entidade.cod_entidade
+                     ,nom_cgm
+                     ,cpf
+                     ,economico.responsavel_tecnico.num_registro
+                     ,sigla_uf
+                  FROM
+                     economico.responsavel_tecnico
+                     ,sw_uf
+                     ,sw_cgm_pessoa_fisica
+                     ,sw_cgm
+                     ,orcamento.entidade
+                  WHERE
+                     orcamento.entidade.exercicio = '".$this->getDado('exercicio')."' AND
+                     orcamento.entidade.cod_entidade IN ( ".$this->getDado('stEntidades')." ) AND
+                     orcamento.entidade.cod_resp_tecnico = sw_cgm.numcgm   AND
+                     orcamento.entidade.cod_resp_tecnico = economico.responsavel_tecnico.numcgm AND
+                     sw_cgm.numcgm  = sw_cgm_pessoa_fisica.numcgm          AND
+                     sw_cgm.cod_uf = sw_uf.cod_uf
+                ) AS cont ON (
+                     cont.exercicio = administracao.configuracao_entidade.exercicio AND
+                     cont.cod_entidade = administracao.configuracao_entidade.cod_entidade
+                     )
+
+    WHERE  configuracao_entidade.cod_entidade IN (  ".$this->getDado('stEntidades')." ) AND
+           configuracao_entidade.exercicio = '".$this->getDado('exercicio')."'          AND
+           configuracao_entidade.parametro = 'tc_codigo_unidade_gestora'
     ";
 
     return $stSql;

@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.03.93
 
-    $Id: LSManterUsuario.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: LSManterUsuario.php 65393 2016-05-18 19:05:03Z jean $
 
     */
 
@@ -62,26 +62,26 @@ if ($_GET["pg"] && $_GET["pos"]) {
     Sessao::write('link_pos',$_GET["pos"]);
 }
 
-# USADO QUANDO EXISTIR FILTRO
+//DEFINICAO DO FILTRO PARA CONSULTA
 
-/*
-if (is_array(Sessao::read('link'))) {
-    $_REQUEST = Sessao::read('link');
-} else {
-    $arLink = array();
-    foreach ($_REQUEST as $key => $valor) {
-        $arLink[$key] = $valor;
-    }
-    Sessao::write('link',$arLink);
+if ($request->get("inNumCGM")) {
+    $stLink .= "&inNumCGM=".$request->get("inNumCGM");
 }
-*/
-$obRUsuario->obRCGM->setNumCGM( $_REQUEST['inNumCGM']   );
-$obRUsuario->obRCGM->setNomCGM( $_REQUEST['stNomCGM']   );
-$obRUsuario->setUsername      ( $_REQUEST['stUserName'] );
+if ($request->get("stNomCGM")) {
+    $stLink .= "&stNomCGM=".$request->get("stNomCGM");
+}
+if ($request->get("stUserName")) {
+    $stLink .= "&stUserName=".$request->get("stUserName");
+}
+
+$obRUsuario->obRCGM->setNumCGM ( $request->get('inNumCGM')   );
+$obRUsuario->obRCGM->setNomCGM ( $request->get('stNomCGM')   );
+$obRUsuario->setUsername       ( $request->get('stUserName') );
+
 if ($stAcao == 'usuario') {
-    $obErro = $obRUsuario->obRCGM->listarFisicoJuridico( $rsRecordSet, preg_replace("/[^a-zA-Z0-9]/",'',$_REQUEST['CNPJ']), preg_replace("/[^a-zA-Z0-9]/",'',$_REQUEST['CPF']), $_REQUEST['inRG'] );
+    $obErro = $obRUsuario->obRCGM->listarFisicoJuridico( $rsRecordSet, preg_replace("/[^a-zA-Z0-9]/",'',$request->get('CNPJ')), preg_replace("/[^a-zA-Z0-9]/",'',$request->get('CPF')), $request->get('inRG') );
 } else {
-     $obErro = $obRUsuario->listarUsuarioCGM( $rsRecordSet,preg_replace("/[^a-zA-Z0-9]/",'',$_REQUEST['CNPJ']), preg_replace("/[^a-zA-Z0-9]/",'',$_REQUEST['CPF']), $_REQUEST['inRG'] );
+     $obErro = $obRUsuario->listarUsuarioCGM( $rsRecordSet,preg_replace("/[^a-zA-Z0-9]/",'',$request->get('CNPJ')), preg_replace("/[^a-zA-Z0-9]/",'',$request->get('CPF')), $request->get('inRG') );
 }
 
 $obLista = new Lista;
@@ -117,6 +117,7 @@ $obLista->ultimaAcao->setAcao( $stAcao );
 $obLista->ultimaAcao->addCampo("&inNumCGM"    ,"numcgm");
 $obLista->ultimaAcao->addCampo("&stNomCGM"    ,"nom_cgm");
 $obLista->ultimaAcao->setLink( $pgProx."?".Sessao::getId().$stLink );
+
 $obLista->commitAcao();
 
 $obLista->show();

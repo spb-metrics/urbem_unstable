@@ -31,7 +31,7 @@
     * @author Desenvolvedor: Andre Almeida
 
     * @ignore
-    $Id: OCImportarRegistroEvento.php 65130 2016-04-26 20:41:36Z michel $
+    $Id: OCImportarRegistroEvento.php 65310 2016-05-11 20:29:34Z evandro $
 
     * Caso de uso: uc-04.05.49
 
@@ -551,12 +551,14 @@ function incluirLoteMatricula(Request $request)
 {
     $obErro = validarLoteEvento('incluir', $request);
     if ( !$obErro->ocorreu() ) {
+        $inCodEvento = $request->get("HdninCodigoEvento");
+        $inCodEvento = (!empty($inCodEvento)) ? $inCodEvento : Sessao::read("HdninCodigoEvento");
         $arLoteMatriculas = Sessao::read("arLoteMatriculas");
         $arTemp["inId"]         = count($arLoteMatriculas);
         $arTemp["registro"]     = $request->get("inContrato");
         $arTemp["nom_cgm"]      = getNomeCGM($request->get("inContrato"));
         $arTemp["codigo"]       = $request->get("inCodigoEvento");
-        $arTemp["cod_evento"]   = $request->get("HdninCodigoEvento");
+        $arTemp["cod_evento"]   = $inCodEvento;
         $arTemp["desc_evento"]  = $request->get("hdnDescEvento");
         $arTemp["texto_comp"]   = Sessao::read("stTextoComplementar");
         $arTemp["natureza"]     = Sessao::read("stNatureza");
@@ -586,12 +588,14 @@ function alterarLoteMatricula(Request $request)
 {
     $obErro = validarLoteEvento("alterar", $request);
     if ( !$obErro->ocorreu() ) {
+        $inCodEvento = $request->get("HdninCodigoEvento");
+        $inCodEvento = (!empty($inCodEvento)) ? $inCodEvento : Sessao::read("HdninCodigoEvento");
         $arLoteMatriculas = Sessao::read("arLoteMatriculas");
         $arTemp["inId"]              = Sessao::read("inId");
         $arTemp["registro"]          = $request->get("inContrato");
         $arTemp["nom_cgm"]           = getNomeCGM($request->get("inContrato"));
         $arTemp["codigo"]            = $request->get("inCodigoEvento");
-        $arTemp["cod_evento"]        = $request->get("HdninCodigoEvento");
+        $arTemp["cod_evento"]        = $inCodEvento;
         $arTemp["desc_evento"]       = $request->get("hdnDescEvento");
         $arTemp["texto_comp"]        = Sessao::read("stTextoComplementar");
         $arTemp["natureza"]          = Sessao::read("stNatureza");
@@ -1250,11 +1254,13 @@ function alterarLoteEvento(Request $request)
     $obErro = validarLoteEvento("alterar", $request);
     if ( !$obErro->ocorreu() ) {
         $arLoteEventos = Sessao::read("arLoteEventos");
+        $inCodEvento = $request->get("HdninCodigoEvento");
+        $inCodEvento = (!empty($inCodEvento)) ? $inCodEvento : Sessao::read("HdninCodigoEvento");
         $arTemp["inId"]              = Sessao::read("inId");
         $arTemp["registro"]          = $request->get("inContrato");
         $arTemp["nom_cgm"]           = getNomeCGM($request->get("inContrato"));
         $arTemp["codigo"]            = $request->get("inCodigoEvento");
-        $arTemp["cod_evento"]        = $request->get("HdninCodigoEvento");
+        $arTemp["cod_evento"]        = $inCodEvento;
         $arTemp["desc_evento"]       = $request->get("hdnDescEvento");
         $arTemp["texto_comp"]        = Sessao::read("stTextoComplementar");
         $arTemp["natureza"]          = Sessao::read("stNatureza");
@@ -1472,7 +1478,7 @@ function gerarSpanImportar()
     $obBtnImportarEvento->setName              ( "btnImportar"       );
     $obBtnImportarEvento->setValue             ( "Importar"          );
     $obBtnImportarEvento->setTipo              ( "button"            );
-    $obBtnImportarEvento->obEvento->setOnClick ( "buscaValor('importarEventos');" );
+    $obBtnImportarEvento->obEvento->setOnClick ( "BloqueiaFrames(true,false); buscaValor('importarEventos');" );
     $obBtnImportarEvento->setDisabled          ( false               );
 
     $obbtnLimparLista = new Button;
@@ -1623,11 +1629,8 @@ function preencheSpnListaEventos($boMostraAcao = true)
         $obLista->commitAcao();
     }
 
-    $obLista->montaHTML();
+    $obLista->montaInnerHTML();
     $stHtml = $obLista->getHTML();
-    $stHtml = str_replace("\n","",$stHtml);
-    $stHtml = str_replace("  ","",$stHtml);
-    $stHtml = str_replace("'","\\'",$stHtml);
 
     $stJs = "jq('#spnListaEventos').html('".$stHtml."');\n";
 
@@ -1760,7 +1763,7 @@ function preencheSpnValoresSomados($boMostraAcao = true)
     $stHtml = str_replace("  ","",$stHtml);
     $stHtml = str_replace("'","\\'",$stHtml);
 
-    $stJs = "jq('#spnValoresSomados').html'".$stHtml."');\n";
+    $stJs = "jq('#spnValoresSomados').html('".$stHtml."');\n";
 
     return $stJs;
 }
@@ -1840,7 +1843,7 @@ function validaValor($nuValor, $stCasaDecimal = "", $mensagem   ="valor informad
     }
 
     //Verifica se o valor possui de 0 a 9 numeros, o separador decimal e 0 a 2 digitos de casa decimal OU se o valor já formado por e somente até 11 números
-    if ( !((ereg( "^[0-9]{0,9}".$stCasaDecimal."[0-9]{0,2}$", $nuValor, $matriz )) || (ereg( "^[0-9]{0,11}$", $nuValor, $matriz )) ) )
+    if ( !((preg_match( "^[0-9]{0,9}".$stCasaDecimal."[0-9]{0,2}$^", $nuValor, $matriz )) || (preg_match( "^[0-9]{0,11}$^", $nuValor, $matriz )) ) )
         $stErro = " - $mensagem";
 
     return $stErro;
@@ -1849,14 +1852,14 @@ function validaValor($nuValor, $stCasaDecimal = "", $mensagem   ="valor informad
 function validaInteiro($nuValor)
 {
     $stErro = "";
-    if ( !ereg( "^[0-9]{0,10}$", $nuValor, $matriz ) )
+    if ( !preg_match( "^[0-9]{0,10}$^", $nuValor, $matriz ) )
         $stErro = " - quantidade de parcelas informada é inválida";
 
     return $stErro;
 }
 
 function validaEventoImportacao($inContrato, $inCodigoEvento, $nuValorEvento, $nuQuantidadeEvento, $nuQuantidadeParcelasEvento, $inMesesCarencia, $stFixado, $stApresentaParcelas, $inCodPeriodoMovimentacao, $stMascaraEvento)
-{
+{    
     include_once CAM_GRH_FOL_MAPEAMENTO."TFolhaPagamentoRegistroEvento.class.php";
     $stErro = "";
 
@@ -1885,7 +1888,7 @@ function validaEventoImportacao($inContrato, $inCodigoEvento, $nuValorEvento, $n
         $stErro .= " - evento não informado";
     if( ( $stFixado != 'Q' ) && (( $nuValorEvento =='' ) || ( $nuValorEvento == '0,00' ) ) )
         $stErro .= " - valor não informado";
-    if( ( $stFixado == 'Q' ) && (!( $nuValorEvento =='' ) || ( $nuValorEvento == '0,00' ) ) )
+    if( ( $stFixado == 'Q' ) && ( $nuValorEvento =='' ) )
         $stErro .= " - valor não pode ser informado para este evento";
     if( ( $stFixado == 'Q' ) && ( $nuQuantidadeEvento =='' ) || ( $nuQuantidadeEvento == '0,00' ) )
         $stErro .= " - quantidade não informada";
@@ -1893,7 +1896,7 @@ function validaEventoImportacao($inContrato, $inCodigoEvento, $nuValorEvento, $n
         $stErro .= " - quantidade de parcelas não informada";
     if( ( $stApresentaParcelas == 'f' ) && (!( $nuQuantidadeParcelasEvento =='' ) || ( $nuQuantidadeParcelasEvento == '0,00' )) )
         $stErro .= " - quantidade de parcelas não pode ser informada para este evento";
-    if( ( $inMesesCarencia == '' ) )
+    if( ( $inMesesCarencia == '' ) && ($stApresentaParcelas == 't') )
         $stErro .= " - os meses de carência não podem ser informados para este evento";
 
     return $stErro;
@@ -2071,32 +2074,6 @@ function limpaCamposLista()
 ######################################
 #IMPORTAR
 ######################################
-
-function submeter(Request $request)
-{
-    $obErro = new Erro();
-    switch ($request->get("stOpcao")) {
-        case "lote_evento":
-            if (count(Sessao::read("arLoteEventos")) == 0) {
-                $obErro->setDescricao("@Deve haver pelo menos uma Matrícula para um evento na lista de Matrículas.");
-            }
-        break;
-        case "lote_matricula":
-            if (count(Sessao::read("arLoteMatriculas")) == 0) {
-                $obErro->setDescricao("@Deve haver pelo menos um evento para uma Matrícula na lista de eventos.");
-            }
-        break;
-        case "importar":
-        break;
-    }
-    if (!$obErro->ocorreu()) {
-        $stJs .= "parent.frames[2].Salvar();";
-    } else {
-        $stJs = "alertaAviso('".$obErro->getDescricao()."','form','erro','".Sessao::getId()."');\n";
-    }
-
-    return $stJs;
-}
 
 function limparImportar()
 {
@@ -2490,9 +2467,11 @@ switch ($request->get("stCtrl")) {
     case "montaAlterarLoteMatricula":
         $stJs = montaAlterarLoteMatricula($request);
     break;
-    case "importarEventos":
+    case "importarEventos":        
         $boAjax = false;
-        $stJs = importarEventos($request);
+        $stJs = " var jq  = window.parent.frames[\"telaPrincipal\"].jQuery; ";
+        $stJs .= importarEventos($request);
+        $stJs .= " LiberaFrames(true,true); ";
     break;
     case "limparImportar":
         $stJs = limparImportar();

@@ -2191,3 +2191,20 @@ DROP FUNCTION insere_catalogo();
 DROP TABLE familia;
 DROP TABLE subfamilia;
 
+
+----------------
+-- Ticket #23670
+----------------
+
+UPDATE administracao.acao SET ordem =  7 WHERE cod_acao = 1640;
+UPDATE administracao.acao SET ordem =  8 WHERE cod_acao = 1641;
+UPDATE administracao.acao SET ordem =  9 WHERE cod_acao = 1642;
+UPDATE administracao.acao SET ordem = 10 WHERE cod_acao = 1980;
+
+
+----------------
+-- Ticket #23723
+----------------
+
+ALTER TABLE licitacao.tipo_instrumento ALTER COLUMN codigo_tc DROP NOT NULL;
+

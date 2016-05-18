@@ -65,8 +65,8 @@ $preview->setVersaoBirt( '2.5.0' );
 $preview->setExportaExcel(false);
 $preview->setReturnURL(CAM_GRH_FOL_INSTANCIAS."relatorio/".$pgFilt);
 
-// Essa variavel serve para passar a quantidade de regitros de enventos por contra cheque.
-$inQuantEvento = 99;
+// Essa variavel serve para passar a quantidade de regitros de eventos por contra cheque.
+$inQuantEvento = 17;
 
 $arFiltro = $_REQUEST;
 

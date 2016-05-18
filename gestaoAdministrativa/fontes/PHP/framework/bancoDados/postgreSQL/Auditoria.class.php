@@ -30,7 +30,7 @@
  * @package bancoDados
  * @subpackage postgreSQL
  *
- * $Id: Auditoria.class.php 64804 2016-04-04 19:29:47Z michel $
+ * $Id: Auditoria.class.php 65296 2016-05-10 17:56:10Z michel $
  *
  * Casos de uso: uc-01.01.00
 */
@@ -371,8 +371,19 @@ class Auditoria
                                         $arValores[$stCampo."_novo"] = str_replace('/','-',$this->getTimestamp());
                                     }
                                 } elseif ($value != $obDetalhe->getDado($stCampo)) {
-                                    $arValores[$stCampo."_antigo"] = $value;
-                                    $arValores[$stCampo."_novo"] = $obDetalhe->getDado($stCampo);
+                                    $valueAntigo = $value;
+                                    $valueNovo = $obDetalhe->getDado($stCampo);
+
+                                    //char(34) => aspas(") e chr(92) => contra barra(\).
+                                    //Necessário substituir aspas(") por contra barra + aspas(\") para salvar no campo valores, em administracao.auditoria_detalhe.
+                                    //Campo valores é do tipo hstore.
+                                    if (substr_count($valueAntigo, chr(92).chr(34)) <= 0)
+                                        $valueAntigo = str_replace(chr(34), chr(92).chr(34), $valueAntigo);
+                                    if (substr_count($valueNovo, chr(92).chr(34)) <= 0)
+                                        $valueNovo = str_replace(chr(34), chr(92).chr(34), $valueNovo);
+
+                                    $arValores[$stCampo."_antigo"] = $valueAntigo;
+                                    $arValores[$stCampo."_novo"] = $valueNovo;
                                 }
                             }
                         }
@@ -381,12 +392,16 @@ class Auditoria
 
                         foreach ($arEstrutura as $count => $key) {
                             if ($key->getConteudo() != '' OR $key->getConteudo() != NULL) {
+                                $valueConteudo = $key->getConteudo();
+
                                 //Fora colocado essa verificação porque na classe $request é feito um addslashes e está adicionando \ 
                                 //assim ao adicionar o \, o str_replace está adicionando novamente a \, então esse str_count verifica
                                 //se já existem \" para não replicar mais
-                                if (substr_count($key->getConteudo(), '\"') <= 0) {
-                                    $arValores[$key->getNomeCampo()] = str_replace('"','\"',$key->getConteudo());
-                                }
+                                //char(34) => aspas(") e chr(92) => contra barra(\).
+                                if (substr_count($valueConteudo, chr(92).chr(34)) <= 0)
+                                    $valueConteudo = str_replace(chr(34), chr(92).chr(34), $valueConteudo);
+
+                                $arValores[$key->getNomeCampo()] = $valueConteudo;
                             }
                         }
                     }

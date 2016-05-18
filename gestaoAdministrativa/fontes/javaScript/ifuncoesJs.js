@@ -2427,6 +2427,80 @@ function mascaraNumerico( campo, tamanho, decimais, evento, negativo ){
 }
 
 /*-------------------------------------------------------+
+|FORMATA O CAMPO PARA MOEDA DURANTE A DIGITAÇÃO DA MESMA |
++-------------------------------------------------------*/
+function mascaraNumericoBR( campo, tamanho, decimais, evento, negativo ){
+    RegExpMenos = new RegExp ("-","g");
+    var boValorNegativo = false;
+
+    if ( (evento.keyCode != 9)) {
+        if ( (evento.keyCode != 16)) {
+
+            if( (evento.keyCode != 0) ){
+                campo.value = campo.value.replace(/[\.]/g, '');
+
+                if( (campo.value.length < (tamanho-decimais)) || (campo.value.search(',') !='-1') || (evento.keyCode == 8) ){
+
+                    if( negativo ) {
+                        //Verifica se o número é negativo
+                        if( evento.keyCode == 109 ){
+                            boValorNegativo = true;
+                        } else {
+                            if( (campo.value.charAt(0) == "-") && ( evento.keyCode != 107 && evento.keyCode != 61 ) ){
+                                boValorNegativo = true;
+                            }
+                        }
+
+                        //Calcula o tamanho máximo do campo
+                        if( (campo.value.charAt(0) != "-") && (evento.keyCode == 109) ){
+                            campo.maxLength = campo.maxLength + 1;
+                        } else if( (campo.value.charAt(0) == "-") && ( evento.keyCode == 107 || evento.keyCode == 61 ) ) {
+                            campo.maxLength = campo.maxLength - 1;
+                        }
+                    }
+                    campo.value = campo.value.replace( RegExpMenos, '' );
+
+                    var virgPos = campo.value.search(',');
+                    //evento.keyCode == 188 é a virgula
+                    //VERIFICA SE O USUARIO TENTOU COLOCAR A VIRGULA NUMA POSICAO INVALIDA
+                    //SE ISSO OCORRER A VIRGULA SERA APAGADA
+                    if( evento.keyCode == 188 ){
+                        if( (campo.value.length - (decimais + 1)) > virgPos ){
+                            campo.value = campo.value.replace(',','');
+                        }else if( campo.value.length == 1 ){
+                            campo.value = "0,";//CASO TENHA SIDO DIGITADO Só A VIRGULA A FUNÇÃO COLOCA O ZERO
+                        }
+                    }else {
+                        var arMoeda = campo.value.split(',');//SEPARA O VALOR NA VIRGULA
+                        var inMoeda = montaMilharMoeda( arMoeda[0] );
+                        if( typeof(arMoeda[1]) != 'undefined'){//VERIFICA SE EXISTEM CASAS DECIMAIS DIGITADAS
+                            if( inMoeda.length == 0 ){//
+                                inMoeda = "0";
+                            }
+                            campo.value = inMoeda+","+arMoeda[1].substr(0, decimais);
+                        }else{
+                            campo.value = inMoeda;
+                        }
+                    }
+
+                    //Coloca o menos da frente se o valor for negativo
+                    if( negativo ) {
+                        if( boValorNegativo ) {
+                            campo.value = "-" + campo.value;
+                        }
+                    }
+                } else {
+                    var inMoeda = montaMilharMoeda( campo.value );
+                    campo.value = inMoeda + ',';
+                }
+            } else {
+                campo.value = campo.value.replace(/\^|~|´|`/g,'');
+            }
+        }
+    }
+}
+
+/*-------------------------------------------------------+
 |SÓ PERMITE A ENTRADA DE CARACTERES VÁLIDOS PARA MOEDAS  |
 +-------------------------------------------------------*/
 function validaCharMoeda( campo, evento ){

@@ -334,6 +334,68 @@ if ($segue) {
             Sessao::write('stDescricao', array('stDescricao'=>$obRTesourariaBoletim->roUltimaArrecadacao->obRTesourariaAutenticacao->getDescricao()));
         }
 
+        if ( $request->get('inCodReceita') != '' && $request->get('inCodBemAlienacao') != '') {
+            include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+            include_once CAM_GP_FRO_MAPEAMENTO."TFrotaVeiculoBaixado.class.php";
+            include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoBaixaPatrimonioAlienacao.class.php";
+            
+            $obTContabilidadeLancamentoBaixaPatrimonioAlienacao = new TContabilidadeLancamentoBaixaPatrimonioAlienacao();
+            $obTPatrimonioBem = new TPatrimonioBem();
+            
+            $obTPatrimonioBem->setDado('exercicio', Sessao::getExercicio());
+            $obTPatrimonioBem->recuperaContaContabil($rsContaContabil, " WHERE bem.cod_bem IN (".$request->get('inCodBemAlienacao').") \n ");
+
+            if ( is_null($rsContaContabil->getCampo('cod_plano')) ) {
+                $obErro->setDescricao("Necessário configurar uma Conta Contábil para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+            } elseif ( is_null($rsContaContabil->getCampo('cod_plano_alienacao_ganho'))) {
+                $obErro->setDescricao("Necessário configurar uma Conta de VPA para Alienação para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+            } else if (is_null($rsContaContabil->getCampo('cod_plano_alienacao_perda'))) {
+                $obErro->setDescricao("Necessário configurar uma Conta de VPD para Alienação para o Grupo: ".$rsContaContabil->getCampo('cod_natureza')." - ".$rsContaContabil->getCampo('nom_natureza')." ".$rsContaContabil->getCampo('cod_grupo')." - ".$rsContaContabil->getCampo('nom_grupo'));
+            }
+
+            if ( !$obErro->ocorreu() ) {
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stCodBem'               , $request->get('inCodBemAlienacao') );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodPlano'             , $request->get('inCodPlano')        );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodEntidade'          , $request->get('inCodEntidade')     );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stExercicio'            , Sessao::getExercicio()             );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stDataBaixa'            , date('Y-m-d')                      );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'nuValorAlienacao'       , str_replace(',','.',str_replace('.','',$request->get('nuValor'))) );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodArrecadacao'       , $obRTesourariaBoletim->roUltimaArrecadacao->getCodArrecadacao()   );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stExercicioArrecadacao' , Sessao::getExercicio()  );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stTimestampArrecadacao' , $stTimestampArrecadacao );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodHistorico'         , 968     );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stTipo'                 , 'H'     );
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'boEstorno'              , 'FALSE' );
+                
+                $obErro = $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->insereLancamentosBaixaPatrimonioAlienacao($rsLancamentoBaixa, $boTransacao);
+                
+                // Verifica se o bem a ser alienados, existe algum que seja veiculo, proprio ou de terceiros, para fazer a sua baixa
+                if (!$obErro->ocorreu()){
+                    $obTFrotaVeiculoBaixado  = new TFrotaVeiculoBaixado();
+                    $obTFrotaVeiculoBaixado->setDado('stCodBem', $request->get('inCodBemAlienacao'));
+                    $obTFrotaVeiculoBaixado->recuperaBaixaVeiculoProprio( $rsVeiculoProprio );
+
+                    // Realiza a baixa de somente de veiculos proprios atraves do ultimo timestamp
+                    if( $rsVeiculoProprio->getNumLinhas() > 0 ){
+                        if ($rsVeiculoProprio->getCampo('veiculo_proprio') == 't') {
+                            $obTFrotaVeiculoBaixado->setdado('cod_veiculo', $rsVeiculoProprio->getCampo('cod_veiculo') );
+                            $obTFrotaVeiculoBaixado->setdado('dt_baixa'   , date('Y-m-d') );
+                            $obTFrotaVeiculoBaixado->setdado('motivo'     , 'Lançamento de baixa do patrimônio por Alienação' );
+                            
+                            if ( $request->get('inTipoBaixa') == '2') {
+                                $obTFrotaVeiculoBaixado->setdado('cod_tipo_baixa', '4' );
+                            } elseif ($request->get('inTipoBaixa') == '4') {
+                                $obTFrotaVeiculoBaixado->setdado('cod_tipo_baixa', '7' );
+                            } else {
+                                $obTFrotaVeiculoBaixado->setdado('cod_tipo_baixa', '99' );
+                            }
+                            $obErro = $obTFrotaVeiculoBaixado->inclusao($boTransacao);
+                        }
+                    }
+                }
+            }
+        }
+
         if ( !$obErro->ocorreu() ) {
             if ( $obRTesourariaConfiguracao->getFormaComprovacao() ) {
                 Sessao::write('filtro',$_REQUEST);
@@ -371,6 +433,45 @@ if ($segue) {
             if ($obRTesourariaBoletim->roUltimaArrecadacao->obRTesourariaAutenticacao->getDescricao()) {
                 Sessao::write('stDescricao', array('stDescricao'=>$obRTesourariaBoletim->roUltimaArrecadacao->obRTesourariaAutenticacao->getDescricao()));
             }
+            
+            if ( $request->get('inCodBemAlienacao') != '') {
+                include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+                include_once CAM_GP_FRO_MAPEAMENTO."TFrotaVeiculoBaixado.class.php";
+                include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeLancamentoBaixaPatrimonioAlienacao.class.php";
+
+                $obTContabilidadeLancamentoBaixaPatrimonioAlienacao = new TContabilidadeLancamentoBaixaPatrimonioAlienacao();
+                $obErro = $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->recuperaTodos($rsBemAlienacao, " WHERE cod_arrecadacao = ".$request->get('inCodArrecadacao'));
+
+                if ( !$obErro->ocorreu() ) {
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stCodBem'               , $request->get('inCodBemAlienacao') );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodPlano'             , $request->get('inCodPlano')        );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodEntidade'          , $request->get('inCodEntidade')     );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stExercicio'            , Sessao::getExercicio()             );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stDataBaixa'            , date('Y-m-d')                      );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'nuValorAlienacao'       , $nuValorEstornar                   );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodArrecadacao'       , $request->get('inCodArrecadacao')  );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stExercicioArrecadacao' , $rsBemAlienacao->getCampo('exercicio_arrecadacao') );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stTimestampArrecadacao' , $rsBemAlienacao->getCampo('timestamp_arrecadacao') );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'inCodHistorico'         , 969    );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'stTipo'                 , 'H'    );
+                    $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->setDado( 'boEstorno'              , 'TRUE' );
+                    
+                    $obErro = $obTContabilidadeLancamentoBaixaPatrimonioAlienacao->insereLancamentosBaixaPatrimonioAlienacao($rsLancamentoBaixa, $boTransacao);
+                    
+                     // verifica se o bem é um veiculo e se sofreu baixa.
+                    if ( !$obErro->ocorreu() ){
+                        $obTFrotaVeiculoBaixado  = new TFrotaVeiculoBaixado();
+                        $obTFrotaVeiculoBaixado->setDado('stCodBem', $request->get('inCodBemAlienacao'));
+                        $obErro = $obTFrotaVeiculoBaixado->recuperaUltimaBaixa( $rsUltimaBaixa );
+                        
+                        if ( $rsUltimaBaixa->getNumLinhas() > 0  ) {
+                            $obTFrotaVeiculoBaixado->setDado('cod_veiculo', $rsUltimaBaixa->getCampo('cod_veiculo') );
+                            $obErro = $obTFrotaVeiculoBaixado->exclusao($boTransacao);
+                        }
+                    }
+                }
+            }
+                        
             if ( !$obErro->ocorreu() ) {
                 $stReceitasArrecadadas =  "Arrecadação ".$_REQUEST['inCodArrecadacao'];
 
@@ -432,4 +533,5 @@ if ($segue) {
         break;
     }
 }
+
 ?>

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGODIC.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGODIC.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -74,23 +74,12 @@ class TTGODIC extends Persistente
                             '10' as tipo_registro,
                             divida_consolidada.num_orgao,
                             divida_consolidada.num_unidade,
-                            divida_consolidada.tipo_lancamento, ";
-        if (Sessao::getExercicio() > 2012) {
-            $stSql .= "                    replace(divida_consolidada.nro_lei_autorizacao, '/', '')||divida_consolidada.exercicio as nro_lei_autorizacao, ";
-        } else {
-            $stSql .= "                    replace(divida_consolidada.nro_lei_autorizacao, '/', '') as nro_lei_autorizacao, ";
-        }
-
-        $stSql .= "
+                            divida_consolidada.tipo_lancamento,
+                            replace(divida_consolidada.nro_lei_autorizacao, '/', '')||divida_consolidada.exercicio as nro_lei_autorizacao,
                             to_char(divida_consolidada.dt_lei_autorizacao, 'ddmmyyyy') as dt_lei_autorizacao,
                             sw_cgm.nom_cgm,
 
-                            CASE ";
-        if (Sessao::getExercicio() > 2012) {
-            $stSql .= "                    WHEN sw_cgm.cod_pais IS NOT NULL AND sw_cgm.cod_pais = 1 THEN 3 ";
-        }
-
-        $stSql .= "
+                            CASE WHEN sw_cgm.cod_pais IS NOT NULL AND sw_cgm.cod_pais = 1 THEN 3 
                                  WHEN coalesce(sw_cgm_pessoa_fisica.numcgm, 0)   != 0 THEN 1
                                  WHEN coalesce(sw_cgm_pessoa_juridica.numcgm, 0) != 0 THEN 2
                             END::varchar as tipo_pessoa,

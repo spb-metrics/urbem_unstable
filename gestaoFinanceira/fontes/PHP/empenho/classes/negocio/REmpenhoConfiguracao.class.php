@@ -33,23 +33,13 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Revision: 30668 $
-    $Name$
-    $Author: cleisson $
-    $Date: 2006-07-05 17:51:50 -0300 (Qua, 05 Jul 2006) $
+    $Id: REmpenhoConfiguracao.class.php 65211 2016-05-03 17:21:13Z michel $
 
     * Casos de uso: uc-02.01.23, uc-02.03.01, uc-02.03.03, uc-02.03.04, uc-02.03.05
 */
 
-/*
-$Log$
-Revision 1.8  2006/07/05 20:47:06  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php");
+include_once CAM_GA_ADM_NEGOCIO."RConfiguracaoConfiguracao.class.php";
 
 class REmpenhoConfiguracao extends RConfiguracaoConfiguracao
 {
@@ -85,6 +75,21 @@ var $boOPAutomatica;
 */
 var $boEmitirCarneOp;
 /**
+     * @access Public
+     * @param String $valor
+*/
+var $stDtAutorizacao;
+/**
+     * @access Public
+     * @param String $valor
+*/
+var $stDtEmpenho;
+/**
+     * @access Public
+     * @param String $valor
+*/
+var $stDtLiquidacao;
+/**
     * @access Public
     * @param Object $valor
 */
@@ -116,6 +121,21 @@ function setOPAutomatica($valor) { $this->boOPAutomatica     = $valor; }
 function setEmitirCarneOP($valor) { $this->boEmitirCarneOp     = $valor; }
 /**
      * @access Public
+     * @param Boolean $valor
+*/
+function setDataAutorizacao($valor) { $this->stDtAutorizacao = $valor; }
+/**
+     * @access Public
+     * @param Boolean $valor
+*/
+function setDataEmpenho($valor) { $this->stDtEmpenho = $valor; }
+/**
+     * @access Public
+     * @param Boolean $valor
+*/
+function setDataLiquidacao($valor) { $this->stDtLiquidacao = $valor; }
+/**
+     * @access Public
      * @return String
 */
 function getNumeracao() { return $this->stNumeracao;    	    }
@@ -144,6 +164,21 @@ function getOPAutomatica() { return $this->boOPAutomatica;                }
      * @param Boolean $valor
 */
 function getEmitirCarneOp() { return $this->boEmitirCarneOp;                }
+/**
+     * @access Public
+     * @param Boolean $valor
+*/
+function getDataAutorizacao() { return $this->stDtAutorizacao; }
+/**
+     * @access Public
+     * @param Boolean $valor
+*/
+function getDataEmpenho() { return $this->stDtEmpenho; }
+/**
+     * @access Public
+     * @param Boolean $valor
+*/
+function getDataLiquidacao() { return $this->stDtLiquidacao; }
 
 /**
     * Método Construtor
@@ -151,7 +186,7 @@ function getEmitirCarneOp() { return $this->boEmitirCarneOp;                }
 function REmpenhoConfiguracao()
 {
     parent::RConfiguracaoConfiguracao();
-    $this->setCodModulo              ( 10 );
+    $this->setCodModulo ( 10 );
 }
 
 function salvar($boTransacao = "")
@@ -212,6 +247,33 @@ function salvar($boTransacao = "")
         } else {
             $obErro = parent::incluir($boTransacao);
         }
+
+        $this->setParametro("data_fixa_autorizacao");
+        $this->setValor( $this->getDataAutorizacao());
+        $this->verificaParametro($boExiste, $boTransacao);
+        if ($boExiste) {
+            $obErro = parent::alterar($boTransacao);
+        } else {
+            $obErro = parent::incluir($boTransacao);
+        }
+
+        $this->setParametro("data_fixa_empenho");
+        $this->setValor( $this->getDataEmpenho());
+        $this->verificaParametro($boExiste, $boTransacao);
+        if ($boExiste) {
+            $obErro = parent::alterar($boTransacao);
+        } else {
+            $obErro = parent::incluir($boTransacao);
+        }
+
+        $this->setParametro("data_fixa_liquidacao");
+        $this->setValor( $this->getDataLiquidacao());
+        $this->verificaParametro($boExiste, $boTransacao);
+        if ($boExiste) {
+            $obErro = parent::alterar($boTransacao);
+        } else {
+            $obErro = parent::incluir($boTransacao);
+        }
     }
     $this->obTransacao->fechaTransacao( $boFlagTransacao, $boTransacao, $obErro, $this->obTConfiguracao );
 
@@ -249,6 +311,30 @@ function consultar($boTransacao = "")
                         $obErro = parent::consultar($boTransacao);
                         if (!$obErro->ocorreu()) {
                             $this->setEmitirCarneOP($this->getValor());
+                        }
+
+                        if (!$obErro->ocorreu()) {
+                            $this->setParametro("data_fixa_autorizacao");
+                            $obErro = parent::consultar($boTransacao);
+                            if (!$obErro->ocorreu()) {
+                                $this->setDataAutorizacao($this->getValor());
+                            }
+
+                            if (!$obErro->ocorreu()) {
+                                $this->setParametro("data_fixa_empenho");
+                                $obErro = parent::consultar($boTransacao);
+                                if (!$obErro->ocorreu()) {
+                                    $this->setDataEmpenho($this->getValor());
+                                }
+
+                                if (!$obErro->ocorreu()) {
+                                    $this->setParametro("data_fixa_liquidacao");
+                                    $obErro = parent::consultar($boTransacao);
+                                    if (!$obErro->ocorreu()) {
+                                        $this->setDataLiquidacao($this->getValor());
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 64470 2016-03-01 13:12:50Z jean $
+    $Id: REmpenhoRelatorioEmpenhadoPagoLiquidado.class.php 65377 2016-05-17 17:46:50Z franver $
 
     $Revision: 32880 $
     $Name$
@@ -773,18 +773,9 @@ function geraRecordSet(&$rsRecordSet , $stOrder = "")
             $arRecord[$inCount]['nom_tipo']          = "";
             $arRecord[$inCount]['razao_social']      = 'TOTAL DO PERÍODO';
             
-            if($this->getSituacao() != "3"){
-                $arRecord[$inCount]['valor']         = number_format( ($inTotalGeral + $flValorOutroPeriodo), 2, ',', '.' );
-                $arRecord[$inCount]['valor_anulado'] = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
-                $arRecord[$inCount]['saldo']         = number_format( ($inTotalSaldo + $flSaldoOutroPeriodo), 2, ',', '.' );
-            }else{
-                $obFEmpenhoEmpenhadoPagoLiquidado->recuperaLiquidadoTotal( $rsLiquidadoTotal );
-                $obFEmpenhoEmpenhadoPagoLiquidado->recuperaLiquidadoAnuladoTotal( $rsLiquidadoTotalAnulado );
-                
-                $arRecord[$inCount]['valor']         = number_format( $rsLiquidadoTotal->getCampo('vl_total'), 2, ',', '.' );
-                $arRecord[$inCount]['valor_anulado'] = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
-                $arRecord[$inCount]['saldo']         = number_format( $rsLiquidadoTotal->getCampo('vl_total') - $rsLiquidadoTotalAnulado->getCampo('vl_total_anulado'), 2, ',', '.' );
-            }
+            $arRecord[$inCount]['valor']         = number_format( ($inTotalGeral + $flValorOutroPeriodo), 2, ',', '.' );
+            $arRecord[$inCount]['valor_anulado'] = number_format( ($inTotalAnulado + $flValorAnuladoOutroPeriodo), 2, ',', '.' );
+            $arRecord[$inCount]['saldo']         = number_format( ($inTotalSaldo + $flSaldoOutroPeriodo), 2, ',', '.' );
             
             $arRecord[$inCount]['data']              = "";
             $arRecord[$inCount]['ordem']             = "";

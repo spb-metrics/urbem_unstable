@@ -34,30 +34,30 @@
 
     * Casos de uso: uc-03.05.21
 
-    $Id: OCManterHomologacao.php 63865 2015-10-27 13:55:57Z franver $
+    $Id: OCManterHomologacao.php 65273 2016-05-09 18:26:23Z michel $
 
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/Table.class.php';
-include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoHomologacao.class.php" );
-include_once ( CAM_GP_COM_MAPEAMENTO."TComprasJulgamentoItem.class.php" );
-include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoJustificativaRazao.class.php" );
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoHomologacao.class.php";
+include_once CAM_GP_COM_MAPEAMENTO."TComprasJulgamentoItem.class.php";
+include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoJustificativaRazao.class.php";
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 function configuracoesIniciais()
 {
     Sessao::write('itensHomologacao', array());
 }
 
-function carregaItensBanco()
+function carregaItensBanco(Request $request)
 {
-    include_once(TLIC."TLicitacaoEdital.class.php");
+    include_once TLIC."TLicitacaoEdital.class.php";
     $obTLicitacaoEdital = new TLicitacaoEdital();
-    $obTLicitacaoEdital->setDado('cod_licitacao', $_REQUEST["inCodLicitacao"]);
-    $obTLicitacaoEdital->setDado('exercicio', $_REQUEST["stExercicioLicitacao"]);
+    $obTLicitacaoEdital->setDado('cod_licitacao', $request->get("inCodLicitacao"));
+    $obTLicitacaoEdital->setDado('exercicio', $request->get("stExercicioLicitacao"));
     $boRetorno = true;
 
     $obTLicitacaoEdital->recuperaEditalSuspender($rsEdital);
@@ -68,12 +68,12 @@ function carregaItensBanco()
 
         $obTLicitacaoHomologacao = new TLicitacaoHomologacao;
 
-        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_licitacao" , $_GET["inCodLicitacao"]       );
-        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_modalidade", $_GET["inCodModalidade"]      );
-        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_entidade"  , $_GET["inCodEntidade"]        );
-        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->obTLicitacaoCotacaoLicitacao->obTLicitacaoLicitacao->setDado( "exercicio", $_GET["stExercicioLicitacao"] );
+        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_licitacao" , $request->get("inCodLicitacao")       );
+        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_modalidade", $request->get("inCodModalidade")      );
+        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->setDado( "cod_entidade"  , $request->get("inCodEntidade")        );
+        $obTLicitacaoHomologacao->obTLicitacaoAdjudicacao->obTLicitacaoCotacaoLicitacao->obTLicitacaoLicitacao->setDado( "exercicio", $request->get("stExercicioLicitacao") );
         $obTLicitacaoHomologacao->recuperaItensComStatus( $rsItens );
-        
+
         $inId = $inHomologados = $inAutorizados = 0;
         $itensHomologacao = array();
 
@@ -102,7 +102,7 @@ function carregaItensBanco()
                 $itensHomologacao[$inId]['justificativa_anulacao'] = $item["justificativa_anulacao"];
                 $itensHomologacao[$inId]['status']                 = $item["status"];
 
-                include_once ( CAM_GP_COM_MAPEAMENTO . 'TComprasMapaItem.class.php' );
+                include_once CAM_GP_COM_MAPEAMENTO.'TComprasMapaItem.class.php';
                 $obTComprasMapaItem = new TComprasMapaItem();
                 $itemComplemento = "";
                 $obTComprasMapaItem->setDado('cod_mapa'     , $item["cod_mapa"]);
@@ -127,7 +127,7 @@ function carregaItensBanco()
                 $itensHomologacao[$inId]['boAlterado']             = "false";
                 $itensHomologacao[$inId]['boAnuladoBanco']         = ( $item["num_adjudicacao_anulada"] != "" ) ? true : false;
 
-                $itensHomologacao[$inId]['valorUnitarioReferencia']             = $item["vl_unitario_referencia"];
+                $itensHomologacao[$inId]['valorUnitarioReferencia'] = $item["vl_unitario_referencia"];
 
                 // se ja estiver todos autorizados, nao pode alterar nada
                 if ($item['status'] == "Homologado e Autorizado") {
@@ -228,7 +228,6 @@ function montaSpnItens()
     $table = new Table;
     $table->setRecordset   ( $rsItens );
     $table->setSummary     ( 'Itens'  );
-    //$table->setConditional ( true , "#E4E4E4" );
 
     if ( $rsItens->getNumLinhas() >= 5 ) {
         $table->setHeadFixed  (true);
@@ -243,11 +242,6 @@ function montaSpnItens()
     $table->Head->addCabecalho ( 'Status'           , 10 );
 
     $boTodosAutorizados = Sessao::read('boTodosAutorizados');
-    /*
-    if (!$boTodosAutorizados) {
-        $table->Head->addCabecalho( 'Selecione'        , 1 );
-    }
-    */
 
     $table->Body->addCampo ( "[codItem] - [descricaoItem]<br>[complemento]" );
     $table->Body->addCampo ( "quantidade"              , "D" );
@@ -255,18 +249,6 @@ function montaSpnItens()
     $table->Body->addCampo ( "valorCotacao"            , "D" );
     $table->Body->addCampo ( "nomFornecedor"                 );
     $table->Body->addCampo ( "status"                  , "C" );
-    
-    /*
-    $obRdnHomologarItem = new Radio();
-    $obRdnHomologarItem->setValue( "inId" );
-    $obRdnHomologarItem->setName( "boHomologarItemInId" );
-    $obRdnHomologarItem->setNull( false );
-    $obRdnHomologarItem->obEvento->setOnClick("montaParametrosGET( 'montaHomologacao', 'boHomologarItemInId' );");
-
-    if (!$boTodosAutorizados) {
-        $table->Body->addComponente( $obRdnHomologarItem, false );
-    }
-    */
 
     $table->montaHTML(true);
     $stHtml = $table->getHTML();
@@ -469,8 +451,8 @@ function cancelarAnularItem()
 
 function limpaDocumento()
 {
-    //$stJs .= "document.getElementById('stCodDocumento').value = '';\n";
-    //$stJs .= "document.getElementById('stCodDocumentoTxt').value = '';\n";
+    $stJs = "";
+
     return $stJs;
 }
 
@@ -491,7 +473,7 @@ function alterarStatusItens($stStatus)
 
 function validaLicitacao($inCodLicitacao, $inCodModalidade, $inCodEntidade, $stExercicio)
 {
-    include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoEdital.class.php");
+    include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoEdital.class.php";
     $obTLicitacaoEdital = new TLicitacaoEdital;
     $boErro    = false;
     $stFiltro  = " WHERE cod_licitacao       =  ".$inCodLicitacao;
@@ -502,22 +484,28 @@ function validaLicitacao($inCodLicitacao, $inCodModalidade, $inCodEntidade, $stE
     $obTLicitacaoEdital->recuperaTodos($rsEdital, $stFiltro);
 
     if ($rsEdital->getNumLinhas() > 0) {
-        include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoEditalSuspenso.class.php");
+        include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoEditalSuspenso.class.php";
         $obTLicitacaoEditalSuspenso = new TLicitacaoEditalSuspenso;
         $obTLicitacaoEditalSuspenso->setDado('num_edital' , $rsEdital->getCampo('num_edital') );
         $obTLicitacaoEditalSuspenso->setDado('exercicio'  , $rsEdital->getCampo('exercicio')  );
         $obTLicitacaoEditalSuspenso->recuperaPorChave($rsEditalSuspenso);
 
         if ($rsEditalSuspenso->getNumLinhas() <= 0) {
-            include_once(CAM_GP_LIC_MAPEAMENTO."TLicitacaoEditalImpugnado.class.php");
+            include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoEditalImpugnado.class.php";
             $obTLicitacaoEditalImpugnado = new TLicitacaoEditalImpugnado;
             $stFiltro  = " WHERE num_edital =  ".$rsEdital->getCampo('num_edital');
             $stFiltro .= "   AND exercicio  = '".$rsEdital->getCampo('exercicio')."'";
             $obTLicitacaoEditalImpugnado->recuperaTodos($rsEditalImpugnado, $stFiltro);
 
             if ($rsEditalImpugnado->getNumLinhas() > 0) {
-                $boErro = true;
-                echo "alertaAviso('Edital ".$rsEdital->getCampo('num_edital')."/".$rsEdital->getCampo('exercicio')." está impugnado!', 'form','erro','".Sessao::getId()."');";
+                include_once TLIC."TLicitacaoAnulacaoImpugnacaoEdital.class.php";
+                $obTLicitacaoAnulacaoImpugnacaoEdital = new TLicitacaoAnulacaoImpugnacaoEdital;
+                $obTLicitacaoAnulacaoImpugnacaoEdital->recuperaTodos($rsEditalImpugnadoAnulacao, $stFiltro);
+
+                if ($rsEditalImpugnadoAnulacao->getNumLinhas() < 1) {
+                    $boErro = true;
+                    echo "alertaAviso('Edital ".$rsEdital->getCampo('num_edital')."/".$rsEdital->getCampo('exercicio')." está impugnado!', 'form','erro','".Sessao::getId()."');";
+                }
             }
         } else {
             $boErro = true;
@@ -527,7 +515,6 @@ function validaLicitacao($inCodLicitacao, $inCodModalidade, $inCodEntidade, $stE
     if ($boErro == true) {
             $js  = limpaSessao();
             $js .= limpaObjeto();
-            $js .= limpaDocumento();
             $js .= '$("spnAutorizacaoEmpenho").innerHTML = "";';
     } else {
         $js  = preencheObjeto();
@@ -537,11 +524,16 @@ function validaLicitacao($inCodLicitacao, $inCodModalidade, $inCodEntidade, $stE
     return $js;
 }
 
-function sugereData()
+function sugereData(Request $request)
 {
+    $stJs = "";
+
     $boSugerirData = true;
+
+    $itensHomologacao = is_array( Sessao::read('itensHomologacao') ) ?  Sessao::read('itensHomologacao') : array();
+
     $rsItens = new RecordSet;
-    $rsItens->preenche(  Sessao::read('itensHomologacao') );
+    $rsItens->preenche( $itensHomologacao );
     $rsItens->addFormatacao('quantidade', 'NUMERIC_BR_4');
 
     while ( !$rsItens->eof() ) {
@@ -553,11 +545,11 @@ function sugereData()
 
     if ($rsItens->getNumLinhas() >= 1) {
         if ($boSugerirData) {
-            include_once ( CAM_GP_LIC_MAPEAMENTO."TLicitacaoAdjudicacao.class.php" );
-            $stFiltro = " WHERE cod_licitacao = ".$_REQUEST["inCodLicitacao"]."
-                            AND cod_modalidade = ".$_REQUEST["inCodModalidade"]."
-                            AND cod_entidade = ".$_REQUEST["inCodEntidade"]."
-                            AND exercicio_licitacao = '".$_REQUEST["stExercicioLicitacao"]."'";
+            include_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoAdjudicacao.class.php";
+            $stFiltro = " WHERE cod_licitacao       = ".$request->get("inCodLicitacao")."
+                            AND cod_modalidade      = ".$request->get("inCodModalidade")."
+                            AND cod_entidade        = ".$request->get("inCodEntidade")."
+                            AND exercicio_licitacao = '".$request->get("stExercicioLicitacao")."'";
 
             $obTLicitacaoAdjudicacao = new TLicitacaoAdjudicacao();
             $obTLicitacaoAdjudicacao->recuperaTodos($rsAdjudicacao, $stFiltro);
@@ -567,10 +559,10 @@ function sugereData()
             $dtDataHomologacao = date('d/m/Y', strtotime($rsAdjudicacao->getCampo("timestamp")));
             $dtHoraHomologacao = date('H:i', strtotime($rsAdjudicacao->getCampo("timestamp")));
         } else {
-            $stFiltro = " WHERE cod_licitacao = ".$_REQUEST["inCodLicitacao"]."
-                            AND cod_modalidade = ".$_REQUEST["inCodModalidade"]."
-                            AND cod_entidade = ".$_REQUEST["inCodEntidade"]."
-                            AND exercicio_licitacao = '".$_REQUEST["stExercicioLicitacao"]."'";
+            $stFiltro = " WHERE cod_licitacao       = ".$request->get("inCodLicitacao")."
+                            AND cod_modalidade      = ".$request->get("inCodModalidade")."
+                            AND cod_entidade        = ".$request->get("inCodEntidade")."
+                            AND exercicio_licitacao = '".$request->get("stExercicioLicitacao")."'";
 
             $obTLicitacaoHomologacao = new TLicitacaoHomologacao();
             $obTLicitacaoHomologacao->recuperaTodos($rsHomologacao, $stFiltro);
@@ -580,30 +572,30 @@ function sugereData()
             $dtDataHomologacao = date('d/m/Y', strtotime($rsHomologacao->getCampo("timestamp")));
             $dtHoraHomologacao = date('H:i', strtotime($rsHomologacao->getCampo("timestamp")));
         }
-        $stJs  = "jQuery('#stDtHomologacao').val('$dtDataHomologacao');\n";
-        $stJs .= "jQuery('#stHoraHomologacao').val('$dtHoraHomologacao');\n";
+        $stJs .= "jQuery('#stDtHomologacao').val('".$dtDataHomologacao."');\n";
+        $stJs .= "jQuery('#stHoraHomologacao').val('".$dtHoraHomologacao."');\n";
     }
 
     return $stJs;
 }
 
-function buscaJustificativaRazao()
+function buscaJustificativaRazao(Request $request)
 { 
     $obTLicitacaoJustificativaRazao = new TLicitacaoJustificativaRazao();
-    $obTLicitacaoJustificativaRazao->setDado('exercicio'         , $_REQUEST["stExercicioLicitacao"]   );
-    $obTLicitacaoJustificativaRazao->setDado('cod_entidade'      , $_REQUEST["inCodEntidade"]   );
-    $obTLicitacaoJustificativaRazao->setDado('cod_modalidade'    , $_REQUEST["inCodModalidade"]   );
-    $obTLicitacaoJustificativaRazao->setDado('cod_licitacao'     , $_REQUEST["inCodLicitacao"] );
+    $obTLicitacaoJustificativaRazao->setDado('exercicio'         , $request->get("stExercicioLicitacao") );
+    $obTLicitacaoJustificativaRazao->setDado('cod_entidade'      , $request->get("inCodEntidade") );
+    $obTLicitacaoJustificativaRazao->setDado('cod_modalidade'    , $request->get("inCodModalidade") );
+    $obTLicitacaoJustificativaRazao->setDado('cod_licitacao'     , $request->get("inCodLicitacao") );
     $obTLicitacaoJustificativaRazao->recuperaPorChave($rsJustificativaRazao);
-    
+
     $stJustificativa = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('justificativa')));
     $stRazao         = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('razao')));
     $stFundamentacao = preg_replace('/[\r\n]+/', "\\n", addslashes($rsJustificativaRazao->getCampo('fundamentacao_legal')));
 
     if ( $rsJustificativaRazao->getNumLinhas() > 0 ) {
-        $stJs  = "jQuery('#stJustificativa').val('$stJustificativa');\n";
-        $stJs .= "jQuery('#stRazao').val('$stRazao');\n";
-        $stJs .= "jQuery('#stFundamentacao').val('$stFundamentacao');\n";
+        $stJs  = "jQuery('#stJustificativa').val(\"".$stJustificativa."\");\n";
+        $stJs .= "jQuery('#stRazao').val(\"".$stRazao."\");\n";
+        $stJs .= "jQuery('#stFundamentacao').val(\"".$stFundamentacao."\");\n";
     } else {
         $stJs  = "jQuery('#stJustificativa').val('');\n";
         $stJs .= "jQuery('#stRazao').val('');\n";
@@ -618,21 +610,20 @@ switch ($stCtrl) {
         $js = montaSpnItens();
     break;
     case "carregaItensBanco":
-        if ($_GET["inCodLicitacao"]) {
-            if (carregaItensBanco()) {
-                $inCodLicitacao  = $_REQUEST['inCodLicitacao'];
-                $inCodModalidade = $_REQUEST['inCodModalidade'];
-                $inCodEntidade   = $_REQUEST['inCodEntidade'];
-                $stExercicio     = $_REQUEST['stExercicioLicitacao'];
+        if ($request->get("inCodLicitacao")) {
+            if (carregaItensBanco($request)) {
+                $inCodLicitacao  = $request->get('inCodLicitacao');
+                $inCodModalidade = $request->get('inCodModalidade');
+                $inCodEntidade   = $request->get('inCodEntidade');
+                $stExercicio     = $request->get('stExercicioLicitacao');
                 $js = isset($js) ? $js : "";
                 $js .= validaLicitacao($inCodLicitacao, $inCodModalidade, $inCodEntidade, $stExercicio);
-                $js .= sugereData();
-                $js .= buscaJustificativaRazao();
+                $js .= sugereData($request);
+                $js .= buscaJustificativaRazao($request);
             }
         } else {
             $js  = limpaSessao();
             $js .= limpaObjeto();
-            $js .= limpaDocumento();
             $js .= '$("spnAutorizacaoEmpenho").innerHTML = "";';
         }
         $js .= montaspnHomologacao();
@@ -642,7 +633,7 @@ switch ($stCtrl) {
         $js = montaSpnItens();
     break;
     case "montaHomologacao":
-        $js = montaspnHomologacao( $_GET['boHomologarItemInId'] );
+        $js = montaspnHomologacao( $request->get('boHomologarItemInId') );
     break;
     case "limpaSpans":
         $js  = limpaSessao();
@@ -652,19 +643,19 @@ switch ($stCtrl) {
         $js .= '$("spnAutorizacaoEmpenho").innerHTML = "";';
     break;
     case "homologarItem":
-        $js  = homologarItem( $_GET['boHomologarItemInId'] );
+        $js  = homologarItem( $request->get('boHomologarItemInId') );
         $js .= verificaAutorizacao();
         $js .= proximoItem();
     break;
     case "cancelarHomologacao":
-        $js  = cancelarHomologacao( $_GET['boHomologarItemInId'] );
+        $js  = cancelarHomologacao( $request->get('boHomologarItemInId') );
         $js .= proximoItem();
     break;
     case "montaAnularItem":
         $js = montaAnularItem();
     break;
     case "anularItem":
-        $js  = anularItem( $_GET['boHomologarItemInId'], $_GET['stJustificativa'], $_GET['boRevogado'] );
+        $js  = anularItem( $request->get('boHomologarItemInId'), $request->get('stJustificativa'), $request->get('boRevogado') );
         $js .= proximoItem();
     break;
     case "cancelarAnularItem":

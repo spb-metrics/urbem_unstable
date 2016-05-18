@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RARRPagamento.class.php 64995 2016-04-18 18:40:22Z evandro $
+    * $Id: RARRPagamento.class.php 65266 2016-05-06 20:24:57Z evandro $
 
    * Casos de uso: uc-05.03.10
 */
@@ -671,7 +671,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
             $arAcrescimos = array();
 
             while ( !$rsConsultaCredito->Eof() ) {
-                $stMulta = $rsConsultaCredito->getCampo("multa_completo");
+                $stMulta = $rsConsultaCredito->getCampo("multa_completo");                
                 $arMulta = explode( ";", $stMulta );
                 $inZ = 1;
                 if ($arMulta[0] > 0.00) {
@@ -700,13 +700,23 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                 }
 
                 $stJuros = $rsConsultaCredito->getCampo("juros_completo");
-                $arJuros = explode( ";", $stJuros );
+                $arJuros = explode( ";", $stJuros );                
                 $inZ = 1;
                 if ($arJuros[0] > 0.00) {
-                    while ( $inZ < count( $arJuros ) ) { //loop para mais de uma multa
+                    while ( $inZ < count( $arJuros ) ) { //loop para mais de um juros
                         $flValorJuros = $arJuros[$inZ];
-
-                        $nuValorPagamentoJuros = round( ($flValorJuros * $flValorAcrescimoPercent) / 100, 2 );
+                       
+                        $nuValorPagamentoJuros = round( ($flValorJuros * $flValorAcrescimoPercent) / 100, 8 );
+                        
+                        //validacao para diferenca juros
+                        $nuDiferencaJuros = $flValorFinal + $nuValorPagamentoJuros;                                                                        
+                        $nuDiferencaJuros = $this->getValorPagamento() - $nuDiferencaJuros;
+                        $nuDiferencaJuros = round($nuDiferencaJuros,8);
+                        //caso o valor for negativo retirar essa diferença
+                        if ($nuDiferencaJuros < 0.00) {
+                            $nuDiferencaJuros = ($nuDiferencaJuros*-1);
+                            $nuValorPagamentoJuros = $nuValorPagamentoJuros - $nuDiferencaJuros;
+                        }
                         $arAcrescimos[$inX]["juros"][$inZ/3] += $nuValorPagamentoJuros;
 
                         $this->obTARRPagamentoAcrescimo->setDado( "numeracao"            , $this->obRARRCarne->getNumeracao()     );
@@ -719,7 +729,6 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                         $obErro = $this->obTARRPagamentoAcrescimo->inclusao( $boTransacao );
                         if ( $obErro->ocorreu() )
                             return $obErro;
-
                         
                         $nuTotal += $this->obTARRPagamentoAcrescimo->getDado("valor");
 
@@ -732,7 +741,7 @@ function efetuarPagamentoManual($boTransacao = "", $boPagamentoAutomatico = FALS
                 $inZ = 1;
 
                 if ($arCorrecao[0] > 0.00) {
-                    while ( $inZ < count( $arCorrecao ) ) { //loop para mais de uma multa
+                    while ( $inZ < count( $arCorrecao ) ) { //loop para mais de uma correcao
                         $flValorCorrecao = $arCorrecao[$inZ];
                         $nuValorPagamentoCorrecao = round( ($flValorCorrecao * $flValorAcrescimoPercent) / 100, 2 );
                         $arAcrescimos[$inX]["correcao"][$inZ/3] += $nuValorPagamentoCorrecao;

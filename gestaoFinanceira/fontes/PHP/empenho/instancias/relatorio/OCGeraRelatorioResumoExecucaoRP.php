@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCGeraRelatorioResumoExecucaoRP.php 64554 2016-03-14 17:05:27Z michel $
+    $Id: OCGeraRelatorioResumoExecucaoRP.php 65308 2016-05-11 20:00:27Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -54,6 +54,7 @@ $obListaMPDF->setCodModulo( 10 );
 $obListaMPDF->setCodEntidades($inCodEntidades);
 $obListaMPDF->setDataInicio($stDataInicial);
 $obListaMPDF->setDataFinal($stDataFinal);
+$obListaMPDF->setTipoSaida('D');
 
 if($arDados['rsAssinaturas'])
     $obListaMPDF->addAssinatura($arDados['rsAssinaturas']);
@@ -131,7 +132,8 @@ if(is_array($arTotal) && count($arTotal) > 0){
     $obListaMPDF->addCabecalho("A PAGAR LIQUIDADO"        , "C", "10%", 1, 1, "", "FALSE", "", "border_right"            );
     $obListaMPDF->addCabecalho("ANULADO"                  , "C", "10%", 1, 1, "", "FALSE", "", "border_left"             );
     $obListaMPDF->addCabecalho("LIQUIDADO"                , "C", "10%", 1, 1, "", "FALSE", "", ""                        );
-    $obListaMPDF->addCabecalho("PAGO"                     , "C", "10%", 1, 1, "", "FALSE", "", "border_left"             );
+    $obListaMPDF->addCabecalho("PAGO"                     , "C", "10%", 1, 1, "", "FALSE", "", "border_right"            );
+    $obListaMPDF->addCabecalho("EMPENHADO"                , "C", "10%", 1, 1, "", "FALSE", "", "border_left"             );
     $obListaMPDF->addCabecalho("A LIQUIDAR"               , "C", "10%", 1, 1, "", "FALSE", "", ""                        );
     $obListaMPDF->addCabecalho("A PAGAR LIQUIDADO"        , "C", "10%", 1, 1, "", "FALSE", "", "border_right"            );
 

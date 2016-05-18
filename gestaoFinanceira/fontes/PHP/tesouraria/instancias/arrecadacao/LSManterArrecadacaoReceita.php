@@ -219,6 +219,7 @@ $obLista->ultimaAcao->addCampo( "&nuValor"                , "vl_arrecadacao"    
 $obLista->ultimaAcao->addCampo( "&nuValorEstornado"       , "vl_estornado"          );
 $obLista->ultimaAcao->addCampo( "&nuValorDeducao"         , "vl_deducao"            );
 $obLista->ultimaAcao->addCampo( "&nuValorDeducaoEstornado", "vl_deducao_estornado"  );
+$obLista->ultimaAcao->addCampo( "&inCodBemAlienacao"      , "cod_bem"               );
 
 $obLista->ultimaAcao->setLink ( $stCaminho.$pgProx."?stAcao=".$stAcao."&".Sessao::getId().$stLink );
 

@@ -33,7 +33,7 @@
     * @author Desenvolvedor: Franver Sarmento de Moraes
 
     * @ignore
-    * $Id: ARP.inc.php 65190 2016-04-29 19:36:51Z michel $
+    * $Id: ARP.inc.php 65220 2016-05-03 21:30:22Z michel $
 
 */
 
@@ -53,11 +53,7 @@ $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2)
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-if (Sessao::getExercicio() > 2013) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(670);
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(430);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(670);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_sequencial");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

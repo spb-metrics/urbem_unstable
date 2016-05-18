@@ -23,7 +23,7 @@
 /*
     * @author Analista:      Dagiane Vieira
     * @author Desenvolvedor: Evandro Melos
-    $Id: $
+    $Id: FTCEMGFolhaPagamentoPessoa.plsql 65246 2016-05-04 18:16:04Z michel $
 */
 CREATE OR REPLACE FUNCTION tcemg.folha_pagamento_pessoa(VARCHAR, INTEGER) RETURNS SETOF RECORD AS $$
 DECLARE 
@@ -31,56 +31,81 @@ DECLARE
     stMes         ALIAS FOR $2;
     stSql         VARCHAR;
     stSqlAux      VARCHAR;
-    stChave       VARCHAR;  
+    stChave       VARCHAR;
     stChaveAux    VARCHAR;
     reRegistro    RECORD;
     reRegistroAux RECORD;
-    
+
 BEGIN
-    stSql := '  
+    stSql := '
+    SELECT *
+      FROM (
       SELECT 10 AS tipo_registro
            , CASE WHEN sw_cgm.cod_pais BETWEEN 0 AND 1
                   THEN 1
                   ELSE 3
               END AS tipo_documento
-           , sw_cgm_pessoa_fisica.cpf
+           , sw_cgm_pessoa_fisica.cpf AS nro_documento
            , sem_acentos(sw_cgm.nom_cgm) AS nome
            , UPPER(COALESCE(sw_cgm_pessoa_fisica.sexo,''M'')) as sexo
            , TO_CHAR(sw_cgm_pessoa_fisica.dt_nascimento,''ddmmyyyy'') as dt_nascimento
            , ''''::VARCHAR as tipo_cadastro
            , ''''::VARCHAR AS justificativa_alteracao
            , sw_cgm.numcgm
-        FROM SW_CGM 
+        FROM SW_CGM
   INNER JOIN sw_cgm_pessoa_fisica
           ON SW_CGM.numcgm = sw_cgm_pessoa_fisica.numcgm
   INNER JOIN (
               SELECT servidor.numcgm
                 FROM pessoal.servidor
                UNION
-              SELECT pensionista.numcgm 
+              SELECT pensionista.numcgm
                 FROM pessoal.pensionista
-             ) as pessoal 
+             ) as pessoal
           ON pessoal.numcgm = SW_CGM.numcgm
    LEFT JOIN tcemg.arquivo_folha_pessoa
           ON SW_CGM.numcgm = arquivo_folha_pessoa.numcgm
-         AND arquivo_folha_pessoa.cpf = sw_cgm_pessoa_fisica.cpf
-         AND arquivo_folha_pessoa.nome = sw_cgm.nom_cgm
-         AND arquivo_folha_pessoa.sexo = sw_cgm_pessoa_fisica.sexo
-         AND arquivo_folha_pessoa.dt_nascimento = sw_cgm_pessoa_fisica.dt_nascimento
        WHERE SW_CGM.numcgm > 0
+
+       UNION
+
+      SELECT 10 AS tipo_registro
+           , 2 AS tipo_documento
+           , sw_cgm_pessoa_juridica.cnpj AS nro_documento
+           , sem_acentos(sw_cgm.nom_cgm) AS nome
+           , '''' as sexo
+           , '''' as dt_nascimento
+           , ''''::VARCHAR as tipo_cadastro
+           , ''''::VARCHAR AS justificativa_alteracao
+           , sw_cgm.numcgm
+        FROM tcemg.teto_remuneratorio
+  INNER JOIN orcamento.entidade
+          ON entidade.exercicio    = teto_remuneratorio.exercicio
+         AND entidade.cod_entidade = teto_remuneratorio.cod_entidade
+  INNER JOIN sw_cgm
+          ON sw_cgm.numcgm = entidade.numcgm
+  INNER JOIN sw_cgm_pessoa_juridica
+          ON sw_cgm.numcgm = sw_cgm_pessoa_juridica.numcgm
+       WHERE teto_remuneratorio.vigencia <= last_day(TO_DATE(''01/'||stMes||'/'||stExercicio||''',''dd/mm/yyyy''))
+         AND teto_remuneratorio.vigencia = ( SELECT MAX(TR.vigencia)
+                                                   FROM tcemg.teto_remuneratorio AS TR
+                                                  WHERE TR.vigencia <= last_day(TO_DATE(''01/'||stMes||'/'||stExercicio||''',''dd/mm/yyyy''))
+                                                    AND TR.cod_entidade = teto_remuneratorio.cod_entidade
+                                               )
+           ) AS sw_cgm
     ORDER BY sw_cgm.numcgm
     ';
 
     stSqlAux := ' SELECT * FROM tcemg.arquivo_folha_pessoa ORDER BY numcgm';
-    
+
     FOR reRegistro IN EXECUTE stSql LOOP
-        
+
         IF EXISTS (SELECT 1 FROM tcemg.arquivo_folha_pessoa) THEN
-            
+
             FOR reRegistroAux IN EXECUTE stSqlAux LOOP
-                
-                stChave    := reRegistro.numcgm::varchar||reRegistro.cpf::varchar||reRegistro.nome::varchar||reRegistro.sexo::varchar||reRegistro.dt_nascimento;
-                stChaveAux := reRegistroAux.numcgm::varchar||reRegistroAux.cpf::varchar||reRegistroAux.nome::varchar||reRegistroAux.sexo::varchar||TO_CHAR(reRegistroAux.dt_nascimento,'ddmmyyyy');                
+
+                stChave    := reRegistro.numcgm::varchar||reRegistro.nome::varchar;
+                stChaveAux := reRegistroAux.numcgm::varchar||reRegistroAux.nome::varchar;                
                 --Verificando se o registro sofreu alteracao
                 IF stChave != stChaveAux THEN
                     --Verifica se o registro é novo ou sofreu alteracao em algum campo
@@ -90,12 +115,9 @@ BEGIN
                             SET   numcgm        = reRegistro.numcgm
                                 , ano           = stExercicio
                                 , mes           = stMes
-                                , cpf           = reRegistro.cpf
                                 , nome          = reRegistro.nome
-                                , sexo          = reRegistro.sexo
-                                , dt_nascimento = TO_DATE(reRegistro.dt_nascimento,'ddmmyyyy')
                                 , alterado      = true
-                        WHERE numcgm = reRegistro.numcgm;                        
+                        WHERE numcgm = reRegistro.numcgm;
                         --Alterando tipo de registro 'Alteracao'
                         reRegistro.tipo_cadastro := '2';
                         reRegistro.justificativa_alteracao := 'Alteração de Cadastro';
@@ -107,10 +129,7 @@ BEGIN
                                 VALUES( reRegistro.numcgm
                                         ,stExercicio
                                         ,stMes
-                                        ,reRegistro.cpf
                                         ,reRegistro.nome
-                                        ,reRegistro.sexo
-                                        ,TO_DATE(reRegistro.dt_nascimento,'ddmmyyyy')
                                         ,false );
                             --Alterando tipo de registro 'Novo'
                             reRegistro.tipo_cadastro := '1';
@@ -119,7 +138,7 @@ BEGIN
                     END IF;
                 --Caso as chaves forem iguais não envia nada para o arquivo nem no resultado da consulta
                 ELSE
-                    IF EXISTS(SELECT 1 FROM tcemg.arquivo_folha_pessoa WHERE numcgm = reRegistroAux.numcgm AND ano = stExercicio AND mes = stMes ) THEN
+                    IF EXISTS( SELECT 1 FROM tcemg.arquivo_folha_pessoa WHERE numcgm = reRegistroAux.numcgm AND ano = stExercicio AND mes = stMes ) THEN
                         IF reRegistroAux.alterado = true THEN
                             reRegistro.tipo_cadastro := '2';
                             reRegistro.justificativa_alteracao := 'Alteração de Cadastro';
@@ -139,10 +158,7 @@ BEGIN
                 VALUES( reRegistro.numcgm
                         ,stExercicio
                         ,stMes
-                        ,reRegistro.cpf
                         ,reRegistro.nome
-                        ,reRegistro.sexo
-                        ,TO_DATE(reRegistro.dt_nascimento,'ddmmyyyy') 
                         ,false );
             --Alterando tipo de registro 'Novo'
             reRegistro.tipo_cadastro := '1';

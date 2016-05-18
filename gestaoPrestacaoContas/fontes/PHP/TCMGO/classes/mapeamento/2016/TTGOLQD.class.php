@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOLQD.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOLQD.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -112,19 +112,10 @@ class TTGOLQD extends Persistente
             --   ,  nota_liquidacao.observacao as especificacaoliquidacao
                   , 'LIQUIDACAO CFE EMPENHO' as especificacaoliquidacao
                ,  LPAD(REPLACE(SUM(nota_liquidacao_item.vl_total)::varchar,'.',','),13,'0') AS vl_liquidado
-               , ";
-        if (Sessao::getExercicio() > '2011') {
-            $stSql.= "'Fabio Oliveira de Lima' AS nom_contador
+               ,  'Fabio Oliveira de Lima' AS nom_contador
 
                       ,'41880854104' AS cpf_resp
-                      , ";
-        } else {
-            $stSql.= "sem_acentos(BTRIM(sw_cgm.nom_cgm)) AS nom_contador
-                     , ";
-        }
-
-        $stSql.= "
-                 recurso.cod_fonte AS codFonteRecurso
+                      , recurso.cod_fonte AS codFonteRecurso
                , despesa.vl_original AS vlDespFR
                , '' AS branco
                , 0  AS  numero_sequencial
@@ -207,7 +198,7 @@ class TTGOLQD extends Persistente
                ,  empenho.cod_empenho
                ,  dtempenho
                ,  dtliquidacao
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  tipoliquidacao
                ,  especificacaoliquidacao
                ,  empenho.cod_entidade
@@ -368,7 +359,7 @@ class TTGOLQD extends Persistente
                ,  empenho.cod_empenho
                ,  dtempenho
                ,  dtliquidacao
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  empenho.cod_entidade
                ,  nota_liquidacao.exercicio_empenho
                ,  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota
@@ -453,21 +444,13 @@ class TTGOLQD extends Persistente
                ,  CASE WHEN sw_cgm_pessoa_juridica.cnpj is NULL
                        THEN sw_cgm_pessoa_fisica.cpf
                        ELSE sw_cgm_pessoa_juridica.cnpj
-                  END AS cnpj_cpf ";
-      if (Sessao::getExercicio() > 2012) {
-        $stSql .= " ,  CASE WHEN credor.cod_pais <> 1
+                  END AS cnpj_cpf
+               ,  CASE WHEN credor.cod_pais <> 1
                        THEN 3
                        WHEN sw_cgm_pessoa_juridica.cnpj is NULL
                        THEN 1
                        ELSE 2
-                  END AS tipo_credor ";
-      } else {
-        $stSql .= " ,  CASE WHEN sw_cgm_pessoa_juridica.cnpj is NULL
-                       THEN 1
-                       ELSE 2
-                  END AS tipo_credor ";
-      }
-      $stSql .= "
+                  END AS tipo_credor
                ,  nota_fiscal.inscricao_estadual AS num_inscest
                ,  nota_fiscal.inscricao_municipal AS num_inscmun
                ,  credor.cep AS cep_municipio
@@ -577,7 +560,7 @@ class TTGOLQD extends Persistente
                ,  empenho.cod_empenho
                ,  dtempenho
                ,  dtliquidacao
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  empenho.cod_entidade
                ,  nota_liquidacao.exercicio_empenho
                ,  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota
@@ -599,13 +582,9 @@ class TTGOLQD extends Persistente
                ,  nota_fiscal.nro_serie
                ,  nota_fiscal.data_emissao
                ,  nota_fiscal.chave_acesso
-               ,  acao.num_acao";
-               
-      if (Sessao::getExercicio() > 2012) {
-        $stSql .= " , credor.cod_pais ";
-      }
-      
-        $stSql .= "
+               ,  acao.num_acao
+               ,  credor.cod_pais
+
        ORDER BY   nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota
         ";
         return $stSql;

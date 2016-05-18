@@ -30,7 +30,7 @@
 * @author Desenvolvedor: Cassiano de Vasconcellos Ferreira
 * @author Documentor: Cassiano de Vasconcellos Ferreira
 
-  $Id: ArquivoExportador.class.php 63223 2015-08-05 14:41:50Z franver $
+  $Id: ArquivoExportador.class.php 65339 2016-05-13 12:33:57Z franver $
 
 * @package framework
 * @subpackage componentes
@@ -448,7 +448,7 @@ function FormataTipoDocumento()
         break;
         case 'TCM_GO':
             // Array arquivo sequencial automático
-            $arArquivoSequencial = array( "HML", "ABL", "HBL", "JGL" );
+            $arArquivoSequencial = array( "HML", "ABL", "HBL", "JGL");
             $arArquivo = explode('_',$this->getNomeArquivo());
             $arArquivo = explode('.',$arArquivo[1]);
 

@@ -59,7 +59,8 @@ $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName( "stCtrl" );
 $obHdnCtrl->setValue( "" );
 
-//$rsTipoInstrumento = new RecordSet();
+$rsTipoInstrumento = new RecordSet();
+
 if ($stAcao == "alterar") {
     $inCodigo = $request->get("inCodigo");
     $obTLicitacaoTipoInstrumento= new TLicitacaoTipoInstrumento();

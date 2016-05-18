@@ -31,7 +31,7 @@
 
     * @ignore
     
-    $Id: ARE.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: ARE.inc.php 65220 2016-05-03 21:30:22Z michel $
 */
 
 $inCount = 0;
@@ -76,11 +76,9 @@ foreach ($rsDetalhamento->getElementos() as $arDetalhamento) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-    if (Sessao::getExercicio() > '2011') {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    }
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("rubrica");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -123,11 +121,9 @@ foreach ($rsDetalhamento->getElementos() as $arDetalhamento) {
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
-            if (Sessao::getExercicio() > '2011') {
-                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-            }
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
 
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("rubrica");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

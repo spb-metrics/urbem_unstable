@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.06
 
- $Id: LSManterBem.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: LSManterBem.php 65343 2016-05-13 17:02:26Z arthur $
 
  */
 
@@ -85,36 +85,45 @@ if ($arFiltro) {
 Sessao::write('paginando',true);
 Sessao::write('filtro',$arFiltro);
 
-if ($_REQUEST['inCodBem'] != '') {
-    $stFiltro .= " AND bem.cod_bem = ".$_REQUEST['inCodBem']." ";
+if ($request->get('inCodBem') != '') {
+    $stFiltro .= " AND bem.cod_bem = ".$request->get('inCodBem')." ";
 }
-if ($_REQUEST['inCodNatureza'] != '') {
-    $stFiltro .= " AND bem.cod_natureza = ".$_REQUEST['inCodNatureza']." ";
+if ($request->get('inCodNatureza') != '') {
+    $stFiltro .= " AND bem.cod_natureza = ".$request->get('inCodNatureza')." ";
 }
-if ($_REQUEST['inCodGrupo'] != '') {
-    $stFiltro .= " AND bem.cod_grupo = ".$_REQUEST['inCodGrupo']." ";
+if ($request->get('inCodGrupo') != '') {
+    $stFiltro .= " AND bem.cod_grupo = ".$request->get('inCodGrupo')." ";
 }
-if ($_REQUEST['inCodEspecie'] != '') {
-    $stFiltro .= " AND bem.cod_especie = ".$_REQUEST['inCodEspecie']." ";
+if ($request->get('inCodEspecie') != '') {
+    $stFiltro .= " AND bem.cod_especie = ".$request->get('inCodEspecie')." ";
 }
-if ($_REQUEST['inCodEspecie'] != '') {
-    $stFiltro .= " AND bem.cod_especie = ".$_REQUEST['inCodEspecie']." ";
+if ($request->get('inCodEspecie') != '') {
+    $stFiltro .= " AND bem.cod_especie = ".$request->get('inCodEspecie')." ";
 }
-if ($_REQUEST['stHdnNomBem'] != '') {
-    $stFiltro .= " AND bem.descricao LIKE '".$_REQUEST['stHdnNomBem']."' ";
+if ($request->get('stHdnNomBem') != '') {
+    $stFiltro .= " AND bem.descricao LIKE '".$request->get('stHdnNomBem')."' ";
 }
-if ($_REQUEST['stPlacaIdentificacao'] == 'nao') {
+if ($request->get('stPlacaIdentificacao') == 'nao') {
     $stFiltro .= " AND bem.num_placa IS NULL AND ";
 }
-if ($_REQUEST['stHdnNumeroPlaca'] != '') {
-    $stFiltro .= " AND bem.num_placa LIKE '".$_REQUEST['stHdnNumeroPlaca']."' ";
+if ($request->get('stHdnNumeroPlaca') != '') {
+    $stFiltro .= " AND bem.num_placa LIKE '".$request->get('stHdnNumeroPlaca')."' ";
 }
-if ($_REQUEST['boBemBaixado'] == 'false') {
+if ($request->get('boBemBaixado') == 'false') {
     $stFiltro .= " AND NOT EXISTS ( SELECT 1
                                       FROM patrimonio.bem_baixado
                                      WHERE bem_baixado.cod_bem = bem.cod_bem
                                   )
     ";
+}
+if ( $request->get('inCodEntidade') ) {
+    $stFiltro .= " 
+        AND EXISTS ( 
+			SELECT 1
+			  FROM patrimonio.bem_comprado
+			 WHERE bem_comprado.cod_bem = bem.cod_bem
+			   AND bem_comprado.cod_entidade = ".$request->get('inCodEntidade')."
+            ) ";
 }
 
 if (preg_match('/stNomBemOrgao/', $_REQUEST['stCampoNom'])) {

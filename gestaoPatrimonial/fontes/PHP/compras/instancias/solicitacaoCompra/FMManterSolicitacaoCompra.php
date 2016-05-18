@@ -32,7 +32,7 @@
 
  * Casos de uso: uc-03.04.01
 
- $Id: FMManterSolicitacaoCompra.php 64185 2015-12-11 19:51:48Z arthur $
+ $Id: FMManterSolicitacaoCompra.php 65196 2016-05-02 17:49:38Z michel $
 
  */
 
@@ -53,6 +53,7 @@ include_once CAM_GP_COM_COMPONENTES."IMontaDotacaoDesdobramento.class.php";
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracao.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasSolicitacao.class.php";
 include_once CAM_GP_COM_MAPEAMENTO."TComprasSolicitacaoConvenio.class.php";
+include_once TCOM."TComprasConfiguracao.class.php";
 
 $stPrograma = "ManterSolicitacaoCompra";
 $pgFilt		= "FL".$stPrograma.".php";
@@ -79,24 +80,24 @@ $boReservaAutorizacao = ($boReservaAutorizacao == 'true') ? true : false;
 
 if(!$boReservaRigida && !$boReservaAutorizacao){
     $stMsg = "Obrigatório Configurar o Tipo de Reserva em: Gestão Patrimonial :: Compras :: Configuração :: Alterar Configuração";
-    
+
     $obLblMsgTipoReserva = new Label();
     $obLblMsgTipoReserva->setRotulo ( "Aviso" );
-    $obLblMsgTipoReserva->setValue  ( $stMsg );
+    $obLblMsgTipoReserva->setValue  ( $stMsg  );
 
     $obFormulario = new Formulario;
     $obFormulario->addTitulo     ( 'Configuração Tipo de Reserva'   );
     $obFormulario->addComponente ( $obLblMsgTipoReserva             );
     $obFormulario->show();
-    
+
     exit();
 }
 
 // Pegar informações da solicitação( para data de solicitação)
 $obTComprasSolicitacao = new TComprasSolicitacao();
-$obTComprasSolicitacao->setDado( 'cod_solicitacao', $_REQUEST['cod_solicitacao'] );
-$obTComprasSolicitacao->setDado( 'exercicio'      , $_REQUEST['exercicio']       );
-$obTComprasSolicitacao->setDado( 'cod_entidade'   , $_REQUEST['cod_entidade']    );
+$obTComprasSolicitacao->setDado( 'cod_solicitacao', $request->get('cod_solicitacao') );
+$obTComprasSolicitacao->setDado( 'exercicio'      , $request->get('exercicio')       );
+$obTComprasSolicitacao->setDado( 'cod_entidade'   , $request->get('cod_entidade')    );
 $obTComprasSolicitacao->consultar();
 
 //Formatar data buscada no banco (timestamp)
@@ -140,7 +141,7 @@ else{
 $obLblExercicio = new Label;
 $obLblExercicio->setRotulo( "Exercício" );
 if ($stAcao == 'alterar') {
-    $obLblExercicio->setValue ( $_REQUEST['exercicio'] );
+    $obLblExercicio->setValue ( $request->get('exercicio') );
 } else {
     $obLblExercicio->setValue ( Sessao::getExercicio() );
 }
@@ -152,9 +153,9 @@ if ($stAcao == 'alterar') {
 
     # Código da Solicitação.
     $obLblSolicitacao = new Label;
-    $obLblSolicitacao->setId     ( 'stSolicitacao'          );
-    $obLblSolicitacao->setrotulo ( 'Solicitação'            );
-    $obLblSolicitacao->setValue  ( $_GET['cod_solicitacao'] );
+    $obLblSolicitacao->setId     ( 'stSolicitacao'                  );
+    $obLblSolicitacao->setrotulo ( 'Solicitação'                    );
+    $obLblSolicitacao->setValue  ( $request->get('cod_solicitacao') );
 }
 
 //Define o objeto da ação stAcao
@@ -173,58 +174,63 @@ $rsConfiguracao = new RecordSet();
 
 $obTConfiguracao = new TAdministracaoConfiguracao();
 $obTConfiguracao->setDado ( "cod_modulo", 35 );
-$obTConfiguracao->setDado ( "parametro" ,"dotacao_obrigatoria_solicitacao" );
-$obTConfiguracao->setDado ( "exercicio" ,Sessao::getExercicio() );
+$obTConfiguracao->setDado ( "parametro" , "dotacao_obrigatoria_solicitacao" );
+$obTConfiguracao->setDado ( "exercicio" , Sessao::getExercicio() );
 $obTConfiguracao->consultar($rsConfiguracao);
 
+$obTConfiguracao = new TComprasConfiguracao();
+$obTConfiguracao->setDado("parametro", "data_fixa_solicitacao_compra" );
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$stDtSolicitacao = trim($rsConfiguracao->getCampo('valor'));
+
 $obHdnConfiguracao = new Hidden;
-$obHdnConfiguracao->setName  ( "boConfiguracao"                  );
+$obHdnConfiguracao->setName  ( "boConfiguracao"                   );
 $obHdnConfiguracao->setValue ( $obTConfiguracao->getDado("valor") );
 
 //Define o objeto de controle
 $obHdnCtrl = new Hidden;
 $obHdnCtrl->setName  ( "stCtrl" );
-$obHdnCtrl->setValue ( "" );
+$obHdnCtrl->setValue ( ""       );
 
 $obHdnItem = new Hidden;
 $obHdnItem->setName  ( "HdnNomItem" );
 $obHdnItem->setId    ( "HdnNomItem" );
-$obHdnItem->setValue ( "" );
+$obHdnItem->setValue ( ""           );
 
 $obHdnUnidade = new Hidden;
 $obHdnUnidade->setName  ( "HdnNomUnidade" );
 $obHdnUnidade->setId    ( "HdnNomUnidade" );
-$obHdnUnidade->setValue ( "" );
+$obHdnUnidade->setValue ( ""              );
 
 if ($stAcao=="alterar") {
     $obHdnSolicitacao = new Hidden;
-    $obHdnSolicitacao->setId    ( "HdnInSolicitacao"            );
-    $obHdnSolicitacao->setName  ( "HdnInSolicitacao"            );
-    $obHdnSolicitacao->setValue ( $_REQUEST['cod_solicitacao']  );
+    $obHdnSolicitacao->setId    ( "HdnInSolicitacao"               );
+    $obHdnSolicitacao->setName  ( "HdnInSolicitacao"               );
+    $obHdnSolicitacao->setValue ( $request->get('cod_solicitacao') );
 
     $obHdnExercicio = new Hidden;
-    $obHdnExercicio->setId    ( 'hdnExercicio'          );
-    $obHdnExercicio->setName  ( 'hdnExercicio'          );
-    $obHdnExercicio->setValue ( $_REQUEST['exercicio']  );
+    $obHdnExercicio->setId    ( 'hdnExercicio'             );
+    $obHdnExercicio->setName  ( 'hdnExercicio'             );
+    $obHdnExercicio->setValue ( $request->get('exercicio') );
 }
 
 $obHdnCodItem= new Hidden;
 $obHdnCodItem->setName  ( "HdnCodItem" );
 $obHdnCodItem->setId    ( "HdnCodItem" );
-$obHdnCodItem->setValue ( "" );
+$obHdnCodItem->setValue ( ""           );
 
 $obHdnCentroDeCusto = new Hidden;
 $obHdnCentroDeCusto->setName  ( "HdnNomCentroCusto" );
 $obHdnCentroDeCusto->setId    ( "HdnNomCentroCusto" );
-$obHdnCentroDeCusto->setValue ( "" );
+$obHdnCentroDeCusto->setValue ( ""                  );
 
 $obHdnCodEntidade = new Hidden;
-$obHdnCodEntidade->setName('HdnCodEntidade');
-$obHdnCodEntidade->setId('HdnCodEntidade');
+$obHdnCodEntidade->setName( 'HdnCodEntidade' );
+$obHdnCodEntidade->setId  ( 'HdnCodEntidade' );
 
 $obHdnCodClassificacao = new Hidden;
-$obHdnCodClassificacao->setName('HdnCodClassificacao');
-$obHdnCodClassificacao->setId('HdnCodClassificacao');
+$obHdnCodClassificacao->setName( 'HdnCodClassificacao' );
+$obHdnCodClassificacao->setId  ( 'HdnCodClassificacao' );
 
 //Define objeto de select multiplo de entidade por usuários
 $obISelectEntidadeUsuario = new ITextBoxSelectEntidadeUsuario();
@@ -250,6 +256,10 @@ $obDtSolicitacao->setId   	( "stDtSolicitacao" );
 $obDtSolicitacao->setRotulo ( "Data da Solicitação" );
 $obDtSolicitacao->setTitle  ( 'Informe a data da solicitação.' );
 $obDtSolicitacao->setNull   ( false );
+if( $stDtSolicitacao != '' ){
+    $obDtSolicitacao->setValue ( $stDtSolicitacao );
+    $obDtSolicitacao->setLabel ( true );
+}
 
 $obHdnDtSolicitacao = new Hidden();
 $obHdnDtSolicitacao->setName('HdnDtSolicitacao');
@@ -272,13 +282,13 @@ $obSolicitante->setTabelaVinculo    ( 'compras.solicitante' );
 $obSolicitante->setCampoVinculo     ( 'solicitante' );
 $obSolicitante->setNomeVinculo      ( 'Solicitante' );
 $obSolicitante->setRotulo           ( 'Solicitante' );
-$obSolicitante->setTitle 		 	( 'Informe o Solicitante.' );
+$obSolicitante->setTitle            ( 'Informe o Solicitante.' );
 $obSolicitante->setName             ( 'stNomCGM' );
 $obSolicitante->setId               ( 'stNomCGM' );
 $obSolicitante->obCampoCod->setName ( 'inCGM' );
 $obSolicitante->obCampoCod->setId   ( 'inCGM' );
 $obSolicitante->setNull             ( false );
-$obSolicitante->setFiltroVinculado ( $stFiltro );
+$obSolicitante->setFiltroVinculado  ( $stFiltro );
 
 $obAlmoxarifado = new ISelectAlmoxarifado($obForm);
 $obAlmoxarifado->setNull ( false                       );
@@ -310,7 +320,7 @@ $obLblDia->setRotulo( "dias" );
 $obLblDia->setValue ("dias"  );
 
 // Define Objeto TextArea para observações/justificativas
-$stObservacao = $_REQUEST["stObservacao"];
+$stObservacao = $request->get("stObservacao");
 $obTxtObs = new TextArea;
 $obTxtObs->setName   ( "stObservacao" );
 $obTxtObs->setId     ( "stObservacao" );
@@ -322,7 +332,7 @@ $obTxtObs->setRows   ( 2 );
 $obTxtObs->setCols   ( 100 );
 
 /* CONVENIO */
-require_once ( CAM_GP_LIC_MAPEAMENTO . "TLicitacaoConvenio.class.php");
+require_once CAM_GP_LIC_MAPEAMENTO."TLicitacaoConvenio.class.php";
 $obTLicitacaoConvenio = new TLicitacaoConvenio;
 $obTLicitacaoConvenio->recuperaConvenioSolicitacao ( $rsConvenio );
 
@@ -355,13 +365,13 @@ $obRdbItensOutraSolicitacaoNao->setValue('nao');
 $obRdbItensOutraSolicitacaoNao->setChecked( true );
 $obRdbItensOutraSolicitacaoNao->obEvento->setOnClick( "executaFuncaoAjax('limparSpnItensOutraSolicitacao');" );
 
-include_once(CAM_GP_COM_COMPONENTES."IMontaDotacaoDesdobramentoPadrao.class.php");
+include_once CAM_GP_COM_COMPONENTES."IMontaDotacaoDesdobramentoPadrao.class.php";
 
 //Define o objeto de configuracao
 $rsConfiguracao = new RecordSet();
 $obTConfiguracao = new TAdministracaoConfiguracao();
 $obTConfiguracao->setDado( "parametro" ,"dotacao_obrigatoria_solicitacao" );
-$obTConfiguracao->setDado( "exercicio" , Sessao::getExercicio()                );
+$obTConfiguracao->setDado( "exercicio" , Sessao::getExercicio()           );
 $obTConfiguracao->recuperaPorChave( $rsConfiguracao );
 
 $obHdnConfiguracao = new Hidden;
@@ -404,8 +414,7 @@ $stHtmlSpanItem = $obFormularioSpan->getHTML();
 $obMontaItemUnidade->obSpnInformacoesItem->setValue( $stHtmlSpanItem );
 //Fim da Habilitação dos Hiddens stNomUnidade e inCodUnidadeMedida.
 
-$stJsOnBlur  = "";
-$stJsOnBlur .= "montaParametrosGET('valorUnitarioUltimaCompra');";
+$stJsOnBlur  = "montaParametrosGET('valorUnitarioUltimaCompra');";
 $stJsOnBlur .= "montaParametrosGET('saldoEstoque', 'inCodItem, inCodCentroCusto');";
 $stJsOnBlur .= "montaParametrosGET('BuscaComplemento');";
 
@@ -415,23 +424,22 @@ $obSpnVlrReferencia = new Span;
 $obSpnVlrReferencia->setId ( "spnVlrReferencia" );
 
 $obTxtComplemento = new TextArea;
-$obTxtComplemento->setName   ( "stComplemento"         );
-$obTxtComplemento->setId     ( "stComplemento"         );
-$obTxtComplemento->setValue  ( $stObservacao           );
-$obTxtComplemento->setRotulo ( "Complemento"           );
+$obTxtComplemento->setName   ( "stComplemento"          );
+$obTxtComplemento->setId     ( "stComplemento"          );
+$obTxtComplemento->setValue  ( $stObservacao            );
+$obTxtComplemento->setRotulo ( "Complemento"            );
 $obTxtComplemento->setTitle  ( "Informe o complemento." );
-$obTxtComplemento->setNull   ( true                    );
-$obTxtComplemento->setRows   ( 2                       );
-$obTxtComplemento->setCols   ( 100                     );
-$obTxtComplemento->setMaxCaracteres( 200               );
+$obTxtComplemento->setNull   ( true                     );
+$obTxtComplemento->setRows   ( 2                        );
+$obTxtComplemento->setCols   ( 100                      );
+$obTxtComplemento->setMaxCaracteres( 200                );
 
 $obCentroCustoUsuario = new IPopUpCentroCustoUsuario($obForm);
 $obCentroCustoUsuario->setNull  (true);
 $obCentroCustoUsuario->setRotulo('*Centro de Custo');
 $obCentroCustoUsuario->obCampoCod->setId ('inCodCentroCusto');
 
-$stJsOnBlur  = "";
-$stJsOnBlur .= "if (saldoCentroItem(this.value)) { ";
+$stJsOnBlur  = "if (saldoCentroItem(this.value)) { ";
 $stJsOnBlur .= "montaParametrosGET('montaDotacao', 'inCodEntidade, inCodCentroCusto,nuVlTotal,boRegistroPreco');";
 $stJsOnBlur .= "montaParametrosGET('saldoEstoque', 'inCodItem, inCodCentroCusto');";
 $stJsOnBlur .= "montaParametrosGET('BuscaComplemento'); }";
@@ -441,17 +449,17 @@ $obCentroCustoUsuario->obCampoCod->obEvento->setOnBlur($obCentroCustoUsuario->ob
 //Define o exercicio corrente
 $obLblSaldoEstoque = new Label;
 $obLblSaldoEstoque->setRotulo( "Saldo em Estoque" );
-$obLblSaldoEstoque->setId    ("lblSaldoEstoque"   );
+$obLblSaldoEstoque->setId    ( "lblSaldoEstoque"  );
 $obLblSaldoEstoque->setValue ( ""                 );
 
 $obMontaQuantidadeValores = new IMontaQuantidadeValores();
-$obMontaQuantidadeValores->obValorUnitario->setRotulo('Valor Unitário');
-$obMontaQuantidadeValores->obValorUnitario->setValue('0,00');
+$obMontaQuantidadeValores->obValorUnitario->setRotulo( 'Valor Unitário' );
+$obMontaQuantidadeValores->obValorUnitario->setValue( '0,00' );
 $obMontaQuantidadeValores->obValorUnitario->setDecimais ( 2 );
 $obMontaQuantidadeValores->obValorUnitario->setNull( true );
 $obMontaQuantidadeValores->obValorTotal->setRotulo( 'Valor Total' );
-$obMontaQuantidadeValores->obValorTotal->setValue('0,00');
-$obMontaQuantidadeValores->obValorTotal->setDecimais ( 2 );
+$obMontaQuantidadeValores->obValorTotal->setValue( '0,00' );
+$obMontaQuantidadeValores->obValorTotal->setDecimais( 2 );
 $obMontaQuantidadeValores->obValorTotal->setNull( true );
 
 $obSpanDotacao = new Span();
@@ -460,16 +468,16 @@ $obSpanDotacao->setID( 'spnDotacao' );
 // Define Objeto Button para Incluir Item
 $obBtnIncluirItemSolicitacao = new Button;
 $obBtnIncluirItemSolicitacao->setValue( "Incluir" );
-$obBtnIncluirItemSolicitacao->setId("incluiItem");
-$obBtnIncluirItemSolicitacao->obEvento->setOnClick( "montaParametrosGET('incluirListaItens');");
+$obBtnIncluirItemSolicitacao->setId( "incluiItem" );
+$obBtnIncluirItemSolicitacao->obEvento->setOnClick( "montaParametrosGET('incluirListaItens');" );
 
 // Define Objeto Button para Limpar Item
 $obBtnLimparItemSolicitacao = new Button;
 $obBtnLimparItemSolicitacao->setValue( "Limpar" );
-$obBtnLimparItemSolicitacao->obEvento->setOnClick("LimparItensSolicitacao();");
+$obBtnLimparItemSolicitacao->obEvento->setOnClick( "LimparItensSolicitacao();" );
 
 $obSpnListaSolicitacoes = new Span;
-$obSpnListaSolicitacoes->setID("spnListaSolicitacoes");
+$obSpnListaSolicitacoes->setID( "spnListaSolicitacoes" );
 
 $obChkRelatorio = new CheckBox();
 $obChkRelatorio->setName( 'boRelatorio' );
@@ -547,7 +555,7 @@ $obFormulario->agrupaComponentes( array($obBtnIncluirItemSolicitacao, $obBtnLimp
 $obFormulario->addSpan          ( $obSpnListaSolicitacoes );
 
 if ($stAcao == 'incluir' || $stAcao =='alterar') {
-    include_once( CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php");
+    include_once CAM_GA_ADM_COMPONENTES."IMontaAssinaturas.class.php";
     $obMontaAssinaturas = new IMontaAssinaturas;
     $obMontaAssinaturas->geraFormulario( $obFormulario );
 }
@@ -555,7 +563,7 @@ if ($stAcao == 'incluir' || $stAcao =='alterar') {
 $obFormulario->addComponente	( $obChkRelatorio );
 
 if ($stAcao == 'alterar') {
-    $obFormulario->Cancelar( $pgList."?".Sessao::getId()."&stAcao=".$stAcao."&pos=".$_REQUEST['pos']."&pg=".$_REQUEST['pg']  );
+    $obFormulario->Cancelar( $pgList."?".Sessao::getId()."&stAcao=".$stAcao."&pos=".$request->get('pos')."&pg=".$request->get('pg')  );
 } else {
     $obFormulario->defineBarra( array($obBtnOkSolicitacao, $obBtnLimparSolicitacao) );
 }
@@ -563,7 +571,7 @@ if ($stAcao == 'alterar') {
 $obFormulario->show();
 
 if ($stAcao=="alterar") {
-    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&cod_solicitacao=".$_GET['cod_solicitacao']."&cod_entidade=".$_GET['cod_entidade']."&exercicio=".$_GET['exercicio']."','carregaSolicitacao');";
+    $stJs .= "ajaxJavaScript('".$pgOcul."?".Sessao::getId()."&cod_solicitacao=".$request->get('cod_solicitacao')."&cod_entidade=".$request->get('cod_entidade')."&exercicio=".$request->get('exercicio')."','carregaSolicitacao');";
 } else {
     $arValores = Sessao::read('arValores');
     if (count($arValores) > 0) {

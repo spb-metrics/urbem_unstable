@@ -31,7 +31,7 @@
  * @package    Framework
  * @author Analista: Diego Victoria
  * @author Desenvolvedor: Lucas Leusin Oaigen
- * $Id: OCConsultarAutorizacao.php 60153 2014-10-02 17:31:24Z arthur $
+ * $Id: OCConsultarAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
  * Casos de uso: uc-02.03.02
                     uc-02.01.08
  */
@@ -54,7 +54,7 @@ $pgOcul = "OC".$stPrograma.".php";
 $pgPror = "PO".$stPrograma.".php";
 $pgJs   = "JS".$stPrograma.".js";
 
-$stCtrl = $_REQUEST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 $obRegra = new REmpenhoAutorizacaoEmpenho;
 $obRegra->setExercicio(Sessao::getExercicio());
@@ -114,12 +114,12 @@ function montaLista($arRecordSet , $boExecuta = true)
         $stHTML = str_replace( "  " ,"" ,$stHTML );
         $stHTML = str_replace( "'","\\'",$stHTML );
 
-            foreach ($arRecordSet as $value) {
-                $vl_total = str_replace('.','',$value['vl_total']);
-                $vl_total = str_replace(',','.',$vl_total);
-                $nuVlTotal += $value['vl_total'];
-            }
-            $nuVlTotal = number_format($nuVlTotal,2,',','.');
+        foreach ($arRecordSet as $value) {
+            $vl_total = str_replace('.','',$value['vl_total']);
+            $vl_total = str_replace(',','.',$vl_total);
+            $nuVlTotal += $value['vl_total'];
+        }
+        $nuVlTotal = number_format($nuVlTotal,2,',','.');
 
         if ($boExecuta) {
             SistemaLegado::executaFrameOculto("d.getElementById('spnLista').innerHTML = '".$stHTML."';");
@@ -131,13 +131,14 @@ function montaLista($arRecordSet , $boExecuta = true)
 function montaLista2($arRecordSet , $boExecuta = true)
 {
     $arRecordSetAux = $arRecordSet;
-    
+
     for($i=0;$i<count($arRecordSet);$i++){
         if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!='')
-            $codItem = true;
-        break;
+            $arRecordSet[$i]['nom_item'] = $arRecordSet[$i]['cod_item'].' - '.$arRecordSet[$i]['nom_item'];
+        if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!='')
+            $arRecordSet[$i]['nom_item'] .= " ( Marca: ".$arRecordSet[$i]['cod_marca']." - ".$arRecordSet[$i]['nome_marca']." )";
     }
-    
+
     foreach ($arRecordSetAux as $inChave => $arValor) {
         if (trim($arValor['complemento']) == "") {
             $arRecordSet[$inChave]['possui_complemento'] = 'f';
@@ -171,16 +172,12 @@ function montaLista2($arRecordSet , $boExecuta = true)
     $table->Head->addCabecalho('Quantidade'     , 10);
     $table->Head->addCabecalho('Valor Total'    , 15);
 
-    if ($codItem) 
-        $table->Body->addCampo('[cod_item] - [nom_item]'   , 'E');
-    else
-        $table->Body->addCampo('nom_item'   , 'E');
-    
+    $table->Body->addCampo('nom_item'   , 'E');
     $table->Body->addCampo('vl_unitario', 'D');
     $table->Body->addCampo('quantidade' , 'D');
     $table->Body->addCampo('vl_total'   , 'D');
     $table->Foot->addSoma ('vl_total'   , 'D');
-    
+
     $table->montaHTML(true);
     $stHTML = $table->getHtml();
 
@@ -192,94 +189,96 @@ function montaLista2($arRecordSet , $boExecuta = true)
 }
 
 switch ($stCtrl) {
-case 'montaListaItemPreEmpenho':
-    montaLista2(Sessao::read('arItens'));
+    case 'montaListaItemPreEmpenho':
+        montaLista2(Sessao::read('arItens'));
     break;
-case 'buscaFornecedorDiverso':
-    if ($_POST["inCodFornecedor"] != "") {
-        $obRegra->obRCGM->setNumCGM( $_POST["inCodFornecedor"] );
-        $obRegra->obRCGM->listar( $rsCGM );
-        $stNomFornecedor = $rsCGM->getCampo( "nom_cgm" );
-        if (!$stNomFornecedor) {
-            $js .= 'f.inCodFornecedor.value = "";';
-            $js .= 'f.inCodFornecedor.focus();';
+    case 'buscaFornecedorDiverso':
+        if ($request->get("inCodFornecedor", "") != "") {
+            $obRegra->obRCGM->setNumCGM( $request->get("inCodFornecedor") );
+            $obRegra->obRCGM->listar( $rsCGM );
+            $stNomFornecedor = $rsCGM->getCampo( "nom_cgm" );
+            if (!$stNomFornecedor) {
+                $js .= 'f.inCodFornecedor.value = "";';
+                $js .= 'f.inCodFornecedor.focus();';
+                $js .= 'd.getElementById("stNomFornecedor").innerHTML = "&nbsp;";';
+                $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$request->get("inCodFornecedor").")','form','erro','".Sessao::getId()."');";
+            } else
+                $js .= 'd.getElementById("stNomFornecedor").innerHTML = "'.$stNomFornecedor.'";';
+        } else
             $js .= 'd.getElementById("stNomFornecedor").innerHTML = "&nbsp;";';
-            $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$_POST["inCodFornecedor"].")','form','erro','".Sessao::getId()."');";
+
+        SistemaLegado::executaFrameOculto($js);
+    break;
+    case "MontaUnidade":
+        if ($request->get("inNumOrgao")) {
+            $stCombo  = "inNumUnidade";
+            $stComboTxt  = "inNumUnidadeTxt";
+            $stJs .= "limpaSelect(f.".$stCombo.",0); \n";
+            $stJs .= "f.".$stComboTxt.".value=''; \n";
+            $stJs .= "f.".$stCombo.".options[0] = new Option('Selecione','', 'selected');\n";
+
+            $obRegra->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($request->get("inNumOrgao"));
+            $obRegra->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->consultar( $rsCombo, $stFiltro,"", $boTransacao );
+
+            $inCount = 0;
+            while (!$rsCombo->eof()) {
+                $inCount++;
+                $inId   = $rsCombo->getCampo("num_unidade");
+                $stDesc = $rsCombo->getCampo("nom_unidade");
+                if( $stSelecionado == $inId )
+                    $stSelected = 'selected';
+                else
+                    $stSelected = '';
+                $stJs .= "f.".$stCombo.".options[".$inCount."] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
+                $rsCombo->proximo();
+            }
+        }
+        $stJs .= $js;
+
+        SistemaLegado::executaFrameOculto( $stJs );
+    break;
+
+    case "mascaraClassificacao":
+        //monta mascara da RUBRICA DE DESPESA
+        $arMascClassificacao = Mascara::validaMascaraDinamica( $request->get('stMascClassificacao') , $request->get('inCodDespesa') );
+        $js .= "f.inCodDespesa.value = '".$arMascClassificacao[1]."'; \n";
+
+        //busca DESCRICAO DA RUBRICA DE DESPESA
+        $obRegra->obROrcamentoClassificacaoDespesa->setMascara          ( $request->get('stMascClassificacao') );
+        $obRegra->obROrcamentoClassificacaoDespesa->setMascClassificacao( $arMascClassificacao[1] );
+        $obRegra->obROrcamentoClassificacaoDespesa->recuperaDescricaoDespesa( $stDescricao );
+        if ($stDescricao != "") {
+            $js .= 'd.getElementById("stDescricaoDespesa").innerHTML = "'.$stDescricao.'";';
         } else {
-            $js .= 'd.getElementById("stNomFornecedor").innerHTML = "'.$stNomFornecedor.'";';
+            $null = "&nbsp;";
+            $js .= 'f.inCodDespesa.value = "";';
+            $js .= 'f.inCodDespesa.focus();';
+            $js .= 'd.getElementById("stDescricaoDespesa").innerHTML = "'.$null.'";';
+            $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$arMascClassificacao[1].")','form','erro','".Sessao::getId()."');";
         }
-    } else $js .= 'd.getElementById("stNomFornecedor").innerHTML = "&nbsp;";';
-    SistemaLegado::executaFrameOculto($js);
+        SistemaLegado::executaFrameOculto( $js );
     break;
-case "MontaUnidade":
-    if ($_REQUEST["inNumOrgao"]) {
-        $stCombo  = "inNumUnidade";
-        $stComboTxt  = "inNumUnidadeTxt";
-        $stJs .= "limpaSelect(f.$stCombo,0); \n";
-        $stJs .= "f.$stComboTxt.value=''; \n";
-        $stJs .= "f.$stCombo.options[0] = new Option('Selecione','', 'selected');\n";
+    case 'buscaDotacao':
+        $obRegra->obROrcamentoDespesa->setCodDespesa( $request->get("inCodDotacao") );
+        $obRegra->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
+        $obRegra->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
 
-        $obRegra->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($_REQUEST["inNumOrgao"]);
-        $obRegra->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->consultar( $rsCombo, $stFiltro,"", $boTransacao );
-
-        $inCount = 0;
-        while (!$rsCombo->eof()) {
-            $inCount++;
-            $inId   = $rsCombo->getCampo("num_unidade");
-            $stDesc = $rsCombo->getCampo("nom_unidade");
-            if( $stSelecionado == $inId )
-                $stSelected = 'selected';
-            else
-                $stSelected = '';
-            $stJs .= "f.$stCombo.options[$inCount] = new Option('".$stDesc."','".$inId."','".$stSelected."'); \n";
-            $rsCombo->proximo();
-        }
-    }
-    $stJs .= $js;
-    SistemaLegado::executaFrameOculto( $stJs );
-    break;
-
-case "mascaraClassificacao":
-    //monta mascara da RUBRICA DE DESPESA
-    $arMascClassificacao = Mascara::validaMascaraDinamica( $_POST['stMascClassificacao'] , $_POST['inCodDespesa'] );
-    $js .= "f.inCodDespesa.value = '".$arMascClassificacao[1]."'; \n";
-
-    //busca DESCRICAO DA RUBRICA DE DESPESA
-    $obRegra->obROrcamentoClassificacaoDespesa->setMascara          ( $_POST['stMascClassificacao'] );
-    $obRegra->obROrcamentoClassificacaoDespesa->setMascClassificacao( $arMascClassificacao[1]       );
-    $obRegra->obROrcamentoClassificacaoDespesa->recuperaDescricaoDespesa( $stDescricao );
-    if ($stDescricao != "") {
-        $js .= 'd.getElementById("stDescricaoDespesa").innerHTML = "'.$stDescricao.'";';
-    } else {
-        $null = "&nbsp;";
-        $js .= 'f.inCodDespesa.value = "";';
-        $js .= 'f.inCodDespesa.focus();';
-        $js .= 'd.getElementById("stDescricaoDespesa").innerHTML = "'.$null.'";';
-        $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$arMascClassificacao[1].")','form','erro','".Sessao::getId()."');";
-    }
-    SistemaLegado::executaFrameOculto( $js );
-    break;
-case 'buscaDotacao':
-    $obRegra->obROrcamentoDespesa->setCodDespesa( $_REQUEST["inCodDotacao"] );
-    $obRegra->obROrcamentoDespesa->setExercicio( Sessao::getExercicio() );
-    $obRegra->obROrcamentoDespesa->listarDespesaUsuario( $rsDespesa );
-
-    $stNomDespesa = $rsDespesa->getCampo( "descricao" );
-    if (!$stNomDespesa) {
-        $js .= 'f.inCodDotacao.value = "";';
-        $js .= 'f.inCodDotacao.focus();';
-        $js .= 'd.getElementById("stNomDotacao").innerHTML = "&nbsp;";';
-        $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$_POST["inCodDotacao"].")','form','erro','".Sessao::getId()."');";
-    } else {
         $stNomDespesa = $rsDespesa->getCampo( "descricao" );
-        $js .= 'd.getElementById("stNomDotacao").innerHTML = "'.$stNomDespesa.'";';
-    }
+        if (!$stNomDespesa) {
+            $js .= 'f.inCodDotacao.value = "";';
+            $js .= 'f.inCodDotacao.focus();';
+            $js .= 'd.getElementById("stNomDotacao").innerHTML = "&nbsp;";';
+            $js .= "SistemaLegado::alertaAviso('@Valor inválido. (".$request->get("inCodDotacao").")','form','erro','".Sessao::getId()."');";
+        } else {
+            $stNomDespesa = $rsDespesa->getCampo( "descricao" );
+            $js .= 'd.getElementById("stNomDotacao").innerHTML = "'.$stNomDespesa.'";';
+        }
 
-    SistemaLegado::executaFrameOculto($js);
+        SistemaLegado::executaFrameOculto($js);
     break;
-case 'detalharAutorizacao':
-    $arItens = Sessao::read('arItens');
-    echo $arItens[$_REQUEST['inChave']]['complemento'];
+    case 'detalharAutorizacao':
+        $arItens = Sessao::read('arItens');
+        echo $arItens[$request->get('inChave')]['complemento'];
     break;
 }
 

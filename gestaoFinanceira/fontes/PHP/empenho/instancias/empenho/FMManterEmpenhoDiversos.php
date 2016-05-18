@@ -34,7 +34,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoDiversos.php 65158 2016-04-28 19:26:54Z evandro $
+    $Id: FMManterEmpenhoDiversos.php 65311 2016-05-11 20:42:32Z michel $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -52,6 +52,8 @@ include_once CAM_FW_HTML.'MontaAtributos.class.php';
 include_once CAM_GF_ORC_COMPONENTES.'IPopUpDotacaoFiltroClassificacao.class.php';
 include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
 require_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php";
+include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma    = 'ManterEmpenho';
@@ -78,7 +80,7 @@ Sessao::write('stTituloPagina', 'Gestão Financeira | Empenho | Empenho | Emitir
 //valida a utilização da rotina de encerramento do mês contábil
 $mesAtual = date('m');
 $boUtilizarEncerramentoMes = SistemaLegado::pegaConfiguracao('utilizar_encerramento_mes', 9);
-include_once CAM_GF_CONT_MAPEAMENTO."TContabilidadeEncerramentoMes.class.php";
+
 $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
@@ -108,7 +110,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $obREmpenhoConfiguracao->consultar();
 
-    $boLiquidacaoAutomatica   = $obREmpenhoConfiguracao->getLiquidacaoAutomatica();
+    $boLiquidacaoAutomatica = $obREmpenhoConfiguracao->getLiquidacaoAutomatica();
 
     $rsOrgao = $rsUnidade = new RecordSet ;
 
@@ -117,7 +119,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->setExercicio(Sessao::getExercicio());
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->setNumCGM(Sessao::read('numCgm'));
     $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->listarEntidadeRestos($rsEntidade);
-    
+
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoTipoEmpenho->listar( $rsTipo, " cod_tipo <> 0 ");
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoHistorico->listar($rsHistorico);
     $obREmpenhoAutorizacaoEmpenho->obREmpenhoPermissaoAutorizacao->setExercicio(Sessao::getExercicio());
@@ -142,6 +144,11 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $stDtVencimento = "31/12/".Sessao::getExercicio();
 
     $obREmpenhoAutorizacaoEmpenho->obRCadastroDinamico->recuperaAtributosSelecionados($rsAtributos);
+
+    $obTConfiguracao = new TEmpenhoConfiguracao();
+    $obTConfiguracao->setDado("parametro","data_fixa_empenho");
+    $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+    $stDtEmpenho = trim($rsConfiguracao->getCampo('valor'));
 
     //*****************************************************//
     // Define COMPONENTES DO FORMULARIO
@@ -237,8 +244,8 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtCodEntidade->setId  ('inCodEntidade');
 
     if ($rsEntidade->getNumLinhas()==1) {
-         $obTxtCodEntidade->setValue($rsEntidade->getCampo("cod_entidade"));
-           $jsOnload = "montaParametrosGET('buscaDtEmpenho', 'inCodEntidade');";
+        $obTxtCodEntidade->setValue($rsEntidade->getCampo("cod_entidade"));
+        $jsOnload = "montaParametrosGET('buscaDtEmpenho', 'inCodEntidade');";
     }
 
     $obTxtCodEntidade->setRotulo ('Entidade');
@@ -431,7 +438,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtNomItem->setValue           ($stNomItem);
     $obTxtNomItem->setRotulo          ('* Descrição do Item');
     $obTxtNomItem->setTitle           ('Informe a descrição do item.');
-    //$obTxtNomItem->setNull            (true);
     $obTxtNomItem->setRows            (2);
     $obTxtNomItem->setCols            (100);
     $obTxtNomItem->setMaxCaracteres   (160);
@@ -444,7 +450,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtComplemento->setValue ($stComplemento);
     $obTxtComplemento->setRotulo('Complemento');
     $obTxtComplemento->setTitle ('Informe o complemento.');
-    //$obTxtComplemento->setNull  (true);
     $obTxtComplemento->setRows  (3);
     $obTxtComplemento->setCols  (100);
 
@@ -463,13 +468,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtQuantidade->setValue    ($nuQuantidade);
     $obTxtQuantidade->setRotulo   ('* Quantidade');
     $obTxtQuantidade->setTitle    ('Informe a quantidade.');
-    $obTxtQuantidade->setDecimais (4);
     $obTxtQuantidade->setNegativo (false);
-    //$obTxtQuantidade->setNull     (true);
     $obTxtQuantidade->setSize     (23);
-    $obTxtQuantidade->setMaxLength(23);
-    //$obTxtQuantidade->setMinValue (1);
-    $obTxtQuantidade->obEvento->setOnChange('gerarValorTotal();');
+    $obTxtQuantidade->setMaxLength(9);
+    $obTxtQuantidade->setDecimais (4);
+    $obTxtQuantidade->setFormatarNumeroBR  (true);
+    $obTxtQuantidade->obEvento->setOnChange('gerarValorTotal(this);');
 
     // Define Objeto Select para Unidade
     $obCmbUnidade = new Select;
@@ -484,30 +488,30 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbUnidade->preencheCombo( $rsUnidade     );
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlUnitario = new Moeda;
+    $obTxtVlUnitario = new ValorUnitario;
     $obTxtVlUnitario->setName              ('nuVlUnitario');
     $obTxtVlUnitario->setId                ('nuVlUnitario');
     $obTxtVlUnitario->setValue             ($nuVlUnitario);
     $obTxtVlUnitario->setRotulo            ('* Valor Unitário');
     $obTxtVlUnitario->setTitle             ('Informe o valor unitário.');
-    //$obTxtVlUnitario->setNull              (true);
     $obTxtVlUnitario->setDecimais          (4);
     $obTxtVlUnitario->setSize              (21);
-    $obTxtVlUnitario->setMaxLength         (21);
-    $obTxtVlUnitario->obEvento->setOnChange('geraValor(this); gerarValorTotal();');
+    $obTxtVlUnitario->setMaxLength         (10);
+    $obTxtVlUnitario->setFormatarNumeroBR  (true);
+    $obTxtVlUnitario->obEvento->setOnChange('geraValor(this); gerarValorTotal(this);');
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlTotal = new Moeda;
+    $obTxtVlTotal = new ValorTotal;
     $obTxtVlTotal->setName              ('nuVlTotal');
     $obTxtVlTotal->setId                ('nuVlTotal');
     $obTxtVlTotal->setValue             ($nuVlTotal);
     $obTxtVlTotal->setRotulo            ('*Valor Total');
     $obTxtVlTotal->setTitle             ('Informe o valor total.');
-    //$obTxtVlTotal->setNull              (true);
     $obTxtVlTotal->setReadOnly          (true);
     $obTxtVlTotal->setSize              (21);
-    $obTxtVlTotal->setMaxLength         (21);
-    $obTxtVlTotal->obEvento->setOnChange('gerarValorTotal();');
+    $obTxtVlTotal->setMaxLength         (12);
+    $obTxtVlTotal->setFormatarNumeroBR  (true);
+    $obTxtVlTotal->obEvento->setOnChange('gerarValorTotal(this);');
 
     // Define Objeto Button para  Incluir Item
     $obBtnIncluir = new Button;
@@ -558,12 +562,15 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     // Define objeto Data para validade final
     $obDtEmpenho = new Data;
     $obDtEmpenho->setName              ('stDtEmpenho');
-    $obDtEmpenho->setValue             ($dtUltimaDataEmpenho);
     $obDtEmpenho->setRotulo            ('Data de Empenho');
     $obDtEmpenho->setTitle             ('Informe a data do empenho.');
     $obDtEmpenho->setNull              (false);
-    // $obDtEmpenho->obEvento->setOnBlur  ('validaDataEmpenho();');
     $obDtEmpenho->obEvento->setOnChange("montaParametrosGET('verificaFornecedor', 'inCodFornecedor, inCodCategoria, inCodContraPartida'); buscaDado('buscaDespesaDiverso')");
+    if( $stDtEmpenho != '' ){
+        $obDtEmpenho->setValue ($stDtEmpenho);
+        $obDtEmpenho->setLabel ( TRUE );
+    }else
+        $obDtEmpenho->setValue ($dtUltimaDataEmpenho);
 
     // Define objeto Data para validade final
     $obDtValidadeFinal = new Data;
@@ -581,8 +588,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $rsAtributos->setPrimeiroElemento();
     while (!$rsAtributos->eof()) {
-        $stAtributos .=
-    'Atributo_'.$rsAtributos->getCampo('cod_atributo').'_'.$rsAtributos->getCampo('cod_cadastro').','.$rsAtributos->getCampo('nao_nulo').','.$rsAtributos->getCampo('nom_atributo').'#';
+        $stAtributos .= 'Atributo_'.$rsAtributos->getCampo('cod_atributo').'_'.$rsAtributos->getCampo('cod_cadastro').','.$rsAtributos->getCampo('nao_nulo').','.$rsAtributos->getCampo('nom_atributo').'#';
         $rsAtributos->proximo();
     }
 
@@ -599,7 +605,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     }
 
     if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
-
         include_once CAM_GPC_TGO_MAPEAMENTO.'TTCMGOModalidade.php';
 
         /* Monta combo com modalidades de licitação */
@@ -713,7 +718,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->addSpan($obSpanContrapartida);
     $obFormulario->addComponente($obTxtDescricao);
     $obFormulario->addComponenteComposto($obTxtCodTipo, $obCmbNomTipo);
-    
+
     $obFormulario->addComponente($obDtValidadeFinal);
     $obFormulario->addComponente($obCmbHistorico);
 
@@ -763,9 +768,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obFormulario->defineBarra(array($obOk, $obLimpar));
 
     $obFormulario->show();
-
 }
+
 echo ("<script>habilitaCampos('Descricao')</script>");
+
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';
 
 ?>

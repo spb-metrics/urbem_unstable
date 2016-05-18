@@ -356,7 +356,8 @@ function montaRecuperaArrecadacaoNaoEstornadaReceita()
     $stSql .= "         ,TARDE.vl_deducao                                                                         \n";
     $stSql .= "         ,TARDE.vl_deducao_estornado                                                               \n";
     $stSql .= "         ,TO_CHAR( TA.timestamp_arrecadacao, 'dd/mm/yyyy' ) as dt_arrecadacao                      \n";
-    $stSql .= "         ,TAER.descricao                                                                           \n";
+    $stSql .= "         ,TAER.descricao                                                                           \n"; 
+    $stSql .= "         ,lancamento_baixa_patrimonio_alienacao.cod_bem                                           \n";
     $stSql .= "     FROM                                                                                          \n";
     $stSql .= "         tesouraria.arrecadacao AS TA                                                              \n";
     $stSql .= "         INNER JOIN tesouraria.arrecadacao_estornada AS TAE ON (                                   \n";
@@ -442,7 +443,12 @@ function montaRecuperaArrecadacaoNaoEstornadaReceita()
     $stSql .= "             AND TA.cod_arrecadacao          = TARDE.cod_arrecadacao                               \n";
     $stSql .= "             AND TA.timestamp_arrecadacao    = TARDE.timestamp_arrecadacao                         \n";
     $stSql .= "         )                                                                                         \n";
-    $stSql .= "         ,tesouraria.boletim      AS TB                                                            \n";
+    $stSql .= "
+                 LEFT JOIN contabilidade.lancamento_baixa_patrimonio_alienacao
+                        ON TA.cod_arrecadacao       = lancamento_baixa_patrimonio_alienacao.cod_arrecadacao
+                       AND TA.exercicio             = lancamento_baixa_patrimonio_alienacao.exercicio_arrecadacao
+                       AND TA.timestamp_arrecadacao = lancamento_baixa_patrimonio_alienacao.timestamp_arrecadacao \n ";
+    $stSql .= "         , tesouraria.boletim      AS TB                                                           \n";
     $stSql .= "     WHERE                                                                                         \n";
     $stSql .= "             TA.cod_boletim          = TB.cod_boletim                                              \n";
     $stSql .= "         AND TA.exercicio            = TB.exercicio                                                \n";
@@ -475,6 +481,7 @@ function montaRecuperaArrecadacaoNaoEstornadaReceita()
     $stSql .= "         ,0.00 as vl_deducao_estornado                                                             \n";
     $stSql .= "         ,TO_CHAR( TA.timestamp_arrecadacao, 'dd/mm/yyyy' ) as dt_arrecadacao                      \n";
     $stSql .= "         ,TAR.descricao                                                                            \n";
+    $stSql .= "         ,lancamento_baixa_patrimonio_alienacao.cod_bem                                            \n";
     $stSql .= "     FROM                                                                                          \n";
     $stSql .= "         tesouraria.arrecadacao AS TA                                                              \n";
     $stSql .= "             LEFT JOIN tesouraria.arrecadacao_estornada AS TAE ON (                                \n";
@@ -512,7 +519,12 @@ function montaRecuperaArrecadacaoNaoEstornadaReceita()
     $stSql .= "                 AND TA.cod_arrecadacao          = TAR.cod_arrecadacao                             \n";
     $stSql .= "                 AND TA.timestamp_arrecadacao    = TAR.timestamp_arrecadacao                       \n";
     $stSql .= "             )                                                                                     \n";
-    $stSql .= "         ,tesouraria.boletim      AS TB                                                            \n";
+    $stSql .= "
+                 LEFT JOIN contabilidade.lancamento_baixa_patrimonio_alienacao
+                        ON TA.cod_arrecadacao       = lancamento_baixa_patrimonio_alienacao.cod_arrecadacao
+                       AND TA.exercicio             = lancamento_baixa_patrimonio_alienacao.exercicio_arrecadacao
+                       AND TA.timestamp_arrecadacao = lancamento_baixa_patrimonio_alienacao.timestamp_arrecadacao \n ";
+    $stSql .= "         , tesouraria.boletim      AS TB                                                           \n";
     $stSql .= "     WHERE                                                                                         \n";
     $stSql .= "             TAE.cod_arrecadacao     IS NULL                                                       \n";
     $stSql .= "         AND TA.cod_boletim          = TB.cod_boletim                                              \n";

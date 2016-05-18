@@ -28,60 +28,30 @@
     * Data de Criação: 13/07/2004
 
     * @author Analista: Dieine
+    * @author Analista: Jorge B. Ribarr
     * @author Desenvolvedor: Marcelo B. Paulino
+    * @author Desenvolvedor: Eduardo Martins
 
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Revision: 30668 $
-    $Name$
-    $Author: cako $
-    $Date: 2007-12-05 15:12:56 -0200 (Qua, 05 Dez 2007) $
+    $Id: TOrcamentoSuplementacao.class.php 65255 2016-05-05 20:25:44Z michel $
 
     * Casos de uso: uc-02.01.24
                     uc-02.01.07
                     uc-02.01.25
 */
 
-/*
-$Log$
-Revision 1.22  2007/08/16 14:29:14  cako
-Bug#9935#
-
-Revision 1.21  2007/08/15 19:16:35  vitor
-Bug#9923#
-
-Revision 1.20  2007/01/24 18:42:33  andre.almeida
-Adicionado consultas para o e-Sfinge (TCE-SC)
-
-Revision 1.19  2006/07/14 17:58:12  andre.almeida
-Bug #6556#
-
-Alterado scripts de NOT IN para NOT EXISTS.
-
-Revision 1.18  2006/07/05 20:42:02  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+include_once CLA_PERSISTENTE;
 
-/**
-  * Efetua conexão com a tabela  ORCAMENTO.SUPLEMENTACAO
-  * Data de Criação: 02/02/2005
-
-  * @author Analista: Jorge B. Ribarr
-  * @author Desenvolvedor: Eduardo Martins
-
-*/
 class TOrcamentoSuplementacao extends Persistente
 {
 /**
     * Método Construtor
     * @access Private
 */
-function TOrcamentoSuplementacao()
+function __construct()
 {
     parent::Persistente();
     $this->setTabela('orcamento.suplementacao');
@@ -1787,25 +1757,28 @@ function recuperaValorTotalSuplementado(&$rsRecordSet, $stCondicao = "", $stOrde
 
 function montaRecuperaValorTotalSuplementado()
 {
-    $stSql="    SELECT SUM(suplementacao_suplementada.valor) as valor_suplementado       
-                
-                FROM orcamento.suplementacao  
-                
+    $stSql="
+                    SELECT SUM(suplementacao_suplementada.valor) as valor_suplementado
+
+                      FROM orcamento.suplementacao  
+
                 INNER JOIN orcamento.suplementacao_suplementada
                         ON suplementacao_suplementada.cod_suplementacao = suplementacao.cod_suplementacao
                        AND suplementacao_suplementada.exercicio         = suplementacao.exercicio
-                
-                LEFT JOIN orcamento.suplementacao_anulada
-                       ON suplementacao_anulada.exercicio         = suplementacao.exercicio
-                      AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
-                
-                WHERE suplementacao_anulada.cod_suplementacao IS NULL
-                  AND suplementacao.cod_tipo = 1 
+
+                 LEFT JOIN orcamento.suplementacao_anulada
+                        ON suplementacao_anulada.exercicio         = suplementacao.exercicio
+                       AND suplementacao_anulada.cod_suplementacao = suplementacao.cod_suplementacao
+
+                 LEFT JOIN orcamento.despesa
+                        ON despesa.exercicio   = suplementacao_suplementada.exercicio
+                       AND despesa.cod_despesa = suplementacao_suplementada.cod_despesa
+
+                     WHERE suplementacao_anulada.cod_suplementacao IS NULL
+                       AND suplementacao.cod_tipo = 1 
             ";
 
     return $stSql;
 }
-
-
 
 }//END OF CLASS

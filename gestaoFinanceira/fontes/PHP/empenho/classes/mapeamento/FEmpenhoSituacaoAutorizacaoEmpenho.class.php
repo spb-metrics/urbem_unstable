@@ -36,108 +36,119 @@
 
     * Casos de uso: uc-02.03.34
 */
-
-/*
-
-$Log:
-
-*/
-
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once ( CLA_PERSISTENTE );
+require_once CLA_PERSISTENTE;
 
 class FEmpenhoSituacaoAutorizacaoEmpenho extends Persistente
 {
-/**
-    * Método Construtor
-    * @access Private
-*/
-function FEmpenhoSituacaoAutorizacaoEmpenho()
-{
-    parent::Persistente();
-
-    $this->setTabela('empenho.fn_situacao_autorizacao_empenho');
-
-    $this->AddCampo('empenho'       ,'integer',false,''    ,false,false);
-    $this->AddCampo('entidade'      ,'integer',false,''    ,false,false);
-    $this->AddCampo('exercicio'     ,'varchar',false,''    ,false,false);
-    $this->AddCampo('emissao'       ,'text',false,''       ,false,false);
-    $this->AddCampo('credor'        ,'varchar',false,''    ,false,false);
-    $this->AddCampo('empenhado'     ,'numeric',false,'14.2',false,false);
-    $this->AddCampo('anulado'       ,'numeric',false,'14.2',false,false);
-    $this->AddCampo('liquidado'     ,'numeric',false,'14.2',false,false);
-    $this->AddCampo('pago'          ,'numeric',false,'14.2',false,false);
-    $this->AddCampo('data_pagamento','text',false,''       ,false,false);
-}
-
-function montaRecuperaTodos()
-{
-    $stSql  = "select retorno.* \n";
-    $stSql .= "  from " . $this->getTabela() . "('" . $this->getDado("stEntidade") ."',             \n";
-    $stSql .= "  '" . $this->getDado("exercicio") . "','" . $this->getDado("stDataInicialEmissao")."',         \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalEmissao")."','" . $this->getDado("stDataInicialAnulacao")."',   \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalAnulacao")."','" . $this->getDado("stDataInicialLiquidacao")."',   \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalLiquidacao")."','" . $this->getDado("stDataInicialEstornoLiquidacao")."',   \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalEstornoLiquidacao")."','" . $this->getDado("stDataInicialPagamento")."',   \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalPagamento")."','" . $this->getDado("stDataInicialEstornoPagamento")."',   \n";
-    $stSql .= "  '" . $this->getDado("stDataFinalEstornoPagamento")."','" . $this->getDado("inCodEmpenhoInicial")."',   \n";
-    $stSql .= "  '" . $this->getDado("inCodEmpenhoFinal")."','" . $this->getDado("inCodDotacao")."', \n";
-    $stSql .= "  '" . $this->getDado("inCodDespesa")."','" . $this->getDado("inCodRecurso")."', \n";
-    $stSql .= "  '" . $this->getDado("stDestinacaoRecurso")."','" . $this->getDado("inCodDetalhamento")."', \n";
-    $stSql .= "  '" . $this->getDado("inNumOrgao")."','" . $this->getDado("inNumUnidade")."', \n";
-    $stSql .= "  '" . $this->getDado("inOrdenacao")."','" . $this->getDado("inCodFornecedor")."', \n";
-    $stSql .= "  '" . $this->getDado("inSituacao")."', \n";
-    $stSql .= "  '" . $this->getDado("inCodAutorizacao")."' ) as retorno(                                        \n";
-    $stSql .= "  autorizacao         integer,                                           \n";
-    $stSql .= "  exercicio           char(4),                                           \n";
-    $stSql .= "  emissao             text,                                              \n";
-    $stSql .= "  entidade            integer,                                           \n";
-    $stSql .= "  credor              varchar,                                           \n";
-    $stSql .= "  empenho             integer,                                           \n";
-    $stSql .= "  autorizado          numeric,                                           \n";
-    $stSql .= "  autorizado_anulado  numeric,                                           \n";
-    $stSql .= "  saldoautorizado     numeric,                                           \n";
-    $stSql .= "  liquidado           numeric,                                           \n";
-    $stSql .= "  pago                numeric,                                           \n";
-    $stSql .= "  empenhadoapagar     numeric                                            \n";
-    $stSql .= "  )                                                                        ";
-
-    if (Sessao::getExercicio() > '2015') {
-        $stSql .= " INNER JOIN empenho.empenho
-                            ON empenho.cod_empenho = retorno.empenho
-                           AND empenho.exercicio = retorno.exercicio
-                           AND empenho.cod_entidade = retorno.entidade
- 
-                    INNER JOIN empenho.pre_empenho
-                            ON pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
-                           AND pre_empenho.exercicio = empenho.exercicio
- 
-                    INNER JOIN empenho.item_pre_empenho
-                            ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
-                           AND item_pre_empenho.exercicio = pre_empenho.exercicio \n";
-
-        if ($this->getDado('inCentroCusto') != "") {
-            $stSql .= " WHERE item_pre_empenho.cod_centro = ".$this->getDado('inCentroCusto')." \n";
-        }
-        
-        
-        $stSql .= "   GROUP BY  retorno.autorizacao
-                              , retorno.exercicio
-                              , retorno.emissao
-                              , retorno.entidade
-                              , retorno.credor
-                              , retorno.empenho
-                              , retorno.autorizado
-                              , retorno.autorizado_anulado
-                              , retorno.saldoautorizado
-                              , retorno.liquidado
-                              , retorno.pago
-                              , retorno.empenhadoapagar
-                              
-                     ORDER BY retorno.autorizacao";
+    /**
+        * Método Construtor
+        * @access Private
+    */
+    public function __construct()
+    {
+        parent::Persistente();
+    
+        $this->setTabela('empenho.fn_situacao_autorizacao_empenho');
+    
+        $this->AddCampo('empenho'       , 'INTEGER', false,    '', false, false);
+        $this->AddCampo('entidade'      , 'INTEGER', false,    '', false, false);
+        $this->AddCampo('exercicio'     , 'varchar', false,    '', false, false);
+        $this->AddCampo('emissao'       ,    'text', false,    '', false, false);
+        $this->AddCampo('credor'        , 'varchar', false,    '', false, false);
+        $this->AddCampo('empenhado'     , 'numeric', false,'14.2', false, false);
+        $this->AddCampo('anulado'       , 'numeric', false,'14.2', false, false);
+        $this->AddCampo('liquidado'     , 'numeric', false,'14.2', false, false);
+        $this->AddCampo('pago'          , 'numeric', false,'14.2', false, false);
+        $this->AddCampo('data_pagamento',    'text', false,    '', false, false);
     }
 
-    return $stSql;
-}
-
+    public function montaRecuperaTodos()
+    {
+        $stSql  = "
+                  SELECT retorno.* 
+                    FROM ".$this->getTabela()." ( '".$this->getDado("stEntidade")."'
+                                                , '".$this->getDado("exercicio")."'
+                                                , '".$this->getDado("stDataInicialEmissao")."'
+                                                , '".$this->getDado("stDataFinalEmissao")."'
+                                                , '".$this->getDado("stDataInicialAnulacao")."'
+                                                , '".$this->getDado("stDataFinalAnulacao")."'
+                                                , '".$this->getDado("stDataInicialLiquidacao")."'
+                                                , '".$this->getDado("stDataFinalLiquidacao")."'
+                                                , '".$this->getDado("stDataInicialEstornoLiquidacao")."'
+                                                , '".$this->getDado("stDataFinalEstornoLiquidacao")."'
+                                                , '".$this->getDado("stDataInicialPagamento")."'
+                                                , '".$this->getDado("stDataFinalPagamento")."'
+                                                , '".$this->getDado("stDataInicialEstornoPagamento")."'
+                                                , '".$this->getDado("stDataFinalEstornoPagamento")."'
+                                                , '".$this->getDado("inCodEmpenhoInicial")."'
+                                                , '".$this->getDado("inCodEmpenhoFinal")."'
+                                                , '".$this->getDado("inCodDotacao")."'
+                                                , '".$this->getDado("inCodDespesa")."'
+                                                , '".$this->getDado("inCodRecurso")."'
+                                                , '".$this->getDado("stDestinacaoRecurso")."'
+                                                , '".$this->getDado("inCodDetalhamento")."'
+                                                , '".$this->getDado("inNumOrgao")."'
+                                                , '".$this->getDado("inNumUnidade")."'
+                                                , '".$this->getDado("inOrdenacao")."'
+                                                , '".$this->getDado("inCodFornecedor")."'
+                                                , '".$this->getDado("inSituacao")."'
+                                                , '".$this->getDado("inCodAutorizacao")."'
+                                                )
+                                       AS retorno
+                                                ( autorizacao         integer
+                                                , exercicio           char(4)
+                                                , emissao             text
+                                                , entidade            integer
+                                                , credor              varchar
+                                                , empenho             integer
+                                                , autorizado          numeric
+                                                , autorizado_anulado  numeric
+                                                , saldoautorizado     numeric
+                                                , liquidado           numeric
+                                                , pago                numeric
+                                                , empenhadoapagar     numeric
+                                                )
+        ";
+        if (Sessao::getExercicio() > '2015') {
+            if ($this->getDado("inCentroCusto") != '') {
+                $stSql .= "
+              INNER JOIN (
+                          SELECT empenho.cod_empenho
+                               , empenho.cod_entidade
+                               , empenho.exercicio
+                            FROM empenho.empenho
+                      INNER JOIN empenho.pre_empenho
+                              ON pre_empenho.exercicio = empenho.exercicio
+                             AND pre_empenho.cod_pre_empenho = empenho.cod_pre_empenho
+                      INNER JOIN empenho.item_pre_empenho
+                              ON item_pre_empenho.cod_pre_empenho = pre_empenho.cod_pre_empenho
+                             AND item_pre_empenho.exercicio = pre_empenho.exercicio
+                           WHERE item_pre_empenho.cod_centro = ".$this->getDado("inCentroCusto")."
+                        GROUP BY empenho.cod_empenho
+                               , empenho.cod_entidade
+                               , empenho.exercicio
+                         ) AS empenho
+                      ON empenho.cod_empenho  = retorno.empenho
+                     AND empenho.cod_entidade = retorno.entidade
+                     AND empenho.exercicio    = retorno.exercicio
+                ";
+            }
+        }
+        $stSql .= "
+                GROUP BY retorno.autorizacao
+                       , retorno.exercicio
+                       , to_date(retorno.emissao,'dd/mm/yyyy')
+                       , retorno.entidade
+                       , retorno.credor
+                       , retorno.empenho
+                       , retorno.autorizado
+                       , retorno.autorizado_anulado
+                       , retorno.saldoautorizado
+                       , retorno.liquidado
+                       , retorno.pago
+                       , retorno.empenhadoapagar
+                ORDER BY retorno.autorizacao
+        ";
+         return $stSql;
+    }
 }

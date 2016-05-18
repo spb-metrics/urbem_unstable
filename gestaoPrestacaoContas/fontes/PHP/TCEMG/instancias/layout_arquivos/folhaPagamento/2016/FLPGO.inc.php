@@ -82,7 +82,7 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
     
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_cpf");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(11);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_reduzido_pessoa");
@@ -105,6 +105,11 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao_situacao");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(150);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_concessao_aposentadoria_pensao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
@@ -120,6 +125,11 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
+        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao_sigla_cargo");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(150);
+        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("requisito_cargo");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
@@ -132,12 +142,12 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nome_lotacao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(120);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(250);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_horas_semanais");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(2);
+        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_efetivacao_exercicio_cargo");
@@ -148,11 +158,6 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("data_exclusao");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_saldo_bruto");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
         $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_remuneracao_bruto");
@@ -175,11 +180,6 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
         $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(17);
         $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_teto_remuneracao");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(15);
-        $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
         //REGISTRO 11
         $stChave11 = '';
         $stChave11Unica = '';
@@ -191,7 +191,7 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
                 //Registro unico 11
                 $stChave11Aux = $arFolha11['num_cpf'].$arFolha11['cod_reduzido_pessoa'].$arFolha11['tipo_remuneracao'];
                 //Caso a chave seja igual ignorar pq pode ir mais de um tipo_remuneracao se ele for 14
-                if ($stChave11Unica !== $stChave11Aux || ($stChave11Unica == $stChave11Aux && $arFolha11['tipo_remuneracao'] == 14) ) {
+                if ($stChave11Unica !== $stChave11Aux || ($stChave11Unica == $stChave11Aux && $arFolha11['tipo_remuneracao'] == 99) ) {
                     $stChave11Unica = $stChave11Aux;
 
                     $rsBloco = 'rsBloco_'.$inCount;
@@ -208,7 +208,7 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
     
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_cpf");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(11);
+                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(14);
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
     
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_reduzido_pessoa");
@@ -224,11 +224,6 @@ if ( $rsRecordSet10->getNumLinhas() > 0) {
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("descricao_outros");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
                     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(150);
-                    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("natureza_saldo");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoMaximo(1);
                     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
                     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor_remuneracao");

@@ -32,11 +32,13 @@
 
     * @ignore
 
-    $Id: OCResumoExecucaoRP.php 64462 2016-02-25 17:57:26Z michel $
+    $Id: OCResumoExecucaoRP.php 65308 2016-05-11 20:00:27Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+
+$stJs = "";
 
 switch ($request->get('stCtrl')) {
     default:
@@ -52,6 +54,8 @@ switch ($request->get('stCtrl')) {
         $inCodEntidades     = $request->get('inCodEntidade');
         $stExercicioEmpenho = $request->get('inExercicio');
         $inCGM              = $request->get('inCGM');
+        $inOrgao            = ($request->get('inCodOrgao') == "") ? 0 : $request->get('inCodOrgao');
+        $inUnidade          = ($request->get('inCodUnidade') == "") ? 0 : $request->get('inCodUnidade');
 
         $stExercicio = Sessao::getExercicio();
 
@@ -64,6 +68,8 @@ switch ($request->get('stCtrl')) {
         $obFEmpenhoRelatorioResumoExecucaoRP->setDado( 'dt_final'          , $stDataFinal);
         $obFEmpenhoRelatorioResumoExecucaoRP->setDado( 'exercicio_empenho' , $stExercicioEmpenho);
         $obFEmpenhoRelatorioResumoExecucaoRP->setDado( 'cgm_credor'        , $inCGM);
+        $obFEmpenhoRelatorioResumoExecucaoRP->setDado( 'inOrgao'           , $inOrgao);
+        $obFEmpenhoRelatorioResumoExecucaoRP->setDado( 'inUnidade'         , $inUnidade);
 
         //Array Filtro
         $inCount = 0;
@@ -85,6 +91,31 @@ switch ($request->get('stCtrl')) {
         $arFiltro[$inCount]['titulo'] = 'Data Final';
         $arFiltro[$inCount]['valor']  = $stDataFinal;
 
+        if($inOrgao > 0){
+            $inCount++;
+
+            $stWhere  = " where exercicio='".Sessao::getExercicio()."'";
+            $stWhere .= " and num_orgao = ".$inOrgao;
+
+            $stNomOrgao = SistemaLegado::pegaDado('nom_orgao', 'orcamento.orgao', $stWhere);
+
+            $arFiltro[$inCount]['titulo'] = 'Órgão';
+            $arFiltro[$inCount]['valor']  = $inOrgao.' - '.$stNomOrgao;
+
+            if($inUnidade > 0){
+                $inCount++;
+
+                $stWhere  = " where exercicio='".Sessao::getExercicio()."'";
+                $stWhere .= " and num_unidade = ".$inUnidade;
+                $stWhere .= " and num_orgao = ".$inOrgao;
+
+                $stNomUnidade = SistemaLegado::pegaDado('nom_unidade', 'orcamento.unidade', $stWhere);
+
+                $arFiltro[$inCount]['titulo'] = 'Unidade';
+                $arFiltro[$inCount]['valor']  = $inUnidade.' - '.$stNomUnidade;
+            }
+        }
+
         $assinaturas = Sessao::read('assinaturas');
         if ( count($assinaturas['selecionadas']) > 0 ) {
             include_once CAM_FW_PDF."RAssinaturas.class.php";
@@ -99,7 +130,6 @@ switch ($request->get('stCtrl')) {
 
         //Gerando os records sets
         $obFEmpenhoRelatorioResumoExecucaoRP->recuperaTodos($rsExecucaoRP);
-
         $arExecucaoRP = $rsExecucaoRP->getElementos();
 
         //SOMAR TODOS OS ARRAYS
@@ -164,6 +194,31 @@ switch ($request->get('stCtrl')) {
         $obRRelatorio->executaFrameOculto( "OCGeraRelatorioResumoExecucaoRP.php" );
 
     break;
+
+    case "MontaUnidade":
+        $stJs .= "limpaSelect(f.inCodUnidade,0); \n";
+        $stJs .= "jq('#inCodUnidadeTxt').val(''); \n";
+        $stJs .= "jq('#inCodUnidade').append( new Option('Selecione','', 'selected')) ;\n";
+
+        if ($request->get('inCodOrgao', '') != '') {
+            include_once CAM_GF_EMP_NEGOCIO."REmpenhoRelatorioRPAnuLiqEstLiq.class.php";
+            $obREmpenhoRPAnuLiqEstLiq = new REmpenhoRelatorioRPAnuLiqEstLiq;
+            $obREmpenhoRPAnuLiqEstLiq->obROrcamentoUnidadeOrcamentaria->obROrcamentoOrgaoOrcamentario->setNumeroOrgao($request->get('inCodOrgao'));
+            $obREmpenhoRPAnuLiqEstLiq->obROrcamentoUnidadeOrcamentaria->setExercicio(Sessao::getExercicio());
+            $obREmpenhoRPAnuLiqEstLiq->obROrcamentoUnidadeOrcamentaria->consultar( $rsCombo, "", "", $boTransacao );
+
+            $inCount = 0;
+            while (!$rsCombo->eof()) {
+                $inCount++;
+                $inId   = $rsCombo->getCampo("num_unidade");
+                $stDesc = $rsCombo->getCampo("nom_unidade");
+                $stJs .= "jq('#inCodUnidade').append( new Option(\"".$rsCombo->getCampo("nom_unidade")."\",\"".$rsCombo->getCampo("num_unidade")."\" )); \n";
+                $rsCombo->proximo();
+            }
+        }
+    break;
 }
+
+echo $stJs;
 
 ?>

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOExtraOrcamentarias.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTCMGOExtraOrcamentarias.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -88,38 +88,16 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                      END
                                 ELSE '000'
                        END AS desdobra_subtipo
-                       ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                     '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
                        , '' AS branco
-                       , arquivo_ext.sequencial ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+                       , arquivo_ext.sequencial
+                       , plano_analitica.cod_plano as nro_extra_orcamentaria
                        from tcmgo.balancete_extmmaa
                        join contabilidade.plano_analitica
                          on ( balancete_extmmaa.exercicio = plano_analitica.exercicio
@@ -154,13 +132,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                    GROUP BY  balancete_extmmaa.tipo_lancamento,balancete_extmmaa.sub_tipo_lancamento
                           , plano_conta.nom_conta
                           , plano_conta.cod_estrutural
-                          , arquivo_ext.sequencial";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+                          , arquivo_ext.sequencial
+                          , plano_analitica.cod_plano
 
                      union
 
@@ -195,38 +168,16 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                       END
                                  ELSE '000'
                         END AS desdobra_subtipo
-                        ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                     '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
                        , '' AS branco
-                       , arquivo_ext.sequencial ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+                       , arquivo_ext.sequencial
+                       , plano_analitica.cod_plano as nro_extra_orcamentaria
                        from tcmgo.balancete_extmmaa
                        join contabilidade.plano_analitica
                          on ( balancete_extmmaa.exercicio = plano_analitica.exercicio
@@ -261,13 +212,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                    GROUP BY balancete_extmmaa.tipo_lancamento,balancete_extmmaa.sub_tipo_lancamento
                           , plano_conta.nom_conta
                           , plano_conta.cod_estrutural
-                          , arquivo_ext.sequencial ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+                          , arquivo_ext.sequencial
+                          , plano_analitica.cod_plano
                 ) AS registros
          ORDER BY tipo_registro
                 , sequencial
@@ -394,9 +340,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
               END                                         AS desdobra_subtipo
             , banco.num_banco AS banco
             , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -408,35 +351,11 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
             , ABS(SUM(transferencia_estornada.valor))               AS valor
-            , '' AS branco";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , plano_analitica.cod_plano as nro_extra_orcamentaria
          FROM tcmgo.orgao
             , tcmgo.balancete_extmmaa
          JOIN contabilidade.plano_analitica
@@ -493,13 +412,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
             , agencia.num_agencia
             , tipo_conta
             , conta_corrente.num_conta_corrente
-            , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+            , plano_conta.cod_estrutural
+            , plano_analitica.cod_plano
 
         UNION
 
@@ -530,9 +444,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
               END                                         AS desdobra_subtipo
             , banco.num_banco AS banco
             , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -544,35 +455,11 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
             , ABS(SUM(transferencia.valor))               AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , plano_analitica.cod_plano as nro_extra_orcamentaria
          FROM tcmgo.orgao
             , tcmgo.balancete_extmmaa
          JOIN contabilidade.plano_analitica
@@ -624,13 +511,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
             , agencia.num_agencia
             , tipo_conta
             , conta_corrente.num_conta_corrente
-            , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+            , plano_conta.cod_estrutural
+            , plano_analitica.cod_plano
 
        UNION
 
@@ -661,10 +543,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              END                                         AS desdobra_subtipo
             , banco.num_banco AS banco
             , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -676,36 +554,11 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
             , ABS(SUM(transferencia.valor))               AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
-
+            , '' AS branco
+            , plano_analitica.cod_plano as nro_extra_orcamentaria
         FROM tcmgo.orgao
            , tcmgo.balancete_extmmaa
         JOIN contabilidade.plano_analitica
@@ -745,13 +598,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
            , agencia.num_agencia
            , tipo_conta
            , conta_corrente.num_conta_corrente
-           , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+           , plano_conta.cod_estrutural
+           , plano_analitica.cod_plano
 
       UNION
 
@@ -782,9 +630,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              END                                         AS desdobra_subtipo
             , banco.num_banco AS banco
             , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -796,36 +641,11 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
             , ABS(SUM(transferencia_estornada.valor))               AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
-
+            , '' AS branco
+            , plano_analitica.cod_plano as nro_extra_orcamentaria
         FROM tcmgo.orgao
            , tcmgo.balancete_extmmaa
         JOIN contabilidade.plano_analitica
@@ -870,13 +690,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
            , agencia.num_agencia
            , tipo_conta
            , conta_corrente.num_conta_corrente
-           , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , plano_analitica.cod_plano ";
-        }
-
-        $stSQL .= "
+           , plano_conta.cod_estrutural
+           , plano_analitica.cod_plano
           ) AS registros
    ORDER BY tipo_registro
           , orgao
@@ -927,9 +742,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                END                                         AS desdobra_subtipo
              , banco.num_banco AS banco
              , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-             ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -941,37 +753,13 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
              , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
              , ABS(SUM(transferencia_estornada.valor))     AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , pa1.cod_plano as nro_extra_orcamentaria
           FROM tcmgo.orgao
              , tcmgo.balancete_extmmaa
           JOIN contabilidade.plano_analitica pa1
@@ -1028,13 +816,7 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
              , plano_conta.cod_estrutural
-             ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano ";
-        }
-
-        $stSQL .= "
+             , pa1.cod_plano
 
         UNION
 
@@ -1065,10 +847,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                END                                         AS desdobra_subtipo
              , banco.num_banco AS banco
              , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-
-             ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -1080,37 +858,13 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
              , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
              , ABS(SUM(transferencia.valor))     AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , pa1.cod_plano as nro_extra_orcamentaria
           FROM tcmgo.orgao
              , tcmgo.balancete_extmmaa
           JOIN contabilidade.plano_analitica pa1
@@ -1161,13 +915,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              , conta_corrente.num_conta_corrente
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
-             , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano ";
-        }
-
-        $stSQL .= "
+             , plano_conta.cod_estrutural
+             , pa1.cod_plano
 
          UNION
 
@@ -1198,10 +947,6 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                END                                         AS desdobra_subtipo
             , banco.num_banco AS banco
             , ltrim(replace(num_agencia,'-',''),'0') AS agencia
-
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN  (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                       LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '9')
                             ELSE
@@ -1213,37 +958,13 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          ,CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    LPAD(ltrim(split_part(num_conta_corrente,'-',1),'0'), 12, '0')
-                          ELSE
-                                    ltrim(split_part(num_conta_corrente,'-',1),'0')
-                          END AS conta_corrente
-                         , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
             , plano_recurso.cod_recurso
             , recurso.cod_fonte
             , ABS(SUM(transferencia.valor))               AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , pa1.cod_plano as nro_extra_orcamentaria
 
           FROM tcmgo.orgao
              , tcmgo.balancete_extmmaa
@@ -1295,13 +1016,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              , conta_corrente.num_conta_corrente
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
-             , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano ";
-        }
-
-        $stSQL .= "
+             , plano_conta.cod_estrutural
+             , pa1.cod_plano
 
         UNION
 
@@ -1338,40 +1054,18 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
                   ltrim(split_part(num_conta_corrente,'-',1),'0')
                 END AS conta_corrente
             , ltrim(split_part(num_conta_corrente,'-',2),'0') AS digito
-            ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSQL .= "
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                     '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSQL .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSQL .= "
+                          END as tipo_conta
             , plano_recurso.cod_recurso
             , recurso.cod_fonte
             , ABS(SUM(transferencia_estornada.valor))               AS valor
-            , '' AS branco ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano as nro_extra_orcamentaria ";
-        }
-
-        $stSQL .= "
+            , '' AS branco
+            , pa1.cod_plano as nro_extra_orcamentaria
 
           FROM tcmgo.orgao
              , tcmgo.balancete_extmmaa
@@ -1428,13 +1122,8 @@ class TTCMGOExtraOrcamentarias extends TOrcamentoContaReceita
              , conta_corrente.num_conta_corrente
              , plano_recurso.cod_recurso
              , recurso.cod_fonte
-             , plano_conta.cod_estrutural ";
-
-        if (Sessao::getExercicio() > 2012) {
-            $stSQL .= " , pa1.cod_plano ";
-        }
-
-        $stSQL .= "
+             , plano_conta.cod_estrutural
+             , pa1.cod_plano
         ) AS registros
  ORDER BY tipo_registro
         , orgao

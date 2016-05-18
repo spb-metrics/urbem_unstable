@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGOAnulacaoEmpenho.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTCMGOAnulacaoEmpenho.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -88,11 +88,8 @@ class TTCMGOAnulacaoEmpenho extends TEmpenhoEmpenho
                          , CASE WHEN ( elemento_de_para.estrutural IS NOT NULL )
                                 THEN substr(replace(elemento_de_para.estrutural,'.',''),7,2)
                                 ELSE '00'
-                            END AS sub_elemento_despesa ";
-      if (Sessao::getExercicio() > 2012) {
-        $stSQL .= " , sw_cgm.cod_pais ";
-      }
-      $stSQL .= "
+                            END AS sub_elemento_despesa
+                         , sw_cgm.cod_pais
                     from empenho.empenho
                     join empenho.pre_empenho
                       on ( empenho.exercicio       = pre_empenho.exercicio
@@ -388,7 +385,7 @@ class TTCMGOAnulacaoEmpenho extends TEmpenhoEmpenho
                LEFT JOIN tcmgo.elemento_de_para
                       ON elemento_de_para.cod_conta = conta_despesa.cod_conta
                      AND elemento_de_para.exercicio = conta_despesa.exercicio
-                    where empenho.exercicio = '2011'
+                    where empenho.exercicio = '". $this->getDado('exercicio')."'
                       and empenho.dt_empenho::date BETWEEN to_date( '".$this->getDado('dtInicio')."', 'dd/mm/yyyy' ) AND to_date( '".$this->getDado('dtFim')."', 'dd/mm/yyyy' )
         ";
         if ( $this->getDado ( 'stEntidades' ) ) {

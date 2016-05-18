@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: EOC.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: EOC.inc.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -166,11 +166,9 @@
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
 
-                if (Sessao::getExercicio() > 2013) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_obra");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -247,11 +245,9 @@
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(06);
 
-                if (Sessao::getExercicio() > 2013) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_unidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nro_contrato");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -267,11 +263,7 @@
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_empenho");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-                if (Sessao::getExercicio() > 2013) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
-                } else {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

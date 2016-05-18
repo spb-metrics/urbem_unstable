@@ -41,25 +41,6 @@
 
 */
 
-/*
-$Log$
-Revision 1.5  2007/08/22 16:09:02  cako
-Bug#9971#
-
-Revision 1.4  2007/02/23 16:44:05  luciano
-#7856#
-
-Revision 1.3  2007/01/15 16:57:44  luciano
-Bug #7856#
-
-Revision 1.2  2006/10/23 16:33:46  domluc
-Add opção para multiplos boletins
-
-Revision 1.1  2006/09/01 16:56:54  jose.eduardo
-uc-02.04.04
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CLA_IAPPLETTERMINAL;
@@ -185,8 +166,10 @@ $obHdnVlDeducao = new Hidden();
 $obHdnVlDeducao->setName( 'nuValorDeducao' );
 $obHdnVlDeducao->setValue( $_REQUEST['nuValorDeducao'] );
 
-if ($_REQUEST['nuValorDeducao'] != '0,00') {
+if ( $request->get('nuValorDeducao') != '') {
     SistemaLegado::exibeAviso("Arrecadação com Dedução: O estorno não poderá ser parcial.","","aviso");
+} elseif ( $request->get('inCodBemAlienacao') != '') {
+    SistemaLegado::exibeAviso("Arrecadação com Alienação: O estorno não poderá ser parcial.","","aviso");
 }
 
 $obHdnVlDeducaoEstornado = new Hidden();
@@ -199,18 +182,6 @@ $obApplet = new IAppletTerminal( $obForm );
 $obILabelEntidade = new ILabelEntidade( $obForm );
 $obILabelEntidade->setMostraCodigo( true );
 $obILabelEntidade->setCodEntidade( $_REQUEST['inCodEntidade'] );
-
-// Define Objeto Label para número do boletim
-//$obLblNumeroBoletim = new Label;
-//$obLblNumeroBoletim->setRotulo  ( "*Número do Boletim" );
-//$obLblNumeroBoletim->setId      ( "inCodBoletimLbl"   );
-//$obLblNumeroBoletim->setValue   ( $_REQUEST['inCodBoletim'] );
-//
-// Define Objeto Label para data do boletim
-//$obLblDtBoletim = new Label;
-//$obLblDtBoletim->setRotulo  ( "Data do Boletim" );
-//$obLblDtBoletim->setId      ( "stDtBoletimLbl"  );
-//$obLblDtBoletim->setValue   ( $_REQUEST['stDtBoletim'] );
 
 require_once( CAM_GF_TES_COMPONENTES . 'ISelectBoletim.class.php' );
 $obISelectBoletim = new ISelectBoletim;
@@ -240,13 +211,9 @@ $obLblVlArrecadado->setRotulo  ( "Valor Arrecadado" );
 $obLblVlArrecadado->setId      ( "stVlArrecadadoLbl"  );
 $obLblVlArrecadado->setValue   ( $_REQUEST['nuValor'] );
 
-if ($_REQUEST['inCodReceitaDedutora']) {
+if ( $request->get('inCodReceitaDedutora') ) {
     $nuValorDeducao  = str_replace(".","",$_REQUEST['nuValorDeducao']);
     $nuValorDeducao  = str_replace(",",".",$nuValorDeducao);
-
-    //$nuValorEstornar = bcsub($nuValor,$nuValorDeducao,2);
-    //$nuValorEstornar = bcsub($nuValorEstornar,$nuValorEstornado,2);
-    //$nuValorEstornar = number_format($nuValorEstornar, "2", ",", ".");
 
     $obHdnValorEstornar = new Hidden();
     $obHdnValorEstornar->setName    ( "nuValorEstornar" );
@@ -255,33 +222,7 @@ if ($_REQUEST['inCodReceitaDedutora']) {
     $obLblVlEstornar = new Label;
     $obLblVlEstornar->setRotulo  ( "Valor a Estornar" );
     $obLblVlEstornar->setValue   ( $nuValorEstornar   );
-
-} else {
-
-    // Define Objeto Label para valor estornado
-    $obLblVlEstornado = new Label;
-    $obLblVlEstornado->setRotulo  ( "Valor Estornado" );
-    $obLblVlEstornado->setId      ( "stVlEstornadoLbl"  );
-    $obLblVlEstornado->setValue   ( $_REQUEST['nuValorEstornado'] );
-
-    // Define Obeto Numerico para valor a estornar
-    $obTxtValorEstornar = new Numerico();
-    $obTxtValorEstornar->setRotulo   ("*Valor a Estornar"        );
-    $obTxtValorEstornar->setTitle    ("Digite o Valor a Estornar");
-    $obTxtValorEstornar->setName     ("nuValorEstornar"          );
-    $obTxtValorEstornar->setId       ("nuValorEstornar"          );
-    $obTxtValorEstornar->setValue    ($nuValorEstornar 			 );
-    $obTxtValorEstornar->setNull     (false                      );
-    $obTxtValorEstornar->setDecimais (2                          );
-    $obTxtValorEstornar->setNegativo (false                      );
-    $obTxtValorEstornar->setNull     (true                       );
-    $obTxtValorEstornar->setSize     (17                         );
-    $obTxtValorEstornar->setMaxLength(17                         );
-    $obTxtValorEstornar->setMinValue (0.01                       );
-
-}
-
-if ($_REQUEST['inCodReceitaDedutora']) {
+    
     $nuValorDeducaoEstornado = str_replace(".","",$_REQUEST['nuValorDeducaoEstornado']);
     $nuValorDeducaoEstornado = str_replace(",",".",$nuValorDeducaoEstornado);
 
@@ -314,27 +255,60 @@ if ($_REQUEST['inCodReceitaDedutora']) {
     $obHdnValorDeducaoEstornar->setName ( 'nuValorDeducaoEstornar' );
     $obHdnValorDeducaoEstornar->setValue ( $nuValorDeducaoEstornar );
 
-    // Define Obeto Numerico para valor deducao a estornar
-//    $obTxtValorDeducaoEstornar = new Numerico();
-//    $obTxtValorDeducaoEstornar->setRotulo   ( "*Valor Dedução a Estornar"  );
-//    $obTxtValorDeducaoEstornar->setTitle    ( "Digite o Valor Dedução a Estornar" );
-//    $obTxtValorDeducaoEstornar->setName     ( "nuValorDeducaoEstornar"     );
-//    $obTxtValorDeducaoEstornar->setId       ( "nuValorDeducaoEstornar"     );
-//    $obTxtValorDeducaoEstornar->setValue    ( $nuValorDeducaoEstornar      );
-//    $obTxtValorDeducaoEstornar->setNull     ( false                        );
-//    $obTxtValorDeducaoEstornar->setDecimais ( 2                            );
-//    $obTxtValorDeducaoEstornar->setNegativo ( false                        );
-//    $obTxtValorDeducaoEstornar->setNull     ( true                         );
-//    $obTxtValorDeducaoEstornar->setSize     ( 17                           );
-//    $obTxtValorDeducaoEstornar->setMaxLength( 17                           );
-//    $obTxtValorDeducaoEstornar->setMinValue ( 1                            );
+} elseif ( $request->get('inCodBemAlienacao') == '' && $request->get('inCodReceitaDedutora') == '' ) {
+
+    // Define Objeto Label para valor estornado
+    $obLblVlEstornado = new Label;
+    $obLblVlEstornado->setRotulo  ( "Valor Estornado" );
+    $obLblVlEstornado->setId      ( "stVlEstornadoLbl"  );
+    $obLblVlEstornado->setValue   ( $_REQUEST['nuValorEstornado'] );
+
+    // Define Obeto Numerico para valor a estornar
+    $obTxtValorEstornar = new Numerico();
+    $obTxtValorEstornar->setRotulo   ("*Valor a Estornar"        );
+    $obTxtValorEstornar->setTitle    ("Digite o Valor a Estornar");
+    $obTxtValorEstornar->setName     ("nuValorEstornar"          );
+    $obTxtValorEstornar->setId       ("nuValorEstornar"          );
+    $obTxtValorEstornar->setValue    ($nuValorEstornar 		 );
+    $obTxtValorEstornar->setNull     (false                      );
+    $obTxtValorEstornar->setDecimais (2                          );
+    $obTxtValorEstornar->setNegativo (false                      );
+    $obTxtValorEstornar->setNull     (true                       );
+    $obTxtValorEstornar->setSize     (17                         );
+    $obTxtValorEstornar->setMaxLength(17                         );
+    $obTxtValorEstornar->setMinValue (0.01                       );
+
+} elseif ($request->get('inCodReceitaDedutora') == '' && $request->get('inCodBemAlienacao') != '') {
+    $obHdnValorEstornar = new Hidden();
+    $obHdnValorEstornar->setName    ( "nuValorEstornar" );
+    $obHdnValorEstornar->setValue   ( $nuValorEstornar  );
+}
+
+if ( $request->get('inCodBemAlienacao') ) {
+    include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+    
+    $obTPatrimonioBem = new TPatrimonioBem();
+    $obTPatrimonioBem->setDado('cod_bem', $request->get('inCodBemAlienacao'));
+    $obTPatrimonioBem->recuperaPorChave($rsBem);
+    
+    $obHdnCodBemAlienacao = new Hidden();
+    $obHdnCodBemAlienacao->setName  ( 'inCodBemAlienacao' );
+    $obHdnCodBemAlienacao->setValue ( $request->get('inCodBemAlienacao') );
+    
+    $obLbDescricaoBem = new Label();
+    $obLbDescricaoBem->setRotulo  ( "Bem:" );
+    $obLbDescricaoBem->setValue   ( $rsBem->getCampo('cod_bem').' - '.$rsBem->getCampo('descricao') );
+    
+    $obLbValorAlienacao = new Label();
+    $obLbValorAlienacao->setRotulo  ( "Valor Alienação:" );
+    $obLbValorAlienacao->setValue   ( $request->get('nuValor') );
 }
 
 //DEFINICAO DO FORMULARIO
 $obFormulario = new Formulario;
-$obFormulario->addForm       ( $obForm             );
-$obFormulario->addHidden     ( $obHdnAcao          );
-$obFormulario->addHidden     ( $obHdnCtrl          );
+$obFormulario->addForm       ( $obForm                    );
+$obFormulario->addHidden     ( $obHdnAcao                 );
+$obFormulario->addHidden     ( $obHdnCtrl                 );
 $obFormulario->addHidden     ( $obHdnCodArrecadacao       );
 $obFormulario->addHidden     ( $obHdnExercicio            );
 $obFormulario->addHidden     ( $obHdnCodReceita           );
@@ -347,28 +321,33 @@ $obFormulario->addHidden     ( $obHdnVlEstornado          );
 $obFormulario->addHidden     ( $obHdnVlEstornar           );
 $obFormulario->addHidden     ( $obHdnVlDeducao            );
 $obFormulario->addHidden     ( $obHdnVlDeducaoEstornado   );
-
-$obFormulario->addHidden     ( $obApplet           );
+$obFormulario->addHidden     ( $obApplet                  );
 $obFormulario->addTitulo     ( "Estornar Arrecadação por Receita" );
 $obFormulario->addComponente ( $obILabelEntidade     );
-//$obFormulario->addComponente ( $obLblNumeroBoletim   );
-//$obFormulario->addComponente ( $obLblDtBoletim       );
 $obFormulario->addComponente ( $obISelectBoletim     );
 $obFormulario->addComponente ( $obILabelContaBanco   );
 $obFormulario->addComponente ( $obILabelReceitaRecurso );
 $obFormulario->addComponente ( $obLblDtArrecadacao   );
 $obFormulario->addComponente ( $obLblVlArrecadado    );
-if ($_REQUEST['inCodReceitaDedutora']) {
+if ( $request->get('inCodReceitaDedutora') ) {
     $obFormulario->addComponente ( $obLblVlEstornar );
     $obFormulario->addHidden     ( $obHdnValorEstornar );
     $obFormulario->addComponente ( $obILabelReceitaRecursoDedutora );
     $obFormulario->addComponente ( $obLblVlDeducao            );
     $obFormulario->addComponente ( $obLblVlDeducaoEstornar    );
     $obFormulario->addHidden     ( $obHdnValorDeducaoEstornar    );
-} else {
+} elseif ( $request->get('inCodReceitaDedutora') == '' && $request->get('inCodBemAlienacao') == '' )  {
     $obFormulario->addComponente ( $obLblVlEstornado     );
     $obFormulario->addComponente ( $obTxtValorEstornar   );
 }
+if ( $request->get('inCodBemAlienacao') ) {
+    $obFormulario->addTitulo     ( "Alienação" );
+    $obFormulario->addHidden     ( $obHdnValorEstornar   );
+    $obFormulario->addHidden     ( $obHdnCodBemAlienacao );
+    $obFormulario->addComponente ( $obLbDescricaoBem     );
+    $obFormulario->addComponente ( $obLbValorAlienacao   );
+}
+
 $obOk = new Ok();
 $obOk->obEvento->setOnClick("salvarArrecadacaoEstornada();");
 

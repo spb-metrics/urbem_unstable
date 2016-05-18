@@ -39,18 +39,10 @@ set_time_limit(0);
 
     * Casos de uso: uc-02.01.23
 */
-
-/*
-$Log$
-Revision 1.8  2006/07/05 20:43:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
-include_once '../../../../../../config.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
-include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_FW_PDF."RRelatorio.class.php" );
+require_once '../../../../../../config.php';
+require_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkPDF.inc.php';
+require_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+require_once CAM_FW_PDF."RRelatorio.class.php";
 
 $obRRelatorio = new RRelatorio;
 $obPDF        = new ListaPDF( "L" );
@@ -81,7 +73,7 @@ $obPDF->setUsuario           ( Sessao::getUsername() );
 $obPDF->setEnderecoPrefeitura( $arConfiguracao );
 
 foreach ($arFiltro['inCodEntidade'] as $inCodEntidade) {
-    $arNomEntidade[] = $arNomiltro['entidade'][$inCodEntidade];
+    $arNomEntidade[] = $arNomFiltro['entidade'][$inCodEntidade];
 }
 
 $obPDF->addFiltro( 'Entidades Relacionadas'             , $arNomEntidade );
@@ -103,7 +95,7 @@ if($arFiltro['inCodUnidadeFinal'])
     $obPDF->addFiltro( 'Unidade Orçamentária Final'  , $arFiltro['inCodUnidadeFinal'] . " - " . $arNomFiltro['unidadeFinal'][$arFiltro[ 'inCodUnidadeFinal' ]] );
 
 if ($arFiltro['stDescricaoRecurso'] != "") {
-    $obPDF->addFiltro( 'Recurso: '    ,  $arFiltro['inCodRecurso']." - ".$arNomFiltro['stDescricaoRecurso'] );
+    $obPDF->addFiltro( 'Recurso: '    ,  $arFiltro['inCodRecurso']." - ".$arFiltro['stDescricaoRecurso'] );
 }
 
 if($arFiltro['inCodFuncao']) {
@@ -123,77 +115,35 @@ if ($arFiltro['inTipo'] == "1") {
     $obPDF->addFiltro( 'Demonstrar Sintéticas: '    ,  "Sim" );
 }
 
-/*for ( $inCont = 0; $inCont < count( //sessao->transf4); $inCont++ ) {
-    //cabeçalho
-    $obPDF->addRecordSet( //essao->transf4[$inCont] );
-    $obPDF->setAlinhamento ( "L" );
-    $obPDF->addCabecalho("", 5, 10);
-    $obPDF->addCabecalho("", 25,10);
-    $obPDF->addCampo("classificacao", 8 );
-    $obPDF->addCampo("descricao", 8 );*/
 
-    //Registros
-//         $obPDF->addRecordSet( //sessao->transf5[$inCont]);
-         $rsConsolidado = Sessao::read('rsConsolidado');
-         $obPDF->addRecordSet( $rsConsolidado );
+//Registros
+$rsConsolidado = Sessao::read('rsConsolidado');
+$obPDF->addRecordSet( $rsConsolidado );
 
-//       $obPDF->setQuebraPaginaLista(false);
-         $obPDF->setAlturaCabecalho(5);
-         $obPDF->setAlinhamento ( "C" );
-         $obPDF->addCabecalho("Elemento da Despesa", 15,8);
-         $obPDF->addCabecalho("",22, 8);
-         $obPDF->setAlinhamento ( "R" );
-         $obPDF->addCabecalho("SALDO INICIAL EMPENHADO NO MÊS EMPENHADO ATÉ PER",12,8);
-         $obPDF->addCabecalho("SUPLEMENTAÇOES ANULADO NO MÊS ANULADO ATÉ PER",12,8 );
-         $obPDF->addCabecalho("REDUÇÕES LIQUIDADO NO MÊS LIQUIDADO ATÉ PER",12, 8);
-         $obPDF->addCabecalho("TOTAL CRÉDITO PAGO NO MÊS PAGO ATÉ PER",11, 8);
-         $obPDF->addCabecalho("SALDO DISPONÍVEL A LIQUIDAR A PAGAR LÍQUIDADO ",13, 8);
-        $obPDF->addIndentacao("nivel","[classificacao]  [descricao_despesa]","    ");
-         $obPDF->addQuebraLinha("nivel",2,5);
-//         $obPDF->addQuebraPagina("pagina",1);
+$obPDF->setAlturaCabecalho(5);
+$obPDF->setAlinhamento ( "C" );
+$obPDF->addCabecalho("Elemento da Despesa", 15,8);
+$obPDF->addCabecalho("",22, 8);
+$obPDF->setAlinhamento ( "R" );
+$obPDF->addCabecalho("SALDO INICIAL EMPENHADO NO MÊS EMPENHADO ATÉ PER",12,8);
+$obPDF->addCabecalho("SUPLEMENTAÇOES ANULADO NO MÊS ANULADO ATÉ PER",12,8 );
+$obPDF->addCabecalho("REDUÇÕES LIQUIDADO NO MÊS LIQUIDADO ATÉ PER",12, 8);
+$obPDF->addCabecalho("TOTAL CRÉDITO PAGO NO MÊS PAGO ATÉ PER",11, 8);
+$obPDF->addCabecalho("SALDO DISPONÍVEL A LIQUIDAR A PAGAR LÍQUIDADO ",13, 8);
+$obPDF->addIndentacao("nivel","[classificacao]  [descricao_despesa]","    ");
+$obPDF->addQuebraLinha("nivel",2,5);
 
-         $obPDF->setAlturaLinha ( 4 );
-         $obPDF->setAlinhamento ( "C" );
-         $obPDF->addCampo("classificacao", 8 );
-         $obPDF->setAlinhamento ( "L" );
-         $obPDF->addCampo("descricao_despesa", 8 );
-         $obPDF->setAlinhamento ( "R" );
-         $obPDF->addCampo("coluna3", 8 );
-         $obPDF->addCampo("coluna4", 8 );
-         $obPDF->addCampo("coluna5", 8 );
-         $obPDF->addCampo("coluna6", 8 );
-         $obPDF->addCampo("coluna7", 8 );
-//}
-
-//monta linha do totalizador
-/*
-         $obPDF->addRecordSet( //sessao->transf3);
-         $obPDF->setQuebraPaginaLista(true);
-         $obPDF->setAlturaCabecalho(5);
-         $obPDF->setAlinhamento ( "L" );
-         $obPDF->addCabecalho("", 12, 10);
-         $obPDF->addCabecalho("",25, 8);
-         $obPDF->setAlinhamento ( "R" );
-
-         $obPDF->addCabecalho("SALDO INICIAL  EMPENHADO NO PER  EMPENHADO NO ANO",12,8);
-         $obPDF->addCabecalho("SUPLEMENTAÇOES  ANULADO NO MÊS  ANULADO NO ANO ",12,8 );
-         $obPDF->addCabecalho("REDUÇÕES  LIQUIDADO NO MÊS  LIQUIDADO NO ANO ",12, 8);
-         $obPDF->addCabecalho("TOTAL CRÉDITO  PAGO NO MÊS  PAGO NO ANO ",11, 8);
-         $obPDF->addCabecalho("      SALDO DISPONÍVEL                      A LIQUIDAR         A PAGAR LÍQUIDADO ",13, 8);
-         $obPDF->addIndentacao("nivel","[classificacao]  [descricao_despesa]","    ");
-         $obPDF->addQuebraLinha("nivel",0,5);
-         $obPDF->addQuebraPagina("pagina",1);
-
-         $obPDF->setAlinhamento ( "L" );
-         $obPDF->addCampo("classificacao", 8 );
-         $obPDF->addCampo("descricao_despesa", 8 );
-         $obPDF->setAlinhamento ( "R" );
-         $obPDF->addCampo("coluna3", 8 );
-         $obPDF->addCampo("coluna4", 8 );
-         $obPDF->addCampo("coluna5", 8 );
-         $obPDF->addCampo("coluna6", 8 );
-         $obPDF->addCampo("coluna7", 8 );
-*/
+$obPDF->setAlturaLinha ( 4 );
+$obPDF->setAlinhamento ( "C" );
+$obPDF->addCampo("classificacao", 8 );
+$obPDF->setAlinhamento ( "L" );
+$obPDF->addCampo("descricao_despesa", 8 );
+$obPDF->setAlinhamento ( "R" );
+$obPDF->addCampo("coluna3", 8 );
+$obPDF->addCampo("coluna4", 8 );
+$obPDF->addCampo("coluna5", 8 );
+$obPDF->addCampo("coluna6", 8 );
+$obPDF->addCampo("coluna7", 8 );
 
 $arAssinaturas = Sessao::read('assinaturas');
 if ( count($arAssinaturas['selecionadas']) > 0 ) {
@@ -201,7 +151,6 @@ if ( count($arAssinaturas['selecionadas']) > 0 ) {
     $obRAssinaturas = new RAssinaturas;
     $obRAssinaturas->setArAssinaturas( $arAssinaturas['selecionadas'] );
     $obPDF->setAssinaturasDefinidas( $obRAssinaturas->getArAssinaturas() );
-    //$obRAssinaturas->montaPDF( $obPDF );
 }
 
 $obPDF->show();

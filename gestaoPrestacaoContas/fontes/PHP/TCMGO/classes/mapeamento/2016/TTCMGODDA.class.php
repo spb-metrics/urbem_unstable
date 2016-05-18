@@ -32,7 +32,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGODDA.class.php 65168 2016-04-29 16:36:09Z michel $
+    $Id: TTCMGODDA.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -57,7 +57,7 @@ class TTCMGODDA extends Persistente
                             '10' as tipo_registro
                             ,(SELECT num_orgao 
                                     FROM tcmgo.orgao 
-                                    where exercicio = '2015' 
+                                    where exercicio = '".$this->getDado('exercicio')."' 
                                     AND uf_crc_contador = 'GO'
                             ) as cod_orgao    
                             ,divida_ativa.cod_inscricao as numr_insc_divida_ativa

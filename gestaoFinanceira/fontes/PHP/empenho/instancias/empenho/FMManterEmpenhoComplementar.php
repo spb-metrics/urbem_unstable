@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenhoComplementar.php 65158 2016-04-28 19:26:54Z evandro $
+    $Id: FMManterEmpenhoComplementar.php 65311 2016-05-11 20:42:32Z michel $
 
     * Casos de uso: uc-02.03.36
 */
@@ -284,12 +284,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtQuantidade->setValue    ( $nuQuantidade  );
     $obTxtQuantidade->setRotulo   ( "*Quantidade"   );
     $obTxtQuantidade->setTitle    ( "Informe a quantidade." );
-    $obTxtQuantidade->setDecimais ( 4 );
     $obTxtQuantidade->setNegativo ( false );
     $obTxtQuantidade->setNull     ( true );
     $obTxtQuantidade->setSize     ( 23 );
-    $obTxtQuantidade->setMaxLength( 23 );
-    $obTxtQuantidade->obEvento->setOnChange( "gerarValorTotal();" );
+    $obTxtQuantidade->setMaxLength( 10 );
+    $obTxtQuantidade->setDecimais ( 4 );
+    $obTxtQuantidade->setFormatarNumeroBR  ( true );
+    $obTxtQuantidade->obEvento->setOnChange( "gerarValorTotal(this);" );
 
     // Define Objeto Select para Unidade
     $obCmbUnidade = new Select;
@@ -305,7 +306,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbUnidade->setNull      ( true          );
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlUnitario = new Moeda;
+    $obTxtVlUnitario = new ValorUnitario;
     $obTxtVlUnitario->setName     ( "nuVlUnitario" );
     $obTxtVlUnitario->setId       ( "nuVlUnitario" );
     $obTxtVlUnitario->setValue    ( $nuVlUnitario  );
@@ -314,11 +315,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlUnitario->setNull     ( true );
     $obTxtVlUnitario->setDecimais ( 4  );
     $obTxtVlUnitario->setSize     ( 21 );
-    $obTxtVlUnitario->setMaxLength( 21 );
-    $obTxtVlUnitario->obEvento->setOnChange( "gerarValorTotal();" );
+    $obTxtVlUnitario->setMaxLength( 10 );
+    $obTxtVlUnitario->setFormatarNumeroBR  ( true );
+    $obTxtVlUnitario->obEvento->setOnChange( "gerarValorTotal(this);" );
 
-    // Define Objeto Moeda para Valor Unitário
-    $obTxtVlTotal = new Moeda;
+    // Define Objeto Moeda para Valor Total
+    $obTxtVlTotal = new ValorTotal;
     $obTxtVlTotal->setName     ( "nuVlTotal" );
     $obTxtVlTotal->setId       ( "nuVlTotal" );
     $obTxtVlTotal->setValue    ( $nuVlTotal  );
@@ -327,8 +329,9 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlTotal->setNull     ( true );
     $obTxtVlTotal->setReadOnly ( true );
     $obTxtVlTotal->setSize     ( 21 );
-    $obTxtVlTotal->setMaxLength( 21 );
-    $obTxtVlTotal->obEvento->setOnChange( "gerarValorTotal();" );
+    $obTxtVlTotal->setMaxLength( 12 );
+    $obTxtVlTotal->setFormatarNumeroBR  ( true );
+    $obTxtVlTotal->obEvento->setOnChange( "gerarValorTotal(this);" );
 
     // Define Objeto Button para  Incluir Item
     $obBtnIncluir = new Button;

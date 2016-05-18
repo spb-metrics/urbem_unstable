@@ -32,7 +32,7 @@
   * @package URBEM
   * @subpackage
 
-  * $Id: OCManterBem.php 64578 2016-03-15 20:25:48Z arthur $
+  * $Id: OCManterBem.php 65343 2016-05-13 17:02:26Z arthur $
 
   * Casos de uso: uc-03.01.06
 */
@@ -45,7 +45,6 @@ include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioTipoNatureza.class.php";
 switch ($request->get('stCtrl')) {
 
     case 'buscaPopupTipoBaixa':
-
         $stMsgErro = "";
         $inCodigo  = str_replace(".","",$request->get('inCodigo'));
         
@@ -110,7 +109,7 @@ switch ($request->get('stCtrl')) {
         }
         
     break;
-        
+ 
     case 'buscaPopup':
         $stMsgErro = "";
         $inCodigo  = str_replace(".","",$request->get('inCodigo'));
@@ -124,14 +123,18 @@ switch ($request->get('stCtrl')) {
             # Validação para verificar se o item existe e não está baixado.
             if (empty($stMsgErro)) {
                 if ($request->get('boBemBaixado') == 'false') {
-                    $stFiltro .= ' AND NOT EXISTS
+                    $stFiltro .= " AND NOT EXISTS
                                        (
                                             SELECT  1
                                               FROM  patrimonio.bem_baixado
                                              WHERE  bem_baixado.cod_bem = bem.cod_bem
-                                       ) ';
+                                       ) \n";
                 }
-
+                
+                if ( $request->get('inCodEntidade') != "" ) {
+                    $stFiltro .= " AND bem_comprado.cod_entidade = ".$request->get('inCodEntidade')." \n";
+                }
+                
                 $obTPatrimonioBem->setDado( 'cod_bem', $inCodigo );
                 $obTPatrimonioBem->recuperaRelacionamento( $rsBem, $stFiltro );
 

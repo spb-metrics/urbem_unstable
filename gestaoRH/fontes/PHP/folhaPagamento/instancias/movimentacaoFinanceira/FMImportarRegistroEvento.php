@@ -32,7 +32,7 @@
 
 * @ignore
 
-$Id: FMImportarRegistroEvento.php 65130 2016-04-26 20:41:36Z michel $
+$Id: FMImportarRegistroEvento.php 65248 2016-05-04 19:08:25Z evandro $
 
 * Casos de uso: uc-04.05.49
 */
@@ -123,8 +123,7 @@ $obRdbOpcaoImportar->obEvento->setOnChange("montaParametrosGET('gerarSpanOpcoes'
 $obSpnOpcao = new Span();
 $obSpnOpcao->setId("spnOpcao");
 
-$obBtnOk = new Ok();
-$obBtnOk->obEvento->setOnClick("montaParametrosGET('submeter','',true);");
+$obBtnOk = new Ok(true);
 
 $arBotoes = array($obBtnOk);
 

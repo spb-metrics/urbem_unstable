@@ -31,7 +31,7 @@
     * @author Analista: Tonismar
     * @author Desenvolvedor: André Machado
 
-    $Id: ECL.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: ECL.inc.php 65220 2016-05-03 21:30:22Z michel $
 
 */
 
@@ -74,11 +74,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_orgao");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-if (Sessao::getExercicio() > '2011') {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_tipo");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -201,15 +199,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-if (Sessao::getExercicio() > '2011') {
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 68 );
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 66 );
-}
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

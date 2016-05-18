@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOEMP.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOEMP.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -58,19 +58,13 @@ class TTGOEMP extends Persistente
     {
         $stSql = "
            SELECT  '10'    AS  tipo_registro
-                , ";
-                if (Sessao::getExercicio() > '2011') {
-                    $stSql.= "CASE WHEN empenho_modalidade.cod_modalidade = '01' OR empenho_modalidade.cod_modalidade = '02' THEN
+                ,
+                         CASE WHEN empenho_modalidade.cod_modalidade = '01' OR empenho_modalidade.cod_modalidade = '02' THEN
                                    '10'
                               ELSE
                                    empenho_modalidade.cod_modalidade
                               END AS modalidade
-                    , ";
-                } else {
-                    $stSql.= "empenho.atributo_empenho_valor.valor AS modalidade
-                    , ";
-                }
-        $stSql.= "'99' as assunto
+                ,  '99' as assunto
                 ,  programa.num_programa
                 ,  despesa.num_orgao
                 ,  despesa.num_unidade
@@ -89,10 +83,7 @@ class TTGOEMP extends Persistente
                 ,  TO_CHAR(empenho.dt_empenho,'dd/mm/yyyy')     AS  dt_empenho
                 ,  SUM(item_pre_empenho.vl_total)  AS  vl_total
                 ,  credor.nom_cgm
-                , ";
-
-                if (Sessao::getExercicio() > '2011') {
-                    $stSql.= "CASE WHEN empenho_modalidade.cod_modalidade <> '10' AND empenho_modalidade.cod_modalidade <> '11'
+                           ,  CASE WHEN empenho_modalidade.cod_modalidade <> '10' AND empenho_modalidade.cod_modalidade <> '11'
                                    THEN ''
                                    ELSE empenho_modalidade.cod_fundamentacao
                               END AS fundamentacao
@@ -104,48 +95,24 @@ class TTGOEMP extends Persistente
                                    THEN ''
                                    ELSE TRIM(regexp_replace(empenho_modalidade.razao_escolha ,E'\\r\\n',''))
                               END AS escolha
-                           , ";
-                } else {
-                    $stSql.= "CASE WHEN atributo_empenho_valor.valor = 5 THEN
-                                   '10'::varchar
-                                   WHEN atributo_empenho_valor.valor = 6 THEN
-                                   '11'::varchar
-                                   ELSE
-                                   '00'::varchar
-                              END AS modalidade
-                              , ";
-                }
-            if (Sessao::getExercicio() > 2012) {
-              $stSql.="CASE WHEN credor.cod_pais <> 1
-                          THEN   3
-                          WHEN sw_cgm_pessoa_fisica.numcgm ISNULL
-                          THEN   2
-                          ELSE   1
-                     END     AS  tipo_credor ";
-            } else {
-              $stSql.="CASE WHEN sw_cgm_pessoa_fisica.numcgm ISNULL
-                          THEN   2
-                          ELSE   1
-                     END     AS  tipo_credor ";
-            }
-
-            $stSql.=",  CASE WHEN sw_cgm_pessoa_fisica.numcgm ISNULL
-                          THEN   sw_cgm_pessoa_juridica.cnpj
-                          ELSE   sw_cgm_pessoa_fisica.cpf
-                     END     AS  documento
+                           ,  CASE WHEN credor.cod_pais <> 1
+                                   THEN   3
+                                   WHEN sw_cgm_pessoa_fisica.numcgm ISNULL
+                                   THEN   2
+                                   ELSE   1
+                              END     AS  tipo_credor
+                           ,  CASE WHEN sw_cgm_pessoa_fisica.numcgm ISNULL
+                                   THEN   sw_cgm_pessoa_juridica.cnpj
+                                   ELSE   sw_cgm_pessoa_fisica.cpf
+                              END     AS  documento
                   ,  pre_empenho.descricao   AS  descricao
-                  , ";
-
-            if (Sessao::getExercicio() > '2011') {
-                    $stSql.= "'Fabio Oliveira de Lima' AS nom_resp
+                  , 'Fabio Oliveira de Lima' AS nom_resp
                     ,'41880854104' AS cpf_resp
                     , contrato.nro_contrato as nro_instrumento_contrato
                     , processos.numero_processo as nro_processo_licitacao
                     , exercicio_processo as ano_processo_licitacao
                     , processo_administrativo as nro_processo_administrativo
-                    , ";
-            }
-            $stSql.= "'0' AS  numero_sequencial
+                    , '0' AS  numero_sequencial
              FROM  empenho.empenho
        INNER JOIN  empenho.pre_empenho
                ON  empenho.exercicio = pre_empenho.exercicio
@@ -181,10 +148,6 @@ class TTGOEMP extends Persistente
         LEFT JOIN  tcmgo.elemento_de_para
                ON  elemento_de_para.cod_conta = conta_despesa.cod_conta
               AND  elemento_de_para.exercicio = conta_despesa.exercicio
-              ";
-
-              if (Sessao::getExercicio() > '2011') {
-                $stSql.="
                 LEFT JOIN  tcmgo.processos
                        ON  processos.cod_empenho  = empenho.cod_empenho
                       AND  processos.cod_entidade = empenho.cod_entidade
@@ -201,10 +164,7 @@ class TTGOEMP extends Persistente
                        ON  empenho_modalidade.exercicio = empenho.exercicio
                       AND  empenho_modalidade.cod_entidade = empenho.cod_entidade
                       AND  empenho_modalidade.cod_empenho = empenho.cod_empenho
-                        ";
-              }
 
-        $stSql.="
             WHERE  empenho.exercicio = '".$this->getDado('exercicio')."'
               AND  atributo_empenho_valor.cod_atributo = 101
               AND  atributo_empenho_valor.cod_modulo = 10
@@ -230,10 +190,7 @@ class TTGOEMP extends Persistente
                  , despesa.num_pao
                  , acao.num_acao 
                  , programa.num_programa
-                 ";
-
-                 if (Sessao::getExercicio() > '2011') {
-                    $stSql.=", empenho_modalidade.cod_modalidade
+                 , empenho_modalidade.cod_modalidade
                              , empenho_modalidade.cod_fundamentacao
                              , empenho_modalidade.justificativa
                              , empenho_modalidade.razao_escolha
@@ -244,12 +201,7 @@ class TTGOEMP extends Persistente
                              , processos.numero_processo
                              , exercicio_processo
                              , processo_administrativo
-                            ";
-                 }
-                 if (Sessao::getExercicio() > 2012) {
-                    $stSql.=", credor.cod_pais";
-                 }
-        $stSql.="
+                             , credor.cod_pais
         ORDER BY
                  programa.num_programa
                  , despesa.num_orgao
@@ -266,12 +218,8 @@ class TTGOEMP extends Persistente
                  , tipo_credor
                  , documento
                  , pre_empenho.descricao
-                 ";
-
-                 if (Sessao::getExercicio() > '2011') {
-                    $stSql.=", empenho.cod_entidade
-                             , empenho.exercicio";
-                 }
+                 , empenho.cod_entidade
+                 , empenho.exercicio";
 
         return $stSql;
     }

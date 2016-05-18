@@ -32,47 +32,20 @@
 
     * @ignore
 
-    $Revision: 31968 $
-    $Name$
-    $Author: vitor $
-    $Date: 2007-07-23 11:35:09 -0300 (Seg, 23 Jul 2007) $
+    $Id: FMManterConfiguracao.php 65211 2016-05-03 17:21:13Z michel $
 
     * Casos de uso: uc-02.03.01, uc-02.03.04, uc-02.03.05
 */
 
-/*
-$Log$
-Revision 1.14  2007/07/23 14:34:39  vitor
-Bug#9669#
-
-Revision 1.13  2007/07/03 19:45:34  luciano
-Bug#9451#
-
-Revision 1.12  2007/07/03 19:36:59  luciano
-Bug#9451#
-
-Revision 1.11  2007/07/03 15:29:16  luciano
-Bug#9451#
-
-Revision 1.10  2006/07/17 14:37:38  andre.almeida
-Bug #6087#
-
-Revision 1.9  2006/07/14 20:59:57  leandro.zis
-Bug #6181#
-
-Revision 1.8  2006/07/05 20:47:34  cleisson
-Adicionada tag Log aos arquivos
-
-*/
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-include_once( CAM_GF_INCLUDE."validaGF.inc.php");
+include_once  CAM_GF_INCLUDE."validaGF.inc.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
-include_once(CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php");
-include_once(CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php"                        );
-include_once(CAM_GF_CONT_COMPONENTES.'IPopUpContaAnalitica.class.php'                              );
-include_once(CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php');
-include_once(CAM_GF_CONT_MAPEAMENTO.'TContabilidadePlanoAnalitica.class.php'                       );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoConfiguracao.class.php";
+include_once CAM_GF_ORC_COMPONENTES."ITextBoxSelectEntidadeGeral.class.php";
+include_once CAM_GF_CONT_COMPONENTES.'IPopUpContaAnalitica.class.php';
+include_once CAM_GA_ADM_MAPEAMENTO.'TAdministracaoConfiguracaoEntidade.class.php';
+include_once CAM_GF_CONT_MAPEAMENTO.'TContabilidadePlanoAnalitica.class.php';
 
 $stPrograma = "ManterConfiguracao";
 $pgFilt = "FL".$stPrograma.".php";
@@ -142,6 +115,11 @@ if ( $rsContaCaixaEntidades->getNumLinhas() > 0 ) {
     }
 }
 Sessao::write('arItens', $arItens);
+
+$stDtAutorizacao = $obRegra->getDataAutorizacao();
+$stDtEmpenho     = $obRegra->getDataEmpenho();
+$stDtLiquidacao  = $obRegra->getDataLiquidacao();
+
 $stAcao = $request->get('stAcao');
 
 $obHdnAcao = new Hidden;
@@ -203,6 +181,33 @@ $obRdnOPCarne->setChecked($stOPCarne);
 $obRdnOPCarne->obRadioSim->setValue("Sim");
 $obRdnOPCarne->obRadioNao->setValue("Não");
 
+$obDtAutorizacao = new Data;
+$obDtAutorizacao->setName   ( "stDtAutorizacao" );
+$obDtAutorizacao->setId     ( "stDtAutorizacao" );
+$obDtAutorizacao->setRotulo ( "Data Fixa para Autorização" );
+$obDtAutorizacao->setTitle  ( 'Informe a data fixa para autorização.' );
+$obDtAutorizacao->setNull   ( true );
+$obDtAutorizacao->setValue  ( $stDtAutorizacao );
+$obDtAutorizacao->obEvento->setOnChange( "montaParametrosGET('validaDtFixa', 'stDtAutorizacao');" );
+
+$obDtEmpenho = new Data;
+$obDtEmpenho->setName   ( "stDtEmpenho" );
+$obDtEmpenho->setId     ( "stDtEmpenho" );
+$obDtEmpenho->setRotulo ( "Data Fixa para Empenho" );
+$obDtEmpenho->setTitle  ( 'Informe a data fixa para empenho.' );
+$obDtEmpenho->setNull   ( true );
+$obDtEmpenho->setValue  ( $stDtEmpenho );
+$obDtEmpenho->obEvento->setOnChange( "montaParametrosGET('validaDtFixa', 'stDtEmpenho');" );
+
+$obDtLiquidacao = new Data;
+$obDtLiquidacao->setName   ( "stDtLiquidacao" );
+$obDtLiquidacao->setId     ( "stDtLiquidacao" );
+$obDtLiquidacao->setRotulo ( "Data Fixa para Liquidação" );
+$obDtLiquidacao->setTitle  ( 'Informe a data fixa para liquidação.' );
+$obDtLiquidacao->setNull   ( true );
+$obDtLiquidacao->setValue  ( $stDtLiquidacao );
+$obDtLiquidacao->obEvento->setOnChange( "montaParametrosGET('validaDtFixa', 'stDtLiquidacao');" );
+
 // Segmento Conta Caixa
 $obCmbEntidade   = new ITextBoxSelectEntidadeGeral();
 $obCmbEntidade->setObrigatorioBarra( true );
@@ -242,6 +247,9 @@ $obFormulario->addComponente        ( $obRdnDataVencimento );
 $obFormulario->addComponente        ( $obRdnLiquidacaoAutomatica );
 $obFormulario->addComponente        ( $obRdnOPAutomatica );
 $obFormulario->addComponente        ( $obRdnOPCarne );
+$obFormulario->addComponente        ( $obDtAutorizacao );
+$obFormulario->addComponente        ( $obDtEmpenho );
+$obFormulario->addComponente        ( $obDtLiquidacao );
 
 $obFormulario->addTitulo            ( "Conta Caixa" );
 $obFormulario->addComponente        ( $obCmbEntidade );
@@ -251,7 +259,7 @@ $obFormulario->addSpan ( $obSpnContaCaixa );
 
 $obFormulario->defineBarra( array( $obOk ) );
 
-$obFormulario->show                 ();
+$obFormulario->show ();
 
 SistemaLegado::executaFrameOculto ( montaSpanContaCaixa() );
 

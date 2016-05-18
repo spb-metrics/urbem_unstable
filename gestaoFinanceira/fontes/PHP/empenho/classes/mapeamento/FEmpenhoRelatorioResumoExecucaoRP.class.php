@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: FEmpenhoRelatorioResumoExecucaoRP.class.php 64462 2016-02-25 17:57:26Z michel $
+    $Id: FEmpenhoRelatorioResumoExecucaoRP.class.php 65265 2016-05-06 18:40:44Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -48,17 +48,19 @@ class FEmpenhoRelatorioResumoExecucaoRP extends Persistente
     function __construct()
     {
         parent::Persistente();
-    
+
         $this->setTabela("empenho.fn_relatorio_resumo_execucao_restos_pagar");
-    
+
         $this->AddCampo('cod_entidade'      ,'integer',true ,'',false,false);
         $this->AddCampo('exercicio'         ,'varchar',true ,'',false,false);
         $this->AddCampo('dt_inicial'        ,'varchar',true ,'',false,false);
         $this->AddCampo('dt_final'          ,'varchar',true ,'',false,false);
         $this->AddCampo('exercicio_empenho' ,'varchar',false,'',false,false);
         $this->AddCampo('cgm_credor'        ,'integer',false,'',false,false);
+        $this->AddCampo('inOrgao'           ,'integer',false,'',false,false);
+        $this->AddCampo('inUnidade'         ,'integer',false,'',false,false);
     }
-    
+
     function montaRecuperaTodos()
     {
         $stSql  = " SELECT rp.exercicio
@@ -80,6 +82,8 @@ class FEmpenhoRelatorioResumoExecucaoRP extends Persistente
                                                                                , '".$this->getDado("dt_final")."'
                                                                                , '".$this->getDado("exercicio_empenho")."'
                                                                                , '".$this->getDado("cgm_credor")."'
+                                                                               , ".$this->getDado("inOrgao")."
+                                                                               , ".$this->getDado("inUnidade")."
                                                                                ) AS rp
                                                                                ( cod_empenho                INTEGER,
                                                                                  cod_entidade               INTEGER,
@@ -105,12 +109,12 @@ class FEmpenhoRelatorioResumoExecucaoRP extends Persistente
                 INNER JOIN sw_cgm
                         ON sw_cgm.numcgm = entidade.numcgm
 
-                GROUP BY rp.exercicio
-                       , rp.cod_entidade
-                       , sw_cgm.nom_cgm
+                  GROUP BY rp.exercicio
+                         , rp.cod_entidade
+                         , sw_cgm.nom_cgm
 
-                ORDER BY rp.cod_entidade
-                       , rp.exercicio
+                  ORDER BY rp.cod_entidade
+                         , rp.exercicio
         ";
 
         return $stSql;

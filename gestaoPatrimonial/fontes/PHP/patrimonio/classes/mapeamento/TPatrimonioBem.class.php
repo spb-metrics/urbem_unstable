@@ -27,7 +27,7 @@
   * @author Analista:
   * @author Programador: Fernando Zank Correa Evangelista
 
-  $Id: TPatrimonioBem.class.php 64184 2015-12-11 14:09:44Z arthur $
+  $Id: TPatrimonioBem.class.php 65343 2016-05-13 17:02:26Z arthur $
 
   Caso de uso: uc-03.01.09
   Caso de uso: uc-03.01.21
@@ -1088,12 +1088,6 @@ class TPatrimonioBem extends Persistente
         }
 
         return substr($stSql,0,-6);
-
-        /*SELECT bem.*
-                       , CASE WHEN (SELECT count(cod_bem) FROM patrimonio.inventario_historico_bem WHERE inventario_historico_bem.cod_bem = bem.cod_bem) > 0
-                              THEN '- ESTÁ EM INVENTÁRIO'
-                       END AS inventario
-                    FROM patrimonio.bem";*/
     }
 
     public function recuperaRelacionamentoTransferencia(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
@@ -1607,6 +1601,8 @@ class TPatrimonioBem extends Persistente
                          , grupo_plano_analitica.cod_plano_doacao
                          , grupo_plano_analitica.cod_plano_perda_involuntaria
                          , grupo_plano_analitica.cod_plano_transferencia
+                         , grupo_plano_analitica.cod_plano_alienacao_ganho
+                         , grupo_plano_analitica.cod_plano_alienacao_perda
                          , natureza.cod_tipo
                          , natureza.cod_natureza                 
                          , natureza.nom_natureza

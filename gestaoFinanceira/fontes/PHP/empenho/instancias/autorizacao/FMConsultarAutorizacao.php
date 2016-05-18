@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMConsultarAutorizacao.php 60153 2014-10-02 17:31:24Z arthur $
+    $Id: FMConsultarAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -57,10 +57,8 @@ include_once CAM_GF_PPA_MAPEAMENTO."TPPAAcao.class.php";
 include_once $pgJS;
 
 //Define a função do arquivo, ex: incluir, excluir, alterar, consultar, etc
-$stAcao = $_GET['stAcao'] ?  $_GET['stAcao'] : $_POST['stAcao'];
-if ( empty( $stAcao ) ) {
-    $stAcao = "incluir";
-}
+$stAcao = $request->get('stAcao', 'incluir');
+
 $arFiltro = array();
 $stFiltro = '';
 if ( Sessao::read('filtro') ) {
@@ -83,22 +81,22 @@ $stMascaraRubrica = $obRegra->obROrcamentoClassificacaoDespesa->recuperaMascara(
 
 Sessao::remove('arItens');
 
-$obRegra->obROrcamentoReserva->setCodReserva( $_REQUEST['inCodReserva'] );
+$obRegra->obROrcamentoReserva->setCodReserva( $request->get('inCodReserva') );
 
-if($_REQUEST['inCodEmpenho'])
-    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenho( $_REQUEST['inCodEmpenho'] );
-    
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $_REQUEST['stExercicio'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $_REQUEST['inCodAutorizacao'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $_REQUEST['inCodPreEmpenho'] );
-$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
+if($request->get('inCodEmpenho'))
+    $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodEmpenho( $request->get('inCodEmpenho') );
 
-$obRegra->setExercicio( $_REQUEST['stExercicio'] );
-$obRegra->setCodAutorizacao( $_REQUEST['inCodAutorizacao'] );
-$obRegra->setCodPreEmpenho( $_REQUEST['inCodPreEmpenho'] );
-$obRegra->obROrcamentoEntidade->setCodigoEntidade( $_REQUEST['inCodEntidade'] );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setExercicio( $request->get('stExercicio') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obREmpenhoAutorizacaoEmpenho->setCodAutorizacao( $request->get('inCodAutorizacao') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+$obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
 
-if($_REQUEST['inCodEmpenho'])
+$obRegra->setExercicio( $request->get('stExercicio') );
+$obRegra->setCodAutorizacao( $request->get('inCodAutorizacao') );
+$obRegra->setCodPreEmpenho( $request->get('inCodPreEmpenho') );
+$obRegra->obROrcamentoEntidade->setCodigoEntidade( $request->get('inCodEntidade') );
+
+if($request->get('inCodEmpenho'))
     $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->consultar();
 
 $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->setBoEmpenhoCompraLicitacao( true );
@@ -118,7 +116,7 @@ $stDespesa = $obRegra->obROrcamentoDespesa->getCodDespesa();
 
 $obRegra->obROrcamentoDespesa->setCodDespesa( $rsSaldos->getCampo( "cod_despesa" ) );
 
-$stAutorizacao      = $_REQUEST['inCodAutorizacao'] . " / " . $_REQUEST['stExercicio'];
+$stAutorizacao      = $request->get('inCodAutorizacao')." / ".$request->get('stExercicio');
 $stDtAutorizacao    = $obRegra->getDtAutorizacao();
 $stNomEntidade      = $obRegra->obROrcamentoEntidade->obRCGM->getNomCGM();
 $inNumUnidade       = $obRegra->obREmpenhoPermissaoAutorizacao->obROrcamentoUnidade->getNumeroUnidade();
@@ -148,11 +146,11 @@ if ($obRegra->obROrcamentoReserva->getVlReserva()!=null) {
 }
 $arItemPreEmpenho = $obRegra->getItemPreEmpenho();
 
-$inCodEmpenho = $_REQUEST['inCodEmpenho'];
+$inCodEmpenho = $request->get('inCodEmpenho');
 
 if ($inCodEmpenho) {
-    $stEmpenho = $inCodEmpenho . " / ".$_REQUEST['stExercicio'];
-    $stDtEmpenho        = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getDtEmpenho();
+    $stEmpenho = $inCodEmpenho." / ".$request->get('stExercicio');
+    $stDtEmpenho = $obREmpenhoEmpenhoAutorizacao->obREmpenhoEmpenho->getDtEmpenho();
 }
 foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $nuVlUnitario = ($obItemPreEmpenho->getValorTotal()/$obItemPreEmpenho->getQuantidade());
@@ -172,15 +170,20 @@ foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
     if($obItemPreEmpenho->getCodItemPreEmp()!='')
         $arItens[$inCount]['cod_item']     = $obItemPreEmpenho->getCodItemPreEmp();
+    if($obItemPreEmpenho->getCodigoMarca()!=''){
+        $stDescricaoItemMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', " WHERE cod_marca = ".$obItemPreEmpenho->getCodigoMarca());
+        $arItens[$inCount]['cod_marca']    = $obItemPreEmpenho->getCodigoMarca();
+        $arItens[$inCount]['nome_marca']   = $stDescricaoItemMarca;
+    }
 
     Sessao::write('arItens', $arItens);
 }
 $nuVlUnitario = "";
 SistemaLegado::executaFramePrincipal("buscaDado('montaListaItemPreEmpenho');");
-$arChaveAtributo =  array( "cod_pre_empenho" => $_REQUEST["inCodPreEmpenho"],
-                           "exercicio"       => Sessao::getExercicio()         );
+$arChaveAtributo =  array( "cod_pre_empenho" => $request->get("inCodPreEmpenho"),
+                           "exercicio"       => Sessao::getExercicio() );
 $obRegra->obRCadastroDinamico->setChavePersistenteValores( $arChaveAtributo );
-$obRegra->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos     );
+$obRegra->obRCadastroDinamico->recuperaAtributosSelecionadosValores( $rsAtributos );
 
 //****************************************//
 //Define COMPONENTES DO FORMULARIO
@@ -202,39 +205,39 @@ $obHdnCtrl->setValue( $stCtrl  );
 // Define objeto Hidden para Codigo da Autorizacao
 $obHdnCodAutorizacao = new Hidden;
 $obHdnCodAutorizacao->setName ( "inCodAutorizacao" );
-$obHdnCodAutorizacao->setValue( $inCodAutorizacao );
+$obHdnCodAutorizacao->setValue( $inCodAutorizacao  );
 
 $obLblAutorizacao = new Label;
-$obLblAutorizacao->setRotulo( "Autorização"       );
+$obLblAutorizacao->setRotulo( "Autorização"      );
 $obLblAutorizacao->setId    ( "inCodAutorizacao" );
-$obLblAutorizacao->setValue ( $stAutorizacao );
+$obLblAutorizacao->setValue ( $stAutorizacao     );
 
 $obLblDtAutorizacao = new Label;
 $obLblDtAutorizacao->setRotulo( "Data da Autorização" );
 $obLblDtAutorizacao->setId    ( "dtDataAutorizacao"   );
-$obLblDtAutorizacao->setValue ( $stDtAutorizacao    );
+$obLblDtAutorizacao->setValue ( $stDtAutorizacao      );
 
 // Define objeto Hidden para Codigo da Entidade
 $obHdnCodEntidade = new Hidden;
-$obHdnCodEntidade->setName ( "inCodEntidade" );
-$obHdnCodEntidade->setValue( $_REQUEST['inCodEntidade'] );
-$obHdnCodEntidade->setId   ( "inCodEntidade" );
+$obHdnCodEntidade->setName ( "inCodEntidade"                );
+$obHdnCodEntidade->setValue( $request->get('inCodEntidade') );
+$obHdnCodEntidade->setId   ( "inCodEntidade"                );
 
 //Define objeto label entidade
 $obLblEntidade = new Label;
-$obLblEntidade->setRotulo( "Entidade"                             );
-$obLblEntidade->setId    ( "stNomeEntidade"                        );
-$obLblEntidade->setValue ( $_REQUEST['inCodEntidade'].' - '.$stNomEntidade     );
+$obLblEntidade->setRotulo( "Entidade"       );
+$obLblEntidade->setId    ( "stNomeEntidade" );
+$obLblEntidade->setValue ( $request->get('inCodEntidade').' - '.$stNomEntidade );
 
 $obLblOrgao = new Label;
-$obLblOrgao->setRotulo( "Orgão Orçamentário"              );
-$obLblOrgao->setId    ( "inCodOrgao"                     );
-$obLblOrgao->setValue ( $stOrgao );
+$obLblOrgao->setRotulo( "Orgão Orçamentário" );
+$obLblOrgao->setId    ( "inCodOrgao"         );
+$obLblOrgao->setValue ( $stOrgao             );
 
 $obLblUnidade = new Label;
-$obLblUnidade->setRotulo( "Unidade Orçamentária"                );
-$obLblUnidade->setId    ( "inCodUnidade"                       );
-$obLblUnidade->setValue ( $stUnidade );
+$obLblUnidade->setRotulo( "Unidade Orçamentária" );
+$obLblUnidade->setId    ( "inCodUnidade"         );
+$obLblUnidade->setValue ( $stUnidade             );
 
 // Define objeto Hidden para Codigo da Classificacao
 $obHdnCodClassificacao = new Hidden;
@@ -242,13 +245,13 @@ $obHdnCodClassificacao->setName  ( "stCodClassificacao" );
 $obHdnCodClassificacao->setValue ( $stCodClassificacao  );
 
 $obLblDotacao = new Label;
-$obLblDotacao->setRotulo( "Dotação Orçamentária"                          );
-$obLblDotacao->setId    ( "stNomDespesa"                            );
-$obLblDotacao->setValue ( $stDespesa );
+$obLblDotacao->setRotulo( "Dotação Orçamentária" );
+$obLblDotacao->setId    ( "stNomDespesa"         );
+$obLblDotacao->setValue ( $stDespesa             );
 
 $obLblDesdobramento = new Label;
-$obLblDesdobramento->setRotulo( "Desdobramento"                                 );
-$obLblDesdobramento->setId    ( "stNomClassificacao"                            );
+$obLblDesdobramento->setRotulo( "Desdobramento"                               );
+$obLblDesdobramento->setId    ( "stNomClassificacao"                          );
 $obLblDesdobramento->setValue ( $stCodClassificacao.' - '.$stNomClassificacao );
 
 // Define objeto Label para PAO
@@ -258,9 +261,9 @@ $obLblPAO->setId    ( 'pao' );
 $obLblPAO->setValue ( $inCodPao.' - '.$stNomPao );
 
 $obLblFornecedor = new Label;
-$obLblFornecedor->setRotulo( "Fornecedor"       );
+$obLblFornecedor->setRotulo( "Fornecedor"      );
 $obLblFornecedor->setId    ( "stNomFornecedor" );
-$obLblFornecedor->setValue ( $inCodFornecedor.' - '.$stNomFornecedor  );
+$obLblFornecedor->setValue ( $inCodFornecedor.' - '.$stNomFornecedor );
 
 $obLblDescricao = new Label;
 $obLblDescricao->setRotulo( "Descrição"     );
@@ -269,8 +272,8 @@ $obLblDescricao->setValue ( $stDescricao    );
 
 // Define Objeto Label para Fornecedor
 $obHdnCodFornecedor = new Hidden;
-$obHdnCodFornecedor->setName     ( "inCodFornecedor" );
-$obHdnCodFornecedor->setValue    ( $inCodFornecedor  );
+$obHdnCodFornecedor->setName ( "inCodFornecedor" );
+$obHdnCodFornecedor->setValue( $inCodFornecedor  );
 
 // Define objeto Label para Empenho
 $obLblEmpenho = new Label;
@@ -310,7 +313,7 @@ $obLblHistorico->setValue ( $inCodHistorico." - ".$stNomHistorico  );
 $obLblSituacao = new Label;
 $obLblSituacao->setRotulo( "Situação"   );
 $obLblSituacao->setId    ( "stSituacao" );
-$obLblSituacao->setValue ( $_REQUEST['stSituacao'] );
+$obLblSituacao->setValue ( $request->get('stSituacao') );
 
 // Atributos Dinamicos
 $obMontaAtributos = new MontaAtributos;
@@ -384,7 +387,7 @@ if ( $rsSaldos->getNumLinhas() > 0 ) {
         $obFormulario->addComponente( $obLblCodCompraDireta        );
         $obFormulario->addComponente( $obLblModalidadeCompraDireta );
     }
-    
+
     if ( $rsSaldos->getCampo("licitacao_cod_modalidade") != "" ) {
         $obFormulario->addTitulo( "Licitação"  );
         $obFormulario->addComponente( $obLblCodLicitacao        );

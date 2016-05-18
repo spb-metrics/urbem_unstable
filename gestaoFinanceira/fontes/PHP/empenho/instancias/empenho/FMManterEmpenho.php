@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMManterEmpenho.php 65158 2016-04-28 19:26:54Z evandro $
+    $Id: FMManterEmpenho.php 65211 2016-05-03 17:21:13Z michel $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -49,6 +49,7 @@ include_once CAM_GPC_TCERN_MAPEAMENTO.'TTCERNRoyalties.class.php';
 include_once CAM_FW_HTML."MontaAtributos.class.php";
 include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoContrapartidaAutorizacao.class.php";
 include_once CAM_GP_LIC_COMPONENTES.'IPopUpContrato.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterEmpenho";
@@ -181,6 +182,11 @@ if ($inCodDespesa){
 }
 
 $nuSaldoAnterior = number_format( $nuSaldoAnterior, 2, ',', '.');
+
+$obTConfiguracao = new TEmpenhoConfiguracao();
+$obTConfiguracao->setDado("parametro","data_fixa_empenho");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$stDtEmpenho = trim($rsConfiguracao->getCampo('valor'));
 
 if ( Sessao::read('filtro') ) {
     $arFiltro = Sessao::read('filtro');
@@ -341,12 +347,16 @@ $obCmbNomTipo->setValue     ( '' );
 // Define objeto Data para validade final
 $obDtEmpenho = new Data;
 $obDtEmpenho->setName     ( "stDtEmpenho" );
-$obDtEmpenho->setValue    ( '' );
 $obDtEmpenho->setRotulo   ( "Data de Empenho"                        );
 $obDtEmpenho->setTitle    ( 'Informe a data do empenho'              );
 $obDtEmpenho->setNull     ( false                                    );
 $obDtEmpenho->obEvento->setOnBlur( "validaDataEmpenho('autorizacao');" );
 $obDtEmpenho->obEvento->setOnChange( "montaParametrosGET('verificaFornecedor'); buscaDado('montaLabelSaldoAnterior');" );
+if($stDtEmpenho != ''){
+    $obDtEmpenho->setValue ( $stDtEmpenho );
+    $obDtEmpenho->setLabel ( TRUE );
+}else
+    $obDtEmpenho->setValue ( '' );
 
 // Define objeto Data para Data de Vencimento
 $obDtVencimento = new Data;
@@ -661,12 +671,6 @@ if ($inCodUF == 9 && Sessao::getExercicio() >= 2012) {
 }
 
 $obMontaAtributos->geraFormulario ( $obFormulario );
-
-/*
-$obFormulario->addTitulo('Contrato');
-$obFormulario->addHidden( $obHdnDtContrato );
-$obContrato->geraFormulario($obFormulario);
-*/
 
 $obFormulario->addTitulo( "Itens do empenho" );
 $obFormulario->addSpan( $obSpan );

@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTCMGORecita.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTCMGORecita.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -389,29 +389,13 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                              THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
                              ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
                            END AS rubrica
-            ";
-            if ($this->getDado('exercicio') > '2012') {
-                $stSQL .= "
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
                                THEN '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
                                  THEN '02'
                                  ELSE '01'
-                            END as tipo_conta ";
-            } else {
-                      $stSQL .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-            }
-            $stSQL .= "  , receita.cod_receita
+                            END as tipo_conta
+                         , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
                          , receita.vl_original
@@ -538,30 +522,12 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                              THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
                              ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
                            END AS rubrica
-                ";
-                
-                if ($this->getDado('exercicio') > '2012') {
-                    $stSQL .= "
                                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
                                     THEN '03'
                                     WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
                                      THEN '02'
                                      ELSE '01'
-                                 END as tipo_conta ";
-                } else {
-                    $stSQL .= "
-                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                      '03'
-                                                 WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                      '02'
-                                                 ELSE
-                                                      '01'
-                                            END as tipo_conta
-                              ";
-                }
-                $stSQL .= "
+                                 END as tipo_conta
                          , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
@@ -719,29 +685,12 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                              THEN substr(replace(conta_receita.cod_estrutural,'.',''),1,9)
                              ELSE '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
                            END AS rubrica
-                ";
-                    if ($this->getDado('exercicio') > '2012') {
-                        $stSQL .= "
                                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01')
                                      THEN '03'
                                      WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4')
                                       THEN '02'
                                       ELSE '01'
-                                  END as tipo_conta ";
-                    } else {
-                        $stSQL .= "
-                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                      '03'
-                                                 WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                      '02'
-                                                 ELSE
-                                                      '01'
-                                            END as tipo_conta
-                              ";
-                    }
-                    $stSQL .= "
+                                  END as tipo_conta
                          , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao
@@ -865,30 +814,13 @@ class TTCMGOReceita extends TOrcamentoContaReceita
                             ELSE
                                 '0' || substr(replace(conta_receita.cod_estrutural,'.',''),1,8)
                            END                              AS rubrica
-                               ";
-                          if ($this->getDado('exercicio') > '2012') {
-                            $stSQL .= "
                                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                           '03'
                                      WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                           '02'
                                      ELSE
                                           '01'
-                                END as tipo_conta ";
-                          } else {
-                            $stSQL .= "
-                                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                      '03'
-                                                 WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                                    OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                      '02'
-                                                 ELSE
-                                                      '01'
-                                            END as tipo_conta
-                              ";
-                          }
-                          $stSQL .= "
+                                END as tipo_conta
                          , receita.cod_receita
                          , receita.exercicio
                          , conta_receita.descricao

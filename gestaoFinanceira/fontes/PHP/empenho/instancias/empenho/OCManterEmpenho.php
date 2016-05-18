@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterEmpenho.php 65158 2016-04-28 19:26:54Z evandro $
+    $Id: OCManterEmpenho.php 65311 2016-05-11 20:42:32Z michel $
 
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -43,11 +43,13 @@ header ("Content-Type: text/html; charset=utf-8");
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
+include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/TableTree.class.php';
 include_once CAM_GF_EMP_NEGOCIO.'REmpenhoAutorizacaoEmpenho.class.php';
 include_once CAM_GF_EMP_NEGOCIO.'REmpenhoEmpenhoAutorizacao.class.php';
 include_once CAM_GF_EMP_NEGOCIO.'REmpenhoEmpenho.class.php';
 include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoPreEmpenho.class.php';
 include_once CAM_GP_LIC_MAPEAMENTO.'TLicitacaoParticipanteDocumentos.class.php';
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = 'ManterEmpenho';
@@ -69,79 +71,46 @@ $obREmpenhoEmpenho->setExercicio(Sessao::getExercicio());
 function montaLista($arRecordSet, $boExecuta = true)
 {
     $codItem = false;
-    $boCodMarca = false;
-    
     for($i=0;$i<count($arRecordSet);$i++){
             if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!=''){
                 $codItem = true;
             }
-            if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!=''){
-                $boCodMarca = true;
-            }
             break;
     }
-        
+
     $rsLista = new RecordSet;
     $rsLista->preenche( $arRecordSet );
     $rsLista->addFormatacao('vl_total'   , 'NUMERIC_BR');
 
-    $obLista = new Lista;
-    $obLista->setMostraPaginacao(false);
-    $obLista->setRecordSet($rsLista);
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo('&nbsp;');
-    $obLista->ultimoCabecalho->setWidth(5);
-    $obLista->commitCabecalho();
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo('Descrição');
-    $obLista->ultimoCabecalho->setWidth(55);
-    $obLista->commitCabecalho();
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo('Valor Unitário');
-    $obLista->ultimoCabecalho->setWidth(15);
-    $obLista->commitCabecalho();
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo('Quantidade');
-    $obLista->ultimoCabecalho->setWidth(10);
-    $obLista->commitCabecalho();
-    $obLista->addCabecalho();
-    $obLista->ultimoCabecalho->addConteudo('Valor Total');
-    $obLista->ultimoCabecalho->setWidth(15);
-    $obLista->commitCabecalho();
+    $obTable = new TableTree();    
+    $obTable->setArquivo( 'OCManterEmpenho.php' );
+    $obTable->setParametros( array('cod_item','num_item','cod_marca','nome_marca') );
+    $obTable->setComplementoParametros( 'stCtrl=detalharItem' );
+    $obTable->setRecordset( $rsLista );
+    $obTable->setSummary('Registros');
+        
+    $obTable->Head->addCabecalho('Descricao'       , 55);
+    $obTable->Head->addCabecalho('Valor Unitário'  , 15);
+    $obTable->Head->addCabecalho('Quantidade'      , 10);
+    $obTable->Head->addCabecalho('Valor Total'     , 15);
 
-    $obLista->addDado();
+    $stTitle = "";
     if ($codItem){
-        if ($boCodMarca) {
-            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );    
-        }else{
-            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item]" );
-        }
+        $obTable->Body->addCampo( '[cod_item] - [nom_item]', "E", $stTitle );        
     }else{
-        $obLista->ultimoDado->setCampo( "nom_item" );
+        $obTable->Body->addCampo( 'nom_item' , "E", $stTitle );
     }
 
-    $obLista->ultimoDado->setAlinhamento('ESQUERDA');
-    $obLista->commitDado();
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo('vl_unitario');
-    $obLista->ultimoDado->setAlinhamento('DIREITA');
-    $obLista->commitDado();
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo('quantidade');
-    $obLista->ultimoDado->setAlinhamento('DIREITA');
-    $obLista->commitDado();
-    $obLista->addDado();
-    $obLista->ultimoDado->setCampo('vl_total');
-    $obLista->ultimoDado->setAlinhamento('DIREITA');
-    $obLista->commitDado();
+    $obTable->Body->addCampo( 'vl_unitario' , "D", $stTitle );
+    $obTable->Body->addCampo( 'quantidade'  , "D", $stTitle );
+    $obTable->Body->addCampo( 'vl_total'    , "D", $stTitle );
 
-    $obLista->montaHTML();
-    $stHTML = $obLista->getHTML();
-    $stHTML = str_replace("\n" ,"" ,$stHTML );
-    $stHTML = str_replace(chr(13) ,"<br>" ,$stHTML );
-    $stHTML = str_replace("  " ,"" ,$stHTML );
-    $stHTML = str_replace("'","\\'",$stHTML );
-    $stHTML = str_replace("\\\'","\\'",$stHTML );
+    $obTable->montaHTML();
+    $stHTML = $obTable->getHtml();
+    $stHTML = str_replace( "\n" ,"" ,$stHTML );
+    $stHTML = str_replace( chr(13) ,"<br>" ,$stHTML );
+    $stHTML = str_replace( "  " ,"" ,$stHTML );
+    $stHTML = str_replace( "'","\\'",$stHTML );
 
     $nuVlTotal = 0;
     foreach ($arRecordSet as $value) {
@@ -230,13 +199,11 @@ function montaLabel($flSaldoDotacao)
 
 function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
 {
-	$codUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
+    $codUf = SistemaLegado::pegaConfiguracao('cod_uf', 2, Sessao::getExercicio());
     $rsLista = new RecordSet;
-    for($i=0;$i<count($arRecordSet);$i++){            
-            if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!=''){
-                $boCodMarca = true;
-            }
-            break;
+    for($i=0;$i<count($arRecordSet);$i++){
+        if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!='')
+            $arRecordSet[$i]['nom_item'] .= " ( Marca: ".$arRecordSet[$i]['cod_marca']." - ".$arRecordSet[$i]['nome_marca']." )";
     }
 
     $rsLista->preenche( $arRecordSet );
@@ -247,12 +214,12 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
         $obLista->setRecordSet($rsLista);
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo('&nbsp;');
-        $obLista->ultimoCabecalho->setWidth(5);
+        $obLista->ultimoCabecalho->setWidth(3);
         $obLista->commitCabecalho();
         if ($request->get('stTipoItem')=='Catalogo') {
             $obLista->addCabecalho();
             $obLista->ultimoCabecalho->addConteudo('Código ');
-            $obLista->ultimoCabecalho->setWidth(10);
+            $obLista->ultimoCabecalho->setWidth(4);
             $obLista->commitCabecalho(); 
         }
         $obLista->addCabecalho();
@@ -261,7 +228,7 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
         $obLista->commitCabecalho();
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo('Valor Unitário ');
-        $obLista->ultimoCabecalho->setWidth(15);
+        $obLista->ultimoCabecalho->setWidth(10);
         $obLista->commitCabecalho();
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo('Quantidade ');
@@ -269,7 +236,7 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
         $obLista->commitCabecalho();
         $obLista->addCabecalho();
         $obLista->ultimoCabecalho->addConteudo('Valor Total');
-        $obLista->ultimoCabecalho->setWidth(15);
+        $obLista->ultimoCabecalho->setWidth(10);
         $obLista->commitCabecalho();
 
         if ($request->get('stAcao') != 'anular') {
@@ -278,23 +245,16 @@ function montaListaDiverso(Request $request, $arRecordSet, $boExecuta = true)
             $obLista->ultimoCabecalho->setWidth( 5 );
             $obLista->commitCabecalho();
         }
+
         if ($request->get('stTipoItem')=='Catalogo') {
             $obLista->addDado();
-            if ($boCodMarca) {
-                $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );    
-            }else{
-                $obLista->ultimoDado->setCampo( "cod_item" );
-            }
             $obLista->ultimoDado->setCampo('cod_item');
             $obLista->ultimoDado->setAlinhamento('ESQUERDA');
             $obLista->commitDado();
-        }        
-        $obLista->addDado();
-        if ($boCodMarca) {
-            $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item] ( Marca: [cod_marca] - [nome_marca] )" );
-        }else{
-            $obLista->ultimoDado->setCampo('nom_item');
         }
+
+        $obLista->addDado();
+        $obLista->ultimoDado->setCampo('nom_item');
         $obLista->ultimoDado->setAlinhamento('ESQUERDA');
         $obLista->commitDado();
         $obLista->addDado();
@@ -586,7 +546,7 @@ $inCodEntidade = $request->get('inCodEntidade');
 
 switch ($stCtrl) {
     case 'montaListaItemPreEmpenho':
-        montaLista(Sessao::read('arItens'));
+        montaLista(Sessao::read('arItens'),true);
     break;
      case 'verificaFornecedor':
         if ($request->get('inCodFornecedor', '') != "") {
@@ -757,7 +717,7 @@ switch ($stCtrl) {
 
                     if (!$obErro->ocorreu()) {
                         $obErro = $obREmpenhoEmpenho->listarMaiorData($rsMaiorData);
-                        if (!$obErro->ocorreu()) {
+                        if (!$obErro->ocorreu() && $obREmpenhoConfiguracao->getDataEmpenho() == '') {
                             $stDtEmpenho = $rsMaiorData->getCampo( "dataempenho" );
                             if ($stDtEmpenho) {
                                 $js .= "f.stDtEmpenho.value='" . $stDtEmpenho . "';\n";
@@ -768,7 +728,8 @@ switch ($stCtrl) {
                         }
                     }
                 } else {
-                    $js .= "f.stDtEmpenho.value='" . date("d/m/Y") . "';\n";
+                    if( $obREmpenhoConfiguracao->getDataEmpenho() == '' )
+                        $js .= "f.stDtEmpenho.value='" . date("d/m/Y") . "';\n";
                 }
             }
         } else {
@@ -782,7 +743,7 @@ switch ($stCtrl) {
             $js .= "f.dtUltimaDataEmpenho.value='$dtUltimaDataEmpenho';";
             if (!$obErro->ocorreu) {
                 $obErro = $obREmpenhoEmpenho->listarMaiorData($rsMaiorData);
-                if (!$obErro->ocorreu()) {
+                if (!$obErro->ocorreu() && $obREmpenhoConfiguracao->getDataEmpenho() == '') {
                     $stDtEmpenho = $rsMaiorData->getCampo('dataempenho');
                     if ($stDtEmpenho) {
                         $js .= "f.stDtEmpenho.value='" . $stDtEmpenho . "';\n";
@@ -1057,8 +1018,9 @@ switch ($stCtrl) {
                 $stJs .= "f.btnIncluir.setAttribute('onclick','return alterarItem()');";
                 $stJs .= "f.stNomItem.value = f.stNomItem.value.unescapeHTML();";
                 $stJs .= "f.stComplemento.value = f.stComplemento.value.unescapeHTML();\n";
-                $stJs .= " jq('#inMarca').val('".$valor["cod_marca"]."'); \n";
-                $stJs .= " jq('#stNomeMarca').html('".$valor["nome_marca"]."'); \n";
+                $stJs .= "jq('#inMarca').val('".$valor["cod_marca"]."');\n";
+                $stJs .= "jq('#stNomeMarca').html('".$valor["nome_marca"]."');\n";
+                $stJs .= "jq('input[name=stNomeMarca]').val('".$valor["nome_marca"]."');\n";
 
                 $value = $valor["cod_unidade"]."-". $valor["cod_grandeza"]."-". $valor["nom_unidade"];
                 $stJs .= "f.inCodUnidade.value='".$value."';";
@@ -1224,6 +1186,11 @@ switch ($stCtrl) {
                 }
                 $rsAtributos->arElementos = $arAtributosModificados;
 
+                $obTConfiguracao = new TEmpenhoConfiguracao();
+                $obTConfiguracao->setDado("parametro","data_fixa_empenho");
+                $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+                $stDtFixaEmpenho = trim($rsConfiguracao->getCampo('valor'));
+
                 $obHdnBoComplementar = new Hidden;
                 $obHdnBoComplementar->setName ('obHdnBoComplementar');
                 $obHdnBoComplementar->setValue(1);
@@ -1339,12 +1306,16 @@ switch ($stCtrl) {
                 // Define objeto Data para validade final
                 $obDtEmpenho = new Data;
                 $obDtEmpenho->setName              ('stDtEmpenho');
-                $obDtEmpenho->setValue             ($stDtEmpenho);
                 $obDtEmpenho->setRotulo            ('Data de Empenho');
                 $obDtEmpenho->setTitle             ('Informe a data do empenho.');
                 $obDtEmpenho->setNull              (false);
                 $obDtEmpenho->obEvento->setOnBlur  ("validaDataEmpenho(); buscaDado('montaLabelSaldoAnterior');");
                 $obDtEmpenho->obEvento->setOnChange("montaParametrosGET('verificaFornecedor');");
+                if( $stDtFixaEmpenho != ''){
+                    $obDtEmpenho->setValue ($stDtFixaEmpenho);
+                    $obDtEmpenho->setLabel ( TRUE );
+                }else
+                    $obDtEmpenho->setValue ($stDtEmpenho);
 
                 // Define objeto Data para validade final
                 $obDtValidadeFinal = new Data;
@@ -1574,6 +1545,68 @@ switch ($stCtrl) {
 
         echo ($js);
     break;
+
+    case 'detalharItem':
+        include_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
+                
+        $obHiddenNumItem = new Hidden();
+        $obHiddenNumItem->setName('hdnNumItem_'.$request->get('num_item'));
+        $obHiddenNumItem->setValue($request->get('num_item'));
+
+        $obHiddenLinha = new Hidden();
+        $obHiddenLinha->setName('hdnLinha_'.$request->get('num_item'));
+        $obHiddenLinha->setValue($request->get('linha_table_tree'));
+
+        $obMarca = new IPopUpMarca(new Form);
+        $obMarca->setNull               ( true );
+        $obMarca->setRotulo             ( 'Marca' );
+        $obMarca->setId                 ( 'stNomMarca_'.$request->get('num_item') );
+        $obMarca->setId                 ( 'stNomMarca_'.$request->get('num_item') );
+        $obMarca->obCampoCod->setName   ( 'inMarca_'.$request->get('num_item') );
+        $obMarca->obCampoCod->setId     ( 'inMarca_'.$request->get('num_item') );
+        $obMarca->obCampoCod->setValue  ( $request->get('cod_marca') );
+        $obMarca->setValue              ( $request->get('nome_marca') );
+
+        $obBtnIncluir = new Button;
+        $obBtnIncluir->setName      ( "btnIncluir_".$request->get('num_item')   );
+        $obBtnIncluir->setValue     ( "Incluir"                                 );
+        $obBtnIncluir->setTipo      ( "button"                                  );
+        $obBtnIncluir->setDisabled  ( false                                     );
+        $stMontaParametrosGET = "montaParametrosGET('incluirMarca',' hdnNumItem_".$request->get('num_item').",inMarca_".$request->get('num_item').",stNomMarca_".$request->get('num_item').",hdnLinha_".$request->get('num_item')." ');";
+        $obBtnIncluir->obEvento->setOnClick ( $stMontaParametrosGET );
+
+        $obFormulario = new Formulario();
+        $obFormulario->addHidden( $obHiddenNumItem );
+        $obFormulario->addHidden( $obHiddenLinha );
+        $obFormulario->addComponente( $obMarca );
+        $obFormulario->addComponente( $obBtnIncluir );
+        $obFormulario->show();
+
+    break;
+
+    case 'incluirMarca':
+        $arItens = Sessao::read('arItens');
+        $arRequest = $request->getAll();
+        if (!empty($arItens)) {
+            foreach ($arItens as $chave => $valor) {                
+                $inNumItemRequest = $request->get('hdnNumItem_'.$valor['num_item']);
+                if ( $valor['num_item'] == $inNumItemRequest ) {                                        
+                    $arItens[$chave]['cod_marca']   = $request->get('inMarca_'.$inNumItemRequest);  
+                    $arItens[$chave]['nome_marca']  = $request->get('stNomMarca_'.$inNumItemRequest);
+                    $stMensagem = "Marca do Item (".$valor['num_item']." - ".$valor['nom_item'].") foi alterada!";
+                    $stLinha = $request->get('hdnLinha_'.$inNumItemRequest);  
+                }
+            }
+        }
+
+        if (!empty($stMensagem)) {            
+            Sessao::write('arItens', $arItens);            
+            montaLista($arItens, true);
+            $js = " alertaAviso('".$stMensagem."','form','erro','".Sessao::getId()."', '../'); ";
+            echo $js;        
+        }
+    break;
+
 }
 
 ?>

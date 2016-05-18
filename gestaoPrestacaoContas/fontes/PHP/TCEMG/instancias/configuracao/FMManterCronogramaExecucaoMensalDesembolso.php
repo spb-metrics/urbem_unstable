@@ -112,6 +112,8 @@ $obInCodUnidade->setExercicio( Sessao::getExercicio() );
 $obInCodUnidade->setNull(false);
 $obInCodUnidade->obEvento->setOnChange("montaParametrosGET( 'montaSpanGruposDespesa'); ");
 
+
+
 //****************************************//
 //Monta FORMULARIO
 //****************************************//
@@ -121,14 +123,18 @@ $obFormulario->addTitulo     ( "Grupos de Despesa" );
 $obFormulario->addHidden     ( $obHdnCtrl          );
 $obFormulario->addHidden     ( $obHdnAcao          );
 $obFormulario->addHidden     ( $obHdnCodUnidade    );
-$obFormulario->addHidden     ( $obHdnVlSaldoTotal    );
+$obFormulario->addHidden     ( $obHdnVlSaldoTotal  );
 
 $obFormulario->addComponente ( $obITextBoxSelectEntidadeGeral );
 $obFormulario->addComponente ( $obInCodOrgao                  );
 $obFormulario->addComponente ( $obInCodUnidade                );
 $obFormulario->addSpan       ( $obSpnGruposDespesa            );
 
-$obFormulario->OK();
+$obOk = new Ok;
+$obOk->setDisabled(true);
+$obLimpar = new Limpar;
+$obLimpar->obEvento->setOnClick('LimparForm();');
+$obFormulario->defineBarra(array($obOk, $obLimpar));
 $obFormulario->show();
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/rodape.inc.php';

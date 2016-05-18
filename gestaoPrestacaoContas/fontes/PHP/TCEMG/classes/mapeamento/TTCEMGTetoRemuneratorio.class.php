@@ -32,7 +32,7 @@
 
   * @ignore
 
-  $Id: TTCEMGTetoRemuneratorio.class.php 64798 2016-04-01 18:31:13Z michel $
+  $Id: TTCEMGTetoRemuneratorio.class.php 65298 2016-05-10 18:53:52Z jean $
 */
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
 include_once CAM_GA_ADM_MAPEAMENTO."TAdministracaoConfiguracaoEntidade.class.php";
@@ -50,12 +50,12 @@ class TTCEMGTetoRemuneratorio extends Persistente
         $this->setCampoCod('');
         $this->setComplementoChave('exercicio,cod_entidade,vigencia');
 
-        $this->AddCampo('exercicio'     , 'varchar',   true, '4',      true,  true);
-        $this->AddCampo('cod_entidade'  , 'integer',   true, '',       true,  true);
-        $this->AddCampo('vigencia'      , 'date',      true, '',       false, false);
+        $this->AddCampo('exercicio'     , 'varchar',   true, '4',      true,   true);
+        $this->AddCampo('cod_entidade'  , 'integer',   true, '',       true,   true);
+        $this->AddCampo('vigencia'      , 'date',      true, '',       true,  false);
         $this->AddCampo('teto'          , 'numeric',   true, '(14,2)', false, false);
         $this->AddCampo('justificativa' , 'varchar',  false, '100',    false, false);
-        $this->AddCampo('cod_evento'    , 'integer',  false, '',       false, true);
+        $this->AddCampo('cod_evento'    , 'integer',  false, '',       false,  true);
     }
 
     public function __destruct(){}

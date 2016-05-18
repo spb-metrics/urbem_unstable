@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: Orgao.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: Orgao.inc.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -87,21 +87,13 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
 
-    if (Sessao::getExercicio() < '2011') {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("gestor");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(45);
-    } else {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("gestor");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-    }
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("gestor");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
 
-    if (Sessao::getExercicio() > '2010') {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cargo_gestor");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-    }
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("logradouro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
@@ -123,71 +115,13 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(08);
 
-    if (Sessao::getExercicio() > '2010') {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("fone_gestor");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-    }
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("fone_gestor");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
 
-    if (Sessao::getExercicio() > '2011') {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("email_gestor");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
-    }
-
-    if (Sessao::getExercicio() < '2012') { //Modificações para o arquivos gerado a partir de 2012
-        if (Sessao::getExercicio() < '2011') {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_contador");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(45);
-        } else {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_contador");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-        }
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_contador");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("crc_contador");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("uf_crc_contador");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-
-        if (Sessao::getExercicio() > '2010') {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("fone_contador");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(10);
-        }
-
-        if (Sessao::getExercicio() < '2011') {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_controle_interno");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(45);
-        } else {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_controle_interno");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(50);
-        }
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_controle_interno");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
-
-    }
-    if ((Sessao::getExercicio() > '2008') and (Sessao::getExercicio()< '2011')) {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_representante");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(45);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cpf_representante");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(11);
-    }
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("email_gestor");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -203,19 +137,9 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-    if (Sessao::getExercicio() < '2011') {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(421);
-    } elseif (Sessao::getExercicio() ==  '2011') {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(450);
-    } else {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(405);
-    }
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

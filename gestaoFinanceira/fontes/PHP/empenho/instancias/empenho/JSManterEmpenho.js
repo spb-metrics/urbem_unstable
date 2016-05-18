@@ -33,10 +33,7 @@
 
     * @ignore
     
-    $Revision: 30668 $
-    $Name$
-    $Autor: $
-    $Date: 2008-02-01 12:46:15 -0200 (Sex, 01 Fev 2008) $
+    $Id: JSManterEmpenho.js 65311 2016-05-11 20:42:32Z michel $
     
     * Casos de uso: uc-02.03.03
                     uc-02.03.04
@@ -376,15 +373,17 @@ function limparItem() {
     document.getElementById('stUnidadeMedida').innerHTML = '&nbsp;';
     jQuery('#inMarca').val('');
     jQuery('#stNomeMarca').html('&nbsp;');
+    jQuery('input[name=stNomeMarca]').val('');
 
     document.frm.btnIncluir.value='Incluir';
     document.frm.btnIncluir.setAttribute('onclick','return incluirItem()');
 }
 
-function gerarValorTotal() {
+function gerarValorTotal(objeto) {
     var nuVlUnidade = document.frm.nuVlUnitario.value;
     var nuQuantidade = document.frm.nuQuantidade.value;
     var nuVlTotal = "";
+    var nuVlTotalTeste = "";
     if( nuVlUnidade && nuQuantidade ) {
         nuVlUnidade = nuVlUnidade.replace( new  RegExp("[.]","g") ,'');
         nuVlUnidade = nuVlUnidade.replace( "," ,'.');
@@ -392,6 +391,7 @@ function gerarValorTotal() {
         nuQuantidade = nuQuantidade.replace( "," ,'.');
         nuVlTotal = nuVlUnidade * nuQuantidade;
         nuVlTotal = Math.round(nuVlTotal*Math.pow(10,2))/Math.pow(10,2);
+        nuVlTotalTeste = nuVlTotal;
         nuVlTotal = new String(nuVlTotal);
         arVlTotal = nuVlTotal.split(".") ;
         if( !arVlTotal[1] )
@@ -412,7 +412,16 @@ function gerarValorTotal() {
         if (boTipo.test(nuVlTotal)){
             nuVlTotal = nuVlTotal + String(0);
         }
-        document.frm.nuVlTotal.value = nuVlTotal;
+
+        if (nuVlTotalTeste > 999999999999.99) {
+            objeto.value = '';
+            document.frm.nuVlTotal.value = '0,00';
+            objeto.focus();
+            alertaAviso('O resultado do campo Valor Total ('+nuVlTotal+') não pode ultrapassar o valor limite de 999.999.999.999,99','form','erro','<?=Sessao::getId();?>', '../');
+        }
+        else{
+            document.frm.nuVlTotal.value = nuVlTotal;
+        }
     }
 }
 
@@ -475,7 +484,7 @@ function geraValor(objeto)
         objeto.value = '';
         alertaAviso('O valor unitário deve ser um valor positivo.','form','erro','<?=Sessao::getId();?>', '../');
     } else {
-        gerarValorTotal();
+        gerarValorTotal(objeto);
     }
 }
 

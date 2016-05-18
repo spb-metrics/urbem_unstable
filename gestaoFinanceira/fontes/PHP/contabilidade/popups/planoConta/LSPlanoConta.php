@@ -32,7 +32,7 @@
 
     * @ignore
 
-    * $Id: LSPlanoConta.php 64857 2016-04-07 19:41:03Z arthur $
+    * $Id: LSPlanoConta.php 65343 2016-05-13 17:02:26Z arthur $
 
     * Casos de uso: uc-02.02.02,uc-02.04.09,uc-02.04.28,uc-02.02.31,uc-02.03.28
 */
@@ -755,11 +755,6 @@ if ($_REQUEST['tipoBusca']) {
             }
         break;
 
-        case "contaDepreciacao":
-            $obRegra->setCodEstrutural('1.2.3.8.1');
-            $obRegra->listarContaAnaliticaDepreciacao ($rsLista,"");
-        break;
-
         case "contaSinteticaAtivoPermanente":
             if ($request->get('stCodEstrutural')) {
                 $inCodEstrutural= $request->get('stCodEstrutural');
@@ -786,6 +781,20 @@ if ($_REQUEST['tipoBusca']) {
             }else{
                 $inCodEstrutural = '3';
             }
+            $obRegra->setCodEstrutural($inCodEstrutural);
+            $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");
+        break;
+    
+        case "contaContabilAlienacao":
+            if ( $request->get('stCodEstrutural') ) {
+                $inCodEstrutural= $request->get('stCodEstrutural') ;
+            }else{
+                if ( $request->get('campoNum') == "inCodContaVPAAlienacao" )
+                    $inCodEstrutural = '4.6.2.2.1';
+                else
+                    $inCodEstrutural = '3.6.2.2.1';
+            }
+            
             $obRegra->setCodEstrutural($inCodEstrutural);
             $obRegra->listarContaAnaliticaAtivoPermanente ($rsLista,"");
         break;

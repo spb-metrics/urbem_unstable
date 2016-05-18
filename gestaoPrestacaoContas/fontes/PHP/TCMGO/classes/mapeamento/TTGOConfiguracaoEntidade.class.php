@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOConfiguracaoEntidade.class.php 59612 2014-09-02 12:00:51Z gelson $
+    $Id: TTGOConfiguracaoEntidade.class.php 65208 2016-05-03 17:09:01Z lisiane $
 
     * Casos de uso: uc-06.04.00
 
@@ -104,5 +104,31 @@ function montaRecuperaCodigos()
 
     return $stSql;
 }
+
+function recuperaEntidadePrefeitura(&$rsRecordSet, $stFiltro = "", $stOrdem = "", $boTransacao = "")
+{
+    $obErro      = new Erro;
+    $obConexao   = new Conexao;
+    $rsRecordSet = new RecordSet;
+    $stSql = $this->montaRecuperaEntidadePrefeitura().$stFiltro.$stOrdem;
+    $this->stDebug = $stSql;
+    $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, "", $boTransacao );
+}
+
+function montaRecuperaEntidadePrefeitura()
+{
+    $stSql  = " SELECT ent.cod_entidade            
+                     , cgm.nom_cgm                 
+                 FROM sw_cgm  cgm     
+                 JOIN orcamento.entidade  ent     
+                   ON cgm.numcgm = ent.numcgm  
+                WHERE ent.exercicio = '".$this->getDado('exercicio')."'                 
+                  AND  ent.cod_entidade = (SELECT valor::INTEGER
+                                                  FROM administracao.configuracao
+                                                 WHERE configuracao.parametro = 'cod_entidade_prefeitura'
+                                                   AND exercicio = '".$this->getDado('exercicio')."' ) ";
+   return $stSql;
+}  
+
 
 }

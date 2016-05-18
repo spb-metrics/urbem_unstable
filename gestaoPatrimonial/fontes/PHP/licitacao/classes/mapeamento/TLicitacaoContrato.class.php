@@ -30,7 +30,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TLicitacaoContrato.class.php 65124 2016-04-26 19:51:11Z lisiane $
+    $Id: TLicitacaoContrato.class.php 65317 2016-05-12 17:40:05Z carlos.silva $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -223,7 +223,7 @@ function montaRecuperaRelacionamento()
                    , contrato_licitacao.exercicio                                            
                    , contrato_licitacao.exercicio_licitacao                                  
                    , (SELECT descricao FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS tipo_descricao
-                   
+                   , (SELECT cod_tipo FROM licitacao.tipo_contrato where cod_tipo = contrato.cod_tipo_contrato) AS cod_tipo_contrato
                    , contrato.num_orgao                                                     
                    , contrato.num_unidade                                                   
                    , contrato.numero_contrato                                               
@@ -245,15 +245,34 @@ function montaRecuperaRelacionamento()
                    , contrato.cod_garantia               
                    , contrato.multa_inadimplemento       
                    , contrato.cod_tipo_instrumento       
-                   , contrato.cgm_representante_legal 
+                   , contrato.cgm_representante_legal
+                   , modalidade.descricao AS modalidade
                 
                 FROM licitacao.licitacao
-                   , licitacao.contrato_licitacao
-                   , compras.objeto
-                   , sw_cgm                                                                  
-                   , sw_cgm as cgm_contratado                                                
-                   , licitacao.contrato                                                      
-        
+
+	      INNER JOIN licitacao.contrato_licitacao 
+	  	          ON licitacao.cod_licitacao = contrato_licitacao.cod_licitacao              
+                 AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade            
+                 AND licitacao.cod_entidade = contrato_licitacao.cod_entidade                
+                 AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao
+
+	      INNER JOIN licitacao.contrato
+		          ON contrato_licitacao.cod_entidade = contrato.cod_entidade                 
+                 AND contrato_licitacao.exercicio = contrato.exercicio                       
+                 AND contrato_licitacao.num_contrato = contrato.num_contrato     
+
+          INNER JOIN compras.objeto
+                  ON licitacao.cod_objeto = objeto.cod_objeto       
+
+          INNER JOIN sw_cgm
+         		  ON sw_cgm.numcgm = contrato.cgm_responsavel_juridico                                                             
+		  
+          INNER JOIN sw_cgm as cgm_contratado    
+		          ON cgm_contratado.numcgm = contrato.cgm_contratado 
+
+          INNER JOIN compras.modalidade
+		          ON modalidade.cod_modalidade = licitacao.cod_modalidade   
+               
            LEFT JOIN sw_cgm as cgm_signatario                                            
                   ON cgm_signatario.numcgm = contrato.cgm_signatario
             
@@ -278,20 +297,9 @@ function montaRecuperaRelacionamento()
                  
            LEFT JOIN compras.tipo_objeto
                   ON tipo_objeto.cod_tipo_objeto = contrato.tipo_objeto
-        
-               WHERE licitacao.cod_licitacao = contrato_licitacao.cod_licitacao              
-                 AND licitacao.cod_modalidade = contrato_licitacao.cod_modalidade            
-                 AND licitacao.cod_entidade = contrato_licitacao.cod_entidade                
-                 AND licitacao.exercicio = contrato_licitacao.exercicio_licitacao            
-        
-                 AND contrato_licitacao.cod_entidade = contrato.cod_entidade                 
-                 AND contrato_licitacao.exercicio = contrato.exercicio                       
-                 AND contrato_licitacao.num_contrato = contrato.num_contrato                 
-                 
-                 AND licitacao.cod_objeto = objeto.cod_objeto                                
-                 AND sw_cgm.numcgm = contrato.cgm_responsavel_juridico                       
-                 AND cgm_contratado.numcgm = contrato.cgm_contratado    \n";
-                 
+                  
+               WHERE 1=1  \n";
+            
     if ( $this->getDado('num_contrato') ) {
         $stSql.= "   AND contrato.num_contrato = ".$this->getDado('num_contrato')."           \n";
     }

@@ -29,7 +29,7 @@
     * @author Analista: Gelson W. Gonçalves
     * @author Desenvolvedor: Henrique Boaventura
 
-    * $Id: OCManterVeiculo.php 62905 2015-07-07 14:49:50Z carlos.silva $
+    * $Id: OCManterVeiculo.php 65346 2016-05-13 19:22:15Z lisiane $
 
     * Casos de uso: uc-03.02.06
 */
@@ -396,7 +396,6 @@ switch ($stCtrl) {
                     //$obDtInicio->setTitle( 'Informe a data de início do responsável.' );
                     $obDtInicio->setValue( $rsBem->getCampo('dt_inicio') );
                     $obDtInicio->setName( 'dtInicio' );
-                    $obDtInicio->setLabel( true );
 
                     $obFormulario->addHidden( $obHdnCodResponsavel );
                     $obFormulario->addComponente( $obLblResponsavel );
@@ -596,15 +595,6 @@ switch ($stCtrl) {
 
                 // LOCAÇÃO -----------------------------------------
 
-                if ( $_REQUEST['inCodVeiculo'] ) {
-                    $stFiltroLocacao = " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']." AND exercicio = '".Sessao::getExercicio()."'";
-                }else{
-                    $stFiltroLocacao = " WHERE exercicio = '".Sessao::getExercicio()."'";
-                }
-                
-                $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao;
-                $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacoes, $stFiltroLocacao);
-
                 //id da locacao
                 $obHdnIdLocacao = new Hidden;
                 $obHdnIdLocacao->setId('hdnIdLocacao');
@@ -740,6 +730,17 @@ switch ($stCtrl) {
                 $obFormularioLocacao->addSpan ( $obSpnLocacaoDados );
 
                 $obFormularioLocacao->montaInnerHTML();
+                
+                
+                $rsVeiculoLocacoes = new Recordset;
+                if ( $_REQUEST['inCodVeiculo'] ) {
+                    $stFiltroLocacao = " WHERE cod_veiculo = ".$_REQUEST['inCodVeiculo']." AND exercicio = '".Sessao::getExercicio()."'";
+                
+                    $obTFrotaVeiculoLocacao = new TFrotaVeiculoLocacao;
+                    $obTFrotaVeiculoLocacao->recuperaTodos($rsVeiculoLocacoes, $stFiltroLocacao);
+                }
+                
+
                 
                 $stJs .= "$('spnLocacao').innerHTML = '".$obFormularioLocacao->getHTML()."'; ";
                 if ($rsVeiculoLocacoes->getNumLinhas() > 0) {

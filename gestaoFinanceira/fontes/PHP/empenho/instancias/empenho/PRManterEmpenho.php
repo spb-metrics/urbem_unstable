@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: PRManterEmpenho.php 64400 2016-02-16 16:00:53Z arthur $
+    $Id: PRManterEmpenho.php 65193 2016-05-02 12:48:43Z evandro $
 
     * Casos de uso: uc-02.01.08
                     uc-02.03.03
@@ -253,6 +253,37 @@ switch ($stAcao) {
             $obTEmpenhoEmpenhoContrato->setDado( "num_contrato"       , $request->get('inCodContrato'));
             $obTEmpenhoEmpenhoContrato->setDado( "exercicio_contrato" , $request->get('stExercicioContrato'));
             $obErro = $obTEmpenhoEmpenhoContrato->inclusao($boTransacao);
+        }
+    }
+
+
+    //Atualizacao do cod_marca na tabela de empenho.item_pre_empenho
+    if ( !$obErro->ocorreu() ) {
+        $arItens = Sessao::read('arItens');
+        if (!empty($arItens)) {
+            include_once CAM_GF_EMP_MAPEAMENTO.'TEmpenhoItemPreEmpenho.class.php';
+            $obTEmpenhoItemPreEmpenho = new TEmpenhoItemPreEmpenho();
+            $obTEmpenhoItemPreEmpenho->setDado('exercicio'      , Sessao::getExercicio() );
+            $obTEmpenhoItemPreEmpenho->setDado('cod_pre_empenho', $request->get('inCodPreEmpenho') );
+            foreach ($arItens as $key => $value) {
+                if ( !$obErro->ocorreu() ) {
+                    $obTEmpenhoItemPreEmpenho->setDado('num_item'  , $value['num_item']   );
+                    $obTEmpenhoItemPreEmpenho->recuperaPorChave($rsItemPreEmpenho,$boTransacao);
+                    if ( $rsItemPreEmpenho->getNumLinhas() > 0 ) {
+                        $obTEmpenhoItemPreEmpenho->setDado('cod_grandeza'  , $rsItemPreEmpenho->getCampo('cod_grandeza')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('quantidade'    , $rsItemPreEmpenho->getCampo('quantidade')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('cod_unidade'   , $rsItemPreEmpenho->getCampo('cod_unidade')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('nom_unidade'   , $rsItemPreEmpenho->getCampo('nom_unidade')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('sigla_unidade' , $rsItemPreEmpenho->getCampo('sigla_unidade')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('vl_total'      , $rsItemPreEmpenho->getCampo('vl_total')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('nom_item'      , $rsItemPreEmpenho->getCampo('nom_item')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('complemento'   , $rsItemPreEmpenho->getCampo('complemento')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('cod_item'      , $rsItemPreEmpenho->getCampo('cod_item')  );
+                        $obTEmpenhoItemPreEmpenho->setDado('cod_marca'     , $value['cod_marca']  );
+                        $boErro = $obTEmpenhoItemPreEmpenho->alteracao( $boTransacao );
+                    }
+                }
+            }
         }
     }
 

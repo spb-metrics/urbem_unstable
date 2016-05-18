@@ -33,7 +33,7 @@
 * @package framework
 * @subpackage componentes
 
-$Id: ArquivoExportadorBlocoColuna.class.php 64496 2016-03-03 20:48:19Z jean $
+$Id: ArquivoExportadorBlocoColuna.class.php 65270 2016-05-09 17:12:26Z michel $
 
 Casos de uso: uc-01.01.00
 */
@@ -399,13 +399,13 @@ function FormataTipoDado($stCampo)
                     break;
                     case "TCE_MG":
                         $this->stPreenchimento  = ' ';
-                        
+
                         if ( $stCampo == '' ) {
                             $stCampo = ' ';
                         } else if ( $stCampo == null ) {
                             $stCampo = ' ';
                         }
-                        
+
                     break;
                     default:
                          $this->inTamanhoFixo    = 8;
@@ -413,17 +413,19 @@ function FormataTipoDado($stCampo)
                     break;
                }
 
-               if (strpos($stCampo,'-') !== FALSE) {
-                    $arData = explode('-',$stCampo);
+               if(strpos($stCampo,'-') !== FALSE || strpos($stCampo,'/') !== FALSE ){
+                    if (strpos($stCampo,'-') !== FALSE) {
+                         $arData = explode('-',$stCampo);
 
-                    if (strlen($arData[0]) == 4) {
-                        $stCampo = SistemaLegado::dataToBr($stCampo);
+                         if (strlen($arData[0]) == 4) {
+                             $stCampo = SistemaLegado::dataToBr($stCampo);
+                         }
                     }
+
+                    $this->inTamanhoMaximo  = null;
+                    $arCampo = explode("/",trim($stCampo));
+                    $stCampo = implode("",$arCampo);
                }
-               
-               $this->inTamanhoMaximo  = null;
-               $arCampo = explode("/",trim($stCampo));
-               $stCampo = implode("",$arCampo);
         break;
         case "DATA_YYYYMMDD":
             $this->inTamanhoFixo    = 8;

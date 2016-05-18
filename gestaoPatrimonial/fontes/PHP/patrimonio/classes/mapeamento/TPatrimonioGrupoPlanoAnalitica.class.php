@@ -63,6 +63,8 @@ function __construct()
     $this->AddCampo('cod_plano_doacao'            ,'integer' ,false ,'' ,false ,false);
     $this->AddCampo('cod_plano_perda_involuntaria','integer' ,false ,'' ,false ,false);
     $this->AddCampo('cod_plano_transferencia'     ,'integer' ,false ,'' ,false ,false);
+    $this->AddCampo('cod_plano_alienacao_ganho'   ,'integer' ,false ,'' ,false ,false);
+    $this->AddCampo('cod_plano_alienacao_perda'   ,'integer' ,false ,'' ,false ,false);
 }
 
 }

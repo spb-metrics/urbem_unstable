@@ -133,7 +133,7 @@ $obFormulario->agrupaComponentes ( array($obRadioTipoManutencaoIndividual, $obRa
 $obFormulario->addSpan           ( $obSpnLoteDiario                                                         );
 $obFormulario->addTitulo         ( "Seleção do Filtro"                                                      );
 $obIFiltroComponentes->geraFormulario($obFormulario);
-$obIFiltroComponentes->getOnload(&$jsOnload);
+$obIFiltroComponentes->getOnload($jsOnload);
 $obFormulario->agrupaComponentes ( array($obRadioOrdenacaoNome, $obRadioOrdenacaoMatricula)                 );
 $obFormulario->OK();
 $obFormulario->show();

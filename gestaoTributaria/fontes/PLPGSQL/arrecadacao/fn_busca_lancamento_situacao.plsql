@@ -25,7 +25,7 @@
 * URBEM Soluções de Gestão Pública Ltda
 * www.urbem.cnm.org.br
 *
-* $Id: fn_busca_lancamento_situacao.plsql 59612 2014-09-02 12:00:51Z gelson $
+* $Id: fn_busca_lancamento_situacao.plsql 65294 2016-05-10 14:39:33Z fabio $
 *
 * Caso de uso: uc-5.3.19
 * Caso de uso: uc-05.03.19
@@ -312,6 +312,7 @@ BEGIN
                  ) as busca
         GROUP BY cod_motivo
                , descricao_resumida
+        ORDER BY cod_motivo
                ;
 
         SELECT count (total.cod_parcela)
@@ -355,12 +356,12 @@ BEGIN
         inNumParcelaGroupDev      := coalesce ( inNumParcelaGroupDev,      0 );
         inNumParcelaGroupPago     := coalesce ( inNumParcelaGroupPago,     0 );
 
+
         IF inNumParcelaGroupPagFalse = (inNumParcelaGroupDev + inNumParcelaGroupPago) THEN
             inNumParcelaGroupPagFalse := 0;
         END IF;
 
-        IF inNumParcelaGroupDev IS NOT NULL AND inNumParcelaGroupPago IS NULL AND ( inNumParcelaGroupDev = inNumeroParcelasTotal ) THEN
-
+        IF (inNumParcelaGroupDev IS NOT NULL AND inNumParcelaGroupPago IS NULL AND ( inNumParcelaGroupDev = inNumeroParcelasTotal )) THEN -- OR (inNumParcelaGroupDev IS NOT NULL AND inNumParcelaGroupDev > 0 AND inNumParcelaGroupPago IS NOT NULL) THEN
             boValido := false;
             stRetorno := stNomParcelaGroup;
 
@@ -395,7 +396,6 @@ BEGIN
                 boValido := false;
                 stRetorno := stNomParcelaGroup;
             END IF;
-
 
         ELSIF ( stNomParcelaGroup = 'Inscrito em D.A.' ) THEN
 

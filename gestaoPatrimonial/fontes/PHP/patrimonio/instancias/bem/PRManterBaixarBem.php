@@ -113,6 +113,8 @@ switch ($stAcao) {
                                         , grupo_plano_analitica.cod_plano_doacao
                                         , grupo_plano_analitica.cod_plano_perda_involuntaria
                                         , grupo_plano_analitica.cod_plano_transferencia
+                                        , grupo_plano_analitica.cod_plano_alienacao_ganho
+                                        , grupo_plano_analitica.cod_plano_alienacao_perda
                                         , natureza.cod_tipo
                                         , natureza.cod_natureza                 
                                         , natureza.nom_natureza

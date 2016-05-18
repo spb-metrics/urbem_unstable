@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Jean
   *
   * @ignore
-  * $Id: TEREM.inc.php 64921 2016-04-13 13:24:54Z evandro $
-  * $Date: 2016-04-13 10:24:54 -0300 (Qua, 13 Abr 2016) $
-  * $Author: evandro $
-  * $Rev: 64921 $
+  * $Id: TEREM.inc.php 65298 2016-05-10 18:53:52Z jean $
+  * $Date: 2016-05-10 15:53:52 -0300 (Ter, 10 Mai 2016) $
+  * $Author: jean $
+  * $Rev: 65298 $
   *
 */
 /**
@@ -55,9 +55,14 @@ $obTTCEMGTEREM->recuperaDados($rsRecordSet);
 //10 – Cadastro de Teto Remuneratório 
 if ( count($rsRecordSet->getElementos()) > 0 ) {
     $obExportador->roUltimoArquivo->addBloco($rsRecordSet);
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tiporegistro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cnpj");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(14);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlparateto");
@@ -65,14 +70,24 @@ if ( count($rsRecordSet->getElementos()) > 0 ) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(15);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipocadastro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_cadastro");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ESPACOS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("justalteracao");
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_inicial");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_final");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
+    $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("just_alteracao");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("ALFANUMERICO_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(100);
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(250);
     $obExportador->roUltimoArquivo->roUltimoBloco->setDelimitador(';');
 } else {
     //Tipo Registro 99

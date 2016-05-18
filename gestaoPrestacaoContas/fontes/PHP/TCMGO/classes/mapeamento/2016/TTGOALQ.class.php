@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOALQ.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOALQ.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -192,7 +192,7 @@ class TTGOALQ extends Persistente
                ,  restos_pre_empenho.cod_estrutural
                ,  empenho.cod_empenho
                ,  empenho.dt_empenho
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  nota_liquidacao.dt_liquidacao
                ,  empenho.cod_entidade
                ,  nota_liquidacao.cod_nota
@@ -201,7 +201,6 @@ class TTGOALQ extends Persistente
                ,  nota_liquidacao.exercicio
                ,  nota_liquidacao.cod_entidade
                ,  elemento_de_para.estrutural
-        --ORDER BY  nota_liquidacao_item_anulado.timestamp
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
 
@@ -355,7 +354,7 @@ class TTGOALQ extends Persistente
                ,  restos_pre_empenho.cod_estrutural
                ,  empenho.cod_empenho
                ,  empenho.dt_empenho
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  nota_liquidacao.dt_liquidacao
                ,  empenho.cod_entidade
                ,  recurso.cod_fonte
@@ -365,7 +364,6 @@ class TTGOALQ extends Persistente
                ,  nota_liquidacao.exercicio
                ,  nota_liquidacao.cod_entidade
                ,  elemento_de_para.estrutural
-        --ORDER BY  nota_liquidacao_item_anulado.timestamp
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
 
@@ -439,23 +437,13 @@ class TTGOALQ extends Persistente
                ,  CASE    WHEN    sw_cgm_pessoa_juridica.cnpj IS NOT NULL
                           THEN    sw_cgm_pessoa_juridica.cnpj
                           ELSE    sw_cgm_pessoa_fisica.cpf
-                  END     AS  cnpj_cpf ";
-      if (Sessao::getExercicio() > 2012) {
-        $stSql .= "
+                  END     AS  cnpj_cpf
                  ,  CASE    WHEN    sw_cgm.cod_pais <> 1
                             THEN    3
                             WHEN    sw_cgm_pessoa_juridica.cnpj IS NOT NULL
                             THEN    2
                             ELSE    1
-                    END AS tipo_credor ";
-      } else {
-        $stSql .= "
-                 ,  CASE    WHEN    sw_cgm_pessoa_juridica.cnpj IS NOT NULL
-                            THEN    2
-                            ELSE    1
-                    END AS tipo_credor ";
-      }
-      $stSql .= "
+                    END AS tipo_credor
                ,  nota_fiscal.inscricao_estadual AS num_inscest
                ,  nota_fiscal.inscricao_municipal AS num_inscmun
                ,  sw_cgm.cep AS cep_municipio
@@ -549,7 +537,7 @@ class TTGOALQ extends Persistente
                ,  restos_pre_empenho.cod_estrutural
                ,  empenho.cod_empenho
                ,  empenho.dt_empenho
-               ,  TCMGO.numero_nota_liquidacao('2007',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
+               ,  TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho)
                ,  nota_liquidacao.dt_liquidacao
                ,  empenho.cod_entidade
                ,  nota_liquidacao.cod_nota
@@ -572,12 +560,8 @@ class TTGOALQ extends Persistente
                ,  elemento_de_para.estrutural
                ,  tipo_docfiscal
                ,  num_docfiscal
-               ,  serie_docfiscal ";
-      if (Sessao::getExercicio() > 2012) {
-        $stSql .= " ,  sw_cgm.cod_pais ";
-      }
-      $stSql .= "
-        --ORDER BY  nota_liquidacao_item_anulado.timestamp
+               ,  serie_docfiscal
+               ,  sw_cgm.cod_pais
         ORDER BY  nota_liquidacao.exercicio, nota_liquidacao.cod_entidade, nota_liquidacao.cod_nota;
     ";
 

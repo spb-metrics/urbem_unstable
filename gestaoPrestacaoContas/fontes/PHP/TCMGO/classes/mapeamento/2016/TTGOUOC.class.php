@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOUOC.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOUOC.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -129,9 +129,7 @@ class TTGOUOC extends Persistente
             sw_uf.sigla_uf,
             sw_cgm.cep,
             COALESCE(sw_cgm.fone_comercial, sw_cgm.fone_celular, sw_cgm.fone_residencial) AS telefone,
-            sw_cgm.e_mail, ";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "
+            sw_cgm.e_mail,
             CASE WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 0 OR sw_cgm_pessoa_fisica.cod_escolaridade = 1 OR sw_cgm_pessoa_fisica.cod_escolaridade = 4 THEN
                 '01'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 5 OR sw_cgm_pessoa_fisica.cod_escolaridade = 2 THEN
@@ -156,9 +154,7 @@ class TTGOUOC extends Persistente
                 '11'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 11 THEN
                 '12'
-           END AS escolaridade, ";
-    }
-    $stSql .= "
+           END AS escolaridade,
            '1' AS numero_registro
 
         FROM tcmgo.unidade_responsavel
@@ -228,9 +224,7 @@ class TTGOUOC extends Persistente
             sw_uf.sigla_uf,
             sw_cgm.cep,
             COALESCE(sw_cgm.fone_comercial, sw_cgm.fone_celular, sw_cgm.fone_residencial) AS telefone,
-            sw_cgm.e_mail, ";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "
+            sw_cgm.e_mail,
             CASE WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 0 OR sw_cgm_pessoa_fisica.cod_escolaridade = 1 OR sw_cgm_pessoa_fisica.cod_escolaridade = 4 THEN
                 '01'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 5 OR sw_cgm_pessoa_fisica.cod_escolaridade = 2 THEN
@@ -255,9 +249,7 @@ class TTGOUOC extends Persistente
                 '11'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 11 THEN
                 '12'
-           END AS escolaridade, ";
-    }
-    $stSql .= "
+           END AS escolaridade,
            '1' AS numero_registro
 
         FROM tcmgo.unidade_responsavel
@@ -340,9 +332,7 @@ class TTGOUOC extends Persistente
             sw_uf.sigla_uf,
             sw_cgm.cep,
             COALESCE(sw_cgm.fone_comercial, sw_cgm.fone_celular, sw_cgm.fone_residencial) AS telefone,
-            sw_cgm.e_mail, ";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "
+            sw_cgm.e_mail,
             CASE WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 0 OR sw_cgm_pessoa_fisica.cod_escolaridade = 1 OR sw_cgm_pessoa_fisica.cod_escolaridade = 4 THEN
                 '01'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 5 OR sw_cgm_pessoa_fisica.cod_escolaridade = 2 THEN
@@ -367,9 +357,7 @@ class TTGOUOC extends Persistente
                 '11'
                  WHEN sw_cgm_pessoa_fisica.cod_escolaridade = 11 THEN
                 '12'
-           END AS escolaridade, ";
-    }
-    $stSql .= "
+           END AS escolaridade,
            '1' AS numero_registro
 
         FROM tcmgo.unidade_responsavel

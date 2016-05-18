@@ -52,7 +52,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
         $stSql = $this->montaRecuperaDadosExportacaoFolhaPagamento10();
-        $this->stDebug = $stSql;
+        $this->stDebug = $stSql;        
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
     
         return $obErro;
@@ -86,38 +86,34 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                ELSE
                                     'I'
                             END AS situacao_servidor_pensionista
+                            ,'' as descricao_situacao
                             ,TO_CHAR(aposentadoria.dt_concessao,'ddmmyyyy') as data_concessao_aposentadoria_pensao
                             ,remove_acentos(cargo.descricao) as nome_cargo
                             ,SUBSTR(tcemg_entidade_cargo_servidor.descricao,1,3) as sigla_cargo
+                            ,SUBSTR(tcemg_entidade_cargo_servidor.descricao,7) AS descricao_sigla_cargo
                             ,COALESCE(tcemg_entidade_requisitos_cargo.cod_tipo,4) as requisito_cargo
                             , CASE WHEN adido_cedido.tipo_cedencia = 'c' AND indicativo_onus = 'c'
                                     THEN 'SCO'
                                     WHEN adido_cedido.tipo_cedencia = 'c' AND indicativo_onus = 'e'
                                     THEN 'SCS'
-                                    ELSE 'SNC'
+                                    ELSE ''
                             END AS indicador_cessao
                             ,orgao_descricao.descricao as nome_lotacao
-                            ,ultimo_contrato_servidor_salario.horas_semanais::INTEGER as valor_horas_semanais
+                            ,ultimo_contrato_servidor_salario.horas_semanais::VARCHAR as valor_horas_semanais
                             ,TO_CHAR(contrato_servidor_funcao.vigencia,'ddmmyyyy') as data_efetivacao_exercicio_cargo
                             ,CASE WHEN aposentadoria_encerramento.cod_contrato IS NOT NULL 
                                     THEN TO_CHAR(aposentadoria_encerramento.dt_encerramento,'ddmmyyyy')                
                                     ELSE TO_CHAR(ultimo_contrato_servidor_caso_causa.dt_rescisao,'ddmmyyyy')
-                            END AS data_exclusao
-                            ,CASE WHEN COALESCE(remuneracoes.valor,0.00) >= 0 THEN
-                                    'C'
-                                    ELSE
-                                    'D'
-                            END as natureza_saldo_bruto
+                            END AS data_exclusao                            
                             ,COALESCE(remuneracoes.valor,0.00) as valor_remuneracao_bruto
                             ,CASE WHEN (remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00)) >= 0 THEN
                                     'C'
                                     ELSE
                                     'D'
                             END as natureza_saldo_liquido
-                            ,((remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00))-COALESCE(teto_remuneracao.valor,0.00)) as valor_remuneracao_liquida
+                            ,((remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00))) as valor_remuneracao_liquida
                             ,COALESCE(irrf_previdencia.valor,0.00) as valor_obrigacoes
-                            ,COALESCE(teto_remuneracao.valor,0.00) as valor_teto_remuneracao
-                    
+                                              
                     
                             FROM pessoal.contrato
                     
@@ -250,9 +246,21 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                             INNER JOIN ultimo_contrato_servidor_orgao('".$stEntidade."', '".$inCodPeriodoMovimentacao."') as ultimo_contrato_servidor_orgao
                                     ON contrato_servidor.cod_contrato = ultimo_contrato_servidor_orgao.cod_contrato
                             
-                            INNER JOIN organograma.orgao_descricao
-                                    ON orgao_descricao.cod_orgao = ultimo_contrato_servidor_orgao.cod_orgao
-                                    AND orgao_descricao.timestamp <= ultimoTimestampPeriodoMovimentacao(".$inCodPeriodoMovimentacao.",'".$stEntidade."')::TIMESTAMP
+                            INNER JOIN (SELECT orgao_descricao.cod_orgao
+                                                ,orgao_descricao.descricao
+                                                ,orgao_descricao.timestamp
+                                                FROM organograma.orgao_descricao
+                                                INNER JOIN( SELECT cod_orgao
+                                                                   ,MAX(timestamp) as timestamp
+                                                                FROM organograma.orgao_descricao
+                                                                WHERE timestamp <= ultimoTimestampPeriodoMovimentacao(".$inCodPeriodoMovimentacao.",'".$stEntidade."')::TIMESTAMP
+                                                                group BY 1
+                                                )as max 
+                                                        ON max.cod_orgao = orgao_descricao.cod_orgao
+                                                        AND max.timestamp = orgao_descricao.timestamp                                                
+                                    ) as orgao_descricao
+                                ON orgao_descricao.cod_orgao = ultimo_contrato_servidor_orgao.cod_orgao
+                                AND orgao_descricao.timestamp <= ultimoTimestampPeriodoMovimentacao(".$inCodPeriodoMovimentacao.",'".$stEntidade."')::TIMESTAMP
                     
                             INNER JOIN ultimo_contrato_servidor_salario('".$stEntidade."', '".$inCodPeriodoMovimentacao."') as ultimo_contrato_servidor_salario
                                     ON contrato_servidor.cod_contrato = ultimo_contrato_servidor_salario.cod_contrato
@@ -464,66 +472,6 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                     ) AS irrf_previdencia
                                             ON irrf_previdencia.cod_contrato = contrato_servidor_periodo.cod_contrato
                                             AND irrf_previdencia.tipo_calculo = remuneracoes.tipo_calculo
-                    
-                            LEFT JOIN ( SELECT 
-                                            cod_contrato        
-                                            ,tipo_calculo
-                                            ,SUM(valor) as valor
-                                            FROM (
-                                                    SELECT * 
-                                                            ,'E' as tipo_calculo
-                                                    from recuperarEventosCalculados(0,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade." 
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                    UNION
-                                                    SELECT * 
-                                                            ,'M' as tipo_calculo
-                                                    from recuperarEventosCalculados(1,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade."  
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                    UNION
-                                                    SELECT * 
-                                                            ,'M' as tipo_calculo
-                                                    from recuperarEventosCalculados(2,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade."  
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                    UNION
-                                                    SELECT * 
-                                                            ,'D' as tipo_calculo
-                                                    from recuperarEventosCalculados(3,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade."  
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                    UNION
-                                                    SELECT * 
-                                                            ,'M' as tipo_calculo
-                                                    from recuperarEventosCalculados(4,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade."  
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                        AND desdobramento != 'D'
-                                                    UNION
-                                                    SELECT * 
-                                                            ,'D' as tipo_calculo
-                                                    from recuperarEventosCalculados(4,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                                            FROM tcemg.teto_remuneratorio 
-                                                                        where cod_entidade = ".$inCodEntidade."  
-                                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                                        AND desdobramento = 'D'
-                                                    ) as retorno
-                                                    GROUP by 1,2
-                                    ) as teto_remuneracao
-                                            ON teto_remuneracao.cod_contrato = contrato_servidor_periodo.cod_contrato
-                                            AND teto_remuneracao.tipo_calculo = remuneracoes.tipo_calculo 
 
             UNION
 
@@ -542,34 +490,30 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                 ,'C' as regime
                 ,remuneracoes.tipo_calculo as tipo_calculo
                 ,'P' as situacao_servidor_pensionista
+                ,'' as descricao_situacao
                 ,TO_CHAR(contrato_pensionista.dt_inicio_beneficio,'ddmmyyyy') as data_concessao_aposentadoria_pensao
                 ,remove_acentos(cargo.descricao) as nome_cargo
                 ,SUBSTR(tcemg_entidade_cargo_pensionista.descricao,1,3) as sigla_cargo
+                ,SUBSTR(tcemg_entidade_cargo_pensionista.descricao,7) AS descricao_sigla_cargo
                 ,COALESCE(tcemg_entidade_requisitos_cargo.cod_tipo,4) as requisito_cargo
                 , CASE WHEN adido_cedido.tipo_cedencia = 'c' AND indicativo_onus = 'c'
                         THEN 'SCO'
                         WHEN adido_cedido.tipo_cedencia = 'c' AND indicativo_onus = 'e'
                         THEN 'SCS'
-                        ELSE 'SNC'
+                        ELSE ''
                 END AS indicador_cessao
                 ,orgao_descricao.descricao as nome_lotacao
-                ,0::INTEGER as valor_horas_semanais
+                ,'00'::VARCHAR as valor_horas_semanais
                 ,TO_CHAR(contrato_pensionista_funcao.vigencia,'ddmmyyyy') as data_efetivacao_exercicio_cargo
-                ,TO_CHAR(contrato_pensionista.dt_encerramento,'ddmmyyyy') as data_exclusao
-                ,CASE WHEN COALESCE(remuneracoes.valor,0.00) >= 0 THEN
-                        'C'
-                        ELSE
-                        'D'
-                END as natureza_saldo_bruto
+                ,TO_CHAR(contrato_pensionista.dt_encerramento,'ddmmyyyy') as data_exclusao                
                 ,COALESCE(remuneracoes.valor,0.00) as valor_remuneracao_bruto
                 ,CASE WHEN (remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00)) >= 0 THEN
                         'C'
                         ELSE
                         'D'
-                END as natureza_saldo_liquido
-                ,((remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00))-COALESCE(teto_remuneracao.valor,0.00)) as valor_remuneracao_liquida
-                ,COALESCE(irrf_previdencia.valor,0.00) as valor_obrigacoes
-                ,COALESCE(teto_remuneracao.valor,0.00) as valor_teto_remuneracao
+                END as natureza_saldo_liquido                
+                ,((remuneracoes.valor - COALESCE(irrf_previdencia.valor,0.00))) as valor_remuneracao_liquida
+                ,COALESCE(irrf_previdencia.valor,0.00) as valor_obrigacoes                
                 
             FROM pessoal.contrato_pensionista
 
@@ -707,7 +651,19 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
             INNER JOIN ultimo_contrato_pensionista_orgao('".$stEntidade."', '".$inCodPeriodoMovimentacao."') as ultimo_contrato_pensionista_orgao
                 ON contrato_pensionista.cod_contrato = ultimo_contrato_pensionista_orgao.cod_contrato
 
-            INNER JOIN organograma.orgao_descricao
+            INNER JOIN (SELECT orgao_descricao.cod_orgao
+                                ,orgao_descricao.descricao
+                                ,orgao_descricao.timestamp
+                                FROM organograma.orgao_descricao
+                                INNER JOIN( SELECT cod_orgao
+                                                   ,MAX(timestamp) as timestamp
+                                                FROM organograma.orgao_descricao
+                                                WHERE timestamp <= ultimoTimestampPeriodoMovimentacao(".$inCodPeriodoMovimentacao.",'".$stEntidade."')::TIMESTAMP
+                                                group BY 1
+                                )as max 
+                                        ON max.cod_orgao = orgao_descricao.cod_orgao
+                                        AND max.timestamp = orgao_descricao.timestamp                                                
+                    ) as orgao_descricao
                 ON orgao_descricao.cod_orgao = ultimo_contrato_pensionista_orgao.cod_orgao
                 AND orgao_descricao.timestamp <= ultimoTimestampPeriodoMovimentacao(".$inCodPeriodoMovimentacao.",'".$stEntidade."')::TIMESTAMP
 
@@ -881,66 +837,6 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
             ) AS irrf_previdencia
                 ON irrf_previdencia.cod_contrato = contrato_pensionista.cod_contrato
                 AND irrf_previdencia.tipo_calculo = remuneracoes.tipo_calculo                
-                    
-            LEFT JOIN ( SELECT 
-                            cod_contrato        
-                            ,tipo_calculo
-                            ,SUM(valor) as valor
-                            FROM (
-                                    SELECT * 
-                                            ,'E' as tipo_calculo
-                                    from recuperarEventosCalculados(0,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                    UNION
-                                    SELECT * 
-                                            ,'M' as tipo_calculo
-                                    from recuperarEventosCalculados(1,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                    UNION
-                                    SELECT * 
-                                            ,'M' as tipo_calculo
-                                    from recuperarEventosCalculados(2,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                    UNION
-                                    SELECT * 
-                                            ,'D' as tipo_calculo
-                                    from recuperarEventosCalculados(3,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','') 
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                    UNION
-                                    SELECT * 
-                                            ,'M' as tipo_calculo
-                                    from recuperarEventosCalculados(4,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                        AND desdobramento != 'D'
-                                    UNION
-                                    SELECT * 
-                                            ,'D' as tipo_calculo
-                                    from recuperarEventosCalculados(4,'".$inCodPeriodoMovimentacao."',0,0,'".$stEntidade."','')
-                                    WHERE cod_evento IN (SELECT cod_evento 
-                                                            FROM tcemg.teto_remuneratorio 
-                                                        where cod_entidade = ".$inCodEntidade."  
-                                                        AND exercicio = '".Sessao::getExercicio()."')
-                                        AND desdobramento = 'D'
-                                    ) as retorno
-                                    GROUP by 1,2
-                ) as teto_remuneracao
-                    ON teto_remuneracao.cod_contrato = contrato_pensionista.cod_contrato
-                    AND teto_remuneracao.tipo_calculo = remuneracoes.tipo_calculo 
 
             ) as resultado
 
@@ -955,7 +851,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
         $obConexao   = new Conexao;
         $rsRecordSet = new RecordSet;
         $stSql = $this->montaRecuperaDadosExportacaoFolhaPagamento11();
-        $this->stDebug = $stSql;
+        $this->stDebug = $stSql;                
         $obErro = $obConexao->executaSQL( $rsRecordSet, $stSql, $boTransacao );
     
         return $obErro;
@@ -975,8 +871,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                            ,cod_reduzido_pessoa
                            ,num_cpf
                            ,LPAD(tipo_remuneracao::varchar,2,'0') as tipo_remuneracao
-                           ,descricao_outros
-                           ,natureza_saldo
+                           ,descricao_outros                           
                            ,SUM(valor_remuneracao) as valor_remuneracao 
                     FROM(
                     SELECT DISTINCT
@@ -989,18 +884,11 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                         contrato.registro||''||3
                         END as cod_reduzido_pessoa                
                         ,sw_cgm_pessoa_fisica.cpf AS num_cpf
-                        ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo IS NULL 
-                                THEN 14
-                                ELSE tcemg_entidade_remuneracao.cod_tipo
-                        END as tipo_remuneracao
-                        ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo = 14 OR tcemg_entidade_remuneracao.cod_tipo IS NULL
+                        ,tcemg_entidade_remuneracao.cod_tipo as tipo_remuneracao
+                        ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo = 99 OR tcemg_entidade_remuneracao.cod_tipo = 09
                                 THEN remuneracoes.descricao
-                                else ''
-                        END AS descricao_outros
-                        ,CASE WHEN COALESCE(remuneracoes.valor,0.00) >= 0 
-                                THEN 'C'
-                                ELSE 'D' 
-                        END AS natureza_saldo
+                                ELSE ''
+                        END AS descricao_outros                        
                         ,COALESCE(remuneracoes.valor,0.00) as valor_remuneracao
                         
                         FROM pessoal.contrato
@@ -1063,7 +951,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                 AND tcemg_entidade_remuneracao.exercicio = '".Sessao::getExercicio()."'
 
         ) as servidor
-        GROUP BY 1,2,3,4,5,6
+        GROUP BY 1,2,3,4,5
 
     UNION ALL
         
@@ -1071,8 +959,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                ,cod_reduzido_pessoa
                ,num_cpf
                ,LPAD(tipo_remuneracao::varchar,2,'0') as tipo_remuneracao
-               ,descricao_outros
-               ,natureza_saldo
+               ,descricao_outros               
                ,SUM(valor_remuneracao) as valor_remuneracao 
         FROM(
         SELECT DISTINCT
@@ -1085,18 +972,11 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                 contrato.registro||''||3
                 END as cod_reduzido_pessoa        
                 ,sw_cgm_pessoa_fisica.cpf AS num_cpf
-                ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo IS NULL 
-                        THEN 14
-                        ELSE tcemg_entidade_remuneracao.cod_tipo
-                END as tipo_remuneracao
-                ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo = 14 OR tcemg_entidade_remuneracao.cod_tipo IS NULL
+                ,tcemg_entidade_remuneracao.cod_tipo as tipo_remuneracao
+                ,CASE WHEN tcemg_entidade_remuneracao.cod_tipo = 99 OR tcemg_entidade_remuneracao.cod_tipo = 09
                         THEN remuneracoes.descricao
-                        else ''
+                        ELSE ''
                 END AS descricao_outros
-                ,CASE WHEN COALESCE(remuneracoes.valor,0.00) >= 0 
-                        THEN 'C'
-                        ELSE 'D' 
-                END AS natureza_saldo
                 ,COALESCE(remuneracoes.valor,0.00) as valor_remuneracao
         
         FROM pessoal.contrato_pensionista
@@ -1157,7 +1037,7 @@ class TTCEMGArquivoFolhaPagamento extends Persistente
                                 AND tcemg_entidade_remuneracao.exercicio = '".Sessao::getExercicio()."'
 
             ) as pensionistas
-            GROUP BY 1,2,3,4,5,6
+            GROUP BY 1,2,3,4,5
         )as resultado
 
         ORDER BY tipo_remuneracao::INTEGER

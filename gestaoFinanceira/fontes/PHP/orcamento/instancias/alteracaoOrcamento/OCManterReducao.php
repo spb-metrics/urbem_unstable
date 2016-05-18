@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterReducao.php 65156 2016-04-28 17:58:44Z michel $
+    $Id: OCManterReducao.php 65255 2016-05-05 20:25:44Z michel $
 
     * Casos de uso: uc-02.01.07
 */
@@ -967,9 +967,9 @@ switch ($stCtrl) {
 
     case 'validaValorLimiteSuplementacao':
         if ($request->get('inCodEntidade') != '') {            
-            include_once ( CAM_GF_ORC_MAPEAMENTO."TOrcamentoSuplementacao.class.php" );
+            include_once CAM_GF_ORC_MAPEAMENTO."TOrcamentoSuplementacao.class.php";
             $obTOrcamentoSuplementacao = new TOrcamentoSuplementacao;
-        
+
             //Caso a suplementação a ser realizada somada as demais suplementações já realizadas
             //ultrapassar o montante do percentual definido na LOA, esta suplementação nao podera ser realizada utilizando a lei da LOA
             $query = "SELECT SUM(vl_original) as valor FROM orcamento.despesa WHERE exercicio = '".Sessao::getExercicio()."' AND cod_entidade = ".$request->get('inCodEntidade')."";
@@ -979,9 +979,10 @@ switch ($stCtrl) {
 
             $nuValorLimiteSuplementacoes = round(($nuValorTotalOrcamento*$nuPorcentagemLimite)/100,2);
 
-            $stFiltro = " AND suplementacao.exercicio = '".Sessao::getExercicio()."' ";
+            $stFiltro  = " AND suplementacao.exercicio = '".Sessao::getExercicio()."' ";
+            $stFiltro .= " AND despesa.cod_entidade IN (".$request->get('inCodEntidade').") ";
             $obTOrcamentoSuplementacao->recuperaValorTotalSuplementado($rsValorSuplementado, $stFiltro, '',$boTransacao);
-        
+
             if ( $rsValorSuplementado->getNumLinhas() > 0 ) {
                 $nuValorTotal = SistemaLegado::formataValorDecimal($request->get('nuVlTotal'),false);
                 $nuValorTotalSuplementado = $rsValorSuplementado->getCampo('valor_suplementado') + $nuValorTotal;
@@ -1000,7 +1001,6 @@ switch ($stCtrl) {
             SistemaLegado::executaFrameOculto($stJs);
             SistemaLegado::exibeAviso($stMensagem,"aviso","aviso");
         }
-
     break;
 
 }

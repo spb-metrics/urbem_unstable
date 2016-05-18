@@ -32,7 +32,7 @@
 
     Casos de uso: uc-01.05.01, uc-01.05.02, uc-01.05.03, uc-04.05.40
 
-    $Id: TOrganogramaOrgao.class.php 63843 2015-10-23 14:02:35Z lisiane $
+    $Id: TOrganogramaOrgao.class.php 65314 2016-05-12 14:51:44Z evandro $
 
     */
 
@@ -100,7 +100,8 @@ function montaRecuperaOrgaoReduzido()
     $stSql .= "     , (SELECT MAX(cod_organograma) as cod_organograma                                  \n";
     $stSql .= "             , MAX(implantacao) AS data                                                 \n";
     $stSql .= "          FROM organograma.organograma oo                                               \n";
-    $stSql .= "         WHERE implantacao <= '".$this->getDado('data_atual')."') as ultima_data        \n";
+    $stSql .= "         WHERE implantacao <= '".$this->getDado('data_atual')."'
+                        AND ativo IS TRUE ) as ultima_data        \n";
     $stSql .= " WHERE organograma.cod_organograma = nivel.cod_organograma                              \n";
     $stSql .= "   AND nivel.cod_organograma       = orgao_nivel.cod_organograma                        \n";
     $stSql .= "   AND nivel.cod_nivel             = orgao_nivel.cod_nivel                              \n";

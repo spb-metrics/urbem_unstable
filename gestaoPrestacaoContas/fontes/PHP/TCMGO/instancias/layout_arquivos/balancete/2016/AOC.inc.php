@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: AOC.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: AOC.inc.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -427,15 +427,9 @@
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-    if (Sessao::getExercicio() < 2011 ) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(75);
-    } else {
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("espacador");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(78);
-    }
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_sequencial");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

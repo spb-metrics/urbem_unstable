@@ -28,10 +28,7 @@
   * Data de Criação: 29/08/2014
   * @author Analista:      Eduardo Paculski Schitz
   * @author Desenvolvedor: Franver Sarmento de Moraes
-  * $Id:$
-  * $Date:$
-  * $Author:$
-  * $Rev:$
+  * $Id: PESSOA.inc.php 65246 2016-05-04 18:16:04Z michel $
   *
 */
 /**

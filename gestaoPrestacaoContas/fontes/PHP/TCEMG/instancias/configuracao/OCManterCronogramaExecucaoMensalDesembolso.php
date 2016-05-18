@@ -249,6 +249,7 @@ function montaSpanGruposDespesa(){
     
     $stJs .= "f.hdnVlSaldoTotal.value = ".$saldo_total.";    \n";
     $stJs .= "jQuery('#spnGruposDespesa').html('".$stHTML."');";
+    $stJs .= "jQuery('#Ok').attr('disabled',false);\n";
     return $stJs;
 }
 

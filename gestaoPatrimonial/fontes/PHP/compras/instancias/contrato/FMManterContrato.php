@@ -70,7 +70,7 @@ include($pgJs);
 Sessao::remove('arValores');
 Sessao::remove('arDocumentos');
 Sessao::remove('arArquivos');
-SistemaLegado::mostraVar($_REQUEST);
+
 $stAcao = $request->get('stAcao');
 $inNumContrato = $request->get('inNumContrato');
 $inCodEntidade = $request->get('inCodEntidade');

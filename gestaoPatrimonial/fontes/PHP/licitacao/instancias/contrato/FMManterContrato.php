@@ -29,7 +29,7 @@
 
     * @author Leandro André Zis
 
-    * $Id: FMManterContrato.php 65124 2016-04-26 19:51:11Z lisiane $
+    * $Id: FMManterContrato.php 65379 2016-05-17 18:22:47Z jean $
 
     * Casos de uso : uc-03.05.22
 */
@@ -78,7 +78,7 @@ $obTLicitacaoTipoContrato = new TLicitacaoTipoContrato();
 $obTLicitacaoTipoContrato->recuperaTodos( $rsTipoContrato, ' WHERE ativo IS TRUE ', ' ORDER BY descricao ' );
 
 $obTLicitacaoTipoInstrumento = new TLicitacaoTipoInstrumento();
-$obTLicitacaoTipoInstrumento->recuperaTodos( $rsTipoInstrumento );
+$obTLicitacaoTipoInstrumento->recuperaTodos( $rsTipoInstrumento, " WHERE ativo = 't'" );
 
 $obTLicitacaoTipoGarantia = new TLicitacaoTipoGarantia();
 $obTLicitacaoTipoGarantia->recuperaTodos( $rsTipoGarantia );
@@ -92,6 +92,7 @@ if ($inNumContrato) {
 
   $inCodLicitacao = $rsContrato->getCampo('cod_licitacao');
   $inCodModalidade = $rsContrato->getCampo('cod_modalidade');
+  $stModalidade = $rsContrato->getCampo('modalidade');
   $stDescObjeto = $rsContrato->getCampo('descricao');
   $inCGMResponsavelJuridico = $rsContrato->getCampo('cgm_responsavel_juridico');
   $stDataAssinatura = $rsContrato->getCampo('dt_assinatura');
@@ -106,6 +107,7 @@ if ($inNumContrato) {
   $nmValorGarantiaExecucao = number_format($rsContrato->getCampo('valor_garantia'),2,',','.');
   $vlContrato = number_format($rsContrato->getCampo('valor_contratado'),2,',','.');
   $stTipoContrato = $rsContrato->getCampo('tipo_descricao');
+  $inCodTipoContrato = $rsContrato->getCampo('cod_tipo_contrato');
   $stExercicioContrato  = $rsContrato->getCampo('exercicio');
   $stExercicioLicitacao = $rsContrato->getCampo('exercicio_licitacao');
   $stTipoInstrumento = $rsContrato->getCampo('cod_tipo_instrumento');
@@ -328,6 +330,9 @@ if ($stAcao == 'incluir') {
     $obMontaLicitacao->obCmbLicitacao->obEvento->setOnBlur("montaParametrosGET('preencheObjeto', 'stExercicioLicitacao,inCodEntidade,inCodModalidade,inCodLicitacao', false );");
     $obMontaLicitacao->obExercicio->setRotulo('Exercicio da Licitação');
 } else {
+   $obLblModalidade= new Label;
+   $obLblModalidade->setRotulo ( "Modalidade" );
+   $obLblModalidade->setValue  ( $stModalidade );
    $obLblNumeroLicitacao= new Label;
    $obLblNumeroLicitacao->setRotulo    ( "Número da Licitação" );
    $obLblNumeroLicitacao->setValue     ( $inCodLicitacao);
@@ -378,9 +383,18 @@ $obHdnDescObjeto->setName   ( 'hdnDescObjeto');
 $obHdnDescObjeto->setValue  ( $stDescObjeto );
 
 if ($stAcao == 'alterar') {
-   $obLblTipoContrato = new Label;
-   $obLblTipoContrato->setRotulo ( "Tipo de Contrato");
-   $obLblTipoContrato->setValue ( $stTipoContrato );
+   $obCmbTipoContrato = new Select();
+   $obCmbTipoContrato->setRotulo( 'Tipo de contrato' );
+   $obCmbTipoContrato->setTitle( 'Selecione o tipo de contrato' );
+   $obCmbTipoContrato->setName( 'inTipoContrato' );
+   $obCmbTipoContrato->setId( 'inTipoContrato' );
+   $obCmbTipoContrato->addOption( '', 'Selecione' );
+   $obCmbTipoContrato->setCampoId( 'cod_tipo' );
+   $obCmbTipoContrato->setCampoDesc( 'descricao' );
+   $obCmbTipoContrato->setStyle('width: 300');
+   $obCmbTipoContrato->setNull(false);
+   $obCmbTipoContrato->preencheCombo( $rsTipoContrato );
+   $obCmbTipoContrato->setValue($inCodTipoContrato);
    
    $obLblExercicioContrato = new Label;
    $obLblExercicioContrato->setRotulo ( "Exercício do Contrato");
@@ -834,18 +848,14 @@ if ($stAcao == 'alterar') {
 
 //define o formulário
 $obFormulario = new Formulario;
-$obFormulario->addForm          ( $obForm                   );
-$obFormulario->setAjuda         ("UC-03.05.22");
-$obFormulario->addHidden        ( $obHdnCtrl                );
-$obFormulario->addHidden        ( $obHdnAcao                );
-$obFormulario->addTitulo        ( "Dados do Contrato"   );
-if ($stAcao == 'incluir') {
-   $obFormulario->addComponente     ( $obCmbTipoContrato );
-}else{
-     $obFormulario->addComponente    ( $obLblTipoContrato );
-}
+$obFormulario->addForm          ( $obForm             );
+$obFormulario->setAjuda         ( "UC-03.05.22"       );
+$obFormulario->addHidden        ( $obHdnCtrl          );
+$obFormulario->addHidden        ( $obHdnAcao          );
+$obFormulario->addTitulo        ( "Dados do Contrato" );
 
-$obFormulario->addComponente     ( $obCmbTipoInstrumento );
+$obFormulario->addComponente    ( $obCmbTipoContrato    );
+$obFormulario->addComponente    ( $obCmbTipoInstrumento );
 
 if($stAcao == 'incluir'){
    $obFormulario->addComponente     ( $obTxtExercicioContrato );
@@ -865,6 +875,7 @@ if($stAcao == 'incluir'){
    $obFormulario->addComponenteComposto( $obTxtOrgao, $obCmbOrgao );
    $obFormulario->addComponenteComposto( $obTxtUnidade, $obCmbUnidade );
 
+   $obFormulario->addComponente     ( $obLblModalidade );
    $obFormulario->addComponente     ( $obLblNumeroLicitacao );
    $obFormulario->addComponente     ( $obCmbTipoObjeto );
    

@@ -33,7 +33,7 @@
     * Casos de uso: uc-03.04.33
                     uc-03.04.32
 
-    $Id: TComprasCompraDireta.class.php 63408 2015-08-25 17:10:37Z lisiane $
+    $Id: TComprasCompraDireta.class.php 65196 2016-05-02 17:49:38Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -1680,38 +1680,73 @@ class TComprasCompraDireta extends Persistente
     {
         $stSql = "
             SELECT DISTINCT
-                        compra_direta.cod_compra_direta                        
+                        compra_direta.cod_compra_direta
                      ,  compra_direta.timestamp
                      ,  compra_direta.cod_modalidade
                      ,  compra_direta.cod_entidade
-                      , compra_direta.cod_entidade                  
+                      , compra_direta.cod_entidade
                      ,  compra_direta.condicoes_pagamento
                      ,  compra_direta.prazo_entrega
                      ,  compra_direta.cod_mapa ||'/'|| compra_direta.exercicio_mapa as mapa
                      ,  compra_direta.exercicio_mapa
                      ,  compra_direta.cod_tipo_objeto
-                     ,  compra_direta.exercicio_entidade       
+                     ,  compra_direta.exercicio_entidade
                      , CASE WHEN compra_direta_anulacao.cod_compra_direta IS NULL THEN
                         'Ativa'
                        ELSE
                         'Anulada'
                        END as status
               FROM  compras.compra_direta
-        
+
         LEFT JOIN  compras.compra_direta_anulacao
                   ON  compra_direta_anulacao.cod_compra_direta = compra_direta.cod_compra_direta
                 AND  compra_direta_anulacao.cod_entidade = compra_direta.cod_entidade
                 AND  compra_direta_anulacao.exercicio_entidade = compra_direta.exercicio_entidade
                 AND  compra_direta_anulacao.cod_modalidade = compra_direta.cod_modalidade
-        
-            WHERE compra_direta.cod_compra_direta = ".$this->getDado('cod_compra_direta')." 
-                AND compra_direta.cod_entidade = ".$this->getDado('cod_entidade')." 
-                AND compra_direta.cod_modalidade = ".$this->getDado('cod_modalidade')." 
+
+            WHERE compra_direta.cod_compra_direta = ".$this->getDado('cod_compra_direta')."
+                AND compra_direta.cod_entidade = ".$this->getDado('cod_entidade')."
+                AND compra_direta.cod_modalidade = ".$this->getDado('cod_modalidade')."
                 AND compra_direta.cod_mapa = ".$this->getDado('cod_mapa')." 
                 AND compra_direta.exercicio_mapa  = '".$this->getDado('exercicio_mapa')."'  ";
 
         return $stSql;
     }
+
+    public function recuperaDataCompraDireta(&$rsRecordSet,$stFiltro="",$stOrder="",$boTransacao="")
+    {
+        return $this->executaRecupera("montaRecuperaDataCompraDireta",$rsRecordSet,$stFiltro,$stOrder,$boTransacao);
+    }
+
+    public function montaRecuperaDataCompraDireta()
+    {
+        $stSql = "
+                SELECT compra_direta.cod_compra_direta
+                     , compra_direta.timestamp
+                     , compra_direta.cod_modalidade
+                     , compra_direta.cod_entidade
+                     , compra_direta.cod_entidade
+                     , compra_direta.condicoes_pagamento
+                     , compra_direta.prazo_entrega
+                     , compra_direta.cod_mapa ||'/'|| compra_direta.exercicio_mapa as mapa
+                     , compra_direta.exercicio_mapa
+                     , compra_direta.cod_tipo_objeto
+                     , compra_direta.exercicio_entidade
+                     , TO_CHAR(compra_direta.timestamp,'dd/mm/yyyy') AS data
+                  FROM compras.compra_direta
+                 WHERE compra_direta.exercicio_entidade = '".$this->getDado('exercicio_entidade')."' \n";
+
+        if ( $this->getDado('cod_entidade') )
+            $stSql.= " AND compra_direta.cod_entidade = ".$this->getDado('cod_entidade')." \n";
+
+        if ( $this->getDado('cod_compra_direta') )
+            $stSql.= " AND compra_direta.cod_compra_direta = ".$this->getDado('cod_compra_direta')." \n";
+
+        if ( $this->getDado('cod_modalidade') )
+            $stSql.= " AND compra_direta.cod_modalidade = ".$this->getDado('cod_modalidade')." \n";
+
+        return $stSql;
+    }
     
-    public function __destruct() {}   
+    public function __destruct() {}
 }

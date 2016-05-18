@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: OCManterOrdemCompra.php 65150 2016-04-28 11:33:52Z evandro $
+    $Id: OCManterOrdemCompra.php 65194 2016-05-02 13:27:34Z evandro $
 
 */
 
@@ -465,7 +465,7 @@ case 'detalharItem' :
     }
 
     $obIPopUpCatalogoItem = new IPopUpItem($obForm);
-    $obIPopUpCatalogoItem->setRotulo            ( '*Código do Item'                 );
+    $obIPopUpCatalogoItem->setRotulo            ( 'Código do Item'                 );
     $obIPopUpCatalogoItem->setNull              ( true                              );
     $obIPopUpCatalogoItem->setRetornaUnidade    ( false                             );
     $obIPopUpCatalogoItem->setId                ( 'stNomItem'.$request->get('num_item') );
@@ -498,7 +498,7 @@ case 'detalharItem' :
 
     $obCentroCustoUsuario = new IPopUpCentroCustoUsuario($obForm);
     $obCentroCustoUsuario->setNull              ( true                                          );
-    $obCentroCustoUsuario->setRotulo            ( '*Centro de Custo'                            );
+    $obCentroCustoUsuario->setRotulo            ( 'Centro de Custo'                            );
     $obCentroCustoUsuario->obCampoCod->setId    ( 'inCodCentroCusto'.$request->get('num_item')      );
     $obCentroCustoUsuario->obCampoCod->setName  ( 'inCodCentroCusto'.$request->get('num_item')      );
     $obCentroCustoUsuario->setId                ( 'stNomCentroCusto'.$request->get('num_item')      );
@@ -523,8 +523,8 @@ case 'detalharItem' :
     }    
 
     $obMarca = new IPopUpMarca( new Form);
-    $obMarca->setNull               ( true                                  );
-    $obMarca->setRotulo             ( '*Marca'                              );
+    $obMarca->setNull               ( true );
+    $obMarca->setRotulo             ( 'Marca' );
     $obMarca->setId                 ( 'stNomMarca'.$request->get('num_item') );
     $obMarca->obCampoCod->setName   ( 'inMarca'.$request->get('num_item')    );
     $obMarca->obCampoCod->setId     ( 'inMarca'.$request->get('num_item')    );

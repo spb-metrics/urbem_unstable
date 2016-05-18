@@ -29,7 +29,7 @@
 
     * @author Fernando Zank Correa Evangelista
 
-    * $Id: FMManterConfiguracao.php 63445 2015-08-28 13:44:54Z michel $
+    * $Id: FMManterConfiguracao.php 65196 2016-05-02 17:49:38Z michel $
 
     * Casos de uso : uc-03.04.08
     */
@@ -105,6 +105,16 @@ $obTSolicitacao->recuperaSolicitacoesMapaCompras($rsSolicitacaoMapa);
 
 $obTLicitacao = new TLicitacaoLicitacao();
 $obTLicitacao->recuperaTodos($rsLicitacao," where exercicio = '".Sessao::getExercicio()."'");
+
+$obTConfiguracao = new TComprasConfiguracao();
+$obTConfiguracao->setDado("parametro","data_fixa_compra_direta");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$stDtCompraDireta = trim($rsConfiguracao->getCampo('valor'));
+
+$obTConfiguracao = new TComprasConfiguracao();
+$obTConfiguracao->setDado("parametro","data_fixa_solicitacao_compra");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$stDtSolicitacao = trim($rsConfiguracao->getCampo('valor'));
 
 /**
   * Recupera o valor do parâmetro "numeracao_automatica" usado para
@@ -229,7 +239,7 @@ if ($rsLicitacao->getCampo('exercicio') != '') {
    $obHdnNumeracaoPorEntidade->setName('stNumeracaoPorEntidade');
    $obHdnNumeracaoPorEntidade->setValue($obChkNumeracaoPorEntidade->getChecked()?'on':'');
    $obChkNumeracaoPorModalidade->setDisabled(true);
-   $obHdnNumeracaoPorModalidade= new Hidden;
+   $obHdnNumeracaoPorModalidade = new Hidden;
    $obHdnNumeracaoPorModalidade->setName('stNumeracaoPorModalidade');
    $obHdnNumeracaoPorModalidade->setValue($obChkNumeracaoPorModalidade->getChecked()?'on':'');
 }
@@ -301,6 +311,24 @@ $obRdbTipoReservaAutorizacao->setValue( "autorizacao" );
 if ($boReservaAutorizacao)
     $obRdbTipoReservaAutorizacao->setChecked( true );
 
+$obDtSolicitacao = new Data;
+$obDtSolicitacao->setName   ( "stDtSolicitacao" );
+$obDtSolicitacao->setId   	( "stDtSolicitacao" );
+$obDtSolicitacao->setRotulo ( "Data Fixa para Solicitação" );
+$obDtSolicitacao->setTitle  ( 'Informe a data fixa para solicitação.' );
+$obDtSolicitacao->setNull   ( true );
+$obDtSolicitacao->setValue  ( $stDtSolicitacao );
+$obDtSolicitacao->obEvento->setOnChange( "montaParametrosGET('validaDtFixa', 'stDtSolicitacao');" );
+
+$obDtCompraDireta = new Data;
+$obDtCompraDireta->setName   ( "stDtCompraDireta" );
+$obDtCompraDireta->setId   	 ( "stDtCompraDireta" );
+$obDtCompraDireta->setRotulo ( "Data Fixa para Compra Direta" );
+$obDtCompraDireta->setTitle  ( 'Informe a data fixa para compra direta.' );
+$obDtCompraDireta->setNull   ( true );
+$obDtCompraDireta->setValue  ( $stDtCompraDireta );
+$obDtCompraDireta->obEvento->setOnChange( "montaParametrosGET('validaDtFixa', 'stDtCompraDireta');" );
+
 ////////// seção para controle de responsáveis pelas entidades
 
 $obITextBoxSelectEntidadeGeral = new  ITextBoxSelectEntidadeGeral( );
@@ -319,7 +347,7 @@ $obSpnResponsaveis->setId ( 'spnResponsaveis' );
 //define o formulário
 $obFormulario = new Formulario;
 $obFormulario->addForm          ( $obForm                   );
-$obFormulario->setAjuda         ("UC-03.04.08"              );
+$obFormulario->setAjuda         ( "UC-03.04.08"             );
 $obFormulario->addHidden        ( $obHdnAcao                );
 $obFormulario->addHidden        ( $obHdnCtrl                );
 $obFormulario->addHidden        ( $obHdnChecked             );
@@ -341,6 +369,9 @@ $obFormulario->agrupaComponentes(array($obRdbIdLicitacaoAutomaticoSim, $obRdbIdL
 # Configuração para valor de referência.
 $obFormulario->agrupaComponentes(array($obRdbVlrRefExato, $obRdbVlrRefLivre, $obRdbVlrRef10PorCento));
 $obFormulario->agrupaComponentes(array($obRdbTipoReservaRigida,$obRdbTipoReservaAutorizacao));
+
+$obFormulario->addComponente( $obDtSolicitacao );
+$obFormulario->addComponente( $obDtCompraDireta );
 
 $obFormulario->addTitulo ( 'Responsáveis' );
 $obFormulario->addComponente ( $obITextBoxSelectEntidadeGeral );

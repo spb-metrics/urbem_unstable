@@ -31,10 +31,10 @@
   * @author Desenvolvedor: Arthur Cruz
   *
   * @ignore
-  * $Id: TTCEMGRESPINF.class.php 64852 2016-04-07 17:08:44Z evandro $
-  * $Date: 2016-04-07 14:08:44 -0300 (Qui, 07 Abr 2016) $
+  * $Id: TTCEMGRESPINF.class.php 65302 2016-05-11 11:35:18Z evandro $
+  * $Date: 2016-05-11 08:35:18 -0300 (Qua, 11 Mai 2016) $
   * $Author: evandro $
-  * $Rev: 64852 $
+  * $Rev: 65302 $
   *
 */
 
@@ -56,10 +56,8 @@ class TTCEMGRESPINF extends Persistente
         $stDataInicial = SistemaLegado::dataToSql($this->getDado('dt_inicial'));
         $stDataInicialFinal = SistemaLegado::dataToSql($this->getDado('dt_final'));
         $stSql = "
-          SELECT sw_cgm.nom_cgm AS nome_responsavel
-               , sw_cgm_pessoa_fisica.rg AS cart_ident
-               , sw_cgm_pessoa_fisica.orgao_emissor AS org_emissor
-               , sw_cgm_pessoa_fisica.cpf AS cpf
+          SELECT 
+               sw_cgm_pessoa_fisica.cpf AS cpf
                , '".$stDataInicial."'AS dt_inicio
                , '".$stDataInicialFinal."' AS dt_final
             FROM tcemg.configuracao_orgao

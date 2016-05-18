@@ -247,27 +247,35 @@ switch ($_GET['stCtrl']) {
         } elseif ($request->get('stTipoBusca') == 'contaContabilDepreciacaoAcumulada') {
             $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
+            $obRContabilidadePlanoContaAnalitica->setCodEstrutural( '1.2.3.8.1' );
             $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaAtivoPermanente($rsSinteticaDepreciacaoAcumulada);
             if ($rsSinteticaDepreciacaoAcumulada->getNumLinhas() > 0) {
                 $stDescricao = $rsSinteticaDepreciacaoAcumulada->getCampo('nom_conta');
             }
-        } elseif ($request->get('stTipoBusca') == 'contaSinteticaDepreciacao') {
-            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
-            $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
-            $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaDepreciacao($rsSinteticaDepreciacao);
-
-            if ($rsSinteticaDepreciacao->getNumLinhas() > 0) {
-                $stDescricao = $rsSinteticaDepreciacao->getCampo('nom_conta');
-            }
         } elseif ($request->get('stTipoBusca') == 'contaContabilBaixaBem') {
             $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
-            $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaDepreciacao($rsSinteticaDepreciacao);
+            $obRContabilidadePlanoContaAnalitica->setCodEstrutural( '3' );
+            $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaAtivoPermanente($rsSinteticaDepreciacao);
 
             if ($rsSinteticaDepreciacao->getNumLinhas() > 0) {
                 $stDescricao = $rsSinteticaDepreciacao->getCampo('nom_conta');
             }
-        } else {
+        } elseif ($request->get('stTipoBusca') == 'contaContabilAlienacao') {
+            $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
+            $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
+            
+            if ($request->get('tipoConta') == "VPAAlienacao" )
+                $obRContabilidadePlanoContaAnalitica->setCodEstrutural( '4.6.2.2.1' );
+            else
+                $obRContabilidadePlanoContaAnalitica->setCodEstrutural( '3.6.2.2.1' );
+            
+            $obErro = $obRContabilidadePlanoContaAnalitica->listarContaAnaliticaAtivoPermanente($rsSinteticaDepreciacao);
+
+            if ($rsSinteticaDepreciacao->getNumLinhas() > 0) {
+                $stDescricao = $rsSinteticaDepreciacao->getCampo('nom_conta');
+            }       
+        }else {
             $obRContabilidadePlanoContaAnalitica->setCodPlano( $_POST[$request->get('stNomCampoCod')] );
             $obRContabilidadePlanoContaAnalitica->setExercicio( Sessao::getExercicio() );
             $obRContabilidadePlanoContaAnalitica->consultar();

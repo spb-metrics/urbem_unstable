@@ -30,8 +30,8 @@
     * @author Analista: Eduardo Schitz
     * @author Desenvolvedor: Carolina Schwaab Marçal
     
-    $Id: PRExportacaoExecucao.php 60665 2014-11-06 18:59:33Z lisiane $
-    
+    $Id: PRExportacaoExecucao.php 65338 2016-05-12 21:26:51Z michel $
+
     * @ignore
 
     * Casos de uso: uc-06.01.22
@@ -53,20 +53,17 @@ $stAcao = $request->get('stAcao');
 
 SistemaLegado::BloqueiaFrames();
 
-$inBimestre  = $_REQUEST['bimestre'];
-$stEntidades = $_REQUEST['inCodEntidade'];
+$inBimestre  = $request->get('bimestre');
+$stEntidades = $request->get('inCodEntidade');
 
 $obTExportacaoExecucao = new TExportacaoExecucao();
 
-
 if ($inBimestre > 0 && $inBimestre < 7) {
-    
     SistemaLegado::periodoInicialFinalBimestre($dtInicial, $dtFinal, $inBimestre,Sessao::getExercicio( ));
-
 } else {
     $obTExportacaoExecucao->setDado('stExercicio', Sessao::getExercicio());
     $obTExportacaoExecucao->setDado('inBimestre',$inBimestre);
-    
+
     $dtInicial = '01/01/'.Sessao::getExercicio();
     $dtFinal   = '31/12/'.Sessao::getExercicio();
 }
@@ -75,8 +72,9 @@ $obRExportacaoExecucao = new RExportacaoExecucao;
 $obRExportacaoExecucao->setBimestre($inBimestre);
 $obRExportacaoExecucao->setEntidades($stEntidades);
 
-foreach ($_REQUEST['arArquivos'] as $stArquivo) {
-   
+$arArquivos = $request->get('arArquivos');
+foreach ($arArquivos as $stArquivo) {
+
     $stVersao="1.0";
     include $stArquivo.'.inc.php';
 
@@ -86,7 +84,7 @@ foreach ($_REQUEST['arArquivos'] as $stArquivo) {
     $arResult = null;
 }
 
-if (count($_REQUEST['arArquivos']) > 1) {
+if (count($arArquivos) > 1) {
     $obRExportacaoExecucao->doZipArquivos();
 }
 

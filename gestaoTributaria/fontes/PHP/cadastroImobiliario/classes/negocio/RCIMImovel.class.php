@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Regra
 
-    * $Id: RCIMImovel.class.php 64894 2016-04-12 18:12:52Z evandro $
+    * $Id: RCIMImovel.class.php 65324 2016-05-12 18:18:24Z jean $
 
     * Casos de uso: uc-05.01.09
 */
@@ -1206,6 +1206,7 @@ function consultarImovelAlteracao($boTransacao = "")
 
         // RECUPERA INFORMACOES DE CORRESPONDENCIA
         $this->obTCIMImovelCorrespondencia->recuperaTodos( $rsCorrespondencia, $stFiltro, 'timestamp desc limit 1', $boTransacao );
+        
         if ( !$obErro->ocorreu() and !$rsCorrespondencia->eof() ) {
             $this->addImovelCorrespondencia();
             $this->obRCIMLogradouroEntrega->setCodigoLogradouro( $rsCorrespondencia->getCampo( "cod_logradouro" ) );
@@ -1734,21 +1735,11 @@ function listarConsultaCadastroImobilario(&$rsRecordSet, $boTransacao = "", $stO
                 --HAVING COUNT (cod_lote) >= ".$inTotalLote;
         }
     } else {
-        $stFiltroAtrbImovel = "
-            GROUP BY
-                inscricao_municipal
-        ";
+        $stFiltroAtrbImovel = " GROUP BY inscricao_municipal ";
 
-        $stFiltroAtrbLote .= "
-            GROUP BY
-                cod_lote
-        ";
+        $stFiltroAtrbLote .= "";
 
-        $stFiltroAtrbEdf = "
-            GROUP BY
-                cod_construcao,
-                cod_tipo
-        ";
+        $stFiltroAtrbEdf .= "";
     }
 
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stDistinct"     , 'TRUE'              );
@@ -1758,7 +1749,6 @@ function listarConsultaCadastroImobilario(&$rsRecordSet, $boTransacao = "", $stO
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbLote" , $stFiltroAtrbLote );
     $this->obFCIMRelatorioCadastroImobiliario->setDado( "stFiltroAtrbEdf" , $stFiltroAtrbEdf );
     $obErro = $this->obFCIMRelatorioCadastroImobiliario->recuperaTodos( $rsRecordSet, $stFiltro, $stOrder );
-        
     return $obErro;
 }
 

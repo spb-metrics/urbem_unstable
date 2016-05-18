@@ -52,22 +52,23 @@ $pgProc     = "PR".$stPrograma.".php";
 $pgForm     = "FM".$stPrograma.".php";
 $pgJs       = "JS".$stPrograma.".js";
 
-$stAcao = $_REQUEST["stAcao"] != "" ? $_REQUEST["stAcao"] : $_GET["stAcao"];
+$stAcao = $request->get('stAcao');
+
 //MANTEM FILTRO E PAGINACAO
-$stLink .= "&stAcao=".$stAcao."&inFiltrar=".$_REQUEST['inFiltrar'];
+$stLink .= "&stAcao=".$stAcao."&inFiltrar=".$request->get('inFiltrar');
 $link = Sessao::read("link");
-if ($_GET["pg"] and  $_GET["pos"]) {
-    $stLink.= "&pg=".$_GET["pg"]."&pos=".$_GET["pos"];
-    $link["pg"]  = $_GET["pg"];
-    $link["pos"] = $_GET["pos"];
+if ( $request->get('pg') and $request->get('pos') ) {
+    $stLink.= "&pg=".$request->get("pg")."&pos=".$request->get("pos");
+    $link["pg"]  = $request->get("pg");
+    $link["pos"] = $request->get("pos");
     Sessao::write("link",$link);
 }
 //USADO QUANDO EXISTIR FILTRO
 //NA FL O VAR LINK DEVE SER RESETADA
-if ( is_array($link) ) {
-    $_REQUEST = $link;
+if ( is_array($link) ) {    
+    $request = new Request($link);
 } else {
-    foreach ($_REQUEST as $key => $valor) {
+    foreach ($request->getAll() as $key => $valor) {
         $link[$key] = $valor;
     }
     Sessao::write("link",$link);
@@ -79,68 +80,71 @@ $rsLista = new RecordSet;
 $obRFolhaPagamentoPeriodoContratoServidor = new RFolhaPagamentoPeriodoContratoServidor( new RFolhaPagamentoPeriodoMovimentacao );
 
 $stValoresFiltro = "";
-switch ($_REQUEST['inFiltrar']) {
+switch ($request->get('inFiltrar')) {
     case 0:
     case 1:
     #case "contrato":
     #case "cgm_contrato":
-        if ($_REQUEST['inContrato']) {
+        if ($request->get('inContrato')) {
             $obTPessoalContrato = new TPessoalContrato;
-            $stFiltro = " WHERE registro = ".$_REQUEST['inContrato'];
-            $obTPessoalContrato->recuperaTodos($rsContrato, $stFiltro);
-            $_REQUEST["stTipoFiltro"] = "contrato";
+            $stFiltro = " WHERE registro = ".$request->get('inContrato');
+            $obTPessoalContrato->recuperaTodos($rsContrato, $stFiltro);            
+            $request->set('stTipoFiltro',"contrato");
             $stValoresFiltro = $rsContrato->getCampo("cod_contrato");
         }
         break;
 
     case 2:
-    #case "reg_sub_car_esp":
-        $_REQUEST["stTipoFiltro"] = "reg_sub_car_esp";
-        $stValoresFiltro  = $_REQUEST["inCodRegime"]."#";
-        $stValoresFiltro .= $_REQUEST["inCodSubDivisao"]."#";
-        $stValoresFiltro .= $_REQUEST["inCodCargo"]."#";
-        if (is_array($_REQUEST["inCodEspecialidade"])) {
-            $stValoresFiltro .= $_REQUEST["inCodEspecialidade"];
+    #case "reg_sub_car_esp":        
+        $request->set("stTipoFiltro","reg_sub_car_esp");        
+        $stValoresFiltro  = $request->get('inCodRegime')."#";
+        $stValoresFiltro  = $request->get('inCodSubDivisao')."#";
+        $stValoresFiltro  = $request->get('inCodCargo')."#";
+        $arInCodEspecialidade = $request->get("inCodEspecialidade");
+        if ( is_array($arInCodEspecialidade) ) {
+            $stValoresFiltro .= $arInCodEspecialidade;
         }
         break;
 
     case 3:
-    #case "reg_sub_fun_esp":
-        $_REQUEST["stTipoFiltro"] = "reg_sub_fun_esp";
-        $stValoresFiltro  = $_REQUEST["inCodRegime"]."#";
-        $stValoresFiltro .= $_REQUEST["inCodSubDivisao"]."#";
-        $stValoresFiltro .= $_REQUEST["inCodCargo"]."#";
-        if (is_array($_REQUEST["inCodEspecialidade"])) {
-            $stValoresFiltro .= $_REQUEST["inCodEspecialidade"];
+    #case "reg_sub_fun_esp":        
+        $request->set("stTipoFiltro","reg_sub_fun_esp");
+        $stValoresFiltro  = $request->get('inCodRegime')."#";
+        $stValoresFiltro  = $request->get('inCodSubDivisao')."#";
+        $stValoresFiltro  = $request->get('inCodCargo')."#";
+        $arInCodEspecialidade = $request->get("inCodEspecialidade");
+        if ( is_array($arInCodEspecialidade) ) {
+            $stValoresFiltro .= $arInCodEspecialidade;
         }
         break;
 
     case 4:
     #case "padrao":
-        $_REQUEST["stTipoFiltro"] = "padrao";
-        $stValoresFiltro = $_REQUEST['inCodPadrao'];
+        $request->set("stTipoFiltro","padrao");
+        $stValoresFiltro = $request->get('inCodPadrao');
         break;
 
     case 5:
     #case "lotacao":
-        $_REQUEST["stTipoFiltro"] = "lotacao";
-        $obRFolhaPagamentoPeriodoContratoServidor->obROrganogramaOrgao->setCodOrgaoEstruturado( $_REQUEST['inCodLotacao'] );
-        $obRFolhaPagamentoPeriodoContratoServidor->obROrganogramaOrgao->listarOrgaoReduzido   ( $rsOrgaoReduzido );
+        $request->set("stTipoFiltro","lotacao");        
+        $obRFolhaPagamentoPeriodoContratoServidor->obROrganogramaOrgao->setCodOrgaoEstruturado( $request->get('inCodLotacao') );
+        $obRFolhaPagamentoPeriodoContratoServidor->obROrganogramaOrgao->listarOrgaoReduzido   ( $rsOrgaoReduzido,"","",$boTransacao );
         $stValoresFiltro = $rsOrgaoReduzido->getCampo("cod_orgao");
     break;
 
     case 6:
-    #case "local":
-        $_REQUEST["stTipoFiltro"] = "local";
-        $stValoresFiltro = $_REQUEST['inCodLocal'];
+    #case "local":        
+        $request->set("stTipoFiltro","local");    
+        $stValoresFiltro = $request->get('inCodLocal');
     break;
 }
 
+$stTipoFiltro = $request->get('stTipoFiltro');
 include_once(CAM_GRH_PES_MAPEAMENTO."TPessoalContratoServidor.class.php");
 $obTPessoalContratoServidor = new TPessoalContratoServidor();
-$obTPessoalContratoServidor->setDado("stTipoFiltro",$_REQUEST["stTipoFiltro"]);
-$obTPessoalContratoServidor->setDado("stValoresFiltro",$stValoresFiltro);
-$obTPessoalContratoServidor->setDado("situacao","'A','P','E'");
+$obTPessoalContratoServidor->setDado("stTipoFiltro"     ,$stTipoFiltro );
+$obTPessoalContratoServidor->setDado("stValoresFiltro"  ,$stValoresFiltro );
+$obTPessoalContratoServidor->setDado("situacao"         ,"'A','P','E'" );
 $obTPessoalContratoServidor->recuperaContratosParaRegistroEvento($rsLista);
 
 $obLista = new Lista;

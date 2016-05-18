@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOOPS.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOOPS.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -101,18 +101,12 @@ function montaRecuperaOrdemPagamento()
              , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL
                     THEN LPAD(sw_cgm_pessoa_fisica.cpf::varchar, 14, '0')
                     ELSE LPAD(sw_cgm_pessoa_juridica.cnpj, 14, '0')
-                END AS CpfCnpj ";
-            if (Sessao::getExercicio() > 2012) {
-                $stSql .= "\n , CASE WHEN sw_cgm.cod_pais <> 1 THEN 3
+                END AS CpfCnpj
+             , CASE WHEN sw_cgm.cod_pais <> 1 THEN 3
                                    WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN 1
                                    ELSE 2
-                               END AS TipoCredor ";
-            } else {
-                $stSql .= "\n , CASE WHEN sw_cgm_pessoa_fisica.cpf IS NOT NULL THEN 1
-                                   ELSE 2
-                               END AS TipoCredor ";
-            }
-             $stSql .= "\n , SUBSTR(REPLACE(conta_despesa.cod_estrutural,'.',''),1,6) AS elementodespesa
+                               END AS TipoCredor
+             , SUBSTR(REPLACE(conta_despesa.cod_estrutural,'.',''),1,6) AS elementodespesa
              , CASE WHEN( elemento_de_para.estrutural IS NOT NULL )
                     THEN SUBSTR(REPLACE(elemento_de_para.estrutural,'.',''),7,2)
                     ELSE '00'
@@ -234,10 +228,8 @@ function montaRecuperaOrdemPagamento()
     INNER JOIN empenho.ordem_pagamento
             ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
            AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
-           AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem";
-
-    if ($this->getDado('exercicio') > '2010') {
-        $stSql .= "\nLEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
+           AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+     LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
                                       , ordem_pagamento_retencao.cod_entidade
                                       , ordem_pagamento_retencao.exercicio
                                       , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
@@ -255,10 +247,8 @@ function montaRecuperaOrdemPagamento()
                     ) AS vl_retencao_orcamentaria
                     ON vl_retencao_orcamentaria.cod_ordem     = ordem_pagamento.cod_ordem
                     AND vl_retencao_orcamentaria.cod_entidade = ordem_pagamento.cod_entidade
-                    AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio";
-    }
-
-    $stSql .= "\nWHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
+                    AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio
+         WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
 
       GROUP BY TipoRegistro
              , CodPrograma
@@ -284,15 +274,10 @@ function montaRecuperaOrdemPagamento()
              , ordem_pagamento.cod_entidade
              , ordem_pagamento.exercicio
              , elemento_de_para.estrutural
-             , nota_liquidacao_paga.num_documento";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "\n,sw_cgm.cod_pais";
-    }
-
-    if ($this->getDado('exercicio') > '2011') {
-        $stSql .= "\n,vlretencao
-                     ,acao.num_acao
-                     
+             , nota_liquidacao_paga.num_documento
+             ,sw_cgm.cod_pais
+             ,vlretencao
+             ,acao.num_acao
 
         ORDER BY  nroop
                 , codunidade
@@ -306,9 +291,6 @@ function montaRecuperaOrdemPagamento()
                 , nroempenho
                 , codprograma
                 , nrdocumento";
-    } else {
-        $stSql .= "\nORDER BY nroOP";
-    }
 
     return $stSql;
 }
@@ -367,17 +349,8 @@ function montaRecuperaOrdemPagamentoLiquidacoes()
                END AS DotOrigp2001
              , LPAD(nota_liquidacao.cod_empenho::varchar, 6, '0') AS nroEmpenho
              , ordem_pagamento.cod_ordem AS nroOP
-             , TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho) AS numeroliquidacao";
-             if (Sessao::getExercicio() > '2011') {
-                if ( Sessao::getExercicio() < '2014' ) {
-                    $stSql .= "\n, LPAD(BTRIM(TO_CHAR((nota_liquidacao_paga.valor + COALESCE(vl_retencao_orcamentaria.vl_retencao, 0)), '9999999999D99')),13,'0') AS vlliquidacao";
-                } else {
-                    $stSql .= "\n, LPAD(BTRIM(TO_CHAR((nota_liquidacao_paga.valor), '9999999999D99')),13,'0') AS vlliquidacao";
-                }
-             } else {
-                $stSql .= "\n, nota_liquidacao_paga.valor AS vlliquidacao";
-            }
-  $stSql .= "\n, pagamento_liquidacao.vl_pagamento AS vloP
+             , TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho) AS numeroliquidacao
+             , pagamento_liquidacao.vl_pagamento AS vloP
              , to_char (empenho.nota_liquidacao.dt_liquidacao, 'dd/mm/yyyy') AS dt_liquidacao
              , 0 AS numero_sequencial
           FROM ( SELECT SUM(nli.vl_total) as valor
@@ -487,10 +460,8 @@ function montaRecuperaOrdemPagamentoLiquidacoes()
     INNER JOIN empenho.ordem_pagamento
             ON pagamento_liquidacao.exercicio = ordem_pagamento.exercicio
            AND pagamento_liquidacao.cod_entidade = ordem_pagamento.cod_entidade
-           AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem";
-
-    if ($this->getDado('exercicio') > '2010') {
-    $stSql .= "\nLEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
+           AND pagamento_liquidacao.cod_ordem = ordem_pagamento.cod_ordem
+     LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
                            , ordem_pagamento_retencao.cod_entidade
                            , ordem_pagamento_retencao.exercicio
                            , SUM(ordem_pagamento_retencao.vl_retencao) AS vl_retencao
@@ -507,10 +478,9 @@ function montaRecuperaOrdemPagamentoLiquidacoes()
                   ) AS vl_retencao_orcamentaria
                  ON vl_retencao_orcamentaria.cod_ordem    = ordem_pagamento.cod_ordem
                 AND vl_retencao_orcamentaria.cod_entidade = ordem_pagamento.cod_entidade
-                AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio ";
-            }
+                AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio
 
-    $stSql .= "\n WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
+             WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
 
       GROUP BY TipoRegistro
              , CodPrograma
@@ -538,10 +508,8 @@ function montaRecuperaOrdemPagamentoLiquidacoes()
              , nota_liquidacao_paga.num_documento
              , nota_liquidacao.dt_liquidacao
              , programa.num_programa
-             , acao.num_acao ";
-
-        if (Sessao::getExercicio('exercicio') > '2011') {
-            $stSql .= "\n, vl_retencao_orcamentaria.vl_retencao
+             , acao.num_acao
+             , vl_retencao_orcamentaria.vl_retencao
             ORDER BY  codprograma
                     , codunidade
                     , codfuncao
@@ -553,7 +521,6 @@ function montaRecuperaOrdemPagamentoLiquidacoes()
                     , dotorigp2001
                     , nroempenho
                     , nroop";
-        }
 
     return $stSql;
 }
@@ -613,9 +580,7 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                              LPAD('', 21, '0')
                     END AS DotOrigp2001
                   , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroEmpenho
-                  , ordem_pagamento.cod_ordem AS nroop ";
-                  if ($this->getDado('exercicio') > '2012') {
-                    $stSql .= "
+                  , ordem_pagamento.cod_ordem AS nroop
                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                              THEN '999'
                              ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
@@ -635,33 +600,7 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                                   '02'
                              ELSE
                                   '01'
-                        END as tipo_conta ";
-                  } else {
-                    $stSql .= "
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999'
-                             ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
-                        END AS Banco
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999999'
-                             ELSE LPAD(BTRIM(REPLACE(COALESCE(agencia.num_agencia, '0'),'-','')), 6, '0')
-                        END AS Agencia
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999999999999'
-                             ELSE LPAD(BTRIM(REPLACE(SPLIT_PART(COALESCE(conta_corrente.num_conta_corrente,'0'), '-', 1), '-', '')), 12, '0')
-                        END AS ContaCorrente
-                      , LTRIM(split_part(conta_corrente.num_conta_corrente,'-',2),'0') AS contaCorrenteDigVerif
-                      , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    '03'
-                               WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                  OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                  OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                    '02'
-                               ELSE
-                                    '01'
-                        END AS tipo_conta ";
-                  }
-                  $stSql .= "
+                        END as tipo_conta
                   , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                        THEN '999999999999999'
                        ELSE nota_liquidacao_paga.nrdocumento
@@ -896,10 +835,8 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                   , vl_retencao
                   , plano_conta.cod_estrutural
                   , programa.num_programa
-                  , acao.num_acao ";
-
-    if ($this->getDado('exercicio') > 2011) {
-        $stSql .= "\nUNION
+                  , acao.num_acao
+                 UNION
                 SELECT '13' AS TipoRegistro
                   , CASE WHEN nota_liquidacao.exercicio_empenho > '2001' THEN
                              (CASE WHEN NOT pre_empenho.implantado THEN
@@ -947,9 +884,7 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                              LPAD('', 21, '0')
                     END AS DotOrigp2001
                   , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroEmpenho
-                  , ordem_pagamento.cod_ordem AS nroop ";
-                  if ($this->getDado('exercicio') > '2012') {
-                    $stSql .= "
+                  , ordem_pagamento.cod_ordem AS nroop
                       , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                              THEN '999'
                              ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
@@ -969,33 +904,7 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                                   '02'
                              ELSE
                                   '01'
-                        END as tipo_conta ";
-                  } else {
-                    $stSql .= "
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999'
-                             ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
-                        END AS Banco
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999999'
-                             ELSE LPAD(BTRIM(REPLACE(COALESCE(agencia.num_agencia, '0'),'-','')), 6, '0')
-                        END AS Agencia
-                      , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                             THEN '999999999999'
-                             ELSE LPAD(BTRIM(REPLACE(SPLIT_PART(COALESCE(conta_corrente.num_conta_corrente,'0'), '-', 1), '-', '')), 12, '0')
-                        END AS ContaCorrente
-                      , LTRIM(split_part(conta_corrente.num_conta_corrente,'-',2),'0') AS contaCorrenteDigVerif
-                      , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                    '03'
-                               WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                  OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                  OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                    '02'
-                               ELSE
-                                    '01'
-                        END AS tipo_conta ";
-                  }
-                  $stSql .= "
+                        END as tipo_conta
                   , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                        THEN '999999999999999'
                        ELSE nota_liquidacao_paga.nrdocumento
@@ -1226,13 +1135,9 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                   , vl_retencao
                   , plano_conta.cod_estrutural
                   , programa.num_programa
-                  , acao.num_acao ";
-    }
-
-    $stSql .="\n) as tbl";
-
-    if ($this->getDado('exercicio') > 2011) {
-    $stSql .= "\nORDER BY codprograma
+                  , acao.num_acao
+        ) as tbl
+        ORDER BY codprograma
                         , codunidade
                         , codfuncao
                         , codsubfuncao
@@ -1247,8 +1152,8 @@ function montaRecuperaOrdemPagamentoFonteRecursos()
                         , banco
                         , agencia
                         , contacorrente
-                        , tipo_retencao";
-    }
+                        , tipo_retencao
+                        ";
 
     return $stSql;
 }
@@ -1480,10 +1385,8 @@ function montaRecuperaOrdemPagamentoMovimentacao()
              , banco.num_agencia
              , banco.conta_corrente
              , DtEmissao
-             , plano_conta.cod_estrutural";
-
-    if ($this->getDado('exercicio') > 2011) {
-        $stSql .= "\nORDER BY codprograma
+             , plano_conta.cod_estrutural
+             ORDER BY codprograma
                             , codunidade
                             , codfuncao
                             , codsubfuncao
@@ -1494,7 +1397,6 @@ function montaRecuperaOrdemPagamentoMovimentacao()
                             , dotorigp2001
                             , nroempenho
                             , nroop";
-    }
 
     return $stSql;
 }
@@ -1506,33 +1408,14 @@ function recuperaOrdemPagamentoMovimentacao2009(&$rsRecordSet,$stFiltro="",$stOr
 
 function montaRecuperaOrdemPagamentoMovimentacao2009()
 {
-    if ($this->getDado('exercicio') > '2010') {
-        $stSql = " SELECT * FROM ( SELECT '12' AS tiporegistro, ltrim(split_part(num_conta_corrente,'-',2),'0') AS contacorrentedigverif ";
-    } else {
-        $stSql = " SELECT * FROM ( SELECT '11' AS tiporegistro ";
-    }
-    if ($this->getDado('exercicio') > '2012') {
-        $stSql .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
+    $stSql = " SELECT * FROM ( SELECT '12' AS tiporegistro, ltrim(split_part(num_conta_corrente,'-',2),'0') AS contacorrentedigverif
+                  , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                     '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";;
-    } else {
-      $stSql .= "
-                    , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                  '03'
-                             WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                  '02'
-                             ELSE
-                                  '01'
-                        END AS tipo_conta ";
-    }
-    $stSql .= "
+                          END as tipo_conta
                   , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                        THEN '99'
                        ELSE tipo_doc
@@ -1584,23 +1467,8 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                          ELSE
                              LPAD('', 21, '0')
                     END AS dotorigp2001
-                  , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroempenho";
-                  if ($this->getDado('exercicio') < '2011') {
-                    $stSql .= ", CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                                       THEN '999'
-                                       ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
-                                  END AS banco
-                                , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                                       THEN '999999'
-                                       ELSE LPAD(BTRIM(REPLACE(COALESCE(agencia.num_agencia, '0'),'-','')), 6, '0')
-                                  END AS agencia
-                                 , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                                      THEN '999999999999'
-                                      ELSE LPAD(BTRIM(REPLACE(COALESCE(conta_corrente.num_conta_corrente,'0'), '-', '')), 12, '0')
-                                 END AS contacorrente";
-                    $stSql .= ", LPAD(BTRIM(TO_CHAR((nota_liquidacao_paga.valor),'9999999999D99')),13,'0') AS vldocumento";
-                  } else {
-                    $stSql .= ", CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
+                  , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroempenho
+                  , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                                        THEN '999'
                                        ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
                                   END AS banco
@@ -1611,13 +1479,9 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                                , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                                       THEN '999999999999'
                                       ELSE LPAD(BTRIM(REPLACE(SPLIT_PART(COALESCE(conta_corrente.num_conta_corrente,'0')::varchar, '-', 1), '-', '')), 12, '0')
-                                 END AS contacorrente";
-                    $stSql .= "--, LPAD(BTRIM(TO_CHAR((sum(nota_liquidacao_paga.valor)),'9999999999D99')),13,'0') AS vldocumento
-                               , SUM(COALESCE(nota_liquidacao_paga.valor,0)) AS vldocumento";
-                  }
-                    $stSql .= "
+                                 END AS contacorrente
+                               , SUM(COALESCE(nota_liquidacao_paga.valor,0)) AS vldocumento
                   , TO_CHAR(nota_liquidacao_paga.timestamp,'ddmmyyyy') AS DtEmissao
-                  --, nota_liquidacao_paga.nrdocumento
                   , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,12) = '1.1.1.1.1.01')
                        THEN '999999999999999'
                        ELSE nota_liquidacao_paga.nrdocumento
@@ -1625,13 +1489,9 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                   , '' AS Brancos
                   , 0 AS numero_sequencial
                   , (SUM(COALESCE(nota_liquidacao_paga.valor,0)) - vl_retencao_orcamentaria.vl_retencao) AS vl_associado
-                  /*,  LPAD(BTRIM(TO_CHAR(nota_liquidacao_paga.vlassociado,'9999999999D99')),13,'0') AS valor_total*/
-                  , LPAD(BTRIM(TO_CHAR(valor_total,'9999999999D99')),13,'0') AS valor_total";
-
-                  if ($this->getDado('exercicio') > '2011') {
-                    $stSql .= "\n, FALSE AS vlretencao";
-                  }
-    $stSql .= "\nFROM ( SELECT nlp.exercicio
+                  , LPAD(BTRIM(TO_CHAR(valor_total,'9999999999D99')),13,'0') AS valor_total
+                  , FALSE AS vlretencao
+                  FROM ( SELECT nlp.exercicio
                            , nlp.cod_nota
                            , nlp.cod_entidade
                            , vl_pago as valor
@@ -1821,10 +1681,7 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
 
                     GROUP BY pagamento_tipo_documento.num_documento
                   ) AS total
-                 ON total.nrDocumento = nota_liquidacao_paga.nrDocumento ";
-
-            if ($this->getDado('exercicio') > '2010') {
-                $stSql .= "
+                 ON total.nrDocumento = nota_liquidacao_paga.nrDocumento
           LEFT JOIN ( SELECT ordem_pagamento_retencao.cod_ordem
                            , ordem_pagamento_retencao.cod_entidade
                            , ordem_pagamento_retencao.exercicio
@@ -1844,10 +1701,7 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                   ) AS vl_retencao_orcamentaria
                  ON vl_retencao_orcamentaria.cod_ordem    = ordem_pagamento.cod_ordem
                 AND vl_retencao_orcamentaria.cod_entidade = ordem_pagamento.cod_entidade
-                AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio ";
-            }
-
-            $stSql .= "
+                AND vl_retencao_orcamentaria.exercicio    = ordem_pagamento.exercicio
               WHERE (to_char(ordem_pagamento.dt_emissao, 'yyyy'))::integer = '".$this->getDado('exercicio')."'
                 AND nota_liquidacao_paga.valor > 0
                 --AND total.valor_total IS NOT NULL
@@ -1857,11 +1711,8 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                   , empenho.cod_empenho
                   , banco.num_banco
                   , agencia.num_agencia
-                  , plano_banco.conta_corrente";
-            if ($this->getDado('exercicio') > '2010') {
-                $stSql .= ", vl_retencao_orcamentaria.vl_retencao ";
-            }
-            $stSql .= "
+                  , plano_banco.conta_corrente
+                  , vl_retencao_orcamentaria.vl_retencao
                   , despesa.num_unidade
                   , ordem_pagamento.cod_ordem
                   , pre_empenho.implantado
@@ -1881,12 +1732,10 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                   , plano_conta.cod_estrutural
                   , nota_liquidacao_paga.vlassociado
                   , programa.num_programa
-                  , acao.num_acao ";
+                  , acao.num_acao
 
-    $stSql .="\n) as tbl";
-
-    if ($this->getDado('exercicio') > 2011) {
-        $stSql .= "\nORDER BY codprograma
+    ) as tbl
+    ORDER BY codprograma
                             , codunidade
                             , codfuncao
                             , codsubfuncao
@@ -1902,7 +1751,6 @@ function montaRecuperaOrdemPagamentoMovimentacao2009()
                             , agencia
                             , contacorrente
                             , vlretencao";
-    }
 
     return $stSql;
 }
@@ -1936,10 +1784,8 @@ function montaRecuperaOrdemPagamentoRetencao()
          , brancos
          , numero_sequencial
          , nom_conta 
-         , nrextraorcamentaria ";
-
-    if ($this->getDado('exercicio') > '2010') {
-        $stSql .= " FROM ( SELECT '14'::varchar AS TipoRegistro
+         , nrextraorcamentaria
+         FROM ( SELECT '14'::varchar AS TipoRegistro
                   , SUBSTR((CASE WHEN de_para_tipo_retencao.cod_tipo IS NOT NULL THEN
                                     de_para_tipo_retencao.cod_tipo::integer
                                 WHEN balancete_extmmaa.sub_tipo_lancamento IS NOT NULL THEN
@@ -1956,24 +1802,7 @@ function montaRecuperaOrdemPagamentoRetencao()
                                     END
                                 ELSE
                                     NULL
-                           END)::varchar, 1, 2) AS tipo_retencao ";
-    } else {
-        $stSql .= " FROM ( SELECT '12'::varchar AS TipoRegistro
-                  , SUBSTR((CASE WHEN de_para_tipo_retencao.cod_tipo IS NOT NULL THEN
-                                    de_para_tipo_retencao.cod_tipo::integer
-                                WHEN balancete_extmmaa.sub_tipo_lancamento IS NOT NULL THEN
-                                    CASE WHEN balancete_extmmaa.sub_tipo_lancamento = 3 THEN
-                                             2::integer
-                                         WHEN balancete_extmmaa.sub_tipo_lancamento = 2 THEN
-                                             99::integer
-                                         ELSE
-                                             balancete_extmmaa.sub_tipo_lancamento::integer
-                                    END
-                                ELSE
-                                    NULL
-                           END)::varchar, 1, 2) AS tipo_retencao ";
-    }
-    $stSql .= "
+                           END)::varchar, 1, 2) AS tipo_retencao
                   , conta_despesa.cod_estrutural
                   , ordem_pagamento.cod_ordem
                   , TCMGO.numero_nota_liquidacao('".$this->getDado('exercicio')."',empenho.cod_entidade,nota_liquidacao.cod_nota,nota_liquidacao.exercicio_empenho,empenho.cod_empenho) AS numeroliquidacao
@@ -2024,28 +1853,10 @@ function montaRecuperaOrdemPagamentoRetencao()
                              LPAD('', 21, '0')
                     END AS DotOrigp2001
                   , LPAD(empenho.cod_empenho::varchar, 6, '0') AS nroEmpenho
-                  , ordem_pagamento.cod_ordem AS nroOP ";
-                  if ($this->getDado('exercicio') > '2012') {
-                     $stSql .= "
+                  , ordem_pagamento.cod_ordem AS nroOP
                                 , LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0') AS Banco
                                 , LPAD(BTRIM(REPLACE(COALESCE(banco.num_agencia, '0'),'-','')), 6, '0') AS Agencia
-                                , LPAD(BTRIM(REPLACE(COALESCE(banco.conta_corrente,'0'), '-', '')), 12, '0') AS ContaCorrente ";
-                  } else {
-                    $stSql .= "
-                    , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                              THEN '999'
-                              ELSE LPAD(BTRIM(COALESCE(banco.num_banco, '0')), 3, '0')
-                      END AS Banco
-                    , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                              THEN '999999'
-                              ELSE LPAD(BTRIM(REPLACE(COALESCE(banco.num_agencia, '0'),'-','')), 6, '0')
-                      END AS Agencia
-                    , CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                              THEN '999999999999'
-                              ELSE LPAD(BTRIM(REPLACE(COALESCE(banco.conta_corrente,'0'), '-', '')), 12, '0')
-                      END AS ContaCorrente ";
-                  }
-                  $stSql .= "
+                                , LPAD(BTRIM(REPLACE(COALESCE(banco.conta_corrente,'0'), '-', '')), 12, '0') AS ContaCorrente
                   , SUM( ordem_pagamento_retencao.vl_retencao) AS VlRetencao
                   , TO_CHAR(nota_liquidacao_paga.timestamp,'ddmmyyyy') AS DtEmissao
                   , ''::varchar AS Brancos

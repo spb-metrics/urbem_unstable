@@ -34,7 +34,7 @@
     * @package framework
     * @subpackage componentes
 
-    $Id: ListaMPDF.class.php 64553 2016-03-14 17:03:17Z michel $
+    $Id: ListaMPDF.class.php 65308 2016-05-11 20:00:27Z jean $
 */
 
 
@@ -883,6 +883,7 @@ class ListaMPDF
         $this->obMPDF->setDataFinal    ( $this->getDataFinal()      );
         $this->obMPDF->setNomeRelatorio( $this->getNomeRelatorio()  );
         $this->obMPDF->setFormatoFolha ( $this->getFormatoFolha()   );
+        $this->obMPDF->setTipoSaida    ( $this->getTipoSaida()      );
 
         $this->montaHTML();
         $stHtml = $this->getHTML();

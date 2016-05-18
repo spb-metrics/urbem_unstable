@@ -34,7 +34,7 @@
 
     * Casos de uso: uc-03.01.06
 
-    $Id: FLManterBem.php 64184 2015-12-11 14:09:44Z arthur $
+    $Id: FLManterBem.php 65343 2016-05-13 17:02:26Z arthur $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -84,6 +84,10 @@ $obHdnStCampoNom->setValue( $request->get('campoNom') );
 $obHdnBoBemBaixado = new Hidden();
 $obHdnBoBemBaixado->setName( 'boBemBaixado' );
 $obHdnBoBemBaixado->setValue( $request->get('boBemBaixado') );
+
+$obHdnInEntidade = new Hidden();
+$obHdnInEntidade->setName( 'inCodEntidade' );
+$obHdnInEntidade->setValue( $request->get('inCodEntidade') );
 
 //cria o componente IMontaClassificacao
 $obIMontaClassificacao = new IMontaClassificacao( $obForm );
@@ -151,9 +155,13 @@ $obFormulario->addHidden    ( $obHdnAcao );
 $obFormulario->addHidden    ( $obHdnCtrl );
 $obFormulario->addHidden    ( $obHdnStCampoNum );
 $obFormulario->addHidden    ( $obHdnStCampoNom );
+
 //se for passado os filtros
 if ($request->get('boBemBaixado')) {
      $obFormulario->addHidden( $obHdnBoBemBaixado );
+}
+if ($request->get('inCodEntidade')) {
+    $obFormulario->addHidden( $obHdnInEntidade );
 }
 
 $obIMontaClassificacao->geraFormulario( $obFormulario );

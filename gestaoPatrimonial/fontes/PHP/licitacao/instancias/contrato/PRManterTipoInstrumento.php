@@ -29,7 +29,7 @@
  * @author Analista: Gelson Wolowski Gonçalves 
  * @author Desenvolvedor: Lisiane da Rosa Morais
  *
- * $Id:$
+ * $Id: PRManterTipoInstrumento.php 65229 2016-05-04 13:48:40Z michel $
  * 
 **/
 
@@ -49,88 +49,85 @@ $pgForm = "FM".$stPrograma.".php";
 $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OC".$stPrograma.".php";
 
+$nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'));
+
 $obTLicitacaoTipoInstrumento = new TLicitacaoTipoInstrumento();
-$obTransacao = new Transacao();
-$obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
+
 $obErro = new Erro;
+$obTransacao = new Transacao();
+$obErro = $obTransacao->abreTransacao( $boFlagTransacao, $boTransacao );
 
-$nomAcao = SistemaLegado::pegaDado("nom_acao","administracao.acao"," where cod_acao = ".Sessao::read('acao'), $boTransacao);
+if (!$obErro->ocorreu()) {
+    switch ($stAcao) {
+        case "incluir":
+            $stLink = $pgForm;
 
-switch ($stAcao) {
-    case "incluir":
-        $stLink = $pgForm;
+            $stFiltro = " WHERE cod_tipo = ".$request->get("inCodigo");
+            $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsTipoInstrumento, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
 
-        $stFiltro = " WHERE cod_tipo = ".$request->get("inCodigo");
-        $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsTipoInstrumento, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
+            if (!$obErro->ocorreu()) {
+                if ($rsTipoInstrumento->getNumLinhas() <= 0) {
+                    $obTLicitacaoTipoInstrumento->setDado("cod_tipo" , $request->get("inCodigo")        );
+                    $obTLicitacaoTipoInstrumento->setDado("descricao", $request->get("stDescricao")     );
+                    $obTLicitacaoTipoInstrumento->setDado("codigo_tc", $request->get("inCodigoTribunal"));
+                    $obTLicitacaoTipoInstrumento->setDado("ativo"    , $request->get("boAtivo")         );
 
-        if (!$obErro->ocorreu()) {
-            if ($rsTipoInstrumento->getNumLinhas() <= 0) {
-                $obTLicitacaoTipoInstrumento->setDado("cod_tipo" , $request->get("inCodigo")        );
-                $obTLicitacaoTipoInstrumento->setDado("descricao", $request->get("stDescricao")     );
-                $obTLicitacaoTipoInstrumento->setDado("codigo_tc"  , $request->get("inCodigoTribunal"));
-                $obTLicitacaoTipoInstrumento->setDado("ativo"    , $request->get("boAtivo")         );
+                    if ($request->get("inCodigoTribunal") != "") {
+                        $stFiltro = " WHERE codigo_tc = ".$request->get("inCodigoTribunal")."";
+                        $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsResultado, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
+                    } else
+                        $rsResultado = new RecordSet;
 
-                if ($request->get("inCodigoTribunal") != "") {
-                    $stFiltro = " WHERE codigo_tc = ".$request->get("inCodigoTribunal")."";
-                    $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsResultado, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
-                } else {
-                    $rsResultado = new RecordSet;
-                }
-
-                if (!$obErro->ocorreu()) {
-                    if ($rsResultado->getNumLinhas() > 0) {
-                        $obErro->setDescricao("Este código de tribunal já existe, escolha outro código!");
-                    } else {
-                        $obErro = $obTLicitacaoTipoInstrumento->inclusao($boTransacao);
+                    if (!$obErro->ocorreu()) {
+                        if ($rsResultado->getNumLinhas() > 0)
+                            $obErro->setDescricao("Este código de tribunal já existe, escolha outro código!");
+                        else
+                            $obErro = $obTLicitacaoTipoInstrumento->inclusao($boTransacao);
                     }
-                }
-            }else{
-                $obErro->setDescricao("O Código de Tipo de Contrato ".$request->get("inCodigo").", já está cadastrado!");
+                }else
+                    $obErro->setDescricao("O Código de Tipo de Instrumento ".$request->get("inCodigo").", já está cadastrado!");
             }
-        }
-    break;
+        break;
 
-    case "alterar":
-        $stLink = $pgFilt;
+        case "alterar":
+            $stLink = $pgFilt;
 
-        $obTLicitacaoTipoInstrumento->setDado("cod_tipo" , $request->get("inCodigo")   );
-        $obTLicitacaoTipoInstrumento->setDado("descricao", $request->get("stDescricao"));
-        $obTLicitacaoTipoInstrumento->setDado("ativo"    , $request->get("boAtivo")    );
-        $obErro = $obTLicitacaoTipoInstrumento->recuperaPorChave($rsResultado, $boTransacao); 
+            $obTLicitacaoTipoInstrumento->setDado("cod_tipo" , $request->get("inCodigo")   );
+            $obTLicitacaoTipoInstrumento->setDado("descricao", $request->get("stDescricao"));
+            $obTLicitacaoTipoInstrumento->setDado("ativo"    , $request->get("boAtivo")    );
+            $obErro = $obTLicitacaoTipoInstrumento->recuperaPorChave($rsResultado, $boTransacao); 
 
-        if (!$obErro->ocorreu()) {
-            if ($rsResultado->getNumLinhas() > 0) {
-                if ($request->get("inCodigoTribunal") != "") {
-                    $stFiltro = " WHERE codigo_tc = ".$request->get("inCodigoTribunal")."";
-                    $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsResultado, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
-                } else {
-                    $rsResultado = new RecordSet;
-                }
+            if (!$obErro->ocorreu()) {
+                if ($rsResultado->getNumLinhas() > 0) {
+                    if ($request->get("inCodigoTribunal") != "") {
+                        $stFiltro = " WHERE codigo_tc = ".$request->get("inCodigoTribunal")." AND cod_tipo NOT IN (".$request->get("inCodigo").") ";
+                        $obErro = $obTLicitacaoTipoInstrumento->recuperaTodos($rsResultado, $stFiltro, " ORDER BY codigo_tc", $boTransacao);
+                    } else
+                        $rsResultado = new RecordSet;
 
-                if (!$obErro->ocorreu()) {
-                    if ($rsResultado->getNumLinhas() > 0) {
-                        $obErro->setDescricao("Este código de tribunal já existe, escolha outro código!");
-                    } else {
-                        $obTLicitacaoTipoInstrumento->setDado("ativo"  , $request->get("boAtivo")         );
-                        $obTLicitacaoTipoInstrumento->setDado("codigo_tc", $request->get("inCodigoTribunal"));
-                        $obErro = $obTLicitacaoTipoInstrumento->alteracao($boTransacao);
+                    if (!$obErro->ocorreu()) {
+                        if ($rsResultado->getNumLinhas() > 0)
+                            $obErro->setDescricao("Este código de tribunal já existe, escolha outro código!");
+                        else {
+                            $obTLicitacaoTipoInstrumento->setDado("ativo"    , $request->get("boAtivo")         );
+                            $obTLicitacaoTipoInstrumento->setDado("codigo_tc", $request->get("inCodigoTribunal"));
+                            $obErro = $obTLicitacaoTipoInstrumento->alteracao($boTransacao);
+                        }
                     }
                 }
             }
-        }
 
-    break;
+        break;
 
-    case "excluir":
-        $stLink = $pgFilt;
-        $obTLicitacaoTipoInstrumento->setDado("cod_tipo",$request->get("inCodigo"));
-        $obErro = $obTLicitacaoTipoInstrumento->recuperaPorChave($rsResultado, $boTransacao);
+        case "excluir":
+            $stLink = $pgFilt;
+            $obTLicitacaoTipoInstrumento->setDado("cod_tipo", $request->get("inCodigo"));
+            $obErro = $obTLicitacaoTipoInstrumento->recuperaPorChave($rsResultado, $boTransacao);
 
-        if (!$obErro->ocorreu()) {
-            $obErro = $obTLicitacaoTipoInstrumento->exclusao($boTransacao);
-        }
-    break;
-
+            if (!$obErro->ocorreu())
+                $obErro = $obTLicitacaoTipoInstrumento->exclusao($boTransacao);
+        break;
+    }
 }
 
 $obTransacao->fechaTransacao($boFlagTransacao, $boTransacao, $obErro, $obTLicitacaoTipoInstrumento);

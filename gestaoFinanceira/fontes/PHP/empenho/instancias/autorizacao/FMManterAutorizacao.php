@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: FMManterAutorizacao.php 65141 2016-04-27 20:10:02Z evandro $
+    $Id: FMManterAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -47,6 +47,7 @@ include_once CAM_GA_ADM_COMPONENTES.'IMontaAssinaturas.class.php';
 include_once TEMP.'TEmpenhoCategoriaEmpenho.class.php';
 include_once CAM_GP_ALM_COMPONENTES.'IPopUpCentroCustoUsuario.class.php';
 require_once CAM_GP_ALM_COMPONENTES."IPopUpMarca.class.php";
+include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = 'ManterAutorizacao';
@@ -80,6 +81,11 @@ $obTContabilidadeEncerramentoMes = new TContabilidadeEncerramentoMes;
 $obTContabilidadeEncerramentoMes->setDado('exercicio', Sessao::getExercicio());
 $obTContabilidadeEncerramentoMes->setDado('situacao', 'F');
 $obTContabilidadeEncerramentoMes->recuperaEncerramentoMes($rsUltimoMesEncerrado, '', ' ORDER BY mes DESC LIMIT 1 ');
+
+$obTConfiguracao = new TEmpenhoConfiguracao();
+$obTConfiguracao->setDado("parametro","data_fixa_autorizacao");
+$obTConfiguracao->recuperaPorChave($rsConfiguracao);
+$stDtAutorizacao = trim($rsConfiguracao->getCampo('valor'));
 
 if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerramentoMes == 'true') {
     $obSpan = new Span;
@@ -132,16 +138,16 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     if ($stAcao == 'alterar') {
         Sessao::remove('inCodUnidadeOrcamentaria');
         Sessao::remove('arItens');
-        
+
         $obREmpenhoAutorizacaoEmpenho->setExercicio     (Sessao::getExercicio());
         $obREmpenhoAutorizacaoEmpenho->setCodAutorizacao($request->get('inCodAutorizacao'));
         $obREmpenhoAutorizacaoEmpenho->setCodPreEmpenho ($request->get('inCodPreEmpenho'));
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade($request->get('inCodEntidade'));
         $obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->setCodReserva($request->get('inCodReserva'));
         $obREmpenhoAutorizacaoEmpenho->consultar();
-        
+
         $boItemMaterial = $obREmpenhoAutorizacaoEmpenho->consultarItemMaterial();
-        
+
         $stNomEmpenho          = $obREmpenhoAutorizacaoEmpenho->getDescricao();
         $inCodEntidade         = $request->get('inCodEntidade');
         $stNomEntidade         = $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->obRCGM->getNomCGM();
@@ -187,11 +193,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         if($obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->getVlReserva()!='')
             $nuVlReserva = number_format($obREmpenhoAutorizacaoEmpenho->obROrcamentoReserva->getVlReserva(),2,',','.');
         $arItemPreEmpenho = $obREmpenhoAutorizacaoEmpenho->getItemPreEmpenho();
+
         foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
             $nuVlUnitario = ($obItemPreEmpenho->getValorTotal()/$obItemPreEmpenho->getQuantidade());
             $nuVlTotalItens = bcadd( $nuVlTotalItens, $obItemPreEmpenho->getValorTotal(),4);
 
             $arItens = Sessao::read('arItens');
+
             $arItens[$inCount]['num_item']     = $inCount+1;
             if($obItemPreEmpenho->getCodItemPreEmp()!=''){
                 $arItens[$inCount]['cod_item']     = $obItemPreEmpenho->getCodItemPreEmp();
@@ -199,6 +207,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
             }else{
                 $booCodItem = false;
             }
+
             $arItens[$inCount]['nom_item']     = $obItemPreEmpenho->getNomItem();
             $arItens[$inCount]['cod_centro']   = $obItemPreEmpenho->getCodCentroCusto();
             $arItens[$inCount]['complemento']  = $obItemPreEmpenho->getComplemento();
@@ -210,6 +219,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
             $arItens[$inCount]['cod_material'] = $obItemPreEmpenho->getCodMaterial();
             $arItens[$inCount]['vl_total']     = $obItemPreEmpenho->getValorTotal();
             $arItens[$inCount]['cod_marca']    = $obItemPreEmpenho->getCodigoMarca();
+
+            // Teve que ser feito a consulta da marca separadamente e manualmente
+            if ($arItens[$inCount]['cod_marca'] != "") {
+                $stNomeMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', ' WHERE cod_marca = '.$arItens[$inCount]['cod_marca']);
+                $arItens[$inCount]['nome_marca'] = $stNomeMarca;
+            }
+
             Sessao::write('arItens', $arItens);
         }
         $nuVlUnitario = '';
@@ -313,12 +329,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obHdnCodEstrutural = new Hidden;
         $obHdnCodEstrutural->setName ('stCodEstrutural');
         $obHdnCodEstrutural->setValue($stCodClassificacao);
-        
+
         // Define o objeto Hidden para Codigo Órgão
         $obHdnCodOrgao = new Hidden;
         $obHdnCodOrgao->setName ('hdnCodOrgao');
         $obHdnCodOrgao->setValue($inCodOrgao);
-        
+
         // Define o objeto Hidden para Codigo Unidade Orcamentaria
         $obHdnCodUnidade = new Hidden;
         $obHdnCodUnidade->setName ('hdnCodUnidade');
@@ -365,7 +381,11 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
         $obCmbNomEntidade->setName ('stNomEntidade');
         $obCmbNomEntidade->setId   ('stNomEntidade');
         $obCmbNomEntidade->setValue($inCodEntidade);
-        $obCmbNomEntidade->obEvento->setOnChange("jq('#inCodEntidade').val(this.value); montaParametrosGET('buscaDtAutorizacao'); getIMontaAssinaturas();");
+
+        $stOnChange  = "jq('#inCodEntidade').val(this.value);";
+        $stOnChange .= " montaParametrosGET('buscaDtAutorizacao');";
+        $stOnChange .= " getIMontaAssinaturas();";
+        $obCmbNomEntidade->obEvento->setOnChange($stOnChange);
 
         if ($rsEntidade->getNumLinhas()>1) {
             $obCmbNomEntidade->addOption('', 'Selecione');
@@ -401,6 +421,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obDtAutorizacao->setTitle ('Informe a data da autorização.');
     $obDtAutorizacao->setNull  (false);
     $obDtAutorizacao->obEvento->setOnChange("buscaDado('buscaDespesa');");
+    if($stDtAutorizacao != ''){
+        $obDtAutorizacao->setValue ( $stDtAutorizacao );
+        $obDtAutorizacao->setLabel ( TRUE );
+    }
 
     // Define Objeto BuscaInner para Despesa
     $obBscDespesa = new BuscaInner;
@@ -579,7 +603,6 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obMarca->obCampoCod->setName   ( 'inMarca' );
     $obMarca->obCampoCod->setId     ( 'inMarca' );
     $obMarca->obCampoCod->setValue  ( $inMarca );
-    $obMarca->setValue              ( $stNomeMarca );
 
     // Define Objeto Numeric para Quantidade
     $obTxtQuantidade = new Numerico;
@@ -588,12 +611,13 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtQuantidade->setValue    ($nuQuantidade);
     $obTxtQuantidade->setRotulo   ('*Quantidade');
     $obTxtQuantidade->setTitle    ('Informe a quantidade.');
-    $obTxtQuantidade->setDecimais (4);
     $obTxtQuantidade->setNegativo (false);
     $obTxtQuantidade->setDefinicao('NUMERIC');
-    $obTxtQuantidade->setSize     (14);
-    $obTxtQuantidade->setMaxLength(13);
-    $obTxtQuantidade->obEvento->setOnChange('gerarValorTotal();');
+    $obTxtQuantidade->setSize     (14);    
+    $obTxtQuantidade->setMaxLength(9);
+    $obTxtQuantidade->setDecimais (4);
+    $obTxtQuantidade->setFormatarNumeroBR  (true);
+    $obTxtQuantidade->obEvento->setOnChange('gerarValorTotal(this);');
 
     // Define Objeto Select para Unidade
     $obCmbUnidade = new Select;
@@ -609,7 +633,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obCmbUnidade->setNull      (true);
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlUnitario = new Numerico;
+    $obTxtVlUnitario = new ValorUnitario;
     $obTxtVlUnitario->setName     ('nuVlUnitario');
     $obTxtVlUnitario->setId       ('nuVlUnitario');
     $obTxtVlUnitario->setValue    ($nuVlUnitario);
@@ -619,11 +643,12 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlUnitario->setDefinicao('NUMERIC');
     $obTxtVlUnitario->setDecimais (4);
     $obTxtVlUnitario->setSize     (21);
-    $obTxtVlUnitario->setMaxLength(21);
-    $obTxtVlUnitario->obEvento->setOnChange('gerarValorTotal();');
+    $obTxtVlUnitario->setMaxLength(10);
+    $obTxtVlUnitario->setFormatarNumeroBR  (true);
+    $obTxtVlUnitario->obEvento->setOnChange('gerarValorTotal(this);');
 
     // Define Objeto Moeda para Valor Unitário
-    $obTxtVlTotal = new Numerico;
+    $obTxtVlTotal = new ValorTotal;
     $obTxtVlTotal->setName     ('nuVlTotal');
     $obTxtVlTotal->setId       ('nuVlTotal');
     $obTxtVlTotal->setValue    ($nuVlTotal);
@@ -632,10 +657,10 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obTxtVlTotal->setNull     (true);
     $obTxtVlTotal->setReadOnly (true);
     $obTxtVlTotal->setDefinicao('NUMERIC');
-    $obTxtVlTotal->setDecimais (2);
     $obTxtVlTotal->setSize     (21);
-    $obTxtVlTotal->setMaxLength(21);
-    $obTxtVlTotal->obEvento->setOnChange('gerarValorTotal();');
+    $obTxtVlTotal->setMaxLength(12);
+    $obTxtVlTotal->setFormatarNumeroBR  (true);
+    $obTxtVlTotal->obEvento->setOnChange('gerarValorTotal(this);');
 
     // Define Objeto Button para  Incluir Item
     $obBtnIncluir = new Button;
@@ -670,7 +695,7 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
 
     $obMontaAssinaturas = new IMontaAssinaturas(null, 'autorizacao_empenho');
     $obMontaAssinaturas->definePapeisDisponiveis('autorizacao_empenho');
-    
+
     //Radio para Item Almoxarifado - Sim
     $obRdTipoItemC = new Radio;
     $obRdTipoItemC->setTitle      ( "Selecione o tipo de Item" );
@@ -691,16 +716,16 @@ if ($rsUltimoMesEncerrado->getCampo('mes') >= $mesAtual AND $boUtilizarEncerrame
     $obRdTipoItemD->setLabel    ( "Não" );
     $obRdTipoItemD->obEvento->setOnClick( "habilitaCampos('Descricao');" );
     $obRdTipoItemD->setChecked( true );
-    
-	//Hidden para armazenar o tipo de Item Almoxarifado
+
+    //Hidden para armazenar o tipo de Item Almoxarifado
     $obHdnTipoItem = new Hidden;
     $obHdnTipoItem->setName ('stTipoItem');
     $obHdnTipoItem->setId   ('stTipoItem');
     $obHdnTipoItem->setValue('Descricao');
-    
+
     $arRadios = array( $obRdTipoItemC, $obRdTipoItemD );
-    
-	//Item de Almoxarifado - Catalogo     
+
+    //Item de Almoxarifado - Catalogo
     include_once CAM_GP_ALM_COMPONENTES."IMontaItemUnidade.class.php";
     $obMontaItemUnidade = new IMontaItemUnidade($obForm);
     $obMontaItemUnidade->obIPopUpCatalogoItem->setRotulo("*Item");

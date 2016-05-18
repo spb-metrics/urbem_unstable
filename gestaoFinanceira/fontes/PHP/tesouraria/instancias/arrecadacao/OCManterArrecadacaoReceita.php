@@ -42,11 +42,10 @@
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
-//include_once("../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php" );
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once(CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php");
+include_once CAM_GF_TES_NEGOCIO."RTesourariaBoletim.class.php";
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/componentes/Table/Table.class.php';
-include_once( CLA_IAPPLETTERMINAL                                                                   );
+include_once CLA_IAPPLETTERMINAL;
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterArrecadacaoReceita";
@@ -591,6 +590,59 @@ switch ($stCtrl) {
         $obFormulario->montaInnerHTML();
         $stHTML .= $obFormulario->getHTML();
         $stJs .= "$('spnModalidade').innerHTML = '".$stHTML."';";
+
+        break;
+        
+        case 'montaBemAlienacao':
+            
+        if ( $request->get('inCodReceita') != "" && $request->get('inCodEntidade') != "" ) {
+            include_once CAM_GP_PAT_MAPEAMENTO."TPatrimonioBem.class.php";
+            include_once( CAM_GF_ORC_MAPEAMENTO."TOrcamentoReceita.class.php" );
+            
+            $obTPatrimonioBem = new TPatrimonioBem();
+            $obTPatrimonioBem->recuperaTodos( $rsBem );
+            
+            $obTOrcamentoReceita = new TOrcamentoReceita();
+           
+            $stFiltro  = " AND receita.exercicio    = '".Sessao::getExercicio()."'
+                           AND receita.cod_entidade IN (".$request->get('inCodEntidade').")
+                           AND receita.cod_receita  = ".$request->get('inCodReceita')."
+                           AND classificacao.mascara_classificacao ILIKE '2.2.%'
+                           AND CLR.estorno = 'false'
+                           AND NOT EXISTS (  SELECT dr.cod_receita_secundaria
+                                              FROM contabilidade.desdobramento_receita as dr
+                                             WHERE receita.cod_receita = dr.cod_receita_secundaria
+                                               AND receita.exercicio   = dr.exercicio )
+                           \n";
+            
+            $obTOrcamentoReceita->recuperaReceitaAnaliticaTCE($rsReceita, $stFiltro, " ORDER BY mascara_classificacao");
+
+            // Caso a gestão patrimonial esteja sendo utilziada e a receita pertença ao grupo de alienação, mostra o campo para selecionar o bem
+            if ( $rsReceita->getNumLinhas() > 0 && $rsBem->getNumLinhas() > 0 ){
+                include_once CAM_GP_PAT_COMPONENTES.'IPopUpBem.class.php';
+
+                $obForm = new Form;                
+                $obIPopUpBemAlienacao = new IPopUpBem( $obForm );
+                $obIPopUpBemAlienacao->setId     ( 'stNomBemAlienacao' );
+                $obIPopUpBemAlienacao->setRotulo ( 'Bem' );
+                $obIPopUpBemAlienacao->setTitle  ( 'Informe o código do bem.' );
+                $obIPopUpBemAlienacao->setNull   ( true );
+                $obIPopUpBemAlienacao->obCampoCod->setName ( 'inCodBemAlienacao' );
+                $obIPopUpBemAlienacao->obCampoCod->setId   ( 'inCodBemAlienacao' );
+                $obIPopUpBemAlienacao->setFuncaoBusca ("abrePopUp('".CAM_GP_PAT_POPUPS."bem/FLManterBem.php','".$obIPopUpBemAlienacao->obForm->getName()."', '".$obIPopUpBemAlienacao->obCampoCod->getName()."','".$obIPopUpBemAlienacao->getId()."','','".Sessao::getId()."&boBemBaixado=false&inCodEntidade=".$request->get('inCodEntidade')."','800','550');");
+                $obIPopUpBemAlienacao->obCampoCod->obEvento->setOnChange ("ajaxJavaScript('".CAM_GP_PAT_POPUPS.'bem/OCManterBem.php?'.Sessao::getId()."&boBemBaixado=false&inCodEntidade=".$request->get('inCodEntidade')."&stNomCampoCod=".$obIPopUpBemAlienacao->obCampoCod->getName()."&boMostrarDescricao=".$obIPopUpBemAlienacao->getMostrarDescricao()."&stIdCampoDesc=".$obIPopUpBemAlienacao->getId()."&stNomForm=".$obIPopUpBemAlienacao->obForm->getName()."&inCodigo='+this.value, 'buscaPopup');".$obIPopUpBemAlienacao->obCampoCod->obEvento->getOnChange());
+
+                $obFormulario = new Formulario;
+                $obFormulario->addForm       ( $obForm );            
+                $obFormulario->addComponente ($obIPopUpBemAlienacao);
+
+                $stHTML = $obFormulario->montaInnerHTML();
+                $stHTML .= $obFormulario->getHTML();
+                $stJs .= "$('spnBemAlienacao').innerHTML = '".$stHTML."';";  
+            } else {
+                $stJs .= "$('spnBemAlienacao').innerHTML = '';";  
+            }
+        }
 
         break;
 

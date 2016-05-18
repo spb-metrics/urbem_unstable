@@ -39,3 +39,10 @@ ALTER TABLE empenho.item_pre_empenho ADD COLUMN cod_marca INTEGER;
 ALTER TABLE empenho.item_pre_empenho ADD CONSTRAINT fk_item_pre_empenho_5 FOREIGN KEY (cod_marca)
                                                                           REFERENCES almoxarifado.marca (cod_marca);
 
+
+----------------
+-- Ticket #23735
+----------------
+
+UPDATE administracao.acao SET nom_acao = complemento_acao, complemento_acao = '' WHERE cod_acao = 3100;
+

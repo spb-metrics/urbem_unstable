@@ -30,7 +30,7 @@
  * @package     STN
  * @author      Analista      Tonismar Bernardo   <tonismar.bernardo@cnm.org.br>
  * @author      Desenvolvedor Henrique Boaventura <henrique.boaventura@cnm.org.br>
- * $Id: CSTNConfiguracao.class.php 65034 2016-04-19 20:58:40Z michel $
+ * $Id: CSTNConfiguracao.class.php 65267 2016-05-06 21:20:43Z michel $
  */
 
 include CAM_FW_COMPONENTES . 'Table/TableTree.class.php';
@@ -132,6 +132,7 @@ class CSTNConfiguracao
             $obNuValorReceitaTributaria->setNegativo        (true);
             $obNuValorReceitaTributaria->setValue           ('0,00');
             $obNuValorReceitaTributaria->setObrigatorioBarra(true);
+            $obNuValorReceitaTributaria->setMaxLength       (17);
             $obNuValorReceitaTributaria->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
             
             //Valor Receita de Contribuições
@@ -144,6 +145,7 @@ class CSTNConfiguracao
             $obNuValorReceitaContribuicoes->setNegativo        (true);
             $obNuValorReceitaContribuicoes->setValue           ('0,00');
             $obNuValorReceitaContribuicoes->setObrigatorioBarra(true);
+            $obNuValorReceitaContribuicoes->setMaxLength       (17);
             $obNuValorReceitaContribuicoes->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Receita Patrimonial
@@ -156,6 +158,7 @@ class CSTNConfiguracao
             $obNuValorReceitaPatrominial->setNegativo        (true);
             $obNuValorReceitaPatrominial->setValue           ('0,00');
             $obNuValorReceitaPatrominial->setObrigatorioBarra(true);
+            $obNuValorReceitaPatrominial->setMaxLength       (17);
             $obNuValorReceitaPatrominial->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
             
             //Valor Receita Agropecuária
@@ -168,6 +171,7 @@ class CSTNConfiguracao
             $obNuValorReceitaAgropecuaria->setNegativo        (true);
             $obNuValorReceitaAgropecuaria->setValue           ('0,00');
             $obNuValorReceitaAgropecuaria->setObrigatorioBarra(true);
+            $obNuValorReceitaAgropecuaria->setMaxLength       (17);
             $obNuValorReceitaAgropecuaria->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Receita Industrial
@@ -180,6 +184,7 @@ class CSTNConfiguracao
             $obNuValorReceitaIndustrial->setNegativo        (true);
             $obNuValorReceitaIndustrial->setValue           ('0,00');
             $obNuValorReceitaIndustrial->setObrigatorioBarra(true);
+            $obNuValorReceitaIndustrial->setMaxLength       (17);
             $obNuValorReceitaIndustrial->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Receita de Serviços
@@ -192,6 +197,7 @@ class CSTNConfiguracao
             $obNuValorReceitaServicos->setNegativo        (true);
             $obNuValorReceitaServicos->setValue           ('0,00');
             $obNuValorReceitaServicos->setObrigatorioBarra(true);
+            $obNuValorReceitaServicos->setMaxLength       (17);
             $obNuValorReceitaServicos->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Transferências Correntes
@@ -204,6 +210,7 @@ class CSTNConfiguracao
             $obNuValorTransferenciaCorrente->setNegativo        (true);
             $obNuValorTransferenciaCorrente->setValue           ('0,00');
             $obNuValorTransferenciaCorrente->setObrigatorioBarra(true);
+            $obNuValorTransferenciaCorrente->setMaxLength       (17);
             $obNuValorTransferenciaCorrente->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Outras Receitas Correntes
@@ -216,6 +223,7 @@ class CSTNConfiguracao
             $obnuValorOutrasReceitas->setNegativo        (true);
             $obnuValorOutrasReceitas->setValue           ('0,00');
             $obnuValorOutrasReceitas->setObrigatorioBarra(true);
+            $obnuValorOutrasReceitas->setMaxLength       (17);
             $obnuValorOutrasReceitas->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             $obLblDeducoes = new Label();
@@ -232,6 +240,7 @@ class CSTNConfiguracao
             $obNuValorContribPlanoSSS->setNegativo        (true);
             $obNuValorContribPlanoSSS->setValue           ('0,00');
             $obNuValorContribPlanoSSS->setObrigatorioBarra(true);
+            $obNuValorContribPlanoSSS->setMaxLength       (17);
             $obNuValorContribPlanoSSS->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Compensação Financ. entre Regimes Previd
@@ -244,6 +253,7 @@ class CSTNConfiguracao
             $obNuValorCompensacaoFinanceira->setNegativo        (true);
             $obNuValorCompensacaoFinanceira->setValue           ('0,00');
             $obNuValorCompensacaoFinanceira->setObrigatorioBarra(true);
+            $obNuValorCompensacaoFinanceira->setMaxLength       (17);
             $obNuValorCompensacaoFinanceira->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor Dedução Fundeb
@@ -256,6 +266,7 @@ class CSTNConfiguracao
             $obNuValorDeducaoFundeb->setNegativo        (true);
             $obNuValorDeducaoFundeb->setValue           ('0,00');
             $obNuValorDeducaoFundeb->setObrigatorioBarra(true);
+            $obNuValorDeducaoFundeb->setMaxLength       (17);
             $obNuValorDeducaoFundeb->obEvento->setOnChange(" montaParametrosGET('somaValoresRCL',''); ");
 
             //Valor TOTAL DA RCL ( Receitas Correntes - Deduções )
@@ -271,6 +282,7 @@ class CSTNConfiguracao
             $obNumValor->setTitle           ('Valor da Receita Corrente Líquida');
             $obNumValor->setObrigatorioBarra(true);
             $obNumValor->setNegativo        (true);
+            $obNumValor->setMaxLength       (17);
 
             $obFormularioValor = new Formulario();
             $obFormularioValor->setForm(FALSE);
@@ -402,6 +414,7 @@ class CSTNConfiguracao
             $obNuValorPessoalAtivo->setNegativo        (true);
             $obNuValorPessoalAtivo->setValue           ('0,00');
             $obNuValorPessoalAtivo->setObrigatorioBarra(true);
+            $obNuValorPessoalAtivo->setMaxLength       (17);
             $obNuValorPessoalAtivo->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
             
             //Valor Pessoal Inativo e Pensionista
@@ -414,6 +427,7 @@ class CSTNConfiguracao
             $obNuValorPessoalInativo->setNegativo        (true);
             $obNuValorPessoalInativo->setValue           ('0,00');
             $obNuValorPessoalInativo->setObrigatorioBarra(true);
+            $obNuValorPessoalInativo->setMaxLength       (17);
             $obNuValorPessoalInativo->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
             //Valor Outras Despesas Terceirização
@@ -426,6 +440,7 @@ class CSTNConfiguracao
             $obNuValorOutrasDespesas->setNegativo        (true);
             $obNuValorOutrasDespesas->setValue           ('0,00');
             $obNuValorOutrasDespesas->setObrigatorioBarra(true);
+            $obNuValorOutrasDespesas->setMaxLength       (17);
             $obNuValorOutrasDespesas->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
             
             $obLblTotalNaoComputadas = new Label();
@@ -442,6 +457,7 @@ class CSTNConfiguracao
             $obNuValorIndenizacoes->setNegativo        (true);
             $obNuValorIndenizacoes->setValue           ('0,00');
             $obNuValorIndenizacoes->setObrigatorioBarra(true);
+            $obNuValorIndenizacoes->setMaxLength       (17);
             $obNuValorIndenizacoes->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
             //Valor Decorrentes de Decisão Judicial
@@ -454,6 +470,7 @@ class CSTNConfiguracao
             $obNuValorDecisaoJudicial->setNegativo        (true);
             $obNuValorDecisaoJudicial->setValue           ('0,00');
             $obNuValorDecisaoJudicial->setObrigatorioBarra(true);
+            $obNuValorDecisaoJudicial->setMaxLength       (17);
             $obNuValorDecisaoJudicial->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
             //Valor Despesas Exercicios Anteriores
@@ -466,6 +483,7 @@ class CSTNConfiguracao
             $obNuValorExercicioAnterior->setNegativo        (true);
             $obNuValorExercicioAnterior->setValue           ('0,00');
             $obNuValorExercicioAnterior->setObrigatorioBarra(true);
+            $obNuValorExercicioAnterior->setMaxLength       (17);
             $obNuValorExercicioAnterior->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
             //Valor Inativos e Pensionistas com Recursos Vinculados
@@ -478,6 +496,7 @@ class CSTNConfiguracao
             $obNuValorInativosPensionista->setNegativo        (true);
             $obNuValorInativosPensionista->setValue           ('0,00');
             $obNuValorInativosPensionista->setObrigatorioBarra(true);
+            $obNuValorInativosPensionista->setMaxLength       (17);
             $obNuValorInativosPensionista->obEvento->setOnChange(" montaParametrosGET('somaValores',''); ");
 
             $obLblTotalDP = new Label();
@@ -514,6 +533,7 @@ class CSTNConfiguracao
             $obNumValorTotal->setNegativo        (true);
             $obNumValorTotal->setValue           ('0,00');
             $obNumValorTotal->setObrigatorioBarra(true);
+            $obNumValorTotal->setMaxLength       (17);
             
             $obFormularioValor = new Formulario();
             $obFormularioValor->setForm(FALSE);
@@ -721,6 +741,7 @@ class CSTNConfiguracao
             $obNumValor->setSize            (20);
             $obNumValor->setReadOnly        (true);
             $obNumValor->setDisabled        (true);
+            $obNumValor->setMaxLength       (14);
             $obNumValor->setValue           ('0,00');
         }else{
             $stJs  = " jq('#spnReceitasCorrentes').css('display', 'none'); ";
@@ -925,14 +946,32 @@ class CSTNConfiguracao
                 $arPeriodo[$inCount]['valor_contrib_plano_sss']        = $this->mascaraValor($arParam['nuValorContribPlanoSSS']      ,false);
                 $arPeriodo[$inCount]['valor_compensacao_financeira']   = $this->mascaraValor($arParam['nuValorCompensacaoFinanceira'],false);
                 $arPeriodo[$inCount]['valor_deducao_fundeb']           = $this->mascaraValor($arParam['nuValorDeducaoFundeb']        ,false);
+
+                $nuSomaTotal = 0.00;
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaTributaria']    ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaContribuicoes'] ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaPatrominial']   ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaAgropecuaria']  ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaIndustrial']    ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorReceitaServicos']      ,false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorTransferenciaCorrente'],false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorOutrasReceitas']       ,false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorContribPlanoSSS']      ,false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorCompensacaoFinanceira'],false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorDeducaoFundeb']        ,false );
+
+                $arParam['flValor'] = $this->mascaraValor($nuSomaTotal,true);
             }
-            $arPeriodo[$inCount]['valor'       ] = str_replace(',','.',str_replace('.','',$arParam['flValor'  ]));
+            $arPeriodo[$inCount]['valor'       ] = $this->mascaraValor($arParam['flValor'],false);
             $arPeriodo[$inCount]['descricao'   ] = $this->arMes[abs($arData[0])] . '/' . $arData[1];
 
             Sessao::write('arPeriodo',$arPeriodo);
 
             $stJs .= "jq('#spnLista').html('" . $this->buildListaPeriodo($arPeriodo) . "');";
             $stJs .= 'limpaFormularioAux();';
+            $stJs .= "alertaAviso('Incluído Período ".$this->arMes[$arData[0]].'/'.$arData[1]."','form','unica','".Sessao::getId()."');";
+            $stJs .= "jq('#stDataImplantacao').focus();";
+            $stJs .= "jq('#stPeriodo').focus();";
         } else {
             $stJs .= "alertaAviso('" . $obErro->getDescricao() . "','form','erro','".Sessao::getId()."');";
         }
@@ -976,6 +1015,17 @@ class CSTNConfiguracao
                 $arPeriodo[$inCount]['valor_decisao_judicial']      = $this->mascaraValor($arParam['nuValorDecisaoJudicial'],false);
                 $arPeriodo[$inCount]['valor_exercicios_anteriores'] = $this->mascaraValor($arParam['nuValorExercicioAnterior'],false);
                 $arPeriodo[$inCount]['valor_inativos_pensionistas'] = $this->mascaraValor($arParam['nuValorInativosPensionista'],false);
+
+                $nuSomaTotal = 0.00;
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorPessoalAtivo'],false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorPessoalInativo'],false );
+                $nuSomaTotal += $this->mascaraValor( $arParam['nuValorOutrasDespesas'],false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorIndenizacoes'],false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorDecisaoJudicial'],false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorExercicioAnterior'],false );
+                $nuSomaTotal -= $this->mascaraValor( $arParam['nuValorInativosPensionista'],false );
+
+                $arParam['flValor'] = $this->mascaraValor($nuSomaTotal,true);
             }
 
             $arPeriodo[$inCount]['valor'] = $this->mascaraValor($arParam['flValor'],false);
@@ -984,6 +1034,9 @@ class CSTNConfiguracao
 
             $stJs .= "jq('#spnLista').html('" . $this->buildListaPeriodo($arPeriodo) . "');";
             $stJs .= 'limpaFormularioAux();';
+            $stJs .= "alertaAviso('Incluído Período ".$this->arMes[$arData[0]].'/'.$arData[1]."','form','unica','".Sessao::getId()."');";
+            $stJs .= "jq('#stDataImplantacao').focus();";
+            $stJs .= "jq('#stPeriodo').focus();";
         } else {
             $stJs .= "alertaAviso('" . $obErro->getDescricao() . "','form','erro','".Sessao::getId()."');";
         }

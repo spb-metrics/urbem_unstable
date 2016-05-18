@@ -35,7 +35,7 @@
 
     * Casos de uso: uc-03.04.08
 
-    $Id: PRManterConfiguracao.php 63367 2015-08-20 21:27:34Z michel $
+    $Id: PRManterConfiguracao.php 65196 2016-05-02 17:49:38Z michel $
 
     */
 
@@ -131,6 +131,24 @@ switch ($stAcao) {
         $obTConfiguracao->setDado( 'parametro'  , 'numeracao_automatica_licitacao' );
         $obTConfiguracao->setDado( 'valor', $_REQUEST['boIdLicitacaoAutomatica'] );
         $obTConfiguracao->alteracao();
+
+        $obTConfiguracao->setDado( 'parametro' , 'data_fixa_solicitacao_compra' );
+        $obTConfiguracao->setDado( 'valor'     , $_REQUEST['stDtSolicitacao'] );
+        $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+
+        if($rsConfiguracao->getNumLinhas()==1)
+            $obTConfiguracao->alteracao();
+        else
+            $obTConfiguracao->inclusao();
+
+        $obTConfiguracao->setDado( 'parametro' , 'data_fixa_compra_direta' );
+        $obTConfiguracao->setDado( 'valor'     , $_REQUEST['stDtCompraDireta'] );
+        $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+
+        if($rsConfiguracao->getNumLinhas()==1)
+            $obTConfiguracao->alteracao();
+        else
+            $obTConfiguracao->inclusao();
 
         Sessao::encerraExcecao();
 

@@ -33,7 +33,7 @@
 
     * @ignore
 
-    $Id: OCManterAutorizacao.php 65141 2016-04-27 20:10:02Z evandro $
+    $Id: OCManterAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
@@ -63,7 +63,9 @@ function montaLista($arRecordSet, $boExecuta = true)
     for($i=0;$i<count($arRecordSet);$i++){
         if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!='')
             $codItem = true;
-        break;
+
+        if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!='')
+            $arRecordSet[$i]['nom_item'] .= " ( Marca: ".$arRecordSet[$i]['cod_marca']." - ".$arRecordSet[$i]['nome_marca']." )";
     }
 
     $rsLista = new RecordSet;
@@ -686,7 +688,8 @@ switch ($stCtrl) {
 
                 $js .= "jq('#stComplemento').val(\"".htmlentities($valor["complemento"], ENT_QUOTES)."\");                      \n";                
                 $js .= "jq('#inMarca').val(\"".$valor["cod_marca"]."\");                                                        \n";
-                $js .= "jq('#inMarca').trigger('blur');                                                                         \n";
+                $js .= "jq('#stNomeMarca').html(\"".$valor["nome_marca"]."\");                                                  \n";
+                $js .= "jq('input[name=stNomeMarca]').val(\"".$valor["nome_marca"]."\");                                        \n";
                 $js .= "jq('#nuQuantidade').val(\"".number_format($valor['quantidade'],4,',','.')."\");                         \n";
                 $js .= "jq('#inCodUnidade').val(\"".$stUnidade."\");                                                            \n";
                 $js .= "jq('#nuVlUnitario').val(\"".number_format($valor['vl_unitario'],4,',','.')."\");                        \n";
@@ -834,12 +837,18 @@ switch ($stCtrl) {
     break;
 
     case 'buscaDtAutorizacao':
+        include_once CAM_GF_EMP_MAPEAMENTO."TEmpenhoConfiguracao.class.php";
+        $obTConfiguracao = new TEmpenhoConfiguracao();
+        $obTConfiguracao->setDado("parametro","data_fixa_autorizacao");
+        $obTConfiguracao->recuperaPorChave($rsConfiguracao);
+        $stDtFixaAutorizacao = trim($rsConfiguracao->getCampo('valor'));
+
         if ($request->get("inCodEntidade") != '') {
             $obREmpenhoAutorizacaoEmpenho->obROrcamentoEntidade->setCodigoEntidade($request->get('inCodEntidade'));
             $obREmpenhoAutorizacaoEmpenho->setExercicio(Sessao::getExercicio());
             $obErro = $obREmpenhoAutorizacaoEmpenho->listarMaiorData($rsMaiorData);
     
-            if (!$obErro->ocorreu()) {
+            if (!$obErro->ocorreu() && $stDtFixaAutorizacao == '') {
                 $stDtAutorizacao = $rsMaiorData->getCampo('data_autorizacao');
                 if ($stDtAutorizacao) {
                     $js .= "jq('#stDtAutorizacao').val('".$stDtAutorizacao."');\n";
@@ -862,7 +871,8 @@ switch ($stCtrl) {
                 $rsOrgao->proximo();
             }
         } else {
-            $js .= "jq('#stDtAutorizacao').val('".date('d/m/Y')."');\n";
+            if($stDtFixaAutorizacao == '')
+                $js .= "jq('#stDtAutorizacao').val('".date('d/m/Y')."');\n";
         }
         $js .= "LiberaFrames(true,false);";
     break;

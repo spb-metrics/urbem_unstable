@@ -29,7 +29,7 @@
     * @author Analista: Diego Barbosa Victoria
     * @author Desenvolvedor: Diego Barbosa Victoria
     * @ignore
-    $Id: FLManterExportacao.php 64093 2015-12-02 12:16:17Z evandro $
+    $Id: FLManterExportacao.php 65303 2016-05-11 13:49:29Z jean $
     * Casos de uso: uc-06.03.00
 */
 
@@ -214,6 +214,7 @@ if ($inCodUnidadeGestora != "") {
                                         ,"FolhaPgt.txt"
                                         ,"EditalDotacao.txt"
                                         ,"EditPregaoElet.txt"
+                                        ,"Regulariza.txt"
                                     );
         break;
     }

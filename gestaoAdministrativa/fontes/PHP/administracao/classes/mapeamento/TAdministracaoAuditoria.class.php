@@ -30,10 +30,7 @@
 * @author Analista: Cassiano
 * @author Desenvolvedor: Cassiano
 
-$Revision: 3476 $
-$Name$
-$Author: pablo $
-$Date: 2005-12-06 13:51:37 -0200 (Ter, 06 Dez 2005) $
+$Id: TAdministracaoAuditoria.class.php 65281 2016-05-10 12:01:27Z michel $
 
 Casos de uso: uc-01.03.91
 */
@@ -43,8 +40,6 @@ class TAuditoria extends Persistente
 {
     public function TAuditoria()
     {
-        //parent::Persistente();   Não pode chamar o construtor da Persistente
-
         $this->setEstrutura( array() );
 
         $this->setTabela('administracao.auditoria');
@@ -156,23 +151,23 @@ class TAuditoria extends Persistente
             $stOrdem = (!strpos($stOrdem, "ORDER BY")) ? " ORDER BY $stOrdem" : $stOrdem;
         }
 
-        $stSql  = " SELECT                                                                                                                                   \n";
-        $stSql .= "     u.username,                                                                                                                          \n";
-        $stSql .= "     a.nom_acao,                                                                                                                          \n";
-        $stSql .= "     to_char(au_d.timestamp, 'dd/mm/yyyy - hh:mi:ss') as timestamp,                                                                         \n";
-        $stSql .= "     au_d.valores,                                                                                                                           \n";
-        $stSql .= "     m.nom_modulo,                                                                                                                        \n";
-        $stSql .= "     f.nom_funcionalidade                                                                                                                 \n";
-        $stSql .= " FROM                                                                                                                                     \n";
-        $stSql .= "     administracao.usuario as u                                                                                                           \n";
-        $stSql .= " INNER JOIN                                                                                                                               \n";
-        $stSql .= "     administracao.auditoria_detalhe as au_d on au_d.numcgm = u.numcgm                                                                                \n";
-        $stSql .= " INNER JOIN                                                                                                                               \n";
-        $stSql .= "     administracao.acao as a on a.cod_acao = au_d.cod_acao                                                                                  \n";
-        $stSql .= " INNER JOIN                                                                                                                               \n";
-        $stSql .= "     administracao.funcionalidade as f on f.cod_funcionalidade = a.cod_funcionalidade                                                     \n";
-        $stSql .= " INNER JOIN                                                                                                                               \n";
-        $stSql .= "     administracao.modulo as m on m.cod_modulo = f.cod_modulo                                                                             \n";
+        $stSql  = "
+                        SELECT u.username,
+                               a.nom_acao,
+                               to_char(au_d.timestamp, 'dd/mm/yyyy - hh:mi:ss') as timestamp,
+                               REPLACE(au_d.valores::TEXT,'\\\"', '\"') AS valores,
+                               m.nom_modulo,
+                               f.nom_funcionalidade
+                          FROM administracao.usuario as u
+                    INNER JOIN administracao.auditoria_detalhe as au_d
+                            ON au_d.numcgm = u.numcgm
+                    INNER JOIN administracao.acao as a
+                            ON a.cod_acao = au_d.cod_acao
+                    INNER JOIN administracao.funcionalidade as f
+                            ON f.cod_funcionalidade = a.cod_funcionalidade
+                    INNER JOIN administracao.modulo as m
+                            ON m.cod_modulo = f.cod_modulo
+        ";
 
         //WHERE
         $stSql .= $stFiltro;

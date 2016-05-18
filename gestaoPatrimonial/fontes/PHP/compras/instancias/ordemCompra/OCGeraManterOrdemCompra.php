@@ -44,7 +44,8 @@ $obBirtPreview = new PreviewBirt( 3, 35, 3 );
 $obBirtPreview->setVersaoBirt ( "2.5.0");
 $obBirtPreview->setNomeArquivo("ordemCompra");
 
-$label = ($_REQUEST['stTipoOrdem'] == 'C') ? "Compra" : "Serviço";
+$label = ($request->get('stTipoOrdem') == 'C') ? "Compra" : "Serviço";
+
 $obBirtPreview->setTitulo     ( "Ordem de ".$label );
 $obBirtPreview->addParametro  ( "cod_ordem" , $_REQUEST['inCodOrdem'] );
 $obBirtPreview->addParametro  ( "cod_entidade" , $_REQUEST['inCodEntidade'] );

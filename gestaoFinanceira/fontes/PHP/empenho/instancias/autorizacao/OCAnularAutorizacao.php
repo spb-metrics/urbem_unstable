@@ -33,28 +33,15 @@
 
     * @ignore
 
-    $Revision: 30805 $
-    $Name$
-    $Autor: $
-    $Date: 2007-02-23 13:15:05 -0200 (Sex, 23 Fev 2007) $
+    $Id: OCAnularAutorizacao.php 65373 2016-05-17 12:31:43Z michel $
 
     * Casos de uso: uc-02.03.02
                     uc-02.01.08
 */
 
-/*
-$Log$
-Revision 1.5  2007/02/23 15:15:05  gelson
-Sempre que for autorização tem que ir a reserva. Adicionado em todos arquivos o caso de uso da reserva.
-
-Revision 1.4  2006/07/05 20:47:28  cleisson
-Adicionada tag Log aos arquivos
-
-*/
-
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
-include_once( CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php" );
+include_once CAM_GF_EMP_NEGOCIO."REmpenhoAutorizacaoEmpenho.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterAutorizacao";
@@ -65,113 +52,91 @@ $pgProc = "PR".$stPrograma.".php";
 $pgOcul = "OCAnularAutorizacao.php";
 $pgPror = "PO".$stPrograma.".php";
 
-$stCtrl = $_GET['stCtrl'] ?  $_GET['stCtrl'] : $_POST['stCtrl'];
+$stCtrl = $request->get('stCtrl');
 
 $obREmpenhoAutorizacaoEmpenho = new REmpenhoPreEmpenho;
 $obREmpenhoAutorizacaoEmpenho->setExercicio( Sessao::getExercicio() );
 
 function montaLista($arRecordSet , $boExecuta = true)
 {
-        for($i=0;$i<count($arRecordSet);$i++){
-                if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!='')
-                    $codItem = true;
-                break;
-        }
-        
-        $rsLista = new RecordSet;
-        $rsLista->preenche( $arRecordSet );
-        $rsLista->addFormatacao( "vl_total", "NUMERIC_BR" );
-        $obLista = new Lista;
-        $obLista->setMostraPaginacao( false );
-        $obLista->setRecordSet( $rsLista );
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-        $obLista->ultimoCabecalho->setWidth( 5 );
-        $obLista->commitCabecalho();
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("Descrição ");
-        $obLista->ultimoCabecalho->setWidth( 50 );
-        $obLista->commitCabecalho();
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("Valor Unitário ");
-        $obLista->ultimoCabecalho->setWidth( 15 );
-        $obLista->commitCabecalho();
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("Quantidade ");
-        $obLista->ultimoCabecalho->setWidth( 10 );
-        $obLista->commitCabecalho();
-        $obLista->addCabecalho();
-        $obLista->ultimoCabecalho->addConteudo("Valor Total");
-        $obLista->ultimoCabecalho->setWidth( 15 );
-        $obLista->commitCabecalho();
+    for($i=0;$i<count($arRecordSet);$i++){
+        if(isset($arRecordSet[$i]['cod_item'])&&$arRecordSet[$i]['cod_item']!='')
+            $arRecordSet[$i]['nom_item'] = $arRecordSet[$i]['cod_item'].' - '.$arRecordSet[$i]['nom_item'];
+        if(isset($arRecordSet[$i]['cod_marca'])&&$arRecordSet[$i]['cod_marca']!='')
+            $arRecordSet[$i]['nom_item'] .= " ( Marca: ".$arRecordSet[$i]['cod_marca']." - ".$arRecordSet[$i]['nome_marca']." )";
+    }
 
-        if ($_REQUEST['stAcao'] != 'anular') {
-            $obLista->addCabecalho();
-            $obLista->ultimoCabecalho->addConteudo("&nbsp;");
-            $obLista->ultimoCabecalho->setWidth( 5 );
-            $obLista->commitCabecalho();
-        }
+    $rsLista = new RecordSet;
+    $rsLista->preenche( $arRecordSet );
+    $rsLista->addFormatacao( "vl_total", "NUMERIC_BR" );
+    $obLista = new Lista;
+    $obLista->setMostraPaginacao( false );
+    $obLista->setRecordSet( $rsLista );
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("&nbsp;");
+    $obLista->ultimoCabecalho->setWidth( 5 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Descrição ");
+    $obLista->ultimoCabecalho->setWidth( 50 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Valor Unitário ");
+    $obLista->ultimoCabecalho->setWidth( 15 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Quantidade ");
+    $obLista->ultimoCabecalho->setWidth( 10 );
+    $obLista->commitCabecalho();
+    $obLista->addCabecalho();
+    $obLista->ultimoCabecalho->addConteudo("Valor Total");
+    $obLista->ultimoCabecalho->setWidth( 15 );
+    $obLista->commitCabecalho();
 
-        $obLista->addDado();
-        if ($codItem)
-                $obLista->ultimoDado->setCampo( "[cod_item] - [nom_item]" );
-        else
-                $obLista->ultimoDado->setCampo( "nom_item" );
-        $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
-        $obLista->commitDado();
-        $obLista->addDado();
-        $obLista->ultimoDado->setCampo( "vl_unitario" );
-        $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
-        $obLista->commitDado();
-        $obLista->addDado();
-        $obLista->ultimoDado->setCampo( "quantidade" );
-        $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
-        $obLista->commitDado();
-        $obLista->addDado();
-        $obLista->ultimoDado->setCampo( "vl_total" );
-        $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
-        $obLista->commitDado();
-        if ($_REQUEST['stAcao'] != 'anular') {
-            $obLista->addAcao();
-            $obLista->ultimaAcao->setAcao( "EXCLUIR" );
-            $obLista->ultimaAcao->setFuncao( true );
-            $obLista->ultimaAcao->setLink( "JavaScript:excluirItem('excluirItemPreEmpenho');" );
-            $obLista->ultimaAcao->addCampo("1","num_item");
-            $obLista->commitAcao();
-        }
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "nom_item" );
+    $obLista->ultimoDado->setAlinhamento( 'ESQUERDA' );
+    $obLista->commitDado();
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "vl_unitario" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "quantidade" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
+    $obLista->addDado();
+    $obLista->ultimoDado->setCampo( "vl_total" );
+    $obLista->ultimoDado->setAlinhamento( 'DIREITA' );
+    $obLista->commitDado();
 
-        $obLista->montaHTML();
-        $stHTML = $obLista->getHTML();
-        $stHTML = str_replace( "\n" ,"" ,$stHTML );
-        $stHTML = str_replace( "  " ,"" ,$stHTML );
-        $stHTML = str_replace( "'","\\'",$stHTML );
+    $obLista->montaHTML();
+    $stHTML = $obLista->getHTML();
+    $stHTML = str_replace( "\n" ,"" ,$stHTML );
+    $stHTML = str_replace( "  " ,"" ,$stHTML );
+    $stHTML = str_replace( "'","\\'",$stHTML );
 
-        foreach ($arRecordSet as $value) {
-            $vl_total = str_replace('.','',$value['vl_total']);
-            $vl_total = str_replace(',','.',$vl_total);
-            $nuVlTotal += $value['vl_total'];
-        }
-        $nuVlTotal = number_format($nuVlTotal,2,',','.');
+    foreach ($arRecordSet as $value) {
+        $vl_total = str_replace('.','',$value['vl_total']);
+        $vl_total = str_replace(',','.',$vl_total);
+        $nuVlTotal += $value['vl_total'];
+    }
+    $nuVlTotal = number_format($nuVlTotal,2,',','.');
 
-        $stLista    = "d.getElementById('spnLista').innerHTML = '".$stHTML."'; ";
-        $stVlTotal  = "d.getElementById('nuValorTotal').innerHTML='".$nuVlTotal."'; ";
-        $stVlTotal .= "d.getElementById('nuVlReserva').innerHTML= '".$nuVlTotal."'; ";
-        $stVlTotal .= "d.getElementById('hdnVlReserva').value= '".$nuVlTotal."'; ";
+    $stLista    = "d.getElementById('spnLista').innerHTML = '".$stHTML."'; ";
+    $stVlTotal  = "d.getElementById('nuValorTotal').innerHTML='".$nuVlTotal."'; ";
+    $stVlTotal .= "d.getElementById('nuVlReserva').innerHTML= '".$nuVlTotal."'; ";
 
-        if ($boExecuta) {
-            SistemaLegado::executaFrameOculto($stLista.$stVlTotal);
-        } else {
-            return $stLista.$stVlTotal;
-        }
-
+    if ($boExecuta) {
+        SistemaLegado::executaFrameOculto($stLista.$stVlTotal);
+    } else {
+        echo $stLista.$stVlTotal;
+    }
 }
 
 switch ($stCtrl) {
-
     case 'montaListaItemPreEmpenhoAnular':
         $js  = montaLista( Sessao::read('arItens'), false );
-        SistemaLegado::executaFrameOculto($js);
     break;
-
 }
 ?>

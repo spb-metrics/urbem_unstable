@@ -34,7 +34,7 @@
     * @package URBEM
     * @subpackage
 
-    $Id: TTCMGOContrato.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTCMGOContrato.class.php 65220 2016-05-03 21:30:22Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/valida.inc.php';
@@ -137,21 +137,18 @@ function recuperaTodosDespesa(&$rsRecordSet, $stFiltro)
     $stSql .= "       , tdp.elemento                      \n";
     $stSql .= "       , tdp.subelemento                   \n";
     $stSql .= "       , ocd.elemento                      \n";
-//    $stSql .= "       , ocd.subelemento                   \n";
     $stSql .= "       , ped.cod_conta                     \n";
     $stSql .= "       , ped.cod_pre_empenho               \n";
     $stSql .= "       , sc.nom_cgm                        \n";
     $stSql .= "       , sc.tipo_pessoa                    \n";
     $stSql .= "       , sc.cpf_cnpj                       \n";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "       , empenho_modalidade.cod_fundamentacao \n";
-        $stSql .= "       , empenho_modalidade.justificativa     \n";
-        $stSql .= "       , empenho_modalidade.razao_escolha     \n";
-        $stSql .= "       , processos.numero_processo            \n";
-        $stSql .= "       , processos.exercicio_processo         \n";
-        $stSql .= "       , processos.processo_administrativo    \n";
-        $stSql .= "       , c.cod_assunto                        \n";
-    }
+    $stSql .= "       , empenho_modalidade.cod_fundamentacao \n";
+    $stSql .= "       , empenho_modalidade.justificativa     \n";
+    $stSql .= "       , empenho_modalidade.razao_escolha     \n";
+    $stSql .= "       , processos.numero_processo            \n";
+    $stSql .= "       , processos.exercicio_processo         \n";
+    $stSql .= "       , processos.processo_administrativo    \n";
+    $stSql .= "       , c.cod_assunto                        \n";
 
     $this->setDebug( $stSql );
 
@@ -183,46 +180,40 @@ function montaRecuperaTodosDespesa()
     $stSql .= "                END as subelemento                                \n";
     $stSql .= "              , ce.cod_empenho                                    \n";
     $stSql .= "              , TO_CHAR(ee.dt_empenho,'ddmmyyyy') AS dt_empenho   \n";
-    if ((Sessao::getExercicio() > '2008') and (Sessao::getExercicio() < '2011' )) {
-        $stSql .= "              , LPAD(nro_contrato::varchar,8,'0') AS nro_contrato           \n";
-    } else {
-    $stSql .= "              , LPAD(nro_contrato::varchar,20,'0') AS nro_contrato           \n";
-    }
+    $stSql .= "              , LPAD(nro_contrato::varchar,20,'0') AS nro_contrato \n";
     $stSql .= "              , c.exercicio as ano_contrato                       \n";
     $stSql .= "              , '1' as tipo_ajuste                                \n";
     $stSql .= "              , cod_assunto                                       \n";
     $stSql .= "              , c.cod_tipo                                        \n";
     $stSql .= "              , c.cod_modalidade                                  \n";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
-        $stSql .= "                    cod_fundamentacao::integer                    \n";
-        $stSql .= "                ELSE                                              \n";
-        $stSql .= "                    0                                             \n";
-        $stSql .= "                END AS fundamentacao_legal                        \n";
-        $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
-        $stSql .= "                    TRIM(regexp_replace(empenho_modalidade.justificativa ,E'\\r\\n',''))                                 \n";
-        $stSql .= "                ELSE                                              \n";
-        $stSql .= "                    ''                                            \n";
-        $stSql .= "                END AS justificativa_dispensa                     \n";
-        $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
-        $stSql .= "                    TRIM(regexp_replace(empenho_modalidade.razao_escolha ,E'\\r\\n',''))                                 \n";
-        $stSql .= "                ELSE                                              \n";
-        $stSql .= "                    ''                                            \n";
-        $stSql .= "                END AS razao_escolha                              \n";
-        $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
-        $stSql .= "                    processos.numero_processo                     \n";
-        $stSql .= "                ELSE                                              \n";
-        $stSql .= "                    '0'                                           \n";
-        $stSql .= "                END AS nro_processo                               \n";
-        $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
-        $stSql .= "                    processos.exercicio_processo                  \n";
-        $stSql .= "                ELSE                                              \n";
-        $stSql .= "                    '0'                                           \n";
-        $stSql .= "                END AS ano_processo                               \n";
-        $stSql .= "              , 0 AS instrumento_contrato                         \n";
-        $stSql .= "              , processos.processo_administrativo                 \n";
-        $stSql .= "              , c.cod_assunto                                     \n";
-    }
+    $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
+    $stSql .= "                    cod_fundamentacao::integer                    \n";
+    $stSql .= "                ELSE                                              \n";
+    $stSql .= "                    0                                             \n";
+    $stSql .= "                END AS fundamentacao_legal                        \n";
+    $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
+    $stSql .= "                    TRIM(regexp_replace(empenho_modalidade.justificativa ,E'\\r\\n',''))                                 \n";
+    $stSql .= "                ELSE                                              \n";
+    $stSql .= "                    ''                                            \n";
+    $stSql .= "                END AS justificativa_dispensa                     \n";
+    $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
+    $stSql .= "                    TRIM(regexp_replace(empenho_modalidade.razao_escolha ,E'\\r\\n',''))                                 \n";
+    $stSql .= "                ELSE                                              \n";
+    $stSql .= "                    ''                                            \n";
+    $stSql .= "                END AS razao_escolha                              \n";
+    $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
+    $stSql .= "                    processos.numero_processo                     \n";
+    $stSql .= "                ELSE                                              \n";
+    $stSql .= "                    '0'                                           \n";
+    $stSql .= "                END AS nro_processo                               \n";
+    $stSql .= "              , CASE WHEN c.cod_modalidade = 10 OR c.cod_modalidade = 11 THEN \n";
+    $stSql .= "                    processos.exercicio_processo                  \n";
+    $stSql .= "                ELSE                                              \n";
+    $stSql .= "                    '0'                                           \n";
+    $stSql .= "                END AS ano_processo                               \n";
+    $stSql .= "              , 0 AS instrumento_contrato                         \n";
+    $stSql .= "              , processos.processo_administrativo                 \n";
+    $stSql .= "              , c.cod_assunto                                     \n";
     $stSql .= "              , vl_contrato                                       \n";
     $stSql .= "              , objeto_contrato                                   \n";
     $stSql .= "              , COALESCE(TO_CHAR(data_inicio,'dd/mm/yyyy'),'00/00/0000') AS data_inicio  \n";
@@ -254,16 +245,14 @@ function montaRecuperaTodosDespesa()
     $stSql .= "     INNER JOIN orcamento.pao op                                  \n";
     $stSql .= "             ON op.num_pao=od.num_pao                             \n";
     $stSql .= "            AND op.exercicio=c.exercicio                          \n";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "      LEFT JOIN tcmgo.empenho_modalidade                          \n";
-        $stSql .= "             ON ee.cod_empenho        = empenho_modalidade.cod_empenho \n";
-        $stSql .= "            AND ee.exercicio          = empenho_modalidade.exercicio \n";
-        $stSql .= "            AND ee.cod_entidade       = empenho_modalidade.cod_entidade \n";
-        $stSql .= "      LEFT JOIN tcmgo.processos                                   \n";
-        $stSql .= "             ON ee.cod_empenho        = processos.cod_empenho \n";
-        $stSql .= "            AND ee.exercicio          = processos.exercicio \n";
-        $stSql .= "            AND ee.cod_entidade       = processos.cod_entidade \n";
-    }
+    $stSql .= "      LEFT JOIN tcmgo.empenho_modalidade                          \n";
+    $stSql .= "             ON ee.cod_empenho        = empenho_modalidade.cod_empenho \n";
+    $stSql .= "            AND ee.exercicio          = empenho_modalidade.exercicio \n";
+    $stSql .= "            AND ee.cod_entidade       = empenho_modalidade.cod_entidade \n";
+    $stSql .= "      LEFT JOIN tcmgo.processos                                   \n";
+    $stSql .= "             ON ee.cod_empenho        = processos.cod_empenho \n";
+    $stSql .= "            AND ee.exercicio          = processos.exercicio \n";
+    $stSql .= "            AND ee.cod_entidade       = processos.cod_entidade \n";
     $stSql .= "LEFT OUTER JOIN ( SELECT *                                        \n";
     $stSql .= "                       , substr(translate(estrutural, '.', ''), 1, 6) as elemento \n";
     $stSql .= "		                  , substr(translate(estrutural, '.', ''), 7, 2) as subelemento \n";
@@ -282,15 +271,11 @@ function montaRecuperaTodosDespesa()
     $stSql .= "     INNER JOIN (          SELECT sc.numcgm                       \n";
     $stSql .= "                                , nom_cgm                         \n";
     $stSql .= "                                , cpf as cpf_cnpj                 \n";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "                                , CASE WHEN sc.cod_pais = 1 THEN  \n";
-        $stSql .= "                                    1                             \n";
-        $stSql .= "                                  ELSE                            \n";
-        $stSql .= "                                    3                             \n";
-        $stSql .= "                                  END as tipo_pessoa              \n";
-    } else {
-        $stSql .= "                                , 1 as tipo_pessoa                \n";
-    }
+    $stSql .= "                                , CASE WHEN sc.cod_pais = 1 THEN  \n";
+    $stSql .= "                                    1                             \n";
+    $stSql .= "                                  ELSE                            \n";
+    $stSql .= "                                    3                             \n";
+    $stSql .= "                                  END as tipo_pessoa              \n";
     $stSql .= "                                      FROM sw_cgm sc              \n";
     $stSql .= "                  LEFT OUTER JOIN sw_cgm_pessoa_fisica scpf       \n";
     $stSql .= "                               ON sc.numcgm = scpf.numcgm         \n";
@@ -299,15 +284,11 @@ function montaRecuperaTodosDespesa()
     $stSql .= "                           SELECT sc.numcgm                       \n";
     $stSql .= "                                , nom_cgm                         \n";
     $stSql .= "                                , cnpj as cpf_cnpj                \n";
-    if (Sessao::getExercicio() > 2012) {
-        $stSql .= "                                , CASE WHEN sc.cod_pais = 1 THEN  \n";
-        $stSql .= "                                    2                             \n";
-        $stSql .= "                                  ELSE                            \n";
-        $stSql .= "                                    3                             \n";
-        $stSql .= "                                  END as tipo_pessoa              \n";
-    } else {
-        $stSql .= "                                , 2 as tipo_pessoa                \n";
-    }
+    $stSql .= "                                , CASE WHEN sc.cod_pais = 1 THEN  \n";
+    $stSql .= "                                    2                             \n";
+    $stSql .= "                                  ELSE                            \n";
+    $stSql .= "                                    3                             \n";
+    $stSql .= "                                  END as tipo_pessoa              \n";
     $stSql .= "                             FROM sw_cgm sc                       \n";
     $stSql .= "                  LEFT OUTER JOIN sw_cgm_pessoa_juridica scpj     \n";
     $stSql .= "                               ON sc.numcgm = scpj.numcgm         \n";
@@ -708,8 +689,6 @@ function recuperaRescisaoContratual(&$rsRecordSet, $stFiltro)
     $stSql .= "       , c.vl_acrescimo                    \n";
     $stSql .= "       , c.vl_decrescimo                   \n";
     $stSql .= "       , c.dt_rescisao                     \n";
-//    $stSql .= "       , c.dt_rescisao                     \n";
-//    $stSql .= "       , c.vl_cancelamento                 \n";
     $stSql .= "       , c.vl_final_contrato               \n";
     $stSql .= "       , c.vl_contratual                   \n";
     $stSql .= "       , nro_sequencial                    \n";
@@ -718,7 +697,6 @@ function recuperaRescisaoContratual(&$rsRecordSet, $stFiltro)
     $stSql .= "       , c.nro_contrato                    \n";
     $stSql .= "       , c.exercicio                       \n";
     $stSql .= "       , c.numero_termo                    \n";
-//    $stSql .= "       , eea.dt_cancelamento               \n";
 
     $this->setDebug( $stSql );
 
@@ -752,8 +730,6 @@ function montaRecuperaRescisaoContratual()
     $stSql .= "              , ce.cod_empenho                                    \n";
     $stSql .= "              , c.cod_tipo                                        \n";
     $stSql .= "              , TO_CHAR(dt_rescisao,'dd/mm/yyyy') AS dt_rescisao      \n";
-//    $stSql .= "              , c.dt_rescisao AS dt_cancelamento                                 \n";
-//  $stSql .= "              , c.vl_cancelamento                                 \n";
     $stSql .= "              , c.vl_final_contrato                               \n";
     $stSql .= "              , c.cod_tipo                                        \n";
     $stSql .= "              , 0 as nro_sequencial                               \n";

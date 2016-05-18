@@ -33,7 +33,7 @@
     * @package URBEM
     * @subpackage Mapeamento
 
-    $Id: TTGOCTB.class.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: TTGOCTB.class.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -62,16 +62,10 @@ class TTGOCTB extends Persistente
         , '01' as num_unidade
         , c.num_conta_corrente
         , c.num_banco
-        , c.num_agencia";
-    if ($this->getDado('exercicio') > 2010 ) {
-        $stSql .= ",c.digito ";
-    }
-    if ( $this->getDado('exercicio') < 2014 ) {
-        $stSql .= "
-            , SUM(c.vl_saidas) as vl_saidas
-            , SUM(c.vl_entradas) as vl_entradas
-        ";
-    } else if ( $this->getDado('exercicio') >= 2014 && $this->getDado('inMesGeracao') == 1 ) {
+        , c.num_agencia
+        ,c.digito ";
+
+    if ( $this->getDado('inMesGeracao') == 1 ) {
         $stSql .= "
             , SUM(c.vl_saidas) + SUM(c.saldo_inicial) as vl_saidas
             , SUM(c.vl_entradas) + SUM(c.saldo_inicial) as vl_entradas
@@ -86,43 +80,11 @@ class TTGOCTB extends Persistente
     $stSql .= "	
         , SUM(c.saldo_inicial) as saldo_inicial
         , SUM(c.saldo_final) as saldo_final
-        , c.tipo_conta";
-    if ($this->getDado('exercicio') < 2011 ) {
-    $stSql .= ",  c.nom_conta";
-    }
-    $stSql .= "	 FROM  (
+        , c.tipo_conta
+    	 FROM  (
                SELECT  '10'::int  AS  tipo_registro
-                    ,  num_orgao";
-    if ($this->getDado('exercicio') < 2011 ) {
-        $stSql .="            ,  CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                            THEN '999999999999'
-                            ELSE REPLACE(conta_corrente,'-','')
-                       END AS num_conta_corrente
-                    ,  CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                            THEN '999999'
-                            ELSE REPLACE(agencia.num_agencia,'-','')
-                       END AS num_agencia
-                    ,  CASE WHEN (SUBSTR(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                            THEN '999'
-                            ELSE banco.num_banco
-                       END AS num_banco,
-               '0'::int as digito";
-    } elseif ($this->getDado('exercicio') < '2013') {
-        $stSql .= "     ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                then '999999999999'
-               else ltrim(split_part(conta_corrente,'-',1),'0')
-             end   as num_conta_corrente
-           ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-              then '999'
-              else num_banco
-            end
-           ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-              then '999999'
-               else ltrim(replace(num_agencia,'-',''),'0')
-             end  as num_agencia
-            , ltrim(split_part(conta_corrente,'-',2),'0') AS digito";
-    } else {
-       $stSql .= " , CASE WHEN ltrim(replace(num_agencia,'-',''),'9') = '' AND num_banco = '999' THEN
+                    ,  num_orgao
+                    , CASE WHEN ltrim(replace(num_agencia,'-',''),'9') = '' AND num_banco = '999' THEN
                         '999999999999'
                       ELSE
                         ltrim(split_part(conta_corrente,'-',1),'0')
@@ -130,37 +92,17 @@ class TTGOCTB extends Persistente
                 ,num_banco
                 ,ltrim(replace(num_agencia,'-',''),'0') as num_agencia
                 , ltrim(split_part(conta_corrente,'-',2),'0') AS digito
-                ";
-    }
-     $stSql .= "    ,  plano_conta.nom_conta
-                    ,  plano_analitica.cod_plano
-                    ,  plano_analitica.exercicio
-                    ";
-                    if ($this->getDado('exercicio') > '2012') {
-                      $stSql .= "
+                ,  plano_conta.nom_conta
+                ,  plano_analitica.cod_plano
+                ,  plano_analitica.exercicio
                           , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                                     '03'
                                WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                                     '02'
                                ELSE
                                     '01'
-                          END as tipo_conta ";
-                    } else {
-                      $stSql .= "
-                          , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                                '03'
-                                           WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                              OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                                '02'
-                                           ELSE
-                                                '01'
-                                      END as tipo_conta
-                        ";
-                    }
-                    $stSql .= "
+                          END as tipo_conta
                     ,  '0'  AS  numero_sequencial
-
                     ,  (   SELECT  SUM(
                                            (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
                                                  FROM  contabilidade.conta_debito
@@ -226,10 +168,6 @@ class TTGOCTB extends Persistente
                             WHERE  pa.cod_plano = plano_analitica.cod_plano
                               AND  pa.exercicio = plano_analitica.exercicio
                        ) * -1  AS  vl_saidas
-
-
-
-
                     ,  (   SELECT  SUM(
                                            (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
                                                  FROM  contabilidade.conta_debito
@@ -301,8 +239,6 @@ class TTGOCTB extends Persistente
                             WHERE  pa.cod_plano = plano_analitica.cod_plano
                               AND  pa.exercicio = plano_analitica.exercicio
                        )   AS  saldo_inicial
-
-
                     ,  (   SELECT  SUM(
                                            (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
                                                  FROM  contabilidade.conta_debito
@@ -358,8 +294,6 @@ class TTGOCTB extends Persistente
                             WHERE  pa.cod_plano = plano_analitica.cod_plano
                               AND  pa.exercicio = plano_analitica.exercicio
                        )   AS  saldo_final
-
-
                  FROM  tcmgo.orgao_plano_banco
            INNER JOIN  contabilidade.plano_banco
                    ON  plano_banco.cod_plano = orgao_plano_banco.cod_plano
@@ -411,14 +345,9 @@ class TTGOCTB extends Persistente
                 , c.num_orgao
                        , c.num_conta_corrente
                  , c.num_banco
-            , c.num_agencia";
-    if ($this->getDado('exercicio') > 2010 ) {
-           $stSql .= ",c.digito ";
-    }
-    $stSql .= "     , c.tipo_conta";
-    if ($this->getDado('exercicio') < 2011 ) {
-    $stSql .= ",  c.nom_conta";
-    }
+            , c.num_agencia
+            , c.digito
+            , c.tipo_conta";
 
         return $stSql;
     }
@@ -448,9 +377,7 @@ class TTGOCTB extends Persistente
       , c.tipo_conta
   FROM  (
       SELECT  '11'::int  AS  tipo_registro
-                ,  num_orgao ";
-          if ($this->getDado('exercicio') > '2012') {
-            $stSql .= "
+                ,  num_orgao
                 ,CASE WHEN split_part(conta_corrente,'-',1) LIKE  '99999%' THEN
                     '999999999999'
                 ELSE
@@ -458,49 +385,16 @@ class TTGOCTB extends Persistente
                 END AS num_conta_corrente
                 ,num_banco
                 ,ltrim(replace(num_agencia,'-',''),'0') as num_agencia
-            ";
-          } else {
-            $stSql .= "
-                ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                  then '999999999999'
-                     else ltrim(split_part(conta_corrente,'-',1),'0')
-                   end   as num_conta_corrente
-                 ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                    then '999'
-                    else num_banco
-                  end
-                 ,case when (substr(plano_conta.cod_estrutural,1,9) = '1.1.1.1.1')
-                    then '999999'
-                     else ltrim(replace(num_agencia,'-',''),'0')
-                   end  as num_agencia ";
-          }
-          $stSql .= "
-            , ltrim(split_part(conta_corrente,'-',2),'0') AS digito
+                , ltrim(split_part(conta_corrente,'-',2),'0') AS digito
                 ,  plano_analitica.cod_plano
-                ,  plano_analitica.exercicio ";
-          if ($this->getDado('exercicio') > '2012') {
-            $stSql .= "
+                ,  plano_analitica.exercicio
                 , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 12) = '1.1.1.1.1.01') THEN
                           '03'
                      WHEN (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.4') THEN
                           '02'
                      ELSE
                           '01'
-                END as tipo_conta ";
-          } else {
-            $stSql .= "
-                , CASE WHEN (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.1') THEN
-                                      '03'
-                                 WHEN ((substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.3')
-                                    OR (substr(plano_conta.cod_estrutural, 1, 5) = '1.1.5')
-                                    OR (substr(plano_conta.cod_estrutural, 1, 9) = '1.1.1.1.4')) THEN
-                                      '02'
-                                 ELSE
-                                      '01'
-                            END as tipo_conta
-              ";
-          }
-          $stSql .= "
+                END as tipo_conta
                 , recurso.cod_fonte as fonte
                 ,  '0'  AS  numero_sequencial
 
@@ -569,10 +463,6 @@ class TTGOCTB extends Persistente
                         WHERE  pa.cod_plano = plano_analitica.cod_plano
                           AND  pa.exercicio = plano_analitica.exercicio
                    ) * -1  AS  vl_saidas
-
-
-
-
                 ,  (   SELECT  SUM(
                                        (   SELECT  COALESCE(SUM(valor_lancamento.vl_lancamento),0.00) as vl_total
                                              FROM  contabilidade.conta_debito

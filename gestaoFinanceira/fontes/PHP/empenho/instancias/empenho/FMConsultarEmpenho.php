@@ -32,7 +32,7 @@
 
     * @ignore
 
-    $Id: FMConsultarEmpenho.php 65158 2016-04-28 19:26:54Z evandro $
+    $Id: FMConsultarEmpenho.php 65311 2016-05-11 20:42:32Z michel $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
@@ -237,16 +237,17 @@ $arItens = array();
 foreach ($arItemPreEmpenho as $inCount => $obItemPreEmpenho) {
     $arItens[$inCount]['num_item']     = $obItemPreEmpenho->getNumItem();
     if($obItemPreEmpenho->getCodItemPreEmp()!=''){
-        $inCodMarca = $obItemPreEmpenho->getCodigoMarca();
-        if (!empty($inCodMarca)) {
-            $stDescricaoItemMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', " WHERE cod_marca = ".$inCodMarca, $boTransacao);
-            $arItens[$inCount]['nom_item'] = $obItemPreEmpenho->getCodItemPreEmp()." - ".stripslashes($obItemPreEmpenho->getNomItem())." (Marca: ".$inCodMarca." - ".$stDescricaoItemMarca.")";
-        }else{
-            $arItens[$inCount]['nom_item'] = $obItemPreEmpenho->getCodItemPreEmp()." - ".stripslashes($obItemPreEmpenho->getNomItem());            
-        }
+        $arItens[$inCount]['nom_item'] = $obItemPreEmpenho->getCodItemPreEmp()." - ".stripslashes($obItemPreEmpenho->getNomItem());
     }else{
         $arItens[$inCount]['nom_item'] = stripslashes($obItemPreEmpenho->getNomItem());
     }
+
+    $inCodMarca = $obItemPreEmpenho->getCodigoMarca();
+    if (!empty($inCodMarca)) {
+        $stDescricaoItemMarca = SistemaLegado::pegaDado('descricao', 'almoxarifado.marca', " WHERE cod_marca = ".$inCodMarca, $boTransacao);
+        $arItens[$inCount]['nom_item'] .= " (Marca: ".$inCodMarca." - ".$stDescricaoItemMarca.")";
+    }
+
     $arItens[$inCount]['complemento']  = stripslashes($obItemPreEmpenho->getComplemento());
     $arItens[$inCount]['quantidade']   = $obItemPreEmpenho->getQuantidade();
     $arItens[$inCount]['cod_unidade']  = $obItemPreEmpenho->obRUnidadeMedida->getCodUnidade();

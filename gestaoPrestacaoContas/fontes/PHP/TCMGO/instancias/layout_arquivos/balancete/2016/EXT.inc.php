@@ -31,7 +31,7 @@
 
     * @ignore
 
-    $Id: EXT.inc.php 65190 2016-04-29 19:36:51Z michel $
+    $Id: EXT.inc.php 65220 2016-05-03 21:30:22Z michel $
 
     * Casos de uso: uc-06.04.00
 */
@@ -62,9 +62,7 @@ $inSequencial = SistemaLegado::pegaDado("sequencial", "tcmgo.arquivo_ext", "WHER
 //tipo10
 foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
     $stChave = $arExtraOrcamentarias['orgao'].$arExtraOrcamentarias['categoria'].$arExtraOrcamentarias['tipo_lancamento'].$arExtraOrcamentarias['sub_tipo_lancamento'].$arExtraOrcamentarias['desdobra_subtipo'];
-    if (Sessao::getExercicio() > 2012) {
-        $stChave .= $arExtraOrcamentarias['nro_extra_orcamentaria'];
-    }
+    $stChave .= $arExtraOrcamentarias['nro_extra_orcamentaria'];
 
     if ($arExtraOrcamentarias['sequencial'] == "") {
         if ($inCodContaAnterior == 0) {
@@ -113,11 +111,9 @@ foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2 );
 
-    if (Sessao::getExercicio() > '2011') {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-    }
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
     $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("categoria");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -131,83 +127,126 @@ foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
     $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
 
-    if (Sessao::getExercicio() > 2008) {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desdobra_subtipo");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desdobra_subtipo");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
 
-        if (Sessao::getExercicio() > 2012) {
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 50 );
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_lancamento");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+
+    /* REGISTRO 11 MOVIMENTAÇÃO FINANCEIRA */
+    foreach ($rsMovimentacaoFinanceira->arElementos as $arMovimentacaoFinanceira) {
+        $stChaveElemento11 = $arMovimentacaoFinanceira['orgao'].$arMovimentacaoFinanceira['categoria'].$arMovimentacaoFinanceira['tipo_lancamento'].$arMovimentacaoFinanceira['sub_tipo_lancamento'].$arMovimentacaoFinanceira['desdobra_subtipo'];
+        $stChaveElemento11 .= $arMovimentacaoFinanceira['nro_extra_orcamentaria'];
+
+        if ($stChave == $stChaveElemento11) {
+            $arMovimentacaoFinanceira['sequencial'] = $arExtraOrcamentarias['sequencial'];
+
+            $stChaveElemento11 .= $arMovimentacaoFinanceira['banco'].$arMovimentacaoFinanceira['agencia'].$arMovimentacaoFinanceira['conta_corrente'].$arMovimentacaoFinanceira['digito'];
+
+            $arMovimentacaoFinanceira['numero_registro'] = ++$inCount;
+
+            $rsBloco = 'rsBloco_'.$inCount;
+            unset($$rsBloco);
+            $$rsBloco = new RecordSet();
+            $$rsBloco->preenche(array($arMovimentacaoFinanceira));
+
+            $obExportador->roUltimoArquivo->addBloco($$rsBloco);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 2 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("orgao");//receita nao tem orgao
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("categoria");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_lancamento");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sub_tipo_lancamento");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desdobra_subtipo");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
+
             $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("banco");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 3 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("agencia");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 4 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 12 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("digito");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 1 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 26 );
+
+            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
             $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
         }
 
-        if (Sessao::getExercicio() < 2011) {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_lote");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-        }
+        /* TIPO REGISTRO 12 -- DETALHAMENTOS DAS FONTES DE RECURSOS*/
+        $i = 0;
+        foreach ($rsDetalhamentoFonteRecurso->arElementos as $arDetalhamentoFonteRecurso) {
+            $stChaveElemento12 = $arDetalhamentoFonteRecurso['orgao'].$arDetalhamentoFonteRecurso['categoria'].$arDetalhamentoFonteRecurso['tipo_lancamento'].$arDetalhamentoFonteRecurso['sub_tipo_lancamento'].$arDetalhamentoFonteRecurso['desdobra_subtipo'].$arDetalhamentoFonteRecurso['nro_extra_orcamentaria'].$arDetalhamentoFonteRecurso['banco'].$arDetalhamentoFonteRecurso['agencia'].$arDetalhamentoFonteRecurso['conta_corrente'].$arDetalhamentoFonteRecurso['digito'];
 
-        if (Sessao::getExercicio() > 2011) {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 50 );
-        } else {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 52 );
-        }
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_lancamento");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-    } else {
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("nom_conta");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 52 );
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("dt_lote");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("DATA_DDMMYYYY");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(8);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vl_lancamento");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 1 );
-
-        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-    }
-
-    /* REGISTRO 11 MOVIMENTAÇÃO FINANCEIRA */
-    if (Sessao::getExercicio() > 2010) {
-
-        foreach ($rsMovimentacaoFinanceira->arElementos as $arMovimentacaoFinanceira) {
-            $stChaveElemento11 = $arMovimentacaoFinanceira['orgao'].$arMovimentacaoFinanceira['categoria'].$arMovimentacaoFinanceira['tipo_lancamento'].$arMovimentacaoFinanceira['sub_tipo_lancamento'].$arMovimentacaoFinanceira['desdobra_subtipo'];
-
-            if (Sessao::getExercicio() > 2012) {
-                $stChaveElemento11 .= $arMovimentacaoFinanceira['nro_extra_orcamentaria'];
-            }
-
-            if ($stChave == $stChaveElemento11) {
-                if (Sessao::getExercicio() > 2012) {
-                    $arMovimentacaoFinanceira['sequencial'] = $arExtraOrcamentarias['sequencial'];
-                }
-                $stChaveElemento11 .= $arMovimentacaoFinanceira['banco'].$arMovimentacaoFinanceira['agencia'].$arMovimentacaoFinanceira['conta_corrente'].$arMovimentacaoFinanceira['digito'];
-
-                $arMovimentacaoFinanceira['numero_registro'] = ++$inCount;
+            if ($stChaveElemento11 === $stChaveElemento12) {
+                $arDetalhamentoFonteRecurso['sequencial'] = $arExtraOrcamentarias['sequencial'];
+                $arDetalhamentoFonteRecurso['numero_registro'] = ++$inCount;
 
                 $rsBloco = 'rsBloco_'.$inCount;
                 unset($$rsBloco);
                 $$rsBloco = new RecordSet();
-                $$rsBloco->preenche(array($arMovimentacaoFinanceira));
+                $$rsBloco->preenche(array($arDetalhamentoFonteRecurso));
 
                 $obExportador->roUltimoArquivo->addBloco($$rsBloco);
 
@@ -219,11 +258,9 @@ foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2 );
 
-                if (Sessao::getExercicio() > '2011') {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("categoria");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -241,17 +278,13 @@ foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
 
-                if (Sessao::getExercicio() > 2012) {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
 
-                if (Sessao::getExercicio() > '2011') { //manda novamente a unidade como unidade financeira
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("banco");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
@@ -269,142 +302,27 @@ foreach ($rsExtraOrcamentarias->arElementos as $arExtraOrcamentarias) {
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 1 );
 
-                if (Sessao::getExercicio() > '2011') {
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
+
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_fonte");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 6 );
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
 
-        if (Sessao::getExercicio() > '2011') {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 26 );
-        } else {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 30 );
-        }
+                $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+                $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 20 );
 
                 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
                 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
             }
-
-            /* TIPO REGISTRO 12 -- DETALHAMENTOS DAS FONTES DE RECURSOS*/
-$i = 0;
-            foreach ($rsDetalhamentoFonteRecurso->arElementos as $arDetalhamentoFonteRecurso) {
-
-                if (Sessao::getExercicio() > 2012) {
-                    $stChaveElemento12 = $arDetalhamentoFonteRecurso['orgao'].$arDetalhamentoFonteRecurso['categoria'].$arDetalhamentoFonteRecurso['tipo_lancamento'].$arDetalhamentoFonteRecurso['sub_tipo_lancamento'].$arDetalhamentoFonteRecurso['desdobra_subtipo'].$arDetalhamentoFonteRecurso['nro_extra_orcamentaria'].$arDetalhamentoFonteRecurso['banco'].$arDetalhamentoFonteRecurso['agencia'].$arDetalhamentoFonteRecurso['conta_corrente'].$arDetalhamentoFonteRecurso['digito'];
-                } else {
-                    $stChaveElemento12 = $arDetalhamentoFonteRecurso['orgao'].$arDetalhamentoFonteRecurso['categoria'].$arDetalhamentoFonteRecurso['tipo_lancamento'].$arDetalhamentoFonteRecurso['sub_tipo_lancamento'].$arDetalhamentoFonteRecurso['desdobra_subtipo'].$arDetalhamentoFonteRecurso['banco'].$arDetalhamentoFonteRecurso['agencia'].$arDetalhamentoFonteRecurso['conta_corrente'].$arDetalhamentoFonteRecurso['digito'];
-                }
-
-                if ($stChaveElemento11 === $stChaveElemento12) {
-                    if (Sessao::getExercicio() > 2012) {
-                        $arDetalhamentoFonteRecurso['sequencial'] = $arExtraOrcamentarias['sequencial'];
-                    }
-                    $arDetalhamentoFonteRecurso['numero_registro'] = ++$inCount;
-
-                    $rsBloco = 'rsBloco_'.$inCount;
-                    unset($$rsBloco);
-                    $$rsBloco = new RecordSet();
-                    $$rsBloco->preenche(array($arDetalhamentoFonteRecurso));
-
-                    $obExportador->roUltimoArquivo->addBloco($$rsBloco);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 2 );
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("orgao");//receita nao tem orgao
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2 );
-
-                    if (Sessao::getExercicio() > '2011') {
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                    }
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("categoria");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(1);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_lancamento");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(2);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sub_tipo_lancamento");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("desdobra_subtipo");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(3);
-
-                    if (Sessao::getExercicio() > 2012) {
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("sequencial");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-                    }
-
-                    if (Sessao::getExercicio() > '2011') { //manda novamente a unidade como unidade financeira
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("num_unidade");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                    }
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("banco");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 3 );
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("agencia");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 4 );
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("conta_corrente");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 12 );
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("digito");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 1 );
-
-                    if (Sessao::getExercicio() > '2011') {
-                        $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_conta");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ZEROS_ESQ");
-                        $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
-                    }
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("cod_fonte");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 6 );
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("valor");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-            if (Sessao::getExercicio() > '2011') {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 20 );
-            } else {
-            $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("branco");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-            $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo( 24 );
-            }
-
-                    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
-                    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(6);
-                }
-$i++;
-            }
+            $i++;
         }
     }
 }
@@ -491,49 +409,9 @@ $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("tipo_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(02);
 
-if (Sessao::getExercicio() < 2011) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoExercAntCaixa");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoExercAntBanco");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoExercAntVinculado");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoMesSegCaixa");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoMesSegBanco");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("vlSaldoMesSegVinculado");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("VALOR_ZEROS_ESQ");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(13);
-}
-
-if ((Sessao::getExercicio() > 2008) and (Sessao::getExercicio() < 2011)) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(4);
-} elseif (Sessao::getExercicio() == '2011' ) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(78);
-} elseif (Sessao::getExercicio() > 2012) {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(82);
-} else {
-    $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
-    $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(76);
-}
+$obExportador->roUltimoArquivo->roUltimoBloco->addColuna("brancos");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("CARACTER_ESPACOS_DIR");
+$obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTamanhoFixo(82);
 
 $obExportador->roUltimoArquivo->roUltimoBloco->addColuna("numero_registro");
 $obExportador->roUltimoArquivo->roUltimoBloco->roUltimaColuna->setTipoDado("NUMERICO_ZEROS_ESQ");

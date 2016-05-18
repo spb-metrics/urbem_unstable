@@ -34,7 +34,7 @@
 
  * Casos de uso: uc-03.01.06
 
- $Id: IPopUpBem.class.php 59612 2014-09-02 12:00:51Z gelson $
+ $Id: IPopUpBem.class.php 65343 2016-05-13 17:02:26Z arthur $
 
  */
 
@@ -95,13 +95,14 @@ class IPopUpBem extends BuscaInner
             $stLink = '&boBemBaixado=true';
         }
 
-        $this->setFuncaoBusca("abrePopUp('".CAM_GP_PAT_POPUPS."bem/FLManterBem.php','".$this->obForm->getName()."', '". $this->obCampoCod->stName ."','". $this->stId . "','','" . Sessao::getId().$stLink . "','800','550');");
-
+        if ( $this->getFuncaoBusca() == "")
+            $this->setFuncaoBusca("abrePopUp('".CAM_GP_PAT_POPUPS."bem/FLManterBem.php','".$this->obForm->getName()."', '". $this->obCampoCod->stName ."','". $this->stId . "','','" . Sessao::getId().$stLink . "','800','550');");
+        
         # Teste necessário para poder usar uma validação independente
         # sem passar pelo OCManterBem do Componente.
         if ($this->getValidacao()) {
             $this->obCampoCod->obEvento->setOnBlur($this->getValidacao());
-        } else {
+        } elseif ($this->obCampoCod->obEvento->getOnChange() == "") {
             $this->obCampoCod->obEvento->setOnChange("ajaxJavaScript('".CAM_GP_PAT_POPUPS.'bem/OCManterBem.php?'.Sessao::getId().$stLink."&stNomCampoCod=".$this->obCampoCod->stName."&boMostrarDescricao=".$this->getMostrarDescricao()."&stIdCampoDesc=".$this->stId."&stNomForm=".$this->obForm->getName()."&inCodigo='+this.value, 'buscaPopup');". $this->obCampoCod->obEvento->getOnChange());
         }
 

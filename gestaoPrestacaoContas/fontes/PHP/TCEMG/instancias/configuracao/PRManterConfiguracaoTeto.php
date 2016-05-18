@@ -32,13 +32,14 @@
 
     * @ignore
 
-    * $Id: PRManterConfiguracaoTeto.php 64799 2016-04-01 18:32:14Z michel $
+    * $Id: PRManterConfiguracaoTeto.php 65298 2016-05-10 18:53:52Z jean $
 */
 
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/pacotes/FrameworkHTML.inc.php';
 include_once '../../../../../../gestaoAdministrativa/fontes/PHP/framework/include/cabecalho.inc.php';
 include_once CAM_GRH_FOL_MAPEAMENTO.'TFolhaPagamentoEvento.class.php';
 include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTetoRemuneratorio.class.php";
+include_once CAM_GPC_TCEMG_MAPEAMENTO."TTCEMGTetoRemuneratorioControle.class.php";
 
 //Define o nome dos arquivos PHP
 $stPrograma = "ManterConfiguracaoTeto";
@@ -51,6 +52,8 @@ $pgOcul    = "OC".$stPrograma.".php";
 $stAcao = $request->get("stAcao");
 
 $stModulo = $request->get("hdnStModulo");
+$arListaTetos = Sessao::read('arListaTetos');
+$arListaTetosDelete = Sessao::read('arListaTetosDelete');
 
 switch ($stAcao) {
     default:
@@ -59,34 +62,91 @@ switch ($stAcao) {
         $obErro = $obTransacao->abreTransacao($boFlagTransacao, $boTransacao);
         $obTFolhaPagamentoEvento = new TFolhaPagamentoEvento();
         $obTTCEMGTetoRemuneratorio = new TTCEMGTetoRemuneratorio();
-
-        $obTTCEMGTetoRemuneratorio->setDado("cod_entidade"  ,$request->get('hdnCodEntidade'));
-        $obErro = $obTTCEMGTetoRemuneratorio->exclusao($boTransacao);
+        $obTTCEMGTetoRemuneratorioControle = new TTCEMGTetoRemuneratorioControle();
 
         if (!$obErro->ocorreu()) {
-            $arListaTetos = Sessao::read('arListaTetos');
-
-            foreach ($arListaTetos as $key => $teto) {
-                $obTTCEMGTetoRemuneratorio = new TTCEMGTetoRemuneratorio();
+            foreach ($arListaTetos as $chave => $teto) {
 
                 if (trim($teto['cod_evento']) != "") {
-                    $obErro = $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo = '".$teto['cod_evento']."'", "", $boTransacao);
+                    $obErro = $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo::INTEGER = ".$teto['cod_evento']."::INTEGER", "", $boTransacao);
                     $obTTCEMGTetoRemuneratorio->setDado("cod_evento" , $rsEvento->getCampo('cod_evento'));
-                } else
+                } else {
                     $obTTCEMGTetoRemuneratorio->setDado("cod_evento" , trim($teto['cod_evento']));
-
+                }
+    
+                $obTTCEMGTetoRemuneratorio->setDado("exercicio"    ,$teto['exercicio']);
+                $obTTCEMGTetoRemuneratorio->setDado("cod_entidade" ,$request->get('hdnCodEntidade'));
+                $obTTCEMGTetoRemuneratorio->setDado("vigencia"     ,$teto['vigencia']);
+                $obTTCEMGTetoRemuneratorio->setDado("teto"         ,$teto['teto']);
+                $obTTCEMGTetoRemuneratorio->setDado("justificativa",$teto['justificativa']);
+                $obErro = $obTTCEMGTetoRemuneratorio->recuperaPorChave($rsTeto, $boTransacao);
                 if (!$obErro->ocorreu()) {
-                    $obTTCEMGTetoRemuneratorio->setDado("exercicio"     ,$teto['exercicio']);
-                    $obTTCEMGTetoRemuneratorio->setDado("cod_entidade"  ,$request->get('hdnCodEntidade'));
-                    $obTTCEMGTetoRemuneratorio->setDado("vigencia"      ,$teto['vigencia']);
-                    $obTTCEMGTetoRemuneratorio->setDado("teto"          ,$teto['teto']);
-                    $obTTCEMGTetoRemuneratorio->setDado("justificativa" ,$teto['justificativa']);
 
-                    $obErro = $obTTCEMGTetoRemuneratorio->inclusao($boTransacao);
+                    if ($rsTeto->getNumLinhas() > 0) {
+                        $obErro = $obTTCEMGTetoRemuneratorio->alteracao($boTransacao);
+
+                        if (!$obErro->ocorreu()) {
+
+                            if (($rsTeto->getCampo('cod_evento') != $teto['cod_evento']) ||
+                                ($rsTeto->getCampo('justificativa') != $teto['justificativa']) ||
+                                ($rsTeto->getCampo('teto') != SistemaLegado::formataValorDecimal($teto['teto']))
+                               ) {
+                                $obTTCEMGTetoRemuneratorioControle->setDado("exercicio"   ,$teto['exercicio']);
+                                $obTTCEMGTetoRemuneratorioControle->setDado("cod_entidade",$request->get('hdnCodEntidade'));
+                                $obTTCEMGTetoRemuneratorioControle->setDado("vigencia"    ,$teto['vigencia']);
+                                $obTTCEMGTetoRemuneratorioControle->setDado("teto"        ,$teto['teto']);
+                                $obErro = $obTTCEMGTetoRemuneratorioControle->recuperaPorChave($rsTetoControle, $boTransacao);
+        
+                                if (!$obErro->ocorreu()) {
+        
+                                    if ($rsTetoControle->getNumLinhas() > 0) {
+                                        $obErro = $obTTCEMGTetoRemuneratorioControle->alteracao($boTransacao);
+                                    } else {
+                                        $obErro = $obTTCEMGTetoRemuneratorioControle->inclusao($boTransacao);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $obErro = $obTTCEMGTetoRemuneratorio->inclusao($boTransacao);
+                    }
                 }
 
-                if ($obErro->ocorreu())
+                if ($obErro->ocorreu()) {
                     break;
+                }
+            }
+        }
+
+        if (!$obErro->ocorreu()) {
+            if ($arListaTetosDelete != "") {
+                foreach ($arListaTetosDelete as $chave => $teto) {
+                    if (trim($teto['cod_evento']) != "") {
+                        $obErro = $obTFolhaPagamentoEvento->recuperaTodos($rsEvento, " WHERE codigo::INTEGER = ".$teto['cod_evento']."::INTEGER", "", $boTransacao);
+                        $obTTCEMGTetoRemuneratorio->setDado("cod_evento" , $rsEvento->getCampo('cod_evento'));
+                    } else {
+                        $obTTCEMGTetoRemuneratorio->setDado("cod_evento" , trim($teto['cod_evento']));
+                    }
+    
+                    $obTTCEMGTetoRemuneratorioControle->setDado("exercicio"   ,$teto['exercicio']);
+                    $obTTCEMGTetoRemuneratorioControle->setDado("cod_entidade",$request->get('hdnCodEntidade'));
+                    $obTTCEMGTetoRemuneratorioControle->setDado("vigencia"    ,$teto['vigencia']);
+                    $obTTCEMGTetoRemuneratorioControle->setDado("teto"        ,$teto['teto']);
+                    $obErro = $obTTCEMGTetoRemuneratorio->exclusao($boTransacao);
+    
+                    if (!$obErro->ocorreu()) {
+                        $obTTCEMGTetoRemuneratorio->setDado("exercicio"    ,$teto['exercicio']);
+                        $obTTCEMGTetoRemuneratorio->setDado("cod_entidade" ,$request->get('hdnCodEntidade'));
+                        $obTTCEMGTetoRemuneratorio->setDado("vigencia"     ,$teto['vigencia']);
+                        $obTTCEMGTetoRemuneratorio->setDado("teto"         ,$teto['teto']);
+                        $obTTCEMGTetoRemuneratorio->setDado("justificativa",$teto['justificativa']);
+                        $obErro = $obTTCEMGTetoRemuneratorio->exclusao($boTransacao);
+                    }
+    
+                    if ($obErro->ocorreu()) {
+                        break;
+                    }
+                }
             }
         }
 
